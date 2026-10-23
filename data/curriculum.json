@@ -1,0 +1,1071 @@
+{
+ "phases": [
+  {
+   "n": 0,
+   "title": "Fondations : machines et performance",
+   "weeks_hint": "semaines 1-5",
+   "goal": "Lire une machine et prédire sa performance avant de la mesurer."
+  },
+  {
+   "n": 1,
+   "title": "Calcul parallèle et GPU",
+   "weeks_hint": "semaines 6-11",
+   "goal": "Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU."
+  },
+  {
+   "n": 2,
+   "title": "Exploiter un cluster",
+   "weeks_hint": "semaines 12-22",
+   "goal": "Provisionner, ordonnancer, relier et alimenter en données un cluster GPU."
+  },
+  {
+   "n": 3,
+   "title": "Systèmes d'entraînement distribué",
+   "weeks_hint": "semaines 23-31",
+   "goal": "Faire tourner un entraînement multi-nœuds qui survit aux pannes."
+  },
+  {
+   "n": 4,
+   "title": "Plateforme cloud-native et multi-fournisseurs",
+   "weeks_hint": "semaines 32-41",
+   "goal": "Placer, observer et facturer des charges sur plusieurs fournisseurs."
+  },
+  {
+   "n": 5,
+   "title": "Production et leadership",
+   "weeks_hint": "semaines 42-48",
+   "goal": "Opérer en production, décider, négocier, diriger et passer l'entretien."
+  }
+ ],
+ "modules": [
+  {
+   "id": "linux-systems",
+   "number": 1,
+   "phase": 0,
+   "hours": 24,
+   "level": 1,
+   "status": "skim",
+   "title": "Linux, systèmes et diagnostic de performance",
+   "summary": "Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.",
+   "prerequisites": [],
+   "outcomes": [
+    "Cartographier une machine (CPU, NUMA, PCIe, NIC, GPU) et dire quel chemin les données empruntent",
+    "Expliquer cgroups v2 et namespaces, et ce que Slurm et Kubernetes en font",
+    "Mener un diagnostic de nœud lent avec la méthode USE et les outils standard",
+    "Écrire un script d'exploitation Bash/Python robuste (codes retour, idempotence, journalisation)"
+   ],
+   "chapters": [
+    "Modèle d'exécution Linux : processus, signaux, ordonnanceur, mémoire virtuelle, page cache, OOM killer",
+    "cgroups v2 et namespaces : hiérarchie, contrôleurs cpu/memory/io, ce que font conteneurs et ordonnanceurs",
+    "Topologie matérielle et NUMA : lscpu, hwloc, numactl, affinités, topologie PCIe, nvidia-smi topo",
+    "Mesurer avant d'optimiser : méthode USE, perf, vmstat/iostat/sar, flamegraphs, introduction à bpftrace",
+    "systemd, journald, limites (memlock, nofile), hugepages, paramètres noyau utiles aux nœuds de calcul",
+    "Réseau Linux : ip, ss, ethtool, MTU, bonding, tc ; premiers pas RDMA (renvoi au module réseau)",
+    "Stockage Linux : blocs, NVMe, xfs/ext4, fio, page cache, O_DIRECT",
+    "Pannes matérielles vues du système : dmesg, EDAC/ECC, SMART, ipmitool/Redfish ; scripts d'exploitation robustes"
+   ],
+   "labs": [
+    {
+     "id": "machine-map",
+     "title": "Cartographier une machine",
+     "kind": "sandbox",
+     "idea": "Script qui produit un rapport JSON (CPU, NUMA, mémoire, disques, interfaces) à partir de lscpu/numactl/sysfs ; tests sur la sortie."
+    },
+    {
+     "id": "cgroup-limits",
+     "title": "cgroups v2 à la main",
+     "kind": "sandbox",
+     "idea": "Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire."
+    },
+    {
+     "id": "fio-pagecache",
+     "title": "fio et page cache",
+     "kind": "sandbox",
+     "idea": "Mesurer lecture/écriture avec et sans page cache, comprendre O_DIRECT ; script qui compare et trace."
+    }
+   ],
+   "facts": [
+    "Brendan Gregg, méthode USE et Systems Performance (2e éd., 2020)",
+    "Documentation noyau cgroup v2 (kernel.org)",
+    "Comportement du OOM killer et de memory.max"
+   ],
+   "feeds": [
+    "homelab-slurm"
+   ]
+  },
+  {
+   "id": "perf-models",
+   "number": 2,
+   "phase": 0,
+   "hours": 24,
+   "level": 1,
+   "status": "core",
+   "title": "Architecture matérielle et modèles de performance",
+   "summary": "Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.",
+   "prerequisites": [],
+   "outcomes": [
+    "Calculer l'intensité arithmétique d'un noyau et le situer sur un roofline",
+    "Prédire le gain maximal d'une parallélisation (Amdahl, Gustafson) et le comparer à une mesure",
+    "Estimer le temps d'un all-reduce avec le modèle α-β puis le valider par une mesure",
+    "Calculer le MFU d'un entraînement à partir de ses FLOP et de son temps par pas"
+   ],
+   "chapters": [
+    "Du transistor au nœud : cœurs, SIMD, hiérarchie mémoire, bande passante, latence",
+    "Le GPU vu comme machine à débit : SM, warps, HBM, tenseurs ; comparaison CPU/GPU",
+    "Mesurer proprement : benchmarks, variance, warm-up, minimum vs médiane, STREAM, GEMM",
+    "Le modèle roofline : intensité arithmétique, bornes mémoire et calcul, lecture de profils",
+    "Passage à l'échelle : loi d'Amdahl, loi de Gustafson, scalabilité forte et faible, efficacité parallèle",
+    "Le modèle de communication α-β (Hockney) et les collectives : arbre, anneau, bande passante optimale",
+    "FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres/optimiseur/activations",
+    "Études de passage à l'échelle reproductibles : plan d'expérience, tracé, rapport honnête"
+   ],
+   "labs": [
+    {
+     "id": "stream-gemm",
+     "title": "STREAM et GEMM : bandes passantes et pic",
+     "kind": "sandbox",
+     "idea": "Mesurer la bande passante mémoire et le débit GEMM de la machine (NumPy), tracer son roofline, comparer au pic théorique du CPU."
+    },
+    {
+     "id": "allreduce-model",
+     "title": "α-β : prédire puis mesurer",
+     "kind": "sandbox",
+     "idea": "Avec torch.distributed gloo sur 4 processus : mesurer des all-reduce de tailles variées, ajuster α et β par régression, comparer la prédiction du modèle en anneau."
+    },
+    {
+     "id": "mfu-calculator",
+     "title": "Calculateur de MFU",
+     "kind": "sandbox",
+     "idea": "Outil Python testé qui calcule FLOP/pas d'un transformeur donné et MFU à partir d'un temps mesuré ; cas de test tirés de valeurs publiées et citées."
+    }
+   ],
+   "facts": [
+    "Williams, Waterman, Patterson (2009), roofline, CACM",
+    "Hockney (1994) et Thakur et al. (2005) pour les collectives",
+    "Chowdhery et al. (PaLM, 2022) pour la définition du MFU",
+    "FLOP de l'attention : formules de Kaplan et al. 2020 / Megatron-LM"
+   ],
+   "feeds": [
+    "scaling-study",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "parallel-programming",
+   "number": 3,
+   "phase": 1,
+   "hours": 30,
+   "level": 2,
+   "status": "core",
+   "title": "Programmation parallèle : OpenMP, MPI et études de passage à l'échelle",
+   "summary": "Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.",
+   "prerequisites": [
+    "perf-models"
+   ],
+   "outcomes": [
+    "Paralléliser une boucle avec OpenMP en justifiant partage, réduction et ordonnancement",
+    "Écrire un programme MPI avec communications point-à-point et collectives, sans interblocage",
+    "Mener une étude de scalabilité forte et faible et expliquer l'écart au modèle",
+    "Relier les collectives MPI à ce que NCCL fait pour l'entraînement"
+   ],
+   "chapters": [
+    "Parallélisme : tâches, données, pipeline ; mémoire partagée contre mémoire distribuée",
+    "OpenMP : régions parallèles, partage, réductions, ordonnancement, faux partage, tâches",
+    "MPI, les bases : rangs, communicateurs, point-à-point bloquant et non bloquant, interblocages",
+    "MPI, les collectives : broadcast, reduce, allreduce, alltoall ; algorithmes et coûts",
+    "Décomposition de domaine, halos et recouvrement calcul/communication",
+    "E/S parallèles et reproductibilité numérique : MPI-IO, sommes non associatives, graines",
+    "Hybride MPI+OpenMP, placement et binding ; lancement sous Slurm",
+    "Étudier la scalabilité : plan d'expérience, efficacité, goulots, rapport"
+   ],
+   "labs": [
+    {
+     "id": "openmp-reduction",
+     "title": "OpenMP : réduction et faux partage",
+     "kind": "sandbox",
+     "idea": "Programme C avec OpenMP : somme, faux partage, effet du schedule ; mesures et comparaison au modèle."
+    },
+    {
+     "id": "mpi-ring",
+     "title": "MPI : anneau, halo et all-reduce",
+     "kind": "sandbox",
+     "idea": "Implémenter un all-reduce en anneau à la main avec MPI (OpenMPI/mpi4py dans le bac à sable, 4 rangs locaux), comparer à MPI_Allreduce."
+    },
+    {
+     "id": "jacobi-scaling",
+     "title": "Jacobi 2D : étude de scalabilité",
+     "kind": "sandbox",
+     "idea": "Solveur Jacobi avec décomposition de domaine ; scalabilité forte/faible sur les cœurs disponibles ; tracé et analyse."
+    }
+   ],
+   "facts": [
+    "Norme MPI (mpi-forum.org), spécification OpenMP (openmp.org)",
+    "Patarasuk & Yuan (2009), all-reduce optimal en bande passante",
+    "Cours de référence cités par les masters (EPCC, Berkeley CS267)"
+   ],
+   "feeds": [
+    "scaling-study"
+   ]
+  },
+  {
+   "id": "gpu-programming",
+   "number": 4,
+   "phase": 1,
+   "hours": 30,
+   "level": 2,
+   "status": "core",
+   "title": "Programmation GPU : CUDA, Triton et profilage",
+   "summary": "Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.",
+   "prerequisites": [
+    "perf-models"
+   ],
+   "outcomes": [
+    "Écrire un noyau CUDA (Numba) avec mémoire partagée et le comparer à une version vectorisée",
+    "Expliquer la coalescence, l'occupation et la divergence de warps sur un exemple chiffré",
+    "Lire un profil Nsight/PyTorch Profiler et nommer le goulot (calcul, mémoire, lancement)",
+    "Expliquer ce qu'apporte FlashAttention, la fusion de noyaux et la précision mixte"
+   ],
+   "chapters": [
+    "Le modèle d'exécution CUDA : grille, blocs, warps, SM ; synchronisation",
+    "Hiérarchie mémoire GPU : globale, partagée, registres, constantes ; coalescence et conflits de bancs",
+    "Écrire des noyaux : réduction, produit matriciel par tuiles, scan ; erreurs classiques",
+    "Streams, événements, copies asynchrones, mémoire épinglée, recouvrement transfert/calcul",
+    "Triton : programmer par blocs, auto-réglage, quand préférer Triton à CUDA",
+    "Précision numérique : FP32, TF32, BF16, FP16, FP8 ; sommes, mise à l'échelle de perte, déterminisme",
+    "Profiler : Nsight Systems/Compute, PyTorch Profiler, métriques clés, lecture d'une trace",
+    "Techniques d'accélération : fusion, FlashAttention, torch.compile, CUDA graphs, quand elles paient"
+   ],
+   "labs": [
+    {
+     "id": "numba-cuda-sim",
+     "title": "Noyaux CUDA dans le simulateur Numba",
+     "kind": "sandbox",
+     "idea": "Noyaux Numba (réduction, matmul par tuiles) exécutés avec NUMBA_ENABLE_CUDASIM=1 ; tests de justesse ; version GPU réelle documentée mais non exécutée."
+    },
+    {
+     "id": "triton-interpret",
+     "title": "Triton en mode interpréteur",
+     "kind": "sandbox",
+     "idea": "Noyau Triton d'addition fusionnée et softmax exécutés avec TRITON_INTERPRET=1 si l'installation CPU est possible ; sinon lab 'gpu' documenté et linté."
+    },
+    {
+     "id": "profile-reading",
+     "title": "Lire une trace de profil",
+     "kind": "sandbox",
+     "idea": "Profil PyTorch Profiler sur CPU d'un petit transformeur ; exporter la trace Chrome, identifier les opérateurs dominants ; transposition au profil GPU expliquée."
+    }
+   ],
+   "facts": [
+    "Documentation CUDA C++ Programming Guide (NVIDIA)",
+    "Dao et al. (2022) FlashAttention",
+    "Tillet et al. (2019) Triton",
+    "Documentation Numba CUDA simulator et Triton interpreter : vérifier la disponibilité sur CPU"
+   ],
+   "feeds": [
+    "scaling-study"
+   ]
+  },
+  {
+   "id": "slurm",
+   "number": 5,
+   "phase": 2,
+   "hours": 32,
+   "level": 2,
+   "status": "core",
+   "title": "Slurm et exploitation d'un cluster HPC",
+   "summary": "L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.",
+   "prerequisites": [
+    "linux-systems"
+   ],
+   "outcomes": [
+    "Écrire et soumettre des jobs (batch, tableaux, dépendances, interactifs) avec ressources GPU",
+    "Configurer partitions, QOS, fairshare et préemption pour une politique donnée",
+    "Lire sacct/sreport et expliquer l'utilisation et les files d'attente d'un cluster",
+    "Diagnostiquer un nœud drainé et un job en attente (raisons Slurm)"
+   ],
+   "chapters": [
+    "Architecture : slurmctld, slurmd, slurmdbd, munge ; flux de vie d'un job",
+    "Soumettre : sbatch, srun, salloc ; ressources, GRES/GPU, tableaux, dépendances, scripts robustes",
+    "Politique : partitions, QOS, associations, fairshare, priorité multifactorielle, backfill",
+    "Préemption, réservations, limites, gang scheduling, jobs de grande taille et fragmentation",
+    "GPU et topologie : gres.conf, cgroups, MIG, binding, topology.conf, placement sensible au réseau",
+    "Comptabilité et reporting : sacct, sreport, sshare, tableaux de bord d'utilisation",
+    "Santé des nœuds : drain, prolog/epilog, NHC, burn-in, remise en service",
+    "Conteneurs et environnements : pyxis/enroot, apptainer, modules/Spack ; Slurm sur Kubernetes (aperçu)"
+   ],
+   "labs": [
+    {
+     "id": "slurm-sandbox",
+     "title": "Un Slurm réel dans le bac à sable",
+     "kind": "sandbox",
+     "idea": "Installer munge, MariaDB, slurmdbd et slurmctld/slurmd sur une seule machine (apt, Slurm 23.11), créer comptes et QOS, soumettre des jobs. Constat de départ : sans base de comptabilité, les jobs restent en InvalidAccount ; documenter la solution (slurmdbd) et fournir un script d'installation reproductible."
+    },
+    {
+     "id": "fairshare-qos",
+     "title": "Fairshare, QOS et préemption",
+     "kind": "sandbox",
+     "idea": "Deux comptes concurrents, un QOS préemptif ; observer sshare/sprio/squeue ; critères chiffrés."
+    },
+    {
+     "id": "node-health",
+     "title": "Drain, prolog et vérification de santé",
+     "kind": "sandbox",
+     "idea": "Script de vérification de nœud appelé en prolog/epilog ; drainer automatiquement sur échec ; tests."
+    }
+   ],
+   "facts": [
+    "Documentation officielle Slurm (slurm.schedmd.com) : slurm.conf, gres.conf, cgroup.conf, sacctmgr, priority multifactor",
+    "Yoo, Jette, Grondona (2003)",
+    "Version testée et date à indiquer ; ne pas écrire 'dernière version' sans lecture de la source officielle"
+   ],
+   "feeds": [
+    "homelab-slurm",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "provisioning",
+   "number": 6,
+   "phase": 2,
+   "hours": 24,
+   "level": 2,
+   "status": "core",
+   "title": "Provisioning, images et santé des nœuds GPU",
+   "summary": "Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.",
+   "prerequisites": [
+    "linux-systems"
+   ],
+   "outcomes": [
+    "Décrire la chaîne PXE → image → configuration → enregistrement dans l'ordonnanceur",
+    "Écrire des rôles Ansible idempotents et des modules Terraform pour un cluster",
+    "Valider un nœud GPU avant mise en service (pilote, DCGM diag, burn-in, bande passante)",
+    "Concevoir une procédure de remplacement et de mise à jour sans interrompre la production"
+   ],
+   "chapters": [
+    "Cycle de vie d'un nœud : recette, installation, exploitation, retrait",
+    "Démarrage réseau et images : PXE/iPXE, outils de provisioning bare-metal (MAAS, Warewulf, BCM : forces et limites)",
+    "Gestion de configuration : Ansible, idempotence, inventaires, secrets",
+    "Terraform pour l'infrastructure : état, modules, environnements, dérive",
+    "La pile GPU : pilote, CUDA, Fabric Manager, DCGM, conteneurs GPU ; compatibilités et pièges de versions",
+    "Recette et burn-in : DCGM diagnostics, gpu-burn, nccl-tests, tests mémoire/PCIe/NVLink",
+    "Mises à jour et pannes : rolling updates, firmware, gestion des RMA, traçabilité",
+    "BMC, Redfish, IPMI et supervision hors bande"
+   ],
+   "labs": [
+    {
+     "id": "ansible-node-role",
+     "title": "Un rôle Ansible de nœud de calcul",
+     "kind": "sandbox",
+     "idea": "Rôle Ansible (muni de molecule ou ansible-playbook --check) qui configure limites, sysctl, services ; tests d'idempotence en local connection."
+    },
+    {
+     "id": "terraform-fleet",
+     "title": "Terraform : une flotte décrite en code",
+     "kind": "sandbox",
+     "idea": "Module Terraform avec provider local/null et sorties ; terraform validate/plan en local ; gestion de la dérive expliquée."
+    },
+    {
+     "id": "node-acceptance",
+     "title": "Recette d'un nœud GPU",
+     "kind": "gpu",
+     "idea": "Script de recette qui enchaîne nvidia-smi, DCGM diag, gpu-burn, nccl-tests ; lint et simulation des sorties pour le test ; exécution réelle documentée (GPU requis)."
+    }
+   ],
+   "facts": [
+    "Documentation NVIDIA DCGM (dcgmi diag) et Fabric Manager",
+    "Documentation Ansible et Terraform",
+    "Capacités actuelles des outils de provisioning HPC (vérifier sur sites officiels)"
+   ],
+   "feeds": [
+    "homelab-slurm",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "networking",
+   "number": 7,
+   "phase": 2,
+   "hours": 28,
+   "level": 2,
+   "status": "core",
+   "title": "Réseaux haute performance : InfiniBand, RoCE et NCCL",
+   "summary": "Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.",
+   "prerequisites": [
+    "linux-systems",
+    "perf-models"
+   ],
+   "outcomes": [
+    "Comparer InfiniBand et RoCE (contrôle de congestion, perte, configuration) et choisir selon le besoin",
+    "Dimensionner une topologie fat-tree et un taux de sur-souscription",
+    "Expliquer comment NCCL choisit anneau/arbre et lire ses journaux (NCCL_DEBUG)",
+    "Mesurer bande passante et latence (ib_write_bw, nccl-tests) et interpréter un écart"
+   ],
+   "chapters": [
+    "Rappels réseau : latence, bande passante, débit utile, MTU, contrôle de flux et de congestion",
+    "RDMA et verbs : pourquoi contourner le noyau ; GPUDirect RDMA et GPUDirect Storage",
+    "InfiniBand : sous-réseau, SM, routage, adaptive routing, NDR/XDR ; opérations quotidiennes",
+    "Ethernet pour l'IA : RoCE v2, PFC, ECN, DCQCN, problèmes de perte ; comparaison honnête avec IB",
+    "Topologies : fat-tree, rail-optimized, dragonfly ; sur-souscription ; placement sensible à la topologie",
+    "Dans le nœud : NVLink, NVSwitch, PCIe, affinité GPU-NIC",
+    "NCCL : algorithmes (anneau, arbre, CollNet/SHARP), protocoles, variables d'environnement utiles, journaux",
+    "Mesure et diagnostic : nccl-tests, perftest, hangs, liens dégradés, erreurs silencieuses"
+   ],
+   "labs": [
+    {
+     "id": "topology-sizing",
+     "title": "Dimensionner un fat-tree",
+     "kind": "sandbox",
+     "idea": "Calculateur Python testé : nombre de commutateurs/câbles pour N GPU, sur-souscription, bande passante de bissection ; comparaison à des configurations publiées et citées."
+    },
+    {
+     "id": "nccl-log-reading",
+     "title": "Lire un journal NCCL",
+     "kind": "sandbox",
+     "idea": "Analyseur de logs NCCL_DEBUG (jeux de logs d'exemple fournis et étiquetés comme synthétiques ou publics) qui extrait topologie, algorithme, interfaces ; tests."
+    },
+    {
+     "id": "nccl-tests-run",
+     "title": "nccl-tests sur un vrai cluster",
+     "kind": "gpu",
+     "idea": "Procédure et script pour exécuter nccl-tests (all_reduce_perf) sous Slurm et interpréter busbw ; lint ; exécution réelle documentée."
+    }
+   ],
+   "facts": [
+    "Documentation NCCL (docs.nvidia.com/deeplearning/nccl) et dépôt nccl-tests",
+    "Guides InfiniBand/RoCE de NVIDIA (Mellanox) ; DCQCN (Zhu et al. 2015)",
+    "Chiffres de bande passante par génération (NVLink, NDR) : citer les fiches constructeur"
+   ],
+   "feeds": [
+    "scaling-study",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "storage",
+   "number": 8,
+   "phase": 2,
+   "hours": 24,
+   "level": 2,
+   "status": "core",
+   "title": "Stockage et E/S pour l'entraînement",
+   "summary": "Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.",
+   "prerequisites": [
+    "linux-systems"
+   ],
+   "outcomes": [
+    "Choisir entre système de fichiers parallèle, NFS et stockage objet pour un usage donné",
+    "Dimensionner le débit nécessaire pour un entraînement et pour un checkpoint",
+    "Diagnostiquer un entraînement limité par ses données (profilage du chargeur)",
+    "Concevoir un cache de données à plusieurs niveaux"
+   ],
+   "chapters": [
+    "Besoins d'E/S d'un entraînement : lecture de jeu de données, checkpoints, journaux, artefacts",
+    "Systèmes de fichiers parallèles : Lustre, GPFS/Storage Scale, BeeGFS, WEKA : architecture, métadonnées, striping",
+    "NFS, objet (S3), FUSE et caches : cohérence, latence, coût ; comparaisons honnêtes",
+    "Formats de données pour l'entraînement : shards, WebDataset, Parquet, Arrow, mmap, tokens pré-packés",
+    "Chargeurs de données : workers, prefetch, pinned memory, goulots CPU ; mesurer avec un profileur",
+    "E/S de checkpoint : débit, atomicité, asynchrone, parallèle ; coût d'un checkpoint",
+    "Mise en cache : NVMe local, cache distribué, pré-chauffage ; invalidation ; GPUDirect Storage",
+    "Capacité, durée de vie des données, sauvegardes, quotas, coût au To"
+   ],
+   "labs": [
+    {
+     "id": "loader-bottleneck",
+     "title": "Démasquer un chargeur de données lent",
+     "kind": "sandbox",
+     "idea": "Boucle PyTorch avec Dataset synthétique ; varier workers/prefetch ; mesurer débit et temps d'attente GPU simulé ; tableau de décision."
+    },
+    {
+     "id": "shard-format",
+     "title": "Shards et lecture séquentielle",
+     "kind": "sandbox",
+     "idea": "Convertir un jeu en shards tar/Parquet ; comparer lecture aléatoire et séquentielle avec fio/Python ; chiffrer l'écart."
+    },
+    {
+     "id": "checkpoint-io",
+     "title": "Coût d'un checkpoint",
+     "kind": "sandbox",
+     "idea": "Écrire des checkpoints de tailles variées (sync/async/fsync) et modéliser débit et temps de blocage."
+    }
+   ],
+   "facts": [
+    "Documentation Lustre (lustre.org), BeeGFS, GPFS ; Mohan et al. (CheckFreq, FAST 2021)",
+    "Chiffres de débit par fournisseur : à citer ou ordre de grandeur",
+    "Documentation PyTorch DataLoader et WebDataset"
+   ],
+   "feeds": [
+    "resilient-trainer",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "distributed-training",
+   "number": 9,
+   "phase": 3,
+   "hours": 36,
+   "level": 3,
+   "status": "core",
+   "title": "Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline",
+   "summary": "Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.",
+   "prerequisites": [
+    "perf-models",
+    "gpu-programming",
+    "networking"
+   ],
+   "outcomes": [
+    "Choisir DDP, FSDP, tensor, pipeline ou expert parallelism pour un modèle et un cluster donnés, chiffres à l'appui",
+    "Estimer la mémoire par GPU (paramètres, gradients, optimiseur, activations) et la réduire (ZeRO, checkpointing d'activations)",
+    "Lancer un job multi-processus avec torchrun et déboguer un deadlock de collective",
+    "Distinguer un bug de distribution d'une instabilité numérique et rendre un run reproductible"
+   ],
+   "chapters": [
+    "Panorama : données, modèle, pipeline, experts, séquence ; la grille de parallélismes 3D/4D",
+    "DDP : buckets, recouvrement, synchronisation, torchrun, rendezvous ; erreurs classiques",
+    "Mémoire d'un entraînement : paramètres, gradients, états d'optimiseur, activations ; ZeRO 1/2/3 et FSDP",
+    "Parallélisme tensoriel et de séquence ; parallélisme pipeline et bulles ; parallélisme d'experts",
+    "Choisir et dimensionner : placer les dimensions sur la topologie, règle du pouce, exemples chiffrés",
+    "MFU en pratique : mesurer, expliquer l'écart, leviers (taille de lot, recouvrement, fusion, précision)",
+    "Numérique et déterminisme : pics de perte, normes de gradient, NaN, reproductibilité bit-à-bit et ses limites",
+    "Déboguer le distribué : deadlocks, hangs, désynchronisation, divergence entre un run mono-GPU et distribué ; outils",
+    "Écosystème : Megatron-LM, DeepSpeed, TorchTitan, Accelerate/Lightning ; comment lire leurs configurations"
+   ],
+   "labs": [
+    {
+     "id": "ddp-gloo",
+     "title": "DDP à quatre processus sur CPU",
+     "kind": "sandbox",
+     "idea": "Entraînement DDP avec torchrun --nproc_per_node=4 backend gloo ; vérifier l'équivalence avec un run mono-processus à la tolérance près ; mesurer le coût de communication."
+    },
+    {
+     "id": "fsdp-memory",
+     "title": "FSDP : mesurer la mémoire par rang",
+     "kind": "sandbox",
+     "idea": "FSDP2/fully_shard sur CPU gloo ; comparer à DDP ; calculer la mémoire attendue et la comparer à la mesure (par tailles de tenseurs)."
+    },
+    {
+     "id": "hang-debug",
+     "title": "Reproduire et diagnostiquer un hang",
+     "kind": "sandbox",
+     "idea": "Script où un rang saute une collective ; utiliser le watchdog/timeout et les traces pour localiser ; procédure d'enquête reproductible."
+    }
+   ],
+   "facts": [
+    "Narayanan et al. (2021) Megatron-LM",
+    "Rajbhandari et al. (2020) ZeRO ; Zhao et al. (2023) PyTorch FSDP",
+    "Documentation PyTorch : torchrun, DDP, fully_shard (FSDP2), DTensor",
+    "Hugging Face Ultra-Scale Playbook ; Austin et al. How to Scale Your Model",
+    "Llama 3 (Dubey et al. 2024) : MFU et configuration de parallélisme, à citer depuis le papier"
+   ],
+   "feeds": [
+    "scaling-study",
+    "resilient-trainer",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "fault-tolerance",
+   "number": 10,
+   "phase": 3,
+   "hours": 28,
+   "level": 3,
+   "status": "core",
+   "title": "Pannes, checkpointing et reprise automatique",
+   "summary": "À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.",
+   "prerequisites": [
+    "distributed-training",
+    "storage"
+   ],
+   "outcomes": [
+    "Modéliser la fiabilité d'un job (MTBF d'un cluster, temps perdu, intervalle de checkpoint optimal)",
+    "Écrire un checkpoint atomique, complet (modèle, optimiseur, RNG, curseur de données) et le tester par injection de pannes",
+    "Concevoir une boucle de reprise automatique qui détecte, isole le nœud fautif et relance",
+    "Expliquer les pannes GPU/réseau courantes (Xid, ECC, liens, hangs NCCL) et les premières actions"
+   ],
+   "chapters": [
+    "Pannes à grande échelle : taxonomie (matériel, réseau, logiciel, humaine), données publiées, loi des grands nombres",
+    "Modèle de coût : formule de Young/Daly, goodput, temps perdu, arbitrage fréquence/coût de checkpoint",
+    "Checkpoint correct : atomicité, état complet, reproductibilité de la reprise, sharding, formats (DCP, safetensors)",
+    "Checkpoints rapides : asynchrones, en mémoire, multi-niveaux, couche de stockage, déduplication",
+    "Détection : watchdogs, heartbeats, timeouts NCCL, métriques de lenteur, nœuds 'stragglers' et silencieux",
+    "Reprise et élasticité : torchrun élastique, retrait d'un nœud, redimensionnement ; pipeline de relance sous Slurm/Kubernetes",
+    "Erreurs GPU courantes : Xid, ECC, thermique, liens NVLink/IB dégradés ; conduite à tenir",
+    "Tests de chaos et procédures : injection de pannes, game days, runbooks, post-mortems sans blâme"
+   ],
+   "labs": [
+    {
+     "id": "young-daly",
+     "title": "Intervalle de checkpoint optimal",
+     "kind": "sandbox",
+     "idea": "Simulation Monte-Carlo de pannes ; comparer l'intervalle de Young/Daly au minimum simulé ; tracé et tests."
+    },
+    {
+     "id": "atomic-checkpoint",
+     "title": "Checkpoint atomique et reprise exacte",
+     "kind": "sandbox",
+     "idea": "Entraîneur PyTorch CPU avec checkpoint complet (modèle, optimiseur, RNG, itérateur de données) ; kill -9 aléatoire ; vérifier que la perte reprend sans saut et que le résultat final est identique."
+    },
+    {
+     "id": "supervisor-loop",
+     "title": "Superviseur de relance",
+     "kind": "sandbox",
+     "idea": "Superviseur qui détecte un hang par heartbeat, tue et relance depuis le dernier checkpoint valide, avec limite de relances ; tests."
+    }
+   ],
+   "facts": [
+    "Llama 3 (Dubey et al. 2024) : interruptions sur 54 jours, répartition des causes ; citer chiffres exacts depuis le papier",
+    "Kokolis et al. (2024) fiabilité des clusters de recherche ML de Meta ; Hu et al. (NSDI 2024)",
+    "Young (1974), Daly (2006) ; Mohan et al. CheckFreq ; Wang et al. Gemini (SOSP 2023) ; documentation PyTorch DCP et torch.distributed.elastic",
+    "Documentation NVIDIA sur les codes Xid"
+   ],
+   "feeds": [
+    "resilient-trainer",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "ray-rl-infra",
+   "number": 11,
+   "phase": 3,
+   "hours": 28,
+   "level": 3,
+   "status": "core",
+   "title": "Ray, infrastructure d'apprentissage par renforcement et boucles en ligne",
+   "summary": "Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.",
+   "prerequisites": [
+    "distributed-training"
+   ],
+   "outcomes": [
+    "Expliquer le modèle de Ray (tâches, acteurs, objets) et choisir quand l'utiliser",
+    "Concevoir une architecture acteur-apprenant avec synchronisation de politique et tampon de rejeu",
+    "Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)",
+    "Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte"
+   ],
+   "chapters": [
+    "Pourquoi un framework distribué général : tâches, acteurs, ressources, ordonnancement dans Ray",
+    "Ray en pratique : objets partagés, placement groups, gestion de la mémoire, tolérance aux pannes, autoscaling",
+    "Ray Train et Ray Data : entraînement distribué, ingestion, traitement par lots et en flux",
+    "RL pour un ingénieur d'infrastructure : boucle observation-action-récompense, PPO/GRPO en une page, post-entraînement des modèles",
+    "Architectures acteur-apprenant : rollouts distribués, synchronisation de poids, obsolescence, tampons de rejeu",
+    "Boucles en ligne et temps réel : latence de bout en bout, files, contre-pression, déséquilibre acteurs/apprenants",
+    "Hétérogénéité : GPU d'entraînement, GPU d'évaluation moins chers, CPU ; placement et files par type",
+    "Ray sur Kubernetes (KubeRay) et sur Slurm ; observabilité d'une application Ray ; alternatives (Dask, Spark, Kubeflow)"
+   ],
+   "labs": [
+    {
+     "id": "ray-actors",
+     "title": "Acteurs et tâches Ray",
+     "kind": "sandbox",
+     "idea": "Pipeline de traitement avec tâches/acteurs Ray local ; mesure d'efficacité, tolérance à la mort d'un acteur ; tests."
+    },
+    {
+     "id": "actor-learner-toy",
+     "title": "Boucle acteur-apprenant minimale",
+     "kind": "sandbox",
+     "idea": "Environnement jouet, N acteurs, un apprenant, tampon de rejeu, synchronisation de politique ; mesurer obsolescence et débit ; courbe d'apprentissage reproductible."
+    },
+    {
+     "id": "throughput-model",
+     "title": "Modèle de débit d'une boucle en ligne",
+     "kind": "sandbox",
+     "idea": "Modèle analytique + simulation événementielle : combien d'acteurs pour saturer un apprenant ; tests de cohérence modèle/simulation."
+    }
+   ],
+   "facts": [
+    "Moritz et al. (2018) Ray (OSDI) ; documentation Ray 2.x",
+    "Documentation KubeRay",
+    "Descriptions publiques d'architectures acteur-apprenant (IMPALA, Espeholt et al. 2018 ; documentation d'outils RLHF/GRPO open source)",
+    "Vérifier l'installation de ray sur le bac à sable (CPU) avant d'annoncer des labs 'vérifiés'"
+   ],
+   "feeds": [
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "kubernetes-gpu",
+   "number": 12,
+   "phase": 4,
+   "hours": 28,
+   "level": 2,
+   "status": "core",
+   "title": "Kubernetes pour l'IA : GPU, files d'attente et gang scheduling",
+   "summary": "Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.",
+   "prerequisites": [
+    "linux-systems",
+    "slurm"
+   ],
+   "outcomes": [
+    "Exposer des GPU à des pods (device plugin, GPU Operator, MIG, time-slicing) et en comprendre les limites",
+    "Mettre en place files d'attente et gang scheduling (Kueue ou Volcano) avec quotas et préemption",
+    "Lancer un entraînement multi-nœuds avec JobSet/Kubeflow Trainer et un cluster Ray avec KubeRay",
+    "Choisir Slurm, Kubernetes ou les deux (Slurm sur Kubernetes) selon l'équipe et la charge"
+   ],
+   "chapters": [
+    "Rappel d'architecture : ce qui est acquis pour un lecteur déjà exploitant de Kubernetes, et ce qui change avec les GPU",
+    "GPU dans Kubernetes : device plugin, GPU Operator, runtime conteneur, MIG, time-slicing, DRA (Dynamic Resource Allocation)",
+    "Files d'attente et gang scheduling : Kueue, Volcano, ClusterQueue, quotas, préemption, équité",
+    "Charges d'entraînement : JobSet, Kubeflow Trainer (ex Training Operator), indexed jobs, rendez-vous, réseau haute performance (RDMA, multus)",
+    "Topologie et placement : affinités, topology-aware scheduling, étiquettes de nœuds, pannes de nœud",
+    "Stockage et données : volumes, CSI, caches, accès objet, performances",
+    "Slurm ou Kubernetes ? Retours publics sur les deux, modèles hybrides (Slurm sur K8s), critères de choix",
+    "Exploitation : mises à jour, sécurité (RBAC, Pod Security, réseau), multi-tenance, coûts"
+   ],
+   "labs": [
+    {
+     "id": "kueue-manifests",
+     "title": "Kueue : files, quotas, préemption",
+     "kind": "sandbox",
+     "idea": "Manifestes ClusterQueue/LocalQueue/WorkloadPriorityClass validés hors ligne (kubernetes-validate/kubeconform si installable) et simulation de la logique d'admission en Python testée ; exécution sur cluster documentée."
+    },
+    {
+     "id": "jobset-training",
+     "title": "JobSet : un entraînement multi-nœuds",
+     "kind": "cluster",
+     "idea": "Manifestes JobSet/Trainer pour torchrun multi-nœuds ; validation de schéma ; exécution réelle documentée."
+    },
+    {
+     "id": "slurm-vs-k8s",
+     "title": "Matrice de décision Slurm / Kubernetes",
+     "kind": "sandbox",
+     "idea": "Grille de critères pondérée avec scénarios d'équipes ; script de calcul de score testé ; justification écrite."
+    }
+   ],
+   "facts": [
+    "Documentation Kubernetes (device plugins, DRA), NVIDIA GPU Operator, Kueue (kueue.sigs.k8s.io), Volcano, JobSet, KubeRay",
+    "Retours publics sur Slurm sur Kubernetes (Slinky/SchedMD, CoreWeave SUNK) : vérifier les pages officielles",
+    "Vérifier l'état de DRA et des versions de Kubernetes à la date du jour"
+   ],
+   "feeds": [
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "multi-cloud",
+   "number": 13,
+   "phase": 4,
+   "hours": 28,
+   "level": 3,
+   "status": "core",
+   "title": "Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC",
+   "summary": "Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.",
+   "prerequisites": [
+    "kubernetes-gpu",
+    "fault-tolerance"
+   ],
+   "outcomes": [
+    "Cartographier l'offre GPU (hyperscalers, GPU clouds, centres HPC, colocation) et ses modèles de capacité",
+    "Décrire un job indépendant du fournisseur (SkyPilot ou équivalent) et son placement sensible aux coûts",
+    "Concevoir une stratégie de débordement et de bascule qui survit à la préemption",
+    "Identifier les coûts cachés (sorties de données, stockage, réseau, latence d'accès)"
+   ],
+   "chapters": [
+    "Le paysage de l'offre GPU : hyperscalers, GPU clouds, fournisseurs européens, centres nationaux, colocation",
+    "Modèles de capacité : à la demande, réservé, spot/préemptible, engagements, contrats de capacité",
+    "Abstraire le fournisseur : SkyPilot, Terraform multi-fournisseurs, Kubernetes fédéré ; ce que chacun résout",
+    "Données et gravité : où vivent les données, sorties de données, caches régionaux, résidence et conformité",
+    "Placement et files : politiques de coût, de latence et de fiabilité ; préemption et reprise entre fournisseurs",
+    "Réseau et identité : VPN/peering, identités fédérées, comptes, quotas, segmentation",
+    "HPC publics : accès aux centres nationaux et européens (appels à projets, quotas), articulation avec le cloud",
+    "Gouvernance : inventaire, étiquetage, coûts par équipe, nettoyage des ressources oubliées"
+   ],
+   "labs": [
+    {
+     "id": "cost-aware-placement",
+     "title": "Simulateur de placement sensible aux coûts",
+     "kind": "sandbox",
+     "idea": "Simulateur Python : offres de plusieurs fournisseurs (prix/disponibilité synthétiques, étiquetés), jobs préemptibles ; comparer politiques ; tests."
+    },
+    {
+     "id": "skypilot-yaml",
+     "title": "Un job SkyPilot indépendant du fournisseur",
+     "kind": "cluster",
+     "idea": "YAML SkyPilot avec ressources, file_mounts, setup/run, restart on preemption ; validation de schéma/linter ; exécution réelle documentée (compte cloud requis)."
+    },
+    {
+     "id": "egress-cost",
+     "title": "Coût réel d'un déménagement de données",
+     "kind": "sandbox",
+     "idea": "Calculateur (avec barèmes cités et datés) de sortie de données, stockage et temps de transfert ; scénarios ; tests."
+    }
+   ],
+   "facts": [
+    "Yang et al. (2023) SkyPilot (NSDI) ; documentation SkyPilot",
+    "Pages tarifaires officielles : toujours citer la source et la date, ne jamais figer un prix sans lien",
+    "Pages d'accès aux centres HPC (GENCI/Jean Zay, EuroHPC JU AI Factories, TACC/ACCESS) : citer les appels en cours",
+    "Capacités et offres des GPU clouds : changent vite, section 'à vérifier'"
+   ],
+   "feeds": [
+    "multi-provider-scheduler",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "observability",
+   "number": 14,
+   "phase": 4,
+   "hours": 24,
+   "level": 2,
+   "status": "core",
+   "title": "Observabilité et fiabilité d'une flotte GPU",
+   "summary": "Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.",
+   "prerequisites": [
+    "linux-systems",
+    "slurm"
+   ],
+   "outcomes": [
+    "Instrumenter une flotte GPU (DCGM, node exporter, exportateurs Slurm/Kubernetes) avec Prometheus",
+    "Définir des SLI/SLO de plateforme (disponibilité de capacité, délai d'attente, goodput) et des alertes utiles",
+    "Détecter automatiquement un job bloqué, un nœud lent et un GPU dégradé",
+    "Relier métriques système et métriques de modèle (MLflow/W&B) pour trouver la cause d'une régression"
+   ],
+   "chapters": [
+    "Ce qu'on observe : système, GPU, réseau, jobs, modèle ; le piège des métriques moyennes",
+    "Métriques GPU : DCGM et dcgm-exporter (utilisation, mémoire, température, puissance, Xid, NVLink) ; ce que l'utilisation GPU ne dit pas",
+    "Prometheus et Grafana pour le calcul : modèle de données, règles d'enregistrement, cardinalité, rétention ; spécificités HPC",
+    "Journaux et traces : Loki/ELK, corrélation par job, traçage distribué des étapes d'entraînement",
+    "Observabilité des ordonnanceurs : exportateurs Slurm, kube-state-metrics, files d'attente, temps d'attente",
+    "SLO de plateforme : disponibilité, délai d'attente, goodput ; alertes qui réveillent pour de bonnes raisons",
+    "Détection de pannes silencieuses : hangs NCCL, stragglers, erreurs ECC, dérives de débit ; tests de santé continus",
+    "Suivi d'expériences et reproductibilité : MLflow, W&B, configuration, versions de code et de données"
+   ],
+   "labs": [
+    {
+     "id": "gpu-metrics-exporter",
+     "title": "Un exportateur de métriques de nœud testé",
+     "kind": "sandbox",
+     "idea": "Exportateur Prometheus Python (prometheus_client) pour une source de métriques simulée au format dcgm-exporter ; tests ; scrape local."
+    },
+    {
+     "id": "alert-rules",
+     "title": "Règles d'alerte testées avec promtool",
+     "kind": "sandbox",
+     "idea": "Règles Prometheus (job bloqué, nœud lent, GPU chaud) testées avec promtool test rules (paquet apt prometheus si disponible)."
+    },
+    {
+     "id": "hang-detector",
+     "title": "Détecteur de job bloqué",
+     "kind": "sandbox",
+     "idea": "Détecteur par stagnation de métriques + heartbeat ; faux positifs et faux négatifs chiffrés sur séries simulées."
+    }
+   ],
+   "facts": [
+    "Documentation NVIDIA DCGM et dcgm-exporter",
+    "Documentation Prometheus (règles, promtool), Grafana, Loki, MLflow",
+    "Pièges d'interprétation de DCGM_FI_DEV_GPU_UTIL : citer la documentation"
+   ],
+   "feeds": [
+    "gpu-observability",
+    "homelab-slurm",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "finops-capacity",
+   "number": 15,
+   "phase": 4,
+   "hours": 24,
+   "level": 2,
+   "status": "core",
+   "title": "FinOps, capacité, énergie et achats de calcul",
+   "summary": "Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.",
+   "prerequisites": [
+    "perf-models"
+   ],
+   "outcomes": [
+    "Construire un modèle de coût total (TCO) comparant achat, colocation, réservation et à la demande",
+    "Prévoir la demande de calcul d'une équipe de recherche et en déduire la capacité à contractualiser",
+    "Lire un contrat de capacité GPU (SLA, remplacement, engagement, sorties) et repérer les clauses à négocier",
+    "Estimer puissance, refroidissement et densité par rack, et leur effet sur le coût et le calendrier"
+   ],
+   "chapters": [
+    "FinOps pour l'IA : cadre, unités (GPU-heure, coût par token, coût par expérience), allocation et responsabilité",
+    "Utilisation réelle : taux d'occupation, goodput, gaspillage, files d'attente et coût de l'inactivité",
+    "Prévoir la demande : modèles d'usage d'une équipe de recherche, scénarios, marges, plans de capacité",
+    "Modèle de coût total : achat, colocation, location à long terme, réservé, spot ; amortissement, valeur résiduelle",
+    "Énergie et datacenter : puissance par GPU et par rack, refroidissement (air, liquide), PUE, délais de raccordement",
+    "Lire un contrat de capacité : SLA, disponibilité, remplacement de nœud, engagement minimum, transfert, support",
+    "Négocier : leviers, alternatives crédibles, calendrier, bonnes et mauvaises pratiques ; rôle de l'ingénieur dans l'achat",
+    "Matrices de décision et RFP techniques ; indicateurs de pilotage trimestriels"
+   ],
+   "labs": [
+    {
+     "id": "tco-model",
+     "title": "Modèle de TCO paramétrable",
+     "kind": "sandbox",
+     "idea": "Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'."
+    },
+    {
+     "id": "demand-forecast",
+     "title": "Prévision de demande de calcul",
+     "kind": "sandbox",
+     "idea": "Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests."
+    },
+    {
+     "id": "contract-checklist",
+     "title": "Lecture d'un contrat de capacité",
+     "kind": "sandbox",
+     "idea": "Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé."
+    }
+   ],
+   "facts": [
+    "FinOps Foundation Framework et 'FinOps for AI' (pages officielles)",
+    "Chiffres de puissance par GPU/rack : fiches constructeur datées ; ordres de grandeur sinon",
+    "Aucun prix ni condition contractuelle réels sans lien et date ; les exemples sont fictifs et marqués comme tels"
+   ],
+   "feeds": [
+    "multi-provider-scheduler",
+    "capstone-rfc"
+   ]
+  },
+  {
+   "id": "platform-leadership",
+   "number": 16,
+   "phase": 5,
+   "hours": 28,
+   "level": 3,
+   "status": "core",
+   "title": "Plateforme interne, sécurité, production et leadership",
+   "summary": "Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.",
+   "prerequisites": [
+    "slurm",
+    "kubernetes-gpu",
+    "observability"
+   ],
+   "outcomes": [
+    "Concevoir une plateforme de calcul self-service (sessions interactives, files, quotas, modèles de jobs)",
+    "Définir un modèle de sécurité multi-locataire (identité, isolation, secrets, audit) pour des GPU partagés",
+    "Instituer des pratiques de production : astreinte, gestion d'incident, post-mortems, revues de conception",
+    "Préparer un entretien de compute infrastructure lead : conception, dépannage, leadership, négociation"
+   ],
+   "chapters": [
+    "La plateforme comme produit : utilisateurs, besoins, adoption, mesure de la vélocité des chercheurs",
+    "Sessions interactives et environnements de développement : VM/conteneurs GPU, notebooks, partage de matériel",
+    "Sécurité d'une plateforme GPU partagée : identité, isolation, secrets, réseau, chaîne d'approvisionnement logicielle, audit",
+    "Fiabilité de production : SLO, astreinte, gestion d'incident, post-mortems, revues de conception (RFC/ADR)",
+    "Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs",
+    "Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication",
+    "Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible",
+    "Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser"
+   ],
+   "labs": [
+    {
+     "id": "rfc-template",
+     "title": "Écrire une RFC de plateforme",
+     "kind": "sandbox",
+     "idea": "Modèle de RFC/ADR avec grille de relecture automatisée (sections, décisions, alternatives, risques, métriques) et script de lint ; exemple complet fourni."
+    },
+    {
+     "id": "incident-review",
+     "title": "Post-mortem d'un incident simulé",
+     "kind": "sandbox",
+     "idea": "Jeu de logs et chronologie synthétiques (clairement étiquetés) ; trouver la cause, écrire le post-mortem ; corrigé détaillé."
+    },
+    {
+     "id": "design-interview",
+     "title": "Exercice de conception : de 8 à 256 GPU",
+     "kind": "sandbox",
+     "idea": "Énoncé d'entretien de conception avec grille d'évaluation et réponses de niveaux différents ; calculateur de dimensionnement testé."
+    }
+   ],
+   "facts": [
+    "Google SRE Book / SRE Workbook (accès libre)",
+    "Documentation Open OnDemand, JupyterHub, Slurm ; modèles de menaces pour GPU partagés (documentation NVIDIA, CNCF)",
+    "Aucune promesse d'emploi ou de salaire"
+   ],
+   "feeds": [
+    "capstone-rfc"
+   ]
+  }
+ ],
+ "projects": [
+  {
+   "id": "homelab-slurm",
+   "number": 1,
+   "hours": 24,
+   "modules": [
+    "linux-systems",
+    "provisioning",
+    "slurm",
+    "observability"
+   ],
+   "title": "Projet 1 — Mini-cluster Slurm instrumenté",
+   "summary": "Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.",
+   "idea": "Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana en JSON. Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension."
+  },
+  {
+   "id": "scaling-study",
+   "number": 2,
+   "hours": 20,
+   "modules": [
+    "perf-models",
+    "parallel-programming",
+    "gpu-programming",
+    "networking",
+    "distributed-training"
+   ],
+   "title": "Projet 2 — Étude de passage à l'échelle d'un entraînement",
+   "summary": "Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.",
+   "idea": "Entraînement DDP/FSDP (gloo, CPU) à 1, 2, 4 processus ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif."
+  },
+  {
+   "id": "resilient-trainer",
+   "number": 3,
+   "hours": 24,
+   "modules": [
+    "storage",
+    "distributed-training",
+    "fault-tolerance"
+   ],
+   "title": "Projet 3 — Entraîneur tolérant aux pannes",
+   "summary": "Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.",
+   "idea": "Entraîneur PyTorch CPU avec checkpoint atomique complet, superviseur de relance, injection de pannes, tests qui prouvent la reprise exacte (perte continue, état RNG et données), rapport de coût de checkpoint et de goodput."
+  },
+  {
+   "id": "multi-provider-scheduler",
+   "number": 4,
+   "hours": 24,
+   "modules": [
+    "multi-cloud",
+    "finops-capacity",
+    "kubernetes-gpu"
+   ],
+   "title": "Projet 4 — Placement multi-fournisseurs sensible aux coûts",
+   "summary": "Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.",
+   "idea": "Simulateur Python d'offres (données synthétiques étiquetées), politique de placement et de bascule, comparaison chiffrée de politiques, fichiers SkyPilot/Terraform/Kueue validés hors ligne, ADR sur les compromis coût/fiabilité/latence."
+  },
+  {
+   "id": "gpu-observability",
+   "number": 5,
+   "hours": 20,
+   "modules": [
+    "observability",
+    "slurm",
+    "fault-tolerance"
+   ],
+   "title": "Projet 5 — Observabilité GPU et détection de pannes silencieuses",
+   "summary": "Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqué ou un GPU dégradé en quelques minutes.",
+   "idea": "Exportateur de métriques au format dcgm-exporter alimenté par un simulateur de nœuds, règles Prometheus avec tests promtool, détecteur de job bloqué et de straggler avec taux de faux positifs mesurés, tableau de bord et runbook."
+  },
+  {
+   "id": "capstone-rfc",
+   "number": 6,
+   "hours": 40,
+   "modules": [
+    "slurm",
+    "provisioning",
+    "networking",
+    "storage",
+    "distributed-training",
+    "fault-tolerance",
+    "ray-rl-infra",
+    "kubernetes-gpu",
+    "multi-cloud",
+    "observability",
+    "finops-capacity",
+    "platform-leadership"
+   ],
+   "title": "Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU",
+   "summary": "Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.",
+   "idea": "RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité/coût testé, politique d'ordonnancement, plan de fiabilité et d'observabilité, plan de migration, runbooks, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types."
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>$pagetitle$</title>
+$if(description)$<meta name="description" content="$description$">
+$endif$<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+$math$
+<link rel="stylesheet" href="$root$assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="$bodyclass$">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="$root$index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+$if(crumbs)$<p class="crumb">$for(crumbs)$<a href="$root$$crumbs.href$">$crumbs.label$</a>$sep$ › $endfor$</p>
+$endif$<header id="title-block-header">
+<h1 class="title">$title$</h1>
+$if(subtitle)$<p class="subtitle">$subtitle$</p>
+$endif$$if(badges)$<p class="badges">$for(badges)$<span class="badge $badges.class$">$badges.label$</span>$endfor$</p>
+$endif$</header>
+$body$
+$if(prev)$$else$$if(next)$$else$$endif$$endif$$if(prev)$<nav class="pager" aria-label="Navigation">
+<a class="prev" href="$root$$prev.href$"><span class="k">← Précédent</span>$prev.label$</a>$if(next)$
+<a class="next" href="$root$$next.href$"><span class="k">Suivant →</span>$next.label$</a>$endif$
+</nav>
+$else$$if(next)$<nav class="pager" aria-label="Navigation">
+<a class="next" href="$root$$next.href$"><span class="k">Suivant →</span>$next.label$</a>
+</nav>
+$endif$$endif$</main>
+</div>
+<footer class="foot">
+<p><a href="$root$index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="$root$assets/theme.js"></script>
+</body>
+</html>
