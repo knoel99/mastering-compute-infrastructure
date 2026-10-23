@@ -1,0 +1,1065 @@
+{
+ "unit": "fr-b",
+ "region": "france",
+ "retrieved_on": "2026-10-22",
+ "programmes": [
+  {
+   "id": "fr-unistra-csmi",
+   "country": "FR",
+   "institution": "Université de Strasbourg (UFR de mathématique et d'informatique, IRMA, plateforme Cemosis)",
+   "programme_name": "Master Mathématiques et applications, parcours Calcul scientifique et mathématiques de l'innovation (CSMI)",
+   "degree": "Master (M1+M2)",
+   "urls": [
+    "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+    "https://export-rof-api.unistra.fr/export/pdf/ME195/PR438",
+    "https://www.cemosis.fr/en/"
+   ],
+   "duration": "2 ans (catalogue 2026-2027), volume global 1050 h",
+   "credits": "120 ECTS",
+   "language": "Français et anglais",
+   "delivery": "on-site",
+   "entry_requirements": "M1 : sur dossier, licence de mathématiques (Bac+3) ou équivalent, niveau d'anglais B1 ; M2 : de plein droit pour les titulaires du M1 CSMI. Prérequis conseillés : L3 de mathématiques appliquées, python voire C++.",
+   "focus": "cse",
+   "structure_summary": "Parcours de mathématiques appliquées à double compétence maths/informatique, avec une suite de trois UE 'Calcul haute performance' (CHP 1 en M1-S1, CHP 2 en M1-S2, CHP 3 en M2-S3) de 3 ECTS / 28 h chacune. Le reste du cursus couvre calcul scientifique, EDP, optimisation, apprentissage automatique scientifique, signal/image et projets avec des entreprises. Stage M1 de 2 mois et mémoire/stage M2 de 750 à 924 h. Les syllabi détaillés des UE CHP ne sont pas publiés sur les pages consultées.",
+   "core_courses": [
+    {
+     "name": "Calcul haute performance 1 (M1-S1)",
+     "credits": "3 ECTS",
+     "topics": [],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Calcul haute performance 2 (M1-S2)",
+     "credits": "3 ECTS",
+     "topics": [],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Calcul haute performance 3 (M2-S3)",
+     "credits": "3 ECTS",
+     "topics": [],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "C++ (M1-S1)",
+     "credits": "3 ECTS",
+     "topics": [],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Système d'exploitation (M1-S1)",
+     "credits": "3 ECTS",
+     "topics": [],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Calcul scientifique 1 et 2 (M1-S1)",
+     "credits": "3 ECTS chacun",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Méthodes numériques pour les EDP 1 (M1-S2) et 2 (M2-S3)",
+     "credits": "6 ECTS puis 3 ECTS",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Apprentissage automatique scientifique 1 (M1-S2) et 2 (M2-S3)",
+     "credits": "3 ECTS chacun",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Prétraitement et post-traitement intégrés au réseau dans le calcul scientifique (M2-S3)",
+     "credits": "3 ECTS",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    },
+    {
+     "name": "Mémoire (M2-S4)",
+     "credits": "30 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours"
+    }
+   ],
+   "electives": [],
+   "capstone": "Stage M1 (2 mois, juin-juillet) ; M2 : stage de 750 à 924 h (mars-août) et mémoire de 30 ECTS",
+   "machines_access": [],
+   "industry_links": [
+    "Projets avec des entreprises puis stages M1 et M2 (page programme)",
+    "Association avec la plateforme Cemosis (Université de Strasbourg), impliquée dans PEPR NumPEx Exa-MA, SAGE-HPC et le CoE EuroHPC HiDALGO2"
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": null,
+    "arch": null,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": null,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": 1,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Durée 2 ans, 120 crédits, 1050 h (catalogue 2026-2027)",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "Volume global d'heures1050 Credits120 crédits Durée2 ans",
+     "source": "web"
+    },
+    {
+     "claim": "UE Calcul haute performance 1 en M1 semestre 1 (3 ECTS, 28 h)",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "UE Calcul haute performance 1 3 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "UE Calcul haute performance 2 en M1 semestre 2",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "UE Calcul haute performance 2 3 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "UE Calcul haute performance 3 en M2 semestre 3",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "UE Calcul haute performance 3 3 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "UE Apprentissage automatique scientifique 1 (M1-S2)",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "UE Apprentissage automatique scientifique 1 3 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "Compétence HPC annoncée dans les objectifs du parcours",
+     "url": "https://export-rof-api.unistra.fr/export/pdf/ME195/PR438",
+     "quote": "compétences avancées en modélisation-simulation-optimisation, signal et image, fouille de données et calcul haute performance",
+     "source": "web"
+    },
+    {
+     "claim": "Lien avec l'industrie : projets avec des entreprises, stages M1/M2",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "problématiques industrielles au travers de projets avec des entreprises puis en stages M1 et M2",
+     "source": "web"
+    },
+    {
+     "claim": "Admission en M1 : licence de mathématiques, B1 anglais",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "Sur dossier et après avis de la commission pédagogique pour les titulaires d’une licence de Mathématiques (Bac+3) ou équivalent.",
+     "source": "web"
+    },
+    {
+     "claim": "Stage M2 de 750 à 924 heures",
+     "url": "https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours",
+     "quote": "Durée totale 750 à 924 heures",
+     "source": "web"
+    },
+    {
+     "claim": "Cemosis : plateforme HPC / exascale adossée au master",
+     "url": "https://www.cemosis.fr/en/",
+     "quote": "Methods and algorithms for exascale computing.",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Titres des UE lus sur le catalogue 2026-2027 ; contenu des UE CHP 1/2/3 (MPI, OpenMP, GPU ?) non publié sur les pages consultées, d'où couverture null pour openmp/mpi/gpu/perf-model. Le catalogue 2024-25 (PDF ROF) listait 'Calcul parallèle' au lieu de CHP 1 ; le nom du parcours y est 'mathématiques de l'information' (devenu 'de l'innovation'). Aucune machine citée pour les étudiants (csmi.cemosis.fr inaccessible)."
+  },
+  {
+   "id": "fr-enslyon-info",
+   "country": "FR",
+   "institution": "ENS de Lyon (Département d'informatique, LIP)",
+   "programme_name": "Master of Computer Science, 'Computer Science: Concepts and Applications' (M1 + M2 Informatique fondamentale)",
+   "degree": "Master (M1 + M2)",
+   "urls": [
+    "https://informatique.ens-lyon.fr/en/academic-programs/master/m1",
+    "https://informatique.ens-lyon.fr/en/academic-programs/master/m2",
+    "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year",
+    "https://suraj.gitlabpages.inria.fr/rac/home.html",
+    "https://www.ens-lyon.fr/formation/catalogue-de-cours/info4106/2026"
+   ],
+   "duration": "M1 + M2 ; M2 : un semestre de cours (septembre-janvier) puis stage de recherche (fin janvier - mi-juin)",
+   "credits": "M2 : 60 ECTS (stage 30 ECTS + au moins 4 cours de 5 ECTS) ; M1 : unités de 5 ECTS + stage de 12 semaines = 12 ECTS (total M1 non lu)",
+   "language": "Anglais (M2 : tous les cours en anglais ; M1 : unités proposées en anglais)",
+   "delivery": "on-site",
+   "entry_requirements": "Fondations très solides en mathématiques et en informatique théorique (page M1) ; admission via la procédure de candidature ENS (détails non lus).",
+   "focus": "mixed",
+   "structure_summary": "Master orienté recherche en informatique fondamentale, sans parcours HPC dédié mais avec des unités pertinentes : en M1 'Parallel and Distributed Algorithms and Programs', 'Distributed Systems', 'Performance Evaluation', 'Advanced Networks' (5 ECTS chacune) ; en M2 une offre renouvelée pour moitié chaque année, dont en 2026-2027 'Resource-aware computations on CPUs and GPUs' (équipe ROMA) et 'Virtualization'. Le M2 se compose de cours au premier semestre et d'un stage de recherche de 30 ECTS au second.",
+   "core_courses": [
+    {
+     "name": "M1 : Parallel and Distributed Algorithms and Programs (INFO4106, Algorithmique et Programmation Parallèles)",
+     "credits": "5 ECTS",
+     "topics": [
+      "parallel-algos",
+      "mpi",
+      "scheduling",
+      "interconnect"
+     ],
+     "url": "https://www.ens-lyon.fr/formation/catalogue-de-cours/info4106/2026"
+    },
+    {
+     "name": "M1 : Distributed Systems",
+     "credits": "5 ECTS",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1"
+    },
+    {
+     "name": "M1 : Performance Evaluation",
+     "credits": "5 ECTS",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1"
+    },
+    {
+     "name": "M1 : Advanced Networks",
+     "credits": "5 ECTS",
+     "topics": [],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1"
+    },
+    {
+     "name": "M1 : Fundamentals of Machine Learning",
+     "credits": "5 ECTS",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1"
+    },
+    {
+     "name": "M1 : Quantum Computer Science",
+     "credits": "5 ECTS",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1"
+    }
+   ],
+   "electives": [
+    {
+     "name": "M2 CR09 (2026-2027) : Resource-aware computations on CPUs and GPUs",
+     "topics": [
+      "gpu-prog",
+      "openmp-threads",
+      "mpi",
+      "perf-model",
+      "arch",
+      "parallel-algos",
+      "scheduling",
+      "numerics",
+      "ml-systems"
+     ],
+     "url": "https://suraj.gitlabpages.inria.fr/rac/home.html"
+    },
+    {
+     "name": "M2 CR17 (2026-2027) : Virtualization",
+     "topics": [
+      "containers-k8s"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year"
+    },
+    {
+     "name": "M2 CR03 (2026-2027) : Computational aspects of quantum simulation",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year"
+    },
+    {
+     "name": "M2 CR07 (2026-2027) : Floating-Point Arithmetic",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year"
+    },
+    {
+     "name": "M2 CR06 (2026-2027) : Generative modelling",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year"
+    },
+    {
+     "name": "M2 CR15 (2026-2027) : Reinforcement Learning and Bandits: beyond Average Return",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year"
+    }
+   ],
+   "capstone": "M1 : stage de recherche de 12 semaines (12 ECTS) ; M2 : stage de recherche fin janvier - mi-juin (30 ECTS), rapport écrit et soutenance orale",
+   "machines_access": [],
+   "industry_links": [
+    "Le stage M1 peut se faire à l'étranger et/ou en entreprise (page M1) ; le M2 est orienté préparation à la recherche"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": 2,
+    "perf-model": 2,
+    "arch": 1,
+    "numerics": 1,
+    "simulation-apps": null,
+    "parallel-algos": 2,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": 1,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": 2,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": 2,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "M2 : 60 ECTS dont stage 30 ECTS et quatre cours de 5 ECTS",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2",
+     "quote": "must obtain 60 credits (ECTS), necessarily including the internship (30 credits) and four courses (5 credits each)",
+     "source": "web"
+    },
+    {
+     "claim": "M2 : cours au premier semestre, tous en anglais",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2",
+     "quote": "The first semester (from September to January) consists of courses. All of them are taught in English.",
+     "source": "web"
+    },
+    {
+     "claim": "Orientation recherche du master",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2",
+     "quote": "primarily focused on the fundamental aspects of computer science and aims at preparing students to research in computer science",
+     "source": "web"
+    },
+    {
+     "claim": "M1 : unité Parallel and Distributed Algorithms and Programs (5 ECTS)",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1",
+     "quote": "Parallel and Distributed Algorithms and Programs (5 ECTS)",
+     "source": "web"
+    },
+    {
+     "claim": "M1 : unité Distributed Systems (5 ECTS)",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1",
+     "quote": "Distributed Systems (5 ECTS)",
+     "source": "web"
+    },
+    {
+     "claim": "M1 : unité Performance Evaluation (5 ECTS)",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1",
+     "quote": "Performance Evaluation (5 ECTS)",
+     "source": "web"
+    },
+    {
+     "claim": "M1 : stage de 12 semaines, 12 ECTS, recherche, à l'étranger et/ou en entreprise",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1",
+     "quote": "An internship of 12 weeks must be validated, and brings 12 ECTS.",
+     "source": "web"
+    },
+    {
+     "claim": "INFO4106 (2026) : initiation à MPI",
+     "url": "https://www.ens-lyon.fr/formation/catalogue-de-cours/info4106/2026",
+     "quote": "there will be an initiation to parallel programming through MPI (Message Passing Interface)",
+     "source": "web"
+    },
+    {
+     "claim": "INFO4106 (2026) : sujets traités",
+     "url": "https://www.ens-lyon.fr/formation/catalogue-de-cours/info4106/2026",
+     "quote": "The covered topics include sorting networks, PRAMs, algorithms on processor rings or grids, and task graph scheduling.",
+     "source": "web"
+    },
+    {
+     "claim": "M2 2026-2027 : cours CR09 CPUs et GPUs (équipe ROMA)",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year",
+     "quote": "CR09: Resource-aware computations on CPUs and GPUs.",
+     "source": "web"
+    },
+    {
+     "claim": "CR09 (2026-2027) : plan du cours sur CUDA",
+     "url": "https://suraj.gitlabpages.inria.fr/rac/home.html",
+     "quote": "CUDA basics",
+     "source": "web"
+    },
+    {
+     "claim": "CR09 : parallélisation OpenMP et MPI en TP",
+     "url": "https://suraj.gitlabpages.inria.fr/rac/home.html",
+     "quote": "Parallelization using OpenMP and MPI",
+     "source": "web"
+    },
+    {
+     "claim": "M2 2026-2027 : cours Virtualization",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year",
+     "quote": "CR17: Virtualization Alain Tchana (Grenoble)",
+     "source": "web"
+    },
+    {
+     "claim": "M1 : prérequis d'admission",
+     "url": "https://informatique.ens-lyon.fr/en/academic-programs/master/m1",
+     "quote": "Very solid foundations in mathematics and theoretical computer science are required.",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Page M2 'List of courses' périmée (liste 2024-25) ; la page 'M2 next year' donne la liste 2026-2027. Pas de parcours HPC/ops : l'intérêt pour un futur ingénieur compute infra se limite à PDAP (M1), CR09 et Virtualization (M2). Aucun accès à une machine cité pour les étudiants (l'ENS héberge le PSMN, mais la page master ne le lie pas). Total ECTS M1 non lu."
+  },
+  {
+   "id": "fr-urca-chps",
+   "country": "FR",
+   "institution": "Université de Reims Champagne-Ardenne (URCA), UFR Sciences Exactes et Naturelles, adossé au centre de calcul ROMEO",
+   "programme_name": "Master Informatique, mention Calcul haute performance et simulation (CHPS), parcours HPC-Image-IA (M1 + M2)",
+   "degree": "Master (M1 + M2)",
+   "urls": [
+    "https://romeo.univ-reims.fr/chps",
+    "https://romeo.univ-reims.fr/chps/19_le-master-chps-;-les-deux-parcours.html",
+    "https://romeo.univ-reims.fr/chps/media/images//maquette/Master_CHPS_2024_presentation_generale.pdf",
+    "https://romeo.univ-reims.fr/chps/media/images//maquette/Master_CHPS_2024_parcours_HPC-Image-IA.pdf",
+    "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf",
+    "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+    "https://romeo.univ-reims.fr/chps/9_plateformes.html",
+    "https://romeo.univ-reims.fr"
+   ],
+   "duration": "2 ans (S7 à S10) ; alternance par périodes de 2-3 semaines à l'université et 3-4 semaines en entreprise, ou formation initiale classique",
+   "credits": "120 ECTS (déduit : 4 semestres S7-S10 de 30 ECTS chacun d'après la synthèse des matières ; la somme n'est pas écrite telle quelle)",
+   "language": "Français (cours d'anglais en M1 et M2)",
+   "delivery": "on-site",
+   "entry_requirements": "M1 : L3 ou équivalent (180 ECTS), de préférence licence d'informatique ; M2 : M1 (240 ECTS) ; M1 CHPS vers M2 CHPS de droit. Procédure MonMaster pour le M1.",
+   "focus": "hpc-core",
+   "structure_summary": "Parcours en M1+M2 entièrement dédié au HPC (parallélisme, GPU, cluster, cloud/virtualisation pour le HPC), adossé au mésocentre ROMEO. M1 : algorithmique et programmation parallèle, technologies des supercalculateurs, modèles de programmation parallèle, programmation GPU, génie logiciel, IA. M2 : programmation cluster, virtualisation et cloud pour le HPC, architecture des processeurs et optimisation, accélérateurs et HPC, IA et HPC, visualisation, applications bio/chimie, projet et stage de 14 ECTS. Le parcours IA pour la Santé (M2) n'ouvre pas en 2026-2027.",
+   "core_courses": [
+    {
+     "name": "CHPS0701 Algorithmique et programmation parallèle (M1-S7)",
+     "credits": "5 ECTS",
+     "topics": [
+      "parallel-algos",
+      "mpi",
+      "openmp-threads",
+      "perf-model",
+      "interconnect"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0702 Technologies des supercalculateurs (M1-S7)",
+     "credits": "5 ECTS",
+     "topics": [
+      "arch",
+      "sysadmin",
+      "cloud"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0705 Génie logiciel (M1-S7)",
+     "credits": "4 ECTS",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0706 Introduction aux éléments finis (M1-S7)",
+     "credits": "4 ECTS",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0801 Modèles de programmation parallèle (M1-S8)",
+     "credits": "4 ECTS",
+     "topics": [
+      "openmp-threads",
+      "mpi"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0802 Programmation GPU (M1-S8)",
+     "credits": "4 ECTS",
+     "topics": [
+      "gpu-prog"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0807 Stage (M1-S8)",
+     "credits": "4 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0901 Programmation cluster (M2-S9)",
+     "credits": "4 ECTS",
+     "topics": [
+      "mpi",
+      "openmp-threads",
+      "sysadmin"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0902 Virtualisation et cloud pour le HPC (M2-S9)",
+     "credits": "4 ECTS",
+     "topics": [
+      "containers-k8s",
+      "cloud",
+      "scheduling"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0903 Architecture des processeurs et optimisation (M2-S9)",
+     "credits": "4 ECTS",
+     "topics": [
+      "arch",
+      "perf-model"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0904 Accélérateurs & HPC (M2-S9)",
+     "credits": "4 ECTS",
+     "topics": [
+      "gpu-prog",
+      "perf-model"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0906 IA & HPC (M2-S9)",
+     "credits": "4 ECTS",
+     "topics": [
+      "ml-dl",
+      "ml-systems"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS0907 Gestion de projets (M2-S9)",
+     "credits": "2 ECTS",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS1003 Visualisation haute performance interactive (M2-S10)",
+     "credits": "3 ECTS",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS1005 Projet (M2-S10)",
+     "credits": "4 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    },
+    {
+     "name": "CHPS1006 Stage (M2-S10)",
+     "credits": "14 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf"
+    }
+   ],
+   "electives": [],
+   "capstone": "Stage M1 (4 ECTS, S8) et stage M2 (14 ECTS, S10, 560 h de travail étudiant selon la synthèse) ; projet M2 (4 ECTS) ; étude bibliographique M1 (2 ECTS)",
+   "machines_access": [
+    "ROMEO (mésocentre de calcul régional de l'URCA) : présenté dans CHPS0702 ; les pages lues ne précisent ni les partitions ni les GPU accessibles aux étudiants"
+   ],
+   "industry_links": [
+    "Alternance (apprentissage / contrat de professionnalisation) : 2-3 semaines à l'université, 3-4 semaines en entreprise",
+    "Prix du jury au 2e Hackathon TERATEC (janv. 2024) pour une équipe de M2 ; visite du TGCC du CEA et du plateau Teratec (janv. 2026) ; participation au NVIDIA GTC 2026 et à SC'24",
+    "Rubrique 'Deep Learning Institute' (NVIDIA) sur le site du master"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": 2,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": 1,
+    "sysadmin": 1,
+    "scheduling": 1,
+    "interconnect": 1,
+    "storage-io": 0,
+    "containers-k8s": 2,
+    "cloud": 2,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": 1,
+    "energy": 0,
+    "quantum-emerging": 0,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": 0,
+    "observability-sre": 0
+   },
+   "evidence": [
+    {
+     "claim": "Cours Algorithmique et programmation parallèle (5 ECTS) en M1-S7",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf",
+     "quote": "CHPS0701 Algorithmique et programmation parallèle",
+     "source": "web"
+    },
+    {
+     "claim": "Cours Programmation GPU en M1-S8",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf",
+     "quote": "CHPS0802 Programmation GPU",
+     "source": "web"
+    },
+    {
+     "claim": "Cours Programmation cluster en M2-S9",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf",
+     "quote": "CHPS0901 Programmation cluster",
+     "source": "web"
+    },
+    {
+     "claim": "Cours Virtualisation et cloud pour le HPC en M2-S9",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf",
+     "quote": "CHPS0902 Virtualisation et cloud pour le HPC",
+     "source": "web"
+    },
+    {
+     "claim": "Cours Architecture des processeurs et optimisation en M2-S9",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf",
+     "quote": "CHPS0903 Architecture des processeurs et optimisation",
+     "source": "web"
+    },
+    {
+     "claim": "Le contenu cite MPI et OpenMP",
+     "url": "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+     "quote": "Environnements de programmation parallèle : MPI, OpenMP",
+     "source": "web"
+    },
+    {
+     "claim": "Contenu avancé : hybridation et multi-GPU",
+     "url": "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+     "quote": "Programmation parallèle avancée : hybridation OpenMP / MPI ; programmation multi-GPU OpenMP/CUDA et MPI/OpenMP/CUDA",
+     "source": "web"
+    },
+    {
+     "claim": "Contenu performance : roofline",
+     "url": "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+     "quote": "Connaissance des métriques d'optimisation (roofline model, taux de vectorisation)",
+     "source": "web"
+    },
+    {
+     "claim": "Contenu conteneurs : Docker, Singularity, Kubernetes",
+     "url": "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+     "quote": "Gestion de conteneurs Docker / Singularity",
+     "source": "web"
+    },
+    {
+     "claim": "Contenu : installation d'un cluster Linux HPC, module, spack",
+     "url": "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+     "quote": "Installation et configuration d'un cluster Linux HPC ; utilisation de gestionnaires de packages (module, spack)",
+     "source": "web"
+    },
+    {
+     "claim": "Accès machine : ROMEO présenté dans le cours Technologies des supercalculateurs",
+     "url": "https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf",
+     "quote": "Présentation d'un centre de calcul, et en particulier du mésocentre de calcul régional ROMEO",
+     "source": "web"
+    },
+    {
+     "claim": "ROMEO accompagne chercheurs et étudiants depuis 2002",
+     "url": "https://romeo.univ-reims.fr",
+     "quote": "Centre de calcul académique, ROMEO accompagne chercheurs et étudiants depuis 2002",
+     "source": "web"
+    },
+    {
+     "claim": "Alternance 2-3 semaines université / 3-4 semaines entreprise",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/Master_CHPS_2024_presentation_generale.pdf",
+     "quote": "L'alternance s'effectue par périodes d'environ 2-3 semaines à l'université et 3-4 semaines en entreprise.",
+     "source": "web"
+    },
+    {
+     "claim": "Admission M1 : L3 ou équivalent (180 ECTS)",
+     "url": "https://romeo.univ-reims.fr/chps/media/images//maquette/Master_CHPS_2024_parcours_HPC-Image-IA.pdf",
+     "quote": "Pour le M1 : être titulaire d’une L3 ou équivalent (180 crédits ECTS)",
+     "source": "web"
+    },
+    {
+     "claim": "Prix au Hackathon TERATEC",
+     "url": "https://romeo.univ-reims.fr/chps",
+     "quote": "Une équipe de la promo 2024 du M2 CHPS de Reims a remporté le prix du jury lors du 2ème Hackathon TERATEC (janv. 2024).",
+     "source": "web"
+    },
+    {
+     "claim": "Parcours IA pour la Santé fermé en 2026-2027",
+     "url": "https://romeo.univ-reims.fr/chps",
+     "quote": "IA pour la Santé (pas d'ouverture en 2026/2027)",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Maquette 2024 (CFVU 19/11/2023), première promotion HPC-Image-IA en septembre 2025 selon la réunion de rentrée M1 ; les fiches sont celles de la maquette, pas un syllabus détaillé par séance. Couverture 0 attribuée quand des recherches par mots-clés dans le texte complet des fiches (Lustre, GPFS, HDF5, checkpoint, tolérance aux pannes, monitoring, Prometheus, énergétique, quantique informatique) ne donnent aucune occurrence pertinente ; Slurm et InfiniBand ne sont pas nommés dans les fiches. Le site cite le RNCP 39279 alors que la maquette 2024 cite RNCP 34120. Matériel du nouveau ROMEO 2025 (GH200, InfiniBand) vu seulement dans un résultat de recherche, non vérifié car les pages ROMEO sont rendues en JavaScript : non repris ici."
+  },
+  {
+   "id": "fr-centralesupelec-metz-info3a",
+   "country": "FR",
+   "institution": "CentraleSupélec, campus de Metz (Grand Est)",
+   "programme_name": "Diplôme d'ingénieur CentraleSupélec, mention Informatique, 3e année (S9-S10), modules HPC-HPDA",
+   "degree": "MEng (diplôme d'ingénieur, 3e année)",
+   "urls": [
+    "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+   ],
+   "duration": "3e année du cycle ingénieur : semestres 9 et 10 (catalogue mis à jour le 21 octobre 2026)",
+   "credits": "60 ECTS sur S9+S10 (somme des blocs listés : S9 = 10+6+7+3+4, S10 = 4+7+2+15+2)",
+   "language": "Français ; catalogue publié en anglais et en français",
+   "delivery": "on-site",
+   "entry_requirements": "Non précisées dans le catalogue ; prérequis par cours, p. ex. le cours commun de 1re année 'Systèmes d'Information et Programmation' (1CC1000) pour le cours GPU.",
+   "focus": "mixed",
+   "structure_summary": "Année de spécialisation en informatique d'une école d'ingénieurs, avec deux modules HPC optionnels au semestre 9 : 'HPC-HPDA on clusters of multi-cores' (2.5 ECTS, 27 h, MPI+multithreading, soumission en batch) et 'HPC-HPDA on GPU with CUDA' (2 ECTS, 22.5 h, avec serveurs GPU du Data Center for Education du campus). Le reste mêle apprentissage automatique, cybersécurité, web/cloud, projet final et stage de fin d'études de 15 ECTS.",
+   "core_courses": [
+    {
+     "name": "Final project S09 (SPM-PRJ-012)",
+     "credits": "7 ECTS (bloc)",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "End-of-studies internship (S10)",
+     "credits": "15 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "HEP S09/S10 : Legal and regulatory systems, Innovation, Financial management, Management",
+     "credits": "3 ECTS puis 2 ECTS",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    }
+   ],
+   "electives": [
+    {
+     "name": "SPM-INF-020 HPC-HPDA on clusters of multi-cores (27 h, bloc Computer Science 1)",
+     "topics": [
+      "mpi",
+      "openmp-threads",
+      "parallel-algos",
+      "scheduling",
+      "perf-model",
+      "bigdata"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "3MD4030 HPC-HPDA on GPU with CUDA (22.5 h, bloc Computer Science 2)",
+     "topics": [
+      "gpu-prog",
+      "arch",
+      "perf-model",
+      "ml-systems"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "3MD4010 Machine learning 2",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "3MD4120 Reinforcement learning",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "SPM-INF-024 Web technologies (intégration continue et déploiement dans le cloud)",
+     "topics": [
+      "cloud"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    },
+    {
+     "name": "SPM-INF-023 Safe software Development",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf"
+    }
+   ],
+   "capstone": "Projet final (S9 72 h, S10 42 h) puis stage de fin d'études de 15 ECTS",
+   "machines_access": [
+    "GPU servers of the Data Center for Education of CentraleSupélec Metz Campus (cours CUDA) ; multi-core PC cluster (cours MPI+multithreading)"
+   ],
+   "industry_links": [
+    "Stage de fin d'études de 15 ECTS (S10)",
+    "Blocs HEP (innovation, management, droit)"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 2,
+    "gpu-prog": 2,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 1,
+    "simulation-apps": null,
+    "parallel-algos": 1,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": 1,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": 1,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": 1,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Bloc Computer Science 1 S09 : 10 ECTS, avec le module HPC-HPDA on clusters of multi-cores (27 h)",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "SPM-INF-020 2.5 HPC-HPDA on clusters of multi-cores 27.0 h",
+     "source": "web"
+    },
+    {
+     "claim": "Module HPC-HPDA on GPU with CUDA (22.5 h)",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "3MD4030 2 HPC-HPDA on GPU with CUDA 22.5 h",
+     "source": "web"
+    },
+    {
+     "claim": "Contenu MPI + multithreading sur cluster",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "Programming in MPI+multithreading and use of a multi-core PC cluster for high-performance computing (HPC) and high-performance data analysis.",
+     "source": "web"
+    },
+    {
+     "claim": "Soumission en batch",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "Learning how to submit distributed applications in batch mode.",
+     "source": "web"
+    },
+    {
+     "claim": "Machine : serveurs GPU du Data Center for Education du campus de Metz",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "GPU servers of the Data Center for Education of CentraleSupélec Metz Campus",
+     "source": "web"
+    },
+    {
+     "claim": "Contenu CUDA : architecture GPU, SIMT, CUBLAS, optimisation",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "GPU architecture Algorithmic principles of fine grained GPU parallelism (SIMD and SIMT models) CUDA programming Usage of CUBLAS library",
+     "source": "web"
+    },
+    {
+     "claim": "Stage de fin d'études 15 ECTS",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "ISP-INF-S10-14 End-of-studies Internship 15 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "Catalogue 3e année informatique, date de mise à jour",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "Computer Science Engineer Third year Metz Campus of CentraleSupélec last update: October 21, 2026",
+     "source": "web"
+    },
+    {
+     "claim": "Prérequis du cours GPU",
+     "url": "https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf",
+     "quote": "1st year common course: ”Systèmes d’Information et Programmation” (1CC1000)",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Deux modules HPC seulement sur une année généraliste informatique ; pas d'administration de cluster, de stockage parallèle ni d'ordonnanceur nommé (Slurm non cité dans les extraits lus). Coverage null pour les thèmes dont les descriptifs n'ont pas été lus en entier. Les modules HPC sont dans des blocs à choix (la somme des modules d'un bloc dépasse son nombre d'ECTS)."
+  },
+  {
+   "id": "fr-centralesupelec-gif-2el1550",
+   "country": "FR",
+   "institution": "CentraleSupélec, campus de Paris-Saclay (Gif-sur-Yvette)",
+   "programme_name": "Électif 2A 2EL1550 Calcul haute performance (cycle ingénieur)",
+   "degree": "MEng (électif du diplôme d'ingénieur)",
+   "urls": [
+    "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf"
+   ],
+   "duration": "Un électif de 2A, 30 h présentielles (période SG6)",
+   "credits": "60 heures d'études élèves (HEE) dont 30 h présentielles ; ECTS non indiqués sur le syllabus lu",
+   "language": "Français",
+   "delivery": "on-site",
+   "entry_requirements": "Prérequis : cours communs 'Systèmes d'Information et Programmation' (1CC1000) et 'Algorithmique et complexité' (1CC2000), bases d'algèbre linéaire.",
+   "focus": "hpc-core",
+   "structure_summary": "Un seul cours HPC (18 h CM, 1,5 h TD, 9 h de TD sur machines en 3 TP, examen de 2 h) mais au contenu complet : architectures parallèles, OpenMP, MPI (mpi4py), calcul scientifique parallèle et mesure de performance, avec TP sur clusters de calcul. Intérêt : référence concrète d'un enseignement HPC dans une grande école, pas un cursus.",
+   "core_courses": [],
+   "electives": [
+    {
+     "name": "2EL1550 Calcul haute performance (électif 2A, responsable Stéphane Vialle)",
+     "topics": [
+      "openmp-threads",
+      "mpi",
+      "arch",
+      "perf-model",
+      "numerics",
+      "parallel-algos",
+      "resilience",
+      "energy"
+     ],
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf"
+    }
+   ],
+   "capstone": "Sans objet (un électif)",
+   "machines_access": [
+    "Clusters de calcul utilisés en TD sur machines (non nommés dans le syllabus)"
+   ],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": null,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 1,
+    "simulation-apps": null,
+    "parallel-algos": 1,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": 1,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": null,
+    "soft-skills": null,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Intitulé, type et volume horaire du cours",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "2EL1550 - Calcul haute performance",
+     "source": "web"
+    },
+    {
+     "claim": "Électif de 2A",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "Type de cours : Electif 2A",
+     "source": "web"
+    },
+    {
+     "claim": "OpenMP et multithreading",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "algorithmique et programmation multithreads avec OpenMP",
+     "source": "web"
+    },
+    {
+     "claim": "MPI avec mpi4py",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "communications point-à-point en MPI (mpi4py)",
+     "source": "web"
+    },
+    {
+     "claim": "Mesure de performance et passage à l'échelle",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "métriques et limites de passage à l'échelle",
+     "source": "web"
+    },
+    {
+     "claim": "Architectures : énergie et tolérance aux pannes",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "aspects énergétiques ; besoin de tolérance aux pannes",
+     "source": "web"
+    },
+    {
+     "claim": "TD sur clusters",
+     "url": "https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf",
+     "quote": "mis en oeuvre lors de TD sur clusters de calculs",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Syllabus 2024-2025 (page 'full.pdf') ; le syllabus 2026-2027 n'a pas été lu. Couverture limitée aux thèmes de ce seul cours ; tous les autres thèmes restent null car le cursus de 2A n'a pas été examiné. Resilience et energy : simple mention ('aspects énergétiques', 'besoin de tolérance aux pannes') dans l'item architectures."
+  }
+ ],
+ "ecosystem": [],
+ "blocked_sources": [
+  "https://csmi.cemosis.fr — certificat TLS invalide pour ce nom d'hôte (CERTIFICATE_VERIFY_FAILED, hostname mismatch) ; descriptions détaillées des UE CHP non lues",
+  "https://romeo.univ-reims.fr/19_supercalculateur-romeo-2025.html — page ROMEO 2025 (matériel) rendue en JavaScript, aucun contenu extractible ; mêmes pages 2_infrastructure.html et 20_federation-mesonet.html",
+  "https://eviden.com/wp-content/uploads/2024/05/eviden-luniversite-de-reims-champagne-ardenne-urca-choisit-pour-son-nouveau-supercalculateur-romeo-integrant-la-technologie-nvidia-et-destine-aux-communautes-de-recherche-fr.pdf — HTTP 404"
+ ],
+ "verification": {
+  "status": "unverified",
+  "checked_claims": 0,
+  "corrected": 0,
+  "removed": 0,
+  "notes": ""
+ }
+}

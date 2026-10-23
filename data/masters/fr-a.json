@@ -1,0 +1,873 @@
+{
+ "unit": "fr-a",
+ "region": "france",
+ "retrieved_on": "2026-10-22",
+ "programmes": [
+  {
+   "id": "fr-uvsq-chps",
+   "country": "FR",
+   "institution": "Université de Versailles Saint-Quentin (UVSQ, ISTY) / Université Paris-Saclay, with ENS Paris-Saclay and INSTN/CEA",
+   "programme_name": "Master Calcul haute performance, simulation (CHPS) - M1, M2 IHPS and M2 MSCHP",
+   "degree": "M2 (preceded by M1 CHPS)",
+   "urls": [
+    "https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation",
+    "https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation",
+    "https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation/m2-informatique-haute-performance-et-simulation-ihps",
+    "https://www.chps.uvsq.fr/m2",
+    "https://www.chps.uvsq.fr/programme-du-m2-chps"
+   ],
+   "duration": "4 semesters over 2 years (M1 + M2); the M2 alone is 2 semesters (1 academic semester + 1 internship semester); Bac+4 entry level for M2",
+   "credits": "M2: 60 ECTS (S3: 30 ECTS and 350 h of teaching; S4: 30 ECTS internship per UVSQ page, while the Paris-Saclay catalogue lists the internship unit as 24 ECTS). M1 total not stated on the pages read.",
+   "language": "French (technical English units; programme page says language of teaching: Français)",
+   "delivery": "on-site",
+   "entry_requirements": "M1: bachelor-level degree equivalent in computer science, mathematics, physics or mechanics (35 places). M2: M1 CHPS (automatic admission for UVSQ M1 CHPS), or a scientific M1 / engineering school with parallel computing (architecture, algorithms, programming) and applied mathematics; selection on file otherwise.",
+   "focus": "hpc-core",
+   "structure_summary": "Part of the national network of CHPS masters. The M1 mixes mathematics (numerical analysis, modelling) with HPC (parallel architectures, parallel programming, distributed algorithms, software engineering for HPC and AI). The M2 has a common core (multicore programming, hardware accelerators, performance evaluation, numerical programming, data/learning, continuum mechanics) followed by one of two tracks: IHPS (high-performance computing, compilers, code optimisation, quantum computing) or MSCHP (modelling and simulation, PDE discretisation, domain decomposition, model reduction). Strongly project-oriented, ending with a 5-6 month internship.",
+   "core_courses": [
+    {
+     "name": "M1 - Parallel Architectures (Architecture Parallèle)",
+     "credits": "5 ECTS",
+     "topics": [
+      "arch",
+      "perf-model"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Algorithms and Parallel Programming (Algorithmique et Programmation Parallèle)",
+     "credits": "5 ECTS",
+     "topics": [
+      "parallel-algos",
+      "mpi",
+      "openmp-threads"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Distributed Algorithms (Algorithmique Distribuée)",
+     "credits": "4 ECTS",
+     "topics": [
+      "distributed-sys",
+      "parallel-algos"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Software Engineering for HPC & AI (Génie logiciel pour le calcul HPC/IA)",
+     "credits": "4 ECTS",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Parallelization Optimization Techniques (Techniques d'optimisation de la parallélisation)",
+     "credits": "3 ECTS",
+     "topics": [
+      "perf-model",
+      "parallel-algos"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Numerical Computing (Calcul numérique)",
+     "credits": "5 ECTS",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Scientific Visualization (Visualisation scientifique)",
+     "credits": "3 ECTS",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M1 - Parallel Machine Programming Project (Projet de programmation sur machine parallèle)",
+     "credits": "4 ECTS",
+     "topics": [
+      "mpi",
+      "openmp-threads",
+      "perf-model"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation"
+    },
+    {
+     "name": "M2 - PAAM: Advanced programming of multicore architectures (Programmation avancée des architectures multicoeurs)",
+     "credits": "3 ECTS",
+     "topics": [
+      "openmp-threads",
+      "arch"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "M2 - APM: Architecture and Programming of Hardware Accelerators (Architecture et Programmation d'accélérateurs Matériels)",
+     "credits": "3 ECTS",
+     "topics": [
+      "gpu-prog",
+      "arch"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "M2 - EDP: Performance Evaluation (Evaluation De Performances)",
+     "credits": "3 ECTS",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "M2 - MPNA: Advanced Methods and Numerical Programming (Méthodes et Programmation Numériques Avancées)",
+     "credits": "3 ECTS",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "M2 - DA: Data/Learning (Données/Apprentissage)",
+     "credits": "3 ECTS",
+     "topics": [
+      "ml-dl",
+      "bigdata"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "M2 - IMMC: Introduction to Continuum Mechanics (Introduction à la Mécanique des Milieux Continus)",
+     "credits": "3 ECTS",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    }
+   ],
+   "electives": [
+    {
+     "name": "IHPS - AOC: Architecture and code optimization for high-performance microprocessors",
+     "topics": [
+      "perf-model",
+      "arch"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "IHPS - COA: Advanced Compiling (Compilation avancée)",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "IHPS - PPCS: Programming Paradigms for Scientific Computing",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "IHPS - CQ: Quantum Computing (Calcul Quantique, CEA DAM)",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "IHPS - ISM: Introduction to molecular simulation",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "MSCHP - MSMF: Modelling and simulation in fluid mechanics",
+     "topics": [
+      "simulation-apps",
+      "numerics"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "MSCHP - MEMDD: Multiscale computing strategies and domain decomposition methods",
+     "topics": [
+      "numerics",
+      "parallel-algos",
+      "simulation-apps"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    },
+    {
+     "name": "MSCHP - RM: Model reduction (Réduction de Modèles)",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps"
+    }
+   ],
+   "capstone": "S4 internship of 5-6 months in a research laboratory or industrial R&D (30 ECTS on UVSQ page; 24 ECTS in the Paris-Saclay catalogue)",
+   "machines_access": [],
+   "industry_links": [
+    "Ter@tec technology park: collaborations with ARM, AWS, CEA, CGG, Eviden, Intel, NVIDIA, Paratools, SiPEARL (Paris-Saclay page)",
+    "HPC hackathons (Teratec) where CHPS students take part",
+    "Research partners: LI-PARAD, Maison de la Simulation, ECR (Exascale Computing Research: Intel, CEA, GENCI, UVSQ), CMLA",
+    "Joint network seminars and shared internship offers across the CHPS masters network"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 1,
+    "gpu-prog": 2,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": 2,
+    "energy": null,
+    "quantum-emerging": 2,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "M2 CHPS (IHPS track) is 2 semesters, Bac+4 recruitment level, 60 ECTS, taught in Guyancourt",
+     "url": "https://www.chps.uvsq.fr/m2",
+     "quote": "Niveau de recrutement Bac + 4 Crédits ECTS 60 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "S3 of the M2 is 30 ECTS and 350 h of teaching, S4 is the internship",
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps",
+     "quote": "Semestre 3 30 ECTS, 350h d’enseignements",
+     "source": "web"
+    },
+    {
+     "claim": "M2 common core includes multicore programming",
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps",
+     "quote": "PAAM : Programmation avancée des architectures multicoeurs",
+     "source": "web"
+    },
+    {
+     "claim": "M2 common core includes a hardware accelerators course taught by CEA/INSTN",
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps",
+     "quote": "APM : Architecture et Programmation d’accélérateurs Matériels (Julien Jaeger- CEA/INSTN)",
+     "source": "web"
+    },
+    {
+     "claim": "M2 common core includes performance evaluation",
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps",
+     "quote": "EDP : Evaluation De Performances",
+     "source": "web"
+    },
+    {
+     "claim": "M2 IHPS track includes a quantum computing course",
+     "url": "https://www.chps.uvsq.fr/programme-du-m2-chps",
+     "quote": "CQ : Calcul Quantique (CEA DAM)",
+     "source": "web"
+    },
+    {
+     "claim": "M1 has a 5-ECTS Algorithms and Parallel Programming unit in semester 2",
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation",
+     "quote": "Algorithmique et Programmation Parallèle 5 Semestre 2",
+     "source": "web"
+    },
+    {
+     "claim": "Programme names CUDA, OpenMP and MPI among its programming techniques",
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation",
+     "quote": "Mastery of advanced programming techniques for multicore architectures and accelerators (CUDA, OpenMP, MPI, etc.)",
+     "source": "web"
+    },
+    {
+     "claim": "Industry link via Ter@tec with named companies",
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation",
+     "quote": "enabling direct collaborations with companies (ARM, AWS, CEA, CGG, Eviden, Intel, NVIDIA, Paratools, SiPEARL, etc.)",
+     "source": "web"
+    },
+    {
+     "claim": "Curriculum ends with a 5-6 month internship",
+     "url": "https://www.universite-paris-saclay.fr/en/education/master/calcul-haute-performance-simulation",
+     "quote": "concludes with a 5-6 month internship in a research laboratory or industrial RD",
+     "source": "web"
+    },
+    {
+     "claim": "Admission to M2 is automatic for UVSQ M1 CHPS holders, on file for others",
+     "url": "https://www.chps.uvsq.fr/m2",
+     "quote": "L’admission en M2 CHPS est automatique pour les étudiants titulaires du M1 CHPS",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Course topics are assigned from unit titles and the programme overview: the per-unit descriptions on the Paris-Saclay site load via JavaScript ('Charger le détail') and were not read, so topics not named in any title or overview are null, not 0. The MSCHP track course list on the Paris-Saclay page is JS-only; its units come from chps.uvsq.fr. No page read names a specific machine or cluster that students use, so machines_access is empty (unknown, not none). Internship ECTS differ between sources (30 on UVSQ, 24 in Paris-Saclay catalogue)."
+  },
+  {
+   "id": "fr-bordeaux-cisd",
+   "country": "FR",
+   "institution": "ENSEIRB-MATMECA (Bordeaux INP) and Université de Bordeaux (joint track in the computer-science master)",
+   "programme_name": "Calcul Intensif et Sciences des Données (CISD) - semester 9 of the ENSEIRB-MATMECA computer-science engineering degree, shared with the Université de Bordeaux M2 informatique",
+   "degree": "Diplôme d'ingénieur (Bac+5, 180 ECTS) specialisation / M2 informatique parcours CISD",
+   "urls": [
+    "https://gforgeron.gitlab.io/cisd/",
+    "https://formation.bordeaux-inp.fr/fr/ENSEIRB-MATMECA/Ingenieur-informatique.html",
+    "https://formation.bordeaux-inp.fr/plugins/odf-web/odf/_content/course-semestre-9-calcul-intensif-et-les-sciences-des-donnees-2-fr-fr/Semestre%209%20-%20Calcul%20Intensif%20et%20Sciences%20des%20Donn%C3%A9es.pdf",
+    "https://www.onisep.fr/ressources/structures-enseignement/nouvelle-aquitaine/gironde/unite-de-formation-d-informatique-universite-de-bordeaux/master-mention-informatique"
+   ],
+   "duration": "Engineering degree: 3 years after a Bac+2 entry (180 ECTS); the CISD specialisation is the 3rd-year semester 9 (30 ECTS) followed by a final-year semester 10 (content not read). Onisep lists the Université de Bordeaux computer-science master as 2 years, CISD being an M2 track.",
+   "credits": "Semester 9 CISD: 30 ECTS (sheet updated 12 Sept 2025). Whole engineering degree: 180 ECTS. Elements are weighted by coefficient (e.g. coef. 2,5), ECTS per element not given on the sheet.",
+   "language": "French (LV1 English unit; programme site written in French)",
+   "delivery": "on-site",
+   "entry_requirements": "Engineering degree entry level Bac+2 (admission via the ENSEIRB-MATMECA admissions); CISD is open to students of the ENSEIRB-MATMECA computer-science stream and to students of the Université de Bordeaux computer-science master. No separate M2 admission rules read.",
+   "focus": "hpc-core",
+   "structure_summary": "Joint ENSEIRB-MATMECA and Université de Bordeaux track combining HPC and data science. Five teaching units: architectures, languages and programming models (MPI, OpenMP, GPU, HPC tools on the training cluster); HPC and learning algorithmics (parallel algorithmics and scheduling, data analysis, dense numerical linear algebra); runtime, extraction and visualisation (scientific visualisation, big-data processing, efficient deep learning, a 3D programming or quantum option); application modules (HPC application project, in-situ processing, data mining); languages and engineering culture. Engineering degree includes three internships totalling 12 months.",
+   "core_courses": [
+    {
+     "name": "Langages du parallélisme (MPI, OpenMP, hybrid MPI+X)",
+     "credits": "coef. 2,5",
+     "topics": [
+      "mpi",
+      "openmp-threads",
+      "parallel-algos"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Multicoeurs et accélérateurs de calcul (CUDA, OpenCL, OpenMP/OpenACC directives, cuBLAS, Thrust)",
+     "credits": "coef. 2,5",
+     "topics": [
+      "gpu-prog",
+      "arch",
+      "perf-model"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Outils et environnements pour le HPC (training cluster, software modules, job submission, performance analysis tools)",
+     "credits": "coef. 1",
+     "topics": [
+      "scheduling",
+      "perf-model"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Algorithmique du parallélisme, ordonnancement, structures de données, équilibrage de charges",
+     "credits": "coef. 2",
+     "topics": [
+      "parallel-algos",
+      "scheduling",
+      "energy"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Algorithmique numérique (dense linear algebra: Cholesky, LU, QR, SVD)",
+     "credits": "coef. 2",
+     "topics": [
+      "numerics",
+      "parallel-algos"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Analyse de données (statistical learning, PCA, clustering, regression, classification, R)",
+     "credits": "coef. 2",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Introduction à la visualisation scientifique (VTK, ParaView)",
+     "credits": "coef. 2",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Supports pour le traitement de données (Hadoop, HDFS, MapReduce, Spark, NoSQL)",
+     "credits": "coef. 2",
+     "topics": [
+      "bigdata",
+      "distributed-sys",
+      "storage-io"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Apprentissage profond efficace (model compression, activation recomputation and offloading, forms of parallelism, profiling)",
+     "credits": "coef. 1",
+     "topics": [
+      "ml-systems",
+      "ml-dl",
+      "perf-model"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Projet Application HPC (vectorisation, multithreading, distributed memory on linear-algebra kernels)",
+     "credits": "coef. 4",
+     "topics": [
+      "perf-model",
+      "mpi",
+      "openmp-threads",
+      "numerics"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Traitement des données in situ (spectral-element acoustic wave simulation, compression, visualisation formats)",
+     "credits": "coef. 1,5",
+     "topics": [
+      "storage-io",
+      "simulation-apps",
+      "viz"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Fouille, extraction et visualisation (Open Data University projects)",
+     "credits": "coef. 1,5",
+     "topics": [
+      "bigdata",
+      "viz"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Intégrer l'entreprise (professional project, pitch, Business Challenge)",
+     "credits": "coef. 2,5",
+     "topics": [
+      "soft-skills",
+      "thesis-internship"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "Parcours personnalisé: Programmation 3D (ray tracing, OpenGL real-time rendering on GPU)",
+     "topics": [
+      "viz",
+      "gpu-prog"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Parcours personnalisé: Algorithmique et calcul quantique (and its use in HPC)",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    },
+    {
+     "name": "Séminaires des masters HPC (national CHPS-masters seminar series)",
+     "topics": [],
+     "url": "https://gforgeron.gitlab.io/cisd/"
+    }
+   ],
+   "capstone": "Projet Application HPC in semester 9; engineering degree has three internships totalling 12 months (final-year internship content not read)",
+   "machines_access": [],
+   "industry_links": [
+    "Sectors listed by the programme: Airbus, Dassault, IBM, Thales, Total; CEA, EDF, IFP-EN",
+    "Industrial testimonials on the programme site from CEA DAM, ANEO and DDN Storage staff",
+    "Open Data University project subjects in the 'Fouille, extraction et visualisation' module",
+    "Shared HPC masters network seminars"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": 2,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 1,
+    "parallel-algos": 2,
+    "distributed-sys": 1,
+    "sysadmin": 0,
+    "scheduling": 1,
+    "interconnect": 0,
+    "storage-io": 1,
+    "containers-k8s": 0,
+    "cloud": 0,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": 2,
+    "hpc-software-eng": 0,
+    "energy": 1,
+    "quantum-emerging": 2,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": 0,
+    "observability-sre": 0
+   },
+   "evidence": [
+    {
+     "claim": "Semester 9 CISD is worth 30 ECTS in the ENSEIRB-MATMECA informatique engineering degree",
+     "url": "https://formation.bordeaux-inp.fr/fr/ENSEIRB-MATMECA/Ingenieur-informatique.html",
+     "quote": "Semestre 9 - Calcul Intensif et Sciences des Données 30 crédits",
+     "source": "web"
+    },
+    {
+     "claim": "Engineering degree: Bac+5 target level, 180 ECTS, Bac+2 entry level",
+     "url": "https://formation.bordeaux-inp.fr/fr/ENSEIRB-MATMECA/Ingenieur-informatique.html",
+     "quote": "Niveau d'étude visé Bac + 5 ECTS 180 crédits",
+     "source": "web"
+    },
+    {
+     "claim": "The CISD training is common to ENSEIRB-MATMECA and the Université de Bordeaux",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "est une formation commune à l'ENSEIRB-MATMECA et à l'Université de Bordeaux",
+     "source": "web"
+    },
+    {
+     "claim": "Parallelism languages course covers MPI, OpenMP and hybrid programming",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "paralléliser les applications de simulation : Message Passing Interface (MPI), OpenMP et programmation hybride MPI+X",
+     "source": "web"
+    },
+    {
+     "claim": "GPU course covers CUDA, OpenCL, OpenMP/OpenACC directives and GPU labs",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "de langages spécifiques (CUDA, OpenCL), de directives (OpenMP, OpenACC) et de bibliothèques optimisées (cuBLAS, Thrust)",
+     "source": "web"
+    },
+    {
+     "claim": "HPC tools course teaches use of the training cluster, software modules and job submission",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "Prise en main du cluster utilisé par la formation, gestion des modules logiciels et soumission des tâches de calcul",
+     "source": "web"
+    },
+    {
+     "claim": "Efficient deep learning course targets reducing compute and memory needs for inference and training",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "réduire leurs besoins en calcul et en mémoire, à l’inférence comme à l’entraînement",
+     "source": "web"
+    },
+    {
+     "claim": "Big-data course covers Hadoop, HDFS, MapReduce and Spark",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "Hadoop et le système de fichiers HDFS, paradigme MapReduce, création d’applications avec Spark",
+     "source": "web"
+    },
+    {
+     "claim": "Numerical algorithmics course is dense parallel linear algebra",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "factorisations de Cholesky et LU, systèmes triangulaires, factorisation QR",
+     "source": "web"
+    },
+    {
+     "claim": "The semester 9 course list of September 2025 includes the HPC application project and HPC masters seminars",
+     "url": "https://formation.bordeaux-inp.fr/plugins/odf-web/odf/_content/course-semestre-9-calcul-intensif-et-les-sciences-des-donnees-2-fr-fr/Semestre%209%20-%20Calcul%20Intensif%20et%20Sciences%20des%20Donn%C3%A9es.pdf",
+     "quote": "Séminaires Masters HPC",
+     "source": "web"
+    },
+    {
+     "claim": "Engineering degree includes three internships totalling 12 months",
+     "url": "https://formation.bordeaux-inp.fr/fr/ENSEIRB-MATMECA/Ingenieur-informatique.html",
+     "quote": "Trois stages, d’une durée cumulée de 12 mois",
+     "source": "web"
+    },
+    {
+     "claim": "Industry sectors targeted by the programme",
+     "url": "https://gforgeron.gitlab.io/cisd/",
+     "quote": "Airbus, Dassault, IBM, Thales, Total",
+     "source": "web"
+    },
+    {
+     "claim": "Onisep lists CISD as an M2 track of the Université de Bordeaux computer-science master, duration 2 years",
+     "url": "https://www.onisep.fr/ressources/structures-enseignement/nouvelle-aquitaine/gironde/unite-de-formation-d-informatique-universite-de-bordeaux/master-mention-informatique",
+     "quote": "Calcul intensif et sciences des données (M2)",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Rare case with real unit descriptions (programme site gforgeron.gitlab.io/cisd), so 0 means the descriptions do not mention the theme. Scheduling is 1 because the course is about scheduling theory and the practical unit covers job submission on the training cluster; Slurm is not named on any page read. The training cluster is not named on the pages read, so machines_access is empty; PLAFRIM is named only in 'Projet Calcul Haute Performance', a course sheet of the sister MATMECA engineering stream (https://formation.bordeaux-inp.fr/plugins/odf-web/odf/_content/course-projet-calcul-haute-performance-fr-fr/Projet%20Calcul%20Haute%20Performance.pdf), not of CISD. The 2024 sheet listed Apprentissage profond efficace and Programmation 3D as a choice; the 2025 sheet and the site list the choice between Programmation 3D and quantum algorithmics. ECTS per element and the semester 10 content were not read."
+  },
+  {
+   "id": "fr-toulouse-enseeiht-hpcbd",
+   "country": "FR",
+   "institution": "Toulouse INP - ENSEEIHT",
+   "programme_name": "Ingénieur ENSEEIHT Informatique et Télécommunications (Sciences du Numérique), parcours HPC et Big Data (S7 to S9)",
+   "degree": "Diplôme d'ingénieur (Bac+5, Master-level), 'parcours' within the FISE degree",
+   "urls": [
+    "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB.html",
+    "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+    "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf",
+    "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s7-fr/Parcours%20HPC%20et%20Big%20Data%20S7.pdf",
+    "https://formations.enseeiht.fr/enseeiht/plugins/odf-web/odf-n7/_content/course-parcours-hpc-et-big-data-s9-en/Parcours%20HPC%20et%20Big%20Data%20S9.pdf"
+   ],
+   "duration": "3 years (engineering cycle, FISE full-time student status); HPC et Big Data parcours runs over semesters 7, 8 and 9 and is followed by a final-year project in semester 10. An apprenticeship (apprentis) version of the degree also lists this parcours.",
+   "credits": "180 ECTS for the engineering degree; 30 ECTS per semester; S9 HPC et Big Data = 5 UE of 5 ECTS (25 ECTS) plus a SHS UE; final-year project (PFE) 30 ECTS",
+   "language": "French, with several units named and taught in English (e.g. Advanced Statistical Machine Learning, High Performance Scientific Computing, Inverse Problems)",
+   "delivery": "on-site",
+   "entry_requirements": "Not read on the pages fetched (the catalogue lists the 3-year engineering cycle; admission route not stated in the extracted text).",
+   "focus": "mixed",
+   "structure_summary": "Engineering degree in computer science and telecoms with a 'HPC et Big Data' parcours. S7 and S8 give the foundations (functional programming, concurrent systems and middleware, optimisation and operations research, OpenMP, advanced linear algebra with Krylov and sparse methods, PDE, numerical simulation project). S9 has five UE: distributed systems and security (including a Calcul Parallèle unit with MPI and an introduction to GPU programming), advanced statistical machine learning, High Performance Scientific Computing (parallel numerical algorithms and performance analysis), inverse problems, and an elective UE (cloud and big-data infrastructure, cloud strategy, quantum mechanics for computing, etc.). S10 is the final-year project.",
+   "core_courses": [
+    {
+     "name": "S9 - Systèmes et algorithmes répartis (consensus, checkpointing, distributed file systems)",
+     "credits": "UE Systèmes répartis et sécurité: 5 ECTS",
+     "topics": [
+      "distributed-sys",
+      "resilience",
+      "storage-io"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 - Calcul Parallèle (supercomputer architecture, MPI, introduction to GPU programming)",
+     "credits": "UE Systèmes répartis et sécurité: 5 ECTS",
+     "topics": [
+      "mpi",
+      "arch",
+      "interconnect",
+      "gpu-prog"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 - Algorithmes pour le calcul à Hautes Performances (roofline, scalability, shared and distributed memory parallel algorithms)",
+     "credits": "UE High Performance Scientific Computing: 5 ECTS",
+     "topics": [
+      "perf-model",
+      "parallel-algos",
+      "arch",
+      "openmp-threads",
+      "mpi"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 - Méthodes itératives en algèbre linéaire (parallel solvers for PDE-derived and sparse systems)",
+     "credits": "UE High Performance Scientific Computing: 5 ECTS",
+     "topics": [
+      "numerics",
+      "simulation-apps",
+      "parallel-algos"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 - Advanced Statistical Machine Learning (statistical learning, deep learning on large data)",
+     "credits": "5 ECTS",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 - Inverse Problems (data assimilation, stochastic filtering, Bayesian analysis)",
+     "credits": "5 ECTS",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S8 - Open MP (in UE Applications concurrentes et communicantes, base de données)",
+     "credits": "UE of 5 ECTS",
+     "topics": [
+      "openmp-threads"
+     ],
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf"
+    },
+    {
+     "name": "S8 - Introduction aux méthodes de Krylov et à l'algèbre linéaire creuse / Projet Simulation Numérique (UE Algèbre linéaire avancée)",
+     "credits": "UE of 5 ECTS",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf"
+    },
+    {
+     "name": "S7 - Systèmes concurrents / Intergiciels (UE Systèmes concurrents et communicants)",
+     "credits": "not stated on the sheet",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s7-fr/Parcours%20HPC%20et%20Big%20Data%20S7.pdf"
+    },
+    {
+     "name": "Soft and Human Skills (communication and English, careers and management, entrepreneurship, citizenship)",
+     "credits": "5 ECTS per semester (S7)",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s7-fr/Parcours%20HPC%20et%20Big%20Data%20S7.pdf"
+    }
+   ],
+   "electives": [
+    {
+     "name": "S9 UE à choix selon finalité (1 to 2 among 12): Infrastructure for cloud, big data and machine learning (description page empty)",
+     "topics": [
+      "cloud",
+      "bigdata"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 elective: Infrastructure for BigData (description not read)",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 elective: Cloud Strategy (cloud adoption, move-to-cloud, micro-services, infrastructure as code and multi-cloud)",
+     "topics": [
+      "cloud",
+      "containers-k8s"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    },
+    {
+     "name": "S9 elective: Algèbre linéaire du calcul quantique (UE High Performance Scientific Computing) and Introduction à la mécanique quantique pour le calcul",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html"
+    }
+   ],
+   "capstone": "Projet de fin d'études (PFE), 30 ECTS in semester 10, plus a 2A internship (6 ECTS)",
+   "machines_access": [],
+   "industry_links": [
+    "S9 elective 'Projet USRP par SILICOM' (industrial partner project)",
+    "Optimisation globale taught by an ENAC professor",
+    "PFE and 2A internship in companies (details not read)"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": 1,
+    "perf-model": 2,
+    "arch": 1,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": null,
+    "cloud": 2,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": 1,
+    "energy": null,
+    "quantum-emerging": 2,
+    "viz": 0,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Engineering degree lasts 3 years and is worth 180 ECTS",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB.html",
+     "quote": "Durée 3 ans ECTS 180 crédits",
+     "source": "web"
+    },
+    {
+     "claim": "S9 HPC et Big Data parcours has a High Performance Scientific Computing UE; the parcours sheet shows 30 credits for the semester",
+     "url": "https://formations.enseeiht.fr/enseeiht/plugins/odf-web/odf-n7/_content/course-parcours-hpc-et-big-data-s9-en/Parcours%20HPC%20et%20Big%20Data%20S9.pdf",
+     "quote": "HIGH PERFORMANCE SCIENTIFIC COMPUTING UE 5 credits",
+     "source": "web"
+    },
+    {
+     "claim": "Calcul Parallèle unit teaches MPI point-to-point and collective communications",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+     "quote": "Programmation parallèle en MPI : communications point a point et collectives, opérations de réduction",
+     "source": "web"
+    },
+    {
+     "claim": "Calcul Parallèle unit covers supercomputer architecture including GPUs and interconnects, and introduces GPU programming",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+     "quote": "accélérateurs GPU, réseaux d’interconnexion",
+     "source": "web"
+    },
+    {
+     "claim": "HPC algorithms course covers roofline, scaling laws and communication models",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+     "quote": "modèle de Hockney, communications collectives, modélisation et analyse d'algorithmes parallèles d'algèbre linéaire numérique",
+     "source": "web"
+    },
+    {
+     "claim": "Distributed algorithms course covers consensus and checkpointing",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+     "quote": "exclusion mutuelle, consensus, terminaison, instantanés globaux et checkpointing, cohérence de la mémoire",
+     "source": "web"
+    },
+    {
+     "claim": "S8 of the HPC parcours has an Open MP matière in the concurrent applications UE",
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf",
+     "quote": "Open MP Matière",
+     "source": "web"
+    },
+    {
+     "claim": "S8 includes sparse linear algebra / Krylov methods",
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf",
+     "quote": "Introduction aux méthodes de Krylov et à l'Algèbre Linéaire Creuse",
+     "source": "web"
+    },
+    {
+     "claim": "Cloud Strategy elective covers infrastructure as code and multi-cloud",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+     "quote": "L’infrastructure as code comme accélérateur, support à l’industrialisation et pilier d’une stratégie multi-cloud",
+     "source": "web"
+    },
+    {
+     "claim": "Quantum computing linear algebra course includes implementing Grover's algorithm on a quantum computer simulator",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html",
+     "quote": "implémenterons l’algorithme de Grover sur un simulateur d'ordinateur quantique",
+     "source": "web"
+    },
+    {
+     "claim": "Final-year project is 30 ECTS and a 2A internship is 6 ECTS",
+     "url": "https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB.html",
+     "quote": "PFE SN avec PL 30 Stage 2A SN 6",
+     "source": "web"
+    },
+    {
+     "claim": "Page states its content is indicative and non-contractual",
+     "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf",
+     "quote": "Toutes les informations de cette page sont indicatives et n'ont pas de valeur contractuelle",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Toulouse has no standalone HPC master found; the HPC-oriented offer is the HPC et Big Data parcours of the ENSEEIHT engineering degree (Master-level). The search also showed a Mastère Spécialisé 'Ingénierie pour la Valorisation des Données Massives' (Bac+6, with a unit 'Calcul Haute performance et applications'), not read in detail. S9 descriptions of the mandatory UEs were read in full, so 0 for viz means they do not mention it; the S7/S8 sheets list titles only and the pages for the two 'Infrastructure for ...' electives are empty, hence null for sysadmin, scheduling, containers, ML systems and observability. Elective-based topics (cloud, bigdata, quantum) are scored 2 because a dedicated course names the theme, but they are optional. Page text is flagged 'indicatives et n'ont pas de valeur contractuelle'."
+  }
+ ],
+ "ecosystem": [],
+ "blocked_sources": [],
+ "verification": {
+  "status": "unverified",
+  "checked_claims": 0,
+  "corrected": 0,
+  "removed": 0,
+  "notes": ""
+ }
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Feuille de route — Mastering Compute Infrastructure</title>
+<meta name="description" content="Séquence des phases, volumes horaires, jalons de validation et parcours accélérés.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+
+<link rel="stylesheet" href="../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../index.html">Accueil</a></p>
+<header id="title-block-header">
+<h1 class="title">Feuille de route</h1>
+<p class="subtitle">6 phases, 592 h au total, jalons et parcours courts</p>
+</header>
+<h2 id="lecture">Comment lire cette feuille de route</h2>
+<p>Le volume total est de <strong>440 h de modules et 152 h de projets</strong>, soit <strong>592 h</strong>. À titre de repère, 12 h par semaine donnent environ 49 semaines ; 25 h par semaine, environ 24 semaines ; un temps plein de 35 h, environ 17 semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.</p>
+<p>Un rythme hebdomadaire type de 12 h : deux séances de lecture de 3 h, une séance de lab de 3 h, et 3 h d'exercices et de relecture. Tenez un journal d'apprentissage dans un dépôt public : c'est aussi une pièce de portfolio.</p>
+<h2 id="phases">Les six phases</h2>
+<div class="tbl-wrap">
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Modules</th>
+<th>Volume</th>
+<th>Projets</th>
+<th>Durée à 12 h/sem.</th>
+<th>Jalon de validation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0 — Fondations : machines et performance</td>
+<td>linux-systems, perf-models</td>
+<td>48 h</td>
+<td>— (0 h)</td>
+<td>4 sem.</td>
+<td>Rapport de mesure reproductible (roofline, α-β) et calculateur de MFU testé.</td>
+</tr>
+<tr class="even">
+<td>1 — Calcul parallèle et GPU</td>
+<td>parallel-programming, gpu-programming</td>
+<td>60 h</td>
+<td>— (0 h)</td>
+<td>5 sem.</td>
+<td>Étude de scalabilité d'un solveur MPI et noyaux GPU validés par leurs tests.</td>
+</tr>
+<tr class="odd">
+<td>2 — Exploiter un cluster</td>
+<td>slurm, provisioning, networking, storage</td>
+<td>108 h</td>
+<td>1 (24 h)</td>
+<td>11 sem.</td>
+<td>Projet 1 : un mini-cluster Slurm reproductible, instrumenté, avec politique d'équité.</td>
+</tr>
+<tr class="even">
+<td>3 — Systèmes d'entraînement distribué</td>
+<td>distributed-training, fault-tolerance, ray-rl-infra</td>
+<td>92 h</td>
+<td>2, 3 (44 h)</td>
+<td>11 sem.</td>
+<td>Projets 2 et 3 : étude de passage à l'échelle et entraîneur tolérant aux pannes.</td>
+</tr>
+<tr class="odd">
+<td>4 — Plateforme cloud-native et multi-fournisseurs</td>
+<td>kubernetes-gpu, multi-cloud, observability, finops-capacity</td>
+<td>104 h</td>
+<td>4, 5 (44 h)</td>
+<td>12 sem.</td>
+<td>Projets 4 et 5 : placement multi-fournisseurs et observabilité GPU.</td>
+</tr>
+<tr class="even">
+<td>5 — Production et leadership</td>
+<td>platform-leadership</td>
+<td>28 h</td>
+<td>6 (40 h)</td>
+<td>6 sem.</td>
+<td>Projet 6 : RFC de plateforme de 8 à 256 GPU et soutenance de 20 minutes.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que ses vérifications ne passent pas, la phase n'est pas terminée, quel que soit le temps passé.</p>
+<h2 id="ordre">Pourquoi cet ordre</h2>
+<ul>
+<li><strong>Phase 0 d'abord</strong>, parce que tout le reste consiste à poser un modèle de performance, à le mesurer et à expliquer l'écart.</li>
+<li><strong>Calcul parallèle et GPU avant l'ordonnancement</strong>, parce qu'on ne règle pas un ordonnanceur pour des charges qu'on ne sait pas décrire.</li>
+<li><strong>L'exploitation du cluster avant l'entraînement distribué</strong>, parce que les pannes et les goulots d'un entraînement se situent presque toujours dans le réseau, le stockage ou l'ordonnanceur.</li>
+<li><strong>Le multi-fournisseurs en phase 4</strong>, parce qu'il suppose de savoir reprendre un job après une panne (phase 3).</li>
+<li><strong>Le leadership en dernier</strong>, parce qu'on dirige mieux ce qu'on a opéré soi-même.</li>
+</ul>
+<h2 id="court">Parcours court : l'essentiel en 192 h</h2>
+<p>Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : Architecture matérielle et modèles de performance, Slurm et exploitation d'un cluster HPC, Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline, Pannes, checkpointing et reprise automatique, Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC, plus les projets Projet 2, Projet 3. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.</p>
+<h2 id="reference">Parcours pour le lecteur de référence</h2>
+<p>Le <a href="../profile/index.html">point de départ</a> compare un profil de référence au métier visé. Il en déduit un parcours ajusté : survol des modules proches de l'expérience existante, travail à fond sur ceux où aucun appui n'existe.</p>
+<h2 id="suivi">Suivre sa progression</h2>
+<ul>
+<li>Après chaque module : cochez son checkpoint de sortie, produit pour chaque capacité la preuve demandée.</li>
+<li>Après chaque phase : publiez le livrable du jalon dans un dépôt, avec un fichier <code>README.md</code> et une décision d'architecture d'une page.</li>
+<li>Tous les deux mois : relisez l'enquête sur les masters et les offres d'emploi, et notez ce qui a changé.</li>
+</ul>
+<nav class="pager" aria-label="Navigation">
+<a class="next" href="../courses/perf-models/index.html"><span class="k">Suivant →</span>Module 02 — Architecture matérielle et modèles de performance</a>
+</nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../assets/theme.js"></script>
+</body>
+</html>

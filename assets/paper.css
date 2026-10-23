@@ -567,3 +567,6 @@ details.sol > summary { cursor: pointer; font-weight: 800; padding: .35rem 0; }
 .phase { margin: 2.4rem 0 .6rem; padding-bottom: .3rem; border-bottom: 3px solid var(--ink); }
 .gauge { display: inline-block; letter-spacing: .1em; font-weight: 800; color: var(--accent); }
 main .crumb { max-width: none; padding: 0; margin: 0 0 1rem; }
+figure.fig { margin: 1.8rem 0; }
+figure.fig svg { display: block; width: 100%; height: auto; color: var(--ink); }
+figure.fig figcaption { margin-top: .5rem; font-size: .98rem; color: var(--soft); }

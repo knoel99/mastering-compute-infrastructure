@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Mastering Compute Infrastructure</title>
+<meta name="description" content="Parcours d'apprentissage en français pour opérer des clusters GPU, ordonnancer, entraîner à grande échelle et piloter la capacité multi-fournisseurs.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+
+<link rel="stylesheet" href="assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc home">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<header id="title-block-header">
+<h1 class="title">Mastering Compute Infrastructure</h1>
+<p class="subtitle">Un parcours pour devenir compute infrastructure engineer : cours, labs vérifiés, projets de portfolio et enquête sur les masters HPC</p>
+</header>
+<p class="lead">
+Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesquelles on entraîne les modèles d'IA : clusters GPU, ordonnanceurs, réseaux, stockage, fiabilité, coût. Ce site rassemble de quoi apprendre ce métier de manière structurée : 16 modules en 6 phases, 6 projets de portfolio, des labs exécutables et une enquête sourcée sur les masters HPC en France, aux États-Unis, en Chine et dans le monde.
+</p>
+<div class="hero-actions">
+<p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a></p>
+</div>
+<h2 id="etat">État du chantier</h2>
+<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>1 module(s) sur 16 et 0 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
+<ul>
+<li><strong>Documenté</strong> : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.</li>
+<li><strong>Vérifié</strong> : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (<code>verify.sh</code>), les pages passent des contrôles mécaniques (<code>tools/check_gates.py</code>).</li>
+<li><strong>Honnête</strong> : un lab non exécuté porte le badge « non vérifié » ; une valeur incertaine est signalée « à vérifier ».</li>
+</ul>
+<h2 id="parcours">Le parcours en un coup d'œil</h2>
+<p>Volume total : <strong>440 h de modules et 152 h de projets</strong>, soit environ 49 semaines à 12 h par semaine. Le détail, les jalons et les parcours courts sont dans la <a href="path/index.html">feuille de route</a>.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Modules</th>
+<th>Volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0 — Fondations : machines et performance</td>
+<td>1, 2</td>
+<td>48 h</td>
+</tr>
+<tr class="even">
+<td>1 — Calcul parallèle et GPU</td>
+<td>3, 4</td>
+<td>60 h</td>
+</tr>
+<tr class="odd">
+<td>2 — Exploiter un cluster</td>
+<td>5, 6, 7, 8</td>
+<td>108 h</td>
+</tr>
+<tr class="even">
+<td>3 — Systèmes d'entraînement distribué</td>
+<td>9, 10, 11</td>
+<td>92 h</td>
+</tr>
+<tr class="odd">
+<td>4 — Plateforme cloud-native et multi-fournisseurs</td>
+<td>12, 13, 14, 15</td>
+<td>104 h</td>
+</tr>
+<tr class="even">
+<td>5 — Production et leadership</td>
+<td>16</td>
+<td>28 h</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="cours">Cours</h2>
+<p>Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge <strong>Cœur</strong> signale un module indispensable ; <strong>À survoler</strong> un module que le lecteur de référence peut parcourir rapidement.</p>
+<h3 class="phase" id="phase0">
+Phase 0 — Fondations : machines et performance
+</h3>
+<p class="sub-line">
+Lire une machine et prédire sa performance avant de la mesurer.
+</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Linux, systèmes et diagnostic de performance
+</h4>
+<p class="meta">
+Module 01 · 24 h · À survoler · en préparation
+</p>
+<p>
+Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.
+</p>
+</div>
+<a class="card" href="courses/perf-models/index.html">
+<h4>
+Architecture matérielle et modèles de performance
+</h4>
+<p class="meta">
+Module 02 · 24 h · Cœur
+</p>
+<p>
+Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.
+</p>
+<p></a></p>
+</div>
+<h3 class="phase" id="phase1">
+Phase 1 — Calcul parallèle et GPU
+</h3>
+<p class="sub-line">
+Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
+</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Programmation parallèle : OpenMP, MPI et études de passage à l'échelle
+</h4>
+<p class="meta">
+Module 03 · 30 h · Cœur · en préparation
+</p>
+<p>
+Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Programmation GPU : CUDA, Triton et profilage
+</h4>
+<p class="meta">
+Module 04 · 30 h · Cœur · en préparation
+</p>
+<p>
+Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.
+</p>
+</div>
+</div>
+<h3 class="phase" id="phase2">
+Phase 2 — Exploiter un cluster
+</h3>
+<p class="sub-line">
+Provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
+</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Slurm et exploitation d'un cluster HPC
+</h4>
+<p class="meta">
+Module 05 · 32 h · Cœur · en préparation
+</p>
+<p>
+L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Provisioning, images et santé des nœuds GPU
+</h4>
+<p class="meta">
+Module 06 · 24 h · Cœur · en préparation
+</p>
+<p>
+Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Réseaux haute performance : InfiniBand, RoCE et NCCL
+</h4>
+<p class="meta">
+Module 07 · 28 h · Cœur · en préparation
+</p>
+<p>
+Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Stockage et E/S pour l'entraînement
+</h4>
+<p class="meta">
+Module 08 · 24 h · Cœur · en préparation
+</p>
+<p>
+Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.
+</p>
+</div>
+</div>
+<h3 class="phase" id="phase3">
+Phase 3 — Systèmes d'entraînement distribué
+</h3>
+<p class="sub-line">
+Faire tourner un entraînement multi-nœuds qui survit aux pannes.
+</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline
+</h4>
+<p class="meta">
+Module 09 · 36 h · Cœur · en préparation
+</p>
+<p>
+Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Pannes, checkpointing et reprise automatique
+</h4>
+<p class="meta">
+Module 10 · 28 h · Cœur · en préparation
+</p>
+<p>
+À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Ray, infrastructure d'apprentissage par renforcement et boucles en ligne
+</h4>
+<p class="meta">
+Module 11 · 28 h · Cœur · en préparation
+</p>
+<p>
+Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.
+</p>
+</div>
+</div>
+<h3 class="phase" id="phase4">
+Phase 4 — Plateforme cloud-native et multi-fournisseurs
+</h3>
+<p class="sub-line">
+Placer, observer et facturer des charges sur plusieurs fournisseurs.
+</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Kubernetes pour l'IA : GPU, files d'attente et gang scheduling
+</h4>
+<p class="meta">
+Module 12 · 28 h · Cœur · en préparation
+</p>
+<p>
+Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC
+</h4>
+<p class="meta">
+Module 13 · 28 h · Cœur · en préparation
+</p>
+<p>
+Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Observabilité et fiabilité d'une flotte GPU
+</h4>
+<p class="meta">
+Module 14 · 24 h · Cœur · en préparation
+</p>
+<p>
+Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+FinOps, capacité, énergie et achats de calcul
+</h4>
+<p class="meta">
+Module 15 · 24 h · Cœur · en préparation
+</p>
+<p>
+Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.
+</p>
+</div>
+</div>
+<h3 class="phase" id="phase5">
+Phase 5 — Production et leadership
+</h3>
+<p class="sub-line">
+Opérer en production, décider, négocier, diriger et passer l'entretien.
+</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Plateforme interne, sécurité, production et leadership
+</h4>
+<p class="meta">
+Module 16 · 28 h · Cœur · en préparation
+</p>
+<p>
+Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.
+</p>
+</div>
+</div>
+<h2 id="projets">Projets de portfolio</h2>
+<p>Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base.</p>
+<div class="cards">
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Mini-cluster Slurm instrumenté
+</h4>
+<p class="meta">
+Projet 1 · 24 h · en préparation
+</p>
+<p>
+Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Étude de passage à l'échelle d'un entraînement
+</h4>
+<p class="meta">
+Projet 2 · 20 h · en préparation
+</p>
+<p>
+Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Entraîneur tolérant aux pannes
+</h4>
+<p class="meta">
+Projet 3 · 24 h · en préparation
+</p>
+<p>
+Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Placement multi-fournisseurs sensible aux coûts
+</h4>
+<p class="meta">
+Projet 4 · 24 h · en préparation
+</p>
+<p>
+Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+Observabilité GPU et détection de pannes silencieuses
+</h4>
+<p class="meta">
+Projet 5 · 20 h · en préparation
+</p>
+<p>
+Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqué ou un GPU dégradé en quelques minutes.
+</p>
+</div>
+<div class="card" style="opacity:.78;border-style:dashed">
+<h4>
+RFC et prototype : une plateforme de calcul de 8 à 256 GPU
+</h4>
+<p class="meta">
+Projet 6 · 40 h · en préparation
+</p>
+<p>
+Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.
+</p>
+</div>
+</div>
+<h2 id="masters">Enquête sur les masters HPC</h2>
+<p>L'enquête sur les masters HPC (France, États-Unis, Chine, monde) est en cours de rédaction.</p>
+<h2 id="usage">Comment utiliser ce site</h2>
+<ol type="1">
+<li>Lisez le <a href="profile/index.html">point de départ</a> : il compare un profil de référence au métier visé et dit quels modules survoler et lesquels travailler à fond.</li>
+<li>Préparez votre <a href="lab-setup/index.html">environnement de travail</a> si la page est publiée : un portable CPU suffit pour la base.</li>
+<li>Suivez les phases dans l'ordre. Dans chaque module, faites les trois questions de positionnement avant de lire.</li>
+<li>Faites les labs et lancez leur <code>verify.sh</code> : un lab compte quand sa vérification passe.</li>
+<li>Terminez chaque phase par son jalon (voir la feuille de route), puis par le projet associé.</li>
+</ol>
+<h2 id="sources">Sources et portée</h2>
+<p>Ce site est un ensemble de notes d'étude indépendantes, rédigées à partir de documentations officielles, d'articles publiés et de fiches de formation publiques. Il n'est affilié à aucun établissement, éditeur ou employeur et ne remplace ni un diplôme ni une certification. Les contrats de contenu et les contrôles qui encadrent chaque page sont dans le dossier <code>specs/</code> et <code>tools/</code> du dépôt.</p>
+</main>
+</div>
+<footer class="foot">
+<p><a href="index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="assets/theme.js"></script>
+</body>
+</html>

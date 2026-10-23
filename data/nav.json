@@ -1,0 +1,12 @@
+{
+ "sequence": [
+  {
+   "href": "path/index.html",
+   "label": "Feuille de route"
+  },
+  {
+   "href": "courses/perf-models/index.html",
+   "label": "Module 02 — Architecture matérielle et modèles de performance"
+  }
+ ]
+}
