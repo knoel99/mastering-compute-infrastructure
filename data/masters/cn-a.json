@@ -1,0 +1,15 @@
+{
+ "unit": "cn-a",
+ "region": "china",
+ "retrieved_on": "2026-10-22",
+ "programmes": [],
+ "ecosystem": [],
+ "blocked_sources": [],
+ "verification": {
+  "status": "unverified",
+  "checked_claims": 0,
+  "corrected": 0,
+  "removed": 0,
+  "notes": ""
+ }
+}

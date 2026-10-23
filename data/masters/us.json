@@ -381,6 +381,235 @@
    ],
    "confidence": "medium",
    "notes": "The degree is a general CS master delivered online; the HPC content is a set of electives, not a track. Course availability varies by term (Current Courses page). Cost, admission criteria and typical duration were not recorded. Topics not examined are null."
+  },
+  {
+   "id": "us-uiuc-ms-cs-cse",
+   "country": "US",
+   "institution": "University of Illinois Urbana-Champaign (Siebel School of Computing and Data Science; Computational Science and Engineering programme; NCSA)",
+   "programme_name": "MS in Computer Science / MCS (Architecture, Compilers, Parallel Computing area) with the CSE Graduate Concentration",
+   "degree": "MS",
+   "urls": [
+    "https://siebelschool.illinois.edu/academics/graduate/ms-program",
+    "https://siebelschool.illinois.edu/academics/graduate/professional-mcs/degree-reqs",
+    "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/",
+    "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/",
+    "https://catalog.illinois.edu/courses-of-instruction/cs/",
+    "https://catalog.illinois.edu/courses-of-instruction/ece/",
+    "https://www.ncsa.illinois.edu/resources-and-services/compute-resources/delta/"
+   ],
+   "duration": "Not stated on the pages read (credit-hour based)",
+   "credits": "MS: 28 credit hours coursework + 4 credit hours thesis; MCS: 32 credit hours coursework only; CSE concentration: 16 graduate credit hours counted inside the degree",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Not read in detail; the MCS page states no GRE is required for admission. The CSE concentration is open only to students already enrolled in participating graduate programmes.",
+   "focus": "cse",
+   "structure_summary": "Illinois has no stand-alone HPC master. The HPC route is a CS MS (research, thesis) or MCS (coursework) whose breadth area 'Architecture, Compilers, Parallel Computing' contains CS 483/484 (parallel programming), CS 533 (parallel architecture), plus an optional transcript-listed CSE concentration (two core + two computing electives, 4 hours each) that adds parallel numerical algorithms (CS 554), parallel programming and applied parallel programming.",
+   "core_courses": [
+    {
+     "name": "CS 484 Parallel Programming",
+     "credits": "3 or 4 credit hours",
+     "topics": [
+      "openmp-threads",
+      "mpi",
+      "perf-model",
+      "parallel-algos"
+     ],
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/"
+    },
+    {
+     "name": "ECE 408 / CS 483 / CSE 408 Applied Parallel Programming",
+     "credits": "4 credit hours",
+     "topics": [
+      "gpu-prog",
+      "parallel-algos"
+     ],
+     "url": "https://catalog.illinois.edu/courses-of-instruction/ece/"
+    },
+    {
+     "name": "CS 420 / CSE 402 / ECE 492 Parallel Programming: Science and Engineering",
+     "credits": "3 or 4 credit hours",
+     "topics": [
+      "perf-model",
+      "openmp-threads",
+      "mpi"
+     ],
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/"
+    },
+    {
+     "name": "CS 554 / CSE 512 Parallel Numerical Algorithms",
+     "credits": "4 credit hours",
+     "topics": [
+      "numerics",
+      "parallel-algos"
+     ],
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/"
+    },
+    {
+     "name": "CSE 527 / CS 519 Scientific Visualization (CSE concentration core option)",
+     "credits": "4 credit hours",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "CS 533 / CSE 522 Parallel Computer Architecture",
+     "topics": [
+      "arch",
+      "parallel-algos"
+     ],
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/"
+    },
+    {
+     "name": "ECE 508 / CS 508 Manycore Parallel Algorithms",
+     "topics": [
+      "gpu-prog",
+      "parallel-algos",
+      "perf-model"
+     ],
+     "url": "https://catalog.illinois.edu/courses-of-instruction/ece/"
+    },
+    {
+     "name": "CSE 422 / CS 433 Computer System Organization",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/"
+    },
+    {
+     "name": "CSE 423 / CS 423 Operating Systems Design",
+     "topics": [
+      "sysadmin"
+     ],
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/"
+    },
+    {
+     "name": "CSE 566 / ATMS 502 Numerical Fluid Dynamics",
+     "topics": [
+      "simulation-apps",
+      "numerics"
+     ],
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/"
+    },
+    {
+     "name": "CSE 511 / CS 556 Iterative and Multigrid Solvers",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/"
+    }
+   ],
+   "capstone": "MS: 4 credit hours of thesis. MCS: coursework only. CSE concentration: thesis with a significant computational component, or (non-thesis MS) a 4-hour independent-study capstone project supervised by CSE-affiliated faculty.",
+   "machines_access": [
+    "NCSA Delta (NSF-funded GPU system), listed on the NCSA site with an allocation process; use by coursework or master's students not confirmed on pages read"
+   ],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": 1,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 1,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "MS CS = 28 coursework + 4 thesis credit hours",
+     "url": "https://siebelschool.illinois.edu/academics/graduate/ms-program",
+     "quote": "requires 28 credit hours of coursework and 4 credit hours of thesis",
+     "source": "web"
+    },
+    {
+     "claim": "MCS is a 32-credit coursework-only degree",
+     "url": "https://siebelschool.illinois.edu/academics/graduate/professional-mcs/degree-reqs",
+     "quote": "The MCS program is a coursework-only degree consisting of 32 credit hours with no GRE required for admission.",
+     "source": "web"
+    },
+    {
+     "claim": "Breadth area Architecture, Compilers, Parallel Computing includes CS 483, 484, 533",
+     "url": "https://siebelschool.illinois.edu/academics/graduate/ms-program",
+     "quote": "Architecture, Compilers, Parallel Computing: CS 426, 431, 433, 483, 484, 526, 533, 534, 536",
+     "source": "web"
+    },
+    {
+     "claim": "CS 484 covers OpenMP, MPI and tuning",
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/",
+     "quote": "libraries and languages for parallel programming such as OpenMP and MPI, performance monitoring, program tuning",
+     "source": "web"
+    },
+    {
+     "claim": "ECE 408 / CS 483 targets many-core processors",
+     "url": "https://catalog.illinois.edu/courses-of-instruction/ece/",
+     "quote": "Parallel programming with emphasis on developing applications for processors with many computation cores.",
+     "source": "web"
+    },
+    {
+     "claim": "CS 554 parallel numerical algorithms",
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/",
+     "quote": "Numerical algorithms for parallel computers: parallel algorithms in numerical linear algebra",
+     "source": "web"
+    },
+    {
+     "claim": "CS 533 parallel computer architecture",
+     "url": "https://catalog.illinois.edu/courses-of-instruction/cs/",
+     "quote": "Theoretical aspects of parallel and pipeline computation",
+     "source": "web"
+    },
+    {
+     "claim": "ECE 508 scalability techniques for parallel software",
+     "url": "https://catalog.illinois.edu/courses-of-instruction/ece/",
+     "quote": "Algorithm techniques for enhancing the scalability of parallel software",
+     "source": "web"
+    },
+    {
+     "claim": "CSE concentration size",
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/",
+     "quote": "This concentration requires students to complete 16 graduate credit hours.",
+     "source": "web"
+    },
+    {
+     "claim": "CSE concentration requires computational thesis or capstone",
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/",
+     "quote": "The graduate thesis must have a significant computational component",
+     "source": "web"
+    },
+    {
+     "claim": "NCSA Delta GPU resource",
+     "url": "https://www.ncsa.illinois.edu/resources-and-services/compute-resources/delta/",
+     "quote": "Delta is the largest x86 based GPU computing resource in NSF’s portfolio",
+     "source": "web"
+    },
+    {
+     "claim": "Parallel Programming and Applied Parallel Programming are approved CSE concentration courses",
+     "url": "https://cse.illinois.edu/cse-educational-programs/graduate-concentration/cse-approved-concentration-courses/",
+     "quote": "Applied Parallel Programming",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "This record describes a pathway, not a branded HPC master: availability of each course per term and the actual student access to Delta were not verified. ECE 408 catalogue text does not name CUDA, hence gpu-prog = 1. Duration, admission requirements and cost not recorded. Distributed systems, scheduling, storage, containers, cloud and resilience are null (not examined)."
   }
  ],
  "ecosystem": [],

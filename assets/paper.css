@@ -570,3 +570,16 @@ main .crumb { max-width: none; padding: 0; margin: 0 0 1rem; }
 figure.fig { margin: 1.8rem 0; }
 figure.fig svg { display: block; width: 100%; height: auto; color: var(--ink); }
 figure.fig figcaption { margin-top: .5rem; font-size: .98rem; color: var(--soft); }
+.bars { margin: 1.2rem 0 1.8rem; display: grid; gap: .35rem; }
+.bars .bar { display: grid; grid-template-columns: minmax(8.5rem, 13rem) 1fr 3.4rem; gap: .6rem; align-items: center; font-size: .98rem; }
+.bars .track { display: block; height: .85rem; background: var(--th-bg); border: 1px solid var(--hair); border-radius: .2rem; overflow: hidden; }
+.bars .fill { display: block; height: 100%; background: var(--accent); }
+.bars .fill.two { background: var(--key-bar); }
+.bars .val { text-align: right; font-weight: 700; }
+@media (max-width: 520px) { .bars .bar { grid-template-columns: 1fr 3.4rem; } .bars .bar .lab { grid-column: 1 / -1; } }
+.sym2 { font-weight: 800; color: var(--key-tag); }
+.sym1 { font-weight: 800; color: var(--def-tag); }
+.sym0, .symn { color: var(--nc); }
+
+/* masters heat table: the 14 narrow columns are centred */
+main table td:not(:first-child) .sym2, main table td:not(:first-child) .sym1, main table td:not(:first-child) .sym0, main table td:not(:first-child) .symn { display: block; text-align: center; }
