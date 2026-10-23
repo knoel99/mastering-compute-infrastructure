@@ -1,6 +1,10 @@
 {
  "sequence": [
   {
+   "href": "profile/index.html",
+   "label": "Point de départ"
+  },
+  {
    "href": "path/index.html",
    "label": "Feuille de route"
   },

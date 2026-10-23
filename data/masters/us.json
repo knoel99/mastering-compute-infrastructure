@@ -1,0 +1,395 @@
+{
+ "unit": "us",
+ "region": "usa",
+ "retrieved_on": "2026-10-22",
+ "programmes": [
+  {
+   "id": "us-gatech-ms-cse",
+   "country": "US",
+   "institution": "Georgia Institute of Technology (College of Computing / College of Engineering / College of Sciences; School of Computational Science and Engineering)",
+   "programme_name": "MS in Computational Science and Engineering (CSE)",
+   "degree": "MS",
+   "urls": [
+    "https://catalog.gatech.edu/programs/computational-science-engineering-ms/",
+    "https://catalog.gatech.edu/courses-grad/cse/",
+    "https://cse.gatech.edu/ms-computational-science-and-engineering",
+    "https://cse.gatech.edu/cse-ms-application-requirements",
+    "https://cse6220.gatech.edu/fa26-oms/"
+   ],
+   "duration": "Not stated on the catalogue or CSE pages read (length is expressed as credit hours; typical full-time duration not confirmed)",
+   "credits": "30 US credit hours (12 core + 6 minor-related + 6 non-CS/CSE + 6 course or thesis, per 2026-2027 catalogue)",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Bachelor's degree in a technical field (CS, mathematics, science or engineering); desired: calculus through multivariable, linear algebra, probability/statistics, 1-2 computing courses and proficiency in a high-level language (C/C++, Python, Java). Missing background may require extra coursework.",
+   "focus": "cse",
+   "structure_summary": "Interdisciplinary MS jointly offered by Computing, Engineering and Sciences. Students pick four of five core courses (numerical linear algebra, CSE algorithms, modelling and simulation, computational data analysis, High Performance Computing), then a specialisation minor with an application area, and finish with either 6 credits of coursework or a defended thesis. HPC is one core option, not mandatory.",
+   "core_courses": [
+    {
+     "name": "CSE/MATH 6643 Numerical Linear Algebra",
+     "credits": "3 credit hours",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE 6140 Computational Science and Engineering Algorithms",
+     "credits": "3 credit hours",
+     "topics": [
+      "parallel-algos",
+      "perf-model"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE 6730 Modeling and Simulation: Foundations and Implementation",
+     "credits": "3 credit hours",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE/ISYE 6740 Computational Data Analysis: Learning, Mining, and Computation",
+     "credits": "3 credit hours",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE 6220 High Performance Computing",
+     "credits": "3 credit hours",
+     "topics": [
+      "parallel-algos",
+      "openmp-threads",
+      "mpi",
+      "arch",
+      "interconnect",
+      "energy",
+      "perf-model"
+     ],
+     "url": "https://cse6220.gatech.edu/fa26-oms/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "CSE 6230 High Performance Parallel Computing: Tools and Applications",
+     "topics": [
+      "perf-model",
+      "mpi",
+      "openmp-threads"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE 6644 Iterative Methods for Systems of Equations",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE 6141 Massive Graph Analysis",
+     "topics": [
+      "parallel-algos",
+      "bigdata"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    },
+    {
+     "name": "CSE 6242 Data and Visual Analytics",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://catalog.gatech.edu/courses-grad/cse/"
+    }
+   ],
+   "capstone": "Either 6 credit hours of approved coursework (course option) or an MS thesis defended before a thesis committee (thesis option).",
+   "machines_access": [
+    "PACE (Partnership for an Advanced Computing Environment): Phoenix cluster and ICE instructional cluster, listed with classroom/teaching resources; use by MS CSE courses not confirmed on the pages read"
+   ],
+   "industry_links": [
+    "CSE page lists target careers in industry, national laboratories and government contractors (modelling and simulation, HPC, data mining)"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": null,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": 1,
+    "quantum-emerging": null,
+    "viz": 1,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Total programme size is 30 credit hours",
+     "url": "https://catalog.gatech.edu/programs/computational-science-engineering-ms/",
+     "quote": "Total Credit Hours 30",
+     "source": "web"
+    },
+    {
+     "claim": "Core: choose four of five, including CSE 6220 High Performance Computing",
+     "url": "https://catalog.gatech.edu/programs/computational-science-engineering-ms/",
+     "quote": "CSE 6220 High Performance Computing",
+     "source": "web"
+    },
+    {
+     "claim": "Core options include numerical linear algebra and modelling and simulation",
+     "url": "https://catalog.gatech.edu/programs/computational-science-engineering-ms/",
+     "quote": "CSE 6730 Modeling and Simulation: Foundations and Implementation",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6220 catalogue description is application-oriented HPC",
+     "url": "https://catalog.gatech.edu/courses-grad/cse/",
+     "quote": "This course will introduce students to the design, analysis, and implementation of high performance computational science and engineering applications.",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6230 emphasises practical HPC on multiple parallel machines",
+     "url": "https://catalog.gatech.edu/courses-grad/cse/",
+     "quote": "Emphasizes practical issues in high-performance computing.",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6220 syllabus names OpenMP and MPI as programming models",
+     "url": "https://cse6220.gatech.edu/fa26-oms/",
+     "quote": "using practical programming models such as Cilk Plus, OpenMP, MPI, or possibly others",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6220 topics include network topology and energy/power metrics",
+     "url": "https://cse6220.gatech.edu/fa26-oms/",
+     "quote": "Efficiency metrics, including “emerging” metrics like energy and power",
+     "source": "web"
+    },
+    {
+     "claim": "Entry requirement: technical bachelor's degree",
+     "url": "https://cse.gatech.edu/cse-ms-application-requirements",
+     "quote": "Most students entering the CSE graduate degree programs will have obtained a bachelors degree in a technical field",
+     "source": "web"
+    },
+    {
+     "claim": "Career targets include national laboratories and HPC",
+     "url": "https://cse.gatech.edu/ms-computational-science-and-engineering",
+     "quote": "systems integration, data mining and visualization, high performance computing, and computational modeling",
+     "source": "web"
+    },
+    {
+     "claim": "Thesis or coursework option",
+     "url": "https://catalog.gatech.edu/programs/computational-science-engineering-ms/",
+     "quote": "Students must either complete 6 additional hours of approved coursework (course option) or an MS thesis",
+     "source": "web"
+    },
+    {
+     "claim": "PACE provides HPC resources including classroom resources and an instructional cluster",
+     "url": "https://pace.gatech.edu/",
+     "quote": "Classroom & Teaching Resources",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "HPC is a core option among five; the CSE MS is breadth-oriented computational science, not an infrastructure/ops programme. Duration and the exact course schedule are not stated on the pages read. topic_coverage 1 for catalogue-only elective mentions. GPU programming, scheduling, sysadmin, storage and containers are null (no accessible syllabus examined), not 0."
+  },
+  {
+   "id": "us-gatech-omscs",
+   "country": "US",
+   "institution": "Georgia Institute of Technology (College of Computing)",
+   "programme_name": "Online Master of Science in Computer Science (OMSCS), with HPC/systems electives (CSE 6220, CS 7295, CS 6290, CS 7210)",
+   "degree": "MS",
+   "urls": [
+    "https://omscs.gatech.edu/degree-requirements",
+    "https://omscs.gatech.edu/current-courses",
+    "https://omscs.gatech.edu/cse-6220-intro-high-performance-computing",
+    "https://omscs.gatech.edu/cs-7295-gpu-hardware-and-software",
+    "https://omscs.gatech.edu/cs-6290-high-performance-computer-architecture",
+    "https://omscs.gatech.edu/cs-7210-distributed-computing",
+    "https://omscs.gatech.edu/cs-6211-system-design-cloud-computing"
+   ],
+   "duration": "Not stated on the degree-requirements page read (part-time online, course by course)",
+   "credits": "30 US credit hours (10 courses)",
+   "language": "English",
+   "delivery": "online",
+   "entry_requirements": "Not read in detail. CSE 6220 suggests prior algorithms course (CS 6515 or undergraduate), C/C++ programming and *nix command-line experience.",
+   "focus": "mixed",
+   "structure_summary": "Online CS master requiring one specialisation (15-18 credit hours) plus free electives from any OMSCS course. There is no HPC specialisation, but the catalogue lets a student assemble an HPC/accelerator track: CSE 6220 (parallel algorithms, OpenMP/MPI), CS 7295 (GPU hardware and CUDA), CS 6290 (computer architecture), CS 7210 (distributed computing) and CS 6211 (cloud system design).",
+   "core_courses": [],
+   "electives": [
+    {
+     "name": "CSE 6220 Intro to High-Performance Computing",
+     "topics": [
+      "parallel-algos",
+      "openmp-threads",
+      "mpi",
+      "arch",
+      "perf-model",
+      "interconnect"
+     ],
+     "url": "https://omscs.gatech.edu/cse-6220-intro-high-performance-computing"
+    },
+    {
+     "name": "CS 7295 GPU Hardware and Software",
+     "topics": [
+      "gpu-prog",
+      "arch"
+     ],
+     "url": "https://omscs.gatech.edu/cs-7295-gpu-hardware-and-software"
+    },
+    {
+     "name": "CS 6290 High Performance Computer Architecture",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://omscs.gatech.edu/cs-6290-high-performance-computer-architecture"
+    },
+    {
+     "name": "CS 7210 Distributed Computing",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://omscs.gatech.edu/cs-7210-distributed-computing"
+    },
+    {
+     "name": "CS 6211 System Design for Cloud Computing",
+     "topics": [
+      "cloud",
+      "distributed-sys",
+      "interconnect"
+     ],
+     "url": "https://omscs.gatech.edu/cs-6211-system-design-cloud-computing"
+    },
+    {
+     "name": "CS 6210 Advanced Operating Systems",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://omscs.gatech.edu/current-courses"
+    }
+   ],
+   "capstone": "None required by the degree-requirements page read.",
+   "machines_access": [],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": 2,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": 1,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": 2,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": 1,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": null,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "30 credit hours, 10 courses",
+     "url": "https://omscs.gatech.edu/degree-requirements",
+     "quote": "The OMSCS degree requires students to complete 30 total credit hours (10 courses).",
+     "source": "web"
+    },
+    {
+     "claim": "Specialisation requirement and free electives",
+     "url": "https://omscs.gatech.edu/degree-requirements",
+     "quote": "Specializations each require 15 to 18 credit hours",
+     "source": "web"
+    },
+    {
+     "claim": "HPC and systems courses are in the OMSCS course list",
+     "url": "https://omscs.gatech.edu/current-courses",
+     "quote": "CSE 6220: Intro to High-Performance Computing",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6220 is a graduate introduction to scalable parallel algorithms",
+     "url": "https://omscs.gatech.edu/cse-6220-intro-high-performance-computing",
+     "quote": "This course is a graduate-level introduction to scalable parallel algorithms.",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6220 programming models",
+     "url": "https://omscs.gatech.edu/cse-6220-intro-high-performance-computing",
+     "quote": "Programming models you’ll use include OpenMP, MPI, and possibly others.",
+     "source": "web"
+    },
+    {
+     "claim": "GPU course covers CUDA and GPU architecture",
+     "url": "https://omscs.gatech.edu/cs-7295-gpu-hardware-and-software",
+     "quote": "you'll gain basic CUDA programming skills, learn optimization techniques, and develop a solid understanding of GPU architecture",
+     "source": "web"
+    },
+    {
+     "claim": "Computer architecture course covers multi- and many-core processors",
+     "url": "https://omscs.gatech.edu/cs-6290-high-performance-computer-architecture",
+     "quote": "cache coherence and consistency, and multi- and many-core processors",
+     "source": "web"
+    },
+    {
+     "claim": "Distributed computing course covers core concepts and system designs",
+     "url": "https://omscs.gatech.edu/cs-7210-distributed-computing",
+     "quote": "core concepts of distributed computing",
+     "source": "web"
+    },
+    {
+     "claim": "Cloud course builds layers of cloud infrastructure",
+     "url": "https://omscs.gatech.edu/cs-6211-system-design-cloud-computing",
+     "quote": "developing different layers of a cloud computing infrastructure including software defined networks, distributed runtime systems",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 6220 suggested background",
+     "url": "https://omscs.gatech.edu/cse-6220-intro-high-performance-computing",
+     "quote": "Have programming experience in a “low- level” “high-level” language like C or C++",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "The degree is a general CS master delivered online; the HPC content is a set of electives, not a track. Course availability varies by term (Current Courses page). Cost, admission criteria and typical duration were not recorded. Topics not examined are null."
+  }
+ ],
+ "ecosystem": [],
+ "blocked_sources": [],
+ "verification": {
+  "status": "unverified",
+  "checked_claims": 0,
+  "corrected": 0,
+  "removed": 0,
+  "notes": ""
+ }
+}

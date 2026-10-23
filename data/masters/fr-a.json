@@ -596,6 +596,12 @@
      "url": "https://www.onisep.fr/ressources/structures-enseignement/nouvelle-aquitaine/gironde/unite-de-formation-d-informatique-universite-de-bordeaux/master-mention-informatique",
      "quote": "Calcul intensif et sciences des données (M2)",
      "source": "web"
+    },
+    {
+     "claim": "CISD is listed as a member of the national CHPS masters network",
+     "url": "https://master-chps.fr/about/",
+     "quote": "Parcours CISD, ENSEIRB-MATMECA, Université de Bordeaux",
+     "source": "web"
     }
    ],
    "confidence": "high",
@@ -753,7 +759,8 @@
    "industry_links": [
     "S9 elective 'Projet USRP par SILICOM' (industrial partner project)",
     "Optimisation globale taught by an ENAC professor",
-    "PFE and 2A internship in companies (details not read)"
+    "PFE and 2A internship in companies (details not read)",
+    "Member of the national Réseau des Masters CHPS (master-chps.fr): joint seminars, shared internships, Teratec hackathon"
    ],
    "topic_coverage": {
     "openmp-threads": 2,
@@ -855,19 +862,559 @@
      "url": "https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf",
      "quote": "Toutes les informations de cette page sont indicatives et n'ont pas de valeur contractuelle",
      "source": "web"
+    },
+    {
+     "claim": "The ENSEEIHT HPC parcours is listed as a member of the national CHPS masters network",
+     "url": "https://master-chps.fr/about/",
+     "quote": "Parcours CHPS, ENSEEITH (Toulouse)",
+     "source": "web"
     }
    ],
    "confidence": "high",
    "notes": "Toulouse has no standalone HPC master found; the HPC-oriented offer is the HPC et Big Data parcours of the ENSEEIHT engineering degree (Master-level). The search also showed a Mastère Spécialisé 'Ingénierie pour la Valorisation des Données Massives' (Bac+6, with a unit 'Calcul Haute performance et applications'), not read in detail. S9 descriptions of the mandatory UEs were read in full, so 0 for viz means they do not mention it; the S7/S8 sheets list titles only and the pages for the two 'Infrastructure for ...' electives are empty, hence null for sysadmin, scheduling, containers, ML systems and observability. Elective-based topics (cloud, bigdata, quantum) are scored 2 because a dedicated course names the theme, but they are optional. Page text is flagged 'indicatives et n'ont pas de valeur contractuelle'."
+  },
+  {
+   "id": "fr-grenoble-mosig",
+   "country": "FR",
+   "institution": "Université Grenoble Alpes (UFR IM2AG) and Grenoble INP - Ensimag",
+   "programme_name": "Master of Science in Informatics at Grenoble (MoSIG), Master Informatique UGA",
+   "degree": "MSc / Master Informatique (M1 + M2, Bac+5)",
+   "urls": [
+    "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+    "https://master-informatique.univ-grenoble-alpes.fr/academic-program/master-of-science-mosig/master-of-science-mosig-79796.kjsp?RH=1467387999848",
+    "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-parallel-algorithms-and-programming-IFZ6CMGD.html",
+    "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-cloud-computing-from-infrastructure-to-applications-KPGXHIZL.html",
+    "https://master-informatique.univ-grenoble-alpes.fr/projets-recherche-et-industrie/parallel-distributed-embedded-systems/"
+   ],
+   "duration": "2 years (M1 + M2); students can apply to the full programme or to the 2nd year; M2 S10 is a 4 to 6 month internship/research project",
+   "credits": "120 ECTS for the master; M2 semester 9 = 30 ECTS (24 ECTS in the chosen theme + 6 ECTS from another theme); S10 research project 30 ECTS",
+   "language": "English (the MoSIG track is taught entirely in English)",
+   "delivery": "on-site",
+   "entry_requirements": "M1: licence-level degree (BSc in computer science/engineering or equivalent, Bac+3 entry) on file and/or interview. M2: validated compatible M1 on file and/or interview. Open to Ensimag, Polytech Grenoble and UGA master students.",
+   "focus": "cloud-distributed",
+   "structure_summary": "Research-oriented computer-science MSc with a broad first year (compilers, operating systems, networks, distributed systems, optional Parallel Algorithms and Programming with OpenMP/MPI labs) and a second year of thematic courses. The 2026-2027 M2 list includes Cloud Computing from infrastructure to applications (6 ECTS), Large scale Data Management (6), Distributed System (3), Virtualization (3), Advanced networking (6) and Scientific Methodology and Performance Evaluation (3), then a 30-ECTS research project. HPC proper (parallel algorithms, OpenMP, MPI) appears as one optional 3-ECTS M1 unit; the older 'Parallel systems' M2 unit seen in a 2021 sheet is not in the 2026-2027 list read.",
+   "core_courses": [
+    {
+     "name": "M1 - Principles of operating systems",
+     "credits": "6 ECTS",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html"
+    },
+    {
+     "name": "M2 - Cloud Computing, from infrastructure to applications (virtualization: hypervisors, kernels, containers; microservices; cloud services)",
+     "credits": "6 ECTS",
+     "topics": [
+      "cloud",
+      "containers-k8s",
+      "distributed-sys",
+      "resilience"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-cloud-computing-from-infrastructure-to-applications-KPGXHIZL.html"
+    },
+    {
+     "name": "M2 - Large scale Data Management (description not available)",
+     "credits": "6 ECTS",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-large-scale-data-management-MBKKQOZX.html"
+    },
+    {
+     "name": "M2 - Distributed System",
+     "credits": "3 ECTS",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-distributed-system-MC1Q4OGA.html"
+    },
+    {
+     "name": "M2 - Virtualization",
+     "credits": "3 ECTS",
+     "topics": [
+      "containers-k8s",
+      "cloud"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-virtualization-MC1Q72TQ.html"
+    },
+    {
+     "name": "M2 - Scientific Methodology and Performance Evaluation",
+     "credits": "3 ECTS",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html"
+    },
+    {
+     "name": "M2 - Research project",
+     "credits": "30 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html"
+    }
+   ],
+   "electives": [
+    {
+     "name": "M1 - Parallel Algorithms and Programming (architecture, algorithms, parallel languages, performance measurement; OpenMP and MPI labs)",
+     "topics": [
+      "openmp-threads",
+      "mpi",
+      "parallel-algos",
+      "arch",
+      "perf-model"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-parallel-algorithms-and-programming-IFZ6CMGD.html"
+    },
+    {
+     "name": "M1 - Introduction to distributed systems",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-introduction-to-distributed-systems-IFZBEHGO.html"
+    },
+    {
+     "name": "M1 - Computer networks principles / M2 - Advanced networking (6 ECTS)",
+     "topics": [],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html"
+    },
+    {
+     "name": "M1 - Foundations of Data Science",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html"
+    }
+   ],
+   "capstone": "M1 compulsory 4-6 month internship or research project (second semester); M2 S10 research project of 30 ECTS, in a research lab or company R&D",
+   "machines_access": [],
+   "industry_links": [
+    "Research teams listed for the Parallel, Distributed, Embedded Systems theme: Inria CORSE, LIG DRAKKAR, ERODS, MESCAL, MOAIS",
+    "Stage or research project can be done in a company R&D department",
+    "Labelled 'Core AI' by MIAI (Multidisciplinary Institute in Artificial intelligence); double degree possible with Swansea"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": null,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 0,
+    "simulation-apps": 0,
+    "parallel-algos": 2,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": 2,
+    "cloud": 2,
+    "bigdata": null,
+    "ml-dl": 1,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": 0,
+    "viz": 1,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Master Informatique UGA: Bac+5 level, 120 ECTS, 2 years",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "Niveau d'étude visé Bac +5 ECTS 120 crédits Durée 2 ans",
+     "source": "web"
+    },
+    {
+     "claim": "Semester 9 is 30 ECTS with 24 ECTS in the chosen theme",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "Pour le semestre S9 de 30 ECTS, les étudiants doivent choisir des cours d'une valeur de 24 ECTS dans le thème qu'ils ont choisi",
+     "source": "web"
+    },
+    {
+     "claim": "Mandatory 4 to 6 month internship or research project",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "Un stage ou projet de recherche obligatoire de 4 à 6 mois est effectué au deuxième semestre",
+     "source": "web"
+    },
+    {
+     "claim": "Catalogue flags the programme as under construction pending a council vote",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "Programme en cours de construction - en attente de vote CFVU",
+     "source": "web"
+    },
+    {
+     "claim": "M2 includes a 6-ECTS Cloud Computing unit",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "UE Cloud Computing, from infrastructure to applications 6 crédits",
+     "source": "web"
+    },
+    {
+     "claim": "Cloud unit covers hypervisors, kernels and containers",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-cloud-computing-from-infrastructure-to-applications-KPGXHIZL.html",
+     "quote": "Virtualization technologies (hypervisors, kernels, and containers) enabling flexible, efficient, safe and secure hosting of code and data",
+     "source": "web"
+    },
+    {
+     "claim": "Parallel Algorithms and Programming unit has OpenMP and MPI labs",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-parallel-algorithms-and-programming-IFZ6CMGD.html",
+     "quote": "with the language extensions OpenMP and MPI",
+     "source": "web"
+    },
+    {
+     "claim": "Parallel Algorithms and Programming is 3 ECTS",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "UE Parallel Algorithms and Programming 3 crédits",
+     "source": "web"
+    },
+    {
+     "claim": "Programme is taught in English",
+     "url": "https://master-informatique.univ-grenoble-alpes.fr/academic-program/master-of-science-mosig/master-of-science-mosig-79796.kjsp?RH=1467387999848",
+     "quote": "Courseware is offered in English",
+     "source": "web"
+    },
+    {
+     "claim": "Research teams behind the parallel/distributed theme",
+     "url": "https://master-informatique.univ-grenoble-alpes.fr/projets-recherche-et-industrie/parallel-distributed-embedded-systems/",
+     "quote": "MOAIS - Parallel Algorithms, Programming Models, Scheduling and Interactive Computing",
+     "source": "web"
+    },
+    {
+     "claim": "M2 admission on file or interview after a compatible M1",
+     "url": "https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html",
+     "quote": "La 2e année de master est accessible sur dossier (et / ou entretien) aux candidats ayant validé la 1ère année d'un parcours compatible",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "HPC content is thin: one optional 3-ECTS M1 unit (Parallel Algorithms and Programming) and no M2 unit named HPC or GPU in the 2026-2027 list read; the 2021 sheet of the same master listed 'Parallel systems' (6 ECTS), 'Software infrastructure for data centers and Cloud computing' and 'Scheduling', now absent. Descriptions were read for only 2 of the units (Parallel Algorithms and Programming, Cloud Computing), so topic values rest on titles for the rest; 0 means no unit title in the whole M1/M2 list names the theme (numerics, simulation, quantum). The catalogue URL says 'catalogue-2021' but shows 2026-2027 and 2027-2028 programme tabs and is flagged as under construction pending a vote. mosig.imag.fr (official MoSIG site) was unreachable. The older CHPS-type Grenoble offer (Ensimag filière) was not found."
+  },
+  {
+   "id": "fr-saclay-dipac",
+   "country": "FR",
+   "institution": "Université Paris-Saclay (Master Informatique)",
+   "programme_name": "M2 Distributed and Parallel Computing (DiPaC), following the M1 DiPaQ",
+   "degree": "M2",
+   "urls": [
+    "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+   ],
+   "duration": "M2 year: indicative dates 04/09/2026 to 30/09/2027; two teaching semesters (Semester 1 and Semester 2 in the unit table) plus a compulsory 6-month internship",
+   "credits": "Not stated as a total on the page read; the listed core units are 3 ECTS each (e.g. GPU programming 3 ECTS).",
+   "language": "English (all courses taught in English; French interactions possible)",
+   "delivery": "on-site",
+   "entry_requirements": "Strong computer-science background with parallel programming and distributed-systems basics, strong mathematics (linear algebra) and programming; natural continuation of the M1 DiPaQ; excellent related-master or engineering-school (double cursus) students admitted. 20 places; applications 15/04/2026 to 30/05/2026 on the Inception platform.",
+   "focus": "hpc-core",
+   "structure_summary": "Advanced HPC and large-scale distributed-algorithms master taught in English. Core units cover GPU programming, data-parallel C++ programming, mobile-agent algorithms, nature-inspired algorithms, tensor computing and scientific computing, with a compulsory large-scale data management unit, one optional opening unit (ZX calculus, machine learning, signal processing or graph analytics), a soft-skill unit and a 6-month internship. Students specialise either in high-performance data analytics and AI (HPDA) or in hybrid HPC/quantum computing (HQI).",
+   "core_courses": [
+    {
+     "name": "Programmation GPU (GPU programming)",
+     "credits": "3 ECTS",
+     "topics": [
+      "gpu-prog"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "Programmation à base du parallélisme de données en C++ (data-parallel programming in C++)",
+     "credits": "3 ECTS",
+     "topics": [
+      "openmp-threads",
+      "parallel-algos"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "Algorithmes d'agents mobiles (mobile-agent algorithms)",
+     "credits": "3 ECTS",
+     "topics": [
+      "distributed-sys",
+      "parallel-algos"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "Algorithmes de la nature (nature-inspired algorithms)",
+     "credits": "3 ECTS",
+     "topics": [
+      "distributed-sys",
+      "parallel-algos"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "Calcul tensoriel (tensor computing)",
+     "credits": "3 ECTS",
+     "topics": [
+      "numerics",
+      "ml-dl"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "Calcul scientifique (scientific computing)",
+     "credits": "3 ECTS",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "[DKAI] Large-Scale Data Management and Data Quality (compulsory opening unit)",
+     "credits": "not read",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    }
+   ],
+   "electives": [
+    {
+     "name": "[M2 DiPaC] ZX calculus (quantum)",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "[AI] Machine Learning Basics 1 and 2",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "[AI] Signal Processing",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    },
+    {
+     "name": "[DKAI] Graph Analytics",
+     "topics": [
+      "bigdata",
+      "parallel-algos"
+     ],
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac"
+    }
+   ],
+   "capstone": "Compulsory 6-month internship on M2 DiPaC themes",
+   "machines_access": [],
+   "industry_links": [
+    "Programme integrated into the Paris-Saclay ecosystem of research laboratories and industrial partners (partners not named on the page read)",
+    "Double-cursus route with CentraleSupélec, Polytech Paris-Saclay and ENSTA Paris engineering students",
+    "Career targets: R&D engineer, ML engineer, research engineer, PhD"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": null,
+    "gpu-prog": 2,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 2,
+    "simulation-apps": 1,
+    "parallel-algos": 2,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": 1,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": null,
+    "cloud": 1,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": 1,
+    "energy": 1,
+    "quantum-emerging": 2,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "All courses are taught in English",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "La langue officielle du programme est l’anglais ; tous les cours sont dispensés en anglais.",
+     "source": "web"
+    },
+    {
+     "claim": "Compulsory 6-month internship",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Un stage obligatoire de 6 mois sur les thèmes du M2 DiPaC complète le programme.",
+     "source": "web"
+    },
+    {
+     "claim": "GPU programming is a 3-ECTS core unit in semester 1",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Programmation GPU 3 Semester 1",
+     "source": "web"
+    },
+    {
+     "claim": "Competence: scheduling and load balancing of parallel jobs on clusters and clouds",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Planification et équilibrage de charge des travaux parallèles sur clusters et clouds.",
+     "source": "web"
+    },
+    {
+     "claim": "Competence: HPC software engineering with modern C++, tests, CI and reproducibility",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Ingénierie logicielle pour le HPC : C++ moderne, tests, CI, reproductibilité.",
+     "source": "web"
+    },
+    {
+     "claim": "Students get access to university machines and partner supercomputers (machines not named)",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Accès aux machines universitaires et aux supercalculateurs partenaires pour TP, projets, développement et optimisation de code.",
+     "source": "web"
+    },
+    {
+     "claim": "Knowledge goals include replication, consensus and consistency in large-scale distributed systems",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "réplication, consensus, cohérence, agents mobiles et algorithmes inspirés de la nature",
+     "source": "web"
+    },
+    {
+     "claim": "Compulsory opening unit on large-scale data management",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "[DKAI] Large-Scale Data Management and Data Quality",
+     "source": "web"
+    },
+    {
+     "claim": "Capacity of 20 places",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Capacité d’accueil Places 20",
+     "source": "web"
+    },
+    {
+     "claim": "Prerequisites: parallel programming and distributed-systems basics",
+     "url": "https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac",
+     "quote": "Solide formation en informatique avec des bases en programmation parallèle et en systèmes distribués.",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Per-unit descriptions load via JavaScript ('Charger le détail') and were not read; the page says seven fundamental HPC/parallel/distributed courses, but only six core units appeared in the extracted table, so one core unit may be missing from this record (possibly the one covering MPI/performance engineering: mpi is therefore null, not 0). Topic values 1 come from the competence and objective lists of the page (scheduling and load balancing on clusters and clouds, HPC software engineering, I/O and networks optimisation, responsible computing, fault tolerance), not from unit titles. The M2 total ECTS is not stated on the page read. Dates and admission data are for the 2026-2027 cycle."
   }
  ],
- "ecosystem": [],
- "blocked_sources": [],
+ "ecosystem": [
+  {
+   "id": "fr-idris-jean-zay",
+   "kind": "centre",
+   "name": "IDRIS (CNRS) - Jean Zay supercomputer, GENCI national resource",
+   "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+   "why_relevant": "Real national GPU supercomputer (CPU, V100, A100 and H100 partitions) operated with Slurm, a Lustre parallel file system and InfiniBand/Omni-Path networks: the closest public, documented example of the cluster stack a compute infrastructure engineer runs. The hardware, scheduler and filesystem pages are public documentation to read and reproduce in labs.",
+   "evidence": [
+    {
+     "claim": "Jean Zay runs RedHat and Slurm",
+     "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+     "quote": "L'environnement d'exploitation se base sur RedHat 9.6 (depuis le 17/02/2026) et Slurm 23.11.3 (depuis le 01/10/2024)",
+     "source": "web"
+    },
+    {
+     "claim": "All nodes access a parallel Lustre file system",
+     "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+     "quote": "L'ensemble des nœuds accède à un système de fichiers parallèle Lustre à très forte bande passante",
+     "source": "web"
+    },
+    {
+     "claim": "Two interconnect generations: Omni-Path on HPE SGI 8600 nodes, InfiniBand on the BullSequana XH3000 extension",
+     "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+     "quote": "sont interconnectés par un réseau Intel Omni-Path et ceux de l'extension Bull BullSequana XH3000 sont interconnectés par un réseau Infiniband",
+     "source": "web"
+    },
+    {
+     "claim": "H100 partition: 364 quad-GPU nodes (extension July 2024)",
+     "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+     "quote": "Avec la partition gpu_p6 (extension juillet 2024), vous aurez accès aux ressources suivantes",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "fr-idris-formations",
+   "kind": "formation-courte",
+   "name": "IDRIS training catalogue (HPC and AI courses: MPI, OpenMP, GPU directives, Kokkos, Deep Learning Optimisé sur Jean Zay)",
+   "url": "http://www.idris.fr/docs/formations/catalogue-formations",
+   "why_relevant": "Short, free (for CNRS and university staff) or CNRS-Formation-Entreprise courses taught by the Jean Zay support team, including a multi-GPU deep-learning scaling course; the course pages are public syllabi that fit a self-study path in parallel programming and distributed training. Registration site was under maintenance on the page read, so check dates.",
+   "evidence": [
+    {
+     "claim": "IDRIS offers HPC and AI training",
+     "url": "http://www.idris.fr/docs/formations/catalogue-formations",
+     "quote": "L'IDRIS propose des formations en calcul haute performance (HPC) et en intelligence artificielle (IA)",
+     "source": "web"
+    },
+    {
+     "claim": "Courses are free for CNRS and university staff, open to company staff via CNRS Formation Entreprise",
+     "url": "http://www.idris.fr/docs/formations/catalogue-formations",
+     "quote": "Ces formations sont gratuites pour le personnel du CNRS et des universités",
+     "source": "web"
+    },
+    {
+     "claim": "DLO-JZ course covers scaling deep learning on a supercomputer and multi-GPU distribution",
+     "url": "http://www.idris.fr/docs/formations/ia/formation-dlojz",
+     "quote": "distribution sur plusieurs GPU seront abordées, d'un point de vue système et algorithmique",
+     "source": "web"
+    },
+    {
+     "claim": "Registration site under maintenance at retrieval time",
+     "url": "http://www.idris.fr/docs/formations/catalogue-formations",
+     "quote": "Le site d'inscription aux cours de l'IDRIS est actuellement en maintenance",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "fr-chps-network",
+   "kind": "réseau",
+   "name": "Réseau des Masters CHPS (Calcul Haute Performance, Simulation)",
+   "url": "https://master-chps.fr/about/",
+   "why_relevant": "National network of French state-recognised HPC and simulation degrees (Paris-Saclay, Bordeaux CISD, Toulouse ENSEEIHT, Perpignan, Reims) with joint seminars, shared internship offers and a student hackathon with Teratec; the entry point to compare French HPC curricula.",
+   "evidence": [
+    {
+     "claim": "Member programmes include Paris-Saclay, Bordeaux CISD and Toulouse",
+     "url": "https://master-chps.fr/about/",
+     "quote": "Parcours CISD, ENSEIRB-MATMECA, Université de Bordeaux",
+     "source": "web"
+    },
+    {
+     "claim": "Toulouse ENSEEIHT is listed as a member (spelled ENSEEITH on the page)",
+     "url": "https://master-chps.fr/about/",
+     "quote": "Parcours CHPS, ENSEEITH (Toulouse)",
+     "source": "web"
+    },
+    {
+     "claim": "Teratec hackathon for HPC students with participation of network groups",
+     "url": "https://master-chps.fr/",
+     "quote": "Teratec organise en 2024 un Hackathon à destination des étudiants sensibilisés aux thématiques du HPC",
+     "source": "web"
+    }
+   ]
+  }
+ ],
+ "blocked_sources": [
+  "https://mosig.imag.fr/ — connection reset from the fetch environment (official MoSIG site, detailed programme not read)",
+  "https://relint.imag.fr/MainEn/Programs — connection reset (Ensimag international relations page)",
+  "https://raymond-namyst.emi.u-bordeaux.fr/documents/Presentation_CISD.pdf — connection reset (CISD presentation slides); CISD content taken from gforgeron.gitlab.io/cisd and Bordeaux INP sheets instead",
+  "https://formations.univ-grenoble-alpes.fr/plugins/odf-web/odf/_content/subprogram-subprogram-master-of-science-in-informatics-at-grenoble-mosig-en_3/Master%20of%20Science%20in%20Informatics%20at%20Grenoble%20(MoSIG).pdf — HTTP 404; the 2021 master-informatique PDF (dated 20 April 2021) was not used as evidence",
+  "https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation/m2-modelisation-et-simulation-avec-le-calcul-haute-performance — course list of the MSCHP track loads via JavaScript only; units taken from chps.uvsq.fr/programme-du-m2-chps",
+  "Paris-Saclay per-unit descriptions ('Charger le détail') for CHPS M1/M2 and DiPaC — JavaScript only, not read",
+  "Toulouse INP-ENSEEIHT S9 elective pages 'Infrastructure for cloud, big data and machine learning' and 'Infrastructure for BigData' — description pages empty in the cache",
+  "http://www.idris.fr/formations/ — HTTP 404 (catalogue found at /docs/formations/catalogue-formations)",
+  "https://cisd.enseirb-matmeca.fr — only a redirect link to gforgeron.gitlab.io/cisd"
+ ],
  "verification": {
   "status": "unverified",
   "checked_claims": 0,
   "corrected": 0,
   "removed": 0,
-  "notes": ""
+  "notes": "Researcher pass only: all web quotes re-checked against the cached text with tools/verify_quotes.py (dry run); no claim comes from memory. Independent verification phase still to run."
  }
 }

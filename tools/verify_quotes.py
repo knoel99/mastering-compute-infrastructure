@@ -58,7 +58,7 @@ def conf(frac):
 def main(argv):
     write = "--write" in argv
     args = [a for a in argv if not a.startswith("--")]
-    files = [Path(a) for a in args] or sorted((ROOT / "data").glob("masters/*.json")) + sorted((ROOT / "data").glob("jobs/*.json")) + sorted((ROOT / "data").glob("resources/*.json"))
+    files = [Path(a).resolve() for a in args] or sorted((ROOT / "data").glob("masters/*.json")) + sorted((ROOT / "data").glob("jobs/*.json")) + sorted((ROOT / "data").glob("resources/*.json"))
     cache = {}
     tot_ok = tot = 0
     for f in files:

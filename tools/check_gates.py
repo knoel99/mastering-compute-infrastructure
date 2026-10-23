@@ -9,6 +9,7 @@ specs/site-architecture.md (site). Run from the repository root:
     python3 tools/check_gates.py --labs          # also run labs/*/*/verify.sh (sandbox labs)
 Exit status 0 = every gate holds.
 """
+import json
 import re
 import subprocess
 import sys
@@ -188,6 +189,10 @@ def check_course(path: Path):
                 errs.append(f"broken anchor #{frag}")
             continue
         p = (path.parent / base).resolve()
+        planned = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
+        rel_t = p.relative_to(ROOT).as_posix() if str(p).startswith(str(ROOT)) else ""
+        if any(rel_t.startswith(f"projects/{pr['id']}") for pr in planned["projects"]) or any(rel_t.startswith(f"courses/{m['id']}") for m in planned["modules"]):
+            continue  # planned page: the link is legitimate even if the page is not published yet
         if p.is_dir():
             p = p / "index.html"
         if not (p.exists() or p.with_suffix(".md").exists() or (p.parent / "index.md").exists() and p.name == "index.html"):

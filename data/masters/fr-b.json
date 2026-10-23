@@ -192,7 +192,7 @@
     }
    ],
    "confidence": "medium",
-   "notes": "Titres des UE lus sur le catalogue 2026-2027 ; contenu des UE CHP 1/2/3 (MPI, OpenMP, GPU ?) non publié sur les pages consultées, d'où couverture null pour openmp/mpi/gpu/perf-model. Le catalogue 2024-25 (PDF ROF) listait 'Calcul parallèle' au lieu de CHP 1 ; le nom du parcours y est 'mathématiques de l'information' (devenu 'de l'innovation'). Aucune machine citée pour les étudiants (csmi.cemosis.fr inaccessible)."
+   "notes": "Titres des UE lus sur le catalogue 2026-2027 de la page UFR ; contenu des UE CHP 1/2/3 (MPI, OpenMP, GPU ?) non publié sur les pages consultées, d'où couverture null pour openmp/mpi/gpu/perf-model. L'export PDF ROF (sans paramètre de catalogue, probablement un catalogue plus ancien) liste 'Calcul parallèle' et 'Réseaux' au lieu de CHP 1/2/3 et nomme le parcours 'mathématiques de l'information' (devenu 'de l'innovation') : seule la page 2026-2027 est utilisée pour les intitulés CHP. Aucune machine citée pour les étudiants (csmi.cemosis.fr inaccessible, erreur TLS). Couverture viz=1 d'après le seul intitulé 'Prétraitement et post-traitement intégrés au réseau dans le calcul scientifique' (sens exact non confirmé)."
   },
   {
    "id": "fr-enslyon-info",
@@ -1047,19 +1047,445 @@
    ],
    "confidence": "high",
    "notes": "Syllabus 2024-2025 (page 'full.pdf') ; le syllabus 2026-2027 n'a pas été lu. Couverture limitée aux thèmes de ce seul cours ; tous les autres thèmes restent null car le cursus de 2A n'a pas été examiné. Resilience et energy : simple mention ('aspects énergétiques', 'besoin de tolérance aux pannes') dans l'item architectures."
+  },
+  {
+   "id": "fr-lyon1-srs",
+   "country": "FR",
+   "institution": "Université Claude Bernard Lyon 1 (co-accrédité : Université Jean Monnet, École Centrale de Lyon, Mines Saint-Étienne)",
+   "programme_name": "Master Informatique, M2 parcours Systèmes, Réseaux et Sécurité (SRS)",
+   "degree": "M2",
+   "urls": [
+    "https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html",
+    "https://offre-de-formations.univ-lyon1.fr/ue-16726-143/stockage-cloud-et-virtualisation.html",
+    "http://master-info.univ-lyon1.fr/SRS/"
+   ],
+   "duration": "M2 en alternance, rythme 2 semaines en formation / 2 semaines en entreprise ou laboratoire ; fiche : 4 semestres",
+   "credits": "Non lu pour le parcours ; UE 'Stockage, cloud et virtualisation' = 3 ECTS (INF2310M)",
+   "language": "Français",
+   "delivery": "on-site",
+   "entry_requirements": "Accès direct en M2 : M1 (ou équivalent) d'un master informatique ou diplôme de niveau BAC+4 en informatique.",
+   "focus": "ops-sysadmin",
+   "structure_summary": "Parcours M2 en alternance orienté administration systèmes et réseaux, cloud et virtualisation, réseaux d'entreprise et d'opérateurs, sécurité. Volume horaire de 460 h. Pas de contenu HPC annoncé sur la fiche lue, mais une UE 'Stockage, cloud et virtualisation' (10 h CM + 20 h TP) couvre IaaS, hyperviseurs, containers et stockage distribué Ceph : utile comme base ops/cloud pour un ingénieur d'infrastructure de calcul.",
+   "core_courses": [
+    {
+     "name": "Stockage, cloud et virtualisation (INF2310M)",
+     "credits": "3 ECTS",
+     "topics": [
+      "cloud",
+      "containers-k8s",
+      "storage-io",
+      "sysadmin"
+     ],
+     "url": "https://offre-de-formations.univ-lyon1.fr/ue-16726-143/stockage-cloud-et-virtualisation.html"
+    }
+   ],
+   "electives": [],
+   "capstone": "Mission en alternance (apprentissage, contrat de professionnalisation ou stage alterné en entreprise ou laboratoire) en lien avec les spécialités du parcours",
+   "machines_access": [],
+   "industry_links": [
+    "Alternance 2 semaines / 2 semaines",
+    "Préparation CCNA (Académie Locale Cisco), certifications Linux LPI ou AWS possibles"
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": null,
+    "arch": null,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": null,
+    "sysadmin": 2,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": 2,
+    "cloud": 2,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": 1,
+    "soft-skills": 1,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Compétences visées : administration systèmes et réseaux, cloud et virtualisation",
+     "url": "https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html",
+     "quote": "Il permet d'acquérir des compétences en administration systèmes et réseaux, cloud et virtualisation, réseaux d’entreprise",
+     "source": "web"
+    },
+    {
+     "claim": "Volume horaire de 460 h",
+     "url": "https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html",
+     "quote": "minimum : 460h , maximum :460",
+     "source": "web"
+    },
+    {
+     "claim": "Parcours uniquement en alternance 2 semaines / 2 semaines",
+     "url": "https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html",
+     "quote": "Ce parcours est ouvert uniquement à l'alternance sur un rythme de 2 semaines en formation - 2 semaines en entreprise ou laboratoire.",
+     "source": "web"
+    },
+    {
+     "claim": "Accès direct en M2 : M1 informatique ou BAC+4",
+     "url": "https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html",
+     "quote": "Avoir validé un M1 (ou équivalent) d'un Master informatique ou un diplôme de niveau BAC+4 en informatique.",
+     "source": "web"
+    },
+    {
+     "claim": "Certification CCNA via Académie Locale Cisco",
+     "url": "https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html",
+     "quote": "Le département Informatique est Académie Locale Cisco et permet donc aux étudiants de préparer la certification Cisco Certified Network Associate (CCNA).",
+     "source": "web"
+    },
+    {
+     "claim": "UE Stockage, cloud et virtualisation : 3 ECTS",
+     "url": "https://offre-de-formations.univ-lyon1.fr/ue-16726-143/stockage-cloud-et-virtualisation.html",
+     "quote": "Nombre de crédits : 3 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "UE : écosystème de virtualisation incluant containers",
+     "url": "https://offre-de-formations.univ-lyon1.fr/ue-16726-143/stockage-cloud-et-virtualisation.html",
+     "quote": "Ecosystème de la virtualisation : hyperviseurs, machines virtuelles, containers, technologies de migrations, switchs virtuelles.",
+     "source": "web"
+    },
+    {
+     "claim": "UE : stockage distribué Ceph",
+     "url": "https://offre-de-formations.univ-lyon1.fr/ue-16726-143/stockage-cloud-et-virtualisation.html",
+     "quote": "mais aussi des systèmes de stockage distribués tel que Ceph.",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Fiche de l'offre de formation Lyon 1 datée (début de session 04/09/2023, dernière mise à jour 06/01/2023) : maquette 2026-2027 non vérifiée. Aucune UE HPC (MPI, GPU) lue pour ce parcours ; l'UE 'Systèmes avancés' (INF2311M, GPU/OpenCL/CUDA d'après un résultat de recherche) n'a pas pu être lue (redirection vers la page d'accueil). Autres thèmes null car la liste complète des UE du parcours n'a pas été lue."
+  },
+  {
+   "id": "fr-rennes-sif",
+   "country": "FR",
+   "institution": "Université de Rennes (ISTIC), co-accrédité avec ENS Rennes, INSA Rennes, CentraleSupélec ; adossé à IRISA/Inria",
+   "programme_name": "Master Informatique, M2 parcours Science Informatique (SIF), domaine Architecture, cloud et réseaux",
+   "degree": "M2",
+   "urls": [
+    "http://master.irisa.fr/courses/lst_courses_rennes.html",
+    "https://istic.univ-rennes.fr/master-informatique"
+   ],
+   "duration": "Non lu",
+   "credits": "Non lu",
+   "language": "Non lu (anglais probable pour les cours ; à vérifier)",
+   "delivery": "on-site",
+   "entry_requirements": "Non lu",
+   "focus": "mixed",
+   "structure_summary": "Parcours recherche de l'université de Rennes ; l'étudiant choisit 7 cours parmi cinq domaines. Le domaine 'Architecture, cloud et réseaux' contient d'après un résultat de recherche : Advanced Cloud Infrastructures (ACI), Big Data Storage and Processing Infrastructures (BSI), Models and Algorithms for Distributed systems and softwares (MAD), Optimizing and Parallelizing Compilers (OPC), Scalable Networks Infrastructures for Optimized Services Delivery (SNI). Liste de 2024-25 ou 2025-26 selon la source ; non vérifiée pour 2026-2027.",
+   "core_courses": [],
+   "electives": [
+    {
+     "name": "Advanced Cloud Infrastructures (ACI)",
+     "topics": [
+      "cloud"
+     ],
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html"
+    },
+    {
+     "name": "Big Data Storage and Processing Infrastructures (BSI)",
+     "topics": [
+      "bigdata",
+      "storage-io"
+     ],
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html"
+    },
+    {
+     "name": "Models and Algorithms for Distributed systems and softwares (MAD)",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html"
+    },
+    {
+     "name": "Optimizing and Parallelizing Compilers (OPC)",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html"
+    },
+    {
+     "name": "Scalable Networks Infrastructures for Optimized Services Delivery (SNI)",
+     "topics": [
+      "interconnect"
+     ],
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html"
+    }
+   ],
+   "capstone": "Non lu",
+   "machines_access": [],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": null,
+    "arch": null,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": 2,
+    "bigdata": 2,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": null,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Cours Advanced Cloud Infrastructures (ACI) au second demi-semestre (d'après un résultat de recherche web ; page non lisible par le vérificateur, HTTP 403)",
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html",
+     "quote": "",
+     "source": "memory"
+    },
+    {
+     "claim": "Cours Big Data Storage and Processing Infrastructures (BSI) (d'après un résultat de recherche web ; page non lisible par le vérificateur, HTTP 403)",
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html",
+     "quote": "",
+     "source": "memory"
+    },
+    {
+     "claim": "Cours Models and Algorithms for Distributed systems and softwares (MAD) (d'après un résultat de recherche web ; page non lisible par le vérificateur, HTTP 403)",
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html",
+     "quote": "",
+     "source": "memory"
+    },
+    {
+     "claim": "Cours Optimizing and Parallelizing Compilers (OPC) (d'après un résultat de recherche web ; page non lisible par le vérificateur, HTTP 403)",
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html",
+     "quote": "",
+     "source": "memory"
+    },
+    {
+     "claim": "Cours Scalable Networks Infrastructures for Optimized Services Delivery (SNI) ; l'étudiant choisit 7 cours (d'après un résultat de recherche web ; page non lisible par le vérificateur, HTTP 403)",
+     "url": "http://master.irisa.fr/courses/lst_courses_rennes.html",
+     "quote": "",
+     "source": "memory"
+    }
+   ],
+   "confidence": "low",
+   "notes": "TOUTES les données de cette fiche viennent d'un résultat de recherche web : les sites univ-rennes.fr, istic, irisa.fr (master.irisa.fr) et formations.univ-rennes.fr répondent HTTP 403 au récupérateur du dépôt, donc aucune citation n'a pu être vérifiée. À requalifier ou supprimer à la phase de vérification si l'accès ne s'ouvre pas."
+  },
+  {
+   "id": "fr-rennes-cni",
+   "country": "FR",
+   "institution": "Université de Rennes (ISTIC) ; parcours lié au réseau EIT Digital Master School",
+   "programme_name": "Master Informatique, parcours Cloud and Network Infrastructures (CNI)",
+   "degree": "M1 + M2",
+   "urls": [
+    "https://formations.univ-rennes.fr/en/parcours/masters-degree-computer-science-pathway-cloud-and-network-infrastructures-cni",
+    "https://www.eitdeeptechtalent.eu/courses/cloud-and-network-infrastructures-master-programme"
+   ],
+   "duration": "2 ans (d'après la page EIT, sites en Finlande, Suède, France, Italie)",
+   "credits": "Non lu",
+   "language": "Anglais (page EIT)",
+   "delivery": "on-site",
+   "entry_requirements": "Non lu",
+   "focus": "cloud-distributed",
+   "structure_summary": "Parcours cloud et réseaux de l'université de Rennes : d'après un résultat de recherche, le M1 comprend 'Calcul à large échelle' et 'Service and Cloud Technologies'. La page EIT Digital décrit un master interdisciplinaire de gestion, exploitation et conception de réseaux, modèles de service et de déploiement cloud, edge et fog computing. Le contenu détaillé des cours n'a pas été lu.",
+   "core_courses": [],
+   "electives": [],
+   "capstone": "Non lu",
+   "machines_access": [],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": null,
+    "arch": null,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": 2,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": null,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Master 'Cloud and Network Infrastructures' : réseaux et cloud, edge et fog computing, en anglais, sur site",
+     "url": "https://www.eitdeeptechtalent.eu/courses/cloud-and-network-infrastructures-master-programme",
+     "quote": "The Cloud and Networking Infrastructure programme also equips you with practical skills in, for example, edge and fog computing",
+     "source": "web"
+    },
+    {
+     "claim": "M1 CNI : cours 'Calcul à large échelle' et 'Service and Cloud Technologies' (d'après un résultat de recherche web ; page non lisible par le vérificateur, HTTP 403)",
+     "url": "https://formations.univ-rennes.fr/en/parcours/masters-degree-computer-science-pathway-cloud-and-network-infrastructures-cni",
+     "quote": "",
+     "source": "memory"
+    }
+   ],
+   "confidence": "low",
+   "notes": "La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification."
   }
  ],
- "ecosystem": [],
+ "ecosystem": [
+  {
+   "id": "eurocc-ccfr",
+   "kind": "réseau",
+   "name": "CC-FR (centre de compétence national EuroCC France)",
+   "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+   "why_relevant": "Point d'entrée français du programme EuroCC : formations de prise en main d'un supercalculateur et formations avancées (containers, LLM) sur le réseau des mésocentres MesoNET, utile pour pratiquer sur de vraies machines hors université.",
+   "evidence": [
+    {
+     "claim": "CC-FR représente EuroCC en France",
+     "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+     "quote": "Le CC-FR est le centre de compétence national représentant le projet européen EuroCC en France.",
+     "source": "web"
+    },
+    {
+     "claim": "Formations proposées : prise en main d'un supercalculateur, containers, LLM",
+     "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+     "quote": "Formation de prise en main d’un supercalculateur,",
+     "source": "web"
+    },
+    {
+     "claim": "Formations avancées sur containers et LLM",
+     "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+     "quote": "Formation avancée sur des technologies avancées (containers, LLM,…)",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "mesonet",
+   "kind": "réseau",
+   "name": "MesoNET (fédération des mésocentres français)",
+   "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+   "why_relevant": "Réseau de centres de calcul régionaux donnant accès à des supercalculateurs, du stockage et des heures de calcul : base du paysage HPC académique français en dessous du niveau national (GENCI).",
+   "evidence": [
+    {
+     "claim": "MesoNET : 21 centres de calcul régionaux",
+     "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+     "quote": "un réseau de 21 centres de calcul régionaux, les mésocentres, du réseau MesoNET donnant accès à des supercalculateurs",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "romeo-formations",
+   "kind": "formation-courte",
+   "name": "ROMEO (Reims) : formations courtes HPC et multi-GPU",
+   "url": "https://romeo.univ-reims.fr",
+   "why_relevant": "Un centre de calcul académique qui propose des formations courtes sur GPU, multi-GPU et IA sur supercalculateur, ouvertes au-delà des étudiants du master CHPS.",
+   "evidence": [
+    {
+     "claim": "Centre de calcul académique au service des chercheurs et étudiants depuis 2002",
+     "url": "https://romeo.univ-reims.fr",
+     "quote": "Centre de calcul académique, ROMEO accompagne chercheurs et étudiants depuis 2002",
+     "source": "web"
+    },
+    {
+     "claim": "Formation : programmation GPU avec CUDA Python",
+     "url": "https://romeo.univ-reims.fr",
+     "quote": "Programmation GPU avec CUDA Python",
+     "source": "web"
+    },
+    {
+     "claim": "Formation : projets IA avec HPC et multi-GPU",
+     "url": "https://romeo.univ-reims.fr",
+     "quote": "Accélérez vos projets IA avec le HPC et les multi-GPU",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "teratec-hackathon",
+   "kind": "compétition",
+   "name": "Hackathon TERATEC",
+   "url": "https://romeo.univ-reims.fr/chps",
+   "why_relevant": "Compétition HPC française à laquelle participent des étudiants (une équipe de M2 CHPS Reims y a obtenu le prix du jury en janvier 2024) ; bon terrain pour pratiquer l'optimisation sur machine réelle.",
+   "evidence": [
+    {
+     "claim": "Prix du jury au 2e Hackathon TERATEC (janv. 2024) pour une équipe de M2 CHPS",
+     "url": "https://romeo.univ-reims.fr/chps",
+     "quote": "Une équipe de la promo 2024 du M2 CHPS de Reims a remporté le prix du jury lors du 2ème Hackathon TERATEC (janv. 2024).",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "cemosis-strasbourg",
+   "kind": "centre",
+   "name": "Cemosis (plateforme de modélisation et simulation, Université de Strasbourg)",
+   "url": "https://www.cemosis.fr/en/",
+   "why_relevant": "Plateforme adossée au master CSMI, impliquée dans PEPR NumPEx (Exa-MA, SAGE-HPC) et le CoE EuroHPC HiDALGO2 : lien concret entre formation, HPC et projets exascale.",
+   "evidence": [
+    {
+     "claim": "Plateforme de recherche de l'Université de Strasbourg",
+     "url": "https://www.cemosis.fr/en/",
+     "quote": "Cemosis is a University of Strasbourg research platform bringing together mathematical models, data and artificial intelligence for interdisciplinary research.",
+     "source": "web"
+    },
+    {
+     "claim": "Projet EuroHPC CoE HiDALGO2 (2023-2026)",
+     "url": "https://www.cemosis.fr/en/",
+     "quote": "Environmental challenge simulations on European supercomputers.",
+     "source": "web"
+    },
+    {
+     "claim": "Projet PEPR NumPEx Exa-MA (2024-2030)",
+     "url": "https://www.cemosis.fr/en/",
+     "quote": "Methods and algorithms for exascale computing.",
+     "source": "web"
+    }
+   ]
+  }
+ ],
  "blocked_sources": [
   "https://csmi.cemosis.fr — certificat TLS invalide pour ce nom d'hôte (CERTIFICATE_VERIFY_FAILED, hostname mismatch) ; descriptions détaillées des UE CHP non lues",
   "https://romeo.univ-reims.fr/19_supercalculateur-romeo-2025.html — page ROMEO 2025 (matériel) rendue en JavaScript, aucun contenu extractible ; mêmes pages 2_infrastructure.html et 20_federation-mesonet.html",
-  "https://eviden.com/wp-content/uploads/2024/05/eviden-luniversite-de-reims-champagne-ardenne-urca-choisit-pour-son-nouveau-supercalculateur-romeo-integrant-la-technologie-nvidia-et-destine-aux-communautes-de-recherche-fr.pdf — HTTP 404"
+  "https://eviden.com/wp-content/uploads/2024/05/eviden-luniversite-de-reims-champagne-ardenne-urca-choisit-pour-son-nouveau-supercalculateur-romeo-integrant-la-technologie-nvidia-et-destine-aux-communautes-de-recherche-fr.pdf — HTTP 404",
+  "https://offre-de-formations.univ-lyon1.fr/ue-16727-143/systemes-avances.html — redirige vers front_index.php, contenu de l'UE 'Systèmes avancés' (GPU) non lisible",
+  "http://master.irisa.fr/ et /courses/lst_courses_rennes.html — HTTP 403 (liste des cours M2 SIF)",
+  "https://istic.univ-rennes.fr/master-informatique — HTTP 403 (idem pour la fiche SIF PDF)",
+  "https://formations.univ-rennes.fr/en/parcours/masters-degree-computer-science-pathway-cloud-and-network-infrastructures-cni — HTTP 403 (idem plaquette PDF Cloud et Réseaux)",
+  "https://www.irisa.fr/master — HTTP 403",
+  "https://insa-rennes.fr/computer-science-2.html — connexion réinitialisée ; https://www.dit.ens-rennes.fr — certificat TLS invalide (hostname mismatch)"
  ],
  "verification": {
   "status": "unverified",
   "checked_claims": 0,
   "corrected": 0,
   "removed": 0,
-  "notes": ""
+  "notes": "verify_quotes.py (dry run) : 76/76 citations web verbatim au 2026-10-22. Les 2 fiches Rennes (fr-rennes-sif, fr-rennes-cni) reposent sur des résultats de recherche car les sites univ-rennes.fr/irisa.fr répondent 403 : evidence source memory, confidence low, à requalifier ou supprimer."
  }
 }
