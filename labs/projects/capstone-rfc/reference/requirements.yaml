@@ -1,0 +1,32 @@
+# FICTIONAL requirements for the capstone. Every figure is invented for the exercise (arbitrary units for money).
+# Replace them with your own team's measurements before using this model for a real decision.
+team: "research group, 40 people, 3 platform engineers, business-hours on-call only"
+hours_per_month: 730
+budget_per_month_u: 450000        # arbitrary units
+gpu_failure_rate_per_gpu_hour: 0.0002   # invented; one failure per 5000 GPU-hours
+checkpoint_cost_min: 4
+restart_cost_min: 15
+classes:
+  pretrain:
+    gpus_per_job: 128
+    jobs_per_month: 1.5
+    mean_work_hours: 240
+    slo: {metric: p90_wait_h, max: 48}
+  finetune:
+    gpus_per_job: 16
+    jobs_per_month: 26
+    mean_work_hours: 10
+    slo: {metric: p90_wait_h, max: 4}
+  eval:
+    gpus_per_job: 8
+    jobs_per_month: 170
+    mean_work_hours: 2
+    slo: {metric: p90_wait_h, max: 1}
+  dev:
+    gpus_per_job: 1
+    jobs_per_month: 650
+    mean_work_hours: 1.2
+    slo: {metric: p90_wait_h, max: 0.083}   # five minutes
+provision_wait_h: 0.25            # invented: time to get on-demand or spot capacity
+spot_interruptions_per_job_hour: 0.15   # invented: extra interruption rate of a spot allocation
+prices_u_per_gpu_hour: {reserved: 6.0, on_demand: 10.0, spot: 4.0}   # invented

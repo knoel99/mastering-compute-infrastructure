@@ -531,11 +531,13 @@ Placer, déborder et basculer des charges entre fournisseurs sans réécrire les
 
 **Projets qui s'appuient sur ce module :** Projet 4, Projet 6.
 
-### Module 14 — Observabilité et fiabilité d'une flotte GPU (plan, 24 h) {#observability}
+### Module 14 — Observabilité et fiabilité d'une flotte GPU (rédigé, 24 h) {#observability}
 
 Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).
+
+**Cours complet :** [Observabilité et fiabilité d'une flotte GPU](courses/observability/index.html).
 
 **Ce que vous saurez vérifier :**
 

@@ -53,6 +53,10 @@
    "label": "Module 10 — Pannes, checkpointing et reprise automatique"
   },
   {
+   "href": "courses/observability/index.html",
+   "label": "Module 14 — Observabilité et fiabilité d'une flotte GPU"
+  },
+  {
    "href": "projects/scaling-study/index.html",
    "label": "Projet 2 — Étude de passage à l'échelle d'un entraînement"
   },
@@ -67,6 +71,10 @@
   {
    "href": "projects/gpu-observability/index.html",
    "label": "Projet 5 — Observabilité GPU et détection de pannes silencieuses"
+  },
+  {
+   "href": "projects/capstone-rfc/index.html",
+   "label": "Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU"
   },
   {
    "href": "resources/index.html",
