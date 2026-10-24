@@ -1,0 +1,25 @@
+---
+title: "Infra de calcul"
+lang: fr
+format:
+  html:
+    theme: none
+    css: assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: generated/chrome-d0.html
+    include-after-body: assets/closing-d0.html
+---
+
+Ce cours du soir mène Kim au poste de Compute Infrastructure Lead dans une startup robotique. L'offre A est la cible. L'offre B est la voie avancée. Elle couvre l'entraînement à grande échelle, une fois l'offre A tenue.
+
+Il suit ce cours le soir, à côté de son travail, sur un laptop. Un cloud GPU peu cher, ou ROMEO, n'est qu'une branche, et seulement si le compte existe.
+
+::: note
+Ces notes sont indépendantes. Elles ne sont pas un site officiel de ROMEO, ni le site de la startup robotique.
+:::
+
+Le catalogue suit les pages du cours, dans l'ordre du parcours.
+
+{{< include generated/home-cards.md >}}
