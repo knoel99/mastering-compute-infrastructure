@@ -1,0 +1,407 @@
+---
+title: "Ordonnancement Slurm et Kubernetes"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 2
+  hours: 16
+  jalon: "Confirmé. Jeu. 5 nov. 2026, 9h30-12h. Utiliser ROMEO2025"
+---
+
+## Objectifs
+
+Kim exploite déjà Kubernetes, Helm et la CI dans une startup robotique. Il vise le poste de Compute Infrastructure Lead. Slurm est nouveau pour lui.
+
+Il fait les six actions suivantes.
+
+- Il dit ce que l'ordonnanceur tranche avant de lancer un job. La partition, la priorité, le fairshare, la limite de temps et la préemption entrent dans cette décision.
+- Il écrit un script sbatch minimal et explique chaque ligne sans cluster.
+- Il lit `squeue`, arrête le bon job avec `scancel`, et ouvre le fichier de sortie.
+- Il explique pourquoi un Deployment ne porte pas un travail qui doit se terminer.
+- Il écrit le Job Kubernetes de la même commande courte. Il nomme Kueue comme file possible, sans l'installer.
+- Avant le jeudi 5 novembre 2026, de 9h30 à 12h, il a un compte d'accès demandé et une clé ed25519. Il ne devine pas le nom du serveur.
+
+L'autre voie est l'entraînement à grande échelle. Cet entraînement est aussi un travail fini, avec une limite de temps. Ce module s'arrête avant cet entraînement.
+
+## Prérequis
+
+Il publie déjà des Deployments, souvent par une release Helm. Il lit les logs d'un pod et le résultat d'un job de CI. Il utilise un shell sur son portable.
+
+Slurm n'est pas installé chez lui au départ. Docker n'est pas à installer. Un cluster Kubernetes local n'est pas à installer. Le calculateur de la séance du 5 novembre ne sert que si le compte d'accès existe déjà. Le travail du portable se valide sans ce compte.
+
+## Notes de cours
+
+L'ordonnanceur choisit quels jobs reçoivent des nœuds, dans quel ordre, et pour combien de temps. Un Deployment ne fait pas ce tri. Un Deployment maintient un service.
+
+### Décisions de l'ordonnanceur
+
+Un job Slurm demande une allocation. L'allocation est l'ensemble de nœuds réservés jusqu'à la fin du script, ou jusqu'à la limite de temps. Le script de ce module demande un seul nœud.
+
+::: def
+Une partition est le nom Slurm d'un groupe de nœuds et de la file des jobs qui y attendent. Le mot anglais courant pour cette file est queue. L'option à écrire, le jour où les organisateurs donnent un nom, est `--partition`, avec ce nom exact. Sans nom, Slurm prend la partition par défaut.
+:::
+
+L'ordre des décisions est stable.
+
+1. Le job entre dans une partition.
+2. Slurm vérifie que la demande peut exister. Être le premier de la file ne suffit pas. Les CPU, la mémoire et le nombre de nœuds doivent tenir. La limite de temps doit être acceptable pour la partition.
+3. Parmi les jobs en attente qui tiennent, la priorité fixe l'ordre. Le fairshare et l'âge de l'attente sont deux facteurs de cette priorité. Les poids dépendent du site et restent hors du module.
+4. L'ordonnanceur lance le job quand les nœuds sont libres. Avec le backfill, un job plus court et moins prioritaire peut prendre un créneau libre. Ce départ n'est permis que si ce job finit avant le début réservé d'un job plus prioritaire. Un débordement laisse le job en attente.
+5. La préemption, si le site l'a activée, peut libérer des nœuds en arrêtant un job déjà en cours. Ce module ne l'active pas.
+
+Un exemple fixe les durées. La partition a deux nœuds. Le backfill est actif. La préemption est inactive. Le job 10 occupe un nœud. Son allocation se termine dans 20 minutes. Le job 11 demande deux nœuds, avec une priorité haute. Le job 12 demande un nœud, avec une priorité basse et une limite de 5 minutes. Le job 12 tient dans ces 20 minutes. Le backfill peut le lancer. Avec une limite de 40 minutes, le job 12 déborderait sur le début réservé du job 11. Les deux jobs en attente resteraient PD.
+
+La commande `sprio -j`, suivie du numéro de job, affiche la priorité et le facteur fairshare quand le binaire existe. L'absence de `sprio` ne retire pas le mécanisme. Sur un Slurm de portable sans comptabilité, le fairshare est souvent inactif. L'idée sert surtout le jour de la séance, si le site l'a branchée.
+
+::: def
+Le fairshare baisse la priorité d'un compte qui a déjà beaucoup consommé, et la remonte quand l'usage ancien s'efface. Ce facteur, seul, ne refuse pas le job. Une partition inoccupée peut encore lancer le job. Un ResourceQuota Kubernetes refuse l'objet quand le plafond est atteint. Un site peut ajouter des plafonds durs à côté du fairshare. Ce module ne les règle pas.
+:::
+
+La limite de temps est une durée d'horloge murale sur l'allocation, pas un temps CPU cumulé. L'option est `--time`. Le format utilisé ici est `heures:minutes:secondes`. `00:02:00` vaut 2 minutes, pas 2 heures.
+
+Le manuel de sbatch fixe la résolution à une minute. Slurm arrondit les secondes à la minute supérieure. Une option `00:00:30` est donc retenue comme 1 minute. Une option `00:02:00` reste 2 minutes. Une limite de zéro demanderait l'absence de limite. Ce module n'utilise pas zéro.
+
+Si la limite demandée dépasse celle de la partition, le job reste PD. Le manuel de sbatch précise que cette attente peut durer sans date de fin.
+
+À l'échéance, Slurm envoie SIGTERM, puis SIGKILL. L'écart entre les deux signaux est le paramètre de configuration KillWait. Ce module ne modifie pas KillWait. L'état final s'appelle TIMEOUT. Un site peut autoriser un dépassement. Ce module n'utilise pas cette tolérance.
+
+::: def
+La préemption est l'arrêt d'un job en cours pour donner ses nœuds à un autre job. Le site peut annuler le job, le remettre en file, ou le suspendre. Le mode se règle hors de ce module. Un job qui disparaît n'a donc pas toujours échoué dans le script. L'état PREEMPTED désigne ce cas, quand la comptabilité l'affiche.
+:::
+
+Un pod Kubernetes peut aussi être préempté par une PriorityClass. Le pod d'un Deployment est recréé, parce que le nombre de répliques reste demandé. Un job Slurm préempté ne revient que si le site le remet en file. Le Job Kubernetes de ce module ne fixe pas de PriorityClass.
+
+### Script sbatch minimal
+
+Le script du module tient en huit lignes. Il recopie le script dans `sommeil.sbatch`.
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=sommeil
+#SBATCH --output=sommeil-%j.out
+#SBATCH --time=00:02:00
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=1G
+hostname
+sleep 30
+```
+
+Chaque ligne a un rôle.
+
+1. `#!/bin/bash` dit au noyau de lancer bash. Pour Slurm, cette ligne est un commentaire. Les options `#SBATCH` qui suivent comptent encore.
+2. `--job-name=sommeil` fixe le nom vu dans `squeue`. Sans cette option, le nom vient du fichier.
+3. `--output=sommeil-%j.out` fixe le fichier de sortie. Slurm remplace `%j` par le numéro du job. Bash ne le remplace pas, parce que la ligne est un commentaire. Slurm lit ces options lui-même. Une variable de shell dans une directive reste du texte brut. Il n'écrit donc pas de `$HOME` dans une option.
+4. `--time=00:02:00` pose une limite de 2 minutes. Le `sleep 30` tient dedans, y compris après l'arrondi à la minute.
+5. `--cpus-per-task=1` demande un CPU pour la tâche. Le défaut est déjà un CPU. La ligne rend la demande visible dans le script.
+6. `--mem=1G` demande 1 gibioctet de mémoire réelle sur le nœud. Le manuel de sbatch compte aussi la mémoire de `slurmstepd` dans le job, d'ordinaire entre 20 et 200 mébioctets. Une demande minuscule peut donc tuer le job avant `hostname`. `1G` laisse de la marge. Le script ne combine pas `--mem` avec une autre option de mémoire.
+7. `hostname` écrit le nom du nœud qui exécute le script. Slurm lance une seule copie du script. Sans `--batch`, que ce script n'utilise pas, cette copie tourne en général sur le premier nœud. Le fichier de sortie est créé sur ce même nœud. `hostname` n'écrit pas les autres nœuds.
+8. `sleep 30` suspend le processus pendant 30 secondes. Le CPU ne tourne pas en boucle. L'allocation reste prise pendant ces 30 secondes. `squeue` peut donc montrer le job.
+
+Une ligne vide n'arrête pas la lecture des directives. La première ligne de commande l'arrête. Une option `#SBATCH` placée sous `hostname` ne compte plus.
+
+`sbatch sommeil.sbatch` envoie le fichier au contrôleur et se termine tout de suite. La ligne affichée contient le numéro du job. Sur un contrôleur courant, elle contient aussi `Submitted batch job`. Un code de sortie 0 signifie que le contrôleur a accepté le script. Ce code ne signifie pas que `hostname` a déjà tourné. Dans la CI qu'il connaît, un code 0 signifie que l'étape a réussi. Ici, la réussite du script se lit plus tard, dans le fichier de sortie ou dans `sacct`.
+
+Le répertoire de travail est celui depuis lequel il lance `sbatch`, sauf avec `--chdir`. Il ne passe pas `--chdir`. Slurm crée le fichier de sortie dans ce répertoire, sur le premier nœud. Slurm ne copie aucun autre fichier. Le fichier apparaît quand l'allocation commence, pas au moment de `sbatch`. Il voit `sommeil-17.out` depuis l'endroit de la soumission seulement si ce répertoire est partagé. Le numéro 17 est un exemple. Le numéro à lire est celui que `sbatch` vient d'imprimer.
+
+Sans `--error`, la sortie standard et l'erreur standard vont dans le même fichier. Le manuel de sbatch décrit ce défaut. Sans `--output`, le nom par défaut est `slurm-%j.out`.
+
+`hostname` se termine avant `sleep`. En quittant, `hostname` écrit sa ligne dans le fichier. Pendant les 30 secondes de sommeil, le fichier peut donc déjà contenir le nom du nœud, dès que le répertoire est visible.
+
+Si les organisateurs donnent un nom de partition, il ajoute une ligne `#SBATCH --partition=` avec ce nom, au-dessus de `hostname`. Si les organisateurs donnent un compte Slurm, il ajoute `#SBATCH --account=` avec ce nom, au même endroit. Le compte Slurm facture le job. Le compte d'accès ouvre la séance. Les deux noms peuvent différer. Il ne met pas le compte d'accès dans `--account`. Tant que les organisateurs n'ont rien donné, le script reste sans ces deux options.
+
+### Sortie, squeue et scancel
+
+Il lance `squeue` pendant le `sleep`, pas après. Après 30 secondes, le job a souvent déjà quitté la file.
+
+```bash
+squeue -u "$USER"
+```
+
+Les colonnes utiles sont JOBID, PARTITION, NAME, ST et TIME. NAME vaut `sommeil` grâce à `--job-name`. TIME montre le temps déjà écoulé, pas la limite demandée. ST est l'état court.
+
+- `PD` signifie que le job attend.
+- `R` signifie que le job tourne.
+- `CG` signifie que le job libère les nœuds.
+
+Pour un job PD, `squeue` peut afficher la raison `Priority` ou la raison `Resources`. `Priority` veut dire qu'un autre job passe devant. `Resources` veut dire que la demande ne tient pas encore sur les nœuds libres.
+
+```bash
+scancel 17
+```
+
+`scancel 17` demande l'arrêt du job 17, à lancer pendant le `sleep` si l'arrêt est voulu. Il remplace 17 par le numéro reçu. Sans numéro, ce n'est pas le geste du module. `scancel -u` suivi d'un nom Linux annule tous les jobs de cette personne. Il ne lance pas cette forme ici.
+
+Quand le job a quitté `squeue`, l'état final a un autre nom.
+
+- `COMPLETED` suit une fin normale, ici le code 0 de `sleep`.
+- `TIMEOUT` suit la limite de temps.
+- `CANCELLED` suit `scancel`.
+- `FAILED` suit un code de sortie non nul du script.
+- `PREEMPTED` suit une préemption.
+
+Si `sacct` répond, il interroge le numéro.
+
+```bash
+sacct -j 17 --format=JobID,State,ExitCode,Elapsed
+```
+
+Sans `sacct`, le fichier `sommeil-17.out` reste la trace. Un Slurm de portable n'a pas toujours la comptabilité. L'absence de `sacct` n'invalide pas le script.
+
+Une option `--time=00:00:10` ne dure pas 10 secondes. Slurm la retient comme 1 minute, et `sleep 30` tient dans cette minute. Un TIMEOUT observable demanderait `--time=00:01:00` et `sleep 90`. `hostname` écrirait sa ligne, puis Slurm enverrait SIGTERM. Ce second script n'est pas le livrable. Le livrable garde `sleep 30` et `00:02:00`.
+
+### Deployment et job fini
+
+::: thm
+Un Deployment maintient le nombre de répliques demandé. Un job Slurm se termine, et rien ne le relance.
+:::
+
+Le même enchaînement `hostname`, puis `sleep 30`, placé dans un Deployment, devient un service qui ne s'arrête pas.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sommeil
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sommeil
+  template:
+    metadata:
+      labels:
+        app: sommeil
+    spec:
+      containers:
+        - name: sommeil
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - hostname; sleep 30
+```
+
+`replicas: 1` demande un pod en permanence. Le sélecteur et le label `app: sommeil` disent quels pods appartiennent à ce Deployment. Le champ `command` remplace le point d'entrée de l'image. `sh -c` enchaîne les deux programmes, parce que ce champ n'est pas un script de plusieurs lignes.
+
+Le `restartPolicy` d'un pod de Deployment vaut Always, et l'API refuse une autre valeur. Quand `sleep` se termine avec le code 0, kubelet relance le conteneur. `hostname` s'exécute de nouveau. Le travail fini est devenu une boucle.
+
+Il n'applique pas ce Deployment. Sur un cluster partagé, la boucle tournerait jusqu'à une suppression manuelle.
+
+Une release Helm qui installe un Deployment maintient les pods de la même façon. Il s'en sert déjà pour les services joignables de la startup robotique. Il ne range pas ce sleep dans un chart. Un job de CI se termine, comme le calcul voulu ici. Le job Slurm se termine aussi. La partition, la priorité, le fairshare et la limite de temps s'ajoutent, parce que les nœuds sont partagés entre équipes.
+
+### Job Kubernetes
+
+Le Job Kubernetes est l'objet qui se termine. Le YAML suivant exécute la même commande courte.
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sommeil
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: sommeil
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - hostname; sleep 30
+```
+
+`backoffLimit: 0` interdit un second pod après un échec. La valeur par défaut est 6. Cette valeur autorise d'autres pods. `activeDeadlineSeconds: 120` tue les pods du Job 120 secondes après que le Job est devenu actif. `--time` annonce à l'ordonnanceur combien de temps l'allocation va durer. Cette annonce permet le backfill. `activeDeadlineSeconds` ne réserve pas de place dans une file.
+
+`restartPolicy: Never` est requis pour un Job. L'autre valeur admise est OnFailure. Never évite de relancer le conteneur dans le même pod. L'image `busybox:1.36` fournit `sh`, `hostname` et `sleep`. Il peut la remplacer par une image qu'il a déjà, si ces trois programmes y sont.
+
+`kubectl apply -f sommeil-job.yaml` fait accepter l'objet par l'API. Un code 0 de `kubectl` signifie cette acceptation, pas que `hostname` a déjà écrit sa ligne. Le parallèle avec `sbatch` est direct.
+
+```bash
+kubectl get pods
+kubectl logs --selector job-name=sommeil
+```
+
+Le contrôleur pose le label `job-name` égal au nom du Job. Les logs contiennent le nom du pod, pas le nom du portable, quand le pod tourne dans un cluster. Ce nom peut donc différer du `hostname` d'un job Slurm lancé à côté. Les deux sorties restent justes. Chacune nomme l'endroit qui a exécuté la commande.
+
+Un second `kubectl apply` sur le même nom ne relance pas `hostname`. Le Job existe déjà, et son gabarit est immuable. Pour un second passage, il supprime l'objet, puis il applique de nouveau.
+
+```bash
+kubectl delete job sommeil
+```
+
+`sbatch`, à l'inverse, crée un nouveau numéro à chaque envoi. Deux envois produisent deux numéros. Chaque numéro donne un fichier `sommeil-%j.out` quand l'allocation commence.
+
+Kubernetes démarre ce Job dès qu'un nœud a la place. Rien dans le YAML ne le fait attendre pour un fairshare entre équipes.
+
+Kueue est le projet qui ajoute cette attente devant les Jobs. Kueue laisse le Job suspendu, puis passe le champ `suspend` à faux quand le quota de la file autorise le démarrage. La file demandée par l'équipe s'appelle LocalQueue. Il nomme Kueue et LocalQueue. Il n'installe pas Kueue. Il n'écrit pas de LocalQueue. Le Job du module ne porte pas de label de file.
+
+### Séance du 5 novembre
+
+La séance est le jeudi 5 novembre 2026, de 9h30 à 12h. Le compte d'accès et la clé se préparent avant ce matin-là. La soumission sur le calculateur de la séance attend que le compte existe. Le script du portable n'attend pas cette date.
+
+Il demande le compte d'accès par le canal que les organisateurs ont indiqué. S'il a déjà ce compte, il n'en demande pas un second. Il note la date de la demande, ou la date à laquelle il a vérifié que le compte était ouvert.
+
+La clé est une clé ed25519, séparée de ses clés habituelles. S'il a déjà le fichier `id_ed25519_romeo`, il le garde et il refuse l'écrasement.
+
+```bash
+ssh-keygen -t ed25519 -f "$HOME/.ssh/id_ed25519_romeo" -C "seance-novembre"
+ssh-keygen -lf "$HOME/.ssh/id_ed25519_romeo.pub"
+```
+
+La première commande demande une passphrase, deux fois. Il en choisit une. Il n'ajoute pas d'option pour la laisser vide. La seconde commande affiche l'empreinte de la clé publique. Il vérifie que le type affiché est ed25519.
+
+Il transmet le fichier dont le nom finit par `.pub` seulement si les organisateurs le demandent. L'autre fichier reste sur le portable. Il ne colle pas la clé privée dans un ticket, un chat, ou `acces.md`.
+
+::: note
+Il se connecte seulement au nœud de login indiqué par les organisateurs. Inventer ce nom est une erreur. Tant que les organisateurs ne l'ont pas écrit, il ne lance pas de client SSH vers la séance.
+:::
+
+### Portable sans cluster
+
+::: note
+S'il a déjà lancé Slurm dans Docker, `sinfo` répond dans cet environnement. Il y soumet le même `sommeil.sbatch`. Installer Docker, ou choisir une image, ne fait pas partie du travail. Sans `sinfo`, le livrable est le script plus une phrase par ligne.
+:::
+
+```bash
+sinfo
+```
+
+Si `sinfo` affiche une partition, il soumet le script, il interroge `squeue` pendant le `sleep`, puis il ouvre le fichier `sommeil-%j.out`. Si `sinfo` est introuvable, il s'arrête après le script et l'explication. Cette absence n'est pas un échec.
+
+```bash
+kubectl get nodes
+```
+
+Si `kubectl get nodes` liste des nœuds, il peut appliquer le Job, lire les logs, puis supprimer le Job. Sinon, le YAML et les phrases suffisent. Il n'installe pas de cluster pour finir le module.
+
+## Exercices
+
+Les quatre exercices se font sur le portable. Aucun ne demande d'installer Slurm, Docker, Kueue, ou un cluster.
+
+### Exercice 1. Écrire le script et expliquer chaque ligne
+
+Il crée `sommeil.sbatch` avec les huit lignes des notes, dans le même ordre. Il crée `lignes.md`. Ce fichier contient une phrase par ligne du script, dans l'ordre, plus trois réponses courtes.
+
+- Que devient une option `#SBATCH` écrite après `hostname`?
+- Quelle durée Slurm enregistre pour l'option `--time=00:00:30`?
+- Quel fichier reçoit la sortie standard et l'erreur standard quand `--error` est absent?
+
+Il n'a pas besoin de soumettre le script pour cet exercice. S'il a déjà un Slurm qui répond à `sinfo`, y compris dans Docker, il peut soumettre en plus et coller la ligne `Submitted batch job` dans `lignes.md`. Sans `sinfo`, les deux fichiers ferment l'exercice.
+
+### Exercice 2. Prévoir le prochain job
+
+Il écrit `decision.md`. Le cluster n'intervient pas. La partition de l'énoncé a deux nœuds. Le backfill est actif. La préemption est inactive.
+
+| Job | État | Nœuds | Priorité | Durée |
+| --- | --- | --- | --- | --- |
+| 51 | R | 1 | basse | 10 minutes restantes |
+| 52 | PD | 2 | haute | limite 1 heure |
+| 53 | PD | 1 | basse | limite 40 minutes |
+
+Il répond à trois questions.
+
+1. Quels jobs en attente restent PD, et pour quelle raison chacun?
+2. Quelle commande `scancel` arrête seulement le job 51?
+3. Après cet arrêt, quel job part, et pourquoi l'autre reste PD?
+
+### Exercice 3. Refuser le Deployment
+
+Il écrit `refus.md`. Il y explique, en quelques phrases, ce que fait le Deployment des notes quand `sleep` sort avec le code 0. Il écrit aussi pourquoi il n'applique pas cet objet.
+
+Il écrit `sommeil-job.yaml` à partir du Job des notes, avec une seule différence. `backoffLimit` vaut 1 dans son fichier. Dans `refus.md`, il dit ce que le contrôleur fait après un code de sortie non nul.
+
+Une phrase de `refus.md` nomme Kueue et rappelle que ce module ne l'installe pas.
+
+Si `kubectl get nodes` liste des nœuds, il applique son Job, il garde la ligne de log de `hostname`, puis il supprime le Job. Sinon, les deux fichiers suffisent. Il n'installe rien pour obtenir cette liste.
+
+### Exercice 4. Préparer le compte et la clé
+
+Il prépare la séance du jeudi 5 novembre 2026, de 9h30 à 12h.
+
+Il demande le compte d'accès, ou il vérifie que ce compte est déjà ouvert. Il génère la clé ed25519 des notes si le fichier n'existe pas. Il affiche l'empreinte de la clé publique.
+
+Il écrit `acces.md` avec quatre éléments.
+
+- La date de la demande, ou la date de la vérification.
+- Le chemin de la clé publique.
+- L'empreinte, et le type ed25519.
+- La phrase recopiée. Connexion uniquement vers le nœud de login indiqué par les organisateurs.
+
+Il ne met pas la clé privée dans `acces.md`. Il ne lance pas de client SSH vers la séance dans cet exercice.
+
+## Projet solo
+
+Il rend un job Slurm CPU qui dort 30 secondes et qui écrit le nom du nœud. Le script est `sommeil.sbatch`. S'il a déjà rendu ce fichier à l'exercice 1, il le reprend tel quel, à condition que la liste suivante soit vraie.
+
+- La première ligne est `#!/bin/bash`.
+- Les options `--job-name=sommeil`, `--output=sommeil-%j.out`, `--time=00:02:00`, `--cpus-per-task=1` et `--mem=1G` sont présentes, toutes avant la première commande.
+- Les deux commandes sont `hostname`, puis `sleep 30`.
+- Aucune option `#SBATCH` ne suit `hostname`.
+- `explication.md` contient une phrase par ligne, y compris le shebang. Ce fichier peut être le `lignes.md` de l'exercice 1, recopié sous le nom demandé.
+
+Deux branches existent. La branche obligatoire est le portable, même sans `sinfo`.
+
+Sur le portable, si `sinfo` ne répond pas, les deux fichiers suffisent. Docker n'est pas à installer pour créer cette réponse. Si `sinfo` répond, y compris dans un Slurm Docker déjà lancé, il soumet une fois. Il lance `squeue -u "$USER"` pendant le `sleep`. Il ouvre le fichier dont le nom contient le numéro annoncé. Il colle dans `explication.md` la ligne de `hostname` et la ligne de `squeue` qui montre l'état R. Cette ligne de `hostname` nomme le nœud de l'allocation. Elle peut différer du nom de la machine où il a tapé `sbatch`. Il écrit si les deux noms coïncident. Il nomme le nœud du job.
+
+Quand le compte d'accès existe, il peut soumettre le même script sur le nœud de login indiqué par les organisateurs. Il n'ajoute `--partition` ou `--account` que si les organisateurs lui ont donné les noms. Cette branche ne remplace pas le portable. Sans compte, cette branche reste fermée.
+
+## Projet de groupe
+
+Deux personnes comparent un job Slurm et un Job Kubernetes sur la même commande courte. La commande est `hostname`, puis `sleep 30`. Dans le conteneur, le champ `command` contient `hostname; sleep 30`. Ce champ n'est pas un script de plusieurs lignes.
+
+Il tient `sommeil.sbatch`. Le script conforme du projet solo se réutilise sans changement. Le collègue tient `sommeil-job.yaml`, conforme au Job des notes, avec `backoffLimit: 0` et `activeDeadlineSeconds: 120`. Il relit le YAML avant la comparaison, car il exploite déjà Kubernetes.
+
+Ensemble, ils écrivent `comparaison.md` en quatre paragraphes.
+
+1. Démarrage. Quelle commande soumet le travail, et quelle condition peut le laisser en attente.
+2. Arrêt. Quelle limite peut tuer le travail, et ce qui se passe après un code 0.
+3. Sortie. Où la ligne de `hostname` apparaît pour le job Slurm, et où elle apparaît pour le Job Kubernetes.
+4. Second passage. Quelle action fait exécuter `hostname` une seconde fois de chaque côté.
+
+Une dernière phrase nomme Kueue et dit que cette file n'est pas installée. Ce Job, sans Kueue, n'a pas de fairshare.
+
+S'ils ont `sinfo`, ils soumettent le script une fois et ils gardent la ligne de `hostname`. S'ils ont `kubectl get nodes`, ils appliquent le Job, ils gardent la ligne de log, puis ils suppriment le Job. Les deux noms peuvent différer sans que l'un soit faux. Si une des deux commandes manque, le fichier de ce côté et les paragraphes suffisent. Ils n'installent ni Slurm, ni Kueue, ni un cluster pour égaliser les deux côtés.
+
+## Examen
+
+L'examen est écrit. Il répond sans cluster, en quelques phrases par question. Chaque réponse nomme le mécanisme et l'effet.
+
+### Question 1. Expliquer une attente
+
+Un job reste PD. La partition a des nœuds libres. La limite de temps demandée est inférieure à celle de la partition. `sprio` montre un fairshare très bas, et d'autres jobs PD ont une priorité plus haute.
+
+Pourquoi ce job reste en attente? Que change un fairshare qui remonte après une baisse de l'usage récent? La réponse dit aussi quel fait de l'énoncé ne fait pas partir le job.
+
+### Question 2. Attribuer le service et la conversion
+
+La startup robotique a deux besoins. Un service doit répondre sur un port en continu. Une conversion de journaux doit s'exécuter une fois, écrire son résultat, et s'arrêter.
+
+Quel objet porte le service, et quel objet porte la conversion, entre un Deployment et un job Slurm? Que fait le Deployment si le processus de conversion sort avec le code 0?
+
+### Question 3. Retrouver la sortie et annuler
+
+Le script contient `hostname`, puis `sleep 30`. L'option de sortie est `--output=sommeil-%j.out`. `sbatch` a annoncé le numéro 17. Le job est encore dans son `sleep`.
+
+Où est le fichier, et quel texte peut déjà s'y trouver? Quelle commande arrête seulement ce job? Que signifie le code 0 déjà renvoyé par `sbatch`?
+
+## Sources
+
+Fiche de la séance du jeudi 5 novembre 2026, de 9h30 à 12h.
+
+<https://romeo.univ-reims.fr/21_formations.html/341/Utiliser_ROMEO2025_et_ses_GPU_pour_le_HPC_et_l_IA>
+
+Manuel de `sbatch`. La résolution d'une minute, le fichier de sortie, et l'arrêt de la lecture des directives viennent de cette page.
+
+<https://slurm.schedmd.com/sbatch.html>
