@@ -9,7 +9,7 @@ project:
   modules: [linux-systems, provisioning, slurm, observability]
 badges:
   - {label: "Portfolio", class: core}
-  - {label: "Tests hors ligne sur des sorties réelles de Slurm 23.11.4", class: verified}
+  - {label: "Tests hors ligne et vérification en direct sur Slurm 23.11.4", class: verified}
 ---
 
 ## Contexte et objectif {#contexte}
@@ -24,7 +24,9 @@ Le point de départ est un constat fait en écrivant le [module Slurm](../../cou
 
 Le projet se vérifie de deux façons. Hors ligne, avec des sorties **réelles** de Slurm 23.11.4 enregistrées dans `fixtures/` : aucun Slurm n'est nécessaire pour faire passer les tests. En direct, avec `verify-live.sh`, qui monte le Slurm du bac à sable du module 5, applique votre configuration deux fois et lit de vraies métriques.
 
-**État de la vérification en direct.** `verify-live.sh` est écrit et passe `shellcheck`, mais il n'a **pas encore été exécuté de bout en bout** par l'auteur de ce parcours : le badge ne couvre donc que les tests hors ligne. Si vous l'exécutez, comparez sa sortie à la liste des étapes de la section « Cahier des charges » (R7) et signalez tout écart.
+**État de la vérification en direct.** Le 2026-10-24, `verify-live.sh` a été exécuté de bout en bout trois fois sur le code de référence, avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes `sacctmgr`, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par `promtool`) et voit un nœud drainé devenir `slurm_node_unhealthy{reason="gpu_xid"} 1`.
+
+Limites : le drainage est provoqué à la main avec `scontrol update … reason=gpu_xid:79`, sans panne de GPU réelle, et les jobs sont des `sleep` sur processeur.
 
 ### Prérequis de connaissances {#pre}
 

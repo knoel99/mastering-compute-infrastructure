@@ -29,7 +29,7 @@ sacctmgr -nP show assoc format=Account,User,Share,QOS | grep -E '^teama\|alice\|
 
 echo "--- 3. real metrics from a real queue"
 sacctmgr -i add user root account=teama >/dev/null 2>&1 || true
-for i in 1 2 3 4; do sbatch -J lv$i -A teama -N1 -n4 --wrap 'sleep 300' >/dev/null; done
+for i in 1 2 3 4; do sbatch -J lv$i -o /dev/null -A teama -N1 -n4 --wrap 'sleep 300' >/dev/null; done
 for _ in $(seq 1 30); do squeue -h -t R | grep -q . && break; sleep 1; done
 metrics="$("$PY" "$IMPL/exporter.py" --once)"
 echo "$metrics" | grep -E '^slurm_(scrape_ok|jobs)\{?' | head -8

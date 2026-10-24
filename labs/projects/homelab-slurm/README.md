@@ -8,7 +8,7 @@ reference/    solution de référence (à consulter après votre tentative)
 fixtures/     sorties RÉELLES de Slurm 23.11.4 (sacctmgr, sinfo, squeue, sshare), capturées dans le bac à sable
 tests/        24 tests ; IMPL=starter|reference choisit le code testé ; fake_sacctmgr.py imite le vrai
 verify.sh     hors ligne : référence verte, départ rouge
-verify-live.sh  sur un vrai Slurm (root) : applique cluster.yml deux fois, lit de vraies métriques, drain d'un nœud   (écrit et linté ; PAS encore exécuté de bout en bout par l'auteur)
+verify-live.sh  sur un vrai Slurm (root) : applique cluster.yml deux fois, lit de vraies métriques, drain d'un nœud   (exécuté de bout en bout 3 fois le 2026-10-24 sur Slurm 23.11.4 ; le drainage est provoqué à la main)
 ```
 
 Prérequis : `promtool` (`sudo apt-get install prometheus`), Python avec `pytest` et `pyyaml`. Pour `verify-live.sh` :

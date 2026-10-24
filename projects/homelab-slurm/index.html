@@ -50,7 +50,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <header id="title-block-header">
 <h1 class="title">Projet 1 — Mini-cluster Slurm instrumenté</h1>
 <p class="subtitle">Projet 1 · 24 h · modules : linux-systems, provisioning, slurm, observability</p>
-<p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Tests hors ligne sur des sorties réelles de Slurm 23.11.4</span></p>
+<p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Tests hors ligne et vérification en direct sur Slurm 23.11.4</span></p>
 </header>
 <h2 id="contexte">Contexte et objectif</h2>
 <p>Un cluster Slurm est un <strong>état</strong> : comptes, QOS, parts d'équité, utilisateurs, partitions. Tant que cet état n'existe que dans l'historique d'un terminal, personne ne peut le relire, le revoir ni le reconstruire. Ce projet vous fait décrire l'état voulu dans un fichier, calculer <strong>ce qui manque</strong> par rapport à l'état réel, l'appliquer, puis observer le cluster avec des métriques et des alertes que vous avez testées.</p>
@@ -59,7 +59,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><span class="tag">Objectif du projet</span> Un cluster que l'on sait décrire (<code>cluster.yml</code>), converger vers cette description sans jamais rien supprimer, et surveiller avec des alertes dont on a prouvé qu'elles se déclenchent, qu'elles se taisent quand il le faut, et que les tests qui les protègent détectent une règle modifiée.</p>
 </div>
 <p>Le projet se vérifie de deux façons. Hors ligne, avec des sorties <strong>réelles</strong> de Slurm 23.11.4 enregistrées dans <code>fixtures/</code> : aucun Slurm n'est nécessaire pour faire passer les tests. En direct, avec <code>verify-live.sh</code>, qui monte le Slurm du bac à sable du module 5, applique votre configuration deux fois et lit de vraies métriques.</p>
-<p><strong>État de la vérification en direct.</strong> <code>verify-live.sh</code> est écrit et passe <code>shellcheck</code>, mais il n'a <strong>pas encore été exécuté de bout en bout</strong> par l'auteur de ce parcours : le badge ne couvre donc que les tests hors ligne. Si vous l'exécutez, comparez sa sortie à la liste des étapes de la section « Cahier des charges » (R7) et signalez tout écart.</p>
+<p><strong>État de la vérification en direct.</strong> Le 2026-10-24, <code>verify-live.sh</code> a été exécuté de bout en bout trois fois sur le code de référence, avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes <code>sacctmgr</code>, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par <code>promtool</code>) et voit un nœud drainé devenir <code>slurm_node_unhealthy{reason="gpu_xid"} 1</code>.</p>
+<p>Limites : le drainage est provoqué à la main avec <code>scontrol update … reason=gpu_xid:79</code>, sans panne de GPU réelle, et les jobs sont des <code>sleep</code> sur processeur.</p>
 <h3 id="pre">Prérequis de connaissances</h3>
 <p>Le <a href="../../courses/slurm/index.html">module Slurm</a> (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; le chapitre sur la comptabilité explique ce que vous allez décrire en code. Les règles d'alerte et leurs tests reprennent la méthode du <a href="../gpu-observability/index.html">projet 5</a>, appliquée ici aux métriques d'un ordonnanceur et non d'un GPU.</p>
 <h2 id="cahier">Cahier des charges</h2>
