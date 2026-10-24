@@ -4,7 +4,7 @@ import unittest
 from html import escape
 from pathlib import Path
 
-from tools.gates import Code, check_gates
+from tools.gates import Code, _html_contains, check_gates
 
 REPO = Path(__file__).resolve().parents[1]
 MARKER = "<!-- derived from module front matter. build_site overwrites this file. -->"
@@ -242,6 +242,12 @@ def _valid_tree(root: Path) -> None:
 
 
 class GateTests(unittest.TestCase):
+    def test_html_accepts_pandoc_apostrophe(self) -> None:
+        straight = "Exercice 2. Lire la RAM de l'hôte"
+        curly = "Exercice 2. Lire la RAM de l\u2019hôte"
+        self.assertTrue(_html_contains(curly, straight))
+        self.assertFalse(_html_contains("Exercice 2. Lire la RAM", straight))
+
     def test_skeleton_missing_travaux(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

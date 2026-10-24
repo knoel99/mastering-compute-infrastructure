@@ -991,6 +991,18 @@ def _derive_glossary(annex_qmd: str | None) -> str:
     return DERIVED_MARK + "\n" + chunk.strip("\n") + "\n"
 
 
+def _html_contains(html: str, needle: str) -> bool:
+    """Return whether needle occurs in html.
+
+    Pandoc rewrites an ASCII apostrophe as U+2019. Both forms match.
+    """
+
+    def fold(value: str) -> str:
+        return value.replace("\u2019", "'").replace("\u2018", "'")
+
+    return fold(needle) in fold(html)
+
+
 def _page_findings(
     module: Module,
     qmd: str,
@@ -1009,7 +1021,8 @@ def _page_findings(
     _chrome_ref(2), _closing_ref(2), and KATEX_JS_URL. When html is None,
     emit missing-html and skip HTML checks. When html is present, it must
     contain lang="fr" and the text of every required heading, exercise
-    heading, and question heading.
+    heading, and question heading. _html_contains accepts the Pandoc
+    apostrophe in that HTML.
     """
     rule = SECTION_RULES[module.status]
     findings: list[Finding] = []
@@ -1075,7 +1088,7 @@ def _page_findings(
     if 'lang="fr"' not in html:
         findings.append(Finding(Code.LANG, html_path, 'lang="fr" manquant'))
     for text in [heading.value for heading in rule.required] + exercises + questions:
-        if text not in html:
+        if not _html_contains(html, text):
             findings.append(Finding(Code.MISSING_SECTION, html_path, f"HTML sans : {text}"))
     return tuple(findings)
 
@@ -1298,7 +1311,7 @@ def _link_findings(
             if module.jalon:
                 bits.append(module.jalon)
             for bit in bits:
-                if bit not in page.html:
+                if not _html_contains(page.html, bit):
                     findings.append(
                         Finding(Code.MISSING_LINK, page.rel_html, f"mention absente : {bit}")
                     )
