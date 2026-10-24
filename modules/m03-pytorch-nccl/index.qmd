@@ -1,0 +1,389 @@
+---
+title: "PyTorch distribué et NCCL"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 4
+  hours: 18
+  jalon: "Confirmé. Jeu. 26 nov. 2026, 13h-17h. Accélérez vos projets IA avec le multi-GPU"
+---
+
+## Objectifs
+
+Il entraîne déjà de petits modèles. Il sert déjà des LLM. Le job sur plusieurs nœuds est nouveau pour lui. Les 18 heures servent à tenir ce premier job, à deux processus, et à lire l'all-reduce qui réunit les gradients.
+
+Au bout du module, il fait cinq choses.
+
+1. Il lance un processus par GPU et il lit `RANK`, `LOCAL_RANK` et `WORLD_SIZE`.
+2. Il calcule la moyenne d'un gradient après l'all-reduce, sur l'exemple à quatre lignes.
+3. Il enveloppe un petit modèle avec `DistributedDataParallel`. Le portable utilise gloo et un tenseur CPU. Un GPU visible, avec `MCI_BACKEND=nccl`, utilise NCCL.
+4. Il reconnaît un blocage et il le sépare d'un pas lent.
+5. Il chronomètre un all-reduce. Un tenseur GPU passe par `torch.cuda.Event`. Un tenseur CPU passe par `time.perf_counter`.
+
+Le jalon est le jeudi 26 novembre 2026, de 13 h à 17 h, en présentiel et en visioconférence. La fiche affiche 4 heures et le nom A. Fahs. Elle place la séance à l'URCA, campus Moulin de la Housse, bâtiment 7, salle TD707. Les places sont limitées. Les 18 heures couvrent la préparation et le travail autour de cette séance.
+
+Le poste visé est Compute Infrastructure Lead dans une startup robotique. Ce poste demande de tenir un job d'entraînement distribué. L'offre B, l'entraînement à grande échelle, reprendra plus tard. Ce module s'arrête à DDP.
+
+## Prérequis
+
+Une boucle PyTorch sur un seul processus suffit. Cette boucle a un tenseur, une perte, un appel à `backward`, et un optimiseur. Le portable a Python 3 et pip. Aucun GPU n'est requis pour valider les laboratoires.
+
+La fiche du 26 novembre demande le cours ROMEO « Fundamentals of Deep Learning », des bases de Python, et des bases de calcul haute performance. Cette page commence après ce cours, au moment où un processus sait déjà calculer un gradient.
+
+Le compte ouvre seulement la branche du cluster, le jour où il existe. Sans compte, un GPU loué porte la même branche nccl. Sans GPU du tout, le chemin gloo reste la validation.
+
+## Notes de cours
+
+### Un processus pour chaque GPU
+
+`DistributedDataParallel` exécute une copie du script par GPU. Chaque copie est un processus, avec son propre interpréteur. Servir un LLM reste un processus. L'entraînement de ce module en lance un par GPU.
+
+Sur un nœud à quatre GPU, il lance quatre processus. Chacun en voit un. Sur le portable, le laboratoire lance deux processus même s'il n'y a aucun GPU. Ces deux processus tiennent le rôle des deux GPU, sur le CPU, pour que l'all-reduce soit réel.
+
+NCCL demande qu'un processus ait l'usage exclusif de chaque GPU qu'il touche. La documentation de `torch.distributed` prévient qu'un GPU partagé entre processus peut mener à un interblocage ou à un usage NCCL invalide. Un processus par GPU évite ce partage.
+
+La fiche nomme aussi le parallélisme de modèle, le découpage du modèle en morceaux. Le script de cette page laisse le modèle entier sur chaque rang, avec une ligne d'entrée différente. Le découpage d'un LLM plus grand qu'un GPU est hors de cette page.
+
+### Trois variables pour situer le processus
+
+`RANK` est l'indice du processus dans le job. Il va de 0 à `WORLD_SIZE` moins un. `WORLD_SIZE` est le nombre de processus du job. `LOCAL_RANK` est l'indice du processus sur le nœud. C'est lui qui choisit le GPU.
+
+Sur un seul nœud et deux processus, `LOCAL_RANK` vaut `RANK`. `WORLD_SIZE` vaut 2.
+
+Sur deux nœuds et deux processus par nœud, `WORLD_SIZE` vaut 4. `RANK` vaut 0, 1, 2 ou 3. `LOCAL_RANK` vaut 0 ou 1, et il recommence à 0 sur chaque nœud. Le GPU se choisit avec `LOCAL_RANK`.
+
+`torchrun` écrit les trois variables, plus `MASTER_ADDR` et `MASTER_PORT`. `init_process_group` les lit quand aucune autre méthode n'est passée. Cette méthode par défaut s'appelle `env://`. La documentation la décrit dans la page citée en sources.
+
+`srun` écrit `SLURM_PROCID`, `SLURM_LOCALID` et `SLURM_NTASKS`. Le fichier Python ne change pas. Le lanceur copie ces trois valeurs dans `RANK`, `LOCAL_RANK` et `WORLD_SIZE`, et il fournit aussi `MASTER_ADDR` et `MASTER_PORT`.
+
+### Ce que la somme écrit sur le gradient
+
+::: def
+[All-reduce]{.tag} Chaque rang entre avec un tenseur de même forme. L'appel remplace le tenseur de chaque rang par la réduction de tous. `all_reduce` somme par défaut.
+:::
+
+L'exemple tient en quatre lignes.
+
+```
+rang 0  [1, 3]
+rang 1  [5, 7]
+somme   [6, 10]
+moyenne [3, 5]
+```
+
+Le rang 0 apporte `[1, 3]`. Le rang 1 apporte `[5, 7]`. La somme est `[6, 10]`. Chaque rang reçoit cette somme. La moyenne est cette somme divisée par `WORLD_SIZE`, donc `[3, 5]`.
+
+`all_reduce` s'arrête à la somme. DDP entraîne avec la moyenne. Le script manuel divise donc par `WORLD_SIZE` après l'appel. Pendant `backward`, DDP fait cette division lui-même. Les deux chemins doivent laisser la même valeur sur chaque rang.
+
+::: thm
+[Même gradient]{.tag} Après la division par `WORLD_SIZE`, chaque rang détient le même gradient. Un SGD déterministe, parti des mêmes poids, écrit alors les mêmes poids au pas suivant.
+:::
+
+### Le script qui tourne sans GPU
+
+Le fichier s'appelle `labo.py`. Le chemin du portable est le défaut. `MCI_BACKEND` absent, ou égal à `gloo`, sélectionne gloo et un tenseur CPU. Un portable qui a déjà un GPU reste sur ce chemin. Le laboratoire du portable ignore ce GPU.
+
+La branche nccl s'ouvre seulement si `MCI_BACKEND` vaut `nccl` et si un GPU est visible. Le tenseur est alors sur le GPU d'indice `LOCAL_RANK`. `DistributedDataParallel` reçoit `device_ids` dans ce seul cas. Sur CPU, l'appel omet `device_ids`.
+
+```python
+import os
+import time
+from datetime import timedelta
+
+import torch
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+
+
+def choose_device():
+    use_nccl = os.environ.get("MCI_BACKEND", "gloo") == "nccl"
+    if not use_nccl:
+        return torch.device("cpu"), "gloo"
+    if not torch.cuda.is_available():
+        raise SystemExit("MCI_BACKEND=nccl demande un GPU visible.")
+    local_rank = int(os.environ["LOCAL_RANK"])
+    torch.cuda.set_device(local_rank)
+    return torch.device("cuda", local_rank), "nccl"
+
+
+def time_allreduce_ms(tensor):
+    if tensor.is_cuda:
+        # Une roue CPU lève une erreur si on construit Event sans GPU.
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
+        start.record()
+        dist.all_reduce(tensor)
+        end.record()
+        end.synchronize()
+        return start.elapsed_time(end)
+    t0 = time.perf_counter()
+    dist.all_reduce(tensor)
+    return (time.perf_counter() - t0) * 1e3
+
+
+def main():
+    device, backend = choose_device()
+    timeout_s = int(os.environ.get("MCI_TIMEOUT_S", "20"))
+    dist.init_process_group(backend=backend, timeout=timedelta(seconds=timeout_s))
+    rank = int(os.environ["RANK"])
+    local_rank = int(os.environ["LOCAL_RANK"])
+    world = int(os.environ["WORLD_SIZE"])
+    if dist.get_rank() != rank or dist.get_world_size() != world:
+        raise SystemExit("RANK ou WORLD_SIZE diverge du process group.")
+    # flush=True, sinon un blocage garde la ligne dans le tampon.
+    print(
+        f"RANK={rank} LOCAL_RANK={local_rank} WORLD_SIZE={world} backend={backend}",
+        flush=True,
+    )
+    if world != 2:
+        raise SystemExit("Ce laboratoire attend WORLD_SIZE=2.")
+
+    local = torch.tensor([1.0, 3.0] if rank == 0 else [5.0, 7.0], device=device)
+    reduced = local.clone()
+    skip_raw = os.environ.get("MCI_SKIP_RANK")
+    skipping = skip_raw is not None and rank == int(skip_raw)
+    if skipping:
+        print(f"saute {rank}", flush=True)
+        time.sleep(timeout_s + 5)
+    else:
+        print(f"entre {rank}", flush=True)
+        dist.all_reduce(reduced, op=dist.ReduceOp.SUM)
+        print(f"sort {rank}", flush=True)
+        mean = reduced / world
+        print(f"moyenne {rank} {mean.tolist()}", flush=True)
+
+    if skip_raw is None:
+        model = torch.nn.Linear(2, 1, bias=False)
+        with torch.no_grad():
+            model.weight.copy_(torch.tensor([[1.0, 1.0]]))
+        model.to(device)
+        if device.type == "cuda":
+            model = DDP(model, device_ids=[local_rank])
+        else:
+            model = DDP(model)
+        row = [1.0, 0.0] if rank == 0 else [0.0, 3.0]
+        loss = model(torch.tensor([row], device=device)).sum()
+        loss.backward()
+        grad = model.module.weight.grad.detach().cpu().tolist()
+        print(f"gradient {rank} {grad}", flush=True)
+        elapsed_ms = time_allreduce_ms(torch.ones(8, device=device))
+        if rank == 0:
+            print(f"all_reduce_ms {elapsed_ms:.3f}", flush=True)
+
+    dist.destroy_process_group()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+::: note
+[Chemin du portable]{.tag} `choose_device` renvoie ensemble le device et le backend. Le défaut est le CPU avec gloo. Le GPU avec nccl n'existe que dans l'autre retour. Un tenseur CPU ne part donc pas vers NCCL.
+:::
+
+La commande du portable est la suivante.
+
+```bash
+torchrun --nproc_per_node=2 --master_port=29531 labo.py
+```
+
+Si le nom `torchrun` est absent du `PATH`, le même lanceur s'appelle ainsi.
+
+```bash
+python3 -m torch.distributed.run --nproc_per_node=2 --master_port=29531 labo.py
+```
+
+Les deux rangs impriment `backend=gloo`, le texte `[3.0, 5.0]` après `moyenne`, et le texte `[[0.5, 1.5]]` après `gradient`. Le rang 0 imprime aussi `all_reduce_ms`. Deux processus peuvent coller deux textes sur la même ligne. Le critère est la présence de ces textes, dans n'importe quel ordre.
+
+Sans `torchrun`, `python3 labo.py` s'arrête dans `init_process_group`. L'erreur contient `environment variable RANK expected, but not set` et elle nomme `env://`. Le lanceur est obligatoire.
+
+Si `MCI_BACKEND=nccl` alors qu'aucun GPU n'est visible, chaque processus s'arrête avec `MCI_BACKEND=nccl demande un GPU visible.` Le message peut apparaître deux fois, une fois par processus.
+
+### La branche avec nccl
+
+Le fichier reste `labo.py`. Sur une machine ou une allocation dont les GPU sont visibles, `torchrun` écrit déjà les cinq variables.
+
+```bash
+MCI_BACKEND=nccl torchrun --nproc_per_node=2 --master_port=29531 labo.py
+```
+
+Si le compte cluster existe, `srun` lance le même fichier. `srun` écrit `SLURM_PROCID`, `SLURM_LOCALID` et `SLURM_NTASKS`. La commande ci-dessous les copie dans `RANK`, `LOCAL_RANK` et `WORLD_SIZE`. `MASTER_ADDR` est le nom du nœud qui porte le rang 0. Sur un seul nœud, `hostname` suffit. Sur deux nœuds, `127.0.0.1` reste dans le nœud local.
+
+```bash
+export MASTER_ADDR="$(hostname)"
+export MASTER_PORT=29531
+export MCI_BACKEND=nccl
+srun --ntasks=2 --gpus-per-task=1 bash -c 'export RANK="$SLURM_PROCID" LOCAL_RANK="$SLURM_LOCALID" WORLD_SIZE="$SLURM_NTASKS"; exec python3 labo.py'
+```
+
+Le drapeau qui demande les GPU dépend du site. S'il est refusé, le fichier Python reste le même. La demande de GPU est celle indiquée avec le compte. Les tenseurs du script fixent `moyenne` et `gradient`. Sur la branche nccl, la ligne `backend` vaut `nccl`.
+
+Un GPU loué, sans compte cluster, reprend la commande `torchrun` de cette section.
+
+### Un rang qui n'entre pas
+
+Un all-reduce et un barrier sont des collectifs. L'appel se termine quand chaque rang y est entré. Si un rang saute le collectif, les rangs qui sont entrés attendent.
+
+Le script le montre avec `MCI_SKIP_RANK`. Le rang dont l'indice est cette valeur imprime `saute` et n'appelle pas `all_reduce`. Les autres impriment `entre`, appellent `all_reduce`, et n'impriment `sort` que si l'appel revient.
+
+La documentation de `init_process_group` indique un délai de 10 minutes pour NCCL et de 30 minutes pour les autres backends, dont gloo. Avec ce délai long, un blocage ressemble à un job encore vivant. Le script passe `timeout` à `init_process_group`. `MCI_TIMEOUT_S` vaut 20 secondes par défaut. Au laboratoire, 8 flottants sur CPU reviennent bien avant 20 secondes. Un silence jusqu'à ce délai est un blocage.
+
+Un pas lent imprime `entre` sur chaque rang, puis `sort` sur chaque rang. Le temps entre les deux est la durée du pas. `all_reduce_ms` est cette durée pour la sonde, en millisecondes.
+
+Un blocage imprime `entre` seulement sur les rangs qui sont entrés, et il n'imprime pas le `sort` correspondant. Le rang qui a sauté imprime `saute` et il n'imprime pas `entre`.
+
+Avec `MCI_SKIP_RANK=1`, le rang 1 imprime `saute 1`. Le rang 0 imprime `entre 0`. Aucun des deux n'imprime `sort`. Gloo lève alors une `RuntimeError` dont le texte contient `Timed out waiting` et le délai choisi. `torchrun` envoie ensuite `SIGTERM` au rang qui a sauté. Le code de sortie du lanceur est 1.
+
+`flush=True` sert à voir `entre` avant l'attente. Sans flush, le tampon peut garder cette ligne, et le blocage ressemble à un processus qui n'a rien démarré.
+
+### Deux horloges pour un collectif
+
+`time_allreduce_ms` chronomètre un all-reduce de 8 flottants, après le `backward`. `init_process_group` a déjà rendu la main. Le nombre commence après le démarrage du job.
+
+Sur un tenseur CUDA, l'all-reduce NCCL rend la main avant la fin du travail sur le GPU. `time.perf_counter` autour de l'appel s'arrête au lancement. `torch.cuda.Event` enregistre sur le flux GPU. `end.synchronize` attend la fin. `elapsed_time` renvoie des millisecondes.
+
+Sur un tenseur CPU, gloo bloque jusqu'à l'écriture du résultat. `time.perf_counter` autour de l'appel est alors la durée. Le script multiplie par `1e3` pour imprimer aussi des millisecondes.
+
+Le test `tensor.is_cuda` choisit l'horloge. Le chemin CPU ne construit pas `torch.cuda.Event`. Une roue installée sans GPU lève `Tried to instantiate dummy base class Event`.
+
+Un barrier se chronomètre avec les mêmes deux horloges, autour de `dist.barrier`. Le laboratoire chronomètre un all-reduce, parce que c'est l'appel qui porte la somme du gradient.
+
+### Ce qu'il prépare avant le 26 novembre
+
+Avant le 26 novembre, il fait tourner `labo.py` sur le portable. Deux rangs, gloo, tenseurs CPU, et les deux lignes `gradient` identiques. C'est le script DDP qu'il apporte.
+
+Si le compte existe, il relance le même fichier sur le cluster, sous `torchrun` ou sous `srun`, avec `MCI_BACKEND=nccl`. Sans compte, le chemin portable reste la validation. Un GPU loué est la branche intermédiaire, avec la même commande nccl.
+
+::: note
+[Compte absent]{.tag} Les exercices se valident sans cluster. La branche nccl attend un GPU visible et, sur le cluster, un compte déjà ouvert. Le fichier Python est le même dans les trois cas.
+:::
+
+Le jour de la séance, la fiche fait travailler sur les GPU du cluster. Il lance le script sur le portable avant d'entrer dans la salle, pour y arriver en connaissant déjà `RANK`.
+
+## Exercices
+
+Les quatre exercices utilisent `labo.py`. Une roue CPU suffit.
+
+```bash
+pip install torch
+```
+
+Le lanceur imprime un bandeau sur `OMP_NUM_THREADS`. Les lignes qui comptent commencent par `RANK`. Si le port `29531` est occupé, changez-le pour un port libre.
+
+### Exercice 1. Lire RANK, LOCAL_RANK et WORLD_SIZE
+
+Copiez le script dans `labo.py`. Lancez-le.
+
+```bash
+torchrun --nproc_per_node=2 --master_port=29531 labo.py
+```
+
+Les deux textes suivants doivent apparaître. Ils peuvent partager une ligne.
+
+```
+RANK=0 LOCAL_RANK=0 WORLD_SIZE=2 backend=gloo
+RANK=1 LOCAL_RANK=1 WORLD_SIZE=2 backend=gloo
+```
+
+Écrivez une phrase. Elle dit quel processus prendrait le second GPU si la machine en avait deux.
+
+Si la sortie contient `Ce laboratoire attend WORLD_SIZE=2.`, la commande n'a lancé qu'un processus.
+
+### Exercice 2. Retrouver la moyenne à la main
+
+Avant de relancer, écrivez les quatre lignes pour `[1, 3]` et `[5, 7]`.
+
+Relancez la commande de l'exercice 1. La sortie contient les deux textes suivants, même collés.
+
+```
+moyenne 0 [3.0, 5.0]
+moyenne 1 [3.0, 5.0]
+```
+
+La somme de l'exemple est `[6, 10]`.
+
+### Exercice 3. Envelopper le petit modèle
+
+La perte est la somme de l'unique sortie. La couche est un `Linear` sans biais. Pour cette perte et cette couche, le gradient local est la ligne d'entrée.
+
+Le rang 0 reçoit `[1, 0]`. Son gradient local est `[1, 0]`. Le rang 1 reçoit `[0, 3]`. Son gradient local est `[0, 3]`. La moyenne est `[0.5, 1.5]`. Le poids a la forme d'une ligne, donc l'impression ajoute une paire de crochets.
+
+Relancez. La sortie contient les deux textes suivants.
+
+```
+gradient 0 [[0.5, 1.5]]
+gradient 1 [[0.5, 1.5]]
+```
+
+Un seul texte `gradient` veut dire que l'autre rang a manqué `backward`.
+
+### Exercice 4. Chronométrer l'all-reduce
+
+Relancez. Relevez la ligne `all_reduce_ms`. Écrivez la valeur, l'unité, et si elle est très en dessous de 20 secondes.
+
+Le tenseur de la sonde contient 8 flottants sur le CPU. Écrivez pourquoi ce chemin prend `time.perf_counter`. Citez le test du script qui choisit l'horloge.
+
+## Projet solo
+
+Il rend `labo.py` et la sortie d'une exécution sur le portable.
+
+Le fichier contient un petit modèle, un `Linear` sans biais, deux entrées et une sortie. Le lanceur démarre deux rangs. Le backend est gloo. Les tenseurs restent sur le CPU, même si un GPU est présent. Les deux rangs impriment le gradient moyenné, et les deux listes sont égales.
+
+La commande est celle de l'exercice 1. Garder les lignes d'entrée du cours est accepté. Les lignes attendues sont alors `gradient 0 [[0.5, 1.5]]` et `gradient 1 [[0.5, 1.5]]`.
+
+S'il change les deux lignes d'entrée, il écrit d'abord la moyenne à la main, puis il montre que l'impression lui est égale. Le critère reste le même. Les deux rangs impriment cette moyenne, et elle est bien la moyenne des deux gradients locaux.
+
+## Projet de groupe
+
+Deux personnes. Une seule commande, lancée par la personne B.
+
+La personne B injecte le rang qui saute le collectif. Elle exporte `MCI_SKIP_RANK=1`. Elle fixe `MCI_TIMEOUT_S=8`, en dessous des 20 secondes du script.
+
+```bash
+MCI_SKIP_RANK=1 MCI_TIMEOUT_S=8 torchrun --nproc_per_node=2 --master_port=29531 labo.py
+```
+
+La personne A laisse la personne B lancer la commande. La personne A lit les lignes du rang 0. La personne B lit les lignes du rang 1. Les textes `entre`, `saute` et `sort` comptent même s'ils partagent une ligne. Le code de sortie 1 est la fin attendue de cette commande.
+
+Ensemble, ils écrivent le symptôme. Cinq phrases, plus la sortie brute.
+
+1. La ligne que le rang 0 a imprimée, et la ligne `sort` qui manque.
+2. La ligne que le rang 1 a imprimée, et la ligne `entre` qui manque.
+3. Le texte de l'erreur qui contient `Timed out waiting` et le délai.
+4. Ce que le lanceur a fait au processus qui a sauté, y compris le signal.
+5. Pourquoi ce n'est pas un pas lent. Un pas lent imprime `entre` puis `sort` sur les deux rangs. Ici, `sort` n'apparaît sur aucun rang.
+
+## Examen
+
+Les trois questions se répondent par écrit, sans rendre `labo.py`.
+
+### Question 1. Situer quatre processus
+
+Un job a deux nœuds et deux processus par nœud. Donnez `WORLD_SIZE`. Donnez `RANK` et `LOCAL_RANK` pour chaque processus. Dites quelle variable choisit le GPU, et pourquoi l'autre ne convient pas dès que le job a deux nœuds.
+
+### Question 2. Somme puis moyenne
+
+`WORLD_SIZE` vaut 2. Le rang 0 tient le gradient 4. Le rang 1 tient le gradient 10. `all_reduce` fait la somme. Que tient chaque rang après l'appel ? Que doit voir l'optimiseur de DDP ? La seconde réponse tient en une phrase.
+
+### Question 3. Ligne manquante
+
+Le rang 0 a imprimé `entre 0` et la ligne `sort` est absente. Le rang 1 a imprimé `saute 1`. Le tenseur a 8 flottants. Le délai passé à `init_process_group` est 20 secondes. Est-ce un blocage ou un pas lent ? Quelle paire de lignes un pas lent aurait ajoutée sur les deux rangs ?
+
+## Sources
+
+Confirmé. Fiche du jeudi 26 novembre 2026, de 13 h à 17 h, A. Fahs, présentiel et visioconférence. Le titre de la fiche est « Accélérez vos projets IA avec le HPC et les multi-GPU ».
+
+https://romeo.univ-reims.fr/21_formations.html/342/Accelerez_vos_projets_IA_avec_le_HPC_et_les_multi-GPU
+
+`init_process_group`, la méthode `env://`, les variables `RANK`, `WORLD_SIZE`, `MASTER_ADDR` et `MASTER_PORT`, les délais par défaut, et `all_reduce` sont décrits dans la documentation de `torch.distributed`. La même page indique que DDP moyenne les gradients réunis.
+
+https://docs.pytorch.org/docs/stable/distributed.html
