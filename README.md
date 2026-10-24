@@ -11,6 +11,17 @@ Le contenu est un ensemble de pages HTML statiques (style dérivé de [`polytech
 - **Enquête sur les masters HPC** (France, États-Unis, Chine, monde) croisée avec des offres d'emploi, avec données sourcées dans `data/`.
 - **Point de départ** : comparaison d'un profil de référence (`CAREER.md` du dépôt [Certifications](https://github.com/knoel99/Certifications)) au métier visé.
 
+## État d'avancement
+
+| Élément | Statut |
+|---|---|
+| Modules rédigés (page, labs, exercices corrigés) | 8 sur 16 : 1 Linux et diagnostic, 2 modèles de performance, 5 Slurm, 10 pannes et checkpointing, 12 Kubernetes pour l'IA, 14 observabilité, 15 FinOps et capacité, 16 plateforme et leadership |
+| Modules planifiés (plan, chapitres et sources dans `syllabus/`) | 3 programmation parallèle, 4 programmation GPU, 6 provisioning, 7 réseaux, 8 stockage, 9 entraînement distribué, 11 Ray et RL, 13 multi-cloud |
+| Projets de portfolio | 6 sur 6 : entraînement résilient, étude de passage à l'échelle, observabilité GPU, ordonnanceur multi-fournisseurs, RFC de capacité, Slurm de laboratoire |
+| Enquête sur les masters et offres d'emploi | faite, avec citations vérifiées mécaniquement (`tools/verify_quotes.py`) |
+
+**Ce qui est vérifié.** Les labs « bac à sable » ont un `verify.sh` exécuté sur une machine virtuelle Linux sans GPU ; les projets ont un gabarit qui échoue et une référence qui réussit ; le projet 1 a aussi été vérifié sur un vrai Slurm 23.11.4. **Ce qui ne l'est pas** : aucun GPU, aucun cluster multi-nœuds, aucun cloud n'a été utilisé. Les parties qui l'exigent ne sont que vérifiées statiquement (lint, validation de schéma) et le disent dans leur badge `unverified` et dans les sections « À vérifier » de chaque page. Les données de prix, de pannes et de demande des exemples sont fictives et étiquetées comme telles.
+
 ## Mise en ligne (GitHub Pages)
 
 Les pages rendues sont commitées à côté de leurs sources (`.nojekyll`, pas de CI) : réglages du dépôt → *Pages* → *Deploy from a branch* → branche voulue, dossier `/ (root)`.
