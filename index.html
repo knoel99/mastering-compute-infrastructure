@@ -42,7 +42,7 @@ Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesque
 <p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a> <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a></p>
 </div>
 <h2 id="etat">État du chantier</h2>
-<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>3 module(s) sur 16 et 3 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
+<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>4 module(s) sur 16 et 4 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
 <ul>
 <li><strong>Documenté</strong> : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.</li>
 <li><strong>Vérifié</strong> : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (<code>verify.sh</code>), les pages passent des contrôles mécaniques (<code>tools/check_gates.py</code>).</li>
@@ -229,17 +229,17 @@ Module 09 · 36 h · Cœur · en préparation
 Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.
 </p>
 </div>
-<div class="card" style="opacity:.78;border-style:dashed">
+<a class="card" href="courses/fault-tolerance/index.html">
 <h4>
 Pannes, checkpointing et reprise automatique
 </h4>
 <p class="meta">
-Module 10 · 28 h · Cœur · en préparation
+Module 10 · 28 h · Cœur
 </p>
 <p>
 À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.
 </p>
-</div>
+</a>
 <div class="card" style="opacity:.78;border-style:dashed">
 <h4>
 Ray, infrastructure d'apprentissage par renforcement et boucles en ligne
@@ -357,19 +357,17 @@ Projet 3 · 24 h
 <p>
 Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.
 </p>
-</a>
-<div class="card" style="opacity:.78;border-style:dashed">
+</a> <a class="card" href="projects/multi-provider-scheduler/index.html">
 <h4>
 Placement multi-fournisseurs sensible aux coûts
 </h4>
 <p class="meta">
-Projet 4 · 24 h · en préparation
+Projet 4 · 24 h
 </p>
 <p>
 Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.
 </p>
-</div>
-<a class="card" href="projects/gpu-observability/index.html">
+</a> <a class="card" href="projects/gpu-observability/index.html">
 <h4>
 Observabilité GPU et détection de pannes silencieuses
 </h4>
