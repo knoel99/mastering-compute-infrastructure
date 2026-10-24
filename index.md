@@ -16,7 +16,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **2 module(s) sur 16 et 3 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **3 module(s) sur 16 et 3 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
@@ -44,7 +44,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Lire une machine et prédire sa performance avant de la mesurer.</p>
 
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Linux, systèmes et diagnostic de performance</h4><p class="meta">Module 01 · 24 h · À survoler · en préparation</p><p>Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.</p></div>
+<a class="card" href="courses/linux-systems/index.html"><h4>Linux, systèmes et diagnostic de performance</h4><p class="meta">Module 01 · 24 h · À survoler</p><p>Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.</p></a>
 <a class="card" href="courses/perf-models/index.html"><h4>Architecture matérielle et modèles de performance</h4><p class="meta">Module 02 · 24 h · Cœur</p><p>Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.</p></a>
 </div>
 

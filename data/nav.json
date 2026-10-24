@@ -37,6 +37,10 @@
    "label": "Environnement de travail"
   },
   {
+   "href": "courses/linux-systems/index.html",
+   "label": "Module 01 — Linux, systèmes et diagnostic de performance"
+  },
+  {
    "href": "courses/perf-models/index.html",
    "label": "Module 02 — Architecture matérielle et modèles de performance"
   },

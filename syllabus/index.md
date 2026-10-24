@@ -13,9 +13,11 @@ Les sources citées dans les rubriques « Sources à lire et faits à vérifier 
 
 ## Phase 0 — Fondations : machines et performance {#phase0}
 
-### Module 01 — Linux, systèmes et diagnostic de performance (plan, 24 h) {#linux-systems}
+### Module 01 — Linux, systèmes et diagnostic de performance (rédigé, 24 h) {#linux-systems}
 
 Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.
+
+**Cours complet :** [Linux, systèmes et diagnostic de performance](courses/linux-systems/index.html).
 
 **Ce que vous saurez vérifier :**
 

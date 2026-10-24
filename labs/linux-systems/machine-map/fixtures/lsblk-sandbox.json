@@ -1,0 +1,47 @@
+{
+   "blockdevices": [
+      {
+         "name": "zram0",
+         "type": "disk",
+         "size": 0,
+         "rota": false,
+         "mountpoint": null
+      },{
+         "name": "vda",
+         "type": "disk",
+         "size": 274877906944,
+         "rota": true,
+         "mountpoint": "/"
+      },{
+         "name": "vdb",
+         "type": "disk",
+         "size": 10035200,
+         "rota": true,
+         "mountpoint": "/opt/rclone"
+      },{
+         "name": "vdc",
+         "type": "disk",
+         "size": 322998272,
+         "rota": true,
+         "mountpoint": "/opt/claude-code"
+      },{
+         "name": "vdd",
+         "type": "disk",
+         "size": 50102272,
+         "rota": true,
+         "mountpoint": "/opt/env-runner"
+      },{
+         "name": "vde",
+         "type": "disk",
+         "size": 708608,
+         "rota": true,
+         "mountpoint": "/mnt/skills/public"
+      },{
+         "name": "vdf",
+         "type": "disk",
+         "size": 6098944,
+         "rota": true,
+         "mountpoint": "/mnt/skills/examples"
+      }
+   ]
+}
