@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Proves: the reference solution passes every test, and the starter code does not.
+# PYTHON needs pytest, pyyaml and yamllint. No GPU, no cloud account, no cluster is used.
+set -euo pipefail
+cd "$(dirname "$0")"
+PY="${PYTHON:-python3}"
+export PYTHON="$PY"
+"$PY" -c "import pytest, yaml, yamllint" 2>/dev/null || { echo "FAIL: PYTHON needs pytest, pyyaml and yamllint" >&2; exit 2; }
+IMPL=reference "$PY" -m pytest -q -p no:cacheprovider tests
+echo "--- starter (failures expected) ---"
+if IMPL=starter "$PY" -m pytest -q -p no:cacheprovider tests > /tmp/mps-starter.log 2>&1; then
+  echo "starter passes all tests: the tests do not discriminate"; exit 1
+fi
+tail -1 /tmp/mps-starter.log
+echo "ok: reference passes, starter fails as intended"

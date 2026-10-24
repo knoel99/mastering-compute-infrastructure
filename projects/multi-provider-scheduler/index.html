@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Projet 4 — Placement multi-fournisseurs sensible aux coûts — Mastering Compute Infrastructure</title>
+<meta name="description" content="Un simulateur de placement de jobs sur des offres à la demande et préemptibles, trois politiques comparées par différences appariées, et les manifestes SkyPilot et Kueue qui les matérialiseraient, validés hors ligne.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#projets">Projets</a></p>
+<header id="title-block-header">
+<h1 class="title">Projet 4 — Placement multi-fournisseurs sensible aux coûts</h1>
+<p class="subtitle">Projet 4 · 24 h · modules : multi-cloud, finops-capacity, kubernetes-gpu</p>
+<p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Code de départ et solution vérifiés (CPU, sans cloud)</span></p>
+</header>
+<h2 id="contexte">Contexte et objectif</h2>
+<p>Un même GPU se vend sous plusieurs formes : à la demande, cher mais fiable, ou préemptible (<em>spot</em>), moins cher mais que le fournisseur peut reprendre à tout moment. Plusieurs fournisseurs et plusieurs régions multiplient les choix. La question de l'ingénieur d'infrastructure n'est pas « quelle offre est la moins chère par heure ? » mais <strong>« où lancer ce job, avec quelle fréquence de checkpoint, et que faire quand on me le reprend ? »</strong>.</p>
+<p>Ce projet vous fait construire un simulateur qui répond à cette question par des chiffres reproductibles : des jobs arrivent, des politiques les placent, des interruptions détruisent le travail non sauvegardé, et l'on compare les coûts et les échéances manquées. Il se termine par la production des fichiers de configuration (tâches SkyPilot, files Kueue) qui appliqueraient la politique retenue.</p>
+<div class="war">
+<p><span class="tag">Toutes les données sont inventées</span> Les prix sont en unités arbitraires, les capacités et les taux d'interruption sont fabriqués pour le projet. <strong>Ne les lisez pas comme le marché.</strong> Aucun prix de fournisseur n'est cité sur cette page : les tarifs changent, varient selon la région et la disponibilité. Pour une étude réelle, relevez vous-même les prix le jour de l'étude, sur les pages des fournisseurs.</p>
+</div>
+<div class="key">
+<p><span class="tag">Idée centrale du projet</span> Le prix par heure n'est pas le coût d'une heure <strong>utile</strong>. Une offre à prix bas qui interrompt souvent fait perdre du travail et en fait refaire : son coût par heure productive peut dépasser celui d'une offre plus chère et plus stable. Le projet vous fait chiffrer cet écart, avec la formule de Young et Daly du <a href="../resilient-trainer/index.html">projet 3</a> pour choisir la fréquence de checkpoint.</p>
+</div>
+<h3 id="pre">Prérequis de connaissances</h3>
+<p>Vous devez savoir lire un code Python de deux cents lignes et écrire des tests. Les notions de checkpoint, de reprise et de période optimale viennent du projet 3 : relisez sa section sur Young et Daly. Les modules « multi-cloud », « FinOps et capacité » et « Kubernetes pour les GPU » du parcours approfondissent le contexte ; ils ne sont pas requis pour faire le projet, qui rappelle ce dont il a besoin.</p>
+<h2 id="cahier">Cahier des charges</h2>
+<p>Le dossier <code>labs/projects/multi-provider-scheduler/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>tests/</code> (29 tests) et <code>verify.sh</code>. Les données (<code>data.py</code>) sont fournies : quatre offres synthétiques et un générateur de jobs.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Exigence</th>
+<th>Test qui la vérifie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R1</td>
+<td><strong>Moteur</strong> minute par minute, avec les règles de facturation, de checkpoint et d'interruption décrites dans <code>sim.py</code> ; la capacité n'est jamais dépassée</td>
+<td><code>tests/test_sim.py</code> (11 tests)</td>
+</tr>
+<tr class="even">
+<td>R2</td>
+<td><strong>Chronologie exacte</strong> : sans interruption, un job de 300 min de travail, avec démarrage de 10 min et checkpoints de 5 min toutes les 60 min, finit à la minute 330 ; avec une interruption forcée à 100 min, à la minute 365</td>
+<td><code>test_timeline_*</code>, <code>test_forced_interruption_*</code></td>
+</tr>
+<tr class="odd">
+<td>R3</td>
+<td><strong>Tirages communs</strong> : la « chance » d'interruption d'une allocation ne dépend que de (graine, job, numéro d'allocation), jamais de la politique</td>
+<td><code>test_interruption_luck_is_common_*</code></td>
+</tr>
+<tr class="even">
+<td>R4</td>
+<td><strong>Trois politiques</strong> : moins cher par heure, à la demande seulement, et une politique « couverte » qui minimise le coût attendu par heure productive avec garde d'échéance</td>
+<td><code>tests/test_policies.py</code> (6 tests)</td>
+</tr>
+<tr class="odd">
+<td>R5</td>
+<td><strong>Comparaison appariée</strong> : mêmes jobs et mêmes interruptions pour chaque politique, différence par graine avec intervalle bootstrap</td>
+<td><code>tests/test_compare.py</code> (5 tests)</td>
+</tr>
+<tr class="even">
+<td>R6</td>
+<td><strong>Tâches SkyPilot</strong> et <strong>manifestes Kueue</strong> générés, avec validation structurelle (références croisées, quotas entiers, version d'API)</td>
+<td><code>tests/test_manifests.py</code> (7 tests)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le moteur suit une sémantique précise, donnée dans la docstring de <code>sim.py</code>. Un job en attente est proposé à la politique au début de chaque minute, dans l'ordre d'arrivée. Une allocation est facturée dès sa première minute, démarrage et checkpoints compris. Une interruption fait perdre toute la progression non sauvegardée, et le job est reproposé la même minute. Le dernier segment de calcul n'est pas suivi d'un checkpoint.</p>
+<h2 id="jalons">Jalons</h2>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>N°</th>
+<th>Jalon</th>
+<th>Durée</th>
+<th>Preuve</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Moteur de simulation (<code>sim.py</code>)</td>
+<td>6 h</td>
+<td>les 11 tests de <code>test_sim.py</code> passent, dont les deux chronologies exactes</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Les trois politiques (<code>policies.py</code>)</td>
+<td>5 h</td>
+<td>les 6 tests de <code>test_policies.py</code> passent</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Comparaison appariée (<code>compare.py</code>)</td>
+<td>5 h</td>
+<td>les 5 tests de <code>test_compare.py</code> passent ; un tableau de résultats sur 20 graines</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Tâches SkyPilot et manifestes Kueue (<code>manifests.py</code>)</td>
+<td>4 h</td>
+<td>les 7 tests de <code>test_manifests.py</code> passent ; <code>yamllint</code> propre sur vos fichiers</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>ADR et lecture critique</td>
+<td>4 h</td>
+<td>un ADR d'une page ; une page des limites de l'étude</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Commencez par le moteur et ses deux chronologies exactes : calculez-les <strong>à la main</strong> avant de coder, comme le fait le commentaire du test. Un moteur dont on ne sait pas prédire la sortie sur un cas à un job n'est pas fiable sur trente.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> labs/projects/multi-provider-scheduler</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span>/chemin/vers/python           <span class="co"># pytest, pyyaml et yamllint</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">IMPL</span><span class="op">=</span>starter <span class="va">$PYTHON</span> <span class="at">-m</span> pytest <span class="at">-q</span> tests     <span class="co"># 28 échecs sur 29 au départ</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                <span class="co"># référence verte, départ rouge</span></span></code></pre></div>
+<h2 id="livrables">Livrables</h2>
+<p>Votre dépôt public contient :</p>
+<ul>
+<li>le code complété, les tests et la commande unique qui les lance ;</li>
+<li>le tableau comparatif des trois politiques sur 20 graines, avec moyennes, intervalles <strong>et différences appariées</strong> ;</li>
+<li>au moins une tâche SkyPilot et un jeu de manifestes Kueue générés par votre code, avec une phrase disant qu'ils n'ont <strong>pas</strong> été appliqués à un vrai compte ou cluster ;</li>
+<li>un <strong>ADR</strong> d'une page ;</li>
+<li>une page « lecture critique » : trois choses que votre simulation ne permet pas de conclure.</li>
+</ul>
+<p>L'ADR tranche au moins quatre questions, en nommant l'alternative écartée :</p>
+<ol type="1">
+<li>Pourquoi des tirages communs aux politiques plutôt que des tirages indépendants, et qu'est-ce que cela change à la précision de la comparaison ?</li>
+<li>Pourquoi un pas de une minute, et qu'est-ce qu'un événement discret changerait au résultat ou au temps de calcul ?</li>
+<li>Que dit votre politique couverte quand toutes les offres préemptibles sont trop risquées pour l'échéance, et à quoi renonce-t-elle ?</li>
+<li>Quelles données réelles faudrait-il collecter pour croire les conclusions, et comment les collecteriez-vous sans citer de prix périmés ?</li>
+</ol>
+<h2 id="criteres">Critères de réussite</h2>
+<p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
+<ul>
+<li><strong>Chronologies exactes.</strong> Job sans interruption : fin à la minute 330 et 330 minutes facturées ; avec interruption forcée à 100 min : fin à la minute 365, 25 minutes perdues. Commande : <code>pytest tests/test_sim.py -k "timeline or forced"</code>.</li>
+<li><strong>Capacité.</strong> Sur les trois politiques, aucun pic de GPU simultanés ne dépasse la capacité d'une offre. Commande : <code>pytest -k capacity_and_cost</code>.</li>
+<li><strong>Comptabilité.</strong> Le coût total est égal à la somme du grand livre des allocations et à la somme des coûts par job, à l'arrondi flottant près.</li>
+<li><strong>Politique couverte.</strong> Sur 8 graines, elle coûte moins que chacune des deux autres <strong>sur chaque graine</strong> et manque moins d'échéances (différence appariée dont l'intervalle est entièrement négatif). Commande : <code>pytest tests/test_compare.py</code>.</li>
+<li><strong>Le moins cher par heure n'est pas le moins cher.</strong> La politique « moins cher par heure » perd au moins cinq fois plus d'heures de progression que la politique couverte. Mesuré par <code>test_cheapest_per_hour_is_not_cheapest_overall</code>.</li>
+<li><strong>Manifestes.</strong> Les cinq mutations testées (flavor inconnu, file inconnue, quota en texte, doublon, mauvaise version d'API) sont toutes rejetées. Commande : <code>pytest tests/test_manifests.py</code>.</li>
+<li><strong>Honnêteté.</strong> Votre README dit que les données sont inventées et que les manifestes ne sont validés que structurellement.</li>
+</ul>
+<h2 id="pistes">Pistes et indices</h2>
+<p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
+<p><strong>Moteur.</strong> Écrivez d'abord un job, une offre, aucune interruption, et prédisez la minute de fin. Le piège classique est un décalage d'une minute : une allocation est facturée dès la minute où elle commence, et la fin d'un job est la minute <strong>suivant</strong> sa dernière minute de calcul.</p>
+<p>Vérifiez aussi que la capacité est restituée <strong>avant</strong> de proposer les jobs en attente, sinon un job attend une minute de trop.</p>
+<p><strong>Tirages communs.</strong> Tirer les interruptions dans un seul générateur global rend le résultat d'une politique dépendant de l'ordre dans lequel les autres jobs consomment des nombres : deux politiques ne rencontrent plus la même malchance. Un générateur propre à chaque allocation, initialisé par (graine, job, numéro), corrige cela et réduit la variance de la <strong>différence</strong> entre politiques.</p>
+<p><strong>Temps d'interruption.</strong> Pour une interruption de taux constant, le temps jusqu'à l'interruption suit une loi exponentielle : à partir d'un tirage uniforme <span class="math inline">u</span>, il vaut <span class="math inline">-\ln(1-u)</span> divisé par le taux par minute. Arrondissez au-dessus et gardez au moins une minute.</p>
+<p><strong>Politique couverte.</strong> Le coût attendu par heure productive est le prix divisé par un moins la fraction de gaspillage, que la formule de Young et Daly de la section suivante fournit. Écrivez-la d'abord à la main pour deux offres, vérifiez que l'offre moins chère par heure peut perdre, puis codez. N'oubliez pas la garde d'échéance : une offre préemptible n'est admissible que s'il reste de la marge.</p>
+<p><strong>Comparaison.</strong> Deux intervalles de moyennes qui se recouvrent ne prouvent pas que deux politiques sont indiscernables : si les mêmes jobs et les mêmes interruptions sont rejoués, la <strong>différence par graine</strong> est bien plus précise. Calculez-la, avec son intervalle et le nombre de graines où chaque politique gagne.</p>
+<p><strong>Manifestes.</strong> Dans Kueue, un travail reçoit « the first flavor in the ClusterQueue's .spec.resourceGroups[*].flavors list that has enough unused nominalQuota » : l'<strong>ordre</strong> des flavors exprime la préférence. Dans SkyPilot, <code>ordered</code> fait basculer dans l'ordre indiqué, alors que pour <code>any_of</code> « the failover order will be decided by the optimizer ». Vérifiez les noms de champs dans la documentation de <strong>votre</strong> version.</p>
+<h3 id="reference-results">Résultats de la solution de référence</h3>
+<p>À lire <strong>après</strong> votre propre travail. Le simulateur est déterministe : ces valeurs sont reproductibles, mais elles dépendent entièrement des données inventées du projet.</p>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Scénario.</strong> Trente jobs de 8, 16 ou 32 GPU, arrivant sur 3 jours, avec 6 à 48 heures de travail. Quatre offres : deux à la demande (64 GPU chacune), deux préemptibles (64 et 32 GPU, taux d'interruption de 0,15 et 0,60 par heure).</p>
+<p>La demande moyenne est de <strong>14 617 GPU-heures</strong> de travail (de 11 199 à 19 039 selon la graine), contre <strong>9 216 GPU-heures</strong> à la demande disponibles pendant les 72 heures d'arrivée : le scénario est contraint en capacité, ce qui explique que la politique « à la demande seulement » manque aussi des échéances (de l'attente, pas des pannes).</p>
+<p><strong>Moyennes sur 20 graines.</strong></p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>politique</th>
+<th>coût (u)</th>
+<th>échéances manquées</th>
+<th>interruptions</th>
+<th>heures de progression perdues</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>moins cher par heure</td>
+<td>144 091</td>
+<td>7,40</td>
+<td>356</td>
+<td>398</td>
+</tr>
+<tr class="even">
+<td>à la demande seulement</td>
+<td>161 008</td>
+<td>8,05</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>couverte</td>
+<td>120 567</td>
+<td>2,05</td>
+<td>187</td>
+<td>42</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Différences appariées</strong> (a moins b, négatif = a meilleur ; intervalle bootstrap à 95 %) :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>comparaison</th>
+<th>coût</th>
+<th>échéances manquées</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>couverte moins moins-cher</td>
+<td>−23 524 [−25 791 ; −21 226], meilleure sur 20/20</td>
+<td>−5,3 [−6,1 ; −4,6], 20/20</td>
+</tr>
+<tr class="even">
+<td>couverte moins à-la-demande</td>
+<td>−40 442 [−42 547 ; −38 583], 20/20</td>
+<td>−6,0 [−7,0 ; −5,0], 20/20</td>
+</tr>
+<tr class="odd">
+<td>moins-cher moins à-la-demande</td>
+<td>−16 918 [−19 589 ; −14 464], 20/20</td>
+<td>−0,7 [−2,0 ; +0,8], 12/20</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Lecture.</strong> La politique couverte gagne partout : l'offre préemptible la plus risquée (0,60 interruption par heure) est moins chère à l'heure, mais <strong>plus chère par heure productive</strong>, et la politique « moins cher par heure » y envoie ses jobs. Elle perd 398 heures de progression contre 42. Entre « moins cher » et « à la demande », le coût diffère nettement mais <strong>les échéances ne se départagent pas</strong> (l'intervalle contient zéro) : c'est exactement ce qu'un tableau de moyennes seul aurait caché.</p>
+</details>
+<h2 id="extensions">Extensions</h2>
+<ul>
+<li><strong>Interruptions corrélées.</strong> Dans la réalité, une interruption préemptible dans une région signale souvent une pénurie dans cette région : la documentation de SkyPilot écrit « preemptions in a region usually indicate a shortage of resources in that region ». Modélisez des pannes simultanées par région et mesurez ce que cela fait à une politique qui se rabat dans la même région.</li>
+<li><strong>Capacité qui varie.</strong> Remplacez les capacités constantes par des capacités qui fluctuent et mesurez l'effet sur les échéances.</li>
+<li><strong>Coûts cachés.</strong> Ajoutez le coût de sortie de données entre régions et le coût du stockage des checkpoints ; qu'est-ce qui change dans le classement ?</li>
+<li><strong>Terraform.</strong> Écrivez le module qui créerait les files de machines correspondantes et validez-le avec <code>terraform validate</code> ; c'est la validation que ce projet ne fait pas.</li>
+<li><strong>Compte réel.</strong> Lancez une tâche SkyPilot sur un compte de test avec une limite de budget <strong>créée avant</strong> (voir la page <a href="../../lab-setup/index.html">environnement de travail</a>) et comparez l'interruption observée à votre modèle.</li>
+</ul>
+<h2 id="portfolio">Pour le portfolio</h2>
+<p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : la question, l'avertissement sur les données inventées, le tableau comparatif avec les différences appariées, la commande qui lance les 29 tests, et un paragraphe « ce que cette simulation ne montre pas ».</p>
+<p><strong>Ce qu'il faut montrer.</strong> Les chronologies exactes testées, la comparaison appariée, les manifestes et l'ADR. Les noms de fournisseurs réels n'y ont pas leur place tant que vous n'avez pas collecté de vraies données.</p>
+<p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui sait que le prix par heure n'est pas le coût d'une heure utile, qui compare des politiques avec des intervalles et des différences appariées plutôt qu'avec des moyennes seules, et qui sait dire à quel point une simulation sur données inventées engage ou n'engage pas.</p>
+<div class="note">
+<p><span class="tag">Pourquoi comparer par différences appariées</span> Les intervalles des moyennes de coût de la politique couverte et de la politique « moins cher par heure » se recouvrent sur 12 graines ([109 547 ; 134 650] contre [132 100 ; 158 074] dans une première exécution) ; pourtant la couverte est moins chère sur <strong>chaque</strong> graine.</p>
+<p>Rejouer les mêmes jobs et les mêmes interruptions élimine la variabilité commune, et la différence par graine devient précise. Les intervalles de moyennes mélangent la variabilité entre scénarios, qui n'a rien à voir avec la comparaison.</p>
+</div>
+<p>Trois accroches <strong>honnêtes</strong>, à adapter à ce que vous avez réellement fait :</p>
+<ol type="1">
+<li>« J'ai écrit un simulateur de placement sur offres préemptibles et à la demande, avec une chronologie testée à la minute près, et montré que l'offre la moins chère par heure est la plus chère par heure productive. »</li>
+<li>« J'ai comparé trois politiques par différences appariées sur 20 graines, et montré que deux intervalles de moyennes qui se recouvrent peuvent cacher une différence nette. »</li>
+<li>« Je sais dire ce que ma simulation ne dit pas : les prix et les taux d'interruption y sont inventés, et mes manifestes ne sont validés que structurellement. »</li>
+</ol>
+<h3 id="formules">Formules du projet</h3>
+<p>Avec C le coût d'un checkpoint, M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le coût d'une reprise et T le temps de calcul entre deux checkpoints, la fraction de gaspillage au premier ordre est :</p>
+<p><span class="math display">W(T) = \frac{C}{T} + \frac{T/2 + R}{M}, \qquad T^{*} = \sqrt{2\,C\,M}</span></p>
+<p>Le coût attendu par heure productive d'une offre de prix <span class="math inline">p</span> est alors :</p>
+<p><span class="math display">\text{coût attendu} = \frac{p}{1 - W(T^{*})}</span></p>
+<p>Pour une offre à la demande, <span class="math inline">W</span> vaut zéro et le coût attendu égale le prix.</p>
+<p>Un exemple de lecture : avec C de 3 min et R de 10 min, une offre à 4 u et 0,15 interruption par heure (M de 400 min) a un <span class="math inline">T^{*}</span> d'environ 49 min, un <span class="math inline">W</span> d'environ 0,15 et un coût attendu d'environ 4,7 u ; une offre à 3 u et 1,5 interruption par heure (M de 40 min) a un <span class="math inline">W</span> d'environ 0,64 et un coût attendu d'environ 8,3 u. La moins chère à l'heure devient la plus chère par heure utile.</p>
+<h3 id="lectures">Pour aller plus loin</h3>
+<ul>
+<li>Documentation de SkyPilot, <a href="https://docs.skypilot.co/en/latest/reference/yaml-spec.html">spécification YAML</a> : <code>accelerators</code>, <code>use_spot</code>, <code>any_of</code>, <code>ordered</code>, <code>job_recovery</code> (lue le 2026-10-24).</li>
+<li>Documentation de Kueue, pages <a href="https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/">ClusterQueue</a>, <a href="https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/">ResourceFlavor</a> et <a href="https://kueue.sigs.k8s.io/docs/concepts/local_queue/">LocalQueue</a> : version d'API <code>kueue.x-k8s.io/v1beta2</code> à la date de lecture ; vérifiez la vôtre.</li>
+<li>Le <a href="../resilient-trainer/index.html">projet 3</a> pour la formule de Young et Daly et son contrôle par simulation.</li>
+</ul>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../projects/resilient-trainer/index.html"><span class="k">← Précédent</span>Projet 3 — Entraîneur tolérant aux pannes</a><a class="next" href="../../projects/gpu-observability/index.html"><span class="k">Suivant →</span>Projet 5 — Observabilité GPU et détection de pannes silencieuses</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

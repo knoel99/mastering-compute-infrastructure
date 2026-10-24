@@ -371,11 +371,13 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Projets qui s'appuient sur ce module :** Projet 2, Projet 3, Projet 6.
 
-### Module 10 — Pannes, checkpointing et reprise automatique (plan, 28 h) {#fault-tolerance}
+### Module 10 — Pannes, checkpointing et reprise automatique (rédigé, 28 h) {#fault-tolerance}
 
 À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.
 
 **Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement).
+
+**Cours complet :** [Pannes, checkpointing et reprise automatique](courses/fault-tolerance/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -679,7 +681,7 @@ Un simulateur et une politique de placement/bascule, avec les manifestes qui la 
 
 **Modules mobilisés :** 13, 15, 12.
 
-**Plan :** Simulateur Python d'offres (données synthétiques étiquetées), politique de placement et de bascule, comparaison chiffrée de politiques, fichiers SkyPilot/Terraform/Kueue validés hors ligne, ADR sur les compromis coût/fiabilité/latence.
+**Plan :** Simulateur Python d'offres (données synthétiques étiquetées comme telles), politiques de placement et de bascule comparées par différences appariées sur les mêmes graines, tâches SkyPilot et manifestes Kueue générés puis validés hors ligne de façon structurelle, ADR sur les compromis coût, fiabilité et latence. Un module Terraform validé avec terraform validate est proposé en extension.
 
 ### Projet 5 — Observabilité GPU et détection de pannes silencieuses (20 h) {#gpu-observability}
 

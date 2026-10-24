@@ -1030,7 +1030,7 @@
    ],
    "title": "Projet 4 — Placement multi-fournisseurs sensible aux coûts",
    "summary": "Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.",
-   "idea": "Simulateur Python d'offres (données synthétiques étiquetées), politique de placement et de bascule, comparaison chiffrée de politiques, fichiers SkyPilot/Terraform/Kueue validés hors ligne, ADR sur les compromis coût/fiabilité/latence."
+   "idea": "Simulateur Python d'offres (données synthétiques étiquetées comme telles), politiques de placement et de bascule comparées par différences appariées sur les mêmes graines, tâches SkyPilot et manifestes Kueue générés puis validés hors ligne de façon structurelle, ADR sur les compromis coût, fiabilité et latence. Un module Terraform validé avec terraform validate est proposé en extension."
   },
   {
    "id": "gpu-observability",

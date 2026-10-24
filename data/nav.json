@@ -49,12 +49,20 @@
    "label": "Module 05 — Slurm et exploitation d'un cluster HPC"
   },
   {
+   "href": "courses/fault-tolerance/index.html",
+   "label": "Module 10 — Pannes, checkpointing et reprise automatique"
+  },
+  {
    "href": "projects/scaling-study/index.html",
    "label": "Projet 2 — Étude de passage à l'échelle d'un entraînement"
   },
   {
    "href": "projects/resilient-trainer/index.html",
    "label": "Projet 3 — Entraîneur tolérant aux pannes"
+  },
+  {
+   "href": "projects/multi-provider-scheduler/index.html",
+   "label": "Projet 4 — Placement multi-fournisseurs sensible aux coûts"
   },
   {
    "href": "projects/gpu-observability/index.html",

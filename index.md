@@ -16,7 +16,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **3 module(s) sur 16 et 3 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **4 module(s) sur 16 et 4 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
@@ -74,7 +74,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 <div class="cards">
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</h4><p class="meta">Module 09 · 36 h · Cœur · en préparation</p><p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p></div>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Pannes, checkpointing et reprise automatique</h4><p class="meta">Module 10 · 28 h · Cœur · en préparation</p><p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p></div>
+<a class="card" href="courses/fault-tolerance/index.html"><h4>Pannes, checkpointing et reprise automatique</h4><p class="meta">Module 10 · 28 h · Cœur</p><p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p></a>
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</h4><p class="meta">Module 11 · 28 h · Cœur · en préparation</p><p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p></div>
 </div>
 
@@ -105,7 +105,7 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Mini-cluster Slurm instrumenté</h4><p class="meta">Projet 1 · 24 h · en préparation</p><p>Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.</p></div>
 <a class="card" href="projects/scaling-study/index.html"><h4>Étude de passage à l'échelle d'un entraînement</h4><p class="meta">Projet 2 · 20 h</p><p>Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.</p></a>
 <a class="card" href="projects/resilient-trainer/index.html"><h4>Entraîneur tolérant aux pannes</h4><p class="meta">Projet 3 · 24 h</p><p>Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.</p></a>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Placement multi-fournisseurs sensible aux coûts</h4><p class="meta">Projet 4 · 24 h · en préparation</p><p>Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.</p></div>
+<a class="card" href="projects/multi-provider-scheduler/index.html"><h4>Placement multi-fournisseurs sensible aux coûts</h4><p class="meta">Projet 4 · 24 h</p><p>Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.</p></a>
 <a class="card" href="projects/gpu-observability/index.html"><h4>Observabilité GPU et détection de pannes silencieuses</h4><p class="meta">Projet 5 · 20 h</p><p>Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqué ou un GPU dégradé en quelques minutes.</p></a>
 <div class="card" style="opacity:.78;border-style:dashed"><h4>RFC et prototype : une plateforme de calcul de 8 à 256 GPU</h4><p class="meta">Projet 6 · 40 h · en préparation</p><p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.</p></div>
 </div>
