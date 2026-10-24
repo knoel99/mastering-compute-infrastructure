@@ -16,7 +16,7 @@ mkdir -p /etc/slurm /var/spool/slurmctld /var/spool/slurmd /var/log/slurm /run/m
 chown -R munge:munge /etc/munge /var/lib/munge /var/log/munge /run/munge
 chmod 700 /etc/munge /var/lib/munge /var/log/munge
 chmod 400 /etc/munge/munge.key
-pgrep -x munged >/dev/null || su -s /bin/sh munge -c /usr/sbin/munged
+pgrep -x munged >/dev/null || su -s /bin/sh munge -c /usr/sbin/munged </dev/null >/dev/null 2>&1
 
 chown mysql:mysql /run/mysqld /var/lib/mysql
 [ -d /var/lib/mysql/mysql ] || mariadb-install-db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1
@@ -77,11 +77,13 @@ wait_for() {  # wait_for <seconds> <description> <command...>
     sleep 1
   done
 }
-pgrep -x slurmdbd >/dev/null || nohup slurmdbd -D >/var/log/slurm/dbd.out 2>&1 &
+# NOTE: `pgrep ... || nohup cmd &` would background the whole list in a subshell that keeps this script's
+# stdout open for as long as the daemon runs (a pipe reader such as `| tail` would never see EOF).
+if ! pgrep -x slurmdbd >/dev/null; then nohup slurmdbd -D >/var/log/slurm/dbd.out 2>&1 </dev/null & fi
 wait_for 60 "slurmdbd" sacctmgr -n list cluster
-pgrep -x slurmctld >/dev/null || nohup slurmctld -D >/var/log/slurm/ctld.out 2>&1 &
+if ! pgrep -x slurmctld >/dev/null; then nohup slurmctld -D >/var/log/slurm/ctld.out 2>&1 </dev/null & fi
 wait_for 60 "slurmctld" scontrol ping
-pgrep -x slurmd >/dev/null || nohup slurmd -D >/var/log/slurm/d.out 2>&1 &
+if ! pgrep -x slurmd >/dev/null; then nohup slurmd -D >/var/log/slurm/d.out 2>&1 </dev/null & fi
 
 sacctmgr -i add cluster sandbox >/dev/null 2>&1 || true
 sacctmgr -i add account research Description=research Organization=lab >/dev/null 2>&1 || true

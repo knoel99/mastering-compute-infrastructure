@@ -152,47 +152,56 @@
      "claim": "Duration: 3-year programme",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "学制为三年；每学年由两个学期组成。",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Credits: at least 30 credits, compulsory >= 20",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "要求学生至少修满 30 学分，其中：",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Course: Parallel and Distributed Computing (DCS5140, 72 hours, 4 credits)",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "并行与分布计算",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Course: Advanced Computer Architecture (DCS5141)",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "高级计算机体系结构",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Elective: High Performance Computer System Architecture (DCS6188, 36 hours, 2 credits)",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "高性能计算机系统体系结构",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Machine access / platform: discipline relies on Tianhe-2 at Guangzhou supercomputing centre",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "以广州超算中心“天河二号”超级计算机平台为依托",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Industry link: graduates work in government, universities and IT companies",
      "url": "https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf",
      "quote": "研究生主要就职于政府部门、高校和著名 IT 企业",
-     "source": "web"
+     "source": "web",
+     "verified": true
     }
    ],
-   "confidence": "medium",
-   "notes": "Plan revision date 2020-07-15 (the file is the '2020级' plan, uploaded to the school site in 2025-01); not necessarily the 2026-2027 version. Only course titles, hours and credits are listed, no syllabi: MPI, OpenMP, GPU, scheduling, storage, containers, cloud are null (unknown), not 0. Titles that only suggest a theme (Computer Simulation, High Performance Communication Network) are rated 1 and sysadmin/hpc-software-eng elective titles (Linux Application and Development, Software Tools and Environment) left null. Elective list mixes many non-HPC courses (software engineering, CV, NLP, graphics). Not a good fit for GPU-cluster/Slurm skills on its own: research-group work on Tianhe-2 would have to supply that."
+   "confidence": "high",
+   "notes": "Plan revision date 2020-07-15 (the file is the '2020级' plan, uploaded to the school site in 2025-01); not necessarily the 2026-2027 version. Only course titles, hours and credits are listed, no syllabi: MPI, OpenMP, GPU, scheduling, storage, containers, cloud are null (unknown), not 0. Titles that only suggest a theme (Computer Simulation, High Performance Communication Network) are rated 1 and sysadmin/hpc-software-eng elective titles (Linux Application and Development, Software Tools and Environment) left null. Elective list mixes many non-HPC courses (software engineering, CV, NLP, graphics). Not a good fit for GPU-cluster/Slurm skills on its own: research-group work on Tianhe-2 would have to supply that.",
+   "evidence_verified": "7/7",
+   "structure_summary_fr": "Master académique d'informatique généraliste en 3 ans (plan révisé en juillet 2020, publié sur le site de l'école en 2025), en deux temps : cours puis mémoire. La discipline de premier niveau est décrite comme s'appuyant sur la plateforme du supercalculateur Tianhe-2 du centre de supercalcul de Canton, avec le calcul haute performance, les données massives et l'IA comme trois domaines forts. La direction architecture des ordinateurs couvre les technologies réseau et le calcul haute performance. Les cours professionnels obligatoires comprennent Calcul parallèle et distribué, Architecture avancée des ordinateurs, Systèmes d'exploitation distribués, Analyse numérique, Analyse matricielle et Calcul quantique ; les options comprennent Architecture des systèmes informatiques haute performance, Analyse de performance des systèmes informatiques et réseaux, Réseaux de communication haute performance, Simulation informatique et Technologies de développement et d'application Linux."
   },
   {
    "id": "cn-ucas-cs-ms",
@@ -389,89 +398,105 @@
      "claim": "Duration: basic 3 years, maximum 4 years including leave",
      "url": "https://ai.ucas.ac.cn/index.php/zh-cn/jxjy/fzpy1/7287-2024-05-11-06-19-14?task=down&fid=sRQMg1wYBbvrEX%2F0JU6DZw%3D%3D",
      "quote": "硕士生基本学制为 3 年，最长修读年限（含休学）不得超过 4 年",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Credits: at least 30 course credits before applying for the degree",
      "url": "https://ai.ucas.ac.cn/index.php/zh-cn/jxjy/fzpy1/7287-2024-05-11-06-19-14?task=down&fid=sRQMg1wYBbvrEX%2F0JU6DZw%3D%3D",
      "quote": "硕士研究生申请硕士学位前，须完成不少于 30 学分的课程学习",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Course list: High Performance Computing Systems (40 h, 2 credits)",
      "url": "https://ai.ucas.ac.cn/index.php/zh-cn/jxjy/fzpy1/7287-2024-05-11-06-19-14?task=down&fid=sRQMg1wYBbvrEX%2F0JU6DZw%3D%3D",
      "quote": "专业普及课 高性能计算系统 40 2",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Course list: Parallel and Distributed Computing (50 h, 3 credits)",
      "url": "https://ai.ucas.ac.cn/index.php/zh-cn/jxjy/fzpy1/7287-2024-05-11-06-19-14?task=down&fid=sRQMg1wYBbvrEX%2F0JU6DZw%3D%3D",
      "quote": "专业普及课 并行与分布式计算 50 3",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Course: Parallel Processing (60 h, 3 credits, core course for computer architecture)",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/256562",
      "quote": "本课程主要讨论各类并行计算机系统设计中的核心问题，涉及计算模型、编程模型、体系结构、性能分析等内容",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Parallel Processing syllabus includes roofline model",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/256562",
      "quote": "性能评价方法：Roofline模型及案例分析",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Parallel Processing syllabus includes MPI programming and IB verbs",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/256562",
      "quote": "消息传递结构及编程：用户级编程接口-MPI编程",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Parallel Processing syllabus includes parallel file systems and parallel I/O",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/256562",
      "quote": "并行文件系统：并行I/O系统级和用户级编程接口和框架",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Intro to HPC programming syllabus: OpenMP, MPI, GPU chapters",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/278713",
      "quote": "MPI点对点通信与集合通信",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "GPU Architecture and Programming syllabus: CUDA chapters",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/267669",
      "quote": "英文名称：GPU Architecture and Programming",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "HPC and Applications course: OpenMP, MPI, CUDA in a 1-credit course",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/288408",
      "quote": "Course Credit：1.00",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Industry link: ICT-CAS teacher took part in Dawning 6000/7000 HPC systems",
      "url": "https://jwba.ucas.ac.cn/sc/course/courseplan/256562",
      "quote": "先后参与了曙光6000/7000等高性能计算系统的研发工作",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Entry: master's term is 2 or 3 years in the 2027 admission charter",
      "url": "https://admission.ucas.ac.cn/ShowArticle/Article/1beb211c-ea0d-4c97-b5ce-61efa7addfcd/8166de60-e1d2-43e4-8311-57c196935f89",
      "quote": "硕士生学制为2年或3年，具体由各培养单位依据相关管理规定和学科特点并结合本单位实际情况确定。",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Required steps: at least 5 credits (proposal 2, mid-term 1, talks/practice 2)",
      "url": "https://ai.ucas.ac.cn/index.php/zh-cn/jxjy/fzpy1/7287-2024-05-11-06-19-14?task=down&fid=sRQMg1wYBbvrEX%2F0JU6DZw%3D%3D",
      "quote": "必修环节的总学分不低于 5 学分",
-     "source": "web"
+     "source": "web",
+     "verified": true
     }
    ],
-   "confidence": "medium",
-   "notes": "Programme-level rules come from the UCAS CS first-level discipline plan (file hosted by the UCAS AI school, undated, 2024 upload); individual training units (e.g. ICT-CAS) may apply different durations. Syllabi were read for 5 courses on jwba.ucas.ac.cn; 'High Performance Computing Systems' syllabus (code 180086081201P3004H) was not retrieved, so sysadmin, scheduling, containers-k8s, hpc-software-eng and observability-sre stay null (unknown), not 0. Course attribute of Advanced Computer Architecture differs between the syllabus (core, 60 h, 3 credits) and the plan table (popularisation, 40 h, 2 credits). Topic scores: MPI/OpenMP/CUDA rated by syllabus chapters inside elective courses; dedicated-course score 2 only for GPU programming, multicore concurrency, architecture, cloud, big data, ML. No Slurm/Kubernetes content visible: fills the 'GPU programming + MPI + architecture' gap of the course but not scheduling or cluster operations."
+   "confidence": "high",
+   "notes": "Programme-level rules come from the UCAS CS first-level discipline plan (file hosted by the UCAS AI school, undated, 2024 upload); individual training units (e.g. ICT-CAS) may apply different durations. Syllabi were read for 5 courses on jwba.ucas.ac.cn; 'High Performance Computing Systems' syllabus (code 180086081201P3004H) was not retrieved, so sysadmin, scheduling, containers-k8s, hpc-software-eng and observability-sre stay null (unknown), not 0. Course attribute of Advanced Computer Architecture differs between the syllabus (core, 60 h, 3 credits) and the plan table (popularisation, 40 h, 2 credits). Topic scores: MPI/OpenMP/CUDA rated by syllabus chapters inside elective courses; dedicated-course score 2 only for GPU programming, multicore concurrency, architecture, cloud, big data, ML. No Slurm/Kubernetes content visible: fills the 'GPU programming + MPI + architecture' gap of the course but not scheduling or cluster operations.",
+   "evidence_verified": "14/14",
+   "structure_summary_fr": "Master académique en 3 ans de la discipline de premier niveau Informatique et technologie de l'UCAS, en système de crédits (au moins 30 crédits de cours). Les cours professionnels se répartissent en cours de base (60 h, 3 crédits, par exemple Architecture des ordinateurs), cours de vulgarisation (40 h, 2 crédits) et séminaires (20 h, 1 crédit). La liste de vulgarisation contient Systèmes de calcul haute performance, Calcul parallèle et distribué, Structures de données concurrentes et programmation multicœur, Technologie du cloud, Systèmes de calcul intelligents, Analyse de données massives et Apprentissage profond. Le système de cours de l'UCAS publie des programmes complets pour d'autres cours HPC (Traitement parallèle, Introduction au calcul haute performance, Architecture et programmation GPU, Calcul distribué et parallèle, Calcul haute performance et applications) couvrant OpenMP, MPI, CUDA, le roofline, les verbes RDMA/IB et les systèmes de fichiers parallèles."
   },
   {
    "id": "cn-sustech-cs-ms",
@@ -609,53 +634,63 @@
      "claim": "Duration: 2-3 academic years (usual 3), maximum 3",
      "url": "https://cse.sustech.edu.cn/uploads/202602/4.%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E7%A7%91%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88-20251212%5B-%5D02094146_26733_55866088",
      "quote": "全日制硕士研究生基本修业年限为二至三学年",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Credits: 37 for domestic students, 40 for international students",
      "url": "https://cse.sustech.edu.cn/uploads/202602/4.%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E7%A7%91%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88-20251212%5B-%5D02094146_26733_55866088",
      "quote": "总学分 国内学生 37 /国际学生 40",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Core course: Advanced Computer Architecture (CSE5030, 3 credits, 64 h)",
      "url": "https://cse.sustech.edu.cn/uploads/202602/4.%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E7%A7%91%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88-20251212%5B-%5D02094146_26733_55866088",
      "quote": "CSE5030 高级计算机系统结构 春 3 64",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Core course: Advanced Distributed Systems (CSE5020)",
      "url": "https://cse.sustech.edu.cn/uploads/202602/4.%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E7%A7%91%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88-20251212%5B-%5D02094146_26733_55866088",
      "quote": "CSE5020 高级分布式系统 春 3 64",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Foundation list: Advanced Numerical Analysis (MAE5002)",
      "url": "https://cse.sustech.edu.cn/uploads/202602/4.%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E7%A7%91%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88-20251212%5B-%5D02094146_26733_55866088",
      "quote": "MAE5002 高等数值分析 春秋 3 48",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Machine: Taiyi cluster has 815 nodes and 4 GPU nodes",
      "url": "https://openlab.sustech.edu.cn/UploadFiles/EquipmentAttachments/%E2%80%9D%E5%A4%AA%E4%B9%99%E2%80%9C%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.pdf",
      "quote": "二期集群（太乙，Tai-Yi）包含815个双路刀片节点，2个大内存节点和4个GPU",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Machine: Taiyi GPU nodes carry 2x NVIDIA V100",
      "url": "https://openlab.sustech.edu.cn/UploadFiles/EquipmentAttachments/%E2%80%9D%E5%A4%AA%E4%B9%99%E2%80%9C%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.pdf",
      "quote": "GPU 节点：4 台 配置：2个 Xeon Gold 6148 CPU(2.4GHz/20c)，384 GB 内存，2 张 NVIDIA V100",
-     "source": "web"
+     "source": "web",
+     "verified": true
     },
     {
      "claim": "Industry/competition link: SUSTech team won first prize at ASC10 finals, tutored by CSE faculty and CCSE chief engineer",
      "url": "https://newshub.sustech.edu.cn/en/?p=39584",
      "quote": "making it the third consecutive year that the team has won a first prize in the finals of the ASC Student Supercomputer Challenge",
-     "source": "web"
+     "source": "web",
+     "verified": true
     }
    ],
-   "confidence": "medium",
-   "notes": "Plan dated 2025-05-09, hosted 2026-02 on the department site. It lists course titles only: MPI/OpenMP/GPU/scheduling/storage/containers/cloud are null (unknown), not 0, even though no course title names them. Low HPC relevance as a degree; the value for the learner is the cluster (Taiyi uses LSF, not Slurm, and Omni-Path, not InfiniBand) and the competition team. The Taiyi user manual is undated and describes an early configuration. A search-result snippet (not opened) mentions a university-wide course 'High Performance Computing: Methods and Practice' (MAE5032) in SUSTech mechanics programmes: unverified lead only. The department programme page https://cse.sustech.edu.cn/graduate/program/ itself renders no text in the cache; the PDF was reached through its attachment link."
+   "confidence": "high",
+   "notes": "Plan dated 2025-05-09, hosted 2026-02 on the department site. It lists course titles only: MPI/OpenMP/GPU/scheduling/storage/containers/cloud are null (unknown), not 0, even though no course title names them. Low HPC relevance as a degree; the value for the learner is the cluster (Taiyi uses LSF, not Slurm, and Omni-Path, not InfiniBand) and the competition team. The Taiyi user manual is undated and describes an early configuration. A search-result snippet (not opened) mentions a university-wide course 'High Performance Computing: Methods and Practice' (MAE5032) in SUSTech mechanics programmes: unverified lead only. The department programme page https://cse.sustech.edu.cn/graduate/program/ itself renders no text in the cache; the PDF was reached through its attachment link.",
+   "evidence_verified": "8/8",
+   "structure_summary_fr": "Master académique d'informatique généraliste de 2 à 3 ans, dont les six directions de second niveau sont l'informatique théorique, l'architecture des ordinateurs, le logiciel, les réseaux et la sécurité, l'IA et l'informatique appliquée. Les cours professionnels obligatoires (au moins 8 crédits) se répartissent en une liste de fondation (par exemple Méthodes de calcul, Analyse numérique avancée, Optimisation combinatoire), un groupe de base I (Conception et analyse avancées d'algorithmes, Architecture avancée des ordinateurs, Systèmes distribués avancés, Réseaux avancés, IA avancée, Apprentissage automatique...) et un groupe de base II (apprentissage par renforcement, avancées de l'apprentissage profond...). Aucun cours dédié à MPI, OpenMP, la programmation GPU, l'ordonnancement ou le stockage n'apparaît dans les listes lues. L'expérience des clusters vient du cluster Taiyi du campus et de l'équipe étudiante de supercalcul (troisième premier prix consécutif à l'ASC en 2023)."
   }
  ],
  "ecosystem": [],
@@ -665,10 +700,12 @@
   "https://www.cs.sjtu.edu.cn/bsyjs_pygl.html — SJTU School of Computer Science graduate 培养管理 / 下载专区 (xzzq.html) pages render navigation only, no master's curriculum text; yjwb.seiee.sjtu.edu.cn search hit was a 2020 part-time PhD plan, not a master's plan"
  ],
  "verification": {
-  "status": "unverified",
-  "checked_claims": 0,
+  "status": "verified",
+  "checked_claims": 29,
   "corrected": 0,
   "removed": 0,
-  "notes": ""
+  "notes": "",
+  "verified_quotes": 29,
+  "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
  }
 }

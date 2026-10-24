@@ -142,6 +142,61 @@ Cette page présente {n} programme(s) pour la zone « {label} ». Chaque fait vi
     return "\n".join(md) + "\n"
 
 
+SKILL_FR = {"kubernetes": "Kubernetes", "sre-oncall": "Astreinte, fiabilité (SRE)", "hpc-experience": "Expérience HPC", "linux-admin": "Administration Linux",
+            "infiniband-roce": "InfiniBand / RoCE", "capacity-planning": "Planification de capacité", "slurm": "Slurm", "scheduler-design": "Conception d'ordonnanceur",
+            "prometheus-grafana": "Prometheus / Grafana", "bare-metal-provisioning": "Provisioning bare-metal", "terraform-iac": "Terraform / IaC",
+            "pytorch-distributed": "PyTorch distribué", "nccl-collectives": "NCCL / collectives", "dcgm-gpu-monitoring": "DCGM / supervision GPU",
+            "checkpoint-fault-tolerance": "Checkpoint, tolérance aux pannes", "ml-training-experience": "Expérience d'entraînement ML",
+            "multicloud-skypilot": "Multi-cloud (SkyPilot)", "hyperscaler-cloud": "Cloud hyperscaler", "rl-infra": "Infra d'apprentissage par renforcement",
+            "ray": "Ray", "parallel-fs-storage": "Stockage parallèle", "containers": "Conteneurs"}
+
+
+def topic_bars(syn):
+    cov = syn["coverage_global"]
+    rows = sorted(((t, c) for t, c in cov.items() if c["share_eq2"] is not None), key=lambda x: -x[1]["share_eq2"])
+    out = ['<div class="bars" role="list">']
+    for t, c in rows:
+        k = c["known"]
+        n2 = round(c["share_eq2"] * k)
+        out.append(f'<div class="bar" role="listitem"><span class="blab">{TOPIC_FR[t]}</span><span class="track"><span class="fill two" style="width:{c["share_eq2"]*100:.0f}%"></span></span><span class="val">{n2}/{k}</span></div>')
+    out.append("</div>")
+    return "\n".join(out)
+
+
+def supply_demand(syn):
+    n = syn["postings_total"]
+    rows = []
+    seen = set()
+    for r in sorted(syn["supply_vs_demand"], key=lambda r: -r["demand_share_any"]):
+        sk = r["skill"]
+        if sk not in SKILL_FR or sk in seen or r["demand_share_any"] < 0.25:
+            continue
+        seen.add(sk)
+        d = syn["skills"][sk]
+        known = r["supply_known"]
+        ded = round(r["supply_share_eq2"] * known) if r["supply_share_eq2"] is not None else 0
+        rows.append(f"| {SKILL_FR[sk]} | {d['required'] + d['bonus']} sur {n} ({d['required']} exigées) | {TOPIC_FR[r['topic']]} | {ded} sur {known} |")
+    return "| Compétence demandée | Offres qui la citent | Thème de master correspondant | Programmes avec un cours dédié |\n|---|---|---|---|\n" + "\n".join(rows)
+
+
+def region_table(byreg):
+    lines = ["| Zone | Programmes étudiés | Où se trouve le HPC |", "|---|---|---|"]
+    where = {"france": "des masters dédiés (réseau CHPS) et des parcours d'écoles d'ingénieurs", "usa": "des cours isolés dans des masters de science computationnelle ou d'informatique",
+             "china": "des masters d'informatique généralistes, adossés à des centres de supercalcul et à des compétitions", "world": "des masters dédiés (Édimbourg, Trieste, Milan) et un diplôme d'exploitation en Inde"}
+    for reg, title, label in REGIONS:
+        if byreg.get(reg):
+            lines.append(f"| {label} | {len(byreg[reg])} | {where[reg]} |")
+    return "\n".join(lines)
+
+
+def index_page(byreg):
+    syn = json.loads((ROOT / "data" / "masters" / "synthesis.json").read_text(encoding="utf-8"))
+    note = (ROOT / "masters" / "_notes" / "index.md").read_text(encoding="utf-8")
+    note = note.replace("{{REGION_TABLE}}", region_table(byreg)).replace("{{TOPIC_BARS}}", topic_bars(syn)).replace("{{SUPPLY_DEMAND}}", supply_demand(syn))
+    note = note.replace("{{N_PROG}}", str(syn["programmes_total"])).replace("{{N_POST}}", str(syn["postings_total"]))
+    return note
+
+
 def main():
     byreg, eco = load()
     done = []
@@ -152,6 +207,9 @@ def main():
         d.mkdir(parents=True, exist_ok=True)
         (d / "index.md").write_text(region_page(reg, title, label, byreg[reg], eco.get(reg, [])), encoding="utf-8")
         done.append(f"{reg}:{len(byreg[reg])}")
+    if (ROOT / "masters" / "_notes" / "index.md").exists() and (ROOT / "data" / "masters" / "synthesis.json").exists():
+        (ROOT / "masters" / "index.md").write_text(index_page(byreg), encoding="utf-8")
+        done.append("index")
     print("generated", ", ".join(done))
 
 

@@ -5,12 +5,36 @@
    "label": "Point de départ"
   },
   {
+   "href": "masters/index.html",
+   "label": "Enquête sur les masters HPC"
+  },
+  {
+   "href": "masters/france/index.html",
+   "label": "Masters en France"
+  },
+  {
+   "href": "masters/usa/index.html",
+   "label": "Masters aux États-Unis"
+  },
+  {
+   "href": "masters/china/index.html",
+   "label": "Masters en Chine"
+  },
+  {
+   "href": "masters/world/index.html",
+   "label": "Masters dans le monde"
+  },
+  {
    "href": "path/index.html",
    "label": "Feuille de route"
   },
   {
    "href": "courses/perf-models/index.html",
    "label": "Module 02 — Architecture matérielle et modèles de performance"
+  },
+  {
+   "href": "resources/index.html",
+   "label": "Ressources"
   }
  ]
 }

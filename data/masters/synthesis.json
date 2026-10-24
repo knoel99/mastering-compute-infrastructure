@@ -1,1035 +1,1841 @@
 {
- "programmes_total": 8,
- "programmes_solid": 8,
- "postings_total": 0,
- "resources_total": 0,
+ "programmes_total": 36,
+ "programmes_solid": 35,
+ "postings_total": 12,
+ "resources_total": 47,
  "programmes_by_region": {
-  "france": 8
+  "china": 6,
+  "world": 11,
+  "france": 12,
+  "usa": 6
  },
  "programmes_by_focus": {
-  "hpc-core": 4,
-  "mixed": 3,
-  "cse": 1
+  "mixed": 11,
+  "hpc-core": 10,
+  "cse": 10,
+  "cloud-distributed": 2,
+  "ops-sysadmin": 2
  },
  "programmes_by_country": {
-  "FR": 8
+  "CN": 6,
+  "GB": 1,
+  "EU": 1,
+  "CH": 1,
+  "IT": 2,
+  "ES": 1,
+  "NL": 1,
+  "FR": 12,
+  "IN": 2,
+  "JP": 1,
+  "SA": 1,
+  "US": 6
  },
  "coverage_global": {
   "openmp-threads": {
-   "known": 7,
-   "unknown": 1,
-   "share_ge1": 1.0,
-   "share_eq2": 0.57
+   "known": 23,
+   "unknown": 12,
+   "share_ge1": 0.96,
+   "share_eq2": 0.39
   },
   "mpi": {
-   "known": 7,
-   "unknown": 1,
+   "known": 21,
+   "unknown": 14,
    "share_ge1": 1.0,
-   "share_eq2": 0.57
+   "share_eq2": 0.48
   },
   "gpu-prog": {
-   "known": 6,
-   "unknown": 2,
-   "share_ge1": 1.0,
-   "share_eq2": 0.83
-  },
-  "perf-model": {
-   "known": 7,
-   "unknown": 1,
-   "share_ge1": 1.0,
+   "known": 21,
+   "unknown": 14,
+   "share_ge1": 0.95,
    "share_eq2": 0.57
   },
-  "arch": {
-   "known": 7,
-   "unknown": 1,
+  "perf-model": {
+   "known": 29,
+   "unknown": 6,
    "share_ge1": 1.0,
-   "share_eq2": 0.43
+   "share_eq2": 0.34
+  },
+  "arch": {
+   "known": 29,
+   "unknown": 6,
+   "share_ge1": 1.0,
+   "share_eq2": 0.66
   },
   "numerics": {
-   "known": 8,
-   "unknown": 0,
-   "share_ge1": 1.0,
-   "share_eq2": 0.62
+   "known": 26,
+   "unknown": 9,
+   "share_ge1": 0.92,
+   "share_eq2": 0.77
   },
   "simulation-apps": {
-   "known": 5,
-   "unknown": 3,
-   "share_ge1": 1.0,
-   "share_eq2": 0.8
+   "known": 23,
+   "unknown": 12,
+   "share_ge1": 0.96,
+   "share_eq2": 0.57
   },
   "parallel-algos": {
-   "known": 7,
-   "unknown": 1,
-   "share_ge1": 1.0,
-   "share_eq2": 0.71
+   "known": 26,
+   "unknown": 9,
+   "share_ge1": 0.96,
+   "share_eq2": 0.58
   },
   "distributed-sys": {
-   "known": 5,
-   "unknown": 3,
+   "known": 22,
+   "unknown": 13,
    "share_ge1": 1.0,
-   "share_eq2": 0.6
+   "share_eq2": 0.64
   },
   "sysadmin": {
-   "known": 2,
-   "unknown": 6,
-   "share_ge1": 0.5,
-   "share_eq2": 0.0
+   "known": 10,
+   "unknown": 25,
+   "share_ge1": 0.8,
+   "share_eq2": 0.3
   },
   "scheduling": {
-   "known": 4,
-   "unknown": 4,
+   "known": 8,
+   "unknown": 27,
    "share_ge1": 1.0,
-   "share_eq2": 0.0
+   "share_eq2": 0.12
   },
   "interconnect": {
-   "known": 4,
-   "unknown": 4,
-   "share_ge1": 0.75,
-   "share_eq2": 0.0
+   "known": 21,
+   "unknown": 14,
+   "share_ge1": 0.9,
+   "share_eq2": 0.05
   },
   "storage-io": {
-   "known": 3,
-   "unknown": 5,
-   "share_ge1": 0.67,
-   "share_eq2": 0.0
+   "known": 15,
+   "unknown": 20,
+   "share_ge1": 0.87,
+   "share_eq2": 0.27
   },
   "containers-k8s": {
-   "known": 3,
-   "unknown": 5,
-   "share_ge1": 0.67,
-   "share_eq2": 0.67
+   "known": 13,
+   "unknown": 22,
+   "share_ge1": 0.85,
+   "share_eq2": 0.38
   },
   "cloud": {
-   "known": 4,
-   "unknown": 4,
-   "share_ge1": 0.75,
-   "share_eq2": 0.5
+   "known": 19,
+   "unknown": 16,
+   "share_ge1": 0.89,
+   "share_eq2": 0.58
   },
   "bigdata": {
-   "known": 5,
-   "unknown": 3,
+   "known": 18,
+   "unknown": 17,
    "share_ge1": 1.0,
-   "share_eq2": 0.4
+   "share_eq2": 0.56
   },
   "ml-dl": {
-   "known": 7,
-   "unknown": 1,
-   "share_ge1": 1.0,
-   "share_eq2": 1.0
+   "known": 27,
+   "unknown": 8,
+   "share_ge1": 0.96,
+   "share_eq2": 0.81
   },
   "ml-systems": {
-   "known": 4,
-   "unknown": 4,
-   "share_ge1": 1.0,
-   "share_eq2": 0.25
+   "known": 14,
+   "unknown": 21,
+   "share_ge1": 0.93,
+   "share_eq2": 0.21
   },
   "hpc-software-eng": {
-   "known": 5,
-   "unknown": 3,
-   "share_ge1": 0.8,
-   "share_eq2": 0.2
+   "known": 12,
+   "unknown": 23,
+   "share_ge1": 0.92,
+   "share_eq2": 0.42
   },
   "energy": {
-   "known": 3,
-   "unknown": 5,
-   "share_ge1": 0.67,
-   "share_eq2": 0.0
+   "known": 13,
+   "unknown": 22,
+   "share_ge1": 0.85,
+   "share_eq2": 0.08
   },
   "quantum-emerging": {
-   "known": 5,
-   "unknown": 3,
-   "share_ge1": 0.8,
-   "share_eq2": 0.8
+   "known": 18,
+   "unknown": 17,
+   "share_ge1": 0.83,
+   "share_eq2": 0.56
   },
   "viz": {
-   "known": 5,
-   "unknown": 3,
-   "share_ge1": 0.8,
-   "share_eq2": 0.6
+   "known": 16,
+   "unknown": 19,
+   "share_ge1": 0.88,
+   "share_eq2": 0.44
   },
   "thesis-internship": {
-   "known": 7,
-   "unknown": 1,
+   "known": 31,
+   "unknown": 4,
    "share_ge1": 1.0,
-   "share_eq2": 1.0
+   "share_eq2": 0.94
   },
   "soft-skills": {
-   "known": 4,
-   "unknown": 4,
+   "known": 20,
+   "unknown": 15,
    "share_ge1": 1.0,
-   "share_eq2": 0.75
+   "share_eq2": 0.35
   },
   "resilience": {
-   "known": 4,
-   "unknown": 4,
-   "share_ge1": 0.5,
+   "known": 12,
+   "unknown": 23,
+   "share_ge1": 0.75,
    "share_eq2": 0.0
   },
   "observability-sre": {
-   "known": 2,
-   "unknown": 6,
-   "share_ge1": 0.0,
+   "known": 4,
+   "unknown": 31,
+   "share_ge1": 0.25,
    "share_eq2": 0.0
   }
  },
  "coverage_by_region": {
-  "france": {
+  "china": {
    "openmp-threads": {
-    "known": 7,
-    "unknown": 1,
+    "known": 2,
+    "unknown": 4,
     "share_ge1": 1.0,
-    "share_eq2": 0.57
+    "share_eq2": 0.5
    },
    "mpi": {
-    "known": 7,
-    "unknown": 1,
+    "known": 1,
+    "unknown": 5,
     "share_ge1": 1.0,
-    "share_eq2": 0.57
+    "share_eq2": 0.0
    },
    "gpu-prog": {
-    "known": 6,
-    "unknown": 2,
+    "known": 1,
+    "unknown": 5,
     "share_ge1": 1.0,
-    "share_eq2": 0.83
+    "share_eq2": 1.0
    },
    "perf-model": {
-    "known": 7,
-    "unknown": 1,
+    "known": 4,
+    "unknown": 2,
     "share_ge1": 1.0,
-    "share_eq2": 0.57
+    "share_eq2": 0.5
    },
    "arch": {
-    "known": 7,
-    "unknown": 1,
-    "share_ge1": 1.0,
-    "share_eq2": 0.43
-   },
-   "numerics": {
-    "known": 8,
+    "known": 6,
     "unknown": 0,
     "share_ge1": 1.0,
-    "share_eq2": 0.62
+    "share_eq2": 1.0
+   },
+   "numerics": {
+    "known": 4,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
    },
    "simulation-apps": {
-    "known": 5,
+    "known": 3,
     "unknown": 3,
     "share_ge1": 1.0,
-    "share_eq2": 0.8
+    "share_eq2": 0.0
    },
    "parallel-algos": {
-    "known": 7,
-    "unknown": 1,
-    "share_ge1": 1.0,
-    "share_eq2": 0.71
-   },
-   "distributed-sys": {
     "known": 5,
-    "unknown": 3,
+    "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 0.6
    },
+   "distributed-sys": {
+    "known": 6,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.83
+   },
    "sysadmin": {
-    "known": 2,
+    "known": 0,
     "unknown": 6,
-    "share_ge1": 0.5,
-    "share_eq2": 0.0
+    "share_ge1": null,
+    "share_eq2": null
    },
    "scheduling": {
-    "known": 4,
-    "unknown": 4,
-    "share_ge1": 1.0,
-    "share_eq2": 0.0
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
    },
    "interconnect": {
-    "known": 4,
-    "unknown": 4,
-    "share_ge1": 0.75,
+    "known": 5,
+    "unknown": 1,
+    "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "storage-io": {
     "known": 3,
-    "unknown": 5,
-    "share_ge1": 0.67,
-    "share_eq2": 0.0
-   },
-   "containers-k8s": {
-    "known": 3,
-    "unknown": 5,
-    "share_ge1": 0.67,
-    "share_eq2": 0.67
-   },
-   "cloud": {
-    "known": 4,
-    "unknown": 4,
-    "share_ge1": 0.75,
-    "share_eq2": 0.5
-   },
-   "bigdata": {
-    "known": 5,
     "unknown": 3,
     "share_ge1": 1.0,
-    "share_eq2": 0.4
+    "share_eq2": 0.67
+   },
+   "containers-k8s": {
+    "known": 1,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "cloud": {
+    "known": 2,
+    "unknown": 4,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "bigdata": {
+    "known": 4,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
    },
    "ml-dl": {
-    "known": 7,
+    "known": 5,
     "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "ml-systems": {
-    "known": 4,
+    "known": 2,
     "unknown": 4,
     "share_ge1": 1.0,
-    "share_eq2": 0.25
+    "share_eq2": 0.0
    },
    "hpc-software-eng": {
-    "known": 5,
-    "unknown": 3,
-    "share_ge1": 0.8,
-    "share_eq2": 0.2
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
    },
    "energy": {
-    "known": 3,
+    "known": 1,
     "unknown": 5,
-    "share_ge1": 0.67,
+    "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "quantum-emerging": {
-    "known": 5,
-    "unknown": 3,
-    "share_ge1": 0.8,
-    "share_eq2": 0.8
+    "known": 4,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
    },
    "viz": {
-    "known": 5,
+    "known": 3,
     "unknown": 3,
-    "share_ge1": 0.8,
-    "share_eq2": 0.6
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
    },
    "thesis-internship": {
-    "known": 7,
+    "known": 5,
     "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "soft-skills": {
-    "known": 4,
-    "unknown": 4,
+    "known": 5,
+    "unknown": 1,
     "share_ge1": 1.0,
-    "share_eq2": 0.75
+    "share_eq2": 0.2
    },
    "resilience": {
-    "known": 4,
+    "known": 1,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "observability-sre": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   }
+  },
+  "france": {
+   "openmp-threads": {
+    "known": 9,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.56
+   },
+   "mpi": {
+    "known": 8,
     "unknown": 4,
-    "share_ge1": 0.5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.62
+   },
+   "gpu-prog": {
+    "known": 7,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.86
+   },
+   "perf-model": {
+    "known": 9,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.44
+   },
+   "arch": {
+    "known": 9,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
+   },
+   "numerics": {
+    "known": 10,
+    "unknown": 2,
+    "share_ge1": 0.9,
+    "share_eq2": 0.6
+   },
+   "simulation-apps": {
+    "known": 7,
+    "unknown": 5,
+    "share_ge1": 0.86,
+    "share_eq2": 0.57
+   },
+   "parallel-algos": {
+    "known": 9,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.78
+   },
+   "distributed-sys": {
+    "known": 7,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.71
+   },
+   "sysadmin": {
+    "known": 3,
+    "unknown": 9,
+    "share_ge1": 0.67,
+    "share_eq2": 0.33
+   },
+   "scheduling": {
+    "known": 5,
+    "unknown": 7,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "interconnect": {
+    "known": 6,
+    "unknown": 6,
+    "share_ge1": 0.83,
+    "share_eq2": 0.0
+   },
+   "storage-io": {
+    "known": 5,
+    "unknown": 7,
+    "share_ge1": 0.8,
+    "share_eq2": 0.0
+   },
+   "containers-k8s": {
+    "known": 5,
+    "unknown": 7,
+    "share_ge1": 0.8,
+    "share_eq2": 0.8
+   },
+   "cloud": {
+    "known": 8,
+    "unknown": 4,
+    "share_ge1": 0.88,
+    "share_eq2": 0.62
+   },
+   "bigdata": {
+    "known": 6,
+    "unknown": 6,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "ml-dl": {
+    "known": 9,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.89
+   },
+   "ml-systems": {
+    "known": 5,
+    "unknown": 7,
+    "share_ge1": 1.0,
+    "share_eq2": 0.2
+   },
+   "hpc-software-eng": {
+    "known": 6,
+    "unknown": 6,
+    "share_ge1": 0.83,
+    "share_eq2": 0.17
+   },
+   "energy": {
+    "known": 4,
+    "unknown": 8,
+    "share_ge1": 0.75,
+    "share_eq2": 0.0
+   },
+   "quantum-emerging": {
+    "known": 7,
+    "unknown": 5,
+    "share_ge1": 0.71,
+    "share_eq2": 0.71
+   },
+   "viz": {
+    "known": 6,
+    "unknown": 6,
+    "share_ge1": 0.83,
+    "share_eq2": 0.5
+   },
+   "thesis-internship": {
+    "known": 10,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.9
+   },
+   "soft-skills": {
+    "known": 7,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.57
+   },
+   "resilience": {
+    "known": 6,
+    "unknown": 6,
+    "share_ge1": 0.67,
     "share_eq2": 0.0
    },
    "observability-sre": {
     "known": 2,
-    "unknown": 6,
+    "unknown": 10,
     "share_ge1": 0.0,
+    "share_eq2": 0.0
+   }
+  },
+  "usa": {
+   "openmp-threads": {
+    "known": 3,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "mpi": {
+    "known": 3,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "gpu-prog": {
+    "known": 3,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
+   },
+   "perf-model": {
+    "known": 5,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "arch": {
+    "known": 4,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "numerics": {
+    "known": 5,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.8
+   },
+   "simulation-apps": {
+    "known": 5,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.8
+   },
+   "parallel-algos": {
+    "known": 6,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
+   },
+   "distributed-sys": {
+    "known": 1,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "sysadmin": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "scheduling": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "interconnect": {
+    "known": 2,
+    "unknown": 4,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "storage-io": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "containers-k8s": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "cloud": {
+    "known": 1,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "bigdata": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "ml-dl": {
+    "known": 5,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.4
+   },
+   "ml-systems": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "hpc-software-eng": {
+    "known": 1,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "energy": {
+    "known": 2,
+    "unknown": 4,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "quantum-emerging": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "viz": {
+    "known": 3,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
+   },
+   "thesis-internship": {
+    "known": 5,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.8
+   },
+   "soft-skills": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "resilience": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   },
+   "observability-sre": {
+    "known": 0,
+    "unknown": 6,
+    "share_ge1": null,
+    "share_eq2": null
+   }
+  },
+  "world": {
+   "openmp-threads": {
+    "known": 9,
+    "unknown": 2,
+    "share_ge1": 0.89,
+    "share_eq2": 0.33
+   },
+   "mpi": {
+    "known": 9,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.56
+   },
+   "gpu-prog": {
+    "known": 10,
+    "unknown": 1,
+    "share_ge1": 0.9,
+    "share_eq2": 0.4
+   },
+   "perf-model": {
+    "known": 11,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.36
+   },
+   "arch": {
+    "known": 10,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.8
+   },
+   "numerics": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 0.86,
+    "share_eq2": 0.86
+   },
+   "simulation-apps": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.62
+   },
+   "parallel-algos": {
+    "known": 6,
+    "unknown": 5,
+    "share_ge1": 0.83,
+    "share_eq2": 0.5
+   },
+   "distributed-sys": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.38
+   },
+   "sysadmin": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 0.86,
+    "share_eq2": 0.29
+   },
+   "scheduling": {
+    "known": 3,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
+   },
+   "interconnect": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 0.88,
+    "share_eq2": 0.12
+   },
+   "storage-io": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 0.86,
+    "share_eq2": 0.29
+   },
+   "containers-k8s": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 0.86,
+    "share_eq2": 0.14
+   },
+   "cloud": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 0.88,
+    "share_eq2": 0.38
+   },
+   "bigdata": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.62
+   },
+   "ml-dl": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 0.88,
+    "share_eq2": 0.88
+   },
+   "ml-systems": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 0.86,
+    "share_eq2": 0.29
+   },
+   "hpc-software-eng": {
+    "known": 5,
+    "unknown": 6,
+    "share_ge1": 1.0,
+    "share_eq2": 0.8
+   },
+   "energy": {
+    "known": 6,
+    "unknown": 5,
+    "share_ge1": 0.83,
+    "share_eq2": 0.17
+   },
+   "quantum-emerging": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 0.86,
+    "share_eq2": 0.43
+   },
+   "viz": {
+    "known": 4,
+    "unknown": 7,
+    "share_ge1": 0.75,
+    "share_eq2": 0.5
+   },
+   "thesis-internship": {
+    "known": 11,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "soft-skills": {
+    "known": 8,
+    "unknown": 3,
+    "share_ge1": 1.0,
+    "share_eq2": 0.25
+   },
+   "resilience": {
+    "known": 5,
+    "unknown": 6,
+    "share_ge1": 0.8,
+    "share_eq2": 0.0
+   },
+   "observability-sre": {
+    "known": 2,
+    "unknown": 9,
+    "share_ge1": 0.5,
     "share_eq2": 0.0
    }
   }
  },
  "coverage_by_focus": {
-  "cse": {
+  "cloud-distributed": {
    "openmp-threads": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
    },
    "mpi": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
    },
    "gpu-prog": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "perf-model": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
    },
    "arch": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
    },
    "numerics": {
     "known": 1,
-    "unknown": 0,
-    "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
    },
    "simulation-apps": {
     "known": 1,
-    "unknown": 0,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "parallel-algos": {
+    "known": 1,
+    "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
-   "parallel-algos": {
-    "known": 0,
-    "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
-   },
    "distributed-sys": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
    },
    "sysadmin": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "scheduling": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "interconnect": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "storage-io": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "containers-k8s": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
    },
    "cloud": {
-    "known": 0,
-    "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
    },
    "bigdata": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "ml-dl": {
     "known": 1,
-    "unknown": 0,
+    "unknown": 1,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.0
    },
    "ml-systems": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "hpc-software-eng": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "energy": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
     "share_ge1": null,
     "share_eq2": null
    },
    "quantum-emerging": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
    },
    "viz": {
     "known": 1,
-    "unknown": 0,
+    "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "thesis-internship": {
     "known": 1,
-    "unknown": 0,
+    "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "soft-skills": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
    },
    "resilience": {
-    "known": 0,
+    "known": 1,
     "unknown": 1,
-    "share_ge1": null,
-    "share_eq2": null
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
    },
    "observability-sre": {
     "known": 0,
-    "unknown": 1,
+    "unknown": 2,
+    "share_ge1": null,
+    "share_eq2": null
+   }
+  },
+  "cse": {
+   "openmp-threads": {
+    "known": 5,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.2
+   },
+   "mpi": {
+    "known": 5,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.4
+   },
+   "gpu-prog": {
+    "known": 5,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.2
+   },
+   "perf-model": {
+    "known": 8,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "arch": {
+    "known": 6,
+    "unknown": 4,
+    "share_ge1": 1.0,
+    "share_eq2": 0.33
+   },
+   "numerics": {
+    "known": 8,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.88
+   },
+   "simulation-apps": {
+    "known": 8,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.88
+   },
+   "parallel-algos": {
+    "known": 6,
+    "unknown": 4,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "distributed-sys": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "sysadmin": {
+    "known": 1,
+    "unknown": 9,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "scheduling": {
+    "known": 1,
+    "unknown": 9,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "interconnect": {
+    "known": 4,
+    "unknown": 6,
+    "share_ge1": 0.75,
+    "share_eq2": 0.0
+   },
+   "storage-io": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 0.5,
+    "share_eq2": 0.0
+   },
+   "containers-k8s": {
+    "known": 1,
+    "unknown": 9,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "cloud": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "bigdata": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "ml-dl": {
+    "known": 8,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.62
+   },
+   "ml-systems": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "hpc-software-eng": {
+    "known": 1,
+    "unknown": 9,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "energy": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "quantum-emerging": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "viz": {
+    "known": 4,
+    "unknown": 6,
+    "share_ge1": 1.0,
+    "share_eq2": 0.25
+   },
+   "thesis-internship": {
+    "known": 10,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.9
+   },
+   "soft-skills": {
+    "known": 3,
+    "unknown": 7,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "resilience": {
+    "known": 2,
+    "unknown": 8,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "observability-sre": {
+    "known": 0,
+    "unknown": 10,
     "share_ge1": null,
     "share_eq2": null
    }
   },
   "hpc-core": {
    "openmp-threads": {
-    "known": 4,
-    "unknown": 0,
-    "share_ge1": 1.0,
-    "share_eq2": 0.75
-   },
-   "mpi": {
-    "known": 4,
+    "known": 10,
     "unknown": 0,
     "share_ge1": 1.0,
     "share_eq2": 0.5
    },
-   "gpu-prog": {
-    "known": 3,
+   "mpi": {
+    "known": 9,
     "unknown": 1,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.56
+   },
+   "gpu-prog": {
+    "known": 9,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.67
    },
    "perf-model": {
-    "known": 4,
+    "known": 10,
     "unknown": 0,
     "share_ge1": 1.0,
     "share_eq2": 0.5
    },
    "arch": {
-    "known": 4,
+    "known": 10,
     "unknown": 0,
     "share_ge1": 1.0,
-    "share_eq2": 0.75
+    "share_eq2": 0.8
    },
    "numerics": {
-    "known": 4,
-    "unknown": 0,
+    "known": 9,
+    "unknown": 1,
     "share_ge1": 1.0,
-    "share_eq2": 0.75
+    "share_eq2": 0.89
    },
    "simulation-apps": {
-    "known": 3,
+    "known": 9,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.56
+   },
+   "parallel-algos": {
+    "known": 9,
     "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 0.67
    },
-   "parallel-algos": {
-    "known": 4,
-    "unknown": 0,
-    "share_ge1": 1.0,
-    "share_eq2": 0.75
-   },
    "distributed-sys": {
-    "known": 3,
-    "unknown": 1,
+    "known": 8,
+    "unknown": 2,
     "share_ge1": 1.0,
-    "share_eq2": 0.33
+    "share_eq2": 0.38
    },
    "sysadmin": {
-    "known": 2,
-    "unknown": 2,
-    "share_ge1": 0.5,
-    "share_eq2": 0.0
+    "known": 7,
+    "unknown": 3,
+    "share_ge1": 0.86,
+    "share_eq2": 0.14
    },
    "scheduling": {
-    "known": 2,
-    "unknown": 2,
+    "known": 4,
+    "unknown": 6,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "interconnect": {
-    "known": 2,
-    "unknown": 2,
-    "share_ge1": 0.5,
+    "known": 6,
+    "unknown": 4,
+    "share_ge1": 0.83,
     "share_eq2": 0.0
    },
    "storage-io": {
-    "known": 2,
-    "unknown": 2,
-    "share_ge1": 0.5,
-    "share_eq2": 0.0
+    "known": 6,
+    "unknown": 4,
+    "share_ge1": 0.83,
+    "share_eq2": 0.17
    },
    "containers-k8s": {
-    "known": 2,
-    "unknown": 2,
-    "share_ge1": 0.5,
-    "share_eq2": 0.5
+    "known": 6,
+    "unknown": 4,
+    "share_ge1": 0.67,
+    "share_eq2": 0.17
    },
    "cloud": {
-    "known": 2,
-    "unknown": 2,
-    "share_ge1": 0.5,
-    "share_eq2": 0.5
+    "known": 7,
+    "unknown": 3,
+    "share_ge1": 0.71,
+    "share_eq2": 0.29
    },
    "bigdata": {
-    "known": 3,
-    "unknown": 1,
+    "known": 8,
+    "unknown": 2,
     "share_ge1": 1.0,
-    "share_eq2": 0.33
+    "share_eq2": 0.5
    },
    "ml-dl": {
-    "known": 3,
-    "unknown": 1,
+    "known": 8,
+    "unknown": 2,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "ml-systems": {
-    "known": 2,
-    "unknown": 2,
+    "known": 7,
+    "unknown": 3,
     "share_ge1": 1.0,
-    "share_eq2": 0.5
+    "share_eq2": 0.43
    },
    "hpc-software-eng": {
-    "known": 3,
-    "unknown": 1,
-    "share_ge1": 0.67,
-    "share_eq2": 0.33
+    "known": 8,
+    "unknown": 2,
+    "share_ge1": 0.88,
+    "share_eq2": 0.62
    },
    "energy": {
-    "known": 3,
-    "unknown": 1,
-    "share_ge1": 0.67,
+    "known": 7,
+    "unknown": 3,
+    "share_ge1": 0.71,
     "share_eq2": 0.0
    },
    "quantum-emerging": {
-    "known": 3,
-    "unknown": 1,
-    "share_ge1": 0.67,
-    "share_eq2": 0.67
+    "known": 8,
+    "unknown": 2,
+    "share_ge1": 0.88,
+    "share_eq2": 0.75
    },
    "viz": {
-    "known": 3,
-    "unknown": 1,
+    "known": 5,
+    "unknown": 5,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.8
    },
    "thesis-internship": {
-    "known": 3,
+    "known": 9,
     "unknown": 1,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "soft-skills": {
-    "known": 2,
-    "unknown": 2,
+    "known": 7,
+    "unknown": 3,
     "share_ge1": 1.0,
-    "share_eq2": 0.5
+    "share_eq2": 0.43
    },
    "resilience": {
-    "known": 3,
-    "unknown": 1,
-    "share_ge1": 0.33,
+    "known": 5,
+    "unknown": 5,
+    "share_ge1": 0.4,
     "share_eq2": 0.0
    },
    "observability-sre": {
-    "known": 2,
-    "unknown": 2,
+    "known": 3,
+    "unknown": 7,
     "share_ge1": 0.0,
     "share_eq2": 0.0
    }
   },
   "mixed": {
    "openmp-threads": {
-    "known": 3,
-    "unknown": 0,
+    "known": 6,
+    "unknown": 5,
     "share_ge1": 1.0,
     "share_eq2": 0.33
    },
    "mpi": {
-    "known": 3,
-    "unknown": 0,
+    "known": 5,
+    "unknown": 6,
     "share_ge1": 1.0,
-    "share_eq2": 0.67
+    "share_eq2": 0.4
    },
    "gpu-prog": {
-    "known": 3,
-    "unknown": 0,
+    "known": 6,
+    "unknown": 5,
     "share_ge1": 1.0,
-    "share_eq2": 0.67
+    "share_eq2": 0.83
    },
    "perf-model": {
-    "known": 3,
-    "unknown": 0,
-    "share_ge1": 1.0,
-    "share_eq2": 0.67
-   },
-   "arch": {
-    "known": 3,
-    "unknown": 0,
-    "share_ge1": 1.0,
-    "share_eq2": 0.0
-   },
-   "numerics": {
-    "known": 3,
-    "unknown": 0,
-    "share_ge1": 1.0,
-    "share_eq2": 0.33
-   },
-   "simulation-apps": {
-    "known": 1,
+    "known": 9,
     "unknown": 2,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.56
    },
-   "parallel-algos": {
-    "known": 3,
+   "arch": {
+    "known": 11,
     "unknown": 0,
     "share_ge1": 1.0,
-    "share_eq2": 0.67
+    "share_eq2": 0.73
+   },
+   "numerics": {
+    "known": 7,
+    "unknown": 4,
+    "share_ge1": 1.0,
+    "share_eq2": 0.71
+   },
+   "simulation-apps": {
+    "known": 4,
+    "unknown": 7,
+    "share_ge1": 1.0,
+    "share_eq2": 0.25
+   },
+   "parallel-algos": {
+    "known": 9,
+    "unknown": 2,
+    "share_ge1": 1.0,
+    "share_eq2": 0.56
    },
    "distributed-sys": {
-    "known": 2,
+    "known": 10,
     "unknown": 1,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.9
    },
    "sysadmin": {
     "known": 0,
-    "unknown": 3,
+    "unknown": 11,
     "share_ge1": null,
     "share_eq2": null
    },
    "scheduling": {
     "known": 2,
-    "unknown": 1,
+    "unknown": 9,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "interconnect": {
-    "known": 2,
-    "unknown": 1,
+    "known": 9,
+    "unknown": 2,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "storage-io": {
-    "known": 1,
-    "unknown": 2,
+    "known": 5,
+    "unknown": 6,
     "share_ge1": 1.0,
-    "share_eq2": 0.0
+    "share_eq2": 0.4
    },
    "containers-k8s": {
-    "known": 1,
-    "unknown": 2,
+    "known": 3,
+    "unknown": 8,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.33
    },
    "cloud": {
-    "known": 2,
-    "unknown": 1,
+    "known": 6,
+    "unknown": 5,
     "share_ge1": 1.0,
-    "share_eq2": 0.5
+    "share_eq2": 0.67
    },
    "bigdata": {
-    "known": 2,
-    "unknown": 1,
+    "known": 7,
+    "unknown": 4,
     "share_ge1": 1.0,
-    "share_eq2": 0.5
+    "share_eq2": 0.43
    },
    "ml-dl": {
-    "known": 3,
-    "unknown": 0,
+    "known": 9,
+    "unknown": 2,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "ml-systems": {
-    "known": 2,
-    "unknown": 1,
+    "known": 4,
+    "unknown": 7,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "hpc-software-eng": {
     "known": 2,
-    "unknown": 1,
+    "unknown": 9,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "energy": {
-    "known": 0,
-    "unknown": 3,
-    "share_ge1": null,
-    "share_eq2": null
-   },
-   "quantum-emerging": {
-    "known": 2,
-    "unknown": 1,
+    "known": 3,
+    "unknown": 8,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
-   },
-   "viz": {
-    "known": 1,
-    "unknown": 2,
-    "share_ge1": 0.0,
     "share_eq2": 0.0
    },
+   "quantum-emerging": {
+    "known": 6,
+    "unknown": 5,
+    "share_ge1": 1.0,
+    "share_eq2": 0.67
+   },
+   "viz": {
+    "known": 5,
+    "unknown": 6,
+    "share_ge1": 0.8,
+    "share_eq2": 0.4
+   },
    "thesis-internship": {
-    "known": 3,
-    "unknown": 0,
+    "known": 9,
+    "unknown": 2,
     "share_ge1": 1.0,
     "share_eq2": 1.0
    },
    "soft-skills": {
-    "known": 2,
-    "unknown": 1,
+    "known": 7,
+    "unknown": 4,
     "share_ge1": 1.0,
-    "share_eq2": 1.0
+    "share_eq2": 0.43
    },
    "resilience": {
-    "known": 1,
-    "unknown": 2,
+    "known": 3,
+    "unknown": 8,
     "share_ge1": 1.0,
     "share_eq2": 0.0
    },
    "observability-sre": {
     "known": 0,
-    "unknown": 3,
+    "unknown": 11,
     "share_ge1": null,
     "share_eq2": null
+   }
+  },
+  "ops-sysadmin": {
+   "openmp-threads": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "mpi": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "gpu-prog": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "perf-model": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "arch": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "numerics": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "simulation-apps": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "parallel-algos": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "distributed-sys": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "sysadmin": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "scheduling": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "interconnect": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "storage-io": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "containers-k8s": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "cloud": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "bigdata": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 1.0
+   },
+   "ml-dl": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "ml-systems": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "hpc-software-eng": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "energy": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "quantum-emerging": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "viz": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 0.0,
+    "share_eq2": 0.0
+   },
+   "thesis-internship": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "soft-skills": {
+    "known": 2,
+    "unknown": 0,
+    "share_ge1": 1.0,
+    "share_eq2": 0.5
+   },
+   "resilience": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
+   },
+   "observability-sre": {
+    "known": 1,
+    "unknown": 1,
+    "share_ge1": 1.0,
+    "share_eq2": 0.0
    }
   }
  },
  "skills": {
   "python": {
-   "required": 0,
+   "required": 9,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.75,
+   "share_required": 0.75
   },
   "systems-lang": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 7,
+   "bonus": 1,
+   "share_any": 0.67,
+   "share_required": 0.58
   },
   "linux-admin": {
-   "required": 0,
+   "required": 7,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.58,
+   "share_required": 0.58
   },
   "slurm": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 2,
+   "bonus": 3,
+   "share_any": 0.42,
+   "share_required": 0.17
   },
   "kubernetes": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 8,
+   "bonus": 2,
+   "share_any": 0.83,
+   "share_required": 0.67
   },
   "ray": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 1,
+   "bonus": 1,
+   "share_any": 0.17,
+   "share_required": 0.08
   },
   "multicloud-skypilot": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 2,
+   "bonus": 1,
+   "share_any": 0.25,
+   "share_required": 0.17
   },
   "terraform-iac": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 3,
+   "bonus": 1,
+   "share_any": 0.33,
+   "share_required": 0.25
   },
   "ansible-config": {
-   "required": 0,
+   "required": 2,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.17,
+   "share_required": 0.17
   },
   "containers": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 2,
+   "bonus": 1,
+   "share_any": 0.25,
+   "share_required": 0.17
   },
   "pytorch-distributed": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 2,
+   "bonus": 2,
+   "share_any": 0.33,
+   "share_required": 0.17
   },
   "nccl-collectives": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 2,
+   "bonus": 2,
+   "share_any": 0.33,
+   "share_required": 0.17
   },
   "cuda-gpu": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 1,
+   "bonus": 1,
+   "share_any": 0.17,
+   "share_required": 0.08
   },
   "infiniband-roce": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 4,
+   "bonus": 3,
+   "share_any": 0.58,
+   "share_required": 0.33
   },
   "parallel-fs-storage": {
-   "required": 0,
+   "required": 2,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.17,
+   "share_required": 0.17
   },
   "object-storage": {
-   "required": 0,
+   "required": 1,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.08,
+   "share_required": 0.08
   },
   "prometheus-grafana": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 4,
+   "bonus": 1,
+   "share_any": 0.42,
+   "share_required": 0.33
   },
   "dcgm-gpu-monitoring": {
-   "required": 0,
+   "required": 4,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.33,
+   "share_required": 0.33
   },
   "logging-tracing": {
-   "required": 0,
+   "required": 1,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.08,
+   "share_required": 0.08
   },
   "experiment-tracking": {
-   "required": 0,
+   "required": 2,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.17,
+   "share_required": 0.17
   },
   "checkpoint-fault-tolerance": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 3,
+   "bonus": 1,
+   "share_any": 0.33,
+   "share_required": 0.25
   },
   "scheduler-design": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 4,
+   "bonus": 1,
+   "share_any": 0.42,
+   "share_required": 0.33
   },
   "hyperscaler-cloud": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 2,
+   "bonus": 1,
+   "share_any": 0.25,
+   "share_required": 0.17
   },
   "gpu-cloud-providers": {
-   "required": 0,
+   "required": 2,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.17,
+   "share_required": 0.17
   },
   "finops-cost": {
-   "required": 0,
+   "required": 2,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.17,
+   "share_required": 0.17
   },
   "procurement-vendor": {
-   "required": 0,
+   "required": 1,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.08,
+   "share_required": 0.08
   },
   "capacity-planning": {
-   "required": 0,
+   "required": 6,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.5,
+   "share_required": 0.5
   },
   "security-compliance": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 1,
+   "bonus": 1,
+   "share_any": 0.17,
+   "share_required": 0.08
   },
   "sre-oncall": {
-   "required": 0,
+   "required": 9,
    "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "share_any": 0.75,
+   "share_required": 0.75
   },
   "leadership-mgmt": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 3,
+   "bonus": 1,
+   "share_any": 0.33,
+   "share_required": 0.25
   },
   "hpc-experience": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 6,
+   "bonus": 2,
+   "share_any": 0.67,
+   "share_required": 0.5
   },
   "ml-training-experience": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 3,
+   "bonus": 1,
+   "share_any": 0.33,
+   "share_required": 0.25
   },
   "rl-infra": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 1,
+   "bonus": 2,
+   "share_any": 0.25,
+   "share_required": 0.08
   },
   "data-pipelines": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 1,
+   "bonus": 1,
+   "share_any": 0.17,
+   "share_required": 0.08
   },
   "networking-general": {
    "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
+   "bonus": 2,
+   "share_any": 0.17,
    "share_required": 0.0
   },
   "bare-metal-provisioning": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 4,
+   "bonus": 1,
+   "share_any": 0.42,
+   "share_required": 0.33
   },
   "ci-cd": {
-   "required": 0,
-   "bonus": 0,
-   "share_any": 0.0,
-   "share_required": 0.0
+   "required": 1,
+   "bonus": 1,
+   "share_any": 0.17,
+   "share_required": 0.08
   },
   "inference-serving": {
    "required": 0,
@@ -1038,302 +1844,378 @@
    "share_required": 0.0
   }
  },
- "postings_by_type": {},
- "postings_by_seniority": {},
- "years_required": {
-  "n": 0,
-  "values": [],
-  "median": null
+ "postings_by_type": {
+  "startup": 2,
+  "ai-lab": 3,
+  "gpu-cloud": 6,
+  "hpc-centre": 1
  },
- "skills_by_company_type": {},
+ "postings_by_seniority": {
+  "unspecified": 1,
+  "lead": 1,
+  "staff": 3,
+  "senior": 3,
+  "ic": 3,
+  "manager": 1
+ },
+ "years_required": {
+  "n": 7,
+  "values": [
+   3,
+   5,
+   7,
+   8,
+   8,
+   10,
+   15
+  ],
+  "median": 8
+ },
+ "skills_by_company_type": {
+  "startup": {
+   "python": 2,
+   "pytorch-distributed": 2,
+   "ml-training-experience": 2,
+   "checkpoint-fault-tolerance": 2,
+   "experiment-tracking": 2,
+   "rl-infra": 2,
+   "slurm": 2,
+   "kubernetes": 2,
+   "infiniband-roce": 2,
+   "cuda-gpu": 1,
+   "data-pipelines": 1,
+   "systems-lang": 1
+  },
+  "ai-lab": {
+   "python": 3,
+   "sre-oncall": 3,
+   "kubernetes": 2,
+   "hyperscaler-cloud": 2,
+   "systems-lang": 2,
+   "terraform-iac": 2,
+   "multicloud-skypilot": 2,
+   "bare-metal-provisioning": 2,
+   "capacity-planning": 2,
+   "scheduler-design": 2,
+   "linux-admin": 2,
+   "dcgm-gpu-monitoring": 2
+  },
+  "gpu-cloud": {
+   "kubernetes": 5,
+   "hpc-experience": 5,
+   "systems-lang": 4,
+   "sre-oncall": 4,
+   "linux-admin": 3,
+   "python": 3,
+   "infiniband-roce": 3,
+   "prometheus-grafana": 3,
+   "capacity-planning": 3,
+   "scheduler-design": 2,
+   "containers": 2,
+   "leadership-mgmt": 2
+  },
+  "hpc-centre": {
+   "linux-admin": 1,
+   "containers": 1,
+   "kubernetes": 1,
+   "python": 1,
+   "systems-lang": 1,
+   "ci-cd": 1,
+   "sre-oncall": 1,
+   "slurm": 1,
+   "hpc-experience": 1,
+   "cuda-gpu": 1,
+   "data-pipelines": 1
+  }
+ },
  "supply_vs_demand": [
   {
    "skill": "ansible-config",
    "topic": "sysadmin",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.5,
-   "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.8,
+   "supply_share_eq2": 0.3,
+   "supply_known": 10
   },
   {
    "skill": "bare-metal-provisioning",
    "topic": "sysadmin",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.5,
-   "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "demand_share_any": 0.42,
+   "demand_share_required": 0.33,
+   "supply_share_ge1": 0.8,
+   "supply_share_eq2": 0.3,
+   "supply_known": 10
   },
   {
    "skill": "capacity-planning",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.5,
+   "demand_share_required": 0.5,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   },
   {
    "skill": "checkpoint-fault-tolerance",
    "topic": "resilience",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.5,
+   "demand_share_any": 0.33,
+   "demand_share_required": 0.25,
+   "supply_share_ge1": 0.75,
    "supply_share_eq2": 0.0,
-   "supply_known": 4
+   "supply_known": 12
   },
   {
    "skill": "ci-cd",
    "topic": "hpc-software-eng",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.8,
-   "supply_share_eq2": 0.2,
-   "supply_known": 5
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.08,
+   "supply_share_ge1": 0.92,
+   "supply_share_eq2": 0.42,
+   "supply_known": 12
   },
   {
    "skill": "containers",
    "topic": "containers-k8s",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.67,
-   "supply_share_eq2": 0.67,
-   "supply_known": 3
+   "demand_share_any": 0.25,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.85,
+   "supply_share_eq2": 0.38,
+   "supply_known": 13
   },
   {
    "skill": "cuda-gpu",
    "topic": "gpu-prog",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.83,
-   "supply_known": 6
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.08,
+   "supply_share_ge1": 0.95,
+   "supply_share_eq2": 0.57,
+   "supply_known": 21
   },
   {
    "skill": "data-pipelines",
    "topic": "bigdata",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.08,
    "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.4,
-   "supply_known": 5
+   "supply_share_eq2": 0.56,
+   "supply_known": 18
   },
   {
    "skill": "dcgm-gpu-monitoring",
    "topic": "observability-sre",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.0,
+   "demand_share_any": 0.33,
+   "demand_share_required": 0.33,
+   "supply_share_ge1": 0.25,
    "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "supply_known": 4
   },
   {
    "skill": "finops-cost",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   },
   {
    "skill": "gpu-cloud-providers",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   },
   {
    "skill": "hpc-experience",
    "topic": "mpi",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
+   "demand_share_any": 0.67,
+   "demand_share_required": 0.5,
    "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.57,
-   "supply_known": 7
+   "supply_share_eq2": 0.48,
+   "supply_known": 21
   },
   {
    "skill": "hyperscaler-cloud",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.25,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   },
   {
    "skill": "infiniband-roce",
    "topic": "interconnect",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.0,
-   "supply_known": 4
+   "demand_share_any": 0.58,
+   "demand_share_required": 0.33,
+   "supply_share_ge1": 0.9,
+   "supply_share_eq2": 0.05,
+   "supply_known": 21
   },
   {
    "skill": "kubernetes",
    "topic": "containers-k8s",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.67,
-   "supply_share_eq2": 0.67,
-   "supply_known": 3
+   "demand_share_any": 0.83,
+   "demand_share_required": 0.67,
+   "supply_share_ge1": 0.85,
+   "supply_share_eq2": 0.38,
+   "supply_known": 13
   },
   {
    "skill": "linux-admin",
    "topic": "sysadmin",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.5,
-   "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "demand_share_any": 0.58,
+   "demand_share_required": 0.58,
+   "supply_share_ge1": 0.8,
+   "supply_share_eq2": 0.3,
+   "supply_known": 10
   },
   {
    "skill": "logging-tracing",
    "topic": "observability-sre",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.0,
+   "demand_share_any": 0.08,
+   "demand_share_required": 0.08,
+   "supply_share_ge1": 0.25,
    "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "supply_known": 4
   },
   {
    "skill": "ml-training-experience",
    "topic": "ml-systems",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.25,
-   "supply_known": 4
+   "demand_share_any": 0.33,
+   "demand_share_required": 0.25,
+   "supply_share_ge1": 0.93,
+   "supply_share_eq2": 0.21,
+   "supply_known": 14
   },
   {
    "skill": "multicloud-skypilot",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.25,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   },
   {
    "skill": "nccl-collectives",
    "topic": "ml-systems",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.25,
-   "supply_known": 4
+   "demand_share_any": 0.33,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.93,
+   "supply_share_eq2": 0.21,
+   "supply_known": 14
   },
   {
    "skill": "networking-general",
    "topic": "interconnect",
-   "demand_share_any": 0.0,
+   "demand_share_any": 0.17,
    "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.0,
-   "supply_known": 4
+   "supply_share_ge1": 0.9,
+   "supply_share_eq2": 0.05,
+   "supply_known": 21
   },
   {
    "skill": "object-storage",
    "topic": "storage-io",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.67,
-   "supply_share_eq2": 0.0,
-   "supply_known": 3
+   "demand_share_any": 0.08,
+   "demand_share_required": 0.08,
+   "supply_share_ge1": 0.87,
+   "supply_share_eq2": 0.27,
+   "supply_known": 15
   },
   {
    "skill": "parallel-fs-storage",
    "topic": "storage-io",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.67,
-   "supply_share_eq2": 0.0,
-   "supply_known": 3
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.87,
+   "supply_share_eq2": 0.27,
+   "supply_known": 15
   },
   {
    "skill": "procurement-vendor",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.08,
+   "demand_share_required": 0.08,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   },
   {
    "skill": "prometheus-grafana",
    "topic": "observability-sre",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.0,
+   "demand_share_any": 0.42,
+   "demand_share_required": 0.33,
+   "supply_share_ge1": 0.25,
    "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "supply_known": 4
   },
   {
    "skill": "pytorch-distributed",
    "topic": "ml-systems",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.25,
-   "supply_known": 4
+   "demand_share_any": 0.33,
+   "demand_share_required": 0.17,
+   "supply_share_ge1": 0.93,
+   "supply_share_eq2": 0.21,
+   "supply_known": 14
   },
   {
    "skill": "ray",
    "topic": "distributed-sys",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
+   "demand_share_any": 0.17,
+   "demand_share_required": 0.08,
    "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.6,
-   "supply_known": 5
+   "supply_share_eq2": 0.64,
+   "supply_known": 22
   },
   {
    "skill": "rl-infra",
    "topic": "ml-systems",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.25,
-   "supply_known": 4
+   "demand_share_any": 0.25,
+   "demand_share_required": 0.08,
+   "supply_share_ge1": 0.93,
+   "supply_share_eq2": 0.21,
+   "supply_known": 14
   },
   {
    "skill": "scheduler-design",
    "topic": "scheduling",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
+   "demand_share_any": 0.42,
+   "demand_share_required": 0.33,
    "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.0,
-   "supply_known": 4
+   "supply_share_eq2": 0.12,
+   "supply_known": 8
   },
   {
    "skill": "slurm",
    "topic": "scheduling",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
+   "demand_share_any": 0.42,
+   "demand_share_required": 0.17,
    "supply_share_ge1": 1.0,
-   "supply_share_eq2": 0.0,
-   "supply_known": 4
+   "supply_share_eq2": 0.12,
+   "supply_known": 8
   },
   {
    "skill": "sre-oncall",
    "topic": "observability-sre",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.0,
+   "demand_share_any": 0.75,
+   "demand_share_required": 0.75,
+   "supply_share_ge1": 0.25,
    "supply_share_eq2": 0.0,
-   "supply_known": 2
+   "supply_known": 4
   },
   {
    "skill": "terraform-iac",
    "topic": "cloud",
-   "demand_share_any": 0.0,
-   "demand_share_required": 0.0,
-   "supply_share_ge1": 0.75,
-   "supply_share_eq2": 0.5,
-   "supply_known": 4
+   "demand_share_any": 0.33,
+   "demand_share_required": 0.25,
+   "supply_share_ge1": 0.89,
+   "supply_share_eq2": 0.58,
+   "supply_known": 19
   }
  ]
 }

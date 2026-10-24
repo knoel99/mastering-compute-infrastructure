@@ -1,0 +1,1265 @@
+{
+ "unit": "eu-b",
+ "region": "world",
+ "retrieved_on": "2026-10-22",
+ "programmes": [
+  {
+   "id": "it-sissa-ictp-mhpc",
+   "country": "IT",
+   "institution": "SISSA (International School for Advanced Studies) and ICTP, Trieste",
+   "programme_name": "Master in High Performance Computing (MHPC)",
+   "degree": "Corso di Perfezionamento / Master in HPC (12-month specialization course, not a laurea magistrale)",
+   "urls": [
+    "https://www.mhpc.it/master-high-performance-computing",
+    "https://www.mhpc.it/structure-modules",
+    "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf",
+    "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPCsyllabus2022-23.pdf",
+    "https://www.mhpc.it/facilities",
+    "https://www.mhpc.it/partnerships",
+    "https://www.mhpc.it/admission-requirements"
+   ],
+   "duration": "12 months (Sept 8, 2025 start in the 2025-2026 call): Part I ~4 months, Part II ~5 months, Part III thesis 4-9 months overlapping",
+   "credits": "Total not stated on the pages read; per-course CFU (Italian credits) listed in the 2025-2026 call, e.g. Parallel Programming 6 CFU, Filesystems and Storage for HPC 3 CFU. Fee EUR 7,000.",
+   "language": "English",
+   "delivery": "on-site (SISSA-ICTP campus, Trieste)",
+   "entry_requirements": "Website: Master's degree or equivalent in a scientific/technical field (physics, maths, CS, engineering); working knowledge of C/C++/Fortran/Python; basic Linux; no prior HPC needed. The 2025-26 call also says international applicants with a Bachelor, Master or Doctoral degree are welcome; evaluation mostly on CV.",
+   "focus": "hpc-core",
+   "structure_summary": "Intensive one-year specialization co-run by SISSA and ICTP. Part I (mandatory, ~4 months) covers scientific programming environment, architectures, advanced C++/Python, parallel programming, GPU, PETSc, numerical analysis and HPC best practices. Part II (~5 months, mandatory plus optional courses) covers storage, cloud, advanced GPU, quantum, ML/DL, RL, HPC technology and workflows. Part III is a thesis project with a research team and/or an industrial partner. Course list varies by edition; the call says so explicitly.",
+   "core_courses": [
+    {
+     "name": "Scientific programming environment",
+     "credits": "6 CFU",
+     "topics": [
+      "sysadmin",
+      "hpc-software-eng"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Introduction to Computer Architectures for HPC",
+     "credits": "3 CFU",
+     "topics": [
+      "arch",
+      "perf-model",
+      "openmp-threads",
+      "mpi"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Advanced Programming (modern C++)",
+     "credits": "6 CFU",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Parallel Programming",
+     "credits": "6 CFU",
+     "topics": [
+      "mpi",
+      "openmp-threads"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Data Structures",
+     "credits": "3 CFU",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Best Practices in HPC",
+     "credits": "3 CFU",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Introduction to Parallel Programming on GPU",
+     "credits": "3 CFU",
+     "topics": [
+      "gpu-prog"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Numerical Analysis",
+     "credits": "3 CFU",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Introduction to PETSc",
+     "credits": "3 CFU",
+     "topics": [
+      "numerics",
+      "gpu-prog"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    }
+   ],
+   "electives": [
+    {
+     "name": "Filesystems and Storage for HPC",
+     "credits": "3 CFU",
+     "topics": [
+      "storage-io"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Cloud Computing for HPC",
+     "credits": "3 CFU",
+     "topics": [
+      "cloud",
+      "distributed-sys"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "High Performance Computing Technology",
+     "credits": "6 CFU",
+     "topics": [
+      "sysadmin",
+      "arch",
+      "cloud"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Advanced GPU programming",
+     "credits": "3 CFU",
+     "topics": [
+      "gpu-prog"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "N-Body Systems on GPUs",
+     "credits": "3 CFU",
+     "topics": [
+      "simulation-apps",
+      "gpu-prog"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Advanced Computer Architectures & Optimizations",
+     "credits": "3 CFU",
+     "topics": [
+      "arch",
+      "perf-model"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Hardware Architecture for HPC",
+     "credits": "2 CFU",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Introduction to Quantum Computing",
+     "credits": "2 CFU",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Introduction to Machine Learning / Deep Learning / Reinforcement Learning",
+     "credits": "6 + 6 + 3 CFU",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Dynamic Workflow (Dynamic Workflows and Federated Deep Learning on the website)",
+     "credits": "2 CFU",
+     "topics": [
+      "ml-systems",
+      "distributed-sys"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    },
+    {
+     "name": "Finite Element Methods with deal.II",
+     "credits": "2 CFU",
+     "topics": [
+      "simulation-apps",
+      "numerics"
+     ],
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf"
+    }
+   ],
+   "capstone": "Part III thesis project (4-9 months) with a research team and/or an industrial partner, overseen by an adviser, accepted by a committee, ending in a thesis defense.",
+   "machines_access": [
+    "CINECA Leonardo supercomputer (via collaboration with CINECA)",
+    "In-house HPC infrastructure hosted at SISSA and ICTP, Trieste"
+   ],
+   "industry_links": [
+    "Partnerships page lists Cineca, IBM, Intel, NVIDIA, DDN Storage, HLRS, Fincantieri, Generali, Prometeia, eXact lab, Cetena, among others",
+    "Thesis projects may be done with an industrial partner; fellowships from sponsoring institutions or industrial partners possible"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": 2,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 1,
+    "distributed-sys": 1,
+    "sysadmin": 1,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": 2,
+    "containers-k8s": null,
+    "cloud": 2,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": 2,
+    "energy": null,
+    "quantum-emerging": 2,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Programme lasts 12 months",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf",
+     "quote": "SISSA and ICTP promote a 12 months education program in High Performance computing.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Dedicated storage course with CFU credit value",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf",
+     "quote": "2.1 Filesystems and Storage for HPC 3 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Dedicated cloud course with CFU credit value",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf",
+     "quote": "2.5 Cloud Computing for HPC 3 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Parallel Programming course credit value (credits in CFU)",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf",
+     "quote": "1.5 Parallel Programming 6 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Parallel programming course covers MPI and OpenMP (2022-23 syllabus)",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPCsyllabus2022-23.pdf",
+     "quote": "Main parallel programming paradigms: message passing (MPI) and multi-threading (OpenMP).",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "HPC Technologies module has students install and configure a Linux cluster (sysadmin-relevant)",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPCsyllabus2022-23.pdf",
+     "quote": "Students will install and configure a HPC Linux Cluster and will also be exposed to the use of Cloud and Grid Infrastructures.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Machine access: Leonardo via CINECA",
+     "url": "https://www.mhpc.it/facilities",
+     "quote": "made available through a collaboration with CINECA, leveraging the computational capabilities of the Leonardo Supercomputer",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Industry/research link: thesis with research team and/or industrial partner",
+     "url": "https://www.mhpc.it/structure-modules",
+     "quote": "undertake a technically challenging project in collaboration with an on-going research team and/or an industrial partner",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Partnership network (research, scholarships, guest lectures, thesis)",
+     "url": "https://www.mhpc.it/partnerships",
+     "quote": "The MHPC programme collaborates with organisations involved in research projects, scholarships, guest lectures and thesis opportunities.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Entry requirements and English-language teaching",
+     "url": "https://www.mhpc.it/admission-requirements",
+     "quote": "Applicants should hold a Master’s degree or equivalent qualification in a scientific or technical field.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Course list varies between editions",
+     "url": "https://backend.mhpc.sissa.it/sites/default/files/custom_files/MHPC_Bando_2025_2026.pdf",
+     "quote": "the exact courses are subject to variations from one edition to another",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Course list is the 2025-26 call's 'example program for one of the previous editions' (not guaranteed for the current edition). Course-level syllabi are only short paragraphs (2022-23 PDF), so topics not named there (scheduling, interconnect, containers/k8s, observability, resilience, energy, viz, soft-skills) are null (unknown), not 0. Not a laurea magistrale: a Corso di Perfezionamento; total CFU not stated. Parallel programming covers MPI and OpenMP per 2022-23 syllabus. Closest of the candidates to a cluster-operations flavour thanks to the HPC Technology (install/configure a Linux cluster) and Filesystems and Storage courses.",
+   "evidence_verified": "11/11",
+   "structure_summary_fr": "Spécialisation intensive d'un an, conduite par la SISSA et l'ICTP. La partie I (obligatoire, environ 4 mois) couvre l'environnement de programmation scientifique, les architectures, le C++ et Python avancés, la programmation parallèle, le GPU, PETSc, l'analyse numérique et les bonnes pratiques du HPC. La partie II (environ 5 mois, cours obligatoires et optionnels) couvre le stockage, le cloud, le GPU avancé, le quantique, le ML/DL, l'apprentissage par renforcement, les technologies HPC et les flux de travail. La partie III est un projet de mémoire avec une équipe de recherche ou un partenaire industriel. La liste des cours varie selon les éditions, ce que l'appel à candidatures indique explicitement."
+  },
+  {
+   "id": "it-polimi-hpc-engineering",
+   "country": "IT",
+   "institution": "Politecnico di Milano",
+   "programme_name": "High Performance Computing Engineering (Laurea Magistrale, class LM-32 Ingegneria Informatica)",
+   "degree": "Laurea Magistrale (MSc)",
+   "urls": [
+    "https://masterhpc.polimi.it",
+    "https://masterhpc.polimi.it/programma",
+    "https://masterhpc.polimi.it/piano-studi",
+    "https://masterhpc.polimi.it/carriere",
+    "https://masterhpc.polimi.it/tesi",
+    "https://masterhpc.polimi.it/mobilita",
+    "https://www.mastereit.polimi.it/cloud-networking-hpc/"
+   ],
+   "duration": "2 years",
+   "credits": "120 CFU (crediti): 60 CFU per year, incl. 40 CFU of free-choice courses and a 20 CFU thesis project",
+   "language": "English",
+   "delivery": "on-site (Milano Leonardo campus)",
+   "entry_requirements": "First-level degree in classes L7, L8, L9 or L31. Automatic admission for PoliMi bachelor graduates in Ingegneria Informatica, Matematica, Fisica, Automazione or Elettronica with average >= 24/30; other applicants are assessed on their record.",
+   "focus": "hpc-core",
+   "structure_summary": "Year 1 is a mandatory common core (parallel computing, numerical linear algebra, numerical methods for PDEs, quantum physics/computing, advanced computer architectures, software engineering for HPC, computing infrastructures, applied statistics). Year 2 adds deep learning and big-data systems, then 40 CFU of electives split across related (maths/quantum/electronics), ICT (distributed systems, performance evaluation, code optimization, security) and HPC application groups, plus a 20 CFU thesis. Four specialisation areas are advertised, including an HPC System Architecture area (OS, virtualization, containers, accelerators).",
+   "core_courses": [
+    {
+     "name": "Parallel Computing",
+     "credits": "5 CFU",
+     "topics": [
+      "openmp-threads",
+      "mpi",
+      "parallel-algos"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Advanced Methods for Scientific Computing",
+     "credits": "5 CFU",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Numerical Linear Algebra",
+     "credits": "5 CFU",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Numerical Methods for PDEs",
+     "credits": "5 CFU",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Quantum Physics",
+     "credits": "5 CFU",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Quantum Computing",
+     "credits": "5 CFU",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Advanced Computer Architectures",
+     "credits": "5 CFU",
+     "topics": [
+      "arch",
+      "gpu-prog"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Software Engineering for HPC",
+     "credits": "5 CFU",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Computing Infrastructures",
+     "credits": "5 CFU",
+     "topics": [
+      "sysadmin",
+      "cloud"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Applied Statistics",
+     "credits": "5 CFU",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Artificial Neural Networks and Deep Learning",
+     "credits": "5 CFU",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Systems and Methods for Big and Unstructured Data",
+     "credits": "5 CFU",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Thesis project",
+     "credits": "20 CFU",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    }
+   ],
+   "electives": [
+    {
+     "name": "Performance Evaluation and Applications",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Distributed Systems",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Networked Software for Distributed Systems",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Streaming Data Analytics",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Network Computing",
+     "topics": [
+      "interconnect"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Code Transformation and Optimization",
+     "topics": [
+      "perf-model",
+      "hpc-software-eng"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Advanced Deep Learning",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Machine Learning",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Computer Security",
+     "topics": [],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Applied CFD for Industrial Engineering",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "High Performance Scientific Computing in Aerospace",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "High Performance Simulation Lab for Mechanical Engineering",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Thermal Management for Information Technologies",
+     "topics": [
+      "energy"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Molecular Modeling of Materials",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    },
+    {
+     "name": "Fintech",
+     "topics": [],
+     "url": "https://masterhpc.polimi.it/piano-studi"
+    }
+   ],
+   "capstone": "Thesis project, 20 CFU; may be done with companies, supercomputing centres or research bodies, sometimes linked to a voluntary curricular internship; scholarships exist for a thesis abroad.",
+   "machines_access": [],
+   "industry_links": [
+    "Thesis can be developed with companies, supercomputing centres or research bodies (tesi page)",
+    "EUMaster4HPC double-degree route and Erasmus partners 'in strong synergy with supercomputing centres' (mobilita page)",
+    "EIT Digital double degree track 'Cloud, Networking Infrastructures and HPC' with company/research-centre involvement"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": 1,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 1,
+    "distributed-sys": 2,
+    "sysadmin": 1,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": 1,
+    "cloud": 1,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": 2,
+    "energy": 1,
+    "quantum-emerging": 2,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Duration and credits",
+     "url": "https://masterhpc.polimi.it",
+     "quote": "2 anni, 120 crediti",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Study plan lists Parallel Computing as a first-year course (5 CFU)",
+     "url": "https://masterhpc.polimi.it/piano-studi",
+     "quote": "Parallel Computing5 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Study plan lists Computing Infrastructures and Software Engineering for HPC",
+     "url": "https://masterhpc.polimi.it/piano-studi",
+     "quote": "Software Engineering for HPC5 CFU Computing Infrastructures5 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Study plan lists Advanced Computer Architectures",
+     "url": "https://masterhpc.polimi.it/piano-studi",
+     "quote": "Advanced Computer Architectures5 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Study plan lists Performance Evaluation and Applications as an ICT elective",
+     "url": "https://masterhpc.polimi.it/piano-studi",
+     "quote": "Performance Evaluation and Applications5 CFU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "HPC System Architecture area covers OS, virtualization, containers",
+     "url": "https://masterhpc.polimi.it/carriere",
+     "quote": "sistemi operativi, virtualizzazione e containerizzazione;",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Thesis can be done with companies or supercomputing centres",
+     "url": "https://masterhpc.polimi.it/tesi",
+     "quote": "Potrai sviluppare la tua tesi anche in collaborazione con aziende, centri di supercalcolo o enti di ricerca",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Language of instruction is English",
+     "url": "https://masterhpc.polimi.it",
+     "quote": "Campus Milano Leonardo Lingua Inglese",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Admission requirements",
+     "url": "https://masterhpc.polimi.it",
+     "quote": "Per essere ammessi occorre essere in possesso di una laurea di primo livello nelle classi",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "EIT Digital double degree with a Cloud, Networking Infrastructures and HPC track",
+     "url": "https://masterhpc.polimi.it/mobilita",
+     "quote": "doppia laurea in 2 anni e 120 crediti con una track specifica su Cloud, Networking Infrastructures & HPC.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Course titles and CFU come from the official study plan; individual course syllabi (topics inside Parallel Computing, Computing Infrastructures, etc.) were not retrieved, so topic coverage rests on titles and programme-level descriptions: 2 only where a title names the theme. scheduling, storage-io, viz, resilience, observability-sre are null (unknown), not 0. No named supercomputer access found on the pages read, hence machines_access is empty. Thesis row is listed under core for the 20 CFU thesis project. The EIT Digital track page says the first year is 60 ECTS including 36 ECTS of technical courses and a 20 ECTS Innovation & Entrepreneurship minor.",
+   "evidence_verified": "10/10",
+   "structure_summary_fr": "L'année 1 est un tronc commun obligatoire (calcul parallèle, algèbre linéaire numérique, méthodes numériques pour les EDP, physique et calcul quantiques, architectures avancées d'ordinateurs, génie logiciel pour le HPC, infrastructures de calcul, statistique appliquée). L'année 2 ajoute l'apprentissage profond et les systèmes de données massives, puis 40 CFU d'options réparties entre groupes connexes (mathématiques, quantique, électronique), TIC (systèmes distribués, évaluation de performance, optimisation de code, sécurité) et applications HPC, plus un mémoire de 20 CFU. Quatre domaines de spécialisation sont annoncés, dont un domaine architecture de systèmes HPC (système d'exploitation, virtualisation, conteneurs, accélérateurs)."
+  },
+  {
+   "id": "es-upc-miri-hpc",
+   "country": "ES",
+   "institution": "Universitat Politecnica de Catalunya (UPC BarcelonaTech), Barcelona School of Informatics (FIB), with Barcelona Supercomputing Center (BSC) training",
+   "programme_name": "Master in Innovation and Research in Informatics (MIRI), specialization High Performance Computing",
+   "degree": "MSc (official master, 4 specializations; HPC is one)",
+   "urls": [
+    "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics",
+    "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+    "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+    "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations"
+   ],
+   "duration": "Four semesters (2 years), starting September and February",
+   "credits": "120 ECTS; standard courses 6 ECTS each; Master's Thesis 30 ECTS; seminars (SIRI) 6 ECTS",
+   "language": "English",
+   "delivery": "on-site (face-to-face)",
+   "entry_requirements": "Not captured: the admission page was not read (see FIB pre-enrolment and admission page).",
+   "focus": "hpc-core",
+   "structure_summary": "Semester 1 has five mandatory common courses (AMMM, CPDS, Operating Systems, Processor Architecture, TMIRI, 6 ECTS each); semester 2 has Multiprocessors Architecture and SMDE plus specialization electives. HPC students pick electives from Advanced Processor Architecture, Supercomputers Architecture, Compilers for High Performance Computers, Parallel Programming Tools and Models, Supercomputing for Challenging Applications and others, plus free electives and seminars (some are BSC training courses). Semester 4 is the 30 ECTS Master's Thesis.",
+   "core_courses": [
+    {
+     "name": "Operating Systems (OS-MIRI)",
+     "credits": "6 ECTS",
+     "topics": [
+      "sysadmin"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Processor Architecture (PA-MIRI)",
+     "credits": "6 ECTS",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Multiprocessors Architecture (MA-MIRI)",
+     "credits": "6 ECTS",
+     "topics": [
+      "arch",
+      "openmp-threads"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Algorithmic Methods for Mathematical Models (AMMM)",
+     "credits": "6 ECTS",
+     "topics": [],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "CPDS (6 ECTS; only the abbreviation appears on the page)",
+     "credits": "6 ECTS",
+     "topics": [],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Techniques and Methodology of Innovation and Research in Informatics (TMIRI)",
+     "credits": "6 ECTS",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Statistical Modelling and Design of Experiments (SMDE)",
+     "credits": "6 ECTS",
+     "topics": [],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Master's Thesis (TFM)",
+     "credits": "30 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    }
+   ],
+   "electives": [
+    {
+     "name": "Supercomputers Architecture (SA-MIRI)",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Parallel Programming Tools and Models (PPTM-MIRI)",
+     "topics": [
+      "openmp-threads",
+      "mpi"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Compilers for High Performance Computers (CHPC-MIRI)",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Supercomputing for Challenging Applications (SCA)",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Advanced Processor Architecture (APA-MIRI)",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Machine Learning Systems in Production (MLOps)",
+     "topics": [
+      "ml-systems"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "Data Visualization (VD)",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing"
+    },
+    {
+     "name": "BSC Training Course: Parallel Programming Workshop (credited seminar)",
+     "topics": [
+      "mpi",
+      "openmp-threads"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics"
+    },
+    {
+     "name": "BSC Training Course: Introduction to OpenACC (credited seminar)",
+     "topics": [
+      "gpu-prog"
+     ],
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics"
+    }
+   ],
+   "capstone": "Master's Thesis (TFM), 30 ECTS, semester 4.",
+   "machines_access": [],
+   "industry_links": [
+    "BSC (Barcelona Supercomputing Center) training courses are offered as MIRI-HPC seminars, delivered by the NVIDIA-awarded GPU Center of Excellence at BSC with UPC",
+    "EUMaster4HPC link appears on the MIRI curriculum menu"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": 1,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": null,
+    "simulation-apps": 1,
+    "parallel-algos": null,
+    "distributed-sys": null,
+    "sysadmin": 1,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": 1,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": 2,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Duration and credits",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics",
+     "quote": "Four semesters (120 ECTS credits). Face-to-face. Starting September and February",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "HPC is one of four MIRI specializations",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations",
+     "quote": "The Master in Innovation and Research in Informatics offers 4 areas of specialization",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "HPC specialization course: Supercomputers Architecture",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+     "quote": "Supercomputers Architecture (SA-MIRI)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "HPC specialization course: Parallel Programming Tools and Models",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+     "quote": "Parallel Programming Tools and Models (PPTM-MIRI)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "HPC specialization course: Compilers for High Performance Computers",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+     "quote": "Compilers for High Performance Computers (CHPC-MIRI)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Specialization competence includes managing system software in supercomputing environments",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+     "quote": "Capability to analyze, evaluate, design and manage system software in supercomputing environments.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Master's Thesis is 30 ECTS in semester 4",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+     "quote": "(TFM - 30 ECTS)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Free elective on ML systems in production",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/curriculum/specializations/high-performance-computing",
+     "quote": "Machine Learning Systems in Production",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Credited BSC seminar covering MPI and OpenMP",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+     "quote": "The objectives of this course are to understand the fundamental concepts supporting message-passing and shared memory programming models.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "BSC OpenACC seminar delivered by NVIDIA GPU Center of Excellence at BSC with UPC",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+     "quote": "This course is delivered by the GPU Center of Excellence (GCOE) awarded by NVIDIA to the Barcelona Supercomputing Center (BSC)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Language of instruction",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics",
+     "quote": "Language English",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Course titles/ECTS come from the official specialization page; no course syllabi were read, so coverage rests on titles and the seminar listing (1 where only seminars or competences mention a theme). BSC's own page (bsc.es) returned an Anubis JavaScript challenge and could not be read, so machine access (MareNostrum) is not stated here: search snippets suggested it, but it is unverified. The expansion of the abbreviation CPDS is not shown on the page. Admission requirements were not captured. Unread themes are null.",
+   "evidence_verified": "11/11",
+   "structure_summary_fr": "Le semestre 1 comporte cinq cours communs obligatoires (AMMM, CPDS, systèmes d'exploitation, architecture des processeurs, TMIRI, 6 ECTS chacun) ; le semestre 2 comporte Architecture des multiprocesseurs et SMDE plus des options de spécialisation. Les étudiants HPC choisissent parmi Architecture avancée des processeurs, Architecture des supercalculateurs, Compilateurs pour ordinateurs haute performance, Outils et modèles de programmation parallèle, Supercalcul pour applications exigeantes et d'autres, plus des options libres et des séminaires (certains sont des formations du BSC). Le semestre 4 est le mémoire de master de 30 ECTS."
+  },
+  {
+   "id": "nl-uva-vu-cs-csi",
+   "country": "NL",
+   "institution": "University of Amsterdam (UvA) and Vrije Universiteit Amsterdam (VU), joint degree",
+   "programme_name": "MSc Computer Science (joint degree UvA/VU), specialisation Computer Systems and Infrastructure",
+   "degree": "MSc",
+   "urls": [
+    "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+    "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/computer-systems-and-infrastructure-computer-science.html",
+    "https://www.uva.nl/en/programmes/masters/computer-science/study-programme/study-programme.html",
+    "https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum"
+   ],
+   "duration": "2 years",
+   "credits": "120 ECTS (research project 30 ECTS; per-course ECTS not shown on the pages read)",
+   "language": "English",
+   "delivery": "on-site (courses at UvA or VU campus)",
+   "entry_requirements": "Not captured: the application and admission page was not read.",
+   "focus": "cse",
+   "structure_summary": "Joint UvA/VU MSc with four specialisations (Big Data Engineering; Computer Systems and Infrastructure; Foundations of Computing and Concurrency; Software Engineering and Green IT). Students complete 15 courses: at least 4 core specialisation courses (here parallel/large-scale systems, distributed systems, reliable computing, multi-core, accelerators, energy-efficient edge computing), one course from each other predefined set, Research Methods in CS and electives, then a 30 ECTS research project in year 2, optionally with industry or public-sector partners.",
+   "core_courses": [
+    {
+     "name": "Programming Large-scale Parallel Systems",
+     "credits": null,
+     "topics": [
+      "mpi",
+      "openmp-threads",
+      "parallel-algos"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Distributed Systems",
+     "credits": null,
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Parallel Programming Practical",
+     "credits": null,
+     "topics": [
+      "openmp-threads",
+      "gpu-prog"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Reliable Computing",
+     "credits": null,
+     "topics": [
+      "resilience"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Multi-core Processor Systems",
+     "credits": null,
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Accelerator-Centric Computing Ecosystem",
+     "credits": null,
+     "topics": [
+      "gpu-prog",
+      "arch"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Energy-efficient Edge Computing",
+     "credits": null,
+     "topics": [
+      "energy"
+     ],
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html"
+    },
+    {
+     "name": "Research Methods in Computer Science (mandatory)",
+     "credits": null,
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://www.uva.nl/en/programmes/masters/computer-science/study-programme/study-programme.html"
+    }
+   ],
+   "electives": [
+    {
+     "name": "High-Performance Computing & Big Data (Big Data Engineering set)",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum"
+    },
+    {
+     "name": "Web Services and Cloud-based Systems (Big Data Engineering set)",
+     "topics": [
+      "cloud"
+     ],
+     "url": "https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum"
+    }
+   ],
+   "capstone": "Research project (30 ECTS) in year 2, typically within a UvA or VU research group, optionally with external partners from industry or public-sector institutions; annual UvA Thesis Fair links students and industry.",
+   "machines_access": [],
+   "industry_links": [
+    "Applied projects with academic and industry partners (UvA specialisation page)",
+    "External industry or public-sector partners possible for the research project",
+    "UvA Thesis Fair brings together industry experts and students"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 1,
+    "gpu-prog": 1,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": null,
+    "cloud": 2,
+    "bigdata": 2,
+    "ml-dl": null,
+    "ml-systems": 1,
+    "hpc-software-eng": null,
+    "energy": 2,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Specialisation is 120 ECTS over two years",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+     "quote": "The specialisation comprises 120 ECTS over two years",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Joint degree between VU and UvA",
+     "url": "https://www.uva.nl/en/programmes/masters/computer-science/study-programme/study-programme.html",
+     "quote": "The Computer Science programme is a joint degree between VU Amsterdam and the University of Amsterdam (UvA).",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Core course list of the Computer Systems and Infrastructure specialisation",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+     "quote": "Programming Large-scale Parallel Systems Distributed Systems Parallel programming practical Reliable Computing Multi-core Processor Systems Accelerator-Centric Computing Ecosystem",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Energy-efficient Edge Computing is a core course",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+     "quote": "Energy-efficient Edge computing",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Research project size",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+     "quote": "you will carry out a research project (30 ECTS)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Industry link for the research project",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+     "quote": "You may also collaborate with external partners from industry or public-sector institutions.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Language of instruction",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html",
+     "quote": "All courses are taught in English.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Curriculum covers architectures, distributed systems, networking and systems infrastructure",
+     "url": "https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum",
+     "quote": "You study modern computer architectures, distributed systems, networking and systems infrastructure, while addressing challenges such as scalability, energy efficiency, reliability, security and privacy.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Applied projects with industry partners",
+     "url": "https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/computer-systems-and-infrastructure-computer-science.html",
+     "quote": "Work on applied projects with academic and industry partners",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Big Data Engineering set contains an HPC course",
+     "url": "https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum",
+     "quote": "High-Performance Computing & Big Data",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Big Data Engineering set contains a cloud course",
+     "url": "https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum",
+     "quote": "Web Services and Cloud-based Systems",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Only course titles were available (no ECTS per course, no syllabi); the UvA/VU study guides were not read, so the coverage values rest on titles and track descriptions and every unread theme is null. No supercomputer or cluster is named on the pages read, so machines_access is empty (search snippets mentioned the DAS testbed; not confirmed on an opened page). Less HPC-centric than MHPC or the PoliMi degree, but it is the only candidate here with a systems and infrastructure track (distributed systems, reliability, energy, accelerators, cloud and data infrastructures).",
+   "evidence_verified": "11/11",
+   "structure_summary_fr": "Master conjoint UvA/VU avec quatre spécialisations (ingénierie des données massives ; systèmes et infrastructures informatiques ; fondements du calcul et de la concurrence ; génie logiciel et informatique verte). Les étudiants suivent 15 cours : au moins 4 cours de base de la spécialisation (ici systèmes parallèles et à grande échelle, systèmes distribués, fiabilité, multicœur, accélérateurs, calcul périphérique économe en énergie), un cours dans chacun des autres ensembles prédéfinis, Méthodes de recherche en informatique et des options, puis un projet de recherche de 30 ECTS en année 2, éventuellement avec des partenaires industriels ou publics."
+  }
+ ],
+ "ecosystem": [
+  {
+   "id": "se-pdc-hpc-summer-school",
+   "kind": "formation-courte",
+   "name": "PDC (KTH) Introduction to High Performance Computing summer school, on the Dardel system",
+   "url": "https://www.pdc.kth.se/summer-school/previous/2024",
+   "why_relevant": "Free hands-on HPC school in Sweden (Nordics) taught on a national-scale system: parallel programming, performance analysis and engineering, software engineering, and Dardel tours; useful as a practical complement to a cluster-operations path. The 2024 edition page was read; later editions may differ.",
+   "evidence": [
+    {
+     "claim": "School is run by PDC and KTH EECS and is called Introduction to High Performance Computing",
+     "url": "https://www.pdc.kth.se/summer-school/previous/2024",
+     "quote": "welcome you to the \"Introduction to High Performance Computing\" summer school.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Content: parallel algorithms, parallel programming, HPC architectures, performance analysis, software engineering",
+     "url": "https://www.pdc.kth.se/summer-school/previous/2024",
+     "quote": "The school includes an introduction to parallel algorithms, parallel programming, modern HPC architectures, performance analysis and engineering, and software engineering.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Hands-on labs on Dardel with guided tours",
+     "url": "https://www.pdc.kth.se/summer-school/previous/2024",
+     "quote": "there will be lectures alternating with hands-on lab sessions",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "3/3"
+  },
+  {
+   "id": "es-bsc-training-courses",
+   "kind": "formation-courte",
+   "name": "BSC Training Courses (Barcelona Supercomputing Center), credited as MIRI-HPC seminars at UPC",
+   "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+   "why_relevant": "Short HPC courses (MPI/OpenMP parallel programming workshop, OpenACC, SYCL, RISC-V) given by BSC and counted as seminar credits for UPC MIRI-HPC students; shows a route to supercomputing-centre training in Spain. The BSC site itself could not be read (JavaScript proof-of-work wall), so the evidence comes from the UPC FIB listing.",
+   "evidence": [
+    {
+     "claim": "BSC Parallel Programming Workshop is a listed seminar for MIRI-HPC",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+     "quote": "BSC Training Course: Parallel Programming Workshop",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Workshop covers MPI and OpenMP",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+     "quote": "The course covers the two widely used programming models: MPI for the distributed-memory environments, and OpenMP for the shared-memory architectures.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "OpenACC course delivered by NVIDIA GPU Center of Excellence at BSC",
+     "url": "https://www.fib.upc.edu/en/masters/master-innovation-and-research-informatics/seminars-innovation-and-research-informatics",
+     "quote": "This course is delivered by the GPU Center of Excellence (GCOE) awarded by NVIDIA to the Barcelona Supercomputing Center (BSC)",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "3/3"
+  },
+  {
+   "id": "it-cineca-leonardo-mhpc",
+   "kind": "centre",
+   "name": "CINECA and the Leonardo supercomputer (Italy), used for MHPC teaching",
+   "url": "https://www.mhpc.it/facilities",
+   "why_relevant": "National supercomputing centre whose Leonardo system is the platform for MHPC training in Trieste; relevant as the Italian entry point for operating or using a large GPU system. Only the MHPC page statement was read, not CINECA's own site.",
+   "evidence": [
+    {
+     "claim": "MHPC infrastructures are provided through a collaboration with CINECA using Leonardo",
+     "url": "https://www.mhpc.it/facilities",
+     "quote": "made available through a collaboration with CINECA, leveraging the computational capabilities of the Leonardo Supercomputer",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "MHPC also lists Cineca among its partners",
+     "url": "https://www.mhpc.it/partnerships",
+     "quote": "The MHPC programme collaborates with organisations involved in research projects, scholarships, guest lectures and thesis opportunities.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "2/2"
+  }
+ ],
+ "blocked_sources": [
+  "https://bsc.es/node/30369 - BSC site protected by an Anubis JavaScript proof-of-work challenge; text not retrievable (MareNostrum access for MIRI-HPC unverified)"
+ ],
+ "verification": {
+  "status": "verified",
+  "checked_claims": 51,
+  "corrected": 0,
+  "removed": 0,
+  "notes": "eu-b (Italy, Spain, Nordics, Netherlands): 4 programmes (MHPC Trieste, PoliMi HPC Engineering, UPC MIRI-HPC, UvA/VU CS Computer Systems and Infrastructure) and 3 ecosystem items. Quotes copied from tools/fetch_text.py output and checked with verify_quotes (dry run). KTH was not retained as a programme (no master's programme page read; only PDC/DD2356 course pages surfaced).",
+  "verified_quotes": 51,
+  "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
+ }
+}

@@ -576,7 +576,7 @@ figure.fig figcaption { margin-top: .5rem; font-size: .98rem; color: var(--soft)
 .bars .fill { display: block; height: 100%; background: var(--accent); }
 .bars .fill.two { background: var(--key-bar); }
 .bars .val { text-align: right; font-weight: 700; }
-@media (max-width: 520px) { .bars .bar { grid-template-columns: 1fr 3.4rem; } .bars .bar .lab { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .bars .bar { grid-template-columns: 1fr 3.4rem; } .bars .bar .blab { grid-column: 1 / -1; } }
 .sym2 { font-weight: 800; color: var(--key-tag); }
 .sym1 { font-weight: 800; color: var(--def-tag); }
 .sym0, .symn { color: var(--nc); }

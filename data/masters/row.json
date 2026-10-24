@@ -1,0 +1,1070 @@
+{
+ "unit": "row",
+ "region": "world",
+ "retrieved_on": "2026-10-22",
+ "programmes": [
+  {
+   "id": "in-cdac-pg-dhpcsa",
+   "country": "IN",
+   "institution": "C-DAC (Centre for Development of Advanced Computing), ACTS Pune, under the National Supercomputing Mission (NSM) capacity-building project",
+   "programme_name": "PG Diploma in HPC System Administration (PG-DHPCSA)",
+   "degree": "Diploma",
+   "urls": [
+    "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+   ],
+   "duration": "900 hours, about 24 weeks in physical classroom and lab sessions (6-8 hours per day, six days a week), Pune",
+   "credits": "No credit system stated: 900 contact hours (NSQF level 8 aligned), 12 modules",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Engineering graduate (IT/CS/Electronics/Telecom/Electrical/Instrumentation) or MSc/MS in CS, IT or Electronics, or postgraduate degree in Mathematics or allied areas, or MCA; 55% or above in the qualifying degree; prerequisites: fundamentals of programming, C and basic Linux; admission through NSM C-CAT (Sections A+B).",
+   "focus": "ops-sysadmin",
+   "structure_summary": "A 24-week, full-time operations-oriented diploma with 12 modules totalling 900 hours: computer architecture, Linux and Perl, HPC system administration (140 h, the largest technical module), Python, networking, storage and backup, resource management (Slurm, PBS Pro), security, Hadoop administration and cloud services. It ends with a 110-hour project, then the C-DAC course-end exam (CCEE) and the campus placement programme.",
+   "core_courses": [
+    {
+     "name": "Computer Architecture (30 h)",
+     "credits": "30 hours",
+     "topics": [
+      "arch",
+      "gpu-prog",
+      "perf-model"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Linux Operating System and Perl (80 h)",
+     "credits": "80 hours",
+     "topics": [
+      "sysadmin"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "HPC System Administration and Management (140 h)",
+     "credits": "140 hours",
+     "topics": [
+      "sysadmin",
+      "observability-sre",
+      "perf-model",
+      "energy",
+      "simulation-apps"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Python Programming (60 h)",
+     "credits": "60 hours",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Fundamental of Computer Network and Management (40 h)",
+     "credits": "40 hours",
+     "topics": [
+      "interconnect"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Storage and Backup Management (50 h)",
+     "credits": "50 hours",
+     "topics": [
+      "storage-io",
+      "resilience"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Resource Management and Accounting (50 h)",
+     "credits": "50 hours",
+     "topics": [
+      "scheduling",
+      "mpi",
+      "resilience"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Security and Traffic Management (70 h)",
+     "credits": "70 hours",
+     "topics": [],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Hadoop Administration (80 h)",
+     "credits": "80 hours",
+     "topics": [
+      "bigdata",
+      "distributed-sys"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Cloud Services & Security (100 h)",
+     "credits": "100 hours",
+     "topics": [
+      "cloud",
+      "containers-k8s",
+      "distributed-sys",
+      "hpc-software-eng"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Aptitude & Effective Communication (90 h)",
+     "credits": "90 hours",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    },
+    {
+     "name": "Project (110 h)",
+     "credits": "110 hours",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf"
+    }
+   ],
+   "electives": [],
+   "capstone": "110-hour project; the objectives mention industrial research projects in HPC administration",
+   "machines_access": [],
+   "industry_links": [
+    "The rulebook states collaboration with multi-national companies at the level of mutual research interests and customer related projects, and a C-DAC Common Campus Placement Programme (CCPP) for qualifiers."
+   ],
+   "topic_coverage": {
+    "openmp-threads": 0,
+    "mpi": 1,
+    "gpu-prog": 0,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": 0,
+    "simulation-apps": 1,
+    "parallel-algos": 0,
+    "distributed-sys": 1,
+    "sysadmin": 2,
+    "scheduling": 2,
+    "interconnect": 2,
+    "storage-io": 2,
+    "containers-k8s": 1,
+    "cloud": 2,
+    "bigdata": 2,
+    "ml-dl": 0,
+    "ml-systems": 0,
+    "hpc-software-eng": 1,
+    "energy": 1,
+    "quantum-emerging": 0,
+    "viz": 0,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": 1,
+    "observability-sre": 1
+   },
+   "evidence": [
+    {
+     "claim": "Duration: 900 hours, NSQF level 8 aligned (no credit units given)",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "The two courses offered are 900 hours duration (NSQF level 8 aligned courses)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "About 24 weeks, full-time, classroom and lab",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "cover the 900 hours in about 24 weeks in physical classroom and lab sessions",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Entry: minimum 55% in qualifying degree",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Candidate must have secured 55% or above in the qualifying degree.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Module: Resource Management and Accounting covers Slurm and PBS Pro installation and job management",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "various open source schedulers in HPC PBS Pro, Slurm, SGE, Components of resource manager, installation and configuration of Slurm and PBS Pro",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Module: Storage and Backup Management includes parallel file systems (Lustre, BeeGFS)",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Introduction to Parallel File Systems, types of Parallel File Systems, PVFS2, Lustre, BeeGFS",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Module: networking covers InfiniBand and Omni-Path interconnects",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "InfiniBand, Omni Path Architecture(OPA), types of protocol supported",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Module: HPC System Administration includes monitoring tools and HPL/HPCG/OSU benchmarking",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "monitoring tools (Ganglia, Collectl, Graphite, nagios and XD mod), System Benchmarking, theoretical peak performance, HPL bench mark",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Module: data-centre design including liquid cooling and energy use",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Collecting the heat, Heat rejection or reuse, Liquid cooling, Energy use systems, Data Centre Metrics",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Cloud module names Docker and Kubernetes",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Docker, Containers, Microservices platforms, Kubernetes.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Module: Computer Architecture mentions cache coherency and compute GPU architecture",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Cache coherency, Standard IO interfaces, GPU elements, Compute GPU Architecture",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Industry link: multi-national company collaboration",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "The collaboration with the different multi-national companies at the level of mutual research interests and customer related projects",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Industry link: common campus placement programme",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "will be allowed to participate in the Common Campus Placement Programme (CCPP)",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Source is the NSM rulebook for the September 2023 batch (V1.0); later batches may differ. The rulebook says a course-end exam (CCEE) and certificates follow; the stipend is INR 1500/month for six months. It names 'Case study of HPC solutions like Param Shavak' but does not state hands-on access to a named supercomputer, so machines_access is left empty. Gaps vs a GPU/ML-training infrastructure role: no GPU programming, no MPI course, no ML systems; strengths: Slurm/PBS, parallel file systems, InfiniBand, monitoring, data-centre design. Sibling course PG-DHPCAP (HPC Application Programming, 900 h) covers OpenMP (50 h), CUDA/OpenACC/SYCL (60 h) and AI with OpenVINO (60 h).",
+   "evidence_verified": "12/12",
+   "structure_summary_fr": "Un diplôme de 24 semaines à temps plein, orienté exploitation, en 12 modules totalisant 900 heures : architecture des ordinateurs, Linux et Perl, administration de systèmes HPC (140 h, le plus gros module technique), Python, réseaux, stockage et sauvegarde, gestion des ressources (Slurm, PBS Pro), sécurité, administration Hadoop et services cloud. Il se termine par un projet de 110 heures, puis l'examen de fin de cours du C-DAC (CCEE) et le programme de placement du campus."
+  },
+  {
+   "id": "in-iisc-cds-mtech",
+   "country": "IN",
+   "institution": "Indian Institute of Science (IISc), Department of Computational and Data Sciences (CDS), Bangalore",
+   "programme_name": "M.Tech. in Computational and Data Science (M.Tech. CDS)",
+   "degree": "MTech",
+   "urls": [
+    "https://cds.iisc.ac.in/academics/mtechcds/",
+    "https://cds.iisc.ac.in/courses/descriptions/",
+    "https://cds.iisc.ac.in/academics/degree-programs/",
+    "https://cds.iisc.ac.in/admissions/course-degrees/"
+   ],
+   "duration": "24 months (2 years, 4 semesters): 2-3 semesters of coursework, 12-month dissertation project",
+   "credits": "64 credits (IISc credit format lecture:practical): 36 coursework (14 hard core + 10 soft core min. + 12 electives) + 28 dissertation",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "BE/B.Tech or equivalent, or MSc or equivalent, in any discipline, with a valid GATE score (eligible papers AE/BT/CE/CH/CS/EC/EE/IN/DA/MA/ME/MT/PH/ST), or graduates of CFTI institutions without GATE; strong mathematical and programming background; shortlisted candidates sit an in-person written test.",
+   "focus": "cse",
+   "structure_summary": "Interdisciplinary computational-science plus data-science MTech. Hard core (14 credits): Introduction to Data Science, Introduction to Scalable Systems (OpenMP, MPI, CUDA, cluster/cloud), Numerical Linear Algebra, Numerical Methods, Research Methods. At least three soft-core courses from a list that includes Parallel Programming, Scalable Systems for Data Science and Modelling and Simulation; electives include Hardware-aware Scientific Computing, System Virtualization and HPC for Quantum Modeling of Materials. A 28-credit dissertation closes the degree.",
+   "core_courses": [
+    {
+     "name": "DS 221 Introduction to Scalable Systems (3:1)",
+     "credits": "3:1 (IISc lecture:practical credits)",
+     "topics": [
+      "arch",
+      "openmp-threads",
+      "mpi",
+      "gpu-prog",
+      "perf-model",
+      "parallel-algos",
+      "distributed-sys",
+      "cloud",
+      "bigdata"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    },
+    {
+     "name": "DS 284 Numerical Linear Algebra (2:1)",
+     "credits": "2:1",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    },
+    {
+     "name": "DS 288 Numerical Methods (3:0)",
+     "credits": "3:0",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    },
+    {
+     "name": "DS 215 Introduction to Data Science (3:0)",
+     "credits": "3:0",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    },
+    {
+     "name": "DS 200 Research Methods (0:1, soft skills course)",
+     "credits": "0:1",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    },
+    {
+     "name": "DS 299 Dissertation Project (0:28)",
+     "credits": "0:28",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "DS 295 Parallel Programming (3:1, soft core)",
+     "topics": [
+      "mpi",
+      "gpu-prog",
+      "parallel-algos",
+      "simulation-apps",
+      "scheduling",
+      "perf-model",
+      "resilience"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    },
+    {
+     "name": "DS 256 Scalable Systems for Data Science (3:1, soft core)",
+     "topics": [
+      "bigdata",
+      "distributed-sys",
+      "cloud"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    },
+    {
+     "name": "DS 290 Modelling and Simulation (3:0, soft core)",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    },
+    {
+     "name": "DS 216 Machine learning for Data Science (3:1, soft core)",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/"
+    },
+    {
+     "name": "DS 226 Introduction to Computing for AI & Machine Learning (2:1, soft core)",
+     "topics": [
+      "ml-dl",
+      "ml-systems"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    },
+    {
+     "name": "DS 244 Hardware-aware Scientific Computing (2:1)",
+     "topics": [
+      "arch",
+      "numerics",
+      "parallel-algos"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    },
+    {
+     "name": "DS 255 System Virtualization (3:1)",
+     "topics": [
+      "containers-k8s",
+      "cloud"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    },
+    {
+     "name": "DS 393 High-performance Computing for Quantum Modeling of Materials (3:1)",
+     "topics": [
+      "simulation-apps",
+      "numerics"
+     ],
+     "url": "https://cds.iisc.ac.in/courses/descriptions/"
+    }
+   ],
+   "capstone": "DS 299 Dissertation Project, 28 credits over a 12-month period",
+   "machines_access": [
+    "Unnamed 'HPC and GPU advanced computing infrastructure' (no machine name given on the pages read)"
+   ],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 2,
+    "gpu-prog": 1,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": 1,
+    "sysadmin": 0,
+    "scheduling": 1,
+    "interconnect": 0,
+    "storage-io": 0,
+    "containers-k8s": 2,
+    "cloud": 1,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": 1,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Duration: 24 months, course and project based",
+     "url": "https://cds.iisc.ac.in/admissions/course-degrees/",
+     "quote": "designed as a course and project based program to be completed in 24 months",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Spans 2 years / 4 semesters",
+     "url": "https://cds.iisc.ac.in/academics/degree-programs/",
+     "quote": "The M.Tech. program spans 2 years (4 semesters).",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Credits: 64 in total (36 coursework + 28 dissertation)",
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/",
+     "quote": "Total: 64 credits",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Coursework volume stated on admissions page",
+     "url": "https://cds.iisc.ac.in/admissions/course-degrees/",
+     "quote": "Students will take 36 credits of coursework over 2-3 semesters.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Entry: BE/BTech or MSc with valid GATE",
+     "url": "https://cds.iisc.ac.in/admissions/course-degrees/",
+     "quote": "Students with a BE / B Tech or equivalent degree in any discipline (with a valid GATE)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Hard-core course: Introduction to Scalable Systems",
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/",
+     "quote": "DS 221 AUG 3:1 Introduction to Scalable Systems",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "DS 221 teaches OpenMP, MPI and CUDA",
+     "url": "https://cds.iisc.ac.in/courses/descriptions/",
+     "quote": "Parallel Programming Models and Languages: OpenMP, MPI, CUDA",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Soft-core course: Parallel Programming",
+     "url": "https://cds.iisc.ac.in/academics/mtechcds/",
+     "quote": "DS 295 JAN 3:1 Parallel Programming",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "DS 295 covers scheduling, performance modeling and fault tolerance",
+     "url": "https://cds.iisc.ac.in/courses/descriptions/",
+     "quote": "System Software: sample topics include scheduling, mapping, performance modeling, fault tolerance.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "DS 295 covers advanced MPI and CUDA",
+     "url": "https://cds.iisc.ac.in/courses/descriptions/",
+     "quote": "advanced MPI including MPI-2 and MPI-3, advanced concepts in CUDA programming",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Elective DS 255 System Virtualization covers the container model",
+     "url": "https://cds.iisc.ac.in/courses/descriptions/",
+     "quote": "OS-level virtualization and the container model",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "DS 256 covers Hadoop/Spark runtimes and storage on clusters and clouds",
+     "url": "https://cds.iisc.ac.in/courses/descriptions/",
+     "quote": "Distributed software architectures, runtime and storage strategies used by Big Data platforms such as Apache Hadoop, Spark",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Access to HPC and GPU infrastructure (unnamed)",
+     "url": "https://cds.iisc.ac.in/admissions/course-degrees/",
+     "quote": "access to HPC and GPU advanced computing infrastructure",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Research-oriented computational/data science MTech, not an operations programme: it teaches parallel programming, numerics and scalable data systems well, but there is no sysadmin, interconnect or storage-I/O course in the CDS list read. Topics set to null (energy, viz, observability-sre, hpc-software-eng) were not seen in the descriptions read; only the HPC-relevant course descriptions (DS 221, 226, 244, 255, 256, 285, 295, 393) were read, not all elective descriptions. The course structure on the programme page is labelled 'effective from Aug 2018 batch'; the 2026 admissions page repeats the 14/10/12-credit split. Credits use IISc lecture:practical notation. The Cray-class machines at IISc SERC are not mentioned on the pages read.",
+   "evidence_verified": "13/13",
+   "structure_summary_fr": "M.Tech interdisciplinaire de science computationnelle et de science des données. Tronc obligatoire (14 crédits) : Introduction à la science des données, Introduction aux systèmes scalables (OpenMP, MPI, CUDA, cluster/cloud), Algèbre linéaire numérique, Méthodes numériques, Méthodes de recherche. Au moins trois cours à choisir parmi une liste comprenant Programmation parallèle, Systèmes scalables pour la science des données et Modélisation et simulation ; les options comprennent Calcul scientifique adapté au matériel, Virtualisation des systèmes et HPC pour la modélisation quantique des matériaux. Un mémoire de 28 crédits clôt le diplôme."
+  },
+  {
+   "id": "jp-scitokyo-mcs-master",
+   "country": "JP",
+   "institution": "Institute of Science Tokyo (formerly Tokyo Institute of Technology), School of Computing, Department of Mathematical and Computing Science",
+   "programme_name": "Graduate Major in Mathematical and Computing Science (Master's Program), with HPC course MCS.T418 on the TSUBAME supercomputer",
+   "degree": "Master's (2-year master's programme)",
+   "urls": [
+    "https://educ.titech.ac.jp/is/eng/",
+    "https://educ.titech.ac.jp/is/eng/education/is_graduate/curriculum.html",
+    "https://educ.titech.ac.jp/is/eng/education/is_graduate/five_features.html",
+    "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053"
+   ],
+   "duration": "2 years (standard model) for the master's program; 3 years for the doctoral program",
+   "credits": "Total master's credits not found on the pages read. Course MCS.T418 shows 単位数 '200' in the syllabus (1st quarter, 2024)",
+   "language": "English site; the HPC course syllabus read is in Japanese (使用言語: 日本語). English availability of the master's major not confirmed",
+   "delivery": "on-site",
+   "entry_requirements": "Entrance examination to advance from an undergraduate major (or from another university) to the master's program; details not read. The HPC course requires C (pointers) and basic Linux command experience.",
+   "focus": "cse",
+   "structure_summary": "Two-year research-oriented master's in a mathematics-plus-computing department, organised in Mathematics, Applied Mathematics and Computer Science course groups (400- and 500-level), with research seminars and a master's thesis. The department states it uses the TSUBAME supercomputer both as a user and as designer/operator. The one HPC course read in detail (MCS.T418, Practical Parallel Computing, 14 lectures) teaches OpenMP, MPI and GPU programming with hands-on practice on TSUBAME; further HPC courses (MCS.T407, CSC.T526) are named but their syllabi were not read.",
+   "core_courses": [],
+   "electives": [
+    {
+     "name": "MCS.T418 Practical Parallel Computing (実践的並列コンピューティング), 2024 1Q",
+     "topics": [
+      "openmp-threads",
+      "mpi",
+      "gpu-prog",
+      "perf-model",
+      "arch",
+      "interconnect"
+     ],
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053"
+    },
+    {
+     "name": "MCS.T407 Large-scale computing (大規模計算論) - named as a related course, syllabus not read",
+     "topics": [],
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053"
+    },
+    {
+     "name": "CSC.T526 High-performance scientific computing (高性能科学技術計算) - named as a related course, syllabus not read",
+     "topics": [],
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053"
+    }
+   ],
+   "capstone": "Research Seminars and master's thesis research",
+   "machines_access": [
+    "TSUBAME (Science Tokyo petascale supercomputer; used by every student of MCS.T418 for practical exercises)"
+   ],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": 2,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Master's programme is 2 years (standard model)",
+     "url": "https://educ.titech.ac.jp/is/eng/education/is_graduate/curriculum.html",
+     "quote": "Master's Program (2 Years)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Computer Science group covers HPC-type large-scale data handling",
+     "url": "https://educ.titech.ac.jp/is/eng/education/is_graduate/curriculum.html",
+     "quote": "Students also learn the skills to practically handle large-scale data from the real world such as high performance computing.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Thesis and research seminars in the master's",
+     "url": "https://educ.titech.ac.jp/is/eng/education/is_graduate/curriculum.html",
+     "quote": "Research Seminars, special experiments and exercises, and their master's thesis research",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Department uses TSUBAME as user and as designer/operator",
+     "url": "https://educ.titech.ac.jp/is/eng/education/is_graduate/five_features.html",
+     "quote": "not only as a user but also as its designer and operator",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Course title and code: MCS.T418 Practical Parallel Computing",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "実践的並列コンピューティング",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Course code MCS.T418",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "MCS.T418",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Course teaches MPI, OpenMP and GPU programming environments",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "MPIやOpenMPなど高性能・並列計算のための標準的なプログラミング環境に加え",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Hands-on practice on the TSUBAME petascale supercomputer",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "実際に東工大のペタスケールスパコンであるTSUBAMEを用いた実習を行います",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Lecture 10: MPI network topology",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "MPIによる分散メモリ並列プログラミング(4) ネットワークトポロジ",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Lecture 13: CUDA programming and parallelism",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "GPUプログラミング (3) CUDAによるGPUプログラミングと並列度",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Related courses named in the syllabus",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "CSC.T526 ： 高性能科学技術計算",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Prerequisites: C pointers and basic Linux",
+     "url": "https://syllabus.s.isct.ac.jp/courses/2024/4/1-22-442222-0-0/202404053",
+     "quote": "簡単なLinuxコマンドの操作経験",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Only one HPC syllabus (MCS.T418, 2024 edition) could be read; the Science Tokyo master's course list as a whole was not accessible, so every topic outside that course is null, not 0. The old OCW page for MCS.T407 'High Performance Computing' (2017) failed (connection reset / HTTP 503). The credit field of the syllabus reads '200'; the master's total credit requirement was not found. Japanese-language delivery of this course limits accessibility for the learner.",
+   "evidence_verified": "12/12",
+   "structure_summary_fr": "Master de recherche en deux ans dans un département de mathématiques et d'informatique, organisé en groupes de cours de mathématiques, mathématiques appliquées et informatique (niveaux 400 et 500), avec séminaires de recherche et mémoire. Le département déclare utiliser le supercalculateur TSUBAME à la fois comme utilisateur et comme concepteur et exploitant. Le seul cours HPC lu en détail (MCS.T418, Calcul parallèle pratique, 14 séances) enseigne OpenMP, MPI et la programmation GPU avec pratique sur TSUBAME ; d'autres cours HPC (MCS.T407, CSC.T526) sont nommés mais leurs programmes n'ont pas été lus."
+  },
+  {
+   "id": "sa-kaust-cs-ms",
+   "country": "SA",
+   "institution": "King Abdullah University of Science and Technology (KAUST), Division of Computer, Electrical and Mathematical Science and Engineering (CEMSE), Computer Science program",
+   "programme_name": "MS in Computer Science (Thesis or Non-Thesis)",
+   "degree": "MS",
+   "urls": [
+    "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+    "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-240",
+    "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-258",
+    "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/300/cs-380",
+    "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab"
+   ],
+   "duration": "Non-thesis: three semesters and one summer session; thesis: four semesters and one summer session (Program Guide 2023-2024)",
+   "credits": "Minimum 36 credits: 12 core (4 courses) + 12 electives + 12 research/capstone; plus non-credit seminar (CS 398) and Winter Enrichment Program",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Written assessment test on arrival (mathematics and basic sciences) to design an individual study plan; failing it mandates remedial non-credit courses. Undergraduate-degree admission rules were not read on a fetched page.",
+   "focus": "mixed",
+   "structure_summary": "General Computer Science MS with a four-course core chosen from a list that includes Computing Systems and Concurrency, Computer Networks, Digital Design and Computer Architecture, System Architecture and Performance, Scientific Visualization and Machine Learning. Twelve elective credits come from CEMSE and any KAUST programme, among them CS 380 GPU and GPGPU Programming. The last 12 credits are thesis research, or a non-thesis capstone made of directed research plus an internship or courses. HPC is available through electives and the on-campus Shaheen/Ibex facilities, not as a dedicated track in the 2023-2024 guide read.",
+   "core_courses": [
+    {
+     "name": "CS 240 Computing Systems and Concurrency (core option)",
+     "credits": "3",
+     "topics": [
+      "distributed-sys",
+      "resilience",
+      "bigdata"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-240"
+    },
+    {
+     "name": "CS 258 System Architecture and Performance (core option)",
+     "credits": "3",
+     "topics": [
+      "arch",
+      "perf-model",
+      "interconnect",
+      "storage-io",
+      "cloud",
+      "containers-k8s",
+      "energy"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-258"
+    },
+    {
+     "name": "CS 244 Computer Networks (core option)",
+     "credits": "3",
+     "topics": [
+      "interconnect"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program"
+    },
+    {
+     "name": "CS 256 Digital Design and Computer Architecture (core option)",
+     "credits": "3",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program"
+    },
+    {
+     "name": "CS 247 Scientific Visualization (core option)",
+     "credits": "3",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program"
+    },
+    {
+     "name": "CS 229 Machine Learning (core option)",
+     "credits": "3",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program"
+    },
+    {
+     "name": "CS 283 Deep Generative Modeling (core option)",
+     "credits": "3",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program"
+    },
+    {
+     "name": "CS 220 Data Analytics (core option)",
+     "credits": "3",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program"
+    }
+   ],
+   "electives": [
+    {
+     "name": "CS 380 GPU and GPGPU Programming",
+     "topics": [
+      "gpu-prog",
+      "arch"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/300/cs-380"
+    },
+    {
+     "name": "CS 345 Advanced Topics in Distributed and Networked Systems",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/300"
+    }
+   ],
+   "capstone": "Thesis (minimum 12 credits of CS 297 Thesis Research) or non-thesis capstone: 12 credits including 6 of directed research (CS 299) plus a summer internship (CS 295) or 200/300-level courses",
+   "machines_access": [
+    "Shaheen (Cray XC40 'Shaheen II' on the lab page read; Shaheen III per search result, not read on a page)",
+    "Ibex (heterogeneous CPU/GPU/large-memory cluster for faculty, researchers and students)"
+   ],
+   "industry_links": [
+    "Optional summer internship (CS 295) in the non-thesis capstone"
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": 2,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": 1,
+    "cloud": 1,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": 1,
+    "quantum-emerging": null,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": 1,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Credits: minimum 36",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+     "quote": "The Master of Science (MS) degree is awarded upon successful completion of a minimum of 36 credits.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Duration, non-thesis",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+     "quote": "MS (Non-Thesis)- three Semesters and one Summer Session.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Duration, thesis",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+     "quote": "MS (Thesis)- four Semesters and one Summer Session.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Core requirement: four courses, 12 credits",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+     "quote": "Students must complete 12 credits (4 Core Courses)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Core option: Computing Systems and Concurrency",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+     "quote": "CS 240 Computing Systems and Concurrency",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "CS 240 covers distributed systems and fault tolerance",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-240",
+     "quote": "Topics include server design, network programming, naming, transactions, concurrency and locking, consistency models and techniques, security, data-intensive computing and fault tolerance.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "CS 258 covers architecture, interconnects, storage, accelerators",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-258",
+     "quote": "pipelining, cache memory design, virtual memory support, interconnect topologies, cloud computing support, virtualization, modern storage systems, and accelerators",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "CS 258 covers performance evaluation and power management",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/200/cs-258",
+     "quote": "runtime systems, programming language issues, power management, and general parallelization techniques",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Elective CS 380 GPU programming with CUDA and OpenCL",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/courses/cs-computer-science/300/cs-380",
+     "quote": "programming with CUDA, Brook, OpenCL, stream computing, approaches to massively parallel computations",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Non-thesis capstone includes optional internship",
+     "url": "https://kaust.smartcatalogiq.ca/en/2023-2024/program-guide/division-of-computer-electrical-and-mathematical-science-and-engineering-cemse/computer-science-cs/computer-science-ms-program",
+     "quote": "Internship: Summer internship (CS 295)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Shaheen supercomputer accessed remotely after training",
+     "url": "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab",
+     "quote": "The Shaheen is accessed remotely so, after appropriate training, our users can work independently.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Ibex CPU/GPU cluster for faculty, researchers and students",
+     "url": "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab",
+     "quote": "Ibex is a high throughput computer system that caters for the computational requirements of faculty, researchers and students",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "confidence": "high",
+   "notes": "Based on the 2023-2024 Program Guide (the version reachable); a 2026-2027 guide may differ. Only CS 240, CS 258 and CS 380 descriptions were read; every other topic is null or inferred from course titles. The lab page text names Shaheen II (Cray XC40); it does not say MS students automatically get accounts. KAUST also states other CS tracks (AI, systems, HPC) in search results, which were not confirmed on a fetched page. A generalist CS MS: weak for MPI/Slurm/ops training but gives systems, architecture and GPU programming plus on-campus supercomputers.",
+   "evidence_verified": "12/12",
+   "structure_summary_fr": "Master d'informatique généraliste avec un tronc de quatre cours choisis dans une liste comprenant Systèmes informatiques et concurrence, Réseaux informatiques, Conception numérique et architecture des ordinateurs, Architecture et performance des systèmes, Visualisation scientifique et Apprentissage automatique. Douze crédits d'options viennent du CEMSE et de tout programme du KAUST, dont CS 380 Programmation GPU et GPGPU. Les 12 derniers crédits sont une recherche de mémoire, ou un projet de synthèse sans mémoire composé de recherche dirigée plus un stage ou des cours. Le HPC est accessible par les options et par les installations Shaheen/Ibex du campus, mais pas comme parcours dédié dans le guide 2023-2024 lu."
+  }
+ ],
+ "ecosystem": [
+  {
+   "id": "ca-scinet-certificates",
+   "kind": "formation-courte",
+   "name": "SciNet Certificate in High Performance Computing (SciNet HPC Consortium, University of Toronto)",
+   "url": "https://scinethpc.ca/scinet-certificate-program/",
+   "why_relevant": "Free-to-academics modular training on the Niagara cluster (OpenMP, MPI, parallel debugging) that can be followed remotely and by recordings; the only Canadian HPC training path with published credit-hour requirements. Not a university credential.",
+   "evidence": [
+    {
+     "claim": "HPC certificate requires 36 credit-hours covering OpenMP, MPI, CUDA",
+     "url": "https://scinethpc.ca/scinet-certificate-program/",
+     "quote": "at least 36 credit-hours of coursework in high performance computing topics, such as programming models like OpenMP, MPI, CUDA",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Course on cluster programming with MPI counts toward it",
+     "url": "https://scinethpc.ca/scinet-certificate-program/",
+     "quote": "Programming Clusters with MPI (4 credits)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Cluster onboarding course on Niagara is part of the list",
+     "url": "https://scinethpc.ca/scinet-certificate-program/",
+     "quote": "Intro to SciNet/Niagara (self-guided, 1 credit)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Certificates are not university credit",
+     "url": "https://scinethpc.ca/scinet-certificate-program/",
+     "quote": "the SciNet Certificates are not University credits, and will not appear on transcripts",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Open to users with an active CCDB account",
+     "url": "https://scinethpc.ca/scinet-certificate-program/",
+     "quote": "SciNet courses and certificates are open to all users with an active account on CCDB.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "5/5"
+  },
+  {
+   "id": "sa-kaust-supercomputing-core-lab",
+   "kind": "centre",
+   "name": "KAUST Supercomputing Core Lab (Shaheen and Ibex)",
+   "url": "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab",
+   "why_relevant": "A national-scale operations team running a Cray supercomputer and a heterogeneous CPU/GPU cluster, with training and user-support services (porting, profiling, tuning); a model of what an HPC operations job involves and a possible internship/research-support employer.",
+   "evidence": [
+    {
+     "claim": "Operates Shaheen Cray XC40 and clusters",
+     "url": "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab",
+     "quote": "The Supercomputing Core Lab proudly boasts the region's top performing supercomputer, the Shaheen II Cray XC40.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Support services offered",
+     "url": "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab",
+     "quote": "Services we offer include; ticket-based support, software installation and porting, profiling and performance analysis, debugging, tuning and optimization and code parallelization.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Ibex is a heterogeneous CPU/GPU cluster",
+     "url": "https://corelabs.kaust.edu.sa/labs/supercomputing-core-lab",
+     "quote": "Ibex is a heterogeneous system comprising of several differing architectures including CPU, GPU and large memory nodes.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "3/3"
+  },
+  {
+   "id": "in-cdac-pg-dhpcap",
+   "kind": "formation-courte",
+   "name": "C-DAC PG Diploma in HPC Application Programming (PG-DHPCAP), sibling of PG-DHPCSA under the NSM capacity-building project",
+   "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+   "why_relevant": "The application-side counterpart (OpenMP, CUDA/OpenACC/SYCL, HPC monitoring tools including Prometheus/Grafana) of the sysadmin diploma, same 900-hour full-time format; useful for comparing ops vs developer training in India.",
+   "evidence": [
+    {
+     "claim": "Second NSM diploma: HPC Application Programming",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Post Graduate Diploma in HPC Application Programming (PG-DHPCAP)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Contains a 60-hour GPU module (CUDA, OpenACC, SYCL)",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Introduction to CUDA Programming OpenACC and SYCL",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Contains a 50-hour OpenMP module",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "OpenMP (50 Hours)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Mentions Prometheus and Grafana as HPC monitoring tools",
+     "url": "https://www.cdac.in/index.aspx?id=acts_photo&dynamicid=PDF%2FNSM%2FRule+Book+for+PG+Diploma+in+HPC+Domain+-+September+2023+V1.0.pdf",
+     "quote": "Introduction to different HPC monitoring tools - ganglia, C-Chakshu, Grafana, Prometheus",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "4/4"
+  }
+ ],
+ "blocked_sources": [
+  "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0300&JWC=201704057&lang=EN&vid=03 - connection reset; the http:// variant returned HTTP 503 (2017 MCS.T407 High Performance Computing syllabus unreadable)"
+ ],
+ "verification": {
+  "status": "verified",
+  "checked_claims": 61,
+  "corrected": 0,
+  "removed": 0,
+  "notes": "Dry-run tools/verify_quotes.py: 61/61 web quotes verbatim at collection time (4 programmes, 3 ecosystem items). No memory-sourced facts. Not yet independently re-checked.",
+  "verified_quotes": 61,
+  "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
+ }
+}

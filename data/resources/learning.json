@@ -1,0 +1,979 @@
+{
+ "unit": "res",
+ "retrieved_on": "2026-10-24",
+ "items": [
+  {
+   "id": "palm",
+   "kind": "paper",
+   "title": "PaLM: Scaling Language Modeling with Pathways",
+   "by": "Chowdhery et al.",
+   "year": 2022,
+   "url": "https://arxiv.org/abs/2204.02311",
+   "topics": [
+    "ml-systems",
+    "perf-model"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Définition du MFU (section 4.1) et formule des FLOP par token (annexe B).",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2204.02311",
+    "quote": "PaLM: Scaling Language Modeling with Pathways",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "llama3",
+   "kind": "paper",
+   "title": "The Llama 3 Herd of Models",
+   "by": "Dubey et al.",
+   "year": 2024,
+   "url": "https://arxiv.org/abs/2407.21783",
+   "topics": [
+    "ml-systems",
+    "resilience"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Tableau 4 (MFU par configuration de parallélisme) et section 3.3.4 sur la fiabilité à 16 000 GPU.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2407.21783",
+    "quote": "The Llama 3 Herd of Models",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "zero",
+   "kind": "paper",
+   "title": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+   "by": "Rajbhandari et al.",
+   "year": 2020,
+   "url": "https://arxiv.org/abs/1910.02054",
+   "topics": [
+    "ml-systems"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Section 3.1 : 16 octets par paramètre en précision mixte avec Adam ; partition des états d'optimiseur.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/1910.02054",
+    "quote": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "megatron",
+   "kind": "paper",
+   "title": "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM",
+   "by": "Narayanan et al.",
+   "year": 2021,
+   "url": "https://arxiv.org/abs/2104.04473",
+   "topics": [
+    "ml-systems"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Combinaison des parallélismes de données, tensoriel et pipeline à grande échelle.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2104.04473",
+    "quote": "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "fsdp",
+   "kind": "paper",
+   "title": "PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel",
+   "by": "Zhao et al.",
+   "year": 2023,
+   "url": "https://arxiv.org/abs/2304.11277",
+   "topics": [
+    "ml-systems"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Conception et retours d'expérience de FSDP, base du module 9.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2304.11277",
+    "quote": "PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "ray-paper",
+   "kind": "paper",
+   "title": "Ray: A Distributed Framework for Emerging AI Applications",
+   "by": "Moritz et al.",
+   "year": 2017,
+   "url": "https://arxiv.org/abs/1712.05889",
+   "topics": [
+    "distributed-sys",
+    "ml-systems"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Modèle de tâches et d'acteurs de Ray, base du module 11.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/1712.05889",
+    "quote": "Ray: A Distributed Framework for Emerging AI Applications",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "flashattention",
+   "kind": "paper",
+   "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+   "by": "Dao et al.",
+   "year": 2022,
+   "url": "https://arxiv.org/abs/2205.14135",
+   "topics": [
+    "gpu-prog",
+    "perf-model"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Un exemple de noyau gouverné par le trafic mémoire : lien direct avec le roofline.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2205.14135",
+    "quote": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "megascale",
+   "kind": "paper",
+   "title": "MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs",
+   "by": "Jiang et al.",
+   "year": 2024,
+   "url": "https://arxiv.org/abs/2402.15627",
+   "topics": [
+    "ml-systems",
+    "resilience",
+    "observability-sre"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Retour d'expérience de ByteDance sur l'efficacité, le diagnostic et la tolérance aux pannes à plus de 10 000 GPU.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2402.15627",
+    "quote": "MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "revisiting-reliability",
+   "kind": "paper",
+   "title": "Revisiting Reliability in Large-Scale Machine Learning Research Clusters",
+   "by": "Kokolis et al.",
+   "year": 2024,
+   "url": "https://arxiv.org/abs/2410.21680",
+   "topics": [
+    "resilience",
+    "observability-sre"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Étude de la fiabilité de grands clusters de recherche en apprentissage automatique.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2410.21680",
+    "quote": "Revisiting Reliability in Large-Scale Machine Learning Research Clusters",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "acme",
+   "kind": "paper",
+   "title": "Characterization of Large Language Model Development in the Datacenter",
+   "by": "Hu et al.",
+   "year": 2024,
+   "url": "https://arxiv.org/abs/2403.07648",
+   "topics": [
+    "resilience",
+    "scheduling",
+    "observability-sre"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Caractérisation de charges de développement de LLM et de leurs pannes dans un centre de calcul.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2403.07648",
+    "quote": "Characterization of Large Language Model Development in the Datacenter",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "roofline",
+   "kind": "paper",
+   "title": "Roofline: An Insightful Visual Performance Model for Floating-Point Programs and Multicore Architectures",
+   "by": "Williams, Waterman, Patterson",
+   "year": 2008,
+   "url": "https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.html",
+   "topics": [
+    "perf-model"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Version rapport technique de l'article du modèle roofline (version CACM 2009 : doi:10.1145/1498765.1498785).",
+   "evidence": {
+    "url": "https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.html",
+    "quote": "Roofline: An Insightful Visual Performance Model for Floating-Point Programs and Multicore Architectures",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "hoefler-belli",
+   "kind": "paper",
+   "title": "Scientific Benchmarking of Parallel Computing Systems: Twelve Ways to Tell the Masses when Reporting Performance Results",
+   "by": "Hoefler, Belli",
+   "year": 2015,
+   "url": "https://evaluate.inf.usi.ch/node/366",
+   "topics": [
+    "perf-model"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Règles de mesure et de rapport statistique ; base des chapitres 3 et 8 du module 2.",
+   "evidence": {
+    "url": "https://evaluate.inf.usi.ch/node/366",
+    "quote": "Twelve Ways to Tell the Masses when Reporting Performance Results",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "patarasuk-yuan",
+   "kind": "paper",
+   "title": "Bandwidth optimal all-reduce algorithms for clusters of workstations",
+   "by": "Patarasuk, Yuan",
+   "year": 2009,
+   "url": "https://www.cs.fsu.edu/~xyuan/paper/09jpdc.pdf",
+   "topics": [
+    "interconnect",
+    "ml-systems"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Borne inférieure de données émises par un all-reduce et algorithme en anneau optimal.",
+   "evidence": {
+    "url": "https://www.cs.fsu.edu/~xyuan/paper/09jpdc.pdf",
+    "quote": "Bandwidth optimal all-reduce algorithms for clusters of workstations",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-priority",
+   "kind": "docs",
+   "title": "Slurm — Multifactor Priority Plugin",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/priority_multifactor.html",
+   "topics": [
+    "scheduling"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "La formule de priorité d'un job et ses poids (module 5, chapitre 3).",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/priority_multifactor.html",
+    "quote": "Job_priority",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-fairtree",
+   "kind": "docs",
+   "title": "Slurm — Fair Tree Fairshare Algorithm",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/fair_tree.html",
+   "topics": [
+    "scheduling"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Algorithme d'équité par défaut depuis 19.05 (module 5, chapitre 3).",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/fair_tree.html",
+    "quote": "Fair Tree Fairshare Algorithm",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-preempt",
+   "kind": "docs",
+   "title": "Slurm — Preemption",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/preempt.html",
+   "topics": [
+    "scheduling"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "PreemptType, PreemptMode, GraceTime (module 5, chapitre 4).",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/preempt.html",
+    "quote": "PreemptMode",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-gres",
+   "kind": "docs",
+   "title": "Slurm — Generic Resource (GRES) Scheduling",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/gres.html",
+   "topics": [
+    "scheduling",
+    "gpu-prog"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Déclaration des GPU et gestion de MIG (module 5, chapitre 5).",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/gres.html",
+    "quote": "MIG Management",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-topology",
+   "kind": "docs",
+   "title": "Slurm — Topology Guide",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/topology.html",
+   "topics": [
+    "scheduling",
+    "interconnect"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "topology/tree, topology/block et --switches (module 5, chapitre 5).",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/topology.html",
+    "quote": "Block Topology",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-prolog",
+   "kind": "docs",
+   "title": "Slurm — Prolog and Epilog Guide",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/prolog_epilog.html",
+   "topics": [
+    "scheduling",
+    "sysadmin"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Sémantique des prologues et épilogues et conséquences de leurs échecs (module 5, chapitre 7).",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/prolog_epilog.html",
+    "quote": "Prolog and Epilog Guide",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-sbatch",
+   "kind": "docs",
+   "title": "Slurm — sbatch",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/sbatch.html",
+   "topics": [
+    "scheduling"
+   ],
+   "level": "intro",
+   "cost": "free",
+   "why": "Toutes les options de soumission, dont --signal, --requeue et --gpus-per-node.",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/sbatch.html",
+    "quote": "--gpus-per-node",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-sinfo",
+   "kind": "docs",
+   "title": "Slurm — sinfo",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/sinfo.html",
+   "topics": [
+    "scheduling",
+    "sysadmin"
+   ],
+   "level": "intro",
+   "cost": "free",
+   "why": "États de nœuds et sorties de sinfo.",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/sinfo.html",
+    "quote": "DRAINING",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-squeue",
+   "kind": "docs",
+   "title": "Slurm — squeue",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/squeue.html",
+   "topics": [
+    "scheduling"
+   ],
+   "level": "intro",
+   "cost": "free",
+   "why": "Codes de raison d'attente d'un job.",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/squeue.html",
+    "quote": "InvalidAccount",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slurm-cgroup",
+   "kind": "docs",
+   "title": "Slurm — cgroup.conf",
+   "by": "SchedMD",
+   "year": 2026,
+   "url": "https://slurm.schedmd.com/cgroup.conf.html",
+   "topics": [
+    "scheduling",
+    "sysadmin"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "ConstrainDevices, ConstrainCores, ConstrainRAMSpace.",
+   "evidence": {
+    "url": "https://slurm.schedmd.com/cgroup.conf.html",
+    "quote": "ConstrainDevices",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "nccl-tests",
+   "kind": "docs",
+   "title": "nccl-tests — performance metrics",
+   "by": "NVIDIA",
+   "year": 2026,
+   "url": "https://raw.githubusercontent.com/NVIDIA/nccl-tests/master/doc/PERFORMANCE.md",
+   "topics": [
+    "interconnect",
+    "ml-systems"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Définitions de algbw et busbw, base du module 7.",
+   "evidence": {
+    "url": "https://raw.githubusercontent.com/NVIDIA/nccl-tests/master/doc/PERFORMANCE.md",
+    "quote": "algbw",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "pyxis",
+   "kind": "tool",
+   "title": "Pyxis — Slurm container plugin",
+   "by": "NVIDIA",
+   "year": 2026,
+   "url": "https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md",
+   "topics": [
+    "containers-k8s",
+    "scheduling"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Plugin SPANK qui ajoute --container-image à srun.",
+   "evidence": {
+    "url": "https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md",
+    "quote": "Pyxis is a [SPANK]",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "nhc",
+   "kind": "tool",
+   "title": "LBNL Node Health Check (NHC)",
+   "by": "Lawrence Berkeley National Laboratory",
+   "year": 2026,
+   "url": "https://raw.githubusercontent.com/mej/nhc/master/README.md",
+   "topics": [
+    "sysadmin",
+    "resilience"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Implémentation de référence d'un contrôle de santé de nœud pour Slurm et d'autres ordonnanceurs.",
+   "evidence": {
+    "url": "https://raw.githubusercontent.com/mej/nhc/master/README.md",
+    "quote": "LBNL Node Health Check (NHC)",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "slinky",
+   "kind": "tool",
+   "title": "Slinky — Slurm and Kubernetes",
+   "by": "SchedMD / NVIDIA",
+   "year": 2026,
+   "url": "https://www.nvidia.com/en-us/software/slinky/",
+   "topics": [
+    "containers-k8s",
+    "scheduling"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Projet ouvert pour exécuter des clusters Slurm dans Kubernetes (module 5, chapitre 8 ; module 12).",
+   "evidence": {
+    "url": "https://www.nvidia.com/en-us/software/slinky/",
+    "quote": "enables seamless interoperability between Slurm and Kubernetes",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-cn-asc-world-student-supercomputer-challenge",
+   "kind": "community",
+   "title": "ASC 世界大学生超级计算机竞赛",
+   "by": "",
+   "year": 2026,
+   "url": "https://m.tech.china.com/article/20260521/202605211874155.html",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Teams build and tune a small cluster under a 5000 W power cap and run HPL, HPCG and scientific/AI applications: the closest hands-on training to cluster operations available to students of these universities; PKU, Tsinghua and ZJU teams appear in the 2026 results.",
+   "evidence": {
+    "url": "https://m.tech.china.com/article/20260521/202605211874155.html",
+    "quote": "各参赛队伍需在5000瓦的总功耗约束下，亲手设计并安装小型超算集群",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-cn-tsinghua-student-supercomputing-team",
+   "kind": "community",
+   "title": "清华大学学生超算团队",
+   "by": "",
+   "year": 2026,
+   "url": "https://www.tsinghua.edu.cn/info/1175/111550.htm",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Student team organised with the HPC group of the CS department (coached by HPC faculty and supported by HPC-institute PhD students); wins in the three international student cluster competitions, including cluster power control, a core cluster-operations skill.",
+   "evidence": {
+    "url": "https://www.tsinghua.edu.cn/info/1175/111550.htm",
+    "quote": "清华大学学生超算团队夺得现场总冠军，同时取得LINPACK基准测试最高性能奖以及之前举行的在线比赛亚军",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-cn-ustc-supercomputing-centre",
+   "kind": "community",
+   "title": "中国科学技术大学超级计算中心",
+   "by": "",
+   "year": 2026,
+   "url": "http://scc.ustc.edu.cn/40970/list.htm",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "A production university cluster documented in detail (A100 GPU nodes, GPFS, HDR InfiniBand, Slurm 24.11, module environment): a realistic reference of a campus HPC/AI cluster and a place where USTC students can get accounts via their supervisor.",
+   "evidence": {
+    "url": "http://scc.ustc.edu.cn/40970/list.htm",
+    "quote": "中心目前管理运行有三套通用超级计算系统，面向全校有高性能计算需求的在校师生用户",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-cn-nudt-tianhe",
+   "kind": "community",
+   "title": "国防科技大学",
+   "by": "",
+   "year": 2026,
+   "url": "https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "NUDT is the builder of the TianHe supercomputers; its computer college is therefore a major HPC training site in China, but no NUDT graduate curriculum page was reachable (see blocked_sources), so no programme entry is given.",
+   "evidence": {
+    "url": "https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm",
+    "quote": "innovations represented by the \"TianHe\" series supercomputer systems",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-fr-idris-jean-zay",
+   "kind": "community",
+   "title": "IDRIS",
+   "by": "",
+   "year": 2026,
+   "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Real national GPU supercomputer (CPU, V100, A100 and H100 partitions) operated with Slurm, a Lustre parallel file system and InfiniBand/Omni-Path networks: the closest public, documented example of the cluster stack a compute infrastructure engineer runs. The hardware, scheduler and filesystem pages are public documentation to read and reproduce in labs.",
+   "evidence": {
+    "url": "http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware",
+    "quote": "L'environnement d'exploitation se base sur RedHat 9.6 (depuis le 17/02/2026) et Slurm 23.11.3 (depuis le 01/10/2024)",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-fr-idris-formations",
+   "kind": "course",
+   "title": "IDRIS training catalogue",
+   "by": "",
+   "year": 2026,
+   "url": "http://www.idris.fr/docs/formations/catalogue-formations",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Short, free (for CNRS and university staff) or CNRS-Formation-Entreprise courses taught by the Jean Zay support team, including a multi-GPU deep-learning scaling course; the course pages are public syllabi that fit a self-study path in parallel programming and distributed training. Registration site was under maintenance on the page read, so check dates.",
+   "evidence": {
+    "url": "http://www.idris.fr/docs/formations/catalogue-formations",
+    "quote": "L'IDRIS propose des formations en calcul haute performance (HPC) et en intelligence artificielle (IA)",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-fr-chps-network",
+   "kind": "community",
+   "title": "Réseau des Masters CHPS",
+   "by": "",
+   "year": 2026,
+   "url": "https://master-chps.fr/about/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "National network of French state-recognised HPC and simulation degrees (Paris-Saclay, Bordeaux CISD, Toulouse ENSEEIHT, Perpignan, Reims) with joint seminars, shared internship offers and a student hackathon with Teratec; the entry point to compare French HPC curricula.",
+   "evidence": {
+    "url": "https://master-chps.fr/about/",
+    "quote": "Parcours CISD, ENSEIRB-MATMECA, Université de Bordeaux",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-eurocc-ccfr",
+   "kind": "community",
+   "title": "CC-FR",
+   "by": "",
+   "year": 2026,
+   "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Point d'entrée français du programme EuroCC : formations de prise en main d'un supercalculateur et formations avancées (containers, LLM) sur le réseau des mésocentres MesoNET, utile pour pratiquer sur de vraies machines hors université.",
+   "evidence": {
+    "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+    "quote": "Le CC-FR est le centre de compétence national représentant le projet européen EuroCC en France.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-mesonet",
+   "kind": "community",
+   "title": "MesoNET",
+   "by": "",
+   "year": 2026,
+   "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Réseau de centres de calcul régionaux donnant accès à des supercalculateurs, du stockage et des heures de calcul : base du paysage HPC académique français en dessous du niveau national (GENCI).",
+   "evidence": {
+    "url": "https://romeo.univ-reims.fr/16_cc-fr.html",
+    "quote": "un réseau de 21 centres de calcul régionaux, les mésocentres, du réseau MesoNET donnant accès à des supercalculateurs",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-romeo-formations",
+   "kind": "course",
+   "title": "ROMEO",
+   "by": "",
+   "year": 2026,
+   "url": "https://romeo.univ-reims.fr",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Un centre de calcul académique qui propose des formations courtes sur GPU, multi-GPU et IA sur supercalculateur, ouvertes au-delà des étudiants du master CHPS.",
+   "evidence": {
+    "url": "https://romeo.univ-reims.fr",
+    "quote": "Centre de calcul académique, ROMEO accompagne chercheurs et étudiants depuis 2002",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-teratec-hackathon",
+   "kind": "community",
+   "title": "Hackathon TERATEC",
+   "by": "",
+   "year": 2026,
+   "url": "https://romeo.univ-reims.fr/chps",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Compétition HPC française à laquelle participent des étudiants (une équipe de M2 CHPS Reims y a obtenu le prix du jury en janvier 2024) ; bon terrain pour pratiquer l'optimisation sur machine réelle.",
+   "evidence": {
+    "url": "https://romeo.univ-reims.fr/chps",
+    "quote": "Une équipe de la promo 2024 du M2 CHPS de Reims a remporté le prix du jury lors du 2ème Hackathon TERATEC (janv. 2024).",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-cemosis-strasbourg",
+   "kind": "community",
+   "title": "Cemosis",
+   "by": "",
+   "year": 2026,
+   "url": "https://www.cemosis.fr/en/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Plateforme adossée au master CSMI, impliquée dans PEPR NumPEx (Exa-MA, SAGE-HPC) et le CoE EuroHPC HiDALGO2 : lien concret entre formation, HPC et projets exascale.",
+   "evidence": {
+    "url": "https://www.cemosis.fr/en/",
+    "quote": "Cemosis is a University of Strasbourg research platform bringing together mathematical models, data and artificial intelligence for interdisciplinary research.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-stanford-cs149",
+   "kind": "course",
+   "title": "Stanford CS149 Parallel Computing",
+   "by": "",
+   "year": 2026,
+   "url": "https://cs149.stanford.edu/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Best public syllabus found for the hardware/software boundary of parallel systems: multicore and SIMD, work scheduling, CUDA, DNN execution on GPUs, datacenter-scale AI serving, coherence and synchronisation, with programming assignments including CUDA kernels and a Trainium2 kernel.",
+   "evidence": {
+    "url": "https://cs149.stanford.edu/",
+    "quote": "teach parallel programming techniques necessary to effectively utilize these machines",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-stanford-cs336",
+   "kind": "course",
+   "title": "Stanford CS336 Language Modeling from Scratch",
+   "by": "",
+   "year": 2026,
+   "url": "https://cs336.stanford.edu/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "A public course where one assignment is explicitly systems: profile, write a Triton FlashAttention2 kernel and build a memory-efficient distributed training loop, which is the user-level view of what a GPU-cluster platform must serve.",
+   "evidence": {
+    "url": "https://cs336.stanford.edu/",
+    "quote": "walking them through the entire process of developing their own",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-cmu-15418",
+   "kind": "course",
+   "title": "CMU 15-418/15-618 Parallel Computer Architecture and Programming",
+   "by": "",
+   "year": 2026,
+   "url": "https://www.cs.cmu.edu/~418/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Public syllabus and assignments for parallel hardware and programming (multicore, GPUs, 'C-like' parallel languages); sister course of Stanford CS149 with a systems-programming flavour.",
+   "evidence": {
+    "url": "https://www.cs.cmu.edu/~418/",
+    "quote": "15-418/15-618: Parallel Computer Architecture and Programming, Fall 2026",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-cmu-dlsys",
+   "kind": "course",
+   "title": "Deep Learning Systems",
+   "by": "",
+   "year": 2026,
+   "url": "https://dlsyscourse.org/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Hands-on view of what sits under PyTorch: automatic differentiation, an NDArray library with CPU/CUDA backends, memory coalescing and tiling; useful background before operating GPU training platforms.",
+   "evidence": {
+    "url": "https://dlsyscourse.org/",
+    "quote": "students will design and build from scratch a complete deep learning library",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-cmu-15442",
+   "kind": "course",
+   "title": "CMU 15-442/15-642 Machine Learning Systems",
+   "by": "",
+   "year": 2026,
+   "url": "https://mlsyscourse.org/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Public schedule covering data/ZeRO, model and pipeline parallelism, GPU architecture and CUDA, GEMM on modern GPUs and LLM serving: the most direct ML-systems syllabus found for a training/inference platform engineer.",
+   "evidence": {
+    "url": "https://mlsyscourse.org/",
+    "quote": "The goal of this course is to provide students an understanding and overview of elements in modern machine learning systems.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-berkeley-cs267",
+   "kind": "course",
+   "title": "UC Berkeley CS267 Applications of Parallel Computers",
+   "by": "",
+   "year": 2026,
+   "url": "https://sites.google.com/lbl.gov/cs267-spr2025",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Long-running reference course (Demmel, Yelick and others) on programming parallel computers for science and engineering; public site with syllabus; part of the Berkeley Designated Emphasis in Computational Science and Engineering.",
+   "evidence": {
+    "url": "https://sites.google.com/lbl.gov/cs267-spr2025",
+    "quote": "CS267 was originally designed to teach students how to program parallel computers to efficiently solve challenging problems in science and engineering",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-student-cluster-competition",
+   "kind": "community",
+   "title": "SC Student Cluster Competition",
+   "by": "",
+   "year": 2026,
+   "url": "https://studentclustercompetition.us/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "Teams of students build, tune and run HPC applications on a cluster in a competition setting; the best hands-on route to cluster operation skills for a student, and a recruiting ground for HPC centres.",
+   "evidence": {
+    "url": "https://studentclustercompetition.us/",
+    "quote": "The Student Cluster Competition (SCC) was created to address this issue by immersing students in all aspects of HPC",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "eco-us-doe-facility-training",
+   "kind": "course",
+   "title": "DOE facility user training",
+   "by": "",
+   "year": 2026,
+   "url": "https://www.nersc.gov/users/training/",
+   "topics": [],
+   "level": "intermediate",
+   "cost": "unknown",
+   "why": "National computing centres publish training for their users; NERSC lists new-user training and SpinUp workshops and OLCF archives materials for Frontier. Details of content were not readable (JavaScript calendar), so use as pointers to current events.",
+   "evidence": {
+    "url": "https://www.nersc.gov/users/training/",
+    "quote": "NERSC New User Training",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  }
+ ],
+ "blocked_sources": [],
+ "verification": {
+  "status": "verified",
+  "checked_claims": 47,
+  "verified_quotes": 47,
+  "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
+ }
+}

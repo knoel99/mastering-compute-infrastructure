@@ -10,7 +10,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 <a class="cta" href="#cours">Voir les cours</a>
 <a class="cta cta-ghost" href="path/index.html">Feuille de route</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
-
+<a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>
 </div>
 
 ## État du chantier {#etat}
@@ -111,7 +111,7 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 
 ## Enquête sur les masters HPC {#masters}
 
-L'enquête sur les masters HPC (France, États-Unis, Chine, monde) est en cours de rédaction.
+Une analyse sourcée des masters orientés calcul haute performance en France, aux États-Unis, en Chine et dans le reste du monde, croisée avec les offres d'emploi de compute infrastructure : ce que les masters enseignent, ce qu'ils n'enseignent presque pas, et ce que ce parcours ajoute. <a href="masters/index.html">Lire l'enquête</a>.
 
 ## Comment utiliser ce site {#usage}
 
