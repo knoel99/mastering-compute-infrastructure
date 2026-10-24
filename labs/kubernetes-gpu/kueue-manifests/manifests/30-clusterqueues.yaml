@@ -1,0 +1,66 @@
+# A 64-GPU pool shared by three teams through one cohort. cpu and memory are quotas of the same flavor,
+# sized at 8 cores and 64 GiB per GPU (an assumption of the lab, not a Kueue rule).
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: research
+spec:
+  cohortName: gpu-pool
+  namespaceSelector:
+    matchLabels: {team: research}
+  queueingStrategy: StrictFIFO
+  preemption:
+    withinClusterQueue: LowerPriority
+    reclaimWithinCohort: Any
+    borrowWithinCohort: {policy: Never}
+  resourceGroups:
+    - coveredResources: ["cpu", "memory", "nvidia.com/gpu"]
+      flavors:
+        - name: h100-80gb
+          resources:
+            - {name: "cpu", nominalQuota: 256, borrowingLimit: 64}
+            - {name: "memory", nominalQuota: 2048Gi, borrowingLimit: 512Gi}
+            - {name: "nvidia.com/gpu", nominalQuota: 32, borrowingLimit: 8, lendingLimit: 16}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: product
+spec:
+  cohortName: gpu-pool
+  namespaceSelector:
+    matchLabels: {team: product}
+  queueingStrategy: BestEffortFIFO
+  preemption:
+    withinClusterQueue: LowerPriority
+    reclaimWithinCohort: LowerPriority
+    borrowWithinCohort: {policy: LowerPriority, maxPriorityThreshold: 100}
+  resourceGroups:
+    - coveredResources: ["cpu", "memory", "nvidia.com/gpu"]
+      flavors:
+        - name: h100-80gb
+          resources:
+            - {name: "cpu", nominalQuota: 192}
+            - {name: "memory", nominalQuota: 1536Gi}
+            - {name: "nvidia.com/gpu", nominalQuota: 24}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: shared-dev
+spec:
+  cohortName: gpu-pool
+  namespaceSelector:
+    matchLabels: {team: dev}
+  queueingStrategy: BestEffortFIFO
+  preemption:
+    withinClusterQueue: Never
+    reclaimWithinCohort: Never
+  resourceGroups:
+    - coveredResources: ["cpu", "memory", "nvidia.com/gpu"]
+      flavors:
+        - name: h100-80gb
+          resources:
+            - {name: "cpu", nominalQuota: 64}
+            - {name: "memory", nominalQuota: 512Gi}
+            - {name: "nvidia.com/gpu", nominalQuota: 8, borrowingLimit: 8}

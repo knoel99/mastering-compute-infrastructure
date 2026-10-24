@@ -1,0 +1,16 @@
+# GPUs through the device plugin: an integer under limits (requests, if given, must be equal).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: one-gpu
+  namespace: default
+spec:
+  restartPolicy: Never
+  nodeSelector:
+    nvidia.com/gpu.product: NVIDIA-H100-80GB-HBM3     # label published by GPU Feature Discovery
+  containers:
+    - name: cuda
+      image: registry.example/cuda-check:1
+      resources:
+        limits:
+          nvidia.com/gpu: 1

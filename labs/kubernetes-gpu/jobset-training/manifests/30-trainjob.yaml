@@ -1,0 +1,21 @@
+# The same run expressed for Kubeflow Trainer v2: the runtime (ClusterTrainingRuntime "torch-distributed",
+# installed with Trainer) owns the JobSet template and the torchrun wiring; the user only gives what changes.
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: pretrain-7b
+  namespace: research
+  labels:
+    kueue.x-k8s.io/queue-name: main
+spec:
+  runtimeRef:
+    name: torch-distributed
+  trainer:
+    numNodes: 16
+    numProcPerNode: "8"
+    image: registry.example/pretrain:7b       # placeholder: your training image
+    command: ["python", "train.py"]
+    args: ["--steps", "100000", "--ckpt-dir", "/ckpt", "--ckpt-every", "500"]
+    resourcesPerNode:
+      requests: {cpu: "64", memory: 512Gi}
+      limits: {nvidia.com/gpu: "8"}

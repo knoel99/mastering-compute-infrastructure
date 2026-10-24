@@ -1,0 +1,37 @@
+# DRA (stable since Kubernetes v1.35): a claim template asking for 8 whole GPUs through the DeviceClass
+# published by the DRA Driver for NVIDIA GPUs. The DeviceClass itself does not exist in this mini cluster:
+# the API server validates the schema of the claim, not the existence of the driver.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: eight-h100
+  namespace: default
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpus
+          exactly:
+            deviceClassName: gpu.nvidia.com
+            allocationMode: ExactCount
+            count: 8
+            selectors:
+              - cel:
+                  expression: device.attributes['gpu.nvidia.com'].productName.matches('H100')
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: trainer-dra
+  namespace: default
+spec:
+  restartPolicy: Never
+  resourceClaims:
+    - name: gpus
+      resourceClaimTemplateName: eight-h100
+  containers:
+    - name: trainer
+      image: registry.example/train:1
+      resources:
+        claims:
+          - name: gpus

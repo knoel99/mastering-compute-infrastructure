@@ -64,8 +64,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Labs :</strong></p>
 <ul>
 <li><strong>Cartographier une machine</strong> (bac à sable, sans GPU) : Script qui produit un rapport JSON (CPU, NUMA, mémoire, disques, interfaces) à partir de lscpu/numactl/sysfs ; tests sur la sortie.</li>
-<li><strong>cgroups v2 à la main</strong> (bac à sable, sans GPU) : Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire.</li>
-<li><strong>fio et page cache</strong> (bac à sable, sans GPU) : Mesurer lecture/écriture avec et sans page cache, comprendre O_DIRECT ; script qui compare et trace.</li>
+<li><strong>Triage avec la méthode USE et la pression PSI</strong> (bac à sable, sans GPU) : Triage avec la méthode USE et la pression PSI</li>
+<li><strong>Page cache : mesurer ce qui touche le disque</strong> (bac à sable, sans GPU) : Page cache : mesurer ce qui touche le disque</li>
+<li><strong>cgroups : limite mémoire, mise à mort, quota de processeur</strong> (bac à sable, sans GPU) : Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire.</li>
+<li><strong>Un script d'exploitation idempotent</strong> (bac à sable, sans GPU) : Un script d'exploitation idempotent</li>
 </ul>
 <p><strong>Sources à lire et faits à vérifier :</strong></p>
 <ul>
@@ -427,9 +429,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 6.</p>
 <h2 id="phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</h2>
-<h3 id="kubernetes-gpu">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (plan, 28 h)</h3>
+<h3 id="kubernetes-gpu">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (rédigé, 28 h)</h3>
 <p>Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).</p>
+<p><strong>Cours complet :</strong> <a href="courses/kubernetes-gpu/index.html">Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Exposer des GPU à des pods (device plugin, GPU Operator, MIG, time-slicing) et en comprendre les limites</li>
@@ -453,6 +456,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Kueue : files, quotas, préemption</strong> (bac à sable, sans GPU) : Manifestes ClusterQueue/LocalQueue/WorkloadPriorityClass validés hors ligne (kubernetes-validate/kubeconform si installable) et simulation de la logique d'admission en Python testée ; exécution sur cluster documentée.</li>
 <li><strong>JobSet : un entraînement multi-nœuds</strong> (cluster) : Manifestes JobSet/Trainer pour torchrun multi-nœuds ; validation de schéma ; exécution réelle documentée.</li>
 <li><strong>Matrice de décision Slurm / Kubernetes</strong> (bac à sable, sans GPU) : Grille de critères pondérée avec scénarios d'équipes ; script de calcul de score testé ; justification écrite.</li>
+<li><strong>Un plan de contrôle Kubernetes 1.37 sans kubelet</strong> (bac à sable, sans GPU) : Un plan de contrôle Kubernetes 1.37 sans kubelet</li>
 </ul>
 <p><strong>Sources à lire et faits à vérifier :</strong></p>
 <ul>
@@ -531,9 +535,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Pièges d'interprétation de DCGM_FI_DEV_GPU_UTIL : citer la documentation</li>
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 5, Projet 1, Projet 6.</p>
-<h3 id="finops-capacity">Module 15 — FinOps, capacité, énergie et achats de calcul (plan, 24 h)</h3>
+<h3 id="finops-capacity">Module 15 — FinOps, capacité, énergie et achats de calcul (rédigé, 24 h)</h3>
 <p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Cours complet :</strong> <a href="courses/finops-capacity/index.html">FinOps, capacité, énergie et achats de calcul</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Construire un modèle de coût total (TCO) comparant achat, colocation, réservation et à la demande</li>
@@ -554,9 +559,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ol>
 <p><strong>Labs :</strong></p>
 <ul>
-<li><strong>Modèle de TCO paramétrable</strong> (bac à sable, sans GPU) : Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'.</li>
-<li><strong>Prévision de demande de calcul</strong> (bac à sable, sans GPU) : Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests.</li>
-<li><strong>Lecture d'un contrat de capacité</strong> (bac à sable, sans GPU) : Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé.</li>
+<li><strong>Du sacct au rapport de showback</strong> (bac à sable, sans GPU) : Du sacct au rapport de showback</li>
+<li><strong>Prévision de la demande et capacité à engager</strong> (bac à sable, sans GPU) : Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests.</li>
+<li><strong>Modèle de coût total paramétrable</strong> (bac à sable, sans GPU) : Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'.</li>
+<li><strong>Revue d'un contrat de capacité fictif</strong> (bac à sable, sans GPU) : Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé.</li>
 </ul>
 <p><strong>Sources à lire et faits à vérifier :</strong></p>
 <ul>

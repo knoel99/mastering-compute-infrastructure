@@ -16,7 +16,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **6 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **8 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
@@ -83,10 +83,10 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Placer, observer et facturer des charges sur plusieurs fournisseurs.</p>
 
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</h4><p class="meta">Module 12 · 28 h · Cœur · en préparation</p><p>Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.</p></div>
+<a class="card" href="courses/kubernetes-gpu/index.html"><h4>Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</h4><p class="meta">Module 12 · 28 h · Cœur</p><p>Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.</p></a>
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</h4><p class="meta">Module 13 · 28 h · Cœur · en préparation</p><p>Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.</p></div>
 <a class="card" href="courses/observability/index.html"><h4>Observabilité et fiabilité d'une flotte GPU</h4><p class="meta">Module 14 · 24 h · Cœur</p><p>Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.</p></a>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>FinOps, capacité, énergie et achats de calcul</h4><p class="meta">Module 15 · 24 h · Cœur · en préparation</p><p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p></div>
+<a class="card" href="courses/finops-capacity/index.html"><h4>FinOps, capacité, énergie et achats de calcul</h4><p class="meta">Module 15 · 24 h · Cœur</p><p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p></a>
 </div>
 
 <h3 class="phase" id="phase5">Phase 5 — Production et leadership</h3>

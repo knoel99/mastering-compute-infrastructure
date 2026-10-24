@@ -1,0 +1,10 @@
+# The node hierarchy Kueue may use for co-location, widest level first. The labels are set on the nodes by the
+# cloud provider or by the administrator (here: topology.example.com/* are placeholders for your own labels).
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: Topology
+metadata:
+  name: gpu-fabric
+spec:
+  levels:
+    - nodeLabel: topology.example.com/block
+    - nodeLabel: topology.example.com/rack

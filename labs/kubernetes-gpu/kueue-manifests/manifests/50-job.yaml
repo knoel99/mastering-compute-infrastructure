@@ -1,0 +1,24 @@
+# A submitted job: the label picks the LocalQueue, another label picks the WorkloadPriorityClass.
+# Kueue's webhook creates the Job suspended; the Job resumes when its Workload is admitted.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pretrain-7b
+  namespace: research
+  labels:
+    kueue.x-k8s.io/queue-name: main
+    kueue.x-k8s.io/priority-class: normal
+spec:
+  parallelism: 4
+  completions: 4
+  completionMode: Indexed
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: registry.example/pretrain:7b
+          resources:
+            requests: {cpu: 64, memory: 512Gi}
+            limits: {nvidia.com/gpu: 8}

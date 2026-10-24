@@ -6,7 +6,7 @@ bash ../../slurm/slurm-sandbox/setup.sh >/dev/null
 trap 'bash ../../slurm/slurm-sandbox/teardown.sh >/dev/null 2>&1 || true' EXIT
 out="$(mktemp -d)"
 jid="$(sbatch --parsable -o "$out/demo.out" examples/requeue_demo.sbatch)"
-for _ in $(seq 1 400); do  # each requeue waits ~2 minutes (Reason=BeginTime) on a default 23.11 configuration
+for _ in $(seq 1 900); do  # each requeue waits ~2 minutes (Reason=BeginTime) on a default 23.11 configuration
   state="$(sacct -X -n -j "$jid" -o State%12 2>/dev/null | tr -d ' ' | head -n 1)"
   [ "$state" = "COMPLETED" ] && break
   sleep 1

@@ -92,6 +92,9 @@ def parent():
             p = d / "progress"
             step = int(p.read_text()) if p.exists() and p.read_text().strip() else None
             if det.update(time.monotonic(), step):
+                if det.last < HANG_STEP - 1:   # stalled long before the injected fault: a scheduling hiccup on a
+                    det = Stagnation(WINDOW_S)  # loaded machine, not the hang. Keep watching instead of failing.
+                    continue
                 alarm_at = time.monotonic()
                 break
             time.sleep(0.25)

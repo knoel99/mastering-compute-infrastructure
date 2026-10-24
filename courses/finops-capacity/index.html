@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>FinOps, capacité, énergie et achats de calcul — Mastering Compute Infrastructure</title>
+<meta name="description" content="Mesurer l'utilisation réelle, prévoir la demande, chiffrer le coût d'une GPU-heure utile, dimensionner puissance et refroidissement, lire et négocier un contrat de capacité.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">FinOps, capacité, énergie et achats de calcul</h1>
+<p class="subtitle">Module 15 · Phase 4 · 24 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> de combien de GPU votre équipe a-t-elle besoin l'an prochain, sous quelle forme (achat, location, réservation, à la demande), à quel coût par unité de travail <em>utile</em>, et comment le démontrer à une direction financière ou à un fournisseur ? Un ingénieur d'infrastructure qui ne sait pas chiffrer son cluster laisse d'autres décider à sa place, avec des hypothèses qu'il n'a pas vues.</p>
+<p>Ce module est le volet technique de l'achat de calcul. Il part de l'utilisation réelle d'une flotte, construit une prévision de la demande avec ses incertitudes, en déduit une capacité à engager, la compare à d'autres régimes par un modèle de coût total, puis aborde ce que les fiches de prix cachent : la puissance et le refroidissement, les clauses d'un contrat de capacité et la façon de négocier.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Une GPU-heure n'a pas de prix : elle a un coût <em>par heure utile</em>, qui dépend de l'utilisation, du goodput et du contrat. Tout chiffre de ce module est donc accompagné de ses hypothèses, et tout exemple de prix est <strong>fictif</strong>, en unités arbitraires notées « u ».</p>
+</div>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>24 h, dont environ 9 h de lecture, 9 h de labs et 6 h d'exercices</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>2 : à l'aise avec Python (les labs s'écrivent et se testent avec <code>pytest</code>), la ligne de commande Linux et les coûts cloud ; avoir lu le module 2</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../perf-models/index.html">Module 2 — Architecture matérielle et modèles de performance</a></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : FinOps cloud connu, mais ni contrats de capacité, ni énergie, ni prévision de demande pour des GPU</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un modèle de coût total testé, un plan de capacité chiffré avec ses risques et une revue de contrat appliquée à un contrat fictif</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>un portable CPU suffit ; aucun GPU ni compte cloud. Un Slurm réel est optionnel (lab 15.1, branche « live »)</td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Exprimer un coût en GPU-heure disponible, allouée et utile, et le convertir en coût par token ou par expérience (chapitres 1 et 2).</li>
+<li>Produire un rapport de <em>showback</em> depuis l'export de l'ordonnanceur et répartir le coût de l'inactivité (chapitres 1 et 2).</li>
+<li>Prévoir la demande d'une équipe de recherche, la tester sur le passé et en déduire la capacité à engager (chapitre 3).</li>
+<li>Comparer achat, location, réservation, à la demande et spot par un modèle de coût total, et dire quelles hypothèses le font basculer (chapitre 4).</li>
+<li>Estimer puissance, densité par baie et refroidissement d'un parc de GPU, et leur effet sur le calendrier (chapitre 5).</li>
+<li>Lire un contrat de capacité GPU, repérer les clauses qui comptent pour un entraînement et chiffrer ce qu'elles valent (chapitres 6 et 7).</li>
+<li>Construire une matrice de décision robuste, un appel d'offres technique et un tableau de pilotage trimestriel (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Neuf séances, soit 24 h : six de 2,5 h et trois de 3 h. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé. Il ne diminue jamais d'une séance à la suivante.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>2.5 h</td>
+<td>1</td>
+<td>ch. 1 FinOps pour l'IA : cadre, unités, allocation</td>
+<td>Ex. 1 ; questions de positionnement</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2.5 h</td>
+<td>1</td>
+<td>ch. 2 Utilisation réelle, goodput, files d'attente</td>
+<td>Lab 15.1 (rapport de showback) ; Ex. 2, 3</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2.5 h</td>
+<td>1</td>
+<td>ch. 3 Prévoir la demande, première moitié : modèle et backtest</td>
+<td>Lab 15.1 branche « live » ; Ex. 4</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 3 seconde moitié : de la prévision à la capacité à engager</td>
+<td>Lab 15.2 ; Ex. 5, 6</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 4 Modèle de coût total</td>
+<td>Lab 15.3 ; Ex. 7</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 5 Énergie et datacenter</td>
+<td>Ex. 8, 9</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 6 Lire un contrat de capacité</td>
+<td>Lab 15.4 ; Ex. 10</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 Négocier</td>
+<td>Ex. 11, 12</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>2.5 h</td>
+<td>3</td>
+<td>ch. 8 Matrices de décision, appel d'offres, pilotage ; checkpoint de sortie</td>
+<td>Ex. 13 ; démarrage du Projet 6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Les prix sont fictifs, en unités arbitraires (u). Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au chapitre 5.</p>
+<ol type="1">
+<li><p><strong>Coût utile.</strong> Une flotte de 64 GPU coûte, tout compris, 2,08 u par GPU-heure disponible. Elle est allouée 55 % du temps, et 90 % des heures allouées produisent un progrès utile. Combien coûte une GPU-heure utile ?</p></li>
+<li><p><strong>Engagement ou demande.</strong> Une GPU-heure engagée sur un an coûte 2,6 u, qu'elle serve ou non. La même heure à la demande coûte 4,0 u. À partir de quel taux d'utilisation de la capacité engagée l'engagement est-il moins cher ?</p></li>
+<li><p><strong>Baie.</strong> Quatre serveurs NVIDIA DGX H100 (10,2 kW maximum chacun, d'après le guide utilisateur de NVIDIA) sont posés dans une même baie. Quelle puissance la baie doit-elle recevoir, et pourquoi une salle « classique » ne convient-elle pas ?</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p><span class="math inline">2{,}08 / (0{,}55 \times 0{,}90) = 4{,}20</span> u, soit deux fois le coût par heure disponible. L'écart s'explique par l'utilisation et le goodput : voir les chapitres 2 et 4.</p></li>
+<li><p>Une heure engagée coûte 2,6 u, qu'on l'utilise ou non. Pour une heure réellement utilisée, elle coûte <span class="math inline">2{,}6/u</span> si la fraction utilisée est <span class="math inline">u</span>. Elle bat la demande quand <span class="math inline">2{,}6/u &lt; 4{,}0</span>, soit <span class="math inline">u &gt; 0{,}65</span>. C'est le résultat central du chapitre 3 et du chapitre 4.</p></li>
+<li><p><span class="math inline">4 \times 10{,}2 = 40{,}8</span> kW dans une baie. L'enquête 2020 de l'Uptime Institute observait que 71 % des répondants avaient une densité modale inférieure à 10 kW par baie : une salle de ce type reçoit un seul de ces serveurs par baie. Voir le chapitre 5.</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. FinOps pour l'IA : cadre, unités, allocation</h2>
+<p>Ce chapitre fixe le vocabulaire financier et les unités du module. Vous n'avez pas besoin de devenir comptable ; vous avez besoin de savoir quelle question chaque chiffre permet de poser, et à qui.</p>
+<h3 id="ce-que-la-finops-apporte">1.1. Ce que la FinOps apporte</h3>
+<p>La FinOps Foundation définit la FinOps comme un cadre opérationnel et une pratique culturelle qui maximise la valeur métier de la technologie, accélère des décisions fondées sur les données et crée une responsabilité financière par la collaboration entre ingénierie, finance et métiers. Le cadre (<em>Framework</em>) repose sur six principes : collaborer, décider par la valeur, responsabiliser chacun sur son usage, rendre les données accessibles et exactes, piloter la pratique de façon centralisée, et tirer parti du modèle de coût variable du cloud.</p>
+<p>Le cadre nomme quatre domaines : comprendre l'usage et le coût, quantifier la valeur métier, optimiser usage et coût, gérer la pratique. Chacun regroupe des capacités. Ce module en travaille six : l'allocation, la prévision, l'économie unitaire (<em>unit economics</em>), la planification, l'optimisation des tarifs (<em>rate optimization</em>) et la facturation interne (<em>invoicing and chargeback</em>). Les personas cités incluent l'ingénierie, la finance, la direction et les achats : vous parlerez aux quatre.</p>
+<p>Le cadre élargit aussi les périmètres (<em>scopes</em>) au-delà du cloud public. La page du cadre y range l'IA, le cloud privé et le centre de données (consultée le 24 octobre 2026). C'est ce qui autorise à appliquer la même grille à un parc acheté, loué ou réservé.</p>
+<h3 id="ce-que-lia-change">1.2. Ce que l'IA change</h3>
+<p>Le document « FinOps for AI Overview » de la Fondation rappelle que l'équation de base reste « prix fois quantité » : on réduit le coût en baissant le prix payé ou la quantité consommée. Il liste ensuite ce qui est spécifique à l'IA. Les compteurs changent (les <em>tokens</em>). Les fournisseurs créent souvent de nouvelles références sans étiquetage natif. Et la rareté des GPU impose, selon le document, des « techniques de gestion de capacité » par le contrat, l'orchestration et les modes d'achat, ce qui est rare pour un cloud classique.</p>
+<p>Le même document précise que le déploiement sur site ou hybride est hors de son périmètre. Ce module comble ce trou pour un lecteur qui doit comparer un parc maîtrisé avec du cloud : la méthode est celle de la FinOps, les ordres de grandeur et les contrats sont ceux du calcul GPU.</p>
+<h3 id="trois-gpu-heures-et-leurs-coûts">1.3. Trois GPU-heures et leurs coûts</h3>
+<p>Il faut distinguer trois quantités. Les confondre est l'erreur la plus fréquente des comparaisons de prix.</p>
+<div class="def">
+<p><span class="tag">GPU-heure disponible, allouée, utile</span> La GPU-heure <strong>disponible</strong> existe dans la capacité que vous payez (achetée, louée ou engagée), qu'un job tourne ou non. Elle est <strong>allouée</strong> quand l'ordonnanceur la confie à un job. Elle est <strong>utile</strong> quand ce job produit du progrès conservé : on retire les redémarrages, le travail perdu après une panne et les attentes (le <em>goodput</em>, chapitre 2).</p>
+</div>
+<p>Avec <span class="math inline">c_{\text{dispo}}</span> le coût plein d'une heure disponible, <span class="math inline">u</span> la part des heures allouées et <span class="math inline">g</span> le goodput des heures allouées, le coût d'une heure utile est :</p>
+<p><span class="math display">c_{\text{utile}} = \frac{c_{\text{dispo}}}{u \times g}</span></p>
+<p>C'est la formule de la question 1 de « Avant de commencer » : avec <span class="math inline">u = 0{,}55</span> et <span class="math inline">g = 0{,}9</span>, un coût de 2,08 u devient 4,20 u. Les régimes à la demande se paient seulement quand on alloue : leur coût par heure utile vaut <span class="math inline">c/g</span>, indépendamment de <span class="math inline">u</span> (chapitre 4).</p>
+<p>Les équipes ne raisonnent pas en GPU-heures mais en unités métier. La Fondation propose, dans son document sur l'IA, des indicateurs comme le coût par inférence, le coût par token (<span class="math inline">\text{coût total} / \text{tokens}</span>) et l'efficacité d'utilisation des ressources (utilisation réelle sur capacité provisionnée). Pour l'entraînement, le chapitre 7 du module 2 donne le pont : <span class="math inline">6N</span> FLOP par token pour un modèle de <span class="math inline">N</span> paramètres.</p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Coût d'un entraînement, par token</span> Entraîner un modèle de <span class="math inline">N = 7 \cdot 10^9</span> paramètres sur <span class="math inline">T = 10^{12}</span> tokens demande <span class="math inline">6NT = 4{,}2 \cdot 10^{22}</span> FLOP. À un MFU de 40 % sur des GPU de 989 TFLOP/s dense (H100 SXM en BF16, module 2), un GPU délivre <span class="math inline">0{,}4 \times 989 \cdot 10^{12} = 3{,}96 \cdot 10^{14}</span> FLOP/s utiles.</p>
+<p>Il faut donc :</p>
+<p><span class="math display">\frac{4{,}2 \cdot 10^{22}}{3{,}96 \cdot 10^{14} \times 3600} \approx 29\,491 \text{ GPU-heures}</span></p>
+<p>À un coût plein fictif de 2,08 u par GPU-heure disponible, cela fait environ 61 341 u, soit 0,061 u par million de tokens d'entraînement. Ce coût suppose que les 29 491 heures sont des heures <em>utiles</em> : chaque point de goodput perdu l'augmente d'autant.</p>
+</div>
+<div class="ex">
+<p><span class="tag">Exemple 1.2 — Coût par token servi : l'utilisation commande</span> Un GPU qui sert 2 500 tokens par seconde (valeur d'exemple, à mesurer sur votre modèle) produit 9 millions de tokens par heure. À 2,08 u l'heure, un million de tokens coûte <span class="math inline">2{,}08/9 = 0{,}231</span> u si le GPU est saturé en permanence.</p>
+<p>À 30 % d'utilisation moyenne, le même million coûte <span class="math inline">0{,}231 / 0{,}3 = 0{,}770</span> u : 3,3 fois plus, sans changer ni le matériel ni le modèle. Le coût par token d'un service est d'abord un coût d'utilisation.</p>
+</div>
+<p>Un troisième regroupement parle aux chercheurs : le coût par expérience. Une exploration d'hyperparamètres sur 8 GPU pendant 6 heures représente 48 GPU-heures, soit environ 100 u au coût plein de 2,08 u. Le coût d'une expérience donne un budget lisible, et le premier levier d'un chercheur est souvent la taille de l'expérience, pas la plateforme.</p>
+<h3 id="allocation-et-responsabilité">1.4. Allocation et responsabilité</h3>
+<p>La Fondation décrit l'allocation comme la répartition du coût entre ceux qui en sont responsables, par comptes, étiquettes (<em>tags</em>) et métadonnées, y compris pour les coûts partagés. Son document sur l'IA recommande de commencer par du <em>showback</em> : montrer à chaque équipe ce qu'elle consomme, sans la facturer immédiatement (le <em>chargeback</em>, qui facture réellement).</p>
+<p>Pour un parc GPU, la règle de comptabilité est simple à énoncer : <strong>le coût plein doit être entièrement alloué</strong>. La somme des coûts directs par équipe, plus la part de l'inactivité, plus ce que garde la plateforme, doit valoir ce que vous payez. Sinon, une partie du budget disparaît entre la facture et les équipes, et personne n'en répond. Le lab 15.1 teste cette conservation sur chaque rapport.</p>
+<p>Reste à décider qui supporte l'inactivité. Trois politiques existent.</p>
+<ul>
+<li><strong>Proportionnelle</strong> : chaque équipe supporte l'inactivité au prorata de sa consommation. Elle est facile à défendre, mais elle fait payer le plus ceux qui utilisent le plus.</li>
+<li><strong>Égale</strong> : chaque équipe en supporte une part identique. Les petites équipes paient très cher ce qu'elles n'ont presque pas utilisé.</li>
+<li><strong>Plateforme</strong> : l'équipe plateforme garde l'inactivité et la montre comme sa propre ligne. Les factures des équipes restent propres, et l'inactivité devient un indicateur de la plateforme.</li>
+</ul>
+<div class="note">
+<p><span class="tag">Un choix de gouvernance</span> Le chiffre d'une petite équipe change d'un facteur trois selon la politique (exercice 4). Il ne s'agit pas d'un détail de calcul : c'est ce qui décide qui est incité à libérer des GPU. Notre recommandation, un choix de ce parcours, est de laisser l'inactivité à la plateforme jusqu'à une cible fixée avec la finance, et de refacturer seulement le dépassement.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li>La FinOps est un cadre de collaboration entre ingénierie, finance et achats ; ses périmètres incluent le centre de données et le cloud privé.</li>
+<li>Trois GPU-heures : disponible, allouée, utile. Le coût utile vaut <span class="math inline">c_{\text{dispo}}/(u \times g)</span>.</li>
+<li>Coût par token, par expérience, par heure utile : choisissez l'unité de celui qui décide.</li>
+<li>Le coût plein doit être entièrement alloué ; la politique d'inactivité est un choix de gouvernance.</li>
+</ul>
+</div>
+<h2 id="ch2">2. Utilisation réelle : occupation, goodput, gaspillage et files d'attente</h2>
+<p>« Notre cluster est utilisé à 80 % » ne veut rien dire tant qu'on ne sait pas ce qui est compté. Ce chapitre décompose le rendement d'une flotte en facteurs mesurables, relève ce que des publications rapportent, et montre comment l'obtenir de l'ordonnanceur.</p>
+<h3 id="une-chaîne-de-rendements">2.1. Une chaîne de rendements</h3>
+<p>Quatre facteurs se multiplient entre la capacité achetée et le calcul utile. Aucun n'est un défaut en soi ; chacun a un propriétaire différent.</p>
+<ul>
+<li><strong>La disponibilité</strong> : la part des GPU en état de servir (ni drainés, ni en réparation, ni en maintenance).</li>
+<li><strong>L'allocation</strong> : la part des heures disponibles confiées à un job (<span class="math inline">u</span> du chapitre 1). Elle dépend de la demande et de l'ordonnanceur.</li>
+<li><strong>Le goodput</strong> : la part des heures allouées qui produit du progrès conservé (<span class="math inline">g</span>). Il dépend des pannes, des redémarrages, des checkpoints et des attentes.</li>
+<li><strong>Le MFU</strong> : la part du pic de calcul que le code exploite pendant qu'il tourne (module 2).</li>
+</ul>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Un quart du pic seulement</span> Prenons des valeurs d'exemple : disponibilité 0,97, allocation 0,70, goodput 0,90 et MFU 0,40. Leur produit vaut <span class="math inline">0{,}97 \times 0{,}70 \times 0{,}90 \times 0{,}40 = 0{,}244</span>. Sur 100 GPU-heures achetées, environ 24 correspondent à du calcul au pic de la fiche technique.</p>
+<p>Aucun des quatre facteurs n'est exceptionnel, et pourtant le produit l'est : c'est pourquoi on ne compare jamais des fournisseurs sur le seul prix de l'heure. Chaque facteur a un propriétaire : la plateforme pour les deux premiers, l'équipe d'entraînement pour les deux derniers.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 640 250" role="img" aria-labelledby="chain-t chain-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="chain-t">
+De la capacité achetée au calcul utile
+</title>
+<desc id="chain-d">Cinq barres horizontales : 100 % de la capacité, 97 % après la disponibilité, 67,9 % après l'allocation, 61,1 % après le goodput et 24,4 % après le MFU.</desc> <text x="10" y="40" font-size="14" fill="currentColor">Capacité achetée</text> <rect x="190" y="20" width="360.0" height="28" fill="var(--side-bg)" stroke="currentColor" stroke-width="1.5"/> <text x="558.0" y="40" font-size="14" font-weight="700" fill="currentColor">100,0 %</text> <text x="10" y="84" font-size="14" fill="currentColor">× disponibilité 0,97</text> <rect x="190" y="64" width="349.2" height="28" fill="var(--side-bg)" stroke="currentColor" stroke-width="1.5"/> <text x="547.2" y="84" font-size="14" font-weight="700" fill="currentColor">97,0 %</text> <text x="10" y="128" font-size="14" fill="currentColor">× allocation 0,70</text> <rect x="190" y="108" width="244.4" height="28" fill="var(--side-bg)" stroke="currentColor" stroke-width="1.5"/> <text x="442.4" y="128" font-size="14" font-weight="700" fill="currentColor">67,9 %</text> <text x="10" y="172" font-size="14" fill="currentColor">× goodput 0,90</text> <rect x="190" y="152" width="220.0" height="28" fill="var(--side-bg)" stroke="currentColor" stroke-width="1.5"/> <text x="418.0" y="172" font-size="14" font-weight="700" fill="currentColor">61,1 %</text> <text x="10" y="216" font-size="14" fill="currentColor">× MFU 0,40</text> <rect x="190" y="196" width="88.0" height="28" fill="var(--accent)" stroke="currentColor" stroke-width="1.5"/> <text x="286.0" y="216" font-size="14" font-weight="700" fill="currentColor">24,4 %</text>
+</svg>
+<figcaption>
+Chaîne de rendements d'une flotte (valeurs de l'exemple 2.1, hypothèses d'exemple) : chaque facteur multiplie le précédent, et un quart seulement du pic achetable devient du calcul utile.
+</figcaption>
+</figure>
+<h3 id="ce-que-des-publications-mesurent">2.2. Ce que des publications mesurent</h3>
+<p>Les équipes de recherche de Meta ont décrit deux clusters de recherche, RSC-1 (16 000 GPU) et RSC-2 (8 000 GPU). Leur article rapporte, pour ces deux clusters, une utilisation moyenne de 83 % et de 85 % (Kokolis et al., 2024). Il définit aussi le <em>Effective Training Time Ratio</em> (ETTR) d'un job : le rapport entre le temps de calcul productif et le temps d'horloge disponible du job, attente en file comprise.</p>
+<p>L'ETTR joue le rôle d'un goodput par job (notre <span class="math inline">g</span> l'égale quand l'attente est nulle) ; l'article réserve le mot « goodput » à la production de travail utile de l'ensemble du cluster.</p>
+<p>L'article de Llama 3 rapporte, lui, plus de 90 % de « temps d'entraînement effectif » pendant l'entraînement du modèle de 405 milliards de paramètres, tout en acceptant une maintenance automatisée du cluster. Sur 54 jours, l'équipe a compté 466 interruptions de jobs, dont 419 inattendues (Dubey et al., 2024).</p>
+<div class="war">
+<p><span class="tag">419 interruptions imprévues en 54 jours</span> Selon le tableau 5 de <a href="https://arxiv.org/abs/2407.21783">l'article de Llama 3</a>, environ 78 % des interruptions inattendues sont attribuées à des problèmes matériels confirmés ou suspectés, sur une période de pré-entraînement du modèle de 405 milliards de paramètres. Le goodput est donc un chiffre d'exploitation, pas une propriété du code : il dépend de la fiabilité du matériel, de l'automatisation des reprises et du coût des checkpoints (projet <a href="../../projects/resilient-trainer/index.html">Entraîneur tolérant aux pannes</a>).</p>
+</div>
+<p>D'autres pertes sont moins spectaculaires. Hu et al. (2024) ont analysé les traces d'un centre de données qui développe des grands modèles de langage. Pour un job d'évaluation sur le jeu HumanEval, ils mesurent que 29,5 % du temps passent à charger le modèle et à préparer les données, et 19,0 % de plus à exécuter des tests de correction de programmes : environ la moitié du temps seulement est consacrée à l'inférence sur GPU.</p>
+<p>Ces trois chiffres ne se comparent pas : ils portent sur des objets différents (cluster, job d'entraînement, job d'évaluation) et des définitions différentes. Retenez la leçon de méthode : avant de comparer deux utilisations, demandez ce qui est au numérateur et au dénominateur.</p>
+<h3 id="mesurer-depuis-lordonnanceur">2.3. Mesurer depuis l'ordonnanceur</h3>
+<p>L'ordonnanceur sait quel compte a utilisé quelles ressources, pendant combien de temps, et comment le job s'est terminé. Avec Slurm (module 5), <code>sacct -X -P</code> produit cette comptabilité : l'option <code>-X</code> ne garde que l'allocation, <code>-P</code> sépare les champs par <code>|</code>. Les champs utiles sont <code>Account</code>, <code>State</code>, <code>Submit</code>, <code>Start</code>, <code>End</code>, <code>ElapsedRaw</code> (durée en secondes) et <code>AllocTRES</code> (ressources allouées, par exemple <code>gres/gpu=8</code>), d'après la documentation de <code>sacct</code>. Sans <code>--format</code>, <code>sacct</code> n'affiche pas ces champs : l'export du lab 15.1 les demande explicitement (voir <code>verify-live.sh</code>). Sur un vrai cluster, ajoutez <code>--allusers</code> pour voir tous les comptes et <code>--starttime</code>/<code>--endtime</code> pour borner la fenêtre.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sacct</span> <span class="at">-X</span> <span class="at">-P</span> <span class="at">--format</span><span class="op">=</span>JobID,Account,User,Partition,State,Submit,Start,End,ElapsedRaw,AllocTRES,NNodes,CPUTimeRAW</span></code></pre></div>
+<p>Le lab 15.1 transforme cet export en rapport de <em>showback</em>. Trois grandeurs en sortent. Les <strong>heures allouées</strong> par compte valent le nombre de GPU multiplié par la durée. L'<strong>utilisation</strong> est le rapport des heures allouées à la capacité multipliée par la durée de la fenêtre. Les <strong>heures perdues candidates</strong> sont celles des jobs terminés en <code>FAILED</code>, <code>TIMEOUT</code>, <code>NODE_FAIL</code>, <code>OUT_OF_MEMORY</code> ou <code>PREEMPTED</code> : c'est une borne supérieure de la perte évitable, car un job qui sauvegarde ses checkpoints ne perd que le travail depuis la dernière sauvegarde.</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.2 — Un mois de trace synthétique</span> Le lab fournit une trace <strong>synthétique</strong> (inventée par un générateur à graine fixe) de 28 jours sur 64 GPU et quatre équipes, soit 43 008 GPU-heures de capacité. Au coût plein fictif de 2,08 u par GPU-heure, le rapport affiche :</p>
+<pre class="text"><code>unit=gres/gpu capacity=64 window=672.0 h  full cost=89457  idle cost=40372
+utilization (allocated / capacity): 54.9 %
+lost candidates: FAILED 1096, TIMEOUT 692, NODE_FAIL 693, PREEMPTED 138 = 11.1 % of allocated hours
+fleet wait: p50 0.00 h, p90 10.41 h</code></pre>
+<p>Les heures allouées sont de 23 598 sur 43 008, soit 54,9 %. L'inactivité coûte 40 372 u, soit 45,1 % du coût plein. Environ 11 % des heures allouées (2 619 GPU-heures) se sont terminées en échec, délai dépassé, panne de nœud ou préemption.</p>
+</div>
+<p>Le tableau par équipe montre qui consomme. La part d'inactivité est ici proportionnelle (politique du chapitre 1). Les valeurs viennent de la même trace synthétique.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Équipe</th>
+<th>Jobs</th>
+<th>GPU-h allouées</th>
+<th>Part</th>
+<th>Coût direct (u)</th>
+<th>Inactivité (u)</th>
+<th>Total (u)</th>
+<th>Attente p90</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>nlp</td>
+<td>19</td>
+<td>14 245</td>
+<td>60,4 %</td>
+<td>29 630</td>
+<td>24 371</td>
+<td>54 001</td>
+<td>6,6 h</td>
+</tr>
+<tr class="even">
+<td>vision</td>
+<td>78</td>
+<td>7 475</td>
+<td>31,7 %</td>
+<td>15 548</td>
+<td>12 789</td>
+<td>28 337</td>
+<td>13,1 h</td>
+</tr>
+<tr class="odd">
+<td>eval</td>
+<td>678</td>
+<td>977</td>
+<td>4,1 %</td>
+<td>2 033</td>
+<td>1 672</td>
+<td>3 705</td>
+<td>10,1 h</td>
+</tr>
+<tr class="even">
+<td>dev</td>
+<td>346</td>
+<td>901</td>
+<td>3,8 %</td>
+<td>1 873</td>
+<td>1 541</td>
+<td>3 414</td>
+<td>10,4 h</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le même lab contient une capture <strong>réelle</strong> : le script <code>verify-live.sh</code> démarre le Slurm 23.11 du bac à sable (4 CPU, sans GPU : les CPU tiennent lieu de GPU), soumet sept jobs de deux comptes, exporte <code>sacct</code> et recalcule les heures allouées. Le résultat est comparé à la colonne <code>CPUTimeRAW</code> de Slurm lui-même : 28 CPU-secondes pour <code>teama</code>, 14 pour <code>teamb</code>, identiques aux nôtres.</p>
+<p>Cette vérification contrôle l'arithmétique de base (lecture de <code>AllocTRES</code> et de <code>ElapsedRaw</code>) contre le calcul de Slurm lui-même ; elle ne valide ni l'allocation de l'inactivité ni les attentes, que seuls les tests du lab couvrent.</p>
+<div class="note">
+<p><span class="tag">Un blocage observé dans la capture réelle</span> Dans cette capture, deux jobs de 2 CPU auraient pu cohabiter sur un nœud de 4 CPU. Ils se sont pourtant exécutés l'un après l'autre : chacun avait reçu <code>mem=12872M</code> dans <code>AllocTRES</code>, soit toute la mémoire déclarée du nœud (le script d'installation en déclare 80 % de celle de la machine, 12 872 Mo ici).</p>
+<p>La documentation de <code>slurm.conf</code> indique que la mémoire par défaut par CPU (<code>DefMemPerCPU</code>) vaut 0, c'est-à-dire illimitée. L'observation est cohérente avec ce défaut, sans essai contraire : un job qui ne demande pas de mémoire peut immobiliser un nœud. Sur un nœud GPU, le même mécanisme laisse des GPU vides à cause de la mémoire ou des CPU.</p>
+</div>
+<h3 id="files-dattente-et-coût-de-linactivité">2.4. Files d'attente et coût de l'inactivité</h3>
+<p>Une utilisation de 55 % n'empêche pas d'attendre dix heures. Deux mécanismes l'expliquent. D'abord la fragmentation et le blocage en tête de file : dans la trace synthétique, un job de 32 GPU attend que 32 GPU se libèrent ensemble, pendant que de petits jobs pourraient passer (c'est ce que le <em>backfill</em> de Slurm corrige, module 5). Ensuite la statistique : plus l'utilisation monte, plus l'attente explose.</p>
+<p>Le modèle le plus simple de file à <span class="math inline">c</span> serveurs identiques, appelé M/M/c, donne la probabilité d'attendre par la formule d'Erlang C et l'attente moyenne en multiples de la durée moyenne d'un job. Pour une charge offerte <span class="math inline">a = \rho c</span> (le nombre moyen d'emplacements demandés), la probabilité d'attendre <span class="math inline">C(c,a)</span> et l'attente moyenne <span class="math inline">W_q</span> (en durées moyennes de job) valent :</p>
+<p><span class="math display">C(c,a) = \frac{\dfrac{a^{c}}{c!}\,\dfrac{c}{c-a}}{\displaystyle\sum_{k=0}^{c-1}\frac{a^{k}}{k!} + \dfrac{a^{c}}{c!}\,\dfrac{c}{c-a}} \qquad W_q = \frac{C(c,a)}{c\,(1-\rho)}</span></p>
+<p>Pour 64 GPU en jobs de 8 GPU, soit <span class="math inline">c = 8</span> emplacements :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Utilisation <span class="math inline">\rho</span></th>
+<th>Probabilité d'attendre</th>
+<th>Attente moyenne / durée d'un job</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0,50</td>
+<td>0,059</td>
+<td>0,015</td>
+</tr>
+<tr class="even">
+<td>0,70</td>
+<td>0,271</td>
+<td>0,113</td>
+</tr>
+<tr class="odd">
+<td>0,80</td>
+<td>0,458</td>
+<td>0,286</td>
+</tr>
+<tr class="even">
+<td>0,90</td>
+<td>0,702</td>
+<td>0,877</td>
+</tr>
+<tr class="odd">
+<td>0,95</td>
+<td>0,844</td>
+<td>2,110</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour des jobs de 10 heures, l'attente moyenne passe d'environ 1,1 heure à 70 % à 2,9 heures à 80 %, puis à 8,8 heures à 90 %. Le simulateur du projet 6, avec 200 000 jobs et trois graines (0 à 2), donne 0,28 à 0,29 (à 80 %) et 0,86 à 0,89 (à 90 %), proches des 0,286 et 0,877 de la formule. Ces résultats supposent des arrivées de Poisson, des durées exponentielles et une seule classe de jobs : la réalité attend davantage, car les durées ont des queues lourdes.</p>
+<div class="key">
+<p><span class="tag">Règle de ce chapitre</span> Il n'existe pas d'utilisation « cible » universelle. La cible est le point où l'attente reste sous l'objectif de service (SLO) des utilisateurs, et ce point est plus bas pour les gros jobs et pour les petits pools. Un cluster à 95 % n'est pas bien géré : il est en train de faire attendre tout le monde.</p>
+</div>
+<p>La <strong>mise en commun</strong> réduit l'attente. À 80 % d'utilisation, quatre équipes qui se partagent quatre pools de 2 emplacements attendent en moyenne 1,78 durée de job ; un pool commun de 8 emplacements, 0,29 : six fois moins. C'est l'argument technique pour un cluster partagé avec quotas et préemption (module 5), plutôt que des îlots par équipe. Le projet 6 fournit le simulateur M/M/c pour tester votre propre mélange de jobs.</p>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li>Le rendement d'une flotte est un produit : disponibilité, allocation, goodput, MFU. Chaque facteur a un propriétaire.</li>
+<li>Ne comparez jamais deux « utilisations » sans connaître le numérateur et le dénominateur.</li>
+<li><code>sacct -X -P</code> suffit à produire heures allouées, heures perdues candidates et attentes ; vérifiez-le contre <code>CPUTimeRAW</code>.</li>
+<li>L'attente explose avec l'utilisation (Erlang C) ; mettre les pools en commun la réduit fortement.</li>
+</ul>
+</div>
+<h2 id="ch3">3. Prévoir la demande et choisir la capacité à engager</h2>
+<p>Acheter ou engager du calcul, c'est parier sur la demande des mois ou des années à venir. Ce chapitre construit une prévision modeste mais testable, avec ses scénarios, puis en déduit une règle de décision chiffrée.</p>
+<h3 id="la-demande-nest-pas-la-consommation">3.1. La demande n'est pas la consommation</h3>
+<p>Ce que l'ordonnanceur enregistre, c'est la consommation : les heures effectivement allouées, plafonnées par la capacité. La demande réelle est plus élevée dès que des jobs attendent, que des chercheurs renoncent à lancer une expérience ou la réduisent pour qu'elle passe. On dit que l'historique est <em>censuré</em>. Un historique à 95 % d'utilisation sous-estime la demande, d'un montant inconnu.</p>
+<p>Deux précautions en découlent. Mesurez la demande à la soumission (taille et durée demandées) plutôt qu'à l'allocation. Et traitez toute prévision construite sur un cluster saturé comme une borne basse.</p>
+<p>La demande d'une équipe de recherche se décompose en trois parts de nature différente.</p>
+<ul>
+<li><strong>Un socle</strong> : développement, évaluations, petites expériences. Il est régulier et croît avec les effectifs.</li>
+<li><strong>Des campagnes</strong> : pré-entraînements ou grosses reprises, de quelques semaines et de plusieurs dizaines de GPU. Elles arrivent par à-coups et se connaissent en partie à l'avance par la feuille de route.</li>
+<li><strong>Une saisonnalité</strong> : échéances de conférences, rythme de l'année universitaire. C'est une hypothèse à vérifier sur vos données.</li>
+</ul>
+<h3 id="un-modèle-de-départ">3.2. Un modèle de départ</h3>
+<p>Le lab 15.2 part d'une série hebdomadaire de GPU demandés (<strong>synthétique</strong>, produite par un générateur qui combine croissance, saison, bruit et campagnes). Le modèle ajuste, par moindres carrés sur le logarithme de la demande, une tendance linéaire et une harmonique annuelle :</p>
+<p><span class="math display">\ln D_t = \beta_0 + \beta_1 t + \beta_2 \sin\frac{2\pi t}{52} + \beta_3 \cos\frac{2\pi t}{52} + \varepsilon_t</span></p>
+<p>Les résidus <span class="math inline">\varepsilon_t</span> sont ensuite rééchantillonnés par blocs de quatre semaines pour conserver leur autocorrélation, et chaque scénario reçoit une perturbation aléatoire de la croissance annuelle. On obtient ainsi 2 000 trajectoires plausibles de l'an prochain, pas une prévision unique.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — La tendance ajustée dépasse la tendance injectée</span> Le générateur injecte une croissance de 35 % par an. Sur l'historique de 104 semaines (graine 0), l'ajustement trouve +54 % par an. Sans campagnes, il retrouve +34,7 % : l'écart vient donc des campagnes. Cinq campagnes ont été tirées ; deux d'entre elles se terminent dans les douze dernières semaines de l'historique et tirent la droite vers le haut.</p>
+<p>Les moyennes passent de 63 GPU (semaines 0 à 25) à 87,5 GPU (semaines 78 à 103). Sur l'an prochain, les 2 000 scénarios ont une moyenne de 135 GPU, une médiane de 122 et un intervalle de 82 à 207 GPU entre les déciles 10 et 90. L'incertitude pèse presque autant que la valeur centrale.</p>
+</div>
+<h3 id="tester-la-prévision-sur-le-passé">3.3. Tester la prévision sur le passé</h3>
+<p>Une prévision qui n'a jamais été confrontée au passé n'est pas un plan. Le test (<em>backtest</em>) ajuste le modèle sur les 78 premières semaines, prévoit les 26 suivantes et compare à la réalité, avec deux repères : une prévision naïve (la moyenne des 8 dernières semaines) et la couverture de la bande entre les déciles 10 et 90, censée contenir 80 % des semaines.</p>
+<p>Sur huit historiques synthétiques de graines différentes, le résultat est instructif (commande <code>demo.py --seeds 8</code> du lab) : le modèle bat la prévision naïve en erreur absolue moyenne dans cinq cas sur huit. La bande de 80 % couvre en réalité de 8 % à 77 % des semaines, avec une médiane de 65 %.</p>
+<p>Trois enseignements à garder. Comparez toujours à une prévision naïve : si vous ne la battez pas, la complexité ne sert à rien. Les bandes de prévision sont souvent trop étroites (ici 65 % de couverture médiane pour 80 % visés) ; élargissez-les ou raisonnez par scénarios nommés. Enfin, les campagnes se connaissent mieux par la feuille de route que par la statistique : le socle se prévoit, les campagnes se planifient avec les chercheurs.</p>
+<h3 id="de-la-prévision-à-la-capacité-à-engager">3.4. De la prévision à la capacité à engager</h3>
+<p>Supposons qu'on puisse engager <span class="math inline">L</span> GPU pour la période (au prix <span class="math inline">r</span> par GPU-heure, payé même sans usage) et acheter le reste à la demande au prix <span class="math inline">o &gt; r</span>. Le coût espéré vaut <span class="math inline">rL + o\,\mathbb{E}[(D-L)^+]</span> par heure. Sa dérivée en <span class="math inline">L</span> s'annule quand <span class="math inline">r = o\,\mathbb{P}(D &gt; L)</span>. C'est le problème classique du « vendeur de journaux » (<em>newsvendor</em>) : l'engagement optimal est un quantile de la demande.</p>
+<p><span class="math display">\mathbb{P}(D &gt; L^{*}) = \frac{r}{o} \quad\Longleftrightarrow\quad L^{*} = F^{-1}\!\left(1 - \frac{r}{o}\right)</span></p>
+<p>Lisez-le à l'envers : on engage le niveau de demande qui est dépassé dans une fraction <span class="math inline">r/o</span> des semaines. Avec une remise faible (<span class="math inline">r</span> proche de <span class="math inline">o</span>), ce niveau est bas. Avec une grosse remise, il monte. Le test <code>test_probability_of_exceeding_the_commitment_is_the_price_ratio</code> du lab vérifie ce résultat par simulation.</p>
+<figure class="fig">
+<svg viewBox="0 0 640 290" role="img" aria-labelledby="ldc-t ldc-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="ldc-t">
+Courbe de durée de la demande et capacité à engager
+</title>
+<desc id="ldc-d">Demande de GPU classée de la plus forte à la plus faible, en fonction de la part des semaines où elle est dépassée. La capacité optimale de 107 GPU coupe la courbe là où la probabilité de dépassement vaut 65 %.</desc> <line x1="70" y1="220" x2="600" y2="220" stroke="currentColor" stroke-width="1.5"/> <line x1="70" y1="220" x2="70" y2="20" stroke="currentColor" stroke-width="1.5"/> <text x="64" y="224" font-size="12" text-anchor="end" fill="currentColor">0</text> <text x="64" y="157" font-size="12" text-anchor="end" fill="currentColor">100</text> <text x="64" y="90" font-size="12" text-anchor="end" fill="currentColor">200</text> <text x="64" y="24" font-size="12" text-anchor="end" fill="currentColor">300</text> <text x="70.0" y="238" font-size="12" text-anchor="middle" fill="currentColor">0 %</text> <text x="202.5" y="238" font-size="12" text-anchor="middle" fill="currentColor">25 %</text> <text x="335.0" y="238" font-size="12" text-anchor="middle" fill="currentColor">50 %</text> <text x="467.5" y="238" font-size="12" text-anchor="middle" fill="currentColor">75 %</text> <text x="600.0" y="238" font-size="12" text-anchor="middle" fill="currentColor">100 %</text> <polyline points="70.0,20.0 80.6,33.3 91.2,49.8 101.8,62.8 112.4,74.3 123.0,82.2 133.6,89.2 144.2,94.6 154.8,99.4 165.4,104.0 176.0,108.0 186.6,111.3 197.2,114.3 207.8,116.9 218.4,119.2 229.0,121.4 239.6,123.5 250.2,125.5 260.8,127.1 271.4,128.8 282.0,130.5 292.6,132.2 303.2,133.9 313.8,135.5 324.4,137.0 335.0,138.4 345.6,139.7 356.2,141.1 366.8,142.4 377.4,143.7 388.0,145.0 398.6,146.4 409.2,147.7 419.8,149.0 430.4,150.3 441.0,151.6 451.6,153.0 462.2,154.3 472.8,155.6 483.4,156.9 494.0,158.2 504.6,159.6 515.2,161.0 525.8,162.4 536.4,163.9 547.0,165.6 557.6,167.4 568.2,169.4 578.8,172.0 589.4,176.4 600.0,190.1" fill="none" stroke="currentColor" stroke-width="2.5"/> <line x1="70" y1="148.4" x2="600" y2="148.4" stroke="var(--accent)" stroke-width="3"/> <line x1="414.5" y1="148.4" x2="414.5" y2="220" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/> <circle cx="414.5" cy="148.4" r="5" fill="var(--accent)" stroke="currentColor"/> <text x="80" y="170.4" font-size="13" font-weight="700" fill="currentColor">engager 107 GPU : P(D &gt; L) = r/o = 0,65</text> <text x="74" y="14" font-size="12" fill="currentColor">GPU demandés (semaine)</text> <text x="600" y="258" font-size="12" text-anchor="end" fill="currentColor">part des semaines où la demande dépasse le niveau</text>
+</svg>
+<figcaption>
+Courbe de durée des 2 000 scénarios synthétiques du lab 15.2 (prix fictifs r = 2,6 et o = 4,0) : on engage le niveau de demande dépassé dans 65 % des semaines, pas la moyenne et encore moins le pic (axe vertical tronqué à 300 GPU).
+</figcaption>
+</figure>
+<div class="ex">
+<p><span class="tag">Exemple 3.2 — Combien engager, selon la remise</span> Avec le prix à la demande fictif <span class="math inline">o = 4{,}0</span> u et les 2 000 scénarios de l'exemple 3.1, le lab donne ce tableau pour cinq niveaux de prix engagé. L'économie est calculée par rapport à un parc entièrement à la demande (4 702 537 u de coût moyen annuel).</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Prix engagé <span class="math inline">r</span></th>
+<th><span class="math inline">1 - r/o</span></th>
+<th>GPU à engager</th>
+<th>Part d'engagement inutilisée</th>
+<th>Économie moyenne</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3,6</td>
+<td>0,10</td>
+<td>82</td>
+<td>1,2 %</td>
+<td>5,4 %</td>
+</tr>
+<tr class="even">
+<td>3,2</td>
+<td>0,20</td>
+<td>93</td>
+<td>2,8 %</td>
+<td>11,9 %</td>
+</tr>
+<tr class="odd">
+<td>2,6</td>
+<td>0,35</td>
+<td>107</td>
+<td>6,2 %</td>
+<td>23,0 %</td>
+</tr>
+<tr class="even">
+<td>2,0</td>
+<td>0,50</td>
+<td>122</td>
+<td>10,6 %</td>
+<td>35,8 %</td>
+</tr>
+<tr class="odd">
+<td>1,6</td>
+<td>0,60</td>
+<td>134</td>
+<td>14,6 %</td>
+<td>45,3 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour <span class="math inline">r = 2{,}6</span>, le coût moyen est de 3 620 507 u. Engager la demande moyenne (135 GPU) coûte 3 746 102 u, soit 3,5 % de plus ; engager le pic simulé (490 GPU) coûte 11 136 982 u, soit 3,1 fois plus ; engager le 90e centile (207 GPU) coûte 4 856 334 u, plus que de ne rien engager. L'optimum est plat autour de son minimum et très pentu du côté du sur-engagement.</p>
+</div>
+<p>Le calcul suppose une offre à la demande illimitée. Or la rareté des GPU est précisément ce que la FinOps Foundation signale pour l'IA. Le lab permet de limiter les GPU obtenables à la demande (<code>cap</code>) et de pénaliser la demande non servie (<code>penalty</code>, coût d'une GPU-heure non satisfaite).</p>
+<p>Avec au plus 20 GPU obtenables à la demande et une pénalité de 20 u par GPU-heure non servie (valeurs d'exemple), la commande <code>demo.py --cap 20 --penalty 20</code> fait passer l'engagement optimal de 107 à 177 GPU. La part d'engagement inutilisée monte à 28,8 %, et 95 % des scénarios contiennent au moins une semaine de demande non servie. Avec une pénalité de 8 u, l'optimum est de 135 GPU. <strong>La rareté se paie en engagement.</strong></p>
+<h3 id="un-plan-de-capacité">3.5. Un plan de capacité</h3>
+<p>Un plan de capacité utile tient en une page, révisée chaque trimestre.</p>
+<ol type="1">
+<li>Les trois scénarios nommés (bas, central, haut), par exemple les déciles 10 et 90 et la médiane des trajectoires : ici 82, 122 et 207 GPU.</li>
+<li>La capacité engagée (le quantile du tableau précédent) et la façon de couvrir l'écart : à la demande, spot pour les travaux tolérants, partenaires.</li>
+<li>Les campagnes connues de la feuille de route, ajoutées au socle statistique.</li>
+<li>Les déclencheurs de révision : utilisation soutenue au-dessus d'un seuil, attente p90 au-dessus de l'objectif, erreur de prévision au-delà d'une marge.</li>
+<li>Le délai d'approvisionnement de chaque option : l'horizon de la prévision doit dépasser le délai de livraison, sinon la prévision ne sert à rien.</li>
+</ol>
+<p>L'engagement n'est pas forcément plat sur l'année. Un engagement par paliers (une part ferme, une part optionnelle) suit mieux une croissance : c'est l'objet de la négociation du chapitre 7.</p>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>L'historique est censuré par la capacité : mesurez la demande à la soumission et lisez une prévision sur cluster saturé comme une borne basse.</li>
+<li>Un modèle simple (tendance, saison, résidus rééchantillonnés) suffit, à condition de le tester contre une prévision naïve et de vérifier la couverture de ses bandes.</li>
+<li>L'engagement optimal est le quantile <span class="math inline">1 - r/o</span> de la demande, pas la moyenne ni le pic.</li>
+<li>La rareté des GPU à la demande augmente l'engagement optimal ; un plan de capacité se révise chaque trimestre.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Modèle de coût total : acheter, louer, réserver, payer à la demande</h2>
+<p>Comparer le prix d'une GPU-heure à la demande avec le « prix » d'un serveur acheté n'a pas de sens. Ce chapitre construit un modèle de coût total (<em>TCO</em>, <em>total cost of ownership</em>) qui ramène chaque régime à la même unité : le coût d'une GPU-heure utile. Le modèle est le lab 15.3.</p>
+<div class="key">
+<p><span class="tag">Prix fictifs</span> Tous les prix, remises, durées de vie et tarifs d'énergie de ce chapitre sont des <strong>valeurs d'exemple</strong> en unités arbitraires (u), regroupées dans <code>assumptions.yaml</code>. Seule la puissance maximale d'un nœud de 8 GPU (10,2 kW, guide utilisateur du DGX H100) est une donnée publiée. Le chapitre vous donne la méthode ; les prix, vous les relevez le jour de la décision sur les pages des fournisseurs et dans les devis reçus.</p>
+</div>
+<h3 id="les-postes-dun-parc-possédé">4.1. Les postes d'un parc possédé</h3>
+<p>Posséder un nœud coûte plus que son prix catalogue. Le modèle retient cinq postes, tous ramenés à une GPU et à une année.</p>
+<ul>
+<li><strong>L'amortissement</strong> du matériel (nœud, réseau, stockage), étalé sur la durée de vie économique, avec le coût du capital et la valeur de revente.</li>
+<li><strong>Le support</strong> : pièces de rechange et garantie étendue.</li>
+<li><strong>Le personnel</strong> d'exploitation, proportionnel au nombre de GPU.</li>
+<li><strong>L'installation</strong> : un prix par kW de puissance informatique réservée (salle dans un centre de colocation, ou amortissement d'un bâtiment sur site).</li>
+<li><strong>L'énergie</strong>, à la puissance moyenne réellement consommée, multipliée par le PUE (chapitre 5).</li>
+</ul>
+<p>L'amortissement avec coût du capital se calcule comme une annuité. Avec <span class="math inline">P</span> le prix d'achat, <span class="math inline">R</span> la valeur de revente à la fin, <span class="math inline">i</span> le taux annuel du capital et <span class="math inline">n</span> la durée de vie en années, le coût annuel est :</p>
+<p><span class="math display">A = \Bigl(P - \frac{R}{(1+i)^{n}}\Bigr)\,\frac{i}{1-(1+i)^{-n}}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — Ce que coûte une GPU possédée</span> Avec les hypothèses fictives du lab (nœud de 280 000 u, 25 % de plus pour réseau et stockage, 4 ans, 10 % de revente, capital à 8 %), l'investissement de 350 000 u par nœud donne <span class="math inline">A = 97\,905</span> u par an, contre 87 500 u par an en amortissement linéaire du prix, sans coût du capital ni revente : le coût du capital, net de la revente, ajoute 12 %. Par GPU (8 par nœud) et à 70 % d'utilisation, le tableau devient :</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Poste</th>
+<th>u par GPU et par an</th>
+<th>Part</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Amortissement</td>
+<td>12 238</td>
+<td>67,1 %</td>
+</tr>
+<tr class="even">
+<td>Support</td>
+<td>2 100</td>
+<td>11,5 %</td>
+</tr>
+<tr class="odd">
+<td>Installation (colocation)</td>
+<td>2 448</td>
+<td>13,4 %</td>
+</tr>
+<tr class="even">
+<td>Énergie (PUE 1,4)</td>
+<td>1 154</td>
+<td>6,3 %</td>
+</tr>
+<tr class="odd">
+<td>Personnel</td>
+<td>300</td>
+<td>1,6 %</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td><strong>18 240</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Divisé par 8 760 heures, le total donne 2,08 u par GPU-heure <em>disponible</em>, la valeur utilisée au chapitre 2 pour le rapport de showback.</p>
+</div>
+<h3 id="le-coût-de-la-gpu-heure-utile">4.2. Le coût de la GPU-heure utile</h3>
+<p>Chaque régime se ramène au coût par heure utile, avec <span class="math inline">u</span> l'allocation et <span class="math inline">g</span> le goodput du chapitre 1. Les régimes à coût fixe (parc possédé, location, réservation) se paient toutes les heures, qu'on les utilise ou non. Les régimes à l'usage ne se paient que pendant l'allocation.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Régime</th>
+<th>Coût par GPU-heure utile</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Possédé</td>
+<td>coût annuel / <span class="math inline">(8760 \cdot u \cdot g)</span></td>
+</tr>
+<tr class="even">
+<td>Location ou réservation</td>
+<td>tarif engagé / <span class="math inline">(u \cdot g)</span></td>
+</tr>
+<tr class="odd">
+<td>À la demande</td>
+<td>tarif / <span class="math inline">g</span></td>
+</tr>
+<tr class="even">
+<td>Spot</td>
+<td>tarif / <span class="math inline">\bigl(g \cdot (1 - W)\bigr)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour le spot, <span class="math inline">W</span> est la part de temps perdue à cause des interruptions. Au premier ordre et avec le meilleur intervalle de checkpoint, le modèle de Young et Daly (projet <a href="../../projects/resilient-trainer/index.html">Entraîneur tolérant aux pannes</a>) donne :</p>
+<p><span class="math display">W = \sqrt{\frac{2C}{M}} + \frac{R}{M}</span></p>
+<p>avec <span class="math inline">C</span> le coût d'un checkpoint, <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le coût d'un redémarrage.</p>
+<p>Pour un checkpoint de 3 minutes et un redémarrage de 10 minutes, la perte vaut 7,9 % si une interruption survient en moyenne toutes les 20 heures. Elle monte à 30,7 % pour une interruption toutes les 2 heures et tombe à 2,3 % pour une toutes les 200 heures.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.2 — Où l'achat devient rentable</span> Avec un goodput de 0,9, le lab calcule le coût par heure utile (en u) pour quatre niveaux d'utilisation.</p>
+<div class="tbl-wrap">
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Utilisation</th>
+<th>Possédé</th>
+<th>Location 3 ans</th>
+<th>Réservé 1 an</th>
+<th>À la demande</th>
+<th>Spot</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0,3</td>
+<td>7,57</td>
+<td>9,63</td>
+<td>11,85</td>
+<td>4,44</td>
+<td>1,93</td>
+</tr>
+<tr class="even">
+<td>0,5</td>
+<td>4,58</td>
+<td>5,78</td>
+<td>7,11</td>
+<td>4,44</td>
+<td>1,93</td>
+</tr>
+<tr class="odd">
+<td>0,7</td>
+<td>3,31</td>
+<td>4,13</td>
+<td>5,08</td>
+<td>4,44</td>
+<td>1,93</td>
+</tr>
+<tr class="even">
+<td>0,9</td>
+<td>2,59</td>
+<td>3,21</td>
+<td>3,95</td>
+<td>4,44</td>
+<td>1,93</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le parc possédé bat la demande à partir d'une utilisation <span class="math inline">u^{*} = 0{,}516</span> (indépendante de <span class="math inline">g</span> : il se simplifie). La location à 2,6 u bat la demande à 4,0 u à partir de <span class="math inline">r/o = 0{,}65</span>, et la réservation à 3,2 u à partir de 0,80. À 30 % d'utilisation, le parc possédé coûte 1,7 fois la demande ; à 90 %, il coûte 42 % de moins.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 640 290" role="img" aria-labelledby="tco-t tco-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="tco-t">
+Coût de la GPU-heure utile selon l'utilisation
+</title>
+<desc id="tco-d">Cinq courbes du coût par GPU-heure utile en fonction de l'utilisation de 30 à 100 %. Les options à coût fixe baissent quand l'utilisation monte ; la courbe de l'achat coupe celle de la demande à environ 52 % d'utilisation.</desc> <line x1="70" y1="220" x2="600" y2="220" stroke="currentColor" stroke-width="1.5"/> <line x1="70" y1="220" x2="70" y2="24" stroke="currentColor" stroke-width="1.5"/> <text x="64" y="224" font-size="12" text-anchor="end" fill="currentColor">0</text> <text x="64" y="175" font-size="12" text-anchor="end" fill="currentColor">3</text> <text x="64" y="126" font-size="12" text-anchor="end" fill="currentColor">6</text> <text x="64" y="77" font-size="12" text-anchor="end" fill="currentColor">9</text> <text x="64" y="28" font-size="12" text-anchor="end" fill="currentColor">12</text> <text x="70.0" y="238" font-size="12" text-anchor="middle" fill="currentColor">30 %</text> <text x="145.7" y="238" font-size="12" text-anchor="middle" fill="currentColor">40 %</text> <text x="221.4" y="238" font-size="12" text-anchor="middle" fill="currentColor">50 %</text> <text x="297.1" y="238" font-size="12" text-anchor="middle" fill="currentColor">60 %</text> <text x="372.9" y="238" font-size="12" text-anchor="middle" fill="currentColor">70 %</text> <text x="448.6" y="238" font-size="12" text-anchor="middle" fill="currentColor">80 %</text> <text x="524.3" y="238" font-size="12" text-anchor="middle" fill="currentColor">90 %</text> <text x="600.0" y="238" font-size="12" text-anchor="middle" fill="currentColor">100 %</text> <polyline points="70.0,96.4 88.9,105.7 107.9,113.8 126.8,120.7 145.7,126.8 164.6,132.2 183.6,137.0 202.5,141.3 221.4,145.1 240.4,148.6 259.3,151.8 278.2,154.7 297.1,157.3 316.1,159.7 335.0,162.0 353.9,164.1 372.9,166.0 391.8,167.8 410.7,169.5 429.6,171.1 448.6,172.5 467.5,173.9 486.4,175.2 505.4,176.5 524.3,177.6 543.2,178.7 562.1,179.8 581.1,180.7 600.0,181.7" fill="none" stroke="var(--accent)" stroke-width="3"/> <polyline points="70.0,62.7 88.9,74.8 107.9,85.2 126.8,94.2 145.7,102.0 164.6,109.0 183.6,115.1 202.5,120.7 221.4,125.6 240.4,130.1 259.3,134.2 278.2,137.9 297.1,141.4 316.1,144.5 335.0,147.4 353.9,150.1 372.9,152.6 391.8,154.9 410.7,157.1 429.6,159.1 448.6,161.0 467.5,162.8 486.4,164.5 505.4,166.1 524.3,167.6 543.2,169.0 562.1,170.3 581.1,171.6 600.0,172.8" fill="none" stroke="currentColor" stroke-width="2"/> <polyline points="70.0,26.4 88.9,41.3 107.9,54.1 126.8,65.1 145.7,74.8 164.6,83.4 183.6,90.9 202.5,97.7 221.4,103.9 240.4,109.4 259.3,114.4 278.2,119.0 297.1,123.2 316.1,127.1 335.0,130.7 353.9,134.0 372.9,137.0 391.8,139.9 410.7,142.6 429.6,145.1 448.6,147.4 467.5,149.6 486.4,151.7 505.4,153.6 524.3,155.5 543.2,157.2 562.1,158.9 581.1,160.4 600.0,161.9" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/> <polyline points="70.0,147.4 88.9,147.4 107.9,147.4 126.8,147.4 145.7,147.4 164.6,147.4 183.6,147.4 202.5,147.4 221.4,147.4 240.4,147.4 259.3,147.4 278.2,147.4 297.1,147.4 316.1,147.4 335.0,147.4 353.9,147.4 372.9,147.4 391.8,147.4 410.7,147.4 429.6,147.4 448.6,147.4 467.5,147.4 486.4,147.4 505.4,147.4 524.3,147.4 543.2,147.4 562.1,147.4 581.1,147.4 600.0,147.4" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2 4"/> <polyline points="70.0,188.5 88.9,188.5 107.9,188.5 126.8,188.5 145.7,188.5 164.6,188.5 183.6,188.5 202.5,188.5 221.4,188.5 240.4,188.5 259.3,188.5 278.2,188.5 297.1,188.5 316.1,188.5 335.0,188.5 353.9,188.5 372.9,188.5 391.8,188.5 410.7,188.5 429.6,188.5 448.6,188.5 467.5,188.5 486.4,188.5 505.4,188.5 524.3,188.5 543.2,188.5 562.1,188.5 581.1,188.5 600.0,188.5" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="10 3 2 3"/> <circle cx="233.6" cy="147.4" r="5" fill="var(--accent)" stroke="currentColor"/> <text x="223.6" y="177.4" font-size="13" font-weight="700" text-anchor="end" fill="currentColor">u* = 0,52</text> <line x1="400" y1="34" x2="436" y2="34" stroke="var(--accent)" stroke-width="3"/> <text x="444" y="38" font-size="13" fill="currentColor">achat (possédé)</text> <line x1="400" y1="54" x2="436" y2="54" stroke="currentColor" stroke-width="2"/> <text x="444" y="58" font-size="13" fill="currentColor">location 3 ans</text> <line x1="400" y1="74" x2="436" y2="74" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/> <text x="444" y="78" font-size="13" fill="currentColor">réservé 1 an</text> <line x1="400" y1="94" x2="436" y2="94" stroke="currentColor" stroke-width="2" stroke-dasharray="2 4"/> <text x="444" y="98" font-size="13" fill="currentColor">à la demande</text> <line x1="400" y1="114" x2="436" y2="114" stroke="currentColor" stroke-width="2" stroke-dasharray="10 3 2 3"/> <text x="444" y="118" font-size="13" fill="currentColor">spot</text> <text x="74" y="14" font-size="12" fill="currentColor">u par GPU-heure utile</text>
+</svg>
+<figcaption>
+Coût de la GPU-heure utile selon l'utilisation (goodput 0,9, données fictives du lab 15.3). Les options à coût fixe se paient à chaque heure et baissent avec l'utilisation ; la demande et le spot ne dépendent pas d'elle.
+</figcaption>
+</figure>
+<p>Deux remarques sur ce tableau. Le spot est le moins cher à toute utilisation, mais ce chiffre est trompeur : il suppose qu'on puisse en obtenir autant qu'on veut, et que le travail tolère des interruptions. Ensuite, la comparaison de deux options à coût fixe (possédé contre location) ne dépend pas de l'utilisation, puisque les deux se divisent par le même <span class="math inline">u</span> : elle se joue sur le coût annuel par GPU, 18 240 u contre 22 776 u dans cet exemple.</p>
+<h3 id="les-régimes-réels-et-leurs-conditions">4.3. Les régimes réels et leurs conditions</h3>
+<p><strong>Achat sur site ou en colocation.</strong> L'installation en colocation se paie au kW réservé ; sur site, vous amortissez salle, alimentation et refroidissement. Avec les valeurs fictives du lab, le point mort contre la demande passe de 0,516 (colocation) à 0,485 (installation sur site à 90 u par kW et par mois) : la différence est réelle mais faible devant celle de l'utilisation.</p>
+<p><strong>Réservations de courte durée.</strong> AWS propose des <em>Capacity Blocks for ML</em> : on réserve des instances GPU pour une date future, avec un début jusqu'à huit semaines à l'avance, jusqu'à 64 instances par bloc et 256 au total, d'après la documentation d'AWS. Le prix dépend de l'offre et de la demande à l'achat, il est payé d'avance et ne change plus ensuite. Les remises des Savings Plans et des Reserved Instances ne s'y appliquent pas. Le temps non utilisé ne coûte rien de plus, mais il est déjà payé.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.3 — Un bloc réservé et payé d'avance</span> Soit un bloc de 8 GPU sur 14 jours à un prix d'exemple de 3,0 u par GPU-heure : 8 064 u payés d'avance. Si le bloc n'est utilisé qu'à 60 %, le coût par heure réellement utilisée est <span class="math inline">3{,}0/0{,}6 = 5{,}0</span> u, plus que le tarif à la demande de 4,0 u. Un bloc payé d'avance ne vaut que si vous remplissez son calendrier : c'est l'argument pour caler les campagnes sur la réservation, pas l'inverse.</p>
+</div>
+<p><strong>Spot.</strong> AWS émet un avis d'interruption deux minutes avant d'arrêter ou de terminer une instance Spot, « au mieux » (<em>best effort</em>) d'après sa documentation. Un entraînement spot doit donc pouvoir sauvegarder un checkpoint en moins de deux minutes, ou accepter de perdre le travail depuis le dernier.</p>
+<h3 id="sensibilité-ce-qui-fait-basculer-la-décision">4.4. Sensibilité : ce qui fait basculer la décision</h3>
+<p>Un modèle sert surtout à savoir <strong>quelles hypothèses comptent</strong>. Le lab fait varier chaque paramètre de ±20 % autour de sa valeur et mesure l'écart sur le coût par heure utile du parc possédé, à 70 % d'utilisation :</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Paramètre</th>
+<th>Coût à −20 %</th>
+<th>Coût à +20 %</th>
+<th>Écart</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prix du nœud</td>
+<td>2,79</td>
+<td>3,82</td>
+<td>1,04</td>
+</tr>
+<tr class="even">
+<td>Durée de vie</td>
+<td>3,77</td>
+<td>3,00</td>
+<td>0,77</td>
+</tr>
+<tr class="odd">
+<td>Coût du capital</td>
+<td>3,22</td>
+<td>3,39</td>
+<td>0,18</td>
+</tr>
+<tr class="even">
+<td>Réseau et stockage</td>
+<td>3,22</td>
+<td>3,39</td>
+<td>0,18</td>
+</tr>
+<tr class="odd">
+<td>Support</td>
+<td>3,23</td>
+<td>3,38</td>
+<td>0,15</td>
+</tr>
+<tr class="even">
+<td>PUE</td>
+<td>3,26</td>
+<td>3,35</td>
+<td>0,08</td>
+</tr>
+<tr class="odd">
+<td>Prix de l'énergie</td>
+<td>3,26</td>
+<td>3,35</td>
+<td>0,08</td>
+</tr>
+<tr class="even">
+<td>Valeur de revente</td>
+<td>3,34</td>
+<td>3,27</td>
+<td>0,07</td>
+</tr>
+<tr class="odd">
+<td>Personnel</td>
+<td>3,29</td>
+<td>3,32</td>
+<td>0,02</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le prix du matériel et la durée de vie dominent. L'énergie, souvent discutée, pèse peu dans le coût (6,3 % du total dans cet exemple) ; elle pèse davantage dans la capacité installable (chapitre 5). La valeur de revente, très incertaine, compte peu.</p>
+<p>Passer la durée de vie de 3 à 6 ans fait baisser le coût par heure disponible de 2,47 à 1,70 u et le point mort de 0,615 à 0,418. <strong>La durée de vie est une hypothèse de risque</strong>, car elle dépend du rythme des générations de GPU, pas seulement de l'amortissement comptable. Fixez-la avec la finance, et testez un scénario où la revente est nulle.</p>
+<h3 id="ce-que-le-modèle-ne-dit-pas">4.5. Ce que le modèle ne dit pas</h3>
+<p>Le lab l'écrit dans son README : ni taxes, ni inflation, ni remises de volume, ni coût de transfert de données, ni limite de capacité sur le spot ou la demande, ni délai de livraison. Les trois derniers sont souvent décisifs. Un régime moins cher mais indisponible pendant six mois n'est pas une option.</p>
+<p>En pratique, on compose les régimes : un socle engagé au niveau du chapitre 3, de la demande pour les pointes, du spot pour les travaux tolérants aux interruptions. Le projet « Placement multi-fournisseurs » prolonge ce chapitre en simulant cette composition sur des capacités et des taux d'interruption fictifs.</p>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li>Ramenez tout à la GPU-heure utile : coût fixe divisé par <span class="math inline">u \cdot g</span>, tarif à l'usage divisé par <span class="math inline">g</span>.</li>
+<li>Un parc possédé ou engagé devient rentable au-delà d'un point mort d'utilisation (<span class="math inline">0{,}516</span> ici face à la demande) ; pour un engagement de tarif <span class="math inline">r</span> face à la demande <span class="math inline">o</span>, ce point mort vaut <span class="math inline">r/o</span>.</li>
+<li>Prix du matériel et durée de vie dominent la sensibilité ; l'énergie pèse peu dans le coût.</li>
+<li>Un bloc payé d'avance coûte <span class="math inline">\text{prix}/\text{taux de remplissage}</span> par heure utilisée.</li>
+<li>Disponibilité, délais et limites de capacité ne sont pas dans le modèle : ajoutez-les par le contrat (chapitre 6).</li>
+</ul>
+</div>
+<h2 id="ch5">5. Énergie et datacenter : puissance, refroidissement, PUE, délais</h2>
+<p>Un GPU ne s'installe pas sans électricité ni évacuation de chaleur. Pour un ingénieur d'infrastructure, la puissance disponible est souvent la première contrainte de dimensionnement, avant le budget. Ce chapitre donne les ordres de grandeur publiés et le calcul qui relie kilowatts, baies et GPU.</p>
+<h3 id="puissance-dun-gpu-dun-nœud-dune-baie">5.1. Puissance d'un GPU, d'un nœud, d'une baie</h3>
+<p>La page produit du H100 de NVIDIA indique une puissance thermique maximale (TDP) « jusqu'à 700 W (configurable) » pour la version SXM (350 à 400 W pour la version NVL). Un nœud de 8 GPU consomme bien plus que 8 fois 700 W : processeurs, mémoire, commutateurs NVLink, cartes réseau, ventilateurs et stockage s'y ajoutent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Système</th>
+<th>Puissance maximale</th>
+<th>Refroidissement</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DGX H100 / H200 (8 GPU)</td>
+<td>10,2 kW, six alimentations de 3,3 kW en 4+2</td>
+<td>air</td>
+<td>guide utilisateur NVIDIA</td>
+</tr>
+<tr class="even">
+<td>DGX B200 (8 GPU)</td>
+<td>14,3 kW, six alimentations de 3,3 kW en 5+1</td>
+<td>air</td>
+<td>guide utilisateur NVIDIA</td>
+</tr>
+<tr class="odd">
+<td>GB200 NVL72 (72 GPU, rack)</td>
+<td>120 kW de capacité de refroidissement requise</td>
+<td>liquide direct</td>
+<td>blog NVIDIA, 2024</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour le DGX H100, les huit GPU représentent au plus <span class="math inline">8 \times 0{,}7 = 5{,}6</span> kW, soit 55 % de la puissance maximale du nœud. Chaque emplacement de GPU « coûte » donc 1,275 kW tout compris, et 1,79 kW pour le DGX B200 (<span class="math inline">14{,}3 / 8</span>). Dans le rack NVL72, la capacité de 120 kW rapportée à 72 GPU donne 1,67 kW par GPU.</p>
+<div class="note">
+<p><span class="tag">Deux chiffres sur la même page</span> Le guide du DGX H100 donne 10,2 kW de puissance maximale et, dans sa table des caractéristiques, une production de chaleur de 38 557 BTU par heure. Avec 1 W = 3,412 BTU/h, cela fait 11,3 kW, soit 11 % de plus. Nous n'avons pas d'explication documentée de l'écart. Pour dimensionner un refroidissement, prenez le plus grand des deux et demandez au constructeur de préciser les conditions de chaque mesure.</p>
+</div>
+<h3 id="densité-par-baie-et-refroidissement">5.2. Densité par baie et refroidissement</h3>
+<p>L'Uptime Institute rapportait en 2020 que, sur son échantillon, 71 % des répondants avaient une densité modale inférieure à 10 kW par baie, et que les baies les plus denses de la plupart des centres se situaient entre 10 et 19 kW. Il notait qu'au-delà de 20 à 25 kW par baie, le refroidissement liquide direct et l'air de précision deviennent plus économiques (enquête de 2020 : les ordres de grandeur ont évolué, mais ce sont les derniers chiffres que nous avons lus à la source).</p>
+<p>Un seul DGX H100 occupe donc une baie entière d'une salle « classique », et quatre dans la même baie demandent 40,8 kW. Pour la ventilation, le guide du DGX H100 indique une température de fonctionnement de 5 à 30 °C et un débit d'air de 1 105 CFM à 80 % de la vitesse des ventilateurs.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — L'air peut-il refroidir 120 kW ?</span> L'élévation de température de l'air est donnée par <span class="math inline">\Delta T = P / (\rho \, \dot V c_p)</span>. Avec 1 105 CFM, soit 0,522 m³/s, une masse volumique de 1,2 kg/m³ et une chaleur massique de 1 005 J/(kg·K), un nœud de 10,2 kW échauffe l'air de 16,2 K. C'est un ordre de grandeur, car le débit cité est à 80 % de la vitesse des ventilateurs et non à la charge maximale.</p>
+<p>Pour évacuer 120 kW avec le même échauffement, il faudrait 6,14 m³/s, soit environ 13 000 CFM : l'équivalent du débit de 11,8 serveurs DGX H100 dans une seule baie. À l'eau, avec un échauffement de 10 K et une chaleur massique de 4 186 J/(kg·K), le même rack demande 2,87 kg/s, soit 172 litres par minute. C'est pour cela que les racks de cette densité sont conçus pour le refroidissement liquide direct.</p>
+</div>
+<p>Le refroidissement liquide direct change l'exploitation : circuits d'eau, unités de distribution, détection de fuites, procédures de maintenance. Il se négocie aussi : qui est responsable d'une fuite, et dans quel délai le fournisseur la répare (chapitre 6).</p>
+<h3 id="le-pue-et-le-coût-de-lénergie">5.3. Le PUE et le coût de l'énergie</h3>
+<p>Le PUE (<em>power usage effectiveness</em>) compare l'énergie totale d'une installation à celle qui alimente les équipements informatiques :</p>
+<p><span class="math display">\text{PUE} = \frac{E_{\text{installation}}}{E_{\text{informatique}}}</span></p>
+<p>Google le rappelle dans sa page sur l'efficacité de ses centres : un PUE de 2,0 signifie qu'à chaque watt informatique s'ajoute un watt pour le refroidissement et la distribution. Google rapporte un PUE moyen de 1,09 en 2025 sur sa flotte, et cite l'enquête 2025 de l'Uptime Institute pour une moyenne mondiale de 1,54. Ce sont deux populations différentes, à ne pas comparer à la légère.</p>
+<p>L'effet sur le coût reste modeste. Un nœud DGX H100 qui tire en moyenne 75 % de sa puissance maximale (7,65 kW, valeur d'exemple) consomme, par GPU-heure et à 0,12 u le kWh (prix fictif), 0,126 u à PUE 1,1, 0,161 u à PUE 1,4 et 0,177 u à PUE 1,54. Cela fait de 6,1 % à 8,5 % du coût plein de 2,08 u. Mille GPU à PUE 1,4 consomment environ 11,7 GWh par an, dont 8,4 GWh pour l'informatique.</p>
+<p>À l'échelle d'un pays, le Lawrence Berkeley National Laboratory estime que les centres de données américains ont consommé 176 TWh en 2023, soit 4,4 % de l'électricité du pays (rapport 2024). L'énergie est donc un sujet de politique publique, mais votre décision d'achat se joue sur la puissance installable plus que sur la facture d'énergie.</p>
+<h3 id="de-la-puissance-disponible-au-nombre-de-gpu">5.4. De la puissance disponible au nombre de GPU</h3>
+<p>La puissance se réserve en kW sur la valeur maximale, et se facture en kWh sur la consommation mesurée. Pour savoir combien de GPU tiennent dans une installation, on raisonne en puissance maximale informatique : le budget électrique de l'installation divisé par le PUE, puis par la puissance maximale d'un nœud.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.2 — Un mégawatt, combien de GPU ?</span> Une installation dispose de 1 000 kW. À PUE 1,4, la part informatique est de <span class="math inline">1000/1{,}4 = 714</span> kW. Avec des nœuds DGX H100 de 10,2 kW, on installe <span class="math inline">\lfloor 714/10{,}2 \rfloor = 70</span> nœuds, soit 560 GPU, en 18 baies de quatre nœuds (40,8 kW chacune), dont la dernière est à moitié pleine.</p>
+<p>Dimensionner sur la puissance <em>moyenne</em> (7,65 kW) conduirait à 93 nœuds, soit 744 GPU, un tiers de plus. C'est tentant et dangereux : disjoncteurs, onduleurs et refroidissement sont dimensionnés pour la pointe, et la charge d'un entraînement varie fortement à l'échelle de la salle. Notre recommandation est de dimensionner sur le maximum et d'utiliser la consommation moyenne pour le budget d'énergie seulement.</p>
+</div>
+<div class="war">
+<p><span class="tag">Des variations de puissance de l'ordre de dizaines de mégawatts</span> Les auteurs de <a href="https://arxiv.org/abs/2407.21783">l'article de Llama 3</a> notent que des dizaines de milliers de GPU peuvent augmenter ou réduire leur consommation en même temps, par exemple quand tous attendent la fin d'un checkpoint ou d'une communication collective, ou au démarrage ou à l'arrêt de tout le job.</p>
+<p>Cela peut provoquer des fluctuations instantanées de consommation de l'ordre de dizaines de mégawatts dans le centre de données, aux limites du réseau électrique. Le même article relève une variation diurne de 1 à 2 % du débit d'entraînement, liée à la température. Demandez à l'exploitant de votre installation le profil de puissance qu'elle supporte avant de lancer une campagne.</p>
+</div>
+<h3 id="délais-et-calendrier">5.5. Délais et calendrier</h3>
+<p>Les délais de raccordement électrique, de fourniture des équipements de refroidissement et de livraison de GPU sont souvent plus longs que le délai de décision. Ce module ne cite aucune durée : nous n'avons pas lu de source primaire à jour qui en donne un ordre de grandeur fiable, et ces délais dépendent du site, du pays et du fournisseur.</p>
+<p>La méthode, elle, est stable. Dressez le chemin critique : alimentation (raccordement et transformateurs), distribution (tableaux, PDU), refroidissement (unités de distribution, circuits), baies, réseau, recette. Demandez par écrit, pour chaque étape, une date et un responsable. Intégrez la date de « prêt pour le service » au contrat, avec une pénalité de retard (chapitre 6). Enfin, utilisez ce délai comme horizon minimal de votre prévision de demande (chapitre 3) : une capacité commandée aujourd'hui répond à la demande de dans plusieurs mois.</p>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Un nœud de 8 GPU tire 10,2 kW (DGX H100) ou 14,3 kW (DGX B200) au maximum ; un rack NVL72 demande 120 kW de refroidissement liquide.</li>
+<li>À l'air, 120 kW demanderaient environ 13 000 CFM par baie ; l'eau n'en demande que 172 L/min pour un échauffement de 10 K.</li>
+<li>Le PUE de l'ordre de 1,1 à 1,5 fait varier l'énergie de 6 à 9 % du coût plein ; il pèse davantage sur la puissance installable.</li>
+<li>Dimensionnez en puissance maximale informatique divisée par le PUE ; ne vous fiez pas à la puissance moyenne.</li>
+<li>Les délais d'alimentation et de refroidissement se demandent par écrit, étape par étape, et se contractualisent.</li>
+</ul>
+</div>
+<h2 id="ch6">6. Lire un contrat de capacité GPU</h2>
+<p>Le contrat est l'endroit où une promesse de capacité devient une obligation mesurable ou ne le devient pas. Ce chapitre apprend à lire un contrat de capacité avec un œil d'ingénieur : quelles clauses comptent pour un entraînement, comment les chiffrer, et lesquelles négocier. Il ne remplace pas un conseil juridique.</p>
+<h3 id="anatomie-dun-contrat-de-capacité">6.1. Anatomie d'un contrat de capacité</h3>
+<p>Un contrat de capacité GPU se découpe en neuf familles de clauses. Pour chacune, la question de l'ingénieur est la même : quel nombre, mesuré comment, avec quelle conséquence en cas de manquement ?</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Famille</th>
+<th>Question à poser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Engagement</td>
+<td>durée minimale, paiement à vide (<em>take-or-pay</em>), renouvellement, droit de sortie</td>
+</tr>
+<tr class="even">
+<td>Livraison</td>
+<td>date de mise à disposition, livraison par tranches, recette, début de la facturation</td>
+</tr>
+<tr class="odd">
+<td>Disponibilité (SLA)</td>
+<td>cible, périmètre mesuré, exclusions, plafond et nature de la compensation</td>
+</tr>
+<tr class="even">
+<td>Remplacement</td>
+<td>délai de remplacement d'un nœud, matériel de remplacement, pièces de rechange</td>
+</tr>
+<tr class="odd">
+<td>Performance</td>
+<td>réseau, stockage, fréquence : engagement ou « au mieux »</td>
+</tr>
+<tr class="even">
+<td>Support</td>
+<td>horaires, délai de première réponse, interlocuteur nommé, escalade</td>
+</tr>
+<tr class="odd">
+<td>Prix</td>
+<td>indexation, augmentations, surcharges</td>
+</tr>
+<tr class="even">
+<td>Sortie et données</td>
+<td>frais de transfert, restitution, suppression et certificat</td>
+</tr>
+<tr class="odd">
+<td>Responsabilité</td>
+<td>plafond, force majeure, suspension, résiliation par le fournisseur</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour chiffrer les clauses, ce chapitre suppose un contrat de 512 GPU (64 nœuds de 8) à un prix d'exemple de 3,0 u par GPU-heure, soit 1 105 920 u par mois de 30 jours.</p>
+<h3 id="lire-un-sla-publié">6.2. Lire un SLA publié</h3>
+<p>Les grands fournisseurs publient leurs SLA ; ils servent d'étalon pour lire un SLA négocié. Le SLA d'Amazon EC2 (page « Last Updated: May 25, 2022 », lue le 24 octobre 2026) s'engage sur une disponibilité mensuelle d'au moins 99,99 % pour une région, à condition que toutes les instances soient déployées dans au moins deux zones.</p>
+<p>En dessous, les crédits sont de 10 % de la facture mensuelle pour une disponibilité inférieure à 99,99 % et au moins égale à 99,0 %, de 30 % entre 99,0 % et 95,0 %, et de 100 % en dessous. Pour une instance isolée, la cible est de 99,5 %.</p>
+<p>Plusieurs détails comptent plus que les pourcentages. Le crédit se calcule sur la facture mensuelle de l'offre concernée, hors paiements uniques d'avance. Il ne s'applique que sur des paiements futurs. Il faut le demander en ouvrant un dossier avant la fin du deuxième cycle de facturation suivant l'incident.</p>
+<p>Le SLA précise qu'il constitue le recours unique et exclusif du client. Et pour une instance isolée, l'indisponibilité est définie comme l'absence de connectivité externe : une instance dont le GPU est défaillant mais qui répond au réseau est disponible au sens du SLA.</p>
+<p>Le SLA de Google Compute Engine a la même structure au niveau régional : crédits de 10 %, 25 % puis 100 % selon la disponibilité mensuelle (entre 99,00 % et le seuil de la cible, entre 95,00 % et 99,00 %, puis en dessous de 95 %), versés sur les factures futures, avec le même recours unique et exclusif. Cette structure se retrouve dans la plupart des contrats : retenez-la comme grille de lecture.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Disponibilité mensuelle</th>
+<th>Minutes d'indisponibilité tolérées sur 30 jours</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>99,99 %</td>
+<td>4,3</td>
+</tr>
+<tr class="even">
+<td>99,9 %</td>
+<td>43,2</td>
+</tr>
+<tr class="odd">
+<td>99,5 %</td>
+<td>216</td>
+</tr>
+<tr class="even">
+<td>99,0 %</td>
+<td>432</td>
+</tr>
+<tr class="odd">
+<td>95,0 %</td>
+<td>2 160</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="pourquoi-un-crédit-nest-pas-une-compensation">6.3. Pourquoi un crédit n'est pas une compensation</h3>
+<p>Un entraînement synchrone s'arrête dès qu'un nœud manque. Un SLA, lui, compte l'indisponibilité à une autre échelle, par instance ou par région, et seulement si le nœud est injoignable.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — Un nœud sur 64 en panne</span> Le module <code>sla.py</code> du lab 15.4 calcule la disponibilité par nœud-heure : <span class="math inline">1 - \text{heures d&#39;arrêt} / (\text{nœuds} \times 720)</span>. Un nœud en panne sur 64 pendant un mois de 30 jours donne :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Nœud en panne</th>
+<th>Disponibilité par nœud-heure</th>
+<th>Crédit (cible 99,5 %)</th>
+<th>Valeur du job de 512 GPU arrêté</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 h</td>
+<td>99,9978 %</td>
+<td>0</td>
+<td>1 536 u</td>
+</tr>
+<tr class="even">
+<td>6 h</td>
+<td>99,9870 %</td>
+<td>0</td>
+<td>9 216 u</td>
+</tr>
+<tr class="odd">
+<td>36 h</td>
+<td>99,9219 %</td>
+<td>0</td>
+<td>55 296 u</td>
+</tr>
+<tr class="even">
+<td>72 h</td>
+<td>99,8438 %</td>
+<td>0</td>
+<td>110 592 u</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>La dernière colonne suppose qu'un job de 512 GPU est arrêté pendant toute la panne (prix d'exemple 3,0 u). Le crédit est nul dans tous les cas : à 99,5 %, il faudrait 230 heures de panne d'un seul nœud sur 64 pour passer sous la cible par nœud-heure, alors que 3,6 heures d'arrêt de <em>tout le cluster</em> y suffiraient. Un SLA mesuré par cluster et sur la joignabilité du réseau ne protège pas un entraînement.</p>
+</div>
+<p>L'inverse existe aussi : une panne totale courte donne un crédit généreux. Avec la grille d'AWS appliquée à 512 GPU, un mois à 99,7 % (130 minutes d'arrêt de tout le cluster) donne 10 % de crédit, soit 110 592 u, pour 3 318 u de GPU-heures perdues. Mais l'arrêt d'un job synchrone coûte plus que les heures d'arrêt (travail perdu depuis le dernier checkpoint), et aucun crédit ne couvre la dégradation silencieuse d'un GPU ou d'un lien. Le lien avec le chapitre 2 est direct : c'est un goodput que le SLA ne protège pas.</p>
+<h3 id="les-clauses-propres-aux-gpu">6.4. Les clauses propres aux GPU</h3>
+<p><strong>Remplacement.</strong> Le contrat fictif du lab promet un remplacement « raisonnable » sans délai. Exigez un nombre d'heures, un stock de pièces dimensionné dans le contrat, et que le nœud compte comme indisponible jusqu'au remplacement. Sans quoi un nœud défaillant reste un nœud payé et inutilisable.</p>
+<p><strong>Substitution.</strong> Si le fournisseur peut remplacer un nœud par une « configuration équivalente », un nœud de génération différente peut entrer dans un job synchrone et le ralentir. Exigez le même modèle de GPU, la même mémoire et la même interconnexion, ou une validation par benchmark.</p>
+<p><strong>Recette et performance.</strong> Une recette (<em>acceptance</em>) décrit des tests passés avant la facturation : durée de rodage (<em>burn-in</em>), débit de bus d'un all-reduce comme celui de <code>nccl-tests</code> (module 2), débit de stockage, état de santé des GPU (projet <a href="../../projects/gpu-observability/index.html">Observabilité des GPU</a>). Les valeurs mesurées à la recette deviennent un plancher pendant le contrat. Un contrat sans engagement de performance ne garantit qu'une présence.</p>
+<p><strong>Maintenance et support.</strong> Plafonnez les heures de maintenance planifiée, exigez un préavis, interdisez le redémarrage de nœuds en cours de job, et demandez un support 24 h sur 24 pour les incidents critiques avec un interlocuteur nommé.</p>
+<p><strong>Relocalisation.</strong> Le droit de déplacer votre capacité dans un autre centre peut dégrader la proximité du stockage et du réseau, et changer la localisation des données.</p>
+<h3 id="engagement-prix-et-sortie">6.5. Engagement, prix et sortie</h3>
+<p><strong>Paiement à vide.</strong> Dans le contrat fictif, vous payez les 512 GPU chaque heure dès la date de début, alors que seuls 25 % sont livrés au départ et que le reste l'est « selon disponibilité ». Si les 75 % restants arrivent après 90 jours, vous avez payé 2 488 320 u de capacité non livrée (à 3,0 u). Demandez de facturer la capacité livrée et recettée, avec un palier de souplesse de 10 à 20 %.</p>
+<p><strong>Prix.</strong> Une augmentation annuelle plafonnée à 8 % à partir de la deuxième année coûte, si elle s'applique deux fois (année 2 puis année 3, hausses composées), 3 269 984 u de plus sur 3 ans, soit 8,2 % du total. Les surcharges d'énergie « pour refléter les hausses de coûts » sans formule sont une augmentation sans plafond.</p>
+<p><strong>Sortie et données.</strong> Les frais de transfert au départ peuvent être un frein à la sortie. AWS décrit un programme de dérogation : sur demande auprès du support, les frais de transfert sortants sont supprimés pour un client qui quitte AWS. Le billet d'AWS précise que cette dérogation suit la direction du règlement européen sur les données (<em>Data Act</em>).</p>
+<p>Une mise à jour datée du 8 octobre 2026 indique que les clients hors Union européenne disposent de 180 jours pour terminer leur départ. Ces conditions évoluent : relisez-les le jour de la décision, et obtenez leur équivalent par écrit dans votre contrat.</p>
+<p><strong>Responsabilité.</strong> Un plafond égal à trois mois de redevances (3 317 760 u dans notre exemple) représente 8,3 % des 39 813 120 u du contrat sur 36 mois. Combiné à l'exclusion de la « perte de progrès d'entraînement », il laisse l'essentiel du risque au client. La force majeure qui inclut « les pénuries de composants » ou « l'indisponibilité d'électricité » retire au fournisseur ses risques propres.</p>
+<p><strong>Résiliation.</strong> Un fournisseur qui peut résilier pour convenance avec 30 jours de préavis, sans remboursement des sommes payées d'avance, rend l'engagement unilatéral. Un client sans droit de résiliation, face à un fournisseur qui peut suspendre « sur soupçon raisonnable » et sans préavis, supporte tous les risques.</p>
+<h3 id="une-grille-de-revue-appliquée-par-un-script">6.6. Une grille de revue, appliquée par un script</h3>
+<p>Le lab 15.4 fournit un contrat <strong>fictif</strong> de 26 clauses (fournisseur inventé, nombres inventés, problèmes plantés), une grille de 24 critères et un script qui les évalue par expressions régulières. Chaque critère est vert (1 point), orange (0,5) ou rouge (0), avec un poids ; quatre critères sont des <em>deal-breakers</em> (paiement à vide, livraison sans recours, périmètre de disponibilité, résiliation unilatérale par le fournisseur).</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.2 — La revue du contrat fictif</span> Sortie réelle du script sur le contrat fictif (premières lignes) :</p>
+<pre class="text"><code>contract score 7/100  (0 green, 5 amber, 19 red)
+by category: commitment 0  delivery 0  service 19  operations 10  price 0  exit_legal 8
+deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_exit</code></pre>
+<p>Après un tour de négociation fictif (version <code>fictional_contract_negotiated.md</code>), le score monte à 88/100 avec 18 critères verts, 6 oranges et aucun rouge. Les six oranges restants sont des compromis : délai de remplacement de 48 heures, disponibilité de 99,5 %, 24 heures de maintenance, engagement de 24 mois, recours exclusif et réponse critique en 4 heures ouvrées.</p>
+</div>
+<p>Le score est une aide au tri, pas une mesure : poids et seuils sont les choix de ce parcours, et vous devez les adapter à votre charge et à vos alternatives.</p>
+<p>Une limite importante : un critère de type indicateur (par exemple la substitution de matériel) devient rouge quand la formulation fautive <em>est présente</em>, et reste vert quand elle est absente. Un contrat muet sur un sujet peut donc paraître vert ; sur un contrat réel, faites un relevé manuel clause par clause. La vraie valeur du score est la liste ordonnée de ce qu'il faut négocier, avec pour chaque point la demande à formuler (chapitre 7).</p>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li>Un SLA publié a presque toujours la même structure : cible, périmètre, exclusions, crédits plafonnés, recours exclusif, réclamation dans un délai.</li>
+<li>Un crédit n'est pas une compensation : un nœud en panne parmi 64 ne déclenche rien, alors qu'il arrête un job synchrone.</li>
+<li>Les clauses propres aux GPU sont le remplacement, la substitution, la recette, le plancher de performance et la maintenance.</li>
+<li>Paiement à vide, hausses de prix, frais de sortie, plafond de responsabilité et force majeure se chiffrent : faites-le avant de négocier.</li>
+</ul>
+</div>
+<h2 id="ch7">7. Négocier : leviers, alternatives, calendrier</h2>
+<p>La négociation d'un contrat de capacité se joue plus sur la préparation que sur le talent oratoire. L'ingénieur n'est pas celui qui signe, mais c'est lui qui sait ce que valent les clauses techniques. Ce chapitre donne une méthode et des chiffres ; les pratiques de négociation relèvent de ce parcours (« recommandé »), pas d'une norme.</p>
+<h3 id="le-rôle-de-lingénieur">7.1. Le rôle de l'ingénieur</h3>
+<p>La FinOps Foundation range les achats et la finance parmi les personas centraux d'une pratique FinOps, à côté de l'ingénierie. Dans un achat de calcul, chacun apporte une pièce que les autres n'ont pas : les achats connaissent les fournisseurs et les procédures, la finance les contraintes de trésorerie et de comptabilité, le juridique la portée des clauses. L'ingénieur apporte quatre choses.</p>
+<ol type="1">
+<li>Une demande chiffrée et ses scénarios (chapitre 3), pour dimensionner l'engagement.</li>
+<li>Un coût par GPU-heure utile et sa sensibilité (chapitre 4), pour juger les prix.</li>
+<li>Des exigences mesurables : disponibilité par nœud-heure, délai de remplacement, tests de recette (chapitre 6).</li>
+<li>Un protocole de test que le fournisseur ne contrôle pas : vos propres charges de travail, pas ses démonstrations.</li>
+</ol>
+<h3 id="mettre-un-prix-sur-chaque-clause">7.2. Mettre un prix sur chaque clause</h3>
+<p>On ne négocie pas tout. Le premier travail est de classer les demandes par valeur espérée, c'est-à-dire par montant en jeu multiplié par la probabilité que la clause joue. Pour le contrat fictif de 512 GPU à 3,0 u l'heure (mois de 720 heures, donc 36 mois = 39 813 120 u), voici quelques ordres de grandeur, recalculés en Python. Ce sont des montants en jeu, pas des espérances.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clause</th>
+<th>Valeur en jeu (u)</th>
+<th>Quand elle joue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 % de prix sur 36 mois</td>
+<td>398 131</td>
+<td>toujours</td>
+</tr>
+<tr class="even">
+<td>Facturation seulement de la capacité livrée (livraison sur 90 jours)</td>
+<td>2 488 320</td>
+<td>si la livraison est retardée</td>
+</tr>
+<tr class="odd">
+<td>Plafond d'augmentation à 3 % au lieu de 8 %</td>
+<td>2 063 647</td>
+<td>si le fournisseur applique le plafond</td>
+</tr>
+<tr class="even">
+<td>Droit de sortie au mois 12 contre 3 mois de redevances</td>
+<td>3 317 760 payés au lieu de 26 542 080</td>
+<td>si la demande chute</td>
+</tr>
+<tr class="odd">
+<td>Plafond de crédit à 30 % au lieu de 10 %</td>
+<td>221 184 par mois dégradé</td>
+<td>si le service est mauvais</td>
+</tr>
+<tr class="even">
+<td>Responsabilité à 12 mois de redevances au lieu de 3</td>
+<td>13 271 040 au lieu de 3 317 760</td>
+<td>si un incident grave survient</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>La lecture est instructive. Un point de prix vaut moins que la souplesse sur la livraison ou que le droit de sortie. Et les clauses de protection (crédits, responsabilité) pèsent peu en espérance tant que le service est bon, mais décident de tout le jour où il ne l'est pas : on les négocie comme une assurance.</p>
+<h3 id="une-alternative-crédible">7.3. Une alternative crédible</h3>
+<p>Le levier le plus fort est de pouvoir partir. Fisher et Ury, dans <em>Getting to Yes</em>, appellent « BATNA » (<em>best alternative to a negotiated agreement</em>) ce que vous obtenez sans accord. Sa valeur fixe votre prix de réserve : le point au-delà duquel vous ne signez pas.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — Le prix de réserve d'une location</span> Reprenons les chiffres du chapitre 4. À une utilisation de 70 %, une location à <span class="math inline">p</span> u la GPU-heure bat la demande à 4,0 u tant que <span class="math inline">p &lt; u \times o = 0{,}7 \times 4{,}0 = 2{,}80</span> u. Si l'achat est une alternative crédible, il fournit un second plafond : 2,08 u par heure disponible. Le prix de réserve est le plus bas des deux, donc 2,08 u, à condition que l'achat soit réalisable dans le délai.</p>
+<p>Une offre à 2,6 u est donc acceptable face à la demande (2,6 &lt; 2,8) mais pas face à un achat crédible (2,6 &gt; 2,08). Obtenir 2,4 u au lieu de 2,6 u pour 512 GPU vaut 897 024 u par an, soit 2 691 072 u sur trois ans, mais ne change pas la conclusion face à l'achat : seul un levier de prix sous 2,08 u le ferait.</p>
+</div>
+<p>Une alternative n'est crédible que si vous la remplissez : un devis écrit, un délai de livraison compatible avec votre besoin, et une charge de travail portable (le projet <a href="../../projects/multi-provider-scheduler/index.html">Placement multi-fournisseurs</a> s'y exerce). Une alternative que vous ne pouvez pas exécuter dans le délai n'est pas une alternative, et le fournisseur le sent.</p>
+<h3 id="calendrier-et-processus">7.4. Calendrier et processus</h3>
+<p>Un achat de calcul se déroule en phases, chacune avec une sortie vérifiable.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Sortie</th>
+<th>Rôle de l'ingénieur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Besoin</td>
+<td>plan de capacité chiffré (chapitre 3)</td>
+<td>construit les scénarios et l'horizon</td>
+</tr>
+<tr class="even">
+<td>Consultation</td>
+<td>réponses de plusieurs fournisseurs à un questionnaire technique</td>
+<td>écrit les exigences mesurables</td>
+</tr>
+<tr class="odd">
+<td>Essai</td>
+<td>mesures sur vos charges de travail</td>
+<td>conçoit et exécute les tests</td>
+</tr>
+<tr class="even">
+<td>Négociation</td>
+<td>liste de demandes classées par valeur</td>
+<td>traduit les résultats d'essai en clauses</td>
+</tr>
+<tr class="odd">
+<td>Contrat</td>
+<td>annexes techniques (recette, santé, performance)</td>
+<td>relit les annexes</td>
+</tr>
+<tr class="even">
+<td>Recette</td>
+<td>rapport de validation avant facturation</td>
+<td>exécute la recette</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Menez au moins deux négociations en parallèle jusqu'à la fin : une négociation avec un seul interlocuteur n'a plus d'alternative. Gardez le calendrier réel pour vous : un délai que l'autre partie connaît est un levier pour elle. Prévoyez que l'essai et la recette prennent du temps de vos propres équipes, et comptez-le dans le coût.</p>
+<h3 id="bonnes-et-mauvaises-pratiques">7.5. Bonnes et mauvaises pratiques</h3>
+<p>Les pratiques ci-dessous sont des recommandations de ce parcours. Elles reposent sur la logique des chapitres précédents, pas sur une étude de marché.</p>
+<p><strong>À faire.</strong></p>
+<ul>
+<li>Séparer avant la discussion ce qui est indispensable de ce qui est souhaitable, et chiffrer chaque demande.</li>
+<li>Échanger des éléments de valeur inégale : accepter une durée plus longue contre de la souplesse sur la livraison, ou une cible de 99,5 % contre une définition stricte de la disponibilité.</li>
+<li>Transformer chaque promesse en nombre dans une annexe : délai, débit, durée.</li>
+<li>Garder les tests sous votre contrôle et conserver les mesures de la recette.</li>
+<li>Garder la sortie en vue : frais de transfert, restitution des données, certificat de suppression.</li>
+</ul>
+<p><strong>À éviter.</strong></p>
+<ul>
+<li>Négocier le prix seul et laisser « au mieux » sur le remplacement, la performance ou le support.</li>
+<li>Engager le pic de la prévision plutôt que le quantile du chapitre 3.</li>
+<li>Laisser le fournisseur choisir ou régler le benchmark.</li>
+<li>Promettre des volumes ou des durées que votre prévision ne soutient pas : ces promesses se paient à vide.</li>
+<li>Signer sans avoir regardé l'alternative la plus plausible.</li>
+</ul>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>L'ingénieur apporte la demande chiffrée, le coût par heure utile, les exigences mesurables et les tests.</li>
+<li>Classez les demandes par valeur en jeu : souplesse de livraison et droit de sortie valent souvent plus qu'un point de prix.</li>
+<li>Le prix de réserve vient de l'alternative crédible : <span class="math inline">u \times o</span> face à la demande, coût disponible face à un achat réalisable.</li>
+<li>Menez plusieurs négociations en parallèle, transformez chaque promesse en nombre dans une annexe, gardez les tests sous votre contrôle.</li>
+</ul>
+</div>
+<h2 id="ch8">8. Matrices de décision, appels d'offres techniques et pilotage trimestriel</h2>
+<p>Une fois les chiffres calculés et le contrat lu, il reste à décider, à consulter les fournisseurs de façon comparable et à suivre l'exécution. Ce chapitre donne les outils de ces trois étapes, avec leurs limites.</p>
+<h3 id="la-matrice-de-décision-pondérée">8.1. La matrice de décision pondérée</h3>
+<p>Une matrice de décision note chaque option sur plusieurs critères et pondère les notes. Elle sert à rendre un arbitrage explicite, pas à le calculer. Voici un exemple dont les notes (de 0 à 10) et les poids sont <strong>inventés</strong> pour l'illustration.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Critère (poids)</th>
+<th>Achat en colocation</th>
+<th>Location 3 ans</th>
+<th>Réservé 1 an</th>
+<th>Demande et spot</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Coût à forte utilisation (3)</td>
+<td>9</td>
+<td>7</td>
+<td>5</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>Flexibilité (2)</td>
+<td>3</td>
+<td>4</td>
+<td>6</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td>Délai d'obtention (2)</td>
+<td>3</td>
+<td>7</td>
+<td>8</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td>Charge d'exploitation (1)</td>
+<td>3</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td>Risque d'approvisionnement (2)</td>
+<td>4</td>
+<td>6</td>
+<td>6</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td><strong>Total pondéré</strong></td>
+<td><strong>5,0</strong></td>
+<td><strong>6,2</strong></td>
+<td><strong>6,3</strong></td>
+<td><strong>5,6</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>La réservation sur un an arrive en tête avec 6,3, à une longueur de la location (6,2). Un écart de 0,1 point sur des notes subjectives ne constitue pas une décision : il faut tester la robustesse du classement.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.1 — Quelle confiance accorder au classement ?</span> Le module <code>decision_matrix.py</code> du lab 15.3 tire 5 000 jeux de poids en multipliant chaque poids par un facteur uniforme entre 0,5 et 1,5. La réservation sur un an arrive première dans 63,4 % des tirages, la location sur 3 ans dans 34,4 %, la demande et le spot dans 2,2 % et l'achat dans aucun.</p>
+<p>Le même module cherche le facteur qui renverse le classement. Il suffit de multiplier le poids du coût par 1,17 pour que la location passe devant, et celui de la flexibilité par 1,88 pour que la demande et le spot passent devant. Un classement qui bascule pour un changement de poids de 17 % n'est pas une conclusion : c'est une question à poser aux décideurs (« le coût compte-t-il vraiment 17 % de plus ? »).</p>
+</div>
+<p>Trois règles de bonne hygiène. Dérivez les notes de mesures quand c'est possible (le coût vient du modèle du chapitre 4, le délai de devis écrits). Présentez des fourchettes plutôt que des notes uniques. Et montrez toujours l'analyse de robustesse à côté du classement.</p>
+<h3 id="lappel-doffres-technique">8.2. L'appel d'offres technique</h3>
+<p>Un appel d'offres (<em>RFP</em>, <em>request for proposal</em>) technique permet de comparer des fournisseurs sur des bases identiques. Sa structure tient en sept blocs.</p>
+<ol type="1">
+<li>Le besoin : plan de capacité et scénarios du chapitre 3, avec le calendrier souhaité.</li>
+<li>Les exigences, classées en obligatoires et souhaitables, chacune exprimée en nombre mesurable.</li>
+<li>Le protocole d'essai : vos charges de travail et vos outils de mesure, pas ceux du fournisseur.</li>
+<li>Le format de réponse : un tableau normalisé, pour que les réponses soient comparables ligne à ligne.</li>
+<li>Les critères d'évaluation et leur pondération, annoncés d'avance.</li>
+<li>Les références : des clients qui exploitent une configuration comparable.</li>
+<li>Les annexes contractuelles demandées : disponibilité, recette, performance, support.</li>
+</ol>
+<p>Les exigences techniques se traduisent en tests de recette. Les seuils sont à fixer avec <em>vos</em> mesures ; le tableau donne les familles de tests et leur source dans ce parcours.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Famille</th>
+<th>Mesure</th>
+<th>Où l'apprendre</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Calcul</td>
+<td>débit d'un GEMM en BF16 par rapport au pic dense</td>
+<td>module 2, lab 2.1</td>
+</tr>
+<tr class="even">
+<td>Réseau</td>
+<td>débit de bus d'un all-reduce à plusieurs tailles de message</td>
+<td>module 2, lab 2.2 ; module 7</td>
+</tr>
+<tr class="odd">
+<td>Stockage</td>
+<td>débit et latence d'écriture d'un checkpoint</td>
+<td>module 8</td>
+</tr>
+<tr class="even">
+<td>Santé</td>
+<td>diagnostics GPU et erreurs matérielles sur la durée du rodage</td>
+<td>projet Observabilité des GPU</td>
+</tr>
+<tr class="odd">
+<td>Ordonnancement</td>
+<td>soumission, tableaux, préemption sous votre ordonnanceur</td>
+<td>module 5</td>
+</tr>
+<tr class="even">
+<td>Disponibilité</td>
+<td>nombre de nœuds sains pendant la période d'essai</td>
+<td>ce module, chapitre 6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="indicateurs-de-pilotage-trimestriels">8.3. Indicateurs de pilotage trimestriels</h3>
+<p>Un tableau de pilotage trimestriel tient en une page et sert à décider. Le document « FinOps for AI » de la Fondation propose, parmi ses indicateurs, l'efficacité d'utilisation des ressources : l'utilisation réelle divisée par la capacité provisionnée. Les indicateurs ci-dessous prolongent cette idée.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Indicateur</th>
+<th>Définition</th>
+<th>Source</th>
+<th>Propriétaire</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Utilisation</td>
+<td>GPU-heures allouées / GPU-heures disponibles</td>
+<td><code>sacct</code> (lab 15.1)</td>
+<td>plateforme</td>
+</tr>
+<tr class="even">
+<td>Goodput</td>
+<td>part des heures allouées qui produit du progrès (l'ETTR de Kokolis et al. compte en plus l'attente en file)</td>
+<td>journaux d'entraînement, checkpoints</td>
+<td>équipes d'entraînement</td>
+</tr>
+<tr class="odd">
+<td>Attente p90 par classe</td>
+<td>percentile 90 de (début − soumission)</td>
+<td><code>sacct</code></td>
+<td>plateforme</td>
+</tr>
+<tr class="even">
+<td>Coût par GPU-heure utile</td>
+<td>coût plein / (heures disponibles × <span class="math inline">u \times g</span>)</td>
+<td>modèle du chapitre 4</td>
+<td>plateforme et finance</td>
+</tr>
+<tr class="odd">
+<td>Couverture de l'engagement</td>
+<td>heures engagées / heures totales</td>
+<td>facturation</td>
+<td>finance et achats</td>
+</tr>
+<tr class="even">
+<td>Utilisation de l'engagement</td>
+<td>heures utilisées / heures engagées</td>
+<td>facturation, <code>sacct</code></td>
+<td>plateforme</td>
+</tr>
+<tr class="odd">
+<td>Erreur de prévision</td>
+<td>biais et erreur absolue relative moyenne</td>
+<td>lab 15.2</td>
+<td>ingénierie</td>
+</tr>
+<tr class="even">
+<td>Énergie</td>
+<td>kWh par GPU-heure, PUE du site</td>
+<td>relevés, fournisseur</td>
+<td>exploitation</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Exemple de lecture de l'erreur de prévision. Sur quatre semaines, la demande observée est de 100, 110, 95 et 120 GPU et la prévision de 105, 100, 100 et 100. L'erreur absolue relative moyenne est de 9,0 % et le biais de −3,9 % (la prévision est en moyenne trop basse). Suivez les deux : le premier mesure l'imprécision, le second dit dans quel sens on se trompe.</p>
+<h3 id="la-revue-trimestrielle">8.4. La revue trimestrielle</h3>
+<p>La revue tient en trois questions. Les chiffres du trimestre sont-ils conformes au plan (écart de prévision, utilisation, attente) ? Qu'est-ce qui a changé dans les hypothèses (prix, délais, feuille de route) ? Quelle décision déclenche-t-on (commander, réduire, renégocier, ne rien faire) ?</p>
+<p>Fixez à l'avance des seuils qui déclenchent des décisions. Par exemple (valeurs à fixer par vous) : une utilisation au-dessus de 85 % pendant quatre semaines avec une attente p90 au-dessus de l'objectif déclenche l'étude d'une extension ; une utilisation de l'engagement sous 60 % déclenche la renégociation ou la revente ; un biais de prévision supérieur à 15 % déclenche la révision du modèle. Le projet 6 vous fait rédiger une RFC qui rassemble ces éléments pour une plateforme de 8 à 256 GPU.</p>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Une matrice pondérée explicite un arbitrage ; testez toujours la robustesse du classement aux poids.</li>
+<li>Un appel d'offres technique compare des fournisseurs sur des exigences mesurables, avec un protocole d'essai que vous contrôlez.</li>
+<li>Un tableau de pilotage trimestriel suit l'utilisation, le goodput, l'attente, le coût par heure utile, l'engagement, l'erreur de prévision et l'énergie.</li>
+<li>Fixez à l'avance les seuils qui déclenchent une décision.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Les quatre labs s'exécutent sur un portable CPU avec Python 3, <code>pytest</code>, <code>numpy</code> et <code>pyyaml</code>, sans GPU ni compte cloud. Ils suivent le format des projets : un code de départ (<code>starter/</code>) dont les fonctions sont à écrire, une solution (<code>reference/</code>) à consulter après votre tentative, des tests partagés (la variable <code>IMPL=starter|reference</code> choisit le code testé) et un script <code>verify.sh</code> qui prouve que la référence passe et que le départ échoue. <strong>Toutes les données sont étiquetées</strong> : séries et traces synthétiques, prix fictifs, contrat fictif.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> .venv/bin/activate</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pytest numpy pyyaml</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="bu">command</span> <span class="at">-v</span> python<span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
+<div class="lab">
+<p><span class="tag">Lab 15.1 — Du sacct au rapport de showback</span></p>
+<p><strong>Objectif.</strong> Écrire l'outil qui transforme l'export de l'ordonnanceur en heures allouées par équipe, utilisation, heures perdues candidates, attentes et allocation du coût plein. <strong>Durée.</strong> 2,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3 et <code>pytest</code>. Pour la branche « live » : une machine Linux jetable avec accès root et le Slurm du module 5.</p>
+<ol type="1">
+<li>Ouvrez <code>labs/finops-capacity/usage-showback/</code> et lisez <code>gen_trace.py</code> : ordonnancement FIFO strict, probabilités d'états finaux, en-tête <code># SYNTHETIC</code> du fichier produit.</li>
+<li>Lancez <code>IMPL=starter python3 -m pytest -q tests</code> et repérez les tests qui échouent : ils décrivent les neuf fonctions de <code>starter/showback.py</code> à écrire.</li>
+<li>Écrivez-les une à une (<code>parse_tres</code>, <code>alloc_hours</code>, <code>usage_by_account</code>, <code>lost_candidates</code>, <code>utilization</code>, <code>percentile</code>, <code>wait_stats</code>, <code>allocate_idle</code>, <code>cost_report</code>), puis lancez <code>bash verify.sh</code>.</li>
+<li>Lancez le rapport avec <code>--idle proportional</code>, puis <code>equal</code>, puis <code>platform</code>, et comparez le total de l'équipe <code>eval</code>.</li>
+<li>Branche « live » : <code>sudo bash verify-live.sh</code> démarre le Slurm du bac à sable, soumet sept jobs, exporte <code>sacct</code> et compare vos heures à <code>CPUTimeRAW</code>.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>utilization (allocated / capacity): 54.9 %</code> puis « ok: usage-showback reference passes, starter fails as intended ». La branche live affiche <code>teama: showback 28 cpu-s, sacct CPUTimeRAW 28 cpu-s OK</code> (26 CPU-secondes à une autre exécution, les durées varient) puis « OK live: showback matches Slurm accounting ».</p>
+<p><strong>Statut de vérification.</strong> <code>verify.sh</code> a été exécuté deux fois avec succès (traces synthétique et réelle). <code>verify-live.sh</code> a été exécuté deux fois sur Slurm 23.11.4 le 24 octobre 2026 et la capture réelle est dans <code>fixtures/real_sandbox_sacct.txt</code>. Les CPU tiennent lieu de GPU : le format <code>gres/gpu</code> n'est testé que sur la trace synthétique.</p>
+<p><strong>Pour aller plus loin.</strong> Remplacez la trace synthétique par l'export de votre cluster. Ajoutez la lecture de <code>AllocTRES</code> avec plusieurs types de GPU et un coût par type.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 15.2 — Prévision de la demande et capacité à engager</span></p>
+<p><strong>Objectif.</strong> Produire des scénarios de demande, en déduire la capacité à engager par la règle du quantile, mesurer le risque, et tester la prévision sur le passé. <strong>Durée.</strong> 2,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3, <code>numpy</code> et <code>pytest</code>.</p>
+<ol type="1">
+<li>Ouvrez <code>labs/finops-capacity/demand-forecast/</code> et lisez <code>starter/forecast.py</code> (fourni) : générateur synthétique, ajustement tendance plus saison, scénarios par blocs, test sur le passé.</li>
+<li>Lancez <code>IMPL=starter python3 -m pytest -q tests</code> : dix échecs, tous dans <code>commit.py</code>.</li>
+<li>Écrivez <code>cost</code>, <code>optimal_commit</code>, <code>best_commit_grid</code> puis <code>risk_report</code> en suivant la formule du chapitre 3.</li>
+<li>Lancez <code>cd reference &amp;&amp; python3 demo.py</code>, puis <code>demo.py --cap 20 --penalty 20</code>, puis <code>demo.py --seeds 8</code>.</li>
+<li>Variez le prix engagé de 3,6 à 1,6 et retrouvez le tableau de l'exemple 3.2.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>critical ratio 1-r/o = 0.350 -&gt; commit 107 GPUs</code>, <code>mean yearly cost: 3620507 (all on-demand 4702537, saving 23.0 %)</code> et « ok: demand-forecast reference passes, starter fails as intended ». Les valeurs dépendent de la graine fixée (0) et de la version de <code>numpy</code> (testé avec Python 3.13 et numpy 2.5.4 le 24 octobre 2026) : avec une autre version, le flux aléatoire peut changer, et avec lui les chiffres exacts du chapitre 3 (les tests, eux, sont structurels et tolérants).</p>
+<p><strong>Statut de vérification.</strong> Deux exécutions réussies de <code>verify.sh</code> (17 tests verts pour la référence, 10 rouges au départ). Données entièrement synthétiques : seuls la méthode et les ordres de grandeur se transposent.</p>
+<p><strong>Pour aller plus loin.</strong> Branchez la sortie de <code>sacct</code> du lab 15.1 comme historique, ajoutez un engagement par paliers (deux niveaux, deux durées) et comparez-le au niveau unique.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 15.3 — Modèle de coût total paramétrable</span></p>
+<p><strong>Objectif.</strong> Construire l'outil qui compare achat, location, réservation, demande et spot en coût par GPU-heure utile, trouve les points morts et classe les hypothèses par influence. <strong>Durée.</strong> 2,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3, <code>pyyaml</code> et <code>pytest</code>.</p>
+<ol type="1">
+<li>Lisez <code>labs/finops-capacity/tco-model/assumptions.yaml</code> et classez chaque valeur : publiée (une seule : 10,2 kW) ou exemple.</li>
+<li>Lancez <code>IMPL=starter python3 -m pytest -q tests</code> : dix-huit échecs.</li>
+<li>Écrivez les sept fonctions de <code>starter/tco.py</code> : <code>annuity_factor</code>, <code>annualized_capex</code>, <code>owned_components</code>, <code>waste_fraction</code>, <code>cost_per_useful_hour</code>, <code>breakeven_utilization</code>, <code>sensitivity</code>.</li>
+<li>Lancez <code>python3 reference/tco.py assumptions.yaml --breakeven --sensitivity</code> et retrouvez les tableaux du chapitre 4.</li>
+<li>Remplacez trois valeurs de <code>assumptions.yaml</code> par des devis datés et sourcés, relancez, et notez le déplacement du point mort.</li>
+<li>Exécutez l'exemple de <code>decision_matrix.py</code> du chapitre 8 avec vos propres notes.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>breakeven owned vs on_demand   : u* = 0.516</code> et « ok: tco-model reference passes, starter fails as intended ».</p>
+<p><strong>Statut de vérification.</strong> Deux exécutions réussies de <code>verify.sh</code> (24 tests verts pour la référence, 18 rouges au départ). Les prix sont fictifs ; le modèle ignore taxes, inflation, remises de volume, limites de capacité et délais.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez une capacité maximale au spot, un délai de livraison par option, ou un scénario où la revente est nulle.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 15.4 — Revue d'un contrat de capacité fictif</span></p>
+<p><strong>Objectif.</strong> Appliquer une grille de revue à un contrat de capacité fictif, comprendre chaque clause rouge et chiffrer ce que vaut sa négociation. <strong>Durée.</strong> 1,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3, <code>pyyaml</code> et <code>pytest</code>.</p>
+<ol type="1">
+<li>Lisez <code>labs/finops-capacity/contract-checklist/fictional_contract.md</code> <strong>sans</strong> lancer le script, et écrivez la liste des cinq clauses que vous refuseriez de signer.</li>
+<li>Lancez <code>python3 review.py fictional_contract.md rubric.yaml</code>. Comparez avec votre liste. Le code de sortie est 1 : au moins un <em>deal-breaker</em> est rouge.</li>
+<li>Lisez <code>answer_key.md</code> et le tableau des quatre <em>deal-breakers</em>, puis <code>sla.py</code> pour la mécanique des crédits.</li>
+<li>Lancez le script sur <code>fictional_contract_negotiated.md</code> et repérez les six clauses encore orange.</li>
+<li>Modifiez un seuil de <code>rubric.yaml</code> (par exemple la disponibilité verte à 99,5) et observez ce qui bouge.</li>
+<li>Rédigez une contre-proposition pour trois clauses rouges et relancez le script.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>contract score 7/100  (0 green, 5 amber, 19 red)</code> pour le contrat fictif et <code>contract score 88/100  (18 green, 6 amber, 0 red)</code> pour sa version négociée, puis « ok: contract-checklist agrees with the answer key ».</p>
+<p><strong>Statut de vérification.</strong> Deux exécutions réussies de <code>verify.sh</code> (12 tests). Le contrat est écrit pour le cours : ses nombres sont inventés et ses problèmes plantés. La grille est une aide au tri, pas un avis juridique.</p>
+<p><strong>Pour aller plus loin.</strong> Appliquez la même grille à un contrat réel dont vous avez le droit de lire le texte, en remplaçant les expressions régulières par un relevé manuel des clauses.</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<p>Les prix sont fictifs (unités arbitraires, notées « u »). Les corrigés ont été recalculés en Python ; les commandes qui y figurent ont été exécutées.</p>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★ — Coût d'un fine-tuning</span> Un fine-tuning complet d'un modèle de <span class="math inline">13 \cdot 10^9</span> paramètres sur <span class="math inline">2 \cdot 10^9</span> tokens coûte <span class="math inline">6NT</span> FLOP. Le MFU est de 35 % sur des GPU de 989 TFLOP/s dense, et le coût plein est de 2,08 u par GPU-heure disponible. Calculez les GPU-heures, la durée sur 16 GPU, le coût, le coût par million de tokens, puis le coût si 10 % des heures allouées sont perdues.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Les FLOP valent <span class="math inline">6NT = 1{,}56 \cdot 10^{20}</span>. Un GPU délivre <span class="math inline">0{,}35 \times 989 \cdot 10^{12} = 3{,}46 \cdot 10^{14}</span> FLOP/s utiles, d'où :</p>
+<p><span class="math display">\frac{1{,}56 \cdot 10^{20}}{3{,}46 \cdot 10^{14} \times 3600} = 125{,}2 \text{ GPU-heures}</span></p>
+<p>Sur 16 GPU, la durée est de <span class="math inline">125{,}2 / 16 = 7{,}8</span> h. Le coût est de <span class="math inline">125{,}2 \times 2{,}08 \approx 260</span> u, soit 0,13 u par million de tokens (<span class="math inline">260/2000</span>). Si 10 % des heures allouées sont perdues, il faut allouer <span class="math inline">125{,}2/0{,}9 = 139{,}1</span> heures : le coût monte à 289 u (+11 %).</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Chaîne de rendements</span> Une flotte a une disponibilité de 0,95, une allocation de 0,62, un goodput de 0,88 et un MFU de 0,38. Calculez la part du pic achetée qui devient du calcul utile et le coût d'une « GPU-heure équivalente au pic » au coût plein de 2,08 u. Si chaque facteur peut gagner 5 points absolus, lequel apporte le plus en valeur relative ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Le produit vaut <span class="math inline">0{,}95 \times 0{,}62 \times 0{,}88 \times 0{,}38 = 0{,}197</span> : environ 20 % du pic acheté. Une heure équivalente au pic coûte <span class="math inline">2{,}08 / 0{,}197 = 10{,}56</span> u, cinq fois le coût disponible.</p>
+<p>Cinq points de plus donnent un gain relatif de <span class="math inline">0{,}05/0{,}95 = 5{,}3</span> % pour la disponibilité, 8,1 % pour l'allocation, 5,7 % pour le goodput et 13,2 % pour le MFU. Le plus faible facteur gagne le plus en valeur relative. Mais les cinq points ne coûtent pas le même effort : monter le MFU de 0,38 à 0,43 est un travail d'ingénierie sur le code, alors que monter la disponibilité relève de l'exploitation.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★★ — Mettre les pools en commun</span> Un cluster de 64 GPU sert des jobs de 8 GPU qui durent 10 heures en moyenne. Option A : quatre équipes ont chacune 16 GPU (deux emplacements). Option B : un pool commun de 64 GPU (huit emplacements). Avec le modèle M/M/c et la formule d'Erlang C, comparez la probabilité d'attendre et l'attente moyenne à 70 % puis à 80 % d'utilisation. Citez deux limites du modèle.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Avec <span class="math inline">a = \rho c</span> le trafic offert, la probabilité d'attendre est la formule d'Erlang C et l'attente moyenne vaut <span class="math inline">C(c,a) / (c(1-\rho))</span> durées de job. Le calcul :</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> erlang_c(c, a):</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> <span class="bu">sum</span>(a<span class="op">**</span>k <span class="op">/</span> math.factorial(k) <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(c))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    top <span class="op">=</span> a<span class="op">**</span>c <span class="op">/</span> math.factorial(c) <span class="op">*</span> c <span class="op">/</span> (c <span class="op">-</span> a)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> top <span class="op">/</span> (s <span class="op">+</span> top)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mean_wait(c, rho, service_h):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> erlang_c(c, rho <span class="op">*</span> c) <span class="op">/</span> (c <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> rho)) <span class="op">*</span> service_h</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> rho <span class="kw">in</span> (<span class="fl">0.7</span>, <span class="fl">0.8</span>):</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(rho, mean_wait(<span class="dv">2</span>, rho, <span class="dv">10</span>), mean_wait(<span class="dv">8</span>, rho, <span class="dv">10</span>))</span></code></pre></div>
+<p>À 70 % : probabilité d'attendre 0,576 (A) contre 0,271 (B), attente moyenne de 9,6 h contre 1,1 h (8,5 fois moins). À 80 % : 0,711 contre 0,458, et 17,8 h contre 2,9 h (6,2 fois moins). Limites : arrivées de Poisson et durées exponentielles sont optimistes (les durées réelles ont des queues lourdes, et les jobs ont plusieurs tailles) ; la mise en commun suppose quotas et préemption pour protéger les petites équipes.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★★ — Lire un rapport de showback</span> Voici la fin d'un rapport produit sur la trace synthétique du lab 15.1 (64 GPU, 28 jours, coût plein 2,08 u par GPU-heure, 89 457 u au total).</p>
+<pre class="text"><code>account    jobs    alloc_h    direct      idle     total p50 wait p90 wait
+nlp          19    14245.4     29630     24371     54001    0.00h    6.64h
+vision       78     7475.2     15548     12789     28337    0.00h   13.11h
+eval        678      977.3      2033      1672      3705    0.00h   10.12h
+dev         346      900.5      1873      1541      3414    0.00h   10.38h
+utilization (allocated / capacity): 54.9 %
+lost candidates: FAILED 1096, TIMEOUT 692, NODE_FAIL 693, PREEMPTED 138 = 11.1 % of allocated hours
+fleet wait: p50 0.00 h, p90 10.41 h</code></pre>
+<ol type="a">
+<li>Un directeur propose de réduire la flotte de moitié puisqu'elle est à 55 %. Quelle ligne du rapport vous fait hésiter ? (b) Combien paierait l'équipe <code>eval</code> avec les politiques « égale » et « plateforme » ? (c) Quelle part du coût plein représentent les heures perdues candidates ? (d) Quelle première action proposez-vous ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>L'attente : malgré 55 % d'utilisation, le p90 est de 10,4 h pour la flotte, et de 16,2 h pour les jobs de 16 GPU ou plus (calcul sur la trace). L'attente vient de la fragmentation et du blocage en tête de file, pas du manque moyen de capacité ; réduire de moitié la flotte multiplierait l'attente (chapitre 2).</p></li>
+<li><p>Avec <code>--idle equal</code>, le coût d'inactivité se partage en quatre parts égales : <code>eval</code> paie 12 126 u, contre 3 705 u en proportionnel (3,3 fois plus). Avec <code>--idle platform</code>, <code>eval</code> paie son coût direct de 2 033 u et la plateforme porte 40 372 u d'inactivité. Dans les trois cas, la somme est de 89 457 u.</p></li>
+<li><p>Les 2 619 GPU-heures perdues candidates coûtent <span class="math inline">2619 \times 2{,}08 \approx 5\,448</span> u, soit 6,1 % du coût plein : une borne supérieure, puisque des checkpoints en récupèrent une partie.</p></li>
+<li><p>D'abord l'attente : vérifier le <em>backfill</em>, la précision des durées demandées et la politique de gros jobs (module 5). Ensuite les 693 GPU-heures perdues en <code>NODE_FAIL</code>, qui désignent une cause matérielle à instruire avec le module 14.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★★ — Quelle capacité engager, à la main</span> La demande hebdomadaire d'une équipe vaut 40, 80 ou 120 GPU avec la même probabilité. Un GPU engagé coûte <span class="math inline">r = 2{,}5</span> u par heure, qu'il serve ou non ; un GPU à la demande coûte <span class="math inline">o = 4{,}0</span> u. (a) Quelle capacité <span class="math inline">L</span> minimise le coût moyen par heure ? (b) Même question avec <span class="math inline">r = 1{,}2</span> u. Vérifiez par le calcul direct du coût de chaque niveau possible.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li>Le ratio critique vaut <span class="math inline">1 - r/o = 0{,}375</span>. La fonction de répartition vaut <span class="math inline">1/3</span> en 40 et <span class="math inline">2/3</span> en 80 : le plus petit niveau où elle atteint 0,375 est <span class="math inline">L^{*} = 80</span>.</li>
+</ol>
+<p>Coût moyen par heure : <span class="math inline">L=0</span> : 320 ; <span class="math inline">L=40</span> : <span class="math inline">100 + 4 \times (0+40+80)/3 = 260</span> ; <span class="math inline">L=80</span> : <span class="math inline">200 + 4 \times 40/3 = 253{,}3</span> ; <span class="math inline">L=120</span> : 300. Le minimum est bien en 80.</p>
+<ol start="2" type="a">
+<li>Le ratio critique vaut <span class="math inline">1 - 1{,}2/4 = 0{,}7 &gt; 2/3</span>, donc <span class="math inline">L^{*} = 120</span>. Coûts : 320, 208, 149,3 et 144 pour <span class="math inline">L = 0, 40, 80, 120</span>. Une remise plus forte pousse l'engagement vers le pic de la distribution.</li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★★★ — Diagnostic de deux prévisions ratées</span> Le test du lab 15.2 sur huit historiques synthétiques donne, pour deux graines, ces résultats (erreur absolue moyenne en GPU, couverture de la bande entre déciles 10 et 90).</p>
+<pre class="text"><code>seed 5  model MAE 73.2  naive MAE 11.7  coverage 0.08   fitted growth 93 %/year, forecast mean 132 vs actual 64
+seed 7  model MAE 59.8  naive MAE 76.0  coverage 0.42   fitted growth 71 %/year, forecast mean  95 vs actual 132</code></pre>
+<p>Les campagnes tirées pour la graine 5 démarrent aux semaines 36, 45, 49, 66 et 77 (la dernière dure trois semaines, les autres de quatre à sept) ; pour la graine 7, certaines démarrent aux semaines 88, 90, 90, 94 et 99 (la fenêtre d'ajustement couvre les semaines 0 à 77, le test les semaines 78 à 103). Expliquez chaque échec, dites ce que vous changeriez dans la démarche, et ce que vous engageriez.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Graine 5 : sur-prévision.</strong> Les cinq campagnes démarrent dans la fenêtre d'ajustement et quatre y finissent ; la dernière (semaine 77, trois semaines) déborde de deux semaines sur le test. La droite log-linéaire les prend pour une croissance (+93 % par an), prolonge la pente, et prévoit 132 GPU alors que la demande de base est restée à 64. La prévision naïve (erreur de 11,7 GPU) bat le modèle (73,2) : la bande couvre 8 % des semaines.</p>
+<p><strong>Graine 7 : sous-prévision.</strong> Cinq campagnes arrivent après la fenêtre d'ajustement. Aucune méthode statistique ne les voit venir : la demande réelle moyenne est de 132 GPU pour une prévision de 95. Le modèle bat ici la prévision naïve (59,8 contre 76,0), mais la bande est trop étroite (couverture de 42 %).</p>
+<p>Changements : séparer le socle des campagnes (ajuster le socle sur les semaines sans campagne, planifier les campagnes avec la feuille de route) ; comparer systématiquement à la prévision naïve ; élargir les bandes ou raisonner par scénarios nommés. Engagement : le quantile de la demande de <em>socle</em>, pas de la demande totale, le reste en capacité flexible, et révision trimestrielle (chapitre 3).</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★ — Point mort entre achat et demande</span> Un GPU possédé coûte 17 000 u par an, énergie comprise et constante. À la demande, une GPU-heure coûte 4,0 u. (a) Quelle utilisation minimale justifie l'achat ? (b) Quel est le coût par heure utile de chaque option à une utilisation de 40 % puis de 80 %, avec un goodput de 0,9 ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Le point mort est <span class="math inline">u^{*} = 17\,000 / (8760 \times 4{,}0) = 0{,}485</span> (le goodput se simplifie).</p></li>
+<li><p>À <span class="math inline">u = 0{,}4</span> : le parc possédé coûte <span class="math inline">17\,000 / (8760 \times 0{,}4 \times 0{,}9) = 5{,}39</span> u par heure utile, la demande <span class="math inline">4{,}0/0{,}9 = 4{,}44</span> u : l'achat coûte 21 % de plus. À <span class="math inline">u = 0{,}8</span> : le parc coûte 2,70 u, 39 % de moins que la demande. L'achat n'a de sens que si l'on sait remplir le parc.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★ — Dimensionner puissance et baies</span> Une salle compte 40 baies limitées à 20 kW chacune. Le budget électrique total de l'installation est de 1,2 MW et le PUE vaut 1,35. On y installe des nœuds de 10,2 kW. (a) Combien de nœuds permet la puissance ? Combien permettent les baies ? (b) Quelle puissance est inutilisée ? (c) Que se passe-t-il si la limite passe à 21 kW par baie, et que vérifier avant ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>La puissance informatique disponible est <span class="math inline">1200 / 1{,}35 = 888{,}9</span> kW, soit <span class="math inline">\lfloor 888{,}9/10{,}2 \rfloor = 87</span> nœuds. Une baie de 20 kW ne reçoit qu'un nœud (deux demanderaient 20,4 kW) : 40 baies donnent 40 nœuds, soit 320 GPU. Les baies sont la contrainte.</p></li>
+<li><p>Chaque baie laisse 9,8 kW inutilisés ; la salle utilise 408 kW sur 888,9 disponibles (46 %).</p></li>
+<li><p>À 21 kW, une baie reçoit deux nœuds (20,4 kW) : 80 nœuds, soit 640 GPU, pour 816 kW informatiques et 1 101,6 kW avec le PUE, sous le budget de 1 200 kW. Les baies restent la contrainte (80 nœuds contre 87 permis par la puissance, soit une marge de 71 kW informatiques). À vérifier avant : les 21 kW par baie traversent la distribution électrique et le refroidissement ; au-delà de 20 à 25 kW, l'Uptime Institute note que le refroidissement liquide direct devient plus économique.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★ — Air ou liquide</span> (a) Un rack de 120 kW est refroidi à l'eau avec un échauffement de 10 K. Quel débit en litres par minute ? Et avec 12 K ? (b) Quel débit d'air faudrait-il avec l'échauffement de 16,2 K du DGX H100, et à combien de ventilations de DGX H100 cela correspond-il ? (c) Convertissez les 38 557 BTU/h de la fiche du DGX H100 en kW et comparez aux 10,2 kW.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Le débit massique vaut <span class="math inline">P/(c_p \Delta T) = 120\,000 / (4186 \times 10) = 2{,}87</span> kg/s, soit 172 L/min (environ 1 kg par litre). À 12 K : 143 L/min.</p></li>
+<li><p>Pour l'air (<span class="math inline">\rho = 1{,}2</span> kg/m³, <span class="math inline">c_p = 1005</span> J/(kg·K)) : <span class="math inline">120\,000 / (1{,}2 \times 1005 \times 16{,}2) = 6{,}14</span> m³/s, soit environ 13 000 CFM, ou 11,8 fois le débit de 1 105 CFM d'un DGX H100.</p></li>
+<li><p><span class="math inline">38\,557 / 3412{,}14 = 11{,}3</span> kW, soit 10,8 % de plus que 10,2 kW. Les deux chiffres figurent sur la même page : dimensionnez sur le plus grand et demandez les conditions de mesure au constructeur.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 10 · ★★ — Lire un SLA publié</span> La facture mensuelle fictive d'un parc de 512 GPU est de 1 105 920 u (3,0 u par GPU-heure sur 720 h). Une région affiche 99,7 % de disponibilité mensuelle.</p>
+<p>D'après la grille du SLA d'Amazon EC2 du 25 mai 2022 (99,99 % de cible régionale, crédits de 10 %, 30 % et 100 %), répondez. (a) Combien de minutes d'arrêt cela représente-t-il sur 30 jours ? (b) Quel crédit, et sous quelle forme ? (c) Que faut-il faire pour l'obtenir ? (d) Quel crédit si un GPU est défaillant sur une instance qui répond au réseau ? (e) Comment le crédit se compare-t-il à la valeur des GPU-heures perdues ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">0{,}003 \times 43\,200 = 129{,}6</span> minutes.</p></li>
+<li><p>La disponibilité est inférieure à 99,99 % et supérieure à 99,0 % : crédit de 10 %, soit 110 592 u, déduit de paiements futurs et non remboursé.</p></li>
+<li><p>Ouvrir un dossier au support, avec les informations demandées, avant la fin du deuxième cycle de facturation qui suit l'incident ; le crédit est le recours exclusif.</p></li>
+<li><p>Aucun : pour une instance isolée, l'indisponibilité est l'absence de connectivité externe, et l'instance est donc disponible.</p></li>
+<li><p>Si tout le parc est arrêté pendant 129,6 minutes, les GPU-heures perdues valent <span class="math inline">512 \times 129{,}6/60 \times 3{,}0 = 3\,318</span> u : le crédit en vaut 33 fois plus. Ce rapport s'inverse pour une panne partielle ou une dégradation silencieuse, et il ne compte pas le travail perdu depuis le dernier checkpoint.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 11 · ★★★ — Priorités d'une revue de contrat</span> Voici le début de la sortie du script du lab 15.4 sur le contrat fictif.</p>
+<pre class="text"><code>contract score 7/100  (0 green, 5 amber, 19 red)
+deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_exit</code></pre>
+<p>Le prix proposé est 3,0 u par GPU-heure pour 512 GPU ; une réservation d'un an à 3,4 u est disponible chez un autre fournisseur. (a) Classez les cinq demandes que vous formuleriez d'abord, avec leur valeur en jeu quand elle se chiffre. (b) Pour chacune, une position de repli. (c) Signez-vous le contrat en l'état ? Justifiez avec la prime de l'alternative.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li>Ordre proposé : 1. périmètre de la disponibilité (clause 3.2 : sans définition par santé des GPU, l'ensemble du SLA est vide) ; 2. résiliation unilatérale par le fournisseur (9.4 : risque existentiel, 30 jours de préavis sans remboursement) ; 3. paiement à vide et livraison sans recours (1.2 et 2.2 : 2 488 320 u si 75 % de la capacité arrive après 90 jours).</li>
+</ol>
+<p>La suite : 4. plafond d'augmentation de 8 % (3 269 984 u de plus sur 3 ans, contre 1 206 338 u à 3 %) ; 5. délai de remplacement et substitution (4.1 et 4.2), avec le plancher de performance.</p>
+<ol start="2" type="a">
+<li><p>Replis : accepter 99,5 % si la définition est stricte ; accepter la livraison par tranches si la facturation suit la recette ; accepter une résiliation par le fournisseur seulement pour impayé ou abus, avec préavis ; accepter 5 % de hausse plafonnée ; accepter 48 h de remplacement si le nœud compte comme indisponible.</p></li>
+<li><p>Non. Quatre <em>deal-breakers</em> sont rouges. Renoncer coûte 1 794 048 u par an de plus (<span class="math inline">0{,}4 \times 512 \times 8760</span> pour la réservation à 3,4 u), soit 5,4 M u sur les trois ans du contrat à prix constant, à comparer aux expositions chiffrées (2,49 M u de paiement à vide, 3,3 M u de hausses). Ce sont des montants maximaux en jeu, pas des espérances : le chiffre ne tranche donc pas seul.</p></li>
+</ol>
+<p>Ce qui tranche, c'est le risque que vous ne pouvez pas chiffrer (résiliation par le fournisseur, SLA vide), que la prime de l'alternative doit couvrir. Le raisonnement porte sur des prix fictifs, à refaire avec vos devis ; la version négociée du lab (88/100) montre où se situe une issue acceptable.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 12 · ★★★ — Deux offres, un arbitrage chiffré</span> Offre A : 512 GPU pendant 36 mois à 2,4 u par GPU-heure, paiement à vide, sans sortie. Offre B : même capacité à 3,2 u pour 12 mois renouvelables, avec ajustement annuel à la demande réelle (utilisation de 0,9 après ajustement). La demande de l'équipe est soit forte (utilisation de 0,9 de la capacité de A) avec une probabilité <span class="math inline">p</span>, soit faible (0,45) avec une probabilité <span class="math inline">1-p</span>, pour les trois années. Comparez le coût par heure utile, trouvez la probabilité qui rend A préférable, chiffrez le regret du cas défavorable, et proposez une clause.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Pour A, le coût par heure utile en espérance (coût total espéré divisé par les heures utiles espérées) est <span class="math inline">2{,}4 / (0{,}9p + 0{,}45(1-p))</span>. Pour B, qui suit la demande, il est de <span class="math inline">3{,}2/0{,}9 = 3{,}56</span> u. À <span class="math inline">p = 0{,}6</span>, A coûte <span class="math inline">2{,}4/0{,}72 = 3{,}33</span> u : A est moins cher en espérance.</p>
+<p>A l'emporte quand cette espérance est inférieure à 3,56 u, soit pour <span class="math inline">p &gt; 0{,}5</span>. Le cas favorable donne 2,67 u pour A. Le cas défavorable donne <span class="math inline">2{,}4/0{,}45 = 5{,}33</span> u, plus que la demande à 4,0 u. Le regret annuel de A face à un achat à la demande des seules heures utiles vaut :</p>
+<p><span class="math display">512 \times 8760 \times (2{,}4 - 4{,}0 \times 0{,}45) = 2\,691\,072 \text{ u}</span></p>
+<p>Clause à demander : un droit de sortie au mois 12 contre trois mois de redevances, soit <span class="math inline">3 \times 2{,}4 \times 512 \times 730 = 2\,691\,072</span> u (un montant égal, par coïncidence, au regret d'une année). Dans le cas défavorable, la perte passe de trois années de regret (8 073 216 u) à une année de regret plus les frais de sortie (5 382 144 u). La décision dépend de <span class="math inline">p</span> : si vous ne pouvez pas affirmer qu'elle dépasse 50 %, préférez B ou négociez la sortie.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 13 · ★★ — Robustesse d'une matrice</span> Reprenez la matrice du chapitre 8 avec les poids : coût 3, flexibilité 4, délai 2, exploitation 1, approvisionnement 2. Calculez les totaux, le classement, la probabilité de gagner de chaque option quand chaque poids varie de ±50 %, et les multiplicateurs qui renversent le classement. Conclusion ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Avec le module du lab (<code>python3</code> dans <code>labs/finops-capacity/tco-model</code>), les poids sont normalisés puis multipliés aux notes :</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> decision_matrix <span class="im">as</span> dm</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> {<span class="st">&quot;cost_at_high_util&quot;</span>: <span class="dv">3</span>, <span class="st">&quot;flexibility&quot;</span>: <span class="dv">4</span>, <span class="st">&quot;time_to_capacity&quot;</span>: <span class="dv">2</span>, <span class="st">&quot;ops_load&quot;</span>: <span class="dv">1</span>, <span class="st">&quot;risk_supply&quot;</span>: <span class="dv">2</span>}</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.total_scores(dm.EXAMPLE_SCORES, w))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dm.win_probability(dm.EXAMPLE_SCORES, w, rel<span class="op">=</span><span class="fl">0.5</span>, draws<span class="op">=</span><span class="dv">5000</span>, seed<span class="op">=</span><span class="dv">0</span>))</span></code></pre></div>
+<p>Totaux : achat 4,67 ; location 5,83 ; réservé 6,25 ; demande et spot 6,33. La demande et le spot sont premiers, d'un cheveu devant le réservé. Sur 5 000 tirages : demande et spot 57,2 %, réservé 38,3 %, location 4,5 %, achat 0 %. Multiplier le poids du coût ou de l'approvisionnement par 1,17, ou celui du délai par 1,25, renverse le classement.</p>
+<p>Conclusion : l'écart de 0,08 point ne fait pas une décision. Remplacez les notes subjectives par des mesures, ou retenez un mélange (socle réservé, pointes à la demande) au lieu d'un gagnant.</p>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux exprimer le coût d'un cluster en GPU-heure utile.</strong> Preuve : l'exercice 2 refait avec vos propres mesures de disponibilité, d'allocation, de goodput et de MFU.</li>
+<li><strong>Je peux produire un rapport de showback depuis l'ordonnanceur.</strong> Preuve : le lab 15.1 appliqué à votre export <code>sacct</code>, avec la conservation du coût plein vérifiée.</li>
+<li><strong>Je peux prévoir la demande et justifier une capacité à engager.</strong> Preuve : le lab 15.2 avec son test sur le passé comparé à une prévision naïve, et le quantile retenu.</li>
+<li><strong>Je peux comparer achat, location, réservation et demande par un modèle de coût total.</strong> Preuve : le lab 15.3 avec trois devis datés et le classement des hypothèses par influence.</li>
+<li><strong>Je peux dimensionner puissance, baies et refroidissement.</strong> Preuve : l'exercice 8 refait pour une salle réelle ou une salle supposée, avec la contrainte qui lie.</li>
+<li><strong>Je peux lire un contrat de capacité et chiffrer ses clauses.</strong> Preuve : le lab 15.4 et la liste ordonnée de vos demandes, chacune avec sa valeur en jeu.</li>
+<li><strong>Je peux préparer une négociation et un appel d'offres.</strong> Preuve : un prix de réserve (exemple 7.1) et une annexe de recette avec des seuils mesurables.</li>
+</ul>
+<p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
+<ol type="1">
+<li><em>Un fournisseur propose 99,9 % de disponibilité. Est-ce suffisant pour nos entraînements ?</em> Réponse-type : demander ce qui est mesuré (joignabilité du nœud ou état de santé des GPU et du réseau), à quelle échelle (cluster ou nœud-heure), avec quel recours (crédits plafonnés, recours exclusif). Un nœud en panne parmi 64 arrête un job synchrone sans déclencher de crédit. Exiger une définition par contrôles de santé, un délai de remplacement en heures, et suivre le goodput réel.</li>
+<li><em>Combien de GPU faut-il engager pour l'an prochain ?</em> Réponse-type : ce n'est pas un nombre mais un quantile. Construire des scénarios à partir de la demande à la soumission, tester le modèle contre une prévision naïve, engager le niveau dépassé dans une fraction <span class="math inline">r/o</span> des semaines, raisonner sur la rareté des GPU à la demande, couvrir le reste de façon flexible et réviser chaque trimestre.</li>
+<li><em>Faut-il acheter ou louer 256 GPU ?</em> Réponse-type : comparer le coût par heure utile à l'utilisation prévue et le point mort face à la demande, avec durée de vie, revente, personnel, puissance, baies, refroidissement et délais. Tester la sensibilité, confronter à une alternative crédible, et ne jamais décider sur le prix catalogue d'une GPU-heure.</li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<ul>
+<li>FinOps Foundation. <em>FinOps Framework</em> (principes, personas, domaines, capacités, périmètres) et <em>FOCUS</em>, la spécification ouverte de normalisation des données de facturation. <a href="https://www.finops.org/framework/">finops.org/framework</a>, <a href="https://focus.finops.org/">focus.finops.org</a>. Consultées le 24 octobre 2026 : chapitres 1 et 8.</li>
+<li>FinOps Foundation. <em>FinOps for AI Overview</em>. <a href="https://www.finops.org/wg/finops-for-ai-overview/">finops.org</a>. Consulté le 24 octobre 2026 : rareté des GPU, showback, indicateurs (chapitres 1, 3 et 8).</li>
+<li>NVIDIA. <em>DGX H100/H200 User Guide</em> et <em>DGX B200 User Guide</em>, chapitres d'introduction : puissance, alimentations, débit d'air, chaleur dégagée. <a href="https://docs.nvidia.com/dgx/dgxh100-user-guide/introduction-to-dgxh100.html">DGX H100</a>, <a href="https://docs.nvidia.com/dgx/dgxb200-user-guide/introduction-to-dgxb200.html">DGX B200</a> : chapitre 5.</li>
+<li>NVIDIA. <em>NVIDIA Contributes NVIDIA GB200 NVL72 Designs to Open Compute Project</em>, blog technique, 2024. <a href="https://developer.nvidia.com/blog/nvidia-contributes-nvidia-gb200-nvl72-designs-to-open-compute-project/">developer.nvidia.com</a> : les 120 kW de refroidissement requis par rack (chapitre 5).</li>
+<li>Google. <em>Data Center Efficiency</em> (PUE). <a href="https://datacenters.google/efficiency/">datacenters.google/efficiency</a> : définition du PUE et valeurs de 2025 (chapitre 5).</li>
+<li>Uptime Institute. <em>Rack Density is Rising</em>, 2020. <a href="https://journal.uptimeinstitute.com/rack-density-is-rising/">journal.uptimeinstitute.com</a> : densités par baie observées en 2020 (chapitre 5).</li>
+<li>Shehabi et al. <em>2024 United States Data Center Energy Usage Report</em>, Lawrence Berkeley National Laboratory, 2024. <a href="https://escholarship.org/content/qt32d6m0d1/qt32d6m0d1.pdf">escholarship.org</a>, publié le 20 décembre 2024 : 176 TWh en 2023 (chapitre 5).</li>
+<li>Amazon Web Services. <em>Amazon EC2 Service Level Agreement</em>. <a href="https://aws.amazon.com/compute/sla/">aws.amazon.com</a>. Google Cloud. <em>Compute Engine Service Level Agreement</em>. <a href="https://cloud.google.com/compute/sla">cloud.google.com</a> : structure des SLA et des crédits, à relire le jour de la décision (chapitre 6).</li>
+<li>Amazon Web Services. <em>Capacity Blocks for ML</em> et <em>Spot Instance interruption notices</em>. <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-blocks.html">Capacity Blocks</a> (prix et facturation : <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/capacity-blocks-pricing-billing.html">page dédiée</a>), <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html">Spot</a> : réservations de courte durée et préavis de deux minutes (chapitre 4).</li>
+<li>Amazon Web Services. <em>Free data transfer out to internet when moving out of AWS</em>, billet de blog avec mises à jour. <a href="https://aws.amazon.com/blogs/aws/free-data-transfer-out-to-internet-when-moving-out-of-aws/">aws.amazon.com</a> : dérogation aux frais de sortie (chapitre 6).</li>
+<li>Kokolis et al. <em>Revisiting Reliability in Large-Scale Machine Learning Research Clusters</em>. 2024. <a href="https://arxiv.org/abs/2410.21680">arXiv:2410.21680</a> : utilisation de 83 % et 85 %, définition de l'ETTR (chapitre 2).</li>
+<li>Dubey et al. <em>The Llama 3 Herd of Models</em>. 2024. <a href="https://arxiv.org/abs/2407.21783">arXiv:2407.21783</a> : temps d'entraînement effectif, interruptions, variations de puissance (chapitres 2 et 5).</li>
+<li>Hu et al. <em>Characterization of Large Language Model Development in the Datacenter</em>. 2024. <a href="https://arxiv.org/abs/2403.07648">arXiv:2403.07648</a> : temps perdu des jobs d'évaluation (chapitre 2).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/sacct.html"><em>sacct</em></a> et <a href="https://slurm.schedmd.com/slurm.conf.html"><em>slurm.conf</em></a> : champs <code>AllocTRES</code>, <code>ElapsedRaw</code>, <code>CPUTimeRAW</code> ; mémoire par défaut (chapitre 2).</li>
+<li>Fisher, Ury. <em>Getting to Yes: Negotiating Agreement Without Giving In</em>. Houghton Mifflin, 1981. <a href="https://en.wikipedia.org/wiki/Getting_to_Yes">notice</a> : la notion de BATNA (chapitre 7).</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les faits suivants ont été relus à la source le 24 octobre 2026 : les principes, personas, domaines, capacités et périmètres de la FinOps Foundation ; les indicateurs et les recommandations de showback du document « FinOps for AI » ; la puissance maximale de 10,2 kW du DGX H100, de 14,3 kW du DGX B200, les alimentations de 3,3 kW, le débit d'air, la température de fonctionnement et la chaleur dégagée de 38 557 BTU/h ; le TDP du H100 (page produit) et les 120 kW du rack GB200 NVL72 ; le PUE de Google et la moyenne de l'Uptime Institute citée par Google ; les densités de baie de l'enquête 2020 ; les 176 TWh du rapport du LBNL ; la structure et les crédits du SLA d'Amazon EC2 (page datée du 25 mai 2022) et de Google Compute Engine ; les conditions des Capacity Blocks et le préavis Spot d'AWS ; la dérogation aux frais de sortie d'AWS et sa mise à jour du 8 octobre 2026 ; les chiffres de Kokolis et al., Dubey et al. et Hu et al. ; les champs de <code>sacct</code> et le défaut de <code>DefMemPerCPU</code>. Tous les calculs des exemples et des corrigés ont été refaits en Python, les observations de Slurm ont été faites sur Slurm 23.11.4 (paquets Ubuntu 24.04) le 24 octobre 2026, et les quatre <code>verify.sh</code> ainsi que <code>verify-live.sh</code> ont été exécutés deux fois avec succès.</p>
+<p><strong>Recommandé.</strong> Les politiques d'allocation de l'inactivité, la règle de dimensionner sur la puissance maximale, la grille de revue de contrat (poids et seuils), les seuils du tableau de pilotage, la marge de souplesse de 10 à 20 % sur un engagement, l'ordre des demandes de négociation, la matrice de décision et la plage de ±20 % de l'analyse de sensibilité sont des choix de ce parcours, pas des normes. La règle du quantile pour l'engagement est un résultat classique, présenté ici comme outil pédagogique.</p>
+<p><strong>À vérifier.</strong> Tous les prix, remises, durées de vie, tarifs d'énergie, taux d'interruption et notes de la matrice de décision sont des valeurs d'exemple fictives. Les résultats d'Erlang C et du vendeur de journaux sont classiques et n'ont pas été rouverts dans un manuel : le premier a été confronté à la simulation à événements discrets du projet 6 (200 000 jobs, trois graines), le second à une minimisation numérique du coût (test <code>test_closed_form_matches_the_grid_minimizer</code> du lab 15.2). Le texte du règlement européen sur les données n'a pas pu être lu (le site officiel refuse l'accès automatisé depuis le bac à sable) : seule la mention qu'en fait AWS est citée. Aucun délai de raccordement ou de livraison n'est donné, faute de source primaire lue. Les chiffres de l'Uptime Institute sont ceux de 2020 pour les densités ; la moyenne de 2025 est citée d'après la note de Google, sans lecture de l'enquête. L'écart entre 38 557 BTU/h et 10,2 kW n'est pas expliqué par la documentation. L'effet de <code>DefMemPerCPU</code> sur la capture est cohérent avec la documentation mais n'a pas fait l'objet d'un essai contraire. Les SLA des fournisseurs changent et peuvent différer pour les instances GPU et les réservations : relisez le texte en vigueur. L'existence du livre de Fisher et Ury et le sens de BATNA ont été confirmés par une notice encyclopédique, le livre n'a pas été relu. Aucun lab n'utilise de GPU : le format <code>gres/gpu</code> n'est testé que sur la trace synthétique, la branche « live » utilise des CPU.</p>
+<p><strong>Hors périmètre.</strong> Les contrats de colocation détaillés (alimentation, redondance, accès), le droit des contrats et de la souveraineté des données, la fiscalité et la comptabilité (amortissement fiscal, crédit-bail), l'empreinte carbone et la mesure des émissions, la conception des circuits de refroidissement, le marché secondaire des GPU, l'achat de réseau et de stockage, et la FinOps de l'inférence à grande échelle en production.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/observability/index.html"><span class="k">← Précédent</span>Module 14 — Observabilité et fiabilité d'une flotte GPU</a><a class="next" href="../../courses/platform-leadership/index.html"><span class="k">Suivant →</span>Module 16 — Plateforme interne, sécurité, production et leadership</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

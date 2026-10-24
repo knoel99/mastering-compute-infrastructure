@@ -94,7 +94,7 @@ def test_draining_node_is_visible_with_a_bounded_reason_class():
     _, s = scrape(squeue=lambda: load("squeue_drained.json"), sinfo=lambda: load("sinfo_draining.json"))
     assert value(s, "slurm_nodes", partition="debug", state="draining") == 1
     assert value(s, "slurm_node_drain_info", node="vm", reason_class="health") == 1
-    # the reason that mentions DRAINED is a capacity wait: the platform, not the user, is to blame
+    # pending jobs on a draining node wait for capacity (Priority x2, Resources): the platform, not the user, is to blame
     assert value(s, "slurm_jobs", state="pending", reason_class="capacity") == 3
 
 

@@ -30,7 +30,6 @@ WAIT_BUCKETS = (10, 30, 60, 300, 600, 1800, 3600, 4 * 3600, 12 * 3600, 24 * 3600
 # Pending reasons grouped by who can act. The grouping is this course's design, the reasons are Slurm's.
 REASON_CLASS = {
     "Priority": "capacity", "Resources": "capacity", "ReqNodeNotAvail": "capacity",
-    "Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions": "capacity",
     "JobHeldUser": "user", "Dependency": "user", "BeginTime": "user",
     "JobHeldAdmin": "admin", "Reservation": "admin", "PartitionDown": "admin",
     "InvalidAccount": "config", "InvalidQOS": "config",

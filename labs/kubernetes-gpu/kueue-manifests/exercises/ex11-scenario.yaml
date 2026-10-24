@@ -1,0 +1,6 @@
+steps:
+  - {t: 0,  submit: {name: eval-sweep,   ns: eval,     queue: main, gpus: 64,  priority: preemptible}}
+  - {t: 5,  submit: {name: sft-70b,      ns: finetune, queue: main, gpus: 96,  priority: normal}}
+  - {t: 10, submit: {name: pretrain-70b, ns: pretrain, queue: main, gpus: 128, priority: normal}}
+  - {t: 15, submit: {name: eval-small,   ns: eval,     queue: main, gpus: 16,  priority: preemptible}}
+  - {t: 60, finish: sft-70b}

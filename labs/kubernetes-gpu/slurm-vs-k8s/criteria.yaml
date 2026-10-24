@@ -1,0 +1,95 @@
+# Decision matrix Slurm / Kubernetes / Slurm-on-Kubernetes.
+# Scores run from 1 (weak) to 5 (strong) FOR AN AI TRAINING FLEET and are the JUDGEMENT of the course as of 2026-10-24,
+# not measurements. Each score carries a short justification; the sourced facts they rest on are listed in the
+# module page (chapters 3, 5 and 7) and in its "Sources et portée" section. Change a score and rerun: the point of the
+# tool is to make a disagreement explicit and to show whether it changes the decision.
+options:
+  slurm:  "Slurm natif sur serveurs nus ou VM"
+  k8s:    "Kubernetes + Kueue + JobSet (ou Trainer v2)"
+  hybrid: "Slurm sur Kubernetes (Slinky, SUNK)"
+
+criteria:
+  gang:
+    label: "Allocation atomique multi-nœuds (gang scheduling)"
+    scores: {slurm: 5, k8s: 3, hybrid: 5}
+    why:
+      slurm: "Un job demande N nœuds et les obtient ensemble ou attend : c'est le modèle de base."
+      k8s: "Absent du scheduler par défaut ; apporté par Kueue ou Volcano ; natif en bêta mais désactivé par défaut en v1.37."
+      hybrid: "L'allocation reste celle de Slurm."
+  queue:
+    label: "Files d'attente, équité, préemption, comptabilité"
+    scores: {slurm: 5, k8s: 4, hybrid: 5}
+    why:
+      slurm: "Fair Tree, QOS, préemption et sacct sont natifs et anciens."
+      k8s: "Kueue (cohortes, emprunt, préemption) couvre l'essentiel ; la comptabilité fine reste à construire."
+      hybrid: "Fonctions de Slurm conservées."
+  topology:
+    label: "Placement conscient de la topologie réseau"
+    scores: {slurm: 4, k8s: 3, hybrid: 4}
+    why:
+      slurm: "Plugins de topologie en arbre et en blocs."
+      k8s: "Kueue TAS (bêta) ; version native encore alpha en v1.37."
+      hybrid: "Topologie de Slurm, alimentée par les étiquettes de nœuds."
+  batch_ux:
+    label: "Ergonomie pour des chercheurs habitués à sbatch/srun"
+    scores: {slurm: 5, k8s: 2, hybrid: 5}
+    why:
+      slurm: "Scripts et habitudes existants."
+      k8s: "Manifestes, images, kubectl : une courbe d'apprentissage réelle pour les chercheurs."
+      hybrid: "Les scripts sbatch sont conservés."
+  services:
+    label: "Services permanents (inférence, API, notebooks) et autoscaling"
+    scores: {slurm: 1, k8s: 5, hybrid: 4}
+    why:
+      slurm: "Pas fait pour des services sans fin ni pour la montée en charge par requêtes."
+      k8s: "Deployments, HPA, services : c'est le cœur de métier."
+      hybrid: "Kubernetes héberge les services à côté de Slurm sur le même parc."
+  ecosystem:
+    label: "Écosystème cloud-native (opérateurs, GitOps, observabilité, CI/CD)"
+    scores: {slurm: 2, k8s: 5, hybrid: 4}
+    why:
+      slurm: "Outillage plus artisanal ; intégrations à écrire."
+      k8s: "Helm, opérateurs, Prometheus, GitOps : standards."
+      hybrid: "Le plan de contrôle Slurm devient un ensemble de ressources Kubernetes."
+  containers:
+    label: "Conteneurs et images comme unité de livraison"
+    scores: {slurm: 3, k8s: 5, hybrid: 4}
+    why:
+      slurm: "Pyxis et Enroot fonctionnent bien mais restent un ajout."
+      k8s: "L'image est l'unité native."
+      hybrid: "Pyxis utilisable dans les pods Slurm."
+  ops_cost:
+    label: "Simplicité d'exploitation (score haut = plus simple)"
+    scores: {slurm: 4, k8s: 3, hybrid: 2}
+    why:
+      slurm: "Un outil, mais une compétence HPC spécifique."
+      k8s: "Nombreux composants à tenir à jour : plugin de périphériques, opérateur GPU, Kueue, JobSet, CNI."
+      hybrid: "Deux couches à exploiter et une double compétence."
+  hw_health:
+    label: "Santé des nœuds, drainage, remise en service"
+    scores: {slurm: 4, k8s: 3, hybrid: 4}
+    why:
+      slurm: "Contrôle de santé périodique, prolog, drainage et raisons de drainage."
+      k8s: "Taints et validateurs de l'opérateur GPU ; la boucle complète est à assembler."
+      hybrid: "États de nœud synchronisés entre pods et Slurm."
+  tenancy:
+    label: "Isolation multi-locataires et contrôle d'accès"
+    scores: {slurm: 3, k8s: 4, hybrid: 4}
+    why:
+      slurm: "Comptes, cgroups et partitions ; noyau partagé, isolation à construire."
+      k8s: "Namespaces, RBAC, NetworkPolicy, Pod Security, quotas."
+      hybrid: "Isolation par pods autour de Slurm."
+  elasticity:
+    label: "Élasticité du parc (cloud, autoscaling de nœuds)"
+    scores: {slurm: 2, k8s: 5, hybrid: 4}
+    why:
+      slurm: "Nœuds cloud possibles mais secondaires dans le modèle."
+      k8s: "Autoscaling de nœuds et de pods."
+      hybrid: "Les pods Slurm suivent le parc Kubernetes."
+  maturity:
+    label: "Maturité publique pour des jobs multi-nœuds durs à grande échelle"
+    scores: {slurm: 5, k8s: 4, hybrid: 3}
+    why:
+      slurm: "Clusters de recherche publics sous Slurm (voir les références du chapitre 7)."
+      k8s: "Retour public d'un cluster d'entraînement sous Kubernetes (références du chapitre 7) ; plus jeune pour le gang natif."
+      hybrid: "Projets récents et versions majeures jeunes."

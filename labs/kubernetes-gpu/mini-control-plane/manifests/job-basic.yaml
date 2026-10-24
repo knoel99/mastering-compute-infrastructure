@@ -1,0 +1,21 @@
+# A training-like Indexed Job: 8 pods, each asking for a whole 8-GPU node (64 GPUs in total).
+# No .spec.scheduling: the default "basic" policy, i.e. pod-by-pod scheduling.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train-basic
+  namespace: default
+spec:
+  parallelism: 8
+  completions: 8
+  completionMode: Indexed
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: registry.example/train:1   # never pulled: this cluster has no kubelet
+          resources:
+            limits:
+              nvidia.com/gpu: 8

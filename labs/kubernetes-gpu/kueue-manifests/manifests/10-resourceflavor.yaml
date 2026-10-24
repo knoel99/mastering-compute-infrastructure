@@ -1,0 +1,10 @@
+# One flavor = one kind of node. Workloads admitted with this flavor get the nodeLabels below as a nodeSelector.
+# topologyName links the flavor to the node hierarchy of 15-topology.yaml (Topology-Aware Scheduling).
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: h100-80gb
+spec:
+  nodeLabels:
+    nvidia.com/gpu.product: NVIDIA-H100-80GB-HBM3
+  topologyName: gpu-fabric

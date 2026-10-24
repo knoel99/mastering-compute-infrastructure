@@ -72,16 +72,28 @@
      "idea": "Script qui produit un rapport JSON (CPU, NUMA, mémoire, disques, interfaces) à partir de lscpu/numactl/sysfs ; tests sur la sortie."
     },
     {
+     "id": "psi-triage",
+     "title": "Triage avec la méthode USE et la pression PSI",
+     "kind": "sandbox",
+     "idea": "Triage avec la méthode USE et la pression PSI"
+    },
+    {
+     "id": "pagecache",
+     "title": "Page cache : mesurer ce qui touche le disque",
+     "kind": "sandbox",
+     "idea": "Page cache : mesurer ce qui touche le disque"
+    },
+    {
      "id": "cgroup-limits",
-     "title": "cgroups v2 à la main",
+     "title": "cgroups : limite mémoire, mise à mort, quota de processeur",
      "kind": "sandbox",
      "idea": "Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire."
     },
     {
-     "id": "fio-pagecache",
-     "title": "fio et page cache",
+     "id": "ops-script",
+     "title": "Un script d'exploitation idempotent",
      "kind": "sandbox",
-     "idea": "Mesurer lecture/écriture avec et sans page cache, comprendre O_DIRECT ; script qui compare et trace."
+     "idea": "Un script d'exploitation idempotent"
     }
    ],
    "facts": [
@@ -727,6 +739,12 @@
      "title": "Matrice de décision Slurm / Kubernetes",
      "kind": "sandbox",
      "idea": "Grille de critères pondérée avec scénarios d'équipes ; script de calcul de score testé ; justification écrite."
+    },
+    {
+     "id": "mini-control-plane",
+     "title": "Un plan de contrôle Kubernetes 1.37 sans kubelet",
+     "kind": "sandbox",
+     "idea": "Un plan de contrôle Kubernetes 1.37 sans kubelet"
     }
    ],
    "facts": [
@@ -888,20 +906,26 @@
    ],
    "labs": [
     {
-     "id": "tco-model",
-     "title": "Modèle de TCO paramétrable",
+     "id": "usage-showback",
+     "title": "Du sacct au rapport de showback",
      "kind": "sandbox",
-     "idea": "Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'."
+     "idea": "Du sacct au rapport de showback"
     },
     {
      "id": "demand-forecast",
-     "title": "Prévision de demande de calcul",
+     "title": "Prévision de la demande et capacité à engager",
      "kind": "sandbox",
      "idea": "Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests."
     },
     {
+     "id": "tco-model",
+     "title": "Modèle de coût total paramétrable",
+     "kind": "sandbox",
+     "idea": "Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'."
+    },
+    {
      "id": "contract-checklist",
-     "title": "Lecture d'un contrat de capacité",
+     "title": "Revue d'un contrat de capacité fictif",
      "kind": "sandbox",
      "idea": "Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé."
     }

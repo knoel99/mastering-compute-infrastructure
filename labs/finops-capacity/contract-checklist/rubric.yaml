@@ -1,0 +1,53 @@
+# Review grid for a GPU capacity contract. Thresholds are the course's RECOMMENDED starting points (see the module page),
+# not market norms: adapt them to your workload, your alternatives and your legal advice. Not legal advice.
+# green = 1 point, amber = 0.5, red = 0. A "missing" number (clause absent) is red: nothing to hold the provider to.
+categories: [commitment, delivery, service, operations, price, exit_legal]
+items:
+  - {id: min_term, category: commitment, weight: 2, kind: number, pattern: 'Minimum Term: (\d+) months', worse: higher, green: 12, amber: 24,
+     title: "Minimum term (months)", ask: "Shorter term, or a step-down schedule, or a break option at month 12 or 24 with a known fee."}
+  - {id: take_or_pay, category: commitment, weight: 3, deal_breaker: true, kind: flag, red_if: ['whether used or not', 'take-or-pay'],
+     title: "Take-or-pay on the full commitment", ask: "Ramp the commitment on delivered capacity; allow a 10-20% flex band; allow resale or reassignment of unused capacity."}
+  - {id: auto_renewal, category: commitment, weight: 1, kind: number, pattern: 'at least (\d+) days before the end of the term', worse: higher, green: 30, amber: 60,
+     title: "Automatic renewal notice (days)", ask: "Renewal only by written agreement, or a notice window of at most 30 days with a reminder from the provider."}
+  - {id: customer_exit, category: commitment, weight: 2, kind: flag, red_if: ['Customer may not terminate for convenience'],
+     title: "Customer right to terminate", ask: "Termination for convenience with a declining fee, and termination for cause on repeated SLA misses."}
+  - {id: delivery_remedy, category: delivery, weight: 3, deal_breaker: true, kind: flag, red_if: ['No remedy applies to a delayed delivery', 'invoiced from the Start Date regardless'],
+     title: "Remedy for late delivery", ask: "Invoice only delivered capacity; credits per week of delay; right to cancel the undelivered share after a long delay."}
+  - {id: acceptance, category: delivery, weight: 2, kind: flag, red_if: ['no acceptance test', 'deemed accepted'],
+     title: "Acceptance test", ask: "Acceptance criteria in an annex: burn-in, interconnect bandwidth test, storage throughput test, node count; invoicing starts at acceptance."}
+  - {id: availability_target, category: service, weight: 2, kind: number, pattern: 'Availability Target: (\d+(?:\.\d+)?)%', worse: lower, green: 99.9, amber: 99.0,
+     title: "Availability target (%)", ask: "A target per node-hour, not per cluster, with the measure written in an annex."}
+  - {id: availability_scope, category: service, weight: 3, deal_breaker: true, kind: flag, red_if: ['management interface answers', 'GPU errors[^.]*are not Unavailability'],
+     title: "What counts as available", ask: "A node is available only if its GPUs, interconnect and storage mount pass the agreed health checks."}
+  - {id: credit_cap, category: service, weight: 2, kind: number, pattern: 'capped at (\d+)% of the monthly fee', worse: lower, green: 30, amber: 20,
+     title: "Service credit cap (% of monthly fee)", ask: "Higher tiers up to 100% for long outages; credits computed on the affected nodes and on the training time lost."}
+  - {id: sole_remedy, category: service, weight: 1, kind: flag, amber_if: ['sole and exclusive remedy'],
+     title: "Credits as sole remedy", ask: "Keep termination for cause and damages for repeated or gross failures outside the credit scheme."}
+  - {id: maintenance, category: operations, weight: 2, kind: number, pattern: 'up to (\d+) hours per month', worse: higher, green: 8, amber: 24,
+     title: "Scheduled maintenance (hours per month)", ask: "A cap of a few hours, 7 days notice, windows agreed with the customer, no rolling reboot of a running job."}
+  - {id: replacement_time, category: operations, weight: 3, kind: number, pattern: 'within (\d+) hours', worse: higher, green: 24, amber: 72,
+     title: "Failed-node replacement time (hours)", ask: "A number: replacement or repair within 24 h, a spare pool sized in the contract, and the time counted as unavailable until then."}
+  - {id: substitution, category: operations, weight: 2, kind: flag, red_if: ['different configuration or GPU generation'],
+     title: "Substitution of hardware", ask: "Same GPU model, memory and interconnect, or customer approval after a benchmark."}
+  - {id: performance, category: operations, weight: 2, kind: flag, red_if: ['no commitment on interconnect bandwidth'],
+     title: "Performance commitments", ask: "Measured acceptance values (busbw, storage GB/s) kept as a floor during the term."}
+  - {id: support, category: operations, weight: 1, kind: number, pattern: 'first response for a critical incident is (\d+) business hours', worse: higher, green: 1, amber: 4,
+     title: "Critical first response (business hours)", ask: "24x7 for critical incidents, a named technical contact, an escalation path with times."}
+  - {id: price_escalation, category: price, weight: 2, kind: number, pattern: 'increase prices once a year by up to (\d+)%', worse: higher, green: 3, amber: 5,
+     title: "Yearly price increase cap (%)", ask: "A fixed price for the term, or an index with a cap and a floor."}
+  - {id: surcharges, category: price, weight: 2, kind: flag, red_if: ['surcharges may be added'],
+     title: "Open-ended surcharges", ask: "No surcharge outside a formula written in the contract."}
+  - {id: egress, category: exit_legal, weight: 2, kind: flag, red_if: ['charged at the standard rate, including during and after termination'], green_if: ['free of charge', 'waived'],
+     title: "Data transfer out at exit", ask: "Transfer out waived or capped for the exit; export format and assistance period written down."}
+  - {id: deletion, category: exit_legal, weight: 1, kind: flag, amber_if: ['no deletion certificate'],
+     title: "Deletion and certificate", ask: "Deletion certificate within a fixed delay, and the right to audit it."}
+  - {id: relocation, category: exit_legal, weight: 1, kind: flag, amber_if: ['move the Committed Capacity to another data center'], green_if: ['only with the written consent'],
+     title: "Relocation of capacity", ask: "Relocation only with consent, same region, no loss of interconnect or storage proximity."}
+  - {id: liability, category: exit_legal, weight: 2, kind: number, pattern: 'fees paid in the (\d+) months', worse: lower, green: 12, amber: 6,
+     title: "Liability cap (months of fees)", ask: "At least 12 months of fees, and no cap for gross negligence or data breach."}
+  - {id: force_majeure, category: exit_legal, weight: 2, kind: flag, red_if: ['shortages of components'],
+     title: "Force majeure scope", ask: "Remove supply-chain and power availability from force majeure: they are the provider's core risk."}
+  - {id: suspension, category: exit_legal, weight: 2, kind: flag, red_if: ['suspend service on reasonable suspicion of breach, without notice'],
+     title: "Suspension rights", ask: "Suspension only for non-payment or proven abuse, after notice, and limited to the affected resources."}
+  - {id: provider_exit, category: exit_legal, weight: 2, deal_breaker: true, kind: flag, red_if: ['terminate for convenience with 30 days notice, with no refund'],
+     title: "Provider termination for convenience", ask: "Delete the clause, or make it a long notice with a full refund and transition support."}

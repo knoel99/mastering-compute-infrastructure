@@ -1,0 +1,19 @@
+# One pod that needs a whole 8-GPU node.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train-whole-node
+  namespace: default
+spec:
+  parallelism: 1
+  completions: 1
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: registry.example/train:1
+          resources:
+            limits:
+              nvidia.com/gpu: 8

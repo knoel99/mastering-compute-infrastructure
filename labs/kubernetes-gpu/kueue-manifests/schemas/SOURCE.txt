@@ -1,0 +1,1 @@
+kubernetes-sigs/kueue v0.20.3 CRDs (config/components/crd/bases), fetched 2026-10-24, Apache-2.0, descriptions removed

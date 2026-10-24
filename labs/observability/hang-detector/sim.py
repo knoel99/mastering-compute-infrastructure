@@ -2,7 +2,7 @@
 
 EVERYTHING HERE IS ASSUMED, NOT MEASURED. The pause distributions (checkpoint, evaluation, data stall) are
 choices made for this lab; the hang signature (utilization stays high, tensor pipe idle, heartbeat thread alive)
-is the hypothesis used by the course, reported by users but not measured by the author on a GPU.
+is the hypothesis used by the course, plausible (a communication kernel that spins while waiting for peers) but neither sourced nor measured by the author on a GPU.
 The lab shows what such assumptions imply for a detector; measure YOUR pauses before copying a threshold.
 """
 import random

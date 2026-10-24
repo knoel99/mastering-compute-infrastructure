@@ -1,0 +1,59 @@
+# 16 nodes x 8 GPUs = 128 GPUs, queued by Kueue, restarted as a whole by JobSet on failure.
+# Pods get stable DNS names <jobset>-<replicatedJob>-<jobIndex>-<podIndex>.<subdomain> from the headless
+# Service that JobSet creates; pod 0 hosts the torchrun rendezvous (c10d backend, port 29500).
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: pretrain-7b
+  namespace: research
+  labels:
+    kueue.x-k8s.io/queue-name: main
+    kueue.x-k8s.io/priority-class: normal
+spec:
+  failurePolicy:
+    maxRestarts: 3                 # the whole JobSet is recreated at most 3 times, the trainer resumes from /ckpt
+  network:
+    enableDNSHostnames: true
+    publishNotReadyAddresses: true
+  replicatedJobs:
+    - name: workers
+      replicas: 1
+      template:
+        spec:
+          parallelism: 16
+          completions: 16
+          completionMode: Indexed
+          backoffLimit: 0          # no per-pod retry: a lone restarted rank cannot rejoin a running collective
+          template:
+            metadata:
+              annotations:
+                kueue.x-k8s.io/podset-required-topology: topology.example.com/block
+            spec:
+              restartPolicy: Never
+              terminationGracePeriodSeconds: 120
+              containers:
+                - name: trainer
+                  image: registry.example/pretrain:7b       # placeholder: your training image
+                  command: ["bash", "-c"]
+                  args:
+                    - >-
+                      exec torchrun --nnodes=16 --nproc_per_node=8
+                      --rdzv_backend=c10d --rdzv_endpoint=pretrain-7b-workers-0-0.pretrain-7b:29500
+                      --rdzv_id=pretrain-7b
+                      train.py --steps 100000 --ckpt-dir /ckpt --ckpt-every 500
+                  ports:
+                    - containerPort: 29500
+                  env:
+                    - {name: OMP_NUM_THREADS, value: "8"}
+                    - {name: PYTHONUNBUFFERED, value: "1"}
+                  resources:
+                    requests: {cpu: 64, memory: 512Gi}
+                    limits: {nvidia.com/gpu: 8}
+                  volumeMounts:
+                    - {name: ckpt, mountPath: /ckpt}
+                    - {name: dshm, mountPath: /dev/shm}
+              volumes:
+                - name: ckpt
+                  persistentVolumeClaim: {claimName: ckpt-pretrain-7b}
+                - name: dshm
+                  emptyDir: {medium: Memory, sizeLimit: 64Gi}

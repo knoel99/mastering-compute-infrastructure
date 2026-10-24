@@ -6,7 +6,7 @@ Deux parties dans un même dossier.
 
 `sim.py` produit, toutes les 15 s, ce que verrait Prometheus pour un entraînement de 6 h : compteur de pas, phase (`train`, `ckpt`, `eval`), utilisation GPU, activité tensorielle, puissance. Trois familles de runs : sains, avec un blocage (`hang`), avec un plantage (`crash`).
 
-**Tout est supposé, rien n'est mesuré.** Les durées des pauses (checkpoint de 30 à 90 s, 10 % de checkpoints lents de 120 à 420 s, évaluations de 120 à 300 s, blocages de données de 20 à 200 s) sont des choix de ce lab. La signature du blocage (utilisation haute, tensor à zéro, battement de cœur toujours actif) est l'hypothèse du cours, rapportée par des utilisateurs mais non mesurée sur GPU par l'auteur. Le lab montre ce que ces hypothèses impliquent pour un détecteur ; **mesurez vos pauses avant de reprendre un seuil**.
+**Tout est supposé, rien n'est mesuré.** Les durées des pauses (checkpoint de 30 à 90 s, 10 % de checkpoints lents de 120 à 420 s, évaluations de 120 à 300 s, blocages de données de 20 à 200 s) sont des choix de ce lab. La signature du blocage (utilisation haute, tensor à zéro, battement de cœur toujours actif) est l'hypothèse du cours, plausible (un noyau de communication qui tourne en attendant ses pairs) mais ni sourcée ni mesurée sur GPU par l'auteur. Le lab montre ce que ces hypothèses impliquent pour un détecteur ; **mesurez vos pauses avant de reprendre un seuil**.
 
 `detectors.py` : `UtilLow` (naïf), `TensorIdle`, `StepStall`, `Heartbeat`, `PhaseAware`, `AnyOf`. `evaluate.py` imprime le tableau de comparaison et le balayage de fenêtre (150 runs sains + 150 blocages + 100 plantages, graines fixes, donc reproductible).
 

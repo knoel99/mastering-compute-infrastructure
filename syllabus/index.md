@@ -40,8 +40,10 @@ Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, system
 **Labs :**
 
 -   **Cartographier une machine** (bac à sable, sans GPU) : Script qui produit un rapport JSON (CPU, NUMA, mémoire, disques, interfaces) à partir de lscpu/numactl/sysfs ; tests sur la sortie.
--   **cgroups v2 à la main** (bac à sable, sans GPU) : Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire.
--   **fio et page cache** (bac à sable, sans GPU) : Mesurer lecture/écriture avec et sans page cache, comprendre O_DIRECT ; script qui compare et trace.
+-   **Triage avec la méthode USE et la pression PSI** (bac à sable, sans GPU) : Triage avec la méthode USE et la pression PSI
+-   **Page cache : mesurer ce qui touche le disque** (bac à sable, sans GPU) : Page cache : mesurer ce qui touche le disque
+-   **cgroups : limite mémoire, mise à mort, quota de processeur** (bac à sable, sans GPU) : Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire.
+-   **Un script d'exploitation idempotent** (bac à sable, sans GPU) : Un script d'exploitation idempotent
 
 **Sources à lire et faits à vérifier :**
 
@@ -454,11 +456,13 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 
 ## Phase 4 — Plateforme cloud-native et multi-fournisseurs {#phase4}
 
-### Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (plan, 28 h) {#kubernetes-gpu}
+### Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (rédigé, 28 h) {#kubernetes-gpu}
 
 Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).
+
+**Cours complet :** [Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](courses/kubernetes-gpu/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -483,6 +487,7 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 -   **Kueue : files, quotas, préemption** (bac à sable, sans GPU) : Manifestes ClusterQueue/LocalQueue/WorkloadPriorityClass validés hors ligne (kubernetes-validate/kubeconform si installable) et simulation de la logique d'admission en Python testée ; exécution sur cluster documentée.
 -   **JobSet : un entraînement multi-nœuds** (cluster) : Manifestes JobSet/Trainer pour torchrun multi-nœuds ; validation de schéma ; exécution réelle documentée.
 -   **Matrice de décision Slurm / Kubernetes** (bac à sable, sans GPU) : Grille de critères pondérée avec scénarios d'équipes ; script de calcul de score testé ; justification écrite.
+-   **Un plan de contrôle Kubernetes 1.37 sans kubelet** (bac à sable, sans GPU) : Un plan de contrôle Kubernetes 1.37 sans kubelet
 
 **Sources à lire et faits à vérifier :**
 
@@ -571,11 +576,13 @@ Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée
 
 **Projets qui s'appuient sur ce module :** Projet 5, Projet 1, Projet 6.
 
-### Module 15 — FinOps, capacité, énergie et achats de calcul (plan, 24 h) {#finops-capacity}
+### Module 15 — FinOps, capacité, énergie et achats de calcul (rédigé, 24 h) {#finops-capacity}
 
 Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
+
+**Cours complet :** [FinOps, capacité, énergie et achats de calcul](courses/finops-capacity/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -597,9 +604,10 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 
 **Labs :**
 
--   **Modèle de TCO paramétrable** (bac à sable, sans GPU) : Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'.
--   **Prévision de demande de calcul** (bac à sable, sans GPU) : Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests.
--   **Lecture d'un contrat de capacité** (bac à sable, sans GPU) : Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé.
+-   **Du sacct au rapport de showback** (bac à sable, sans GPU) : Du sacct au rapport de showback
+-   **Prévision de la demande et capacité à engager** (bac à sable, sans GPU) : Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests.
+-   **Modèle de coût total paramétrable** (bac à sable, sans GPU) : Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'.
+-   **Revue d'un contrat de capacité fictif** (bac à sable, sans GPU) : Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé.
 
 **Sources à lire et faits à vérifier :**
 

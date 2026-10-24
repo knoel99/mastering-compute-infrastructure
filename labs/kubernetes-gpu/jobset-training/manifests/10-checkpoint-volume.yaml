@@ -1,0 +1,13 @@
+# Shared checkpoint volume. ReadWriteMany needs a storage class whose CSI driver supports it
+# (a shared file system); "shared-fs" is a placeholder name for the class of your cluster.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckpt-pretrain-7b
+  namespace: research
+spec:
+  accessModes: ["ReadWriteMany"]
+  storageClassName: shared-fs
+  resources:
+    requests:
+      storage: 2Ti

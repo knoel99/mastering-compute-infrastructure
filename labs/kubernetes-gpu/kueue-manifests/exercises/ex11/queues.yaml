@@ -1,0 +1,59 @@
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata: {name: pretrain}
+spec:
+  cohortName: pool-256
+  namespaceSelector: {matchLabels: {team: pretrain}}
+  queueingStrategy: StrictFIFO
+  preemption: {withinClusterQueue: LowerPriority, reclaimWithinCohort: Any}
+  resourceGroups:
+    - coveredResources: ["nvidia.com/gpu"]
+      flavors:
+        - name: h100
+          resources:
+            - {name: "nvidia.com/gpu", nominalQuota: 128, lendingLimit: 64}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata: {name: finetune}
+spec:
+  cohortName: pool-256
+  namespaceSelector: {matchLabels: {team: finetune}}
+  queueingStrategy: BestEffortFIFO
+  preemption: {withinClusterQueue: LowerPriority, reclaimWithinCohort: LowerPriority}
+  resourceGroups:
+    - coveredResources: ["nvidia.com/gpu"]
+      flavors:
+        - name: h100
+          resources:
+            - {name: "nvidia.com/gpu", nominalQuota: 96}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata: {name: eval}
+spec:
+  cohortName: pool-256
+  namespaceSelector: {matchLabels: {team: eval}}
+  queueingStrategy: BestEffortFIFO
+  preemption: {withinClusterQueue: Never, reclaimWithinCohort: Never}
+  resourceGroups:
+    - coveredResources: ["nvidia.com/gpu"]
+      flavors:
+        - name: h100
+          resources:
+            - {name: "nvidia.com/gpu", nominalQuota: 32, borrowingLimit: 32}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata: {name: main, namespace: pretrain}
+spec: {clusterQueue: pretrain}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata: {name: main, namespace: finetune}
+spec: {clusterQueue: finetune}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata: {name: main, namespace: eval}
+spec: {clusterQueue: eval}

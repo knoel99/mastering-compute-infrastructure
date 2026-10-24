@@ -27,7 +27,7 @@ kill $PID; trap - EXIT
 
 if [ "${LIVE_SLURM:-0}" = "1" ]; then
   echo "--- 5. LIVE branch: real squeue/sinfo/sacct (needs a running Slurm, e.g. labs/slurm/slurm-sandbox/setup.sh)"
-  sbatch --wrap='sleep 2' >/dev/null
+  sbatch -o /dev/null --wrap='sleep 2' >/dev/null
   DPORT=$("$PY" -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1])')
   (cd fixtures && exec "$PY" -m http.server "$DPORT" --bind 127.0.0.1 >/dev/null 2>&1) & HPID=$!
   trap 'kill $HPID 2>/dev/null || true' EXIT

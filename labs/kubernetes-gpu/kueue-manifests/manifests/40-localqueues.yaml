@@ -1,0 +1,14 @@
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata: {name: main, namespace: research}
+spec: {clusterQueue: research}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata: {name: main, namespace: product}
+spec: {clusterQueue: product}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata: {name: sandbox, namespace: dev}
+spec: {clusterQueue: shared-dev}

@@ -1,0 +1,12 @@
+# A day on the 64-GPU pool of manifests/. Times are minutes since the start of the scenario.
+# "queue" is the LocalQueue of the namespace: research/main -> research, product/main -> product,
+# dev/sandbox -> shared-dev.
+steps:
+  - {t: 0,  submit: {name: notebooks,     ns: dev,      queue: sandbox, gpus: 8,  priority: normal}}
+  - {t: 5,  submit: {name: finetune-14b,  ns: product,  queue: main,    gpus: 30, priority: normal}}
+  - {t: 10, submit: {name: pretrain-7b,   ns: research, queue: main,    gpus: 32, priority: normal}}
+  - {t: 15, submit: {name: ablation-sweep, ns: research, queue: main,   gpus: 8,  priority: preemptible}}
+  - {t: 20, submit: {name: incident-eval, ns: research, queue: main,    gpus: 16, priority: urgent}}
+  - {t: 30, finish: notebooks}
+  - {t: 40, finish: incident-eval}
+  - {t: 50, finish: pretrain-7b}

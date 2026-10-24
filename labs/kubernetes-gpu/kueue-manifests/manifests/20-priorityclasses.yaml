@@ -1,0 +1,22 @@
+# WorkloadPriorityClass: priority of the Workload (admission and preemption order) without touching Pod priority.
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata: {name: urgent}
+value: 1000
+description: "Incident response and deadline runs; may reclaim lent quota"
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata: {name: high}
+value: 500
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata: {name: normal}
+value: 100
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: WorkloadPriorityClass
+metadata: {name: preemptible}
+value: 10
+description: "Fills idle quota; expected to checkpoint and tolerate eviction"

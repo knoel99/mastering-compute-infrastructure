@@ -1,0 +1,23 @@
+# Four small single-GPU pods (an evaluation sweep, for instance), each with realistic cpu and memory requests.
+# The default NodeResourcesFit score only looks at cpu and memory unless extended resources are listed in the
+# scoring strategy: these requests are what spreads the pods over the nodes in the default configuration.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: eval-small
+  namespace: default
+spec:
+  parallelism: 4
+  completions: 4
+  completionMode: Indexed
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: eval
+          image: registry.example/eval:1
+          resources:
+            requests: {cpu: 8, memory: 64Gi}
+            limits:
+              nvidia.com/gpu: 1

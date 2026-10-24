@@ -59,8 +59,8 @@ Dix séances, soit 28 h : six de 3 h et quatre de 2,5 h. Le niveau ne diminue ja
 | Séance | Durée | Niveau | Contenu | Pratique |
 |---|---|---|---|---|
 | 1 | 3 h | 1 | ch. 1 Pannes à grande échelle | Ex. 1, 4 ; questions de positionnement |
-| 2 | 3 h | 1 | ch. 2 Modèle de coût, première moitié (Young) | Ex. 2, 3 |
-| 3 | 3 h | 2 | ch. 2 seconde moitié (Daly, ETTR, dimensionnement) | Lab 10.1 |
+| 2 | 3 h | 1 | ch. 2 Modèle de coût, première moitié (Young) | Ex. 2 |
+| 3 | 3 h | 2 | ch. 2 seconde moitié (Daly, ETTR, dimensionnement) | Lab 10.1 ; Ex. 3 |
 | 4 | 3 h | 2 | ch. 3 Checkpoint correct | Lab 10.2 partie A ; Ex. 12 |
 | 5 | 2.5 h | 2 | ch. 3 suite (formats, reproductibilité), début du ch. 4 | Lab 10.2 partie B |
 | 6 | 2.5 h | 2 | ch. 4 Checkpoints rapides | Ex. 6 |
@@ -115,13 +115,13 @@ Doubler la taille du job divise donc par deux le temps entre pannes. C'est la ra
 Les deux dernières lignes reproduisent les projections de l'article (« 1.8 hours » pour 16 384 GPU, « 0.23 hours » pour 131 072 GPU) : le modèle en série à taux constant suffit pour le calcul d'ordre de grandeur.
 :::
 
-Deux réserves s'imposent. Le taux n'est pas constant : les mêmes auteurs observent des périodes à environ 2,5 pannes pour mille nœuds-jours et des pointes à environ 17,5, parce que les charges et les logiciels changent. Et l'indépendance est une hypothèse : un mauvais nœud réalloué à chaque relance, un commutateur défaillant ou une vague de chaleur créent des pannes corrélées. Nous y reviendrons avec les nœuds « citron » au chapitre 6.
+Deux réserves s'imposent. Le taux n'est pas constant : les mêmes auteurs observent des périodes à environ 2,5 pannes pour mille nœuds-jours et des pointes à environ 17,5, parce que les charges et les logiciels changent. Et l'indépendance est une hypothèse : un mauvais nœud réalloué à chaque relance, un commutateur défaillant ou une vague de chaleur créent des pannes corrélées. Nous y reviendrons avec le nœud défectueux qui revient à chaque relance (chapitre 5) et son exclusion par le superviseur (chapitre 6).
 
 ### 1.2. Une taxonomie utile à l'action
 
 Classer les pannes par composant ne suffit pas : ce qui compte pour l'exploitant, c'est **ce qu'on fait ensuite**. Nous retiendrons quatre familles et un cas à part.
 
--   **Matériel.** GPU (erreurs ECC, mémoire HBM, processeur système du GPU, capteurs thermiques), hôte (processeur, mémoire, SSD, alimentation, châssis, carte d'extension). La réparation est un échange de composant ; l'action immédiate est de retirer le nœud.
+-   **Matériel.** GPU (erreurs ECC, du nom du code correcteur d'erreurs de la mémoire, mémoire HBM, processeur système du GPU, capteurs thermiques), hôte (processeur, mémoire, SSD, alimentation, châssis, carte d'extension). La réparation est un échange de composant ; l'action immédiate est de retirer le nœud.
 -   **Réseau.** Câble ou commutateur, lien d'interconnexion qui flotte, carte réseau. Le symptôme est souvent un délai d'attente de collective qui n'indique pas la cause.
 -   **Logiciel.** Pilote, bibliothèque de communication, bogue du *framework*, code utilisateur, dépendance externe (système de fichiers, service de métriques). La relance suffit parfois, parfois non : un bogue déterministe se reproduit à l'identique.
 -   **Humaine et planifiée.** Mise à jour de micrologiciel, changement de configuration, mise à jour du jeu de données, erreur de commande. Ces interruptions se planifient, donc se réduisent.
@@ -133,11 +133,11 @@ Cinq sources décrivent des entraînements ou des clusters réels. Elles ne sont
 
 | Source | Ce qui est mesuré | Chiffres cités |
 |---|---|---|
-| [Llama 3](https://arxiv.org/abs/2407.21783) (2024) | 54 jours de pré-entraînement du 405B sur jusqu'à 16 000 GPU H100 | 466 interruptions dont 47 prévues et 419 imprévues ; plus de 90 % de temps d'entraînement effectif |
+| [Llama 3](https://arxiv.org/abs/2407.21783) (2024) | une fenêtre de 54 jours du pré-entraînement du 405B, sur jusqu'à 16 000 GPU H100 | 466 interruptions dont 47 prévues et 419 imprévues ; plus de 90 % de temps d'entraînement effectif |
 | [Kokolis et al.](https://arxiv.org/abs/2410.21680) (2024) | onze mois sur deux clusters de recherche (RSC-1, RSC-2), 4 millions de jobs | 6,50 et 2,34 pannes pour mille nœuds-jours ; MTBF projeté de 1,8 h à 16 384 GPU |
 | [OPT-175B](https://arxiv.org/abs/2205.01068) (2022) | deux mois d'entraînement | au moins 35 redémarrages manuels, plus de 100 hôtes remplacés, plus de 70 redémarrages automatiques estimés |
 | [BLOOM](https://arxiv.org/abs/2211.05100) (2022) | l'entraînement du modèle de 176 milliards de paramètres | en moyenne 1 à 2 pannes de GPU par semaine |
-| [Hu et al. (Acme)](https://arxiv.org/abs/2403.07648) (2024) | six mois sur deux clusters de 4 704 GPU A100 | les pannes d'infrastructure représentent 11 % des jobs en échec mais plus de 82 % du temps GPU des jobs en échec |
+| [Hu et al. (Acme)](https://arxiv.org/abs/2403.07648) (2024) | six mois (mars à août 2023) sur deux clusters totalisant 4 704 GPU A100 | les pannes d'infrastructure représentent 11 % des jobs en échec mais plus de 82 % du temps GPU des jobs en échec |
 
 Le tableau 5 de l'article Llama 3 détaille les 419 interruptions imprévues. Nous l'avons regroupé par famille (chiffres de l'article, regroupement et divisions faits ici) :
 
@@ -153,7 +153,7 @@ Le tableau 5 de l'article Llama 3 détaille les 419 interruptions imprévues. No
 ::: note
 [Un chiffre de l'article qui ne se recalcule pas]{.tag} Le texte de l'article dit que les problèmes de GPU forment « 58.7% » des causes imprévues, et le tableau donne 30,1 % à la ligne « Faulty GPU ». Or les comptes du tableau somment bien à 419, et $148/419 = 35{,}3\ \%$, pas 30,1 %. Recalculée à partir des comptes, la part des GPU est de 64,0 %, pas 58,7 %. 
 
-Nous n'avons pas de moyen de savoir lequel des deux jeux de chiffres est le bon : l'exercice 4 vous demande de refaire ce calcul. Retenez que les **comptes** somment correctement et que la conclusion (les GPU forment de loin la première famille) ne change pas.
+La colonne des pourcentages, elle, est cohérente avec le texte : $30{,}1 + 17{,}2 + 4{,}5 + 4{,}1 + 1{,}4 + 1{,}4 = 58{,}7$. Seule la ligne « Faulty GPU » est donc incohérente : avec 126 interruptions elle donnerait 30,1 %, mais les comptes ne sommeraient plus à 419. Nous ne pouvons pas trancher : l'exercice 4 vous demande de refaire ce calcul. La conclusion (les GPU forment de loin la première famille) ne change pas.
 :::
 
 La leçon opérationnelle la plus utile est ailleurs. Sur 419 interruptions imprévues en 54 jours, l'article indique que « significant manual intervention was required only three times during this period, with the rest of issues handled by automation ». L'écart entre 419 pannes et trois interventions humaines, c'est le contenu de ce module.
@@ -245,7 +245,7 @@ exact   argmin of E[wall] (numerical) =   1115.7 s
      4621     0.7523   0.7729   0.7749 0.0024   0.7997
 ~~~
 
-La colonne « MC exp » (Monte-Carlo, goodput moyen, erreur standard dans la colonne suivante) coïncide avec le modèle exact à moins de deux erreurs standard. Le premier ordre sous-estime le goodput d'environ un demi-point à l'optimum, et de deux points aux extrémités. La dernière colonne utilise des pannes en rafales (loi de Weibull de paramètre de forme 0,7, de même moyenne) : le goodput est un peu meilleur et l'optimum, sur cette grille, ne bouge pas.
+La colonne « MC exp » (Monte-Carlo, goodput moyen, erreur standard dans la colonne suivante) coïncide avec le modèle exact à moins de deux erreurs standard. Le premier ordre sous-estime le goodput d'environ 0,7 point à l'optimum, et de 1,3 à 4,1 points aux extrémités de la grille. La dernière colonne utilise des pannes en rafales (loi de Weibull de paramètre de forme 0,7, de même moyenne) : le goodput est un peu meilleur et l'optimum, sur cette grille, ne bouge pas.
 :::
 
 <figure class="fig">
@@ -324,7 +324,7 @@ Les 60 minutes donnent 0,68, que l'article arrondit à 0,7 ; les 5 minutes donne
 Que contient le checkpoint, et combien pèse-t-il ? Pour l'optimiseur Adam en précision mixte, le papier [ZeRO](https://arxiv.org/abs/1910.02054) compte 2 octets par paramètre pour la copie en demi-précision, 2 pour les gradients et $K = 12$ pour l'état de l'optimiseur (copie maître en simple précision, deux moments), soit $16\Psi$ octets pour $\Psi$ paramètres. Un checkpoint n'a pas besoin des gradients : de $12\Psi$ à $14\Psi$ octets selon que l'on sauve ou non la copie en demi-précision (qui se reconstruit).
 
 ::: ex
-[Exemple 2.4 — Un modèle de 70 milliards de paramètres]{.tag} Avec $14\Psi$ octets, $\Psi = 70 \times 10^9$ donne 980 Go. Sur un job de 1 024 GPU ($M = 28{,}8$ h au taux de RSC-1, $R = 600$ s supposé), le minimum exact du modèle donne (**calculé ici**, débits d'écriture agrégés **supposés**) :
+[Exemple 2.4 — Un modèle de 70 milliards de paramètres]{.tag} Avec $14\Psi$ octets, $\Psi = 70 \times 10^9$ donne 980 Go. Sur un job de 1 024 GPU ($M = 28{,}85$ h au taux de RSC-1, $R = 600$ s supposé), le minimum exact du modèle donne (**calculé ici**, débits d'écriture agrégés **supposés**) :
 
 | Débit d'écriture | $\delta$ bloquant | $\tau^{\ast}$ | Temps perdu |
 |---|---|---|---|
@@ -469,7 +469,7 @@ Le chapitre 2 a montré que le coût bloquant $\delta$ fixe la fréquence de che
 
 Un checkpoint synchrone enchaîne quatre phases, toutes bloquantes : copier l'état du GPU vers la mémoire de l'hôte (*snapshot*), le sérialiser, l'écrire sur le stockage, valider (manifeste, renommage). La seule phase qui doit absolument arrêter l'entraînement est la première, parce que l'état change à chaque pas. Les autres peuvent se faire pendant que les pas suivants calculent.
 
-C'est l'idée du **checkpoint en deux phases** de CheckFreq (Mohan, Phanishayee et Chidambaram, FAST 2021) : une phase de *snapshot* rapide, puis une phase de persistance qui recouvre le calcul. Les auteurs rapportent que leur système peut ramener le temps de reprise « from hours to seconds while bounding the runtime overhead within 3.5% ». MegaScale (ByteDance) décrit la même structure : chaque GPU copie son état vers la mémoire de l'hôte puis reprend l'entraînement, et un processus de fond transfère ensuite l'état vers un système de fichiers distribué. 
+C'est l'idée du **checkpoint en deux phases** de CheckFreq (Mohan, Phanishayee et Chidambaram, FAST 2021) : une phase de *snapshot* rapide, puis une phase de persistance qui recouvre le calcul. Les auteurs rapportent que leur système peut ramener le temps de reprise « from hours to seconds while bounding the runtime overhead within 3.5% ». MegaScale (Jiang et al., 2024) décrit la même structure : chaque GPU copie son état vers la mémoire de l'hôte puis reprend l'entraînement, et un processus de fond transfère ensuite l'état vers un système de fichiers distribué. 
 
 L'équipe d'Acme, de son côté, annonce un checkpoint accéléré de 3,6 à 58,7 fois par cette approche, en citant un ralentissement de l'entraînement pouvant atteindre 43 % avec des checkpoints synchrones de plusieurs téraoctets.
 
@@ -523,11 +523,11 @@ Cela conduit à un modèle à **deux niveaux** : un checkpoint rapide et fréque
 $$\tau_1 = \sqrt{\frac{2\,\delta_1 M}{p}} \qquad \tau_2 = \sqrt{\frac{2\,\delta_2 M}{1-p}}$$
 
 ::: ex
-[Exemple 4.1 — Un niveau ou deux ?]{.tag} Reprenons le job de 1 024 GPU ($M = 28{,}8$ h). Hypothèses **posées pour l'exemple**, à mesurer chez vous : niveau 1 avec $\delta_1 = 2$ s et $R_1 = 120$ s, niveau 2 avec $\delta_2 = 120$ s et $R_2 = 600$ s, et $p = 0{,}8$. 
+[Exemple 4.1 — Un niveau ou deux ?]{.tag} Reprenons le job de 1 024 GPU ($M = 28{,}85$ h). Hypothèses **posées pour l'exemple**, à mesurer chez vous : niveau 1 avec $\delta_1 = 2$ s et $R_1 = 120$ s, niveau 2 avec $\delta_2 = 120$ s et $R_2 = 600$ s, et $p = 0{,}8$. 
 
-Le calcul (**fait ici**, confirmé par minimisation numérique) donne 721 s (12 minutes) pour $\tau_1$ et 11 163 s (3,1 heures) pour $\tau_2$, soit un temps perdu de 2,9 %.
+Le calcul au premier ordre (**fait ici**, confirmé par minimisation numérique) donne 721 s (12 minutes) pour $\tau_1$ et 11 163 s (3,1 heures) pour $\tau_2$, soit un temps perdu de 2,9 %.
 
-Avec le seul niveau 2, la période serait de 4 992 s (83 minutes) et le temps perdu de 5,4 %. Le second niveau divise presque par deux le temps perdu, à condition que $p = 0{,}8$ soit vrai : si le placement des copies fait qu'un nœud et son pair tombent ensemble, $p$ chute et le gain avec lui.
+Avec le seul niveau 2, la période de Young serait de 4 992 s (83 minutes) et le temps perdu de 5,4 % (le modèle exact donne 5,3 %). Le second niveau divise presque par deux le temps perdu, à condition que $p = 0{,}8$ soit vrai : si le placement des copies fait qu'un nœud et son pair tombent ensemble, $p$ chute et le gain avec lui.
 :::
 
 ### 4.4. La couche de stockage
@@ -579,7 +579,7 @@ Dix minutes de blocage sur un grand job se paient en GPU-heures.
 [Exemple 5.1 — Le prix d'un blocage détecté trop tard]{.tag} Un blocage sur 16 384 GPU, détecté par le délai NCCL de 10 minutes, laisse 16 384 GPU inactifs pendant 10 minutes : 2 731 GPU-heures (**calculé ici**). Avec un délai de 2 minutes, 546 GPU-heures. Sur 1 024 GPU, 171 GPU-heures pour 10 minutes. Un délai court détecte plus tôt mais risque de tuer un job sain pendant une phase légitimement lente (checkpoint synchrone, évaluation). Le bon délai est le plus court qui soit **plus long que la plus longue phase silencieuse légitime**, mesurée sur votre job.
 :::
 
-Au niveau du réseau, NCCL ajoute ses propres minuteries. Pour InfiniBand, la [documentation de NCCL](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html) précise que `NCCL_IB_TIMEOUT` fixe un délai de $4{,}096\ \mu s \times 2^{\text{valeur}}$, et que le temps total d'attente avant erreur est le produit de ce délai par `NCCL_IB_RETRY_CNT`. Avec la valeur 20 et 7 essais, le tableau de la documentation indique 30 secondes (nous retrouvons $4{,}096\ \mu s \times 2^{20} = 4{,}29$ s, fois 7). Une valeur de 0, ou supérieure ou égale à 32, donne un délai infini.
+Au niveau du réseau, NCCL ajoute ses propres minuteries. Pour InfiniBand, la [documentation de NCCL](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html) précise que `NCCL_IB_TIMEOUT` fixe un délai de $4{,}096\ \mu s \times 2^{\text{valeur}}$, et que le temps total d'attente avant erreur est le produit de ce délai par `NCCL_IB_RETRY_CNT`. Avec la valeur 20 et 7 essais, la documentation indique environ 30 secondes (nous retrouvons $4{,}096\ \mu s \times 2^{20} = 4{,}29$ s, fois 7). Une valeur de 0, ou supérieure ou égale à 32, donne un délai infini.
 
 Quand une erreur de communicateur NCCL est fatale, la documentation indique qu'il faut appeler `ncclCommAbort` puis recréer le communicateur : une collective bloquée ne se débloque pas d'elle-même.
 
@@ -718,7 +718,7 @@ Le script doit donc savoir reprendre (`--resume latest`). La variable `SLURM_RES
 
 Avec `--no-kill`, le job n'est pas tué si un nœud tombe, et la documentation précise que « The user will assume the responsibilities for fault-tolerance should a node fail ». `--exclude` écarte des nœuds.
 
-Le script `examples/train.sbatch` du lab assemble ces options pour 4 nœuds ; il est linté, pas exécuté, faute de GPU.
+Le script `examples/train.sbatch` du lab assemble ces options pour 4 nœuds ; il est linté, pas exécuté, faute de GPU. Il suppose un `train.py` à vous (non fourni) qui accepte `--resume latest` et teste un fichier de demande de checkpoint. En effet `torchrun` n'installe par défaut des gestionnaires que pour `SIGTERM`, `SIGINT`, `SIGHUP` et `SIGQUIT`, et ils arrêtent les processus (variable `TORCHELASTIC_SIGNALS_TO_HANDLE`, lue dans le code de PyTorch 2.14.1) : un `SIGUSR1` n'est pas relayé aux processus d'entraînement.
 
 ::: ex
 [Exemple 6.4 — Ce que coûte une remise en file sous Slurm 23.11.4]{.tag} Le script `requeue_demo.sbatch` s'auto-remet en file deux fois puis se termine, sur le Slurm mono-nœud du module 5 (paquets Ubuntu 24.04, sans GPU). Sortie réelle (2026-10-24) :
@@ -789,7 +789,7 @@ Le catalogue des Xid (page « Analyzing Xid Errors with the Xid Catalog », mise
 | 140 | `UNRECOVERABLE_ECC_ERROR_ESCAPE` | erreur ECC non récupérée | `RESET_GPU` |
 | 154 | `GPU_RECOVERY_ACTION_CHANGED` | changement d'action de récupération | informatif |
 
-Nous reproduisons les libellés tels quels : les sigles de la colonne d'action (`RESTART_APP`, `RESET_GPU`, `RESTART_BM`, `WORKFLOW_*`) ne sont pas définis dans la page lue, et nous ne les traduisons pas. Le catalogue précise que l'Xid 154 « summarizes the recovery action required for other Xids » : lisez-le avec l'Xid qu'il accompagne. Sur les clusters de recherche de Meta, Kokolis et coauteurs observent que 43 % des erreurs PCIe de RSC-1 (63 % pour RSC-2) coïncident avec l'Xid 79, ce qui rappelle qu'un symptôme peut venir d'un bus et pas du GPU.
+Nous reproduisons les libellés tels quels : les sigles de la colonne d'action (`RESTART_APP`, `RESET_GPU`, `RESTART_BM`, `WORKFLOW_*`) ne sont pas définis dans la page lue, et nous ne les traduisons pas. Le catalogue précise que l'Xid 154 « summarizes the recovery action required for other Xids » : lisez-le avec l'Xid qu'il accompagne. Dans leurs clusters de recherche, Kokolis et coauteurs observent que 43 % des erreurs PCIe de RSC-1 (63 % pour RSC-2) coïncident avec l'Xid 79, ce qui rappelle qu'un symptôme peut venir d'un bus et pas du GPU.
 
 ### 7.2. Mémoire : ECC, confinement et remappage
 
@@ -979,7 +979,7 @@ export PYTHON="$(command -v python)"
 
 ## Exercices {#ex}
 
-Les calculs des corrigés ont été refaits en Python (fichier de calcul conservé par l'auteur), et les commandes citées ont été exécutées dans le bac à sable.
+Les calculs des corrigés ont été refaits en Python (avec `yd.py` du lab 10.1 pour les modèles de checkpoint et `scipy.stats.poisson` pour l'exercice 9), et les commandes citées ont été exécutées dans le bac à sable.
 
 ::: exo
 [Exercice 1 · ★ — MTBF d'un job]{.tag} Les nœuds d'un cluster tombent en panne au taux de 6,5 pannes pour mille nœuds-jours. Un job occupe 256 nœuds (2 048 GPU). (a) Quel est son MTBF ? (b) Quelle est la probabilité qu'il tourne 48 heures sans aucune panne ? (c) Combien de pannes attendez-vous en moyenne en 48 heures ?
@@ -1026,7 +1026,7 @@ Soit 94,5 %. L'écart est de 0,90 point, soit $0{,}0090 \times 2048 \times 24 \a
 
 (c) À 289 s, le goodput simulé tombe à 0,7939 : 8,3 points de moins qu'à l'optimum. « Par prudence » n'est pas gratuit : trop fréquent coûte autant que trop rare (à 4 621 s, 4 fois la période de Young, la perte est de 10,2 points).
 
-(d) Le premier ordre approxime la perte de recalcul et néglige des termes d'ordre supérieur en $\tau/M$ et $\delta/M$ ; il sous-estime donc le goodput d'environ un demi-point à l'optimum et de deux points aux extrémités.
+(d) Le premier ordre approxime la perte de recalcul et néglige des termes d'ordre supérieur en $\tau/M$ et $\delta/M$ ; il sous-estime donc le goodput d'environ 0,7 point à l'optimum et de 1,3 à 4,1 points aux extrémités de la grille.
 :::
 
 ::: exo
@@ -1038,7 +1038,7 @@ Soit 94,5 %. L'écart est de 0,90 point, soit $0{,}0090 \times 2048 \times 24 \a
 
 (b) 58,7 % de 419 font 246 interruptions de GPU. C'est ce qu'on obtient si « défaut du GPU » vaut 126, car $0{,}301 \times 419 = 126$ et $126 + 72 + 19 + 17 + 6 + 6 = 246$. Mais alors les comptes de tout le tableau ne somment plus à 419 mais à 397.
 
-(c) Le tableau ne peut pas être cohérent avec ses deux colonnes à la fois. Les comptes somment exactement à 419, les pourcentages des autres lignes sont ceux de comptes divisés par 419 : la ligne « défaut du GPU » est la seule incohérente. Sans accès aux données, il faut signaler l'écart, citer les **comptes** et recalculer les parts. Dans les deux lectures, les GPU restent la première famille.
+(c) Le tableau ne peut pas être cohérent avec ses deux colonnes à la fois. Les comptes somment exactement à 419, les pourcentages des autres lignes sont ceux de comptes divisés par 419 : la ligne « défaut du GPU » est la seule incohérente. Les pourcentages publiés des six lignes GPU (30,1 ; 17,2 ; 4,5 ; 4,1 ; 1,4 ; 1,4) additionnés donnent bien 58,7 %, ce qui montre d'où vient ce chiffre. Sans accès aux données, il faut signaler l'écart, citer les **comptes** et recalculer les parts. Dans les deux lectures, les GPU restent la première famille.
 :::
 
 ::: exo
@@ -1123,6 +1123,8 @@ Soit 94,5 %. L'écart est de 0,90 point, soit $0{,}0090 \times 2048 \times 24 \a
 
 ::: exo
 [Exercice 9 · ★★★ — Combien de nœuds de rechange ?]{.tag} Un cluster alloue 2 048 nœuds à un job. Les nœuds tombent en panne indépendamment au taux de 6,5 pannes pour mille nœuds-jours et une réparation prend 2 jours (hypothèse), sans limite de capacité de réparation. (a) Combien de nœuds sont en réparation en moyenne ? (b) Combien de rechanges garantissent, avec une probabilité d'au moins 99 %, de remplacer sans redimensionner ? (c) Que devient ce nombre si la réparation prend 5 jours ou 1 jour ? (d) Combien coûtent les rechanges inactives, et comment réduire ce coût ?
+
+*Indice* : le nombre moyen de nœuds en réparation est le taux de panne multiplié par la durée de réparation (loi de Little) ; sans limite de capacité de réparation, ce nombre suit une loi de Poisson.
 :::
 
 ::: sol
@@ -1136,7 +1138,7 @@ Soit 94,5 %. L'écart est de 0,90 point, soit $0{,}0090 \times 2048 \times 24 \a
 :::
 
 ::: exo
-[Exercice 10 · ★★★ — Une boucle de relance toute la nuit]{.tag} Un job de 1 024 GPU a redémarré 28 fois entre 1 h et 6 h 30. Le superviseur indique, pour chaque tentative : un nœud différent, un échec 90 secondes après le lancement, et `step_before = step_after = 18000`. $R$ vaut 600 s. (a) Qu'est-ce qui, dans ces données, écarte une panne de nœud ? (b) Combien de GPU-heures ont été perdues ? (c) Quelle garde aurait limité les dégâts, et combien aurait-elle économisé ? (d) Quelle cause expliquerait ce comportement quand les empreintes du checkpoint sont correctes ? (e) Quels changements proposez-vous ?
+[Exercice 10 · ★★★ — Une boucle de relance toute la nuit]{.tag} Dans ce scénario fictif, un job de 1 024 GPU a redémarré 28 fois entre 1 h et 6 h 30. Le superviseur indique, pour chaque tentative : un nœud différent, un échec 90 secondes après le lancement, et `step_before = step_after = 18000`. $R$ vaut 600 s. (a) Qu'est-ce qui, dans ces données, écarte une panne de nœud ? (b) Combien de GPU-heures ont été perdues ? (c) Quelle garde aurait limité les dégâts, et combien aurait-elle économisé ? (d) Quelle cause expliquerait ce comportement quand les empreintes du checkpoint sont correctes ? (e) Quels changements proposez-vous ?
 :::
 
 ::: sol
@@ -1179,7 +1181,7 @@ Une bonne réponse comporte : des hypothèses mesurables et pas seulement « le 
 ::: sol
 **Défauts.** (1) L'écriture n'est pas atomique : une coupure laisse un fichier tronqué sous le nom final. (2) Le précédent checkpoint est écrasé : aucun repli possible. (3) Aucun `fsync` : le noyau peut avoir accepté l'écriture sans qu'elle soit durable. (4) Aucune empreinte : un fichier abîmé est chargé sans alerte. (5) Souvent, l'état est incomplet (optimiseur, générateurs aléatoires, curseur de données).
 
-**Correction partielle** (exécutée dans le bac à sable : elle affiche `['ckpt.pt'] 20` après deux sauvegardes) :
+**Correction partielle** (exécutée dans le bac à sable : après deux sauvegardes successives, le répertoire ne contient que `ckpt.pt`, sans résidu `.tmp`) :
 
 ~~~python
 import os

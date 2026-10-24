@@ -53,8 +53,16 @@
    "label": "Module 10 — Pannes, checkpointing et reprise automatique"
   },
   {
+   "href": "courses/kubernetes-gpu/index.html",
+   "label": "Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling"
+  },
+  {
    "href": "courses/observability/index.html",
    "label": "Module 14 — Observabilité et fiabilité d'une flotte GPU"
+  },
+  {
+   "href": "courses/finops-capacity/index.html",
+   "label": "Module 15 — FinOps, capacité, énergie et achats de calcul"
   },
   {
    "href": "courses/platform-leadership/index.html",

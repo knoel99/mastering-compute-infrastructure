@@ -1,0 +1,24 @@
+# Five team profiles. `weights` say how much each criterion matters (0 = irrelevant, 5 = decisive);
+# `must` are hard requirements: an option scoring below the minimum is ineligible whatever its total.
+# Profiles are fictional composites written for this lab, not descriptions of real organisations.
+scenarios:
+  research-lab:
+    story: "Laboratoire de 40 chercheurs, 200 GPU, charge 100 % entraînement et évaluation, scripts sbatch existants."
+    weights: {gang: 5, queue: 5, topology: 4, batch_ux: 5, services: 0, ecosystem: 1, containers: 2, ops_cost: 4, hw_health: 3, tenancy: 2, elasticity: 0, maturity: 4}
+    must: {gang: 4}
+  inference-first-startup:
+    story: "Start-up dont l'essentiel de la charge est de l'inférence 24 h sur 24 sur 64 GPU cloud, avec quelques entraînements."
+    weights: {gang: 2, queue: 2, topology: 1, batch_ux: 1, services: 5, ecosystem: 5, containers: 5, ops_cost: 4, hw_health: 2, tenancy: 2, elasticity: 5, maturity: 1}
+    must: {services: 4}
+  enterprise-platform:
+    story: "Entreprise avec une plateforme Kubernetes commune ; une équipe de recherche exige ses scripts Slurm."
+    weights: {gang: 4, queue: 4, topology: 3, batch_ux: 4, services: 3, ecosystem: 4, containers: 4, ops_cost: 4, hw_health: 3, tenancy: 4, elasticity: 2, maturity: 3}
+    must: {}
+  sovereign-hpc-center:
+    story: "Centre de calcul de plus de 2 000 GPU partagés entre de nombreux laboratoires, comptabilité et équité strictes."
+    weights: {gang: 5, queue: 5, topology: 5, batch_ux: 5, services: 0, ecosystem: 1, containers: 2, ops_cost: 3, hw_health: 4, tenancy: 5, elasticity: 0, maturity: 5}
+    must: {queue: 4, maturity: 4}
+  gpu-cloud-provider:
+    story: "Fournisseur de cloud GPU qui offre à ses clients à la fois un environnement Slurm et un environnement Kubernetes."
+    weights: {gang: 4, queue: 3, topology: 4, batch_ux: 4, services: 4, ecosystem: 4, containers: 4, ops_cost: 2, hw_health: 5, tenancy: 5, elasticity: 4, maturity: 3}
+    must: {}

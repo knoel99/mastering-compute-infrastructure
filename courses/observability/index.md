@@ -40,7 +40,7 @@ Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriq
 | Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), [Module 5 — Slurm](../slurm/index.html) |
 | Statut pour le lecteur de référence | cœur : l'outillage Prometheus est acquis, la sémantique GPU, la détection de blocages et les SLO de calcul ne le sont pas |
 | Livrable | un exportateur testé, des règles d'alerte testées par promtool et par mutation, un détecteur de blocage dont vous connaissez les fausses alarmes |
-| Environnement | un portable ou une VM Linux, **sans GPU** ; `promtool` (paquet apt `prometheus`), Python avec `prometheus_client`, `torch` CPU, `pytest`, `pyyaml` ; Slurm du module 5 pour la branche en direct |
+| Environnement | un portable ou une VM Linux, **sans GPU** ; `promtool` (paquet apt `prometheus`), Python avec `prometheus_client`, `torch` CPU, `pytest`, `pyyaml` (et `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3) ; Slurm du module 5 pour la branche en direct |
 | Projets liés | [Projet 5 — Observabilité GPU et pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
@@ -60,7 +60,7 @@ Dix séances, soit 24 h. Le niveau ne diminue jamais d'une séance à la suivant
 | Séance | Durée | Niveau | Contenu | Pratique |
 |---|---|---|---|---|
 | 1 | 2.5 h | 1 | ch. 1 Ce qu'on observe, le piège des moyennes | Questions de positionnement ; Ex. 1 |
-| 2 | 2.5 h | 2 | ch. 2 Métriques GPU : DCGM | Ex. 2 |
+| 2 | 2 h | 2 | ch. 2 Métriques GPU : DCGM | Ex. 2 |
 | 3 | 2.5 h | 2 | ch. 3 Prometheus et Grafana pour le calcul | Lab 14.1 partie A ; Ex. 3 |
 | 4 | 2 h | 2 | ch. 4 Journaux et traces | Lecture de la partie B du lab 14.3 ; Ex. 4 |
 | 5 | 2.5 h | 2 | ch. 5 Observabilité des ordonnanceurs | Lab 14.1 partie B (Slurm) ; Ex. 5 |
@@ -68,7 +68,7 @@ Dix séances, soit 24 h. Le niveau ne diminue jamais d'une séance à la suivant
 | 7 | 3 h | 3 | ch. 7 Pannes silencieuses | Lab 14.2 mutation ; Ex. 7, 8 |
 | 8 | 3 h | 3 | Lab 14.3 parties A et B | Ex. 9 |
 | 9 | 2 h | 3 | ch. 8 Suivi d'expériences et reproductibilité | Lab 14.3 partie C ; Ex. 10 |
-| 10 | 1.5 h | 3 | Checkpoint de sortie, démarrage du Projet 5 | Reprise de l'exercice 9 |
+| 10 | 2 h | 3 | Checkpoint de sortie, démarrage du Projet 5 | Reprise de l'exercice 9 |
 
 ## Avant de commencer {#avant}
 
@@ -99,7 +99,7 @@ Avant de choisir un outil, il faut savoir quelles questions on veut pouvoir pose
 Une flotte d'entraînement se lit en cinq couches. Chacune a sa source, son rythme et ses pannes typiques.
 
 -   **Le modèle et l'entraîneur** : perte, pas d'optimisation, tokens par seconde, durée des étapes. C'est la seule couche qui sait si le travail avance.
--   **Les GPU** : fréquences, température, puissance, mémoire, erreurs matérielles, activité des unités de calcul (DCGM, chapitre 2).
+-   **Les GPU** : fréquences, température, puissance, mémoire, erreurs matérielles (codes XID : les messages d'erreur du pilote NVIDIA), activité des unités de calcul (DCGM, chapitre 2).
 -   **Le nœud** : processeur, mémoire, disque, noyau, réseau. Les erreurs matérielles apparaissent aussi dans le journal du noyau.
 -   **Le réseau et le stockage** : compteurs d'erreurs des cartes, débit de lecture des données, latence d'écriture des points de contrôle.
 -   **L'ordonnanceur** : files, états des nœuds, jobs en attente ou en échec (chapitre 5).
@@ -163,12 +163,12 @@ Une règle pratique : alertez sur des métriques, enquêtez dans les journaux, o
 
 ### 1.3. Le piège de la moyenne
 
-Dans un entraînement synchrone, chaque étape se termine quand le rang le plus lent a fini. La fréquence moyenne des GPU, la température moyenne ou l'utilisation moyenne de la flotte sont donc des indicateurs **aveugles à l'unique GPU qui compte**.
+Dans un entraînement synchrone, chaque étape se termine quand le rang le plus lent a fini (un **rang**, *rank*, est l'un des processus parallèles de l'entraînement, en général un par GPU). La fréquence moyenne des GPU, la température moyenne ou l'utilisation moyenne de la flotte sont donc des indicateurs **aveugles à l'unique GPU qui compte**.
 
 ::: ex
 [Exemple 1.1 — Un GPU sur 64 à 60 % de sa fréquence]{.tag} Un job occupe 64 GPU ; 63 tournent à 1 980 MHz et un seul à 1 188 MHz (60 %), par exemple à cause d'une limitation thermique. Les valeurs sont celles d'un calcul, pas d'une mesure.
 
-La fréquence moyenne est $(63 \times 1980 + 1188)/64 = 1\,967{,}6$ MHz : elle ne baisse que de 0,62 %. Elle donne l'impression que tout va bien.
+La fréquence moyenne est $(63 \times 1980 + 1188)/64 = 1\,967{,}6$ MHz : elle ne baisse que de 0,63 %. Elle donne l'impression que tout va bien.
 
 Supposons que 80 % d'une étape soit du calcul proportionnel à la fréquence et 20 % de la communication. Le rang lent allonge le calcul de $1/0{,}6$, et tous les autres l'attendent :
 
@@ -220,7 +220,7 @@ Un point qui concerne Slurm : DCGM ne sait rien des jobs. Le code source de dcgm
 | Utilisation | `GPU_UTIL`, `MEM_COPY_UTIL` | jauge | présence de noyaux (voir 2.3) |
 | Profil | `PROF_GR_ENGINE_ACTIVE`, `PROF_PIPE_TENSOR_ACTIVE`, `PROF_DRAM_ACTIVE` | jauge | intensité réelle du calcul |
 | Mémoire | `FB_USED`, `FB_FREE` | jauge (MiB) | risque de saturation |
-| Erreurs | `XID_ERRORS`, `UNCORRECTABLE_REMAPPED_ROWS`, `ROW_REMAP_FAILURE` | jauge | santé matérielle |
+| Erreurs | `XID_ERRORS`, `UNCORRECTABLE_REMAPPED_ROWS`, `ROW_REMAP_FAILURE` | jauge ; compteur pour les lignes remappées | santé matérielle |
 | Bus | `PCIE_REPLAY_COUNTER`, `PROF_PCIE_TX_BYTES` | compteur, jauge | liaisons dégradées |
 
 Les métriques du groupe « profil » portent un commentaire dans le fichier : elles sont prises en charge sur les GPU de centre de données de génération Volta ou plus récente. Sur d'autres GPU, elles sont absentes : une règle qui en dépend doit gérer ce cas.
@@ -236,18 +236,18 @@ La documentation de `nvidia-smi` définit l'utilisation du GPU ainsi : « pource
 La documentation de DCGM décrit les métriques de profil, plus fines, en termes de cycles :
 
 -   `PROF_GR_ENGINE_ACTIVE` : la fraction du temps où une partie du moteur graphique ou de calcul est active.
--   `PROF_SM_ACTIVE` : la fraction du temps où au moins un *warp* est actif sur un multiprocesseur, moyennée sur tous. Un *warp* en attente de la mémoire compte comme actif.
+-   `PROF_SM_ACTIVE` : la fraction du temps où au moins un *warp* (groupe de threads exécutés ensemble) est actif sur un multiprocesseur (*streaming multiprocessor*, SM), moyennée sur tous. Un *warp* en attente de la mémoire compte comme actif. Cette métrique est commentée dans `default-counters.csv` : il faut l'activer soi-même.
 -   `PROF_PIPE_TENSOR_ACTIVE` : la fraction des cycles où l'unité de calcul matriciel (HMMA ou IMMA) est active.
 
 ::: ex
-[Exemple 2.1 — Deux noyaux à 100 % d'utilisation]{.tag} La documentation de DCGM donne deux cas qui produisent le **même** `SM_ACTIVE` de 0,2 : un noyau qui lance $N/5$ blocs sur un GPU à $N$ multiprocesseurs pendant tout l'intervalle, ou un noyau qui lance $N$ blocs pendant un cinquième de l'intervalle, les multiprocesseurs restant sinon inactifs.
+[Exemple 2.1 — Même SM_ACTIVE, utilisation de 100 % ou de 20 %]{.tag} La documentation de DCGM donne deux cas qui produisent le **même** `SM_ACTIVE` de 0,2 : un noyau qui lance $N/5$ blocs sur un GPU à $N$ multiprocesseurs pendant tout l'intervalle, ou un noyau qui lance $N$ blocs pendant un cinquième de l'intervalle, les multiprocesseurs restant sinon inactifs.
 
-Dans le premier cas, des noyaux s'exécutent tout le temps : `GPU_UTIL` vaut 100 %. Dans le second, un noyau s'exécute un cinquième du temps : `GPU_UTIL` vaut 20 %. Mais dans le premier cas, 80 % des multiprocesseurs sont inactifs en permanence. Deux GPU affichant 100 % d'utilisation peuvent donc différer d'un facteur 5 dans le travail effectué.
+Dans le premier cas, des noyaux s'exécutent tout le temps : `GPU_UTIL` vaut 100 %. Dans le second, un noyau s'exécute un cinquième du temps : `GPU_UTIL` vaut 20 %. Mais dans le premier cas, 80 % des multiprocesseurs sont inactifs en permanence. Un GPU à 100 % d'utilisation peut donc avoir un `SM_ACTIVE` cinq fois plus faible qu'un autre GPU qui affiche lui aussi 100 %.
 
 La même documentation précise qu'une valeur de `SM_ACTIVE` de 0,8 ou plus est « nécessaire mais pas suffisante » pour un usage efficace, et qu'une valeur inférieure à 0,5 indique probablement un usage inefficace. Pour `TENSOR_ACTIVE`, 0,2 peut signifier 20 % des multiprocesseurs à pleine charge, ou tous à 20 %, ou toute combinaison intermédiaire.
 :::
 
-Conséquence pour l'exploitation : l'utilisation GPU sert à détecter un GPU **réservé et inactif** (zéro prolongé), jamais à prouver que l'entraînement est sain. Un entraînement bloqué dans une communication collective peut, selon des témoignages d'utilisateurs, garder des noyaux d'attente en boucle et afficher une utilisation élevée avec une activité tensorielle nulle ; cette signature est une **hypothèse** utilisée par ce cours et par le projet 5, non une mesure faite ici. Elle est à valider sur vos GPU.
+Conséquence pour l'exploitation : l'utilisation GPU sert à détecter un GPU **réservé et inactif** (zéro prolongé), jamais à prouver que l'entraînement est sain. Selon une hypothèse plausible mais non sourcée ici, un entraînement bloqué dans une communication collective peut garder des noyaux d'attente en boucle et afficher une utilisation élevée avec une activité tensorielle nulle ; cette signature est une **hypothèse** utilisée par ce cours et par le projet 5, non une mesure faite ici. Elle est à valider sur vos GPU.
 
 ### 2.4. Lire un scrape
 
@@ -316,7 +316,7 @@ Un identifiant de job est un tel ensemble non borné : il change à chaque job. 
 La flotte n'a que $1024 \times 10 = 10\,240$ séries de base. L'étiquette fait donc **créer six fois plus de séries par jour** que la flotte n'en compte, alors que le nombre de séries actives à un instant donné reste le même. L'index grossit, les blocs se compactent plus difficilement, et les requêtes sur plusieurs jours parcourent des milliers de séries de quelques heures. (Calcul arithmétique ; l'effet réel sur votre serveur est à mesurer.)
 :::
 
-La parade est de **joindre au moment de la requête**. L'exportateur publie une métrique d'association qui vaut toujours 1, `slurm_job_gpu_allocated{Hostname, gpu, job}`, et les règles font la jointure :
+La parade est de **joindre au moment de la requête**. Un exportateur de plateforme (celui du projet 5, pas celui du lab 14.1) publie une métrique d'association qui vaut toujours 1, `slurm_job_gpu_allocated{Hostname, gpu, job}`, et les règles font la jointure :
 
 ~~~yaml
 expr: avg by (job) (DCGM_FI_PROF_PIPE_TENSOR_ACTIVE
@@ -372,7 +372,7 @@ Les métriques disent qu'un job ne va pas bien ; les journaux disent pourquoi. C
 
 ### 4.1. Ce qu'on journalise, et comment on l'indexe
 
-Les sources utiles sont les journaux de chaque rang (une ligne JSON par événement : identifiant du job, rang, pas, événement), le journal du noyau (les erreurs XID des GPU y apparaissent), ceux de Slurm (`slurmd`, `slurmctld`) et ceux de NCCL quand ils sont activés. Écrivez des lignes **structurées** : un champ `job_id` et un champ `rank` dans chaque ligne rendent la corrélation triviale.
+Les sources utiles sont les journaux de chaque rang (une ligne JSON par événement : identifiant du job, rang, pas, événement), le journal du noyau (les erreurs XID des GPU y apparaissent), ceux de Slurm (`slurmd`, `slurmctld`) et ceux de NCCL (la bibliothèque de communications collectives de NVIDIA) quand ils sont activés. Écrivez des lignes **structurées** : un champ `job_id` et un champ `rank` dans chaque ligne rendent la corrélation triviale.
 
 Loki indexe des **flux** définis par leurs étiquettes, pas le contenu des lignes. Sa documentation dit que les étiquettes sont destinées à des valeurs de faible cardinalité décrivant la source des journaux, et recommande de n'ajouter une étiquette dynamique qu'avec parcimonie : trop de combinaisons produisent trop de flux, donc un gros index et de petits morceaux. Pour les valeurs à forte cardinalité que l'on cherche souvent, elle propose les métadonnées structurées. Appliqué à notre cas :
 
@@ -391,7 +391,7 @@ La requête ci-dessus est écrite d'après la syntaxe de LogQL et n'a **pas** é
 
 ### 4.2. Localiser un rang fautif
 
-Le journal le plus précieux d'un blocage est celui des **entrées dans les collectives**. Quand un rang ne rejoint jamais une opération collective, tous les autres l'attendent. Il suffit de comparer, rang par rang, le dernier pas où la collective a été **entrée** et celui où elle s'est **terminée** : le rang qui est resté en arrière est le fautif.
+Le journal le plus précieux d'un blocage est celui des **entrées dans les collectives**. Quand un rang ne rejoint jamais une opération collective (une opération où tous les rangs doivent entrer, comme la somme des gradients, *all-reduce*), tous les autres l'attendent. Il suffit de comparer, rang par rang, le dernier pas où la collective a été **entrée** et celui où elle s'est **terminée** : le rang qui est resté en arrière est le fautif.
 
 C'est le principe du *flight recorder* de PyTorch, que Llama Team décrit comme une fonction qui capture les métadonnées des collectives et les piles dans un tampon circulaire, ce qui permet de diagnostiquer rapidement les blocages. Il s'active par `TORCH_NCCL_TRACE_BUFFER_SIZE` (une valeur positive, 2 000 recommandé selon le tutoriel) et `TORCH_NCCL_DUMP_ON_TIMEOUT`, qui écrit un fichier par rang à l'expiration du délai. Ce délai est, d'après la documentation de PyTorch 2.14, de 10 minutes par défaut avec NCCL et de 30 minutes avec les autres moteurs.
 
@@ -459,7 +459,7 @@ La raison d'attente de Slurm (`Priority`, `Resources`, `JobHeldUser`, `Dependenc
 
 | Classe | Raisons (page de manuel de `squeue`) | Qui agit |
 |---|---|---|
-| `capacity` | `Priority`, `Resources`, `ReqNodeNotAvail`, « Nodes required for job are DOWN, DRAINED… » | la plateforme |
+| `capacity` | `Priority`, `Resources`, `ReqNodeNotAvail` | la plateforme |
 | `user` | `JobHeldUser`, `Dependency`, `BeginTime` | l'utilisateur |
 | `admin` | `JobHeldAdmin`, `Reservation`, `PartitionDown` | un administrateur |
 | `config` | `InvalidAccount`, `InvalidQOS` | l'administrateur, tout de suite |
@@ -482,7 +482,9 @@ slurm_cpus{partition="debug",state="other"} 1.0
 slurm_scrape_success 1.0
 ~~~
 
-Lisez la file en trois lignes : quatre jobs attendent à cause de la **plateforme** (classe `capacity`), le plus ancien depuis 27 s ; le nœud est en cours de drainage pour une raison de santé ; il reste un CPU « autre » (inutilisable) et zéro CPU libre. Dans une autre capture de la même file (fixture `squeue_drained.json`), un job affiche la raison « Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions » : le lab la classe en `capacity`, car c'est la plateforme, pas l'utilisateur, qui lui fait perdre du temps.
+Lisez la file en trois lignes : quatre jobs attendent à cause de la **plateforme** (classe `capacity`), le plus ancien depuis 27 s ; le nœud est en cours de drainage pour une raison de santé ; il reste un CPU « autre » (inutilisable) et zéro CPU libre.
+
+Dans la capture `squeue_drained.json`, associée à `sinfo_draining.json`, trois jobs en `Priority` ou `Resources` sont classés en `capacity` pendant que le nœud est en drainage. La raison `ReqNodeNotAvail` (nœud requis indisponible, par exemple drainé), absente de ces captures, est classée de la même façon : c'est la plateforme, pas l'utilisateur, qui fait perdre du temps au job.
 :::
 
 ### 5.4. Le délai d'attente et ses seaux
@@ -490,6 +492,12 @@ Lisez la file en trois lignes : quatre jobs attendent à cause de la **plateform
 Le délai d'attente d'un job est la différence entre son démarrage et sa soumission. Exposé comme **histogramme** de Prometheus, chaque job est compté une fois, dans le seau de sa durée. Le lab 14.1 dédoublonne par identifiant de job : un histogramme ne doit que croître, et deux lectures du même `sacct` ne doivent pas compter deux fois.
 
 Pour une file réelle, la soumission est un mauvais départ : un job retenu par son propriétaire ou en attente d'une dépendance semble attendre des heures sans que la plateforme y soit pour rien. Le champ `Eligible` de `sacct` (début de l'éligibilité) est plus juste ; le lab utilise `Submit` pour rester simple, et cette limite est à lever en production.
+
+Pour le quantile $\phi$ de $N$ jobs, `histogram_quantile` vise le rang $r = \phi N$, prend le premier seau $i$ dont le décompte cumulé $c_i$ atteint ce rang, puis interpole linéairement dans ce seau, comme si ses observations y étaient réparties uniformément :
+
+$$q = b_{i-1} + (b_i - b_{i-1})\,\frac{r - c_{i-1}}{c_i - c_{i-1}}$$
+
+Ici $b_i$ est la borne supérieure du seau $i$, avec $b_0 = 0$ et $c_0 = 0$.
 
 ::: ex
 [Exemple 5.2 — Ce que `histogram_quantile` répond sur six attentes réelles]{.tag} Six jobs ont attendu 1, 2, 5, 8, 12 et 17 s sur le bac à sable (capture réelle de `sacct`). Valeurs exactes : médiane 6,5 s, 90e centile 14,5 s par interpolation linéaire. Avec les seaux 10 et 30 s, Prometheus doit **interpoler à l'intérieur d'un seau** : `histogram_quantile` répond 7,5 s pour la médiane et 24 s pour le 90e centile, soit 65 % de trop. C'est ce qu'établit le test `tests/wait_quantile.test.yml` du lab 14.2, vérifié avec `promtool`.
@@ -560,6 +568,10 @@ Le seuil est $\text{vitesse} \times (1 - 0{,}95)$ : $14{,}4 \times 0{,}05 = 0{,}
 -   40 % d'erreurs pendant 8 h : la page lente se déclenche à la 270e minute, la rapide jamais ;
 -   20 % d'erreurs pendant 30 h : seul le ticket se déclenche, après 18 h ($0{,}2 \times 18/72 = 0{,}05$).
 
+**Limite de ce SLI.** L'histogramme ne compte un job qu'une fois démarré. Dans une vraie panne où plus rien ne démarre, aucune observation n'arrive, le rapport d'erreurs est indéfini et aucune de ces trois alertes ne se déclenche. Les scénarios supposent des jobs qui démarrent tard, pas des jobs qui ne démarrent pas : il faut en plus une alerte sur l'âge du plus ancien job en attente (`slurm_pending_oldest_age_seconds`, voir « Pour aller plus loin » du lab 14.2).
+
+Le lab mesure aussi l'attente totale depuis `Submit`, sans tri par classe de raison : l'attente « imputable à la plateforme » du 6.2 est la cible, pas ce que le lab calcule.
+
 Les alertes n'ont volontairement **pas** de `for` : le Workbook déconseille les durées dans les alertes de SLO, car une série qui oscille autour du seuil remet le minuteur à zéro et n'alerte jamais. Les deux fenêtres jouent ce rôle de filtre.
 :::
 
@@ -570,7 +582,7 @@ Les alertes n'ont volontairement **pas** de `for` : le Workbook déconseille les
 ### 6.4. Le goodput
 
 ::: def
-[Goodput et ETTR]{.tag} Le rapport technique de Llama 3 définit le temps d'entraînement effectif comme le temps passé en entraînement utile sur le temps écoulé, et rapporte plus de 90 % tout en acceptant des maintenances automatisées. Kokolis et al. (2024) définissent l'*Effective Training Time Ratio* (ETTR) comme le rapport entre le temps d'exécution productif et le temps réel disponible d'une exécution, et le goodput comme la quantité de travail productif accompli par unité de temps.
+[Goodput et ETTR]{.tag} Le rapport technique de Llama 3 définit le temps d'entraînement effectif comme le temps passé en entraînement utile sur le temps écoulé, et rapporte plus de 90 % tout en acceptant des maintenances automatisées. Kokolis et al. (2024) définissent l'*Effective Training Time Ratio* (ETTR) comme le rapport entre le temps d'exécution productif et le temps réel disponible d'une exécution, et le goodput comme la quantité de travail productif accompli par unité de temps, à l'échelle d'une grappe. Dans ce module, « goodput » désigne par commodité le rapport par job (proche de l'ETTR).
 :::
 
 Pour piloter une plateforme, il faut décomposer ce rapport en pertes que l'on sait nommer. Pour un job qui s'arrête en moyenne toutes les $M$ secondes, qui écrit un point de contrôle toutes les $\tau$ secondes pour un coût $\delta$, et dont chaque panne coûte une détection $d$, un redémarrage $R$ et la moitié d'un intervalle de travail refait :
@@ -669,9 +681,9 @@ PhaseAware 240 s + Heartbeat 60 s              100              100             
 
 Quatre enseignements, **valables pour ces hypothèses**. Le détecteur sur l'utilisation est aveugle aux blocages, par construction du modèle de blocage (utilisation haute) ; il voit les plantages parce qu'un GPU sans processus tombe à zéro. Le battement de cœur voit les plantages et jamais les blocages.
 
-Le compteur de pas seul n'est sans fausse alarme qu'à partir d'une fenêtre de 480 s ; à 600 s, c'est exactement le délai par défaut de NCCL.
+Parmi les fenêtres testées (30 à 900 s), le compteur de pas seul n'est sans fausse alarme qu'à partir de 480 s ; à 600 s, c'est exactement le délai par défaut de NCCL.
 
-La phase déclarée donne zéro fausse alarme dès 246 s : la détection est 2,4 fois plus rapide. Il faut **deux** alertes, progrès par phase et vivacité, car l'absence d'une série n'est pas une stagnation.
+La phase déclarée donne zéro fausse alarme dès 246 s : la détection est environ 2,5 fois plus rapide que les 606 s du compteur seul. Ce zéro découle des hypothèses : la plus longue pause de données simulée dure 200 s et le plus long checkpoint 420 s, tous deux sous les tolérances. Des pauses réelles plus longues feraient apparaître des fausses alarmes. Il faut **deux** alertes, progrès par phase et vivacité, car l'absence d'une série n'est pas une stagnation.
 :::
 
 <figure class="fig">

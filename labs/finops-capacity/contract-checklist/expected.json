@@ -1,0 +1,65 @@
+{
+ "fictional_contract.md": {
+  "statuses": {
+   "min_term": "red",
+   "take_or_pay": "red",
+   "auto_renewal": "red",
+   "customer_exit": "red",
+   "delivery_remedy": "red",
+   "acceptance": "red",
+   "availability_target": "amber",
+   "availability_scope": "red",
+   "credit_cap": "red",
+   "sole_remedy": "amber",
+   "maintenance": "amber",
+   "replacement_time": "red",
+   "substitution": "red",
+   "performance": "red",
+   "support": "red",
+   "price_escalation": "red",
+   "surcharges": "red",
+   "egress": "red",
+   "deletion": "amber",
+   "relocation": "amber",
+   "liability": "red",
+   "force_majeure": "red",
+   "suspension": "red",
+   "provider_exit": "red"
+  },
+  "deal_breakers_red": [
+   "take_or_pay",
+   "delivery_remedy",
+   "availability_scope",
+   "provider_exit"
+  ]
+ },
+ "fictional_contract_negotiated.md": {
+  "statuses": {
+   "min_term": "amber",
+   "take_or_pay": "green",
+   "auto_renewal": "green",
+   "customer_exit": "green",
+   "delivery_remedy": "green",
+   "acceptance": "green",
+   "availability_target": "amber",
+   "availability_scope": "green",
+   "credit_cap": "green",
+   "sole_remedy": "amber",
+   "maintenance": "amber",
+   "replacement_time": "amber",
+   "substitution": "green",
+   "performance": "green",
+   "support": "amber",
+   "price_escalation": "green",
+   "surcharges": "green",
+   "egress": "green",
+   "deletion": "green",
+   "relocation": "green",
+   "liability": "green",
+   "force_majeure": "green",
+   "suspension": "green",
+   "provider_exit": "green"
+  },
+  "deal_breakers_red": []
+ }
+}
