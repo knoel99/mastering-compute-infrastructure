@@ -2,14 +2,776 @@
  "unit": "cn-a",
  "region": "china",
  "retrieved_on": "2026-10-22",
- "programmes": [],
- "ecosystem": [],
- "blocked_sources": [],
+ "programmes": [
+  {
+   "id": "cn-tsinghua-cs-ms",
+   "country": "CN",
+   "institution": "清华大学 (Tsinghua University), 计算机科学与技术系 (Department of Computer Science and Technology)",
+   "programme_name": "计算机科学与技术系硕士研究生培养方案 [081200] 计算机科学与技术 — 二级学科 计算机系统结构 (Computer Architecture / systems track, hosted by the 高性能计算研究所 HPC Institute) — academic master's, not an HPC-branded degree",
+   "degree": "硕士 (Master of Engineering, academic track)",
+   "urls": [
+    "https://www.cs.tsinghua.edu.cn/info/1044/5993.htm",
+    "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+    "https://hpc.cs.tsinghua.edu.cn/",
+    "https://www.cs.tsinghua.edu.cn/jwjx/yjs.htm",
+    "https://www.tsinghua.edu.cn/info/1175/111550.htm"
+   ],
+   "duration": "Not stated in the programme document: it only says the study duration follows the university's postgraduate regulations (学习年限符合《清华大学研究生学籍管理规定》要求); thesis research work of at least one year.",
+   "credits": "不少于 28 学分 (degree credits: >= 5 public compulsory + >= 3 compulsory components + >= 20 subject-specific); elective and self-study credits counted separately",
+   "language": "Chinese (a separate English-taught 'Advanced Computing' master exists, see notes)",
+   "delivery": "on-site",
+   "entry_requirements": "Not stated in the programme document. The department publishes yearly admission notices (e.g. a 2027 master's recommended-admission notice, https://www.cs.tsinghua.edu.cn/info/1087/7261.htm) but their body text was not readable via the cache.",
+   "focus": "mixed",
+   "structure_summary": "Generic CS master's of the Tsinghua CS department with three second-level disciplines (computer architecture, software and theory, applied computing). Students need >= 28 degree credits: public compulsory courses, compulsory components (literature review and proposal, academic activities, academic/professional skills) and >= 20 credits of subject courses, including at least one 'professional foundation course' of the chosen discipline. The computer-architecture list contains Parallel Computing, an HPC lab course, parallel programming for computational science and engineering, network storage, distributed systems and big-data systems; no course is mandatory except one foundation course.",
+   "core_courses": [
+    {
+     "name": "并行计算 (Parallel Computing) — 70240263",
+     "credits": "3 学分",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "高等计算机系统结构 (Advanced Computer Architecture) — 70240013",
+     "credits": "3 学分",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "计算机网络和计算机系统的性能评价 (Performance Evaluation of Computer Networks and Systems) — 70240253",
+     "credits": "3 学分",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "计算机系统与体系结构 (Computer Systems and Architecture) — 80470262",
+     "credits": "2 学分",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "高等计算机网络 (Advanced Computer Networks) — 60240083",
+     "credits": "3 学分",
+     "topics": [
+      "interconnect"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    }
+   ],
+   "electives": [
+    {
+     "name": "高性能计算实验 (High-Performance Computing Laboratory) — 60240093",
+     "topics": [
+      "perf-model",
+      "parallel-algos"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "计算科学与工程中的并行编程技术 (Parallel Programming Techniques in Computational Science and Engineering) — 80240153",
+     "topics": [
+      "parallel-algos",
+      "simulation-apps"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "计算机系统性能测试 (Computer System Performance Testing) — 80240242",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "网络存储技术 (Network Storage Technology) — 80240303",
+     "topics": [
+      "storage-io"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "分布式系统导论 (Introduction to Distributed Systems) — 80240613",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "高级操作系统 (Advanced Operating Systems) — 80240442",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "大数据系统导论 (Introduction to Big Data Systems) — 80240693",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "大数据分析与内存计算 (Big Data Analytics and In-Memory Computing) — 80240673",
+     "topics": [
+      "bigdata"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "高等数值分析 (Advanced Numerical Analysis) — 60420024",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "数据可视化 (Data Visualization) — 80240683",
+     "topics": [
+      "viz"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "深度学习 (Deep Learning) — 80240743; 机器学习 (Machine Learning) — 80245013",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    },
+    {
+     "name": "量子复杂性理论 (Quantum Complexity Theory) — 80470242",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf"
+    }
+   ],
+   "capstone": "Master's thesis after a literature review and proposal (选题报告, presented in English) and a mid-term check; thesis research work is normally at least one year.",
+   "machines_access": [],
+   "industry_links": [
+    "Research-level only: the HPC Institute page reports scalability tests of an atmosphere-model algorithm on the Tianhe-2 supercomputer (not stated as student access).",
+    "Student supercomputing team coached by HPC-group faculty, winner of ISC24 (see ecosystem)."
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 1,
+    "parallel-algos": 1,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 2,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": 1,
+    "viz": 2,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Degree credit requirement: at least 28 credits (>=5 public compulsory, >=3 compulsory components, >=20 subject credits)",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "需获得学位学分不少于 28，其中公共必修学分不少于 5，必修环节学分不少于 3，学科专业学分不少于 20",
+     "source": "web"
+    },
+    {
+     "claim": "Study duration is delegated to the university regulations (no number given in the programme document)",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "学习年限符合《清华大学研究生学籍管理规定》要求",
+     "source": "web"
+    },
+    {
+     "claim": "Thesis research lasts at least one year",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "论文研究工作时间一般不少于一年",
+     "source": "web"
+    },
+    {
+     "claim": "Course listed in the computer-architecture foundation list: Parallel Computing, 3 credits",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "并行计算 70240263 3 学分 考试 春",
+     "source": "web"
+    },
+    {
+     "claim": "Course listed in the computer-architecture specialised list: HPC lab, 3 credits, graded by assessment (考查)",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "高性能计算实验 60240093 3 学分 考查 秋",
+     "source": "web"
+    },
+    {
+     "claim": "Course listed: parallel programming techniques in computational science and engineering",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "计算科学与工程中的并行编程技术 80240153 3 学分 考试 春",
+     "source": "web"
+    },
+    {
+     "claim": "Course listed: network storage technology",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "网络存储技术 80240303 3 学分 考试 春",
+     "source": "web"
+    },
+    {
+     "claim": "Course listed: introduction to distributed systems",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "分布式系统导论 80240613 3 学分 考试 秋",
+     "source": "web"
+    },
+    {
+     "claim": "Course listed: computer system performance testing (2 credits)",
+     "url": "https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf",
+     "quote": "计算机系统性能测试 80240242 2 学分 考试 春",
+     "source": "web"
+    },
+    {
+     "claim": "HPC Institute research uses the Tianhe-2 supercomputer for scaling tests (research link, not student access)",
+     "url": "https://hpc.cs.tsinghua.edu.cn/",
+     "quote": "在天河-2超级计算机上的测试显示，该算法可有效扩展到6000节点以上",
+     "source": "web"
+    },
+    {
+     "claim": "The department's student supercomputing team (coached by HPC-group faculty) won ISC24 overall; extracurricular cluster-competition link, not a course",
+     "url": "https://www.tsinghua.edu.cn/info/1175/111550.htm",
+     "quote": "清华大学学生超算团队夺得现场总冠军，同时取得LINPACK基准测试最高性能奖",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Programme PDF is undated in its text (it mentions students from the 2021 cohort onward) and is hosted on a department page stamped 2024.03.21; the 2026-2027 version may differ. Only course titles/codes/credits were readable: no syllabi, so topics such as MPI, OpenMP, GPU, scheduling, containers were left null (unknown), not 0. No Tsinghua page read states access of master's students to a named cluster. Separate English-taught 'Advanced Computing' MSc (https://ac.cs.tsinghua.edu.cn/curriculum.html, 26 credits for the master) is general CS (ML, distributed systems, big data, networks): no parallel/HPC course in its listing, so not made a separate entry."
+  },
+  {
+   "id": "cn-ustc-cs-ms",
+   "country": "CN",
+   "institution": "中国科学技术大学 (University of Science and Technology of China, USTC), 计算机科学与技术学院 / 研究生院 (Graduate School)",
+   "programme_name": "计算机科学与技术 (081200) 硕士培养方案 — 二级学科 计算机系统结构 (081201) includes 高性能计算, 云计算 research directions; academic master's, not an HPC-branded degree",
+   "degree": "硕士 (academic master's, 科学学位)",
+   "urls": [
+    "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+    "https://gradschool.ustc.edu.cn/",
+    "http://scc.ustc.edu.cn/40970/list.htm",
+    "http://scc.ustc.edu.cn/40974/list.htm",
+    "http://scc.ustc.edu.cn/41069/list.htm"
+   ],
+   "duration": "基本学习年限为 2-3 年，最长学习年限为 5 年 (basic 2-3 years, maximum 5 years)",
+   "credits": "总学分不低于 36 分 (>= 36 credits: 7 public compulsory + >= 26 across subject-foundation/professional-foundation/professional electives + 2 thesis proposal + 1 academic talks; quality courses <= 3); weighted average of foundation courses >= 75",
+   "language": "Chinese",
+   "delivery": "on-site",
+   "entry_requirements": "Via the national unified master's entrance examination or recommended admission without exam (统考或免试推荐); no further requirements in the document.",
+   "focus": "mixed",
+   "structure_summary": "Generic CS master's with four second-level disciplines. The computer-architecture track lists High-level Computer Architecture (mandatory) plus Parallel Algorithms, Advanced Computer Networks, Advanced Operating Systems and Introduction to Quantum Computing as professional-foundation courses (at least one). Professional electives include Parallel Programming (3.5), Parallel Compiler Techniques, Storage and File Systems, Edge and Cloud Computing, Computer Systems Modelling and Simulation, Intelligent Computing Systems and Virtual Machine principles. High Performance Computing (COMP7201P) is listed only as a doctoral course.",
+   "core_courses": [
+    {
+     "name": "COMP6101P 高级计算机体系结构 (Advanced Computer Architecture) — mandatory for the architecture track",
+     "credits": "3",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6102P 并行算法 (Parallel Algorithms) — professional-foundation list, >= 1 course of the track",
+     "credits": "3",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6001P 算法设计与分析 (Algorithm Design and Analysis) — compulsory subject-foundation course",
+     "credits": "3",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6004P 计算机系统 (Computer Systems) — subject-foundation list",
+     "credits": "3",
+     "topics": [
+      "arch"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    }
+   ],
+   "electives": [
+    {
+     "name": "COMP6201P 并行程序设计 (Parallel Program Design / Parallel Programming)",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6204P 并行编译技术 (Parallel Compiler Techniques)",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6107P 并行与分布式计算 (Parallel and Distributed Computing) — software-and-theory track foundation list",
+     "topics": [
+      "distributed-sys",
+      "parallel-algos"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6221P 存储与文件系统 (Storage and File Systems)",
+     "topics": [
+      "storage-io"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6226P 边缘与云计算 (Edge and Cloud Computing)",
+     "topics": [
+      "cloud",
+      "distributed-sys"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6206P 计算机系统建模与仿真 (Computer Systems Modelling and Simulation)",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6202P 虚拟机原理与技术 (Virtual Machine Principles and Technology)",
+     "topics": [
+      "containers-k8s"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6222P 智能计算系统 (Intelligent Computing Systems), 4 credits",
+     "topics": [
+      "ml-systems",
+      "ml-dl"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6113P 量子计算导论 (Introduction to Quantum Computing)",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP6103P 高级计算机网络 (Advanced Computer Networks)",
+     "topics": [
+      "interconnect"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP7201P 高性能计算 (High Performance Computing) — doctoral course, 3 credits",
+     "topics": [
+      "parallel-algos",
+      "perf-model"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    },
+    {
+     "name": "COMP7205P 计算机系统性能评价与预测 (Computer System Performance Evaluation and Prediction) — doctoral course, 2 credits",
+     "topics": [
+      "perf-model"
+     ],
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf"
+    }
+   ],
+   "capstone": "Master's thesis with a proposal defence (学位论文开题, 2 credits; earliest in semester 3, at the latest half a year before thesis review) and a thesis defence.",
+   "machines_access": [
+    "瀚海22 (Hanhai22, since 2022-09): node list shows 21 GPU nodes with 8x NVIDIA A100 80GB (NVLink) each, plus CPU and large-memory nodes; page totals state 200 A100 GPUs, 20352 CPU cores, 3.06 PFLOPS FP64 (node counts and totals on the page do not reconcile exactly); GPFS 11 PB; Mellanox HDR 200 Gbps InfiniBand. Campus-wide centre open to students/staff with a supervisor-approved account; the programme document itself does not grant CS master's students a quota",
+    "瀚海25 (Hanhai25, since 2025): GPFS 2 PB, HDR 200 Gbps InfiniBand; 瀚海20 (since 2020): 752 diskless nodes incl. V100/A100 GPU and ARM nodes; jobs run through Slurm with the module tool"
+   ],
+   "industry_links": [
+    "No industry links stated in the programme document. Campus supercomputing centre (超级计算中心, attached to the Network Information Center) offers HPC, intelligent-computing and cloud services."
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": 1,
+    "arch": 2,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": 2,
+    "distributed-sys": 2,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 2,
+    "containers-k8s": 1,
+    "cloud": 2,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": 1,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": 2,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Duration: basic 2-3 years, maximum 5 years",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "基本学习年限为 2-3 年，最长学习年限为 5 年",
+     "source": "web"
+    },
+    {
+     "claim": "Credit requirement: at least 36 credits plus weighted-average condition",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "必须取得总学分不低于 36 分，且基础课加权平均分不低于 75 分",
+     "source": "web"
+    },
+    {
+     "claim": "Programme applies from the 2023 intake",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "本培养方案自 2023 年入学的研究生开始执行",
+     "source": "web"
+    },
+    {
+     "claim": "Course: Advanced Computer Architecture is mandatory for the architecture track",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP6101P 高级计算机体系结构★（3）",
+     "source": "web"
+    },
+    {
+     "claim": "Course: Parallel Algorithms (3)",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP6102P 并行算法（3）",
+     "source": "web"
+    },
+    {
+     "claim": "Course: Parallel Programming (3.5 credits)",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP6201P 并行程序设计（3.5）",
+     "source": "web"
+    },
+    {
+     "claim": "Course: Storage and File Systems",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP6221P 存储与文件系统（3）",
+     "source": "web"
+    },
+    {
+     "claim": "Course: Edge and Cloud Computing",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP6226P 边缘与云计算（3）",
+     "source": "web"
+    },
+    {
+     "claim": "Course: Intelligent Computing Systems (4 credits)",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP6222P 智能计算系统（4）",
+     "source": "web"
+    },
+    {
+     "claim": "Doctoral course High Performance Computing (3 credits) exists but only in the PhD list",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "COMP7201P 高性能计算（3）",
+     "source": "web"
+    },
+    {
+     "claim": "Research directions of the architecture discipline include high-performance computing and cloud computing",
+     "url": "https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf",
+     "quote": "智能计算系统、大数据存储系统、量子计算系统、智能物联网系统、系统软件、高性能计算、云计算",
+     "source": "web"
+    },
+    {
+     "claim": "Campus supercomputing centre runs three general systems for all students/staff who need HPC (machine access, not a programme-specific quota)",
+     "url": "http://scc.ustc.edu.cn/40970/list.htm",
+     "quote": "中心目前管理运行有三套通用超级计算系统，面向全校有高性能计算需求的在校师生用户",
+     "source": "web"
+    },
+    {
+     "claim": "Hanhai22 has 200 A100 GPUs; Slurm is mandatory for jobs; module tool for software environments",
+     "url": "http://scc.ustc.edu.cn/40970/list.htm",
+     "quote": "纯计算节点共20352颗CPU核及200颗A100 GPU",
+     "source": "web"
+    },
+    {
+     "claim": "All jobs go through Slurm",
+     "url": "http://scc.ustc.edu.cn/40970/list.htm",
+     "quote": "使用slurm作业管理系统，所有任务必须通过slurm提交成作业进行计算",
+     "source": "web"
+    },
+    {
+     "claim": "Students apply for accounts after their supervisor has registered",
+     "url": "http://scc.ustc.edu.cn/40974/list.htm",
+     "quote": "学生申请前，需要导师/负责人先注册有账号，以便审批学生的申请",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Programme applies from the 2023 intake (latest version found, not necessarily the 2026-2027 version). Only titles/credits are listed, no syllabi: MPI, OpenMP, GPU, scheduling, sysadmin topics are null (unknown), not 0. 'High Performance Computing' is a doctoral course only. Machine access not stated in this document. Machine access evidence comes from the university supercomputing centre (scc.ustc.edu.cn), a campus-wide service."
+  },
+  {
+   "id": "cn-zju-cs-ms",
+   "country": "CN",
+   "institution": "浙江大学 (Zhejiang University), 计算机科学与技术学院 (College of Computer Science and Technology)",
+   "programme_name": "计算机科学与技术 硕士 (computer systems architecture and parallel computing direction) — legacy academic master's; from the 2027 intake the college recruits only 085400 电子信息 (计算机技术、网络与信息安全), a professional degree",
+   "degree": "硕士 (full-time academic master's, legacy; 2027 intake: 电子信息 professional master's)",
+   "urls": [
+    "http://www.cs.zju.edu.cn/csen/2019/0304/c26993a1026381/page.htm",
+    "http://www.cs.zju.edu.cn/csen/2003/0630/c26995a1202774/page.htm",
+    "http://www.cs.zju.edu.cn/csen/2009/1224/c26995a1202793/page.htm",
+    "http://www.cs.zju.edu.cn/csen/2026/0615/c27010a3178920/page.htm",
+    "http://www.cs.zju.edu.cn/csen/26995/list.htm"
+   ],
+   "duration": "学制2.5年 (2.5 years, from the college's programme introduction page)",
+   "credits": "最低学分数26学分左右 (about 26 credits minimum)",
+   "language": "Chinese",
+   "delivery": "on-site",
+   "entry_requirements": "Not stated on the pages read. For 2027 the college announces a single master's recruitment line 085400 电子信息 (计算机技术、网络与信息安全), full-time, with details deferred to the university's 2027 prospectus (expected in September).",
+   "focus": "mixed",
+   "structure_summary": "The college lists 'computer systems architecture and parallel computing' and 'distributed processing and grid services' among the research directions of its computer-architecture discipline. Only two graduate syllabi with HPC-relevant content are online: Advanced Computer Architecture (3 credits, 54 hours; ILP, thread-level parallelism, cache design, multiprocessor synchronisation and consistency, interconnects and cluster computers) and Grid Computing (2 credits, 36 hours, elective). The 2023 graduate programme (course list and credit breakdown) is hosted on a domain that did not resolve, so the actual current course list is unknown.",
+   "core_courses": [
+    {
+     "name": "高级计算机系统结构 (Advanced Computer Architecture) — 学位课 (degree course), syllabus dated 2003-06-30",
+     "credits": "3 学分, 54 学时",
+     "topics": [
+      "arch",
+      "openmp-threads",
+      "interconnect"
+     ],
+     "url": "http://www.cs.zju.edu.cn/csen/2003/0630/c26995a1202774/page.htm"
+    }
+   ],
+   "electives": [
+    {
+     "name": "网格计算 (Grid Computing) — 硕士生选修课, syllabus dated 2009-12-24",
+     "topics": [
+      "distributed-sys"
+     ],
+     "url": "http://www.cs.zju.edu.cn/csen/2009/1224/c26995a1202793/page.htm"
+    }
+   ],
+   "capstone": "Not stated on the pages read.",
+   "machines_access": [],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": null,
+    "arch": 2,
+    "numerics": null,
+    "simulation-apps": null,
+    "parallel-algos": null,
+    "distributed-sys": 1,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": null,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": null,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Duration 2.5 years and about 26 credits for the master's (college introduction page, published 2019)",
+     "url": "http://www.cs.zju.edu.cn/csen/2019/0304/c26993a1026381/page.htm",
+     "quote": "学制2.5年，实行学分制，最低学分数26学分左右",
+     "source": "web"
+    },
+    {
+     "claim": "Computer-architecture discipline research directions include parallel computing and grid services",
+     "url": "http://www.cs.zju.edu.cn/csen/2019/0304/c26993a1026381/page.htm",
+     "quote": "计算机系统结构与并行计算、分布式处理与网格服务、嵌入式系统与普适计算",
+     "source": "web"
+    },
+    {
+     "claim": "Advanced Computer Architecture: 3 credits, 54 hours",
+     "url": "http://www.cs.zju.edu.cn/csen/2003/0630/c26995a1202774/page.htm",
+     "quote": "学分学时：3学分，54学时",
+     "source": "web"
+    },
+    {
+     "claim": "Advanced Computer Architecture covers multiprocessor interconnects and cluster computers",
+     "url": "http://www.cs.zju.edu.cn/csen/2003/0630/c26995a1202774/page.htm",
+     "quote": "多处理器的互连网络与集群计算机及其设计技术",
+     "source": "web"
+    },
+    {
+     "claim": "Advanced Computer Architecture covers thread-level parallelism",
+     "url": "http://www.cs.zju.edu.cn/csen/2003/0630/c26995a1202774/page.htm",
+     "quote": "线程级并行技术",
+     "source": "web"
+    },
+    {
+     "claim": "Grid Computing is a master's elective of 2 credits, 36 hours",
+     "url": "http://www.cs.zju.edu.cn/csen/2009/1224/c26995a1202793/page.htm",
+     "quote": "学分学时：2学分，36学时",
+     "source": "web"
+    },
+    {
+     "claim": "Grid Computing content: computational grid, web services, data grid, P2P",
+     "url": "http://www.cs.zju.edu.cn/csen/2009/1224/c26995a1202793/page.htm",
+     "quote": "计算网格（Computational Grid）、Web 服务（Web Service）、数据网格（Data Grid）、P2P Computing",
+     "source": "web"
+    },
+    {
+     "claim": "From 2027 the college recruits master's students only into 085400 electronic information (computer technology, network and information security), full-time professional degree",
+     "url": "http://www.cs.zju.edu.cn/csen/2026/0615/c27010a3178920/page.htm",
+     "quote": "085400 电子信息 专业学位 计算机技术、网络与信息安全 全日制",
+     "source": "web"
+    }
+   ],
+   "confidence": "low",
+   "notes": "Evidence is dated (programme intro 2019, syllabi 2003 and 2009) and shows the college's earlier offer, not the 2026-2027 curriculum. The 2023 graduate programme page (http://cspo.zju.edu.cn/2023/1008/c27172a2809779/page.htm) could not be fetched (DNS failure). No HPC-branded course (MPI/OpenMP/GPU, scheduling) found; those topics are null (unknown), not 0. Kept as a low-confidence entry because ZJU students and teams participate in ASC competitions (see ecosystem) but no ZJU page read documents HPC training."
+  }
+ ],
+ "ecosystem": [
+  {
+   "id": "cn-asc-world-student-supercomputer-challenge",
+   "kind": "compétition",
+   "name": "ASC 世界大学生超级计算机竞赛 (ASC Student Supercomputer Challenge), final ASC26 in Wuxi (Peking Univ. 1st, Tsinghua 2nd, Zhejiang Univ. application-innovation award)",
+   "url": "https://m.tech.china.com/article/20260521/202605211874155.html",
+   "why_relevant": "Teams build and tune a small cluster under a 5000 W power cap and run HPL, HPCG and scientific/AI applications: the closest hands-on training to cluster operations available to students of these universities; PKU, Tsinghua and ZJU teams appear in the 2026 results.",
+   "evidence": [
+    {
+     "claim": "ASC26 final: teams build a mini-cluster under a 5000 W power budget",
+     "url": "https://m.tech.china.com/article/20260521/202605211874155.html",
+     "quote": "各参赛队伍需在5000瓦的总功耗约束下，亲手设计并安装小型超算集群",
+     "source": "web"
+    },
+    {
+     "claim": "ASC26 results: Peking University and Tsinghua University took first and second place",
+     "url": "https://m.tech.china.com/article/20260521/202605211874155.html",
+     "quote": "北京大学和清华大学代表队表现出色，分获冠亚军",
+     "source": "web"
+    },
+    {
+     "claim": "Zhejiang University received an application-innovation award at ASC26",
+     "url": "https://m.tech.china.com/article/20260521/202605211874155.html",
+     "quote": "浙江大学、复旦大学、北京邮电大学三支队伍凭借在单项赛题上的优异表现获得了应用创新奖",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "cn-tsinghua-student-supercomputing-team",
+   "kind": "compétition",
+   "name": "清华大学学生超算团队 (Tsinghua student supercomputing team), ISC24 overall champion",
+   "url": "https://www.tsinghua.edu.cn/info/1175/111550.htm",
+   "why_relevant": "Student team organised with the HPC group of the CS department (coached by HPC faculty and supported by HPC-institute PhD students); wins in the three international student cluster competitions, including cluster power control, a core cluster-operations skill.",
+   "evidence": [
+    {
+     "claim": "Team won the ISC24 overall title and the LINPACK award",
+     "url": "https://www.tsinghua.edu.cn/info/1175/111550.htm",
+     "quote": "清华大学学生超算团队夺得现场总冠军，同时取得LINPACK基准测试最高性能奖以及之前举行的在线比赛亚军",
+     "source": "web"
+    },
+    {
+     "claim": "Coaches are CS department faculty, supported by HPC-institute PhD students",
+     "url": "https://www.tsinghua.edu.cn/info/1175/111550.htm",
+     "quote": "指导教师为计算机系讲师韩文弢、教授翟季冬、博士后金煜阳",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "cn-ustc-supercomputing-centre",
+   "kind": "centre",
+   "name": "中国科学技术大学超级计算中心 (USTC Supercomputing Center): Hanhai20/22/25 systems",
+   "url": "http://scc.ustc.edu.cn/40970/list.htm",
+   "why_relevant": "A production university cluster documented in detail (A100 GPU nodes, GPFS, HDR InfiniBand, Slurm 24.11, module environment): a realistic reference of a campus HPC/AI cluster and a place where USTC students can get accounts via their supervisor.",
+   "evidence": [
+    {
+     "claim": "Three general supercomputing systems serve all students and staff needing HPC",
+     "url": "http://scc.ustc.edu.cn/40970/list.htm",
+     "quote": "中心目前管理运行有三套通用超级计算系统，面向全校有高性能计算需求的在校师生用户",
+     "source": "web"
+    },
+    {
+     "claim": "Scheduler is Slurm 24.11.4",
+     "url": "http://scc.ustc.edu.cn/40970/list.htm",
+     "quote": "作业调度系统：Slurm 24.11.4",
+     "source": "web"
+    },
+    {
+     "claim": "Centre's duties include capacity planning, monitoring and container environments",
+     "url": "http://scc.ustc.edu.cn/40894/list.htm",
+     "quote": "提供编译、优化、调试、容器环境和 AI 框架等服务",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "cn-nudt-tianhe",
+   "kind": "centre",
+   "name": "国防科技大学 (NUDT) TianHe supercomputer series",
+   "url": "https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm",
+   "why_relevant": "NUDT is the builder of the TianHe supercomputers; its computer college is therefore a major HPC training site in China, but no NUDT graduate curriculum page was reachable (see blocked_sources), so no programme entry is given.",
+   "evidence": [
+    {
+     "claim": "NUDT names the TianHe supercomputer series among its innovations",
+     "url": "https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm",
+     "quote": "innovations represented by the \"TianHe\" series supercomputer systems",
+     "source": "web"
+    },
+    {
+     "claim": "NUDT is authorised to grant master's degrees in 26 first-level disciplines",
+     "url": "https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm",
+     "quote": "authorized to grant master's degrees under 26 first-level disciplines",
+     "source": "web"
+    }
+   ]
+  }
+ ],
+ "blocked_sources": [
+  "http://yjszs.nudt.edu.cn/index/index.view — NUDT graduate school: SSL handshake failure, unreachable",
+  "https://www.nudt.edu.cn/yssz/jsjxy/index.htm — NUDT College of Computer: page returned navigation only, no programme content",
+  "https://www.nudt.edu.cn/zsjy/yjszsw/index.htm — NUDT graduate admissions: empty page",
+  "https://cs.nudt.edu.cn/ — 502 Bad Gateway (proxy)",
+  "http://cspo.zju.edu.cn/2023/1008/c27172a2809779/page.htm — ZJU CS 2023 graduate programme: DNS failure; https://www.cs.zju.edu.cn/ and https://grs.zju.edu.cn/: connection reset",
+  "https://hpc.pku.edu.cn/ — PKU HPC platform: connection reset; https://grs.pku.edu.cn/docs/2026-08/62b381f4dbd04884847cd1ae22d23c94.pdf: SSL EOF; PKU Chinese master's programme (培养方案) and course list for the CS school not found (only English-based curriculum list, without HPC course)",
+  "https://www.asc-events.org/ and https://news.sina.cn/sx/2026-05-21/detail-inhyrmmv8343563.d.html — connection reset (ASC results taken from m.tech.china.com instead)",
+  "https://cs.ustc.edu.cn/ — USTC CS school: connection reset; only the Graduate School programme PDF was used"
+ ],
  "verification": {
   "status": "unverified",
-  "checked_claims": 0,
+  "checked_claims": 44,
   "corrected": 0,
   "removed": 0,
-  "notes": ""
+  "notes": "Researcher dry run of tools/verify_quotes.py on 2026-10-22: 44/44 web quotes found verbatim in the cached page text. Programme-level facts (course titles, credits) come only from catalogue-style documents, not syllabi, except ZJU (2003/2009 syllabi). Unknown topic coverage is null."
  }
 }

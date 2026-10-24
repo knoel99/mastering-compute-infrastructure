@@ -70,12 +70,21 @@ NodeName=${HOST} CPUs=${CPUS} RealMemory=${MEM_MB} State=UNKNOWN
 PartitionName=debug Nodes=${HOST} Default=YES MaxTime=INFINITE State=UP
 CONF
 
-pgrep -x slurmdbd >/dev/null || { nohup slurmdbd -D >/var/log/slurm/dbd.out 2>&1 & sleep 4; }
-pgrep -x slurmctld >/dev/null || { nohup slurmctld -D >/var/log/slurm/ctld.out 2>&1 & sleep 3; }
-pgrep -x slurmd >/dev/null || { nohup slurmd -D >/var/log/slurm/d.out 2>&1 & sleep 3; }
+wait_for() {  # wait_for <seconds> <description> <command...>
+  local t=$1 what=$2; shift 2; local end=$((SECONDS + t))
+  until "$@" >/dev/null 2>&1; do
+    [ "$SECONDS" -ge "$end" ] && { echo "setup: timeout waiting for $what" >&2; exit 1; }
+    sleep 1
+  done
+}
+pgrep -x slurmdbd >/dev/null || nohup slurmdbd -D >/var/log/slurm/dbd.out 2>&1 &
+wait_for 60 "slurmdbd" sacctmgr -n list cluster
+pgrep -x slurmctld >/dev/null || nohup slurmctld -D >/var/log/slurm/ctld.out 2>&1 &
+wait_for 60 "slurmctld" scontrol ping
+pgrep -x slurmd >/dev/null || nohup slurmd -D >/var/log/slurm/d.out 2>&1 &
 
 sacctmgr -i add cluster sandbox >/dev/null 2>&1 || true
 sacctmgr -i add account research Description=research Organization=lab >/dev/null 2>&1 || true
 sacctmgr -i add user root Account=research DefaultAccount=research >/dev/null 2>&1 || true
-for _ in $(seq 1 20); do sinfo -h -o '%T' 2>/dev/null | grep -q idle && break; sleep 1; done
+wait_for 60 "an idle node" bash -c "sinfo -h -o %T | grep -q idle"
 sinfo

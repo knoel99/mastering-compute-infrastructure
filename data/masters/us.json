@@ -610,15 +610,818 @@
    ],
    "confidence": "medium",
    "notes": "This record describes a pathway, not a branded HPC master: availability of each course per term and the actual student access to Delta were not verified. ECE 408 catalogue text does not name CUDA, hence gpu-prog = 1. Duration, admission requirements and cost not recorded. Distributed systems, scheduling, storage, containers, cloud and resilience are null (not examined)."
+  },
+  {
+   "id": "us-utaustin-oden-csem",
+   "country": "US",
+   "institution": "The University of Texas at Austin (Oden Institute for Computational Engineering and Sciences; TACC)",
+   "programme_name": "MS in Computational Science, Engineering, and Mathematics (CSEM)",
+   "degree": "MS",
+   "urls": [
+    "https://catalog.utexas.edu/archive/2025-26/graduate/areas-of-study/intercollegial-programs/computational-science-engineering-mathematics/",
+    "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/",
+    "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/c-s/",
+    "https://tacc.utexas.edu/systems/horizon/",
+    "https://tacc.utexas.edu/education/undergraduates-graduates/",
+    "https://oden.utexas.edu/academics/masters-program"
+   ],
+   "duration": "Not stated on any page that could be fetched (Oden Institute pages fail TLS verification in this environment)",
+   "credits": "Thesis option 30, report option 33, no-thesis/no-report option 36 US credit hours; 24 hours must come from the three CSEM concentration areas (search-result snippet of the Oden master's page, not verified on the page itself)",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Bachelor's in engineering, natural sciences, mathematics/statistics, computer science or a field using advanced mathematical modelling (search-result snippet, not verified). The same snippet says the programme is primarily PhD-track with few funded master's places.",
+   "focus": "cse",
+   "structure_summary": "Interdisciplinary graduate programme in three areas: applicable mathematics, numerical analysis and scientific computation, and mathematical modelling and applications. Course options in the catalogue include parallel computing and computer architecture. Students use Oden clusters and TACC supercomputers. The CSE 380 course gives a practical introduction to HPC hardware and software engineering; CSE 397H is a graduate research internship.",
+   "core_courses": [
+    {
+     "name": "CSE 383C Numerical Analysis: Linear Algebra",
+     "credits": "3 lecture hours per week, one semester",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    },
+    {
+     "name": "CSE 380 Tools and Techniques of Computational Science",
+     "credits": "3 lecture hours per week, one semester",
+     "topics": [
+      "arch",
+      "perf-model",
+      "hpc-software-eng"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    },
+    {
+     "name": "CSE 389C Introduction to Mathematical Modeling in Science and Engineering I",
+     "credits": "3 lecture hours per week, one semester",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "CSE 393F Finite Element Methods",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    },
+    {
+     "name": "CSE 382M Foundational Techniques of Machine Learning and Data Sciences",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    },
+    {
+     "name": "CSE 382G Computer Graphics (scientific visualization, high-performance graphics architectures)",
+     "topics": [
+      "viz",
+      "arch"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    },
+    {
+     "name": "C S 380P Parallel Systems",
+     "topics": [
+      "parallel-algos",
+      "arch",
+      "openmp-threads"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/c-s/"
+    },
+    {
+     "name": "C S 377 Principles and Applications of Parallel Programming",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/c-s/"
+    },
+    {
+     "name": "CSE 397H Graduate Research Internship",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/"
+    }
+   ],
+   "capstone": "Thesis (CSE 698), master's report (CSE 398R) or coursework-only option; optional graduate research internship course CSE 397H.",
+   "machines_access": [
+    "Oden Institute clusters (about 10 distributed-memory clusters, 64 to 1344 cores each)",
+    "TACC supercomputers: Stampede3, Lonestar6, Vista, Frontera; Horizon (NSF LCCF, Phase 1 production Fall 2026)"
+   ],
+   "industry_links": [
+    "CSE 397H internship in a research/industrial setting",
+    "TACC Frontera Fellowships for graduate students"
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": 1,
+    "arch": 1,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 1,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 1,
+    "ml-systems": null,
+    "hpc-software-eng": 1,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": 1,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "CSEM has three areas and offers parallel computing and computer architecture courses",
+     "url": "https://catalog.utexas.edu/archive/2025-26/graduate/areas-of-study/intercollegial-programs/computational-science-engineering-mathematics/",
+     "quote": "parallel computing and computer architecture, and mathematical modeling",
+     "source": "web"
+    },
+    {
+     "claim": "Three areas: applicable mathematics, numerical analysis, modelling",
+     "url": "https://catalog.utexas.edu/archive/2025-26/graduate/areas-of-study/intercollegial-programs/computational-science-engineering-mathematics/",
+     "quote": "comprises three areas: (1) applicable mathematics, (2) numerical analysis and scientific computation, and (3) mathematical modeling and applications",
+     "source": "web"
+    },
+    {
+     "claim": "Students have access to Oden clusters",
+     "url": "https://catalog.utexas.edu/archive/2025-26/graduate/areas-of-study/intercollegial-programs/computational-science-engineering-mathematics/",
+     "quote": "about 10 distributed memory computer clusters with between 64 and 1344 cores each",
+     "source": "web"
+    },
+    {
+     "claim": "Students have access to TACC supercomputers",
+     "url": "https://catalog.utexas.edu/archive/2025-26/graduate/areas-of-study/intercollegial-programs/computational-science-engineering-mathematics/",
+     "quote": "graduate students also have access to large-scale supercomputing resources of the Texas Advanced Computing Center (TACC)",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 380 is a practical HPC course",
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/",
+     "quote": "Advanced introduction to the practical use of high performance computing hardware and software engineering principles for scientific technical computing.",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 383C numerical linear algebra",
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/",
+     "quote": "Survey of numerical methods in linear algebra: floating-point computation",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 397H research internship",
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/",
+     "quote": "Practical work experience in a research/industrial setting.",
+     "source": "web"
+    },
+    {
+     "claim": "CSE 382M machine learning and data science tools",
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/",
+     "quote": "Introduction to computational and mathematical tools of data science.",
+     "source": "web"
+    },
+    {
+     "claim": "C S 380P Parallel Systems course",
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/c-s/",
+     "quote": "Explores parallel systems, from languages to hardware, from large-scale parallel computers to multicore chips",
+     "source": "web"
+    },
+    {
+     "claim": "C S 377 parallel programming",
+     "url": "https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/c-s/",
+     "quote": "programming of parallel algorithms and computations",
+     "source": "web"
+    },
+    {
+     "claim": "Horizon is the NSF leadership-class machine at TACC",
+     "url": "https://tacc.utexas.edu/systems/horizon/",
+     "quote": "Horizon will provide U.S. researchers with unprecedented computing and artificial intelligence capabilities",
+     "source": "web"
+    },
+    {
+     "claim": "TACC Frontera Fellowships for graduate students",
+     "url": "https://tacc.utexas.edu/education/undergraduates-graduates/",
+     "quote": "The Frontera fellowship program provides a year-long opportunity for talented graduate students to compute on the most powerful academic supercomputer in the world",
+     "source": "web"
+    },
+    {
+     "claim": "Credit options 30/33/36 (from a WebSearch snippet of oden.utexas.edu/academics/masters-program; page not fetchable)",
+     "url": "https://oden.utexas.edu/academics/masters-program",
+     "quote": "thesis option requires 30 credit hours, the report option 33, and the no-thesis/no-report option 36",
+     "source": "memory"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "The Oden Institute site (oden.utexas.edu, www.ices.utexas.edu) fails TLS verification (incomplete certificate chain) from this environment, so the programme page, handbook PDF and degree requirements could not be read. Course evidence comes from the archived 2025-26 UT catalogue; the current 2026-27 catalogue page for the programme exposes only the facilities text. Which courses are required vs optional could not be confirmed, so the core/elective split is indicative (catalogue courses in the CSE prefix). MPI, GPU, scheduling, storage and similar topics are null, not 0."
+  },
+  {
+   "id": "us-stanford-icme-ms",
+   "country": "US",
+   "institution": "Stanford University (Institute for Computational and Mathematical Engineering, ICME)",
+   "programme_name": "MS in Computational and Mathematical Engineering (general track plus Data Science, Imaging Science and Mathematical & Computational Finance tracks)",
+   "degree": "MS",
+   "urls": [
+    "https://icme.stanford.edu/academics-admission/icme-master-science",
+    "https://bulletin.stanford.edu/programs/CME-MS",
+    "https://icme.stanford.edu/get-involved/icme-resources/hpc-resources",
+    "https://cs149.stanford.edu/",
+    "https://cs336.stanford.edu/"
+   ],
+   "duration": "Not stated as a number of years on the pages read; admission for autumn quarter only; part-time/remote study possible via CGOE but on-campus attendance required",
+   "credits": "45 units of coursework (courses numbered 200 or above, at least 36 graded units), no thesis required",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Recommended: strong mathematics (linear algebra, numerical methods, probability, stochastics) and programming proficiency in C and MATLAB (Python/R depending on track). No specific background requirement stated by the bulletin.",
+   "focus": "cse",
+   "structure_summary": "Applied-mathematics-centred MS: foundational courses (12 units), computing and programming (6 units), breadth electives (15), specialised electives (9) and seminars (3) in the general track. The bulletin lists training in matrix computations, optimisation, PDE solution, parallel computer algorithms and new computing paradigms. ICME runs its own clusters with CPU and GPU nodes and restricted course partitions. HPC and ML-systems content is reachable through electives in Stanford CS (e.g. CS 149, CS 336), whose eligibility as ICME electives was not confirmed.",
+   "core_courses": [],
+   "electives": [
+    {
+     "name": "CS 149 Parallel Computing (Stanford CS, publicly documented; ICME elective eligibility not confirmed)",
+     "topics": [
+      "gpu-prog",
+      "arch",
+      "perf-model",
+      "parallel-algos",
+      "energy",
+      "ml-systems"
+     ],
+     "url": "https://cs149.stanford.edu/"
+    },
+    {
+     "name": "CS 336 Language Modeling from Scratch (Stanford CS, publicly documented; ICME elective eligibility not confirmed)",
+     "topics": [
+      "ml-dl",
+      "ml-systems",
+      "gpu-prog",
+      "perf-model"
+     ],
+     "url": "https://cs336.stanford.edu/"
+    }
+   ],
+   "capstone": "No thesis required. Optional 'Master of Science with Distinction in Research': at least three quarters of research ending in a written thesis (CME 291).",
+   "machines_access": [
+    "ICME clusters (CPU nodes with Infiniband and GPU nodes), used by ICME students with restricted partitions for certain courses"
+   ],
+   "industry_links": [
+    "ICME publishes an employment report for MS graduates; Affiliate Program runs professional development workshops (e.g. LLM agents workshop)"
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": null,
+    "arch": null,
+    "numerics": 1,
+    "simulation-apps": 1,
+    "parallel-algos": 1,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 1,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": 1,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "MS requires 45 units, no thesis",
+     "url": "https://bulletin.stanford.edu/programs/CME-MS",
+     "quote": "The master’s program consists of 45 units of coursework taken at Stanford. No thesis is required",
+     "source": "web"
+    },
+    {
+     "claim": "Programme trains in parallel computer algorithms among other topics",
+     "url": "https://bulletin.stanford.edu/programs/CME-MS",
+     "quote": "numerical solution of partial differential equations, parallel computer algorithms, and new computing paradigms",
+     "source": "web"
+    },
+    {
+     "claim": "Four tracks",
+     "url": "https://bulletin.stanford.edu/programs/CME-MS",
+     "quote": "The ICME master’s program offers a general Computational and Mathematical Engineering track as well as three specialized tracks",
+     "source": "web"
+    },
+    {
+     "claim": "Data Science track covers machine learning",
+     "url": "https://bulletin.stanford.edu/programs/CME-MS",
+     "quote": "DS track covers both computational data science and machine learning",
+     "source": "web"
+    },
+    {
+     "claim": "Imaging track includes HPC skills",
+     "url": "https://bulletin.stanford.edu/programs/CME-MS",
+     "quote": "high-performance computing skills and architecture oriented toward imaging sciences",
+     "source": "web"
+    },
+    {
+     "claim": "Cannot be completed fully online",
+     "url": "https://icme.stanford.edu/academics-admission/icme-master-science",
+     "quote": "The ICME master's program cannot be completed fully online; on-campus attendance will be required.",
+     "source": "web"
+    },
+    {
+     "claim": "Recommended background",
+     "url": "https://icme.stanford.edu/academics-admission/icme-master-science",
+     "quote": "Recommended background: strong foundation in mathematics with courses in linear algebra, numerical methods, probabilities, stochastics and programming proficiency in C and MATLAB.",
+     "source": "web"
+    },
+    {
+     "claim": "ICME runs clusters used by students, with course partitions",
+     "url": "https://icme.stanford.edu/get-involved/icme-resources/hpc-resources",
+     "quote": "The ICME clusters are used by ICME students and have restricted partitions for certain courses.",
+     "source": "web"
+    },
+    {
+     "claim": "ICME GPU nodes",
+     "url": "https://icme.stanford.edu/get-involved/icme-resources/hpc-resources",
+     "quote": "Pascal dual GPU and dual Intel processor nodes, 192 GB memory per node, Infiniband",
+     "source": "web"
+    },
+    {
+     "claim": "CS 149 content: multicore, GPU and datacenter AI",
+     "url": "https://cs149.stanford.edu/",
+     "quote": "to the world's largest supercomputers and web sites, parallel processing is ubiquitous in modern computing",
+     "source": "web"
+    },
+    {
+     "claim": "CS 336 assignment 2 is systems: Triton FlashAttention2 and distributed training",
+     "url": "https://cs336.stanford.edu/",
+     "quote": "optimize Attention with your own Triton implementation of FlashAttention2.",
+     "source": "web"
+    },
+    {
+     "claim": "Optional research-distinction MS with thesis",
+     "url": "https://bulletin.stanford.edu/programs/CME-MS",
+     "quote": "culminating in a written thesis",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "The ICME MS is not an HPC master; it is computational mathematics with a programming requirement. ExploreCourses (JS only) and the bulletin's course tables were not readable, so required course codes (e.g. CME 213 'parallel computing using MPI, OpenMP and CUDA', known from memory only) are not listed. The CS 149 and CS 336 records are indicative of the Stanford CS offer, they are not confirmed ICME requirements. Duration in years not recorded."
+  },
+  {
+   "id": "us-mit-cse-sm",
+   "country": "US",
+   "institution": "Massachusetts Institute of Technology (Center for Computational Science and Engineering, Schwarzman College of Computing)",
+   "programme_name": "SM in Computational Science and Engineering (CSE SM)",
+   "degree": "SM",
+   "urls": [
+    "https://cse.mit.edu/programs-admissions/cse-sm/",
+    "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/",
+    "https://catalog.mit.edu/subjects/18/"
+   ],
+   "duration": "12-18 months for self-supported or fellowship students; allow two years if funded by RA/TA positions",
+   "credits": "108 MIT units total (core 36 + restricted electives 24 + unrestricted elective 12 + thesis 36)",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "Not read in detail. IMPORTANT: external admissions to the CSE SM are currently paused (programme page, 2026-10-22); the page notes it will post information if admissions restart.",
+   "focus": "cse",
+   "structure_summary": "Thesis master housed in the Center for Computational Science & Engineering. Three core subjects chosen from four (modelling and simulation, optimisation methods, numerical methods for PDEs, introduction to numerical methods), 24 units of restricted electives from a large cross-department list (includes 18.337[J] Parallel Computing and Scientific Machine Learning, machine learning, fluid mechanics, optimisation), one unrestricted graduate elective and a 36-unit thesis.",
+   "core_courses": [
+    {
+     "name": "6.7300[J] Introduction to Modeling and Simulation",
+     "credits": "12 units (36 for three core subjects)",
+     "topics": [
+      "simulation-apps",
+      "numerics"
+     ],
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/"
+    },
+    {
+     "name": "15.C57[J] Optimization Methods",
+     "credits": "12 units",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/"
+    },
+    {
+     "name": "18.335[J] Introduction to Numerical Methods",
+     "credits": "12 units",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/"
+    },
+    {
+     "name": "16.920[J] Numerical Methods for Partial Differential Equations (one of the four core options per the degree chart)",
+     "credits": "12 units",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "18.337[J] / 6.7320[J] Parallel Computing and Scientific Machine Learning",
+     "topics": [
+      "parallel-algos",
+      "gpu-prog",
+      "perf-model",
+      "ml-dl",
+      "numerics"
+     ],
+     "url": "https://catalog.mit.edu/subjects/18/"
+    },
+    {
+     "name": "18.336[J] Fast Methods for Partial Differential and Integral Equations",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://catalog.mit.edu/subjects/18/"
+    },
+    {
+     "name": "6.7900 Machine Learning",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/"
+    },
+    {
+     "name": "2.29 Numerical Fluid Mechanics",
+     "topics": [
+      "simulation-apps",
+      "numerics"
+     ],
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/"
+    }
+   ],
+   "capstone": "Master's thesis (CSE.THG, 36 units) supervised by a faculty advisor.",
+   "machines_access": [],
+   "industry_links": [
+    "CSE programme site has an Industry Engagement section (not read in detail)"
+   ],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": 1,
+    "perf-model": 1,
+    "arch": null,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 1,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": null,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": null,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "108 total units with 36-unit thesis",
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/",
+     "quote": "Total Units 108",
+     "source": "web"
+    },
+    {
+     "claim": "Core subjects: select three",
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/",
+     "quote": "Select three of the following subjects:",
+     "source": "web"
+    },
+    {
+     "claim": "Core option: numerical methods",
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/",
+     "quote": "Introduction to Numerical Methods",
+     "source": "web"
+    },
+    {
+     "claim": "24 units of restricted electives from a list",
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/",
+     "quote": "Choose 24 units of coursework from the list below.",
+     "source": "web"
+    },
+    {
+     "claim": "18.337 is on the restricted-elective list",
+     "url": "https://catalog.mit.edu/degree-charts/master-computational-science-engineering/",
+     "quote": "Parallel Computing and Scientific Machine Learning",
+     "source": "web"
+    },
+    {
+     "claim": "18.337 optimises code for supercomputers, GPUs and multicores",
+     "url": "https://catalog.mit.edu/subjects/18/",
+     "quote": "Provides direct experience with the modern realities of optimizing code performance for supercomputers, GPUs, and multicores in a high-level language.",
+     "source": "web"
+    },
+    {
+     "claim": "18.337 covers parallelisation of large-scale simulation",
+     "url": "https://catalog.mit.edu/subjects/18/",
+     "quote": "parallelization of large-scale scientific simulation",
+     "source": "web"
+    },
+    {
+     "claim": "18.337 offered in spring 2026-2027",
+     "url": "https://catalog.mit.edu/subjects/18/",
+     "quote": "Acad Year 2026-2027: G (Spring)",
+     "source": "web"
+    },
+    {
+     "claim": "Programme length 12-18 months",
+     "url": "https://cse.mit.edu/programs-admissions/cse-sm/",
+     "quote": "can complete the program in 12-18 months",
+     "source": "web"
+    },
+    {
+     "claim": "External admissions paused",
+     "url": "https://cse.mit.edu/programs-admissions/cse-sm/",
+     "quote": "External admissions for the CSE Master of Science (CSE SM) Program is currently paused.",
+     "source": "web"
+    },
+    {
+     "claim": "Thesis under a faculty advisor",
+     "url": "https://cse.mit.edu/programs-admissions/cse-sm/",
+     "quote": "Students write a master’s thesis under the supervision of a faculty advisor.",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Scientific-computing master with exactly one parallel-computing subject (18.337J) in the elective list; no MPI, scheduling, sysadmin or storage subject was seen. The degree chart text was partly flattened by the extractor (unit counts per subject not all visible). External admissions are paused, so the programme is currently useful as a curriculum reference only. 18.337 details come from the Course 18 subject listing. Topics not examined are null."
   }
  ],
- "ecosystem": [],
- "blocked_sources": [],
+ "ecosystem": [
+  {
+   "id": "us-stanford-cs149",
+   "kind": "cours-ouvert",
+   "name": "Stanford CS149 Parallel Computing (public syllabus, assignments, Fall 2025)",
+   "url": "https://cs149.stanford.edu/",
+   "why_relevant": "Best public syllabus found for the hardware/software boundary of parallel systems: multicore and SIMD, work scheduling, CUDA, DNN execution on GPUs, datacenter-scale AI serving, coherence and synchronisation, with programming assignments including CUDA kernels and a Trainium2 kernel.",
+   "evidence": [
+    {
+     "claim": "Course goal: parallel hardware and software design",
+     "url": "https://cs149.stanford.edu/",
+     "quote": "teach parallel programming techniques necessary to effectively utilize these machines",
+     "source": "web"
+    },
+    {
+     "claim": "Lecture on GPU architecture and CUDA",
+     "url": "https://cs149.stanford.edu/",
+     "quote": "GPU Architecture and CUDA Programming",
+     "source": "web"
+    },
+    {
+     "claim": "Lecture on AI at datacenter scale",
+     "url": "https://cs149.stanford.edu/",
+     "quote": "How modern AI applications are served at datacenter scale",
+     "source": "web"
+    },
+    {
+     "claim": "Assignment on CUDA kernels",
+     "url": "https://cs149.stanford.edu/",
+     "quote": "Assignment 5: Make the World's Fastest CUDA Kernels",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-stanford-cs336",
+   "kind": "cours-ouvert",
+   "name": "Stanford CS336 Language Modeling from Scratch (Spring 2026 materials, assignments, recordings)",
+   "url": "https://cs336.stanford.edu/",
+   "why_relevant": "A public course where one assignment is explicitly systems: profile, write a Triton FlashAttention2 kernel and build a memory-efficient distributed training loop, which is the user-level view of what a GPU-cluster platform must serve.",
+   "evidence": [
+    {
+     "claim": "Course is about building a language model end to end",
+     "url": "https://cs336.stanford.edu/",
+     "quote": "walking them through the entire process of developing their own",
+     "source": "web"
+    },
+    {
+     "claim": "Making models run efficiently on GPUs across multiple machines",
+     "url": "https://cs336.stanford.edu/",
+     "quote": "making neural language models run quickly and efficiently on GPUs across multiple machines",
+     "source": "web"
+    },
+    {
+     "claim": "Assignment 2 Systems: distributed training",
+     "url": "https://cs336.stanford.edu/",
+     "quote": "Build a memory-efficient, distributed version of the Assignment 1 model training code.",
+     "source": "web"
+    },
+    {
+     "claim": "Self-study GPU compute via cloud providers",
+     "url": "https://cs336.stanford.edu/",
+     "quote": "you can access GPU compute from a cloud provider to complete the assignments",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-cmu-15418",
+   "kind": "cours-ouvert",
+   "name": "CMU 15-418/15-618 Parallel Computer Architecture and Programming (Fall 2026 site)",
+   "url": "https://www.cs.cmu.edu/~418/",
+   "why_relevant": "Public syllabus and assignments for parallel hardware and programming (multicore, GPUs, 'C-like' parallel languages); sister course of Stanford CS149 with a systems-programming flavour.",
+   "evidence": [
+    {
+     "claim": "Course title and term",
+     "url": "https://www.cs.cmu.edu/~418/",
+     "quote": "15-418/15-618: Parallel Computer Architecture and Programming, Fall 2026",
+     "source": "web"
+    },
+    {
+     "claim": "Scope from smartphones to supercomputers",
+     "url": "https://www.cs.cmu.edu/~418/",
+     "quote": "parallel processing is ubiquitous in modern computing",
+     "source": "web"
+    },
+    {
+     "claim": "Related systems courses suggested as helpful",
+     "url": "https://www.cs.cmu.edu/~418/",
+     "quote": "Previous experience with operating systems (15-410), distributed systems (15-440), or compilers (15-411) may also prove helpful.",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-cmu-dlsys",
+   "kind": "cours-ouvert",
+   "name": "Deep Learning Systems (dlsyscourse.org, CMU; build the 'Needle' framework with CPU/CUDA backends)",
+   "url": "https://dlsyscourse.org/",
+   "why_relevant": "Hands-on view of what sits under PyTorch: automatic differentiation, an NDArray library with CPU/CUDA backends, memory coalescing and tiling; useful background before operating GPU training platforms.",
+   "evidence": [
+    {
+     "claim": "Students build a deep learning library from scratch",
+     "url": "https://dlsyscourse.org/",
+     "quote": "students will design and build from scratch a complete deep learning library",
+     "source": "web"
+    },
+    {
+     "claim": "CUDA operations in C++",
+     "url": "https://dlsyscourse.org/",
+     "quote": "Implement efficient algorithms for core deep learning operations including matrix multiplication, convolution, and attention mechanisms using both C++ and CUDA",
+     "source": "web"
+    },
+    {
+     "claim": "Hardware acceleration techniques",
+     "url": "https://dlsyscourse.org/",
+     "quote": "Apply hardware acceleration techniques including memory coalescing, tiling, and parallel computation strategies",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-cmu-15442",
+   "kind": "cours-ouvert",
+   "name": "CMU 15-442/15-642 Machine Learning Systems (public schedule, Spring 2026)",
+   "url": "https://mlsyscourse.org/",
+   "why_relevant": "Public schedule covering data/ZeRO, model and pipeline parallelism, GPU architecture and CUDA, GEMM on modern GPUs and LLM serving: the most direct ML-systems syllabus found for a training/inference platform engineer.",
+   "evidence": [
+    {
+     "claim": "Goal: understand elements of modern ML systems",
+     "url": "https://mlsyscourse.org/",
+     "quote": "The goal of this course is to provide students an understanding and overview of elements in modern machine learning systems.",
+     "source": "web"
+    },
+    {
+     "claim": "Week on data parallelism and ZeRO",
+     "url": "https://mlsyscourse.org/schedule",
+     "quote": "Week 5: ML Parallelization (Data Parallelism and Zero Redundancy)",
+     "source": "web"
+    },
+    {
+     "claim": "Week on model and pipeline parallelism",
+     "url": "https://mlsyscourse.org/schedule",
+     "quote": "Week 6: ML Parallelization (Model and Pipeline Parallelism)",
+     "source": "web"
+    },
+    {
+     "claim": "Week on LLM serving",
+     "url": "https://mlsyscourse.org/schedule",
+     "quote": "Week 9: LLM Serving (Continuous Batching, PagedAttention, RadixAttention)",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-berkeley-cs267",
+   "kind": "cours-ouvert",
+   "name": "UC Berkeley CS267 Applications of Parallel Computers (Spring 2025 site)",
+   "url": "https://sites.google.com/lbl.gov/cs267-spr2025",
+   "why_relevant": "Long-running reference course (Demmel, Yelick and others) on programming parallel computers for science and engineering; public site with syllabus; part of the Berkeley Designated Emphasis in Computational Science and Engineering.",
+   "evidence": [
+    {
+     "claim": "Course purpose",
+     "url": "https://sites.google.com/lbl.gov/cs267-spr2025",
+     "quote": "CS267 was originally designed to teach students how to program parallel computers to efficiently solve challenging problems in science and engineering",
+     "source": "web"
+    },
+    {
+     "claim": "Counts toward the CSE Designated Emphasis",
+     "url": "https://sites.google.com/lbl.gov/cs267-spr2025",
+     "quote": "CS267 satisfies part of the course requirements for the Designated Emphasis",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-student-cluster-competition",
+   "kind": "compétition",
+   "name": "SC Student Cluster Competition (SCC) at the SC conference",
+   "url": "https://studentclustercompetition.us/",
+   "why_relevant": "Teams of students build, tune and run HPC applications on a cluster in a competition setting; the best hands-on route to cluster operation skills for a student, and a recruiting ground for HPC centres.",
+   "evidence": [
+    {
+     "claim": "Purpose of the competition",
+     "url": "https://studentclustercompetition.us/",
+     "quote": "The Student Cluster Competition (SCC) was created to address this issue by immersing students in all aspects of HPC",
+     "source": "web"
+    },
+    {
+     "claim": "Hands-on training impact",
+     "url": "https://studentclustercompetition.us/",
+     "quote": "Providing excellent hands-on training for the next generation in HPC",
+     "source": "web"
+    },
+    {
+     "claim": "Current edition",
+     "url": "https://studentclustercompetition.us/",
+     "quote": "SCC26 competition at SC26",
+     "source": "web"
+    }
+   ]
+  },
+  {
+   "id": "us-doe-facility-training",
+   "kind": "formation-courte",
+   "name": "DOE facility user training (NERSC New User Training and SpinUp workshops; OLCF training calendar and archives)",
+   "url": "https://www.nersc.gov/users/training/",
+   "why_relevant": "National computing centres publish training for their users; NERSC lists new-user training and SpinUp workshops and OLCF archives materials for Frontier. Details of content were not readable (JavaScript calendar), so use as pointers to current events.",
+   "evidence": [
+    {
+     "claim": "NERSC lists new user training",
+     "url": "https://www.nersc.gov/users/training/",
+     "quote": "NERSC New User Training",
+     "source": "web"
+    },
+    {
+     "claim": "NERSC lists SpinUp workshops",
+     "url": "https://www.nersc.gov/users/training/",
+     "quote": "SpinUp Workshops",
+     "source": "web"
+    },
+    {
+     "claim": "OLCF training events and archives",
+     "url": "https://www.olcf.ornl.gov/for-users/training/",
+     "quote": "Find upcoming training events and archives of training materials detailing how to use OLCF resources and services.",
+     "source": "web"
+    }
+   ]
+  }
+ ],
+ "blocked_sources": [
+  "https://oden.utexas.edu/academics/masters-program (also www.ices.utexas.edu and the CSEM_Handbook.pdf) - TLS: certificate verify failed (unable to get local issuer certificate) even with the proxy CA bundle; degree requirements read only via a search-result snippet",
+  "https://extremecomputingtraining.anl.gov/ and https://www.alcf.anl.gov/atpesc (ATPESC) - HTTP 403 Forbidden to the fetcher; ATPESC could not be verified and is not listed",
+  "https://hpcuniversity.org/ (HPC University) - HTTP 502 via the proxy on every attempt; not listed",
+  "https://explorecourses.stanford.edu/ - JavaScript-only, empty text; Stanford course catalogue entries (e.g. CME 213) not verifiable",
+  "https://sites.google.com/lbl.gov/cs267-spr2026 - redirects to a Google sign-in page; the Spring 2025 CS267 site was used instead",
+  "https://www.nersc.gov/news-and-events/calendar-of-events/nersc-new-user-training (and spin-training) - page text is navigation only, no training content readable"
+ ],
  "verification": {
   "status": "unverified",
-  "checked_claims": 0,
+  "checked_claims": 94,
   "corrected": 0,
   "removed": 0,
-  "notes": ""
+  "notes": "All 94 web quotes verified verbatim by tools/verify_quotes.py (dry run, 2026-10-22). One memory-tagged evidence (UT Austin credit options, from a search-result snippet) is not verifiable. No semantic review yet."
  }
 }

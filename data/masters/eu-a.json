@@ -1,0 +1,754 @@
+{
+ "unit": "eu-a",
+ "region": "world",
+ "retrieved_on": "2026-10-22",
+ "programmes": [
+  {
+   "id": "uk-edinburgh-epcc-msc-hpc",
+   "country": "GB",
+   "institution": "University of Edinburgh (School of Informatics, delivered by EPCC)",
+   "programme_name": "MSc High Performance Computing (also PgDip; sister programmes HPC with Data Science, online HPC, Imaging Vision and HPC)",
+   "degree": "MSc",
+   "urls": [
+    "https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing",
+    "https://www.epcc.ed.ac.uk/education-training/masters-programmes",
+    "https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm",
+    "https://www.epcc.ed.ac.uk/whats-happening/articles/epcc-msc-students-visit-advanced-computing-facility"
+   ],
+   "duration": "MSc 1 year full-time (Sept start) or 3 years part-time; PgDip 9 months (study.ed.ac.uk). Online variant: 3-6 years part-time intermittent.",
+   "credits": "180 SCQF credits (120 taught + 60 dissertation); most courses 10 SCQF credits = 5 ECTS per course page",
+   "language": "English",
+   "delivery": "on-site (an online part-time intermittent version also exists)",
+   "entry_requirements": "UK 2:1 honours degree or international equivalent in a relevant subject (computer science, physics, maths, engineering, biology, chemistry, geosciences); experienced programmer in at least one of C, C++, Python or Fortran; familiarity with algebra, linear algebra, probability and statistics; English-language proof.",
+   "focus": "hpc-core",
+   "structure_summary": "Two semesters of taught courses (120 credits) then a three-month dissertation (60 credits). Compulsory: Message-Passing Programming, Threaded Programming, HPC Architectures, Practical Software Development and Project Preparation; 40-60 credits of EPCC HPC options (numerical algorithms, parallel algorithms, performance programming, accelerated systems, parallel design patterns, advanced MPI, HPC languages) plus up to 20 credits of data or outside courses (data management, ML at scale, HPDA, quantum). Dissertations can be industry-based.",
+   "core_courses": [
+    {
+     "name": "EPCC11002 Message-Passing Programming",
+     "credits": "10 SCQF credits",
+     "topics": [
+      "mpi",
+      "parallel-algos"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11002.htm"
+    },
+    {
+     "name": "EPCC11003 Threaded Programming",
+     "credits": "10 SCQF credits",
+     "topics": [
+      "openmp-threads"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11003.htm"
+    },
+    {
+     "name": "EPCC11004 HPC Architectures",
+     "credits": "10 SCQF credits",
+     "topics": [
+      "arch",
+      "interconnect",
+      "scheduling",
+      "sysadmin"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11004.htm"
+    },
+    {
+     "name": "EPCC11001 Practical Software Development",
+     "credits": "20 SCQF credits",
+     "topics": [
+      "hpc-software-eng",
+      "perf-model",
+      "soft-skills"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11001.htm"
+    },
+    {
+     "name": "EPCC11008 Project Preparation",
+     "credits": "10 SCQF credits",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm"
+    },
+    {
+     "name": "EPCC11015 Dissertation (High Performance Computing)",
+     "credits": "60 SCQF credits",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm"
+    }
+   ],
+   "electives": [
+    {
+     "name": "EPCC11020 Accelerated Systems: Principles and Practice",
+     "topics": [
+      "gpu-prog",
+      "arch",
+      "perf-model"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11020.htm"
+    },
+    {
+     "name": "EPCC11009 Performance Programming",
+     "topics": [
+      "perf-model",
+      "arch"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11009.htm"
+    },
+    {
+     "name": "EPCC11006 Numerical Algorithms for High Performance Computing",
+     "topics": [
+      "numerics",
+      "simulation-apps"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11006.htm"
+    },
+    {
+     "name": "EPCC11007 Design and Analysis of Parallel Algorithms",
+     "topics": [
+      "parallel-algos"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11007.htm"
+    },
+    {
+     "name": "EPCC11010 Parallel Design Patterns",
+     "topics": [
+      "parallel-algos",
+      "hpc-software-eng"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11010.htm"
+    },
+    {
+     "name": "EPCC11012 Advanced Message-Passing Programming",
+     "topics": [
+      "mpi"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11012.htm"
+    },
+    {
+     "name": "EPCC11019 Programming Languages for HPC",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11019.htm"
+    },
+    {
+     "name": "EPCC11013 Machine Learning at Scale",
+     "topics": [
+      "ml-dl",
+      "ml-systems",
+      "storage-io",
+      "gpu-prog"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11013.htm"
+    },
+    {
+     "name": "EPCC11014 High Performance Data Analytics",
+     "topics": [
+      "bigdata",
+      "ml-dl"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11014.htm"
+    },
+    {
+     "name": "EPCC11005 Fundamentals of Data Management",
+     "topics": [
+      "bigdata",
+      "distributed-sys"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11005.htm"
+    },
+    {
+     "name": "INFR11099 Introduction to Quantum Computing",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm"
+    }
+   ],
+   "capstone": "Three-month supervised dissertation over the summer (60 credits); EPCC-based or with an external collaborator, with some competitive placements in local companies.",
+   "machines_access": [
+    "Cirrus (EPSRC Tier-2 national service hosted by EPCC; used frequently across the MSc programmes)"
+   ],
+   "industry_links": [
+    "Industry-based dissertations (Intel, Xilinx, Virgin Money, Renault FP1 team, Scottish companies)",
+    "Graduate destinations include Arm",
+    "EPCC industry solutions/consultancy"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 2,
+    "mpi": 2,
+    "gpu-prog": 2,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 1,
+    "parallel-algos": 2,
+    "distributed-sys": 1,
+    "sysadmin": 1,
+    "scheduling": 1,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": 0,
+    "cloud": 0,
+    "bigdata": 1,
+    "ml-dl": 2,
+    "ml-systems": 2,
+    "hpc-software-eng": 2,
+    "energy": 0,
+    "quantum-emerging": 2,
+    "viz": 1,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": 0,
+    "observability-sre": 0
+   },
+   "evidence": [
+    {
+     "claim": "MSc is 1 year full-time (3 years part-time), PgDip 9 months",
+     "url": "https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing",
+     "quote": "MSc | 1 year | Start date: September 2027",
+     "source": "web"
+    },
+    {
+     "claim": "120 taught credits plus 60-credit dissertation (180 total)",
+     "url": "https://www.epcc.ed.ac.uk/education-training/masters-programmes",
+     "quote": "120 credits of taught courses followed by a dissertation worth 60 credits.",
+     "source": "web"
+    },
+    {
+     "claim": "Compulsory core: Message-Passing Programming teaches MPI",
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11002.htm",
+     "quote": "This course uses the de facto standard for message passing, the Message-Passing Interface (MPI)",
+     "source": "web"
+    },
+    {
+     "claim": "Compulsory Threaded Programming teaches OpenMP",
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11003.htm",
+     "quote": "The majority of the course is focused on teaching the use of the industry standard OpenMP API.",
+     "source": "web"
+    },
+    {
+     "claim": "HPC Architectures covers system software, batch systems, interconnects, GPGPUs",
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11004.htm",
+     "quote": "System software: OSs, processes, threads, scheduling, batch systems.",
+     "source": "web"
+    },
+    {
+     "claim": "Accelerated Systems course teaches GPU programming models",
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11020.htm",
+     "quote": "We will concentrate on the most widely deployed architecture (GPUs) and programming models (for example CUDA, OpenMP, SYCL)",
+     "source": "web"
+    },
+    {
+     "claim": "Machine Learning at Scale course on large-scale distributed training and inference",
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11013.htm",
+     "quote": "The course will evaluate a range of real-world examples where researchers have scaled machine learning up to very large computers",
+     "source": "web"
+    },
+    {
+     "claim": "Practical Software Development covers testing, build tools, profiling and Agile",
+     "url": "https://www.drps.ed.ac.uk/26-27/dpt/cxepcc11001.htm",
+     "quote": "Automated regression and unit testing to help ensure and maintain program correctness.",
+     "source": "web"
+    },
+    {
+     "claim": "Cirrus Tier-2 system is used in MSc teaching",
+     "url": "https://www.epcc.ed.ac.uk/whats-happening/articles/epcc-msc-students-visit-advanced-computing-facility",
+     "quote": "This system is used frequently across the MSc programmes",
+     "source": "web"
+    },
+    {
+     "claim": "Dissertation projects with industry",
+     "url": "https://www.epcc.ed.ac.uk/whats-happening/articles/two-decades-msc-programmes-epcc",
+     "quote": "Industrial projects have included Scottish companies as well as international ones such as Xilinx (inventor of FPGAs), Intel, Virgin Money, and the Renault FP1 team.",
+     "source": "web"
+    }
+   ],
+   "confidence": "high",
+   "notes": "Study page lists 2027 entry; 2026-27 degree programme table is the latest course list. Variants: HPC with Data Science (on-campus and online), online HPC MSc (3-6 years, part-time intermittent), joint MSc Imaging, Vision and HPC with Heriot-Watt (see EPCC masters page). Optional dedicated courses counted as 2 in topic_coverage even though not compulsory (progression rule requires passing 3 of: MPI, Threaded, HPC Architectures, Parallel Design Patterns, Advanced MPI, Accelerated Systems). Syllabi of options read via course descriptors (DRPS) 2026/27; no course mentions containers, cloud, energy, resilience or observability, hence 0."
+  },
+  {
+   "id": "eu-eumaster4hpc",
+   "country": "EU",
+   "institution": "EUMaster4HPC consortium (coordinator University of Luxembourg; awarding universities UPC, Politecnico di Milano, FAU Erlangen-Nurnberg, Sorbonne, Sofia University, AGH Krakow, VSB Ostrava, FU Berlin)",
+   "programme_name": "EUMaster4HPC - European Master for High Performance Computing (dual degree)",
+   "degree": "MSc (dual degree from two consortium universities)",
+   "urls": [
+    "https://eumaster4hpc.eu/studies/curriculum/",
+    "https://eumaster4hpc.eu/studies/curriculum/year-one-fundamentals/",
+    "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/",
+    "https://eumaster4hpc.eu/studies/awarded-degrees-and-study-programmes/",
+    "https://eumaster4hpc.eu/how-to-apply/",
+    "https://eumaster4hpc.eu/studies/extracurricular-activities/",
+    "https://www.eurohpc-ju.europa.eu/eumaster4hpc-programme-continues-advancing-hpc-skills-europe-new-phase-2026-2032-2026-07-29_en",
+    "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+   ],
+   "duration": "2 years (4 semesters of 30 ECTS); mobility between two countries, Year 1 at a host university and Year 2 specialisation at a visiting university",
+   "credits": "120 ECTS (30 ECTS per semester; thesis or internship 30 ECTS in semester 4)",
+   "language": "English",
+   "delivery": "on-site (mandatory mobility between two countries)",
+   "entry_requirements": "Bachelor's degree in a STEM subject, computer science or related field; at least two university-level CS courses (data structures, algorithms, programming); solid technical mathematics (list of at least four courses); English at CEFR B2 (TOEFL 85 or IELTS 5, or English-taught degree). Citizens of listed countries are eligible for tuition waiver and mobility scholarship.",
+   "focus": "hpc-core",
+   "structure_summary": "Year 1 at a host university covers fundamentals (mathematics and statistics, software engineering, parallel programming, computer architecture, transversal skills). Year 2 at a different-country university offers a specialisation: Numerical and Data Specialist, Performance Analyst and Advisor, System Development and Support, or System Architect (AI and Quantum specialisations are in development). Closes with a 30 ECTS master thesis or internship. Extracurricular summer school, workshops, challenge and internships are mandatory.",
+   "core_courses": [
+    {
+     "name": "Year 1 area: Parallel Programming (programming models, parallel languages, software ecosystem)",
+     "credits": "9 balancing + 24 fundamentals ECTS",
+     "topics": [
+      "openmp-threads",
+      "mpi",
+      "gpu-prog",
+      "parallel-algos"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-one-fundamentals/"
+    },
+    {
+     "name": "Year 1 area: Computer Architecture (processors, memory hierarchy, I/O subsystem, networking, cloud, circuit design)",
+     "credits": "3 balancing + 15 fundamentals ECTS",
+     "topics": [
+      "arch",
+      "interconnect",
+      "cloud",
+      "storage-io"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-one-fundamentals/"
+    },
+    {
+     "name": "Year 1 area: Software Engineering (sequential programming, debugging, managing and organising software)",
+     "credits": "6 balancing ECTS",
+     "topics": [
+      "hpc-software-eng"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-one-fundamentals/"
+    },
+    {
+     "name": "Year 1 area: Mathematics and Statistics",
+     "credits": "6 balancing + 6 fundamentals ECTS",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-one-fundamentals/"
+    },
+    {
+     "name": "Year 1 area: Transversal Skills (ethics, team management, research techniques, entrepreneurship, legal aspects)",
+     "credits": "9 fundamentals ECTS",
+     "topics": [
+      "soft-skills"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/"
+    },
+    {
+     "name": "Master thesis or internship",
+     "credits": "30 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/extracurricular-activities/"
+    }
+   ],
+   "electives": [
+    {
+     "name": "Specialisation: Performance Analyst and Advisor (performance analysis tools and models, heterogeneous programming)",
+     "topics": [
+      "perf-model",
+      "gpu-prog",
+      "parallel-algos"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/"
+    },
+    {
+     "name": "Specialisation: System Development and Support (operating systems and virtualisation, storage and system administration, compilers and programming models)",
+     "topics": [
+      "sysadmin",
+      "containers-k8s",
+      "storage-io",
+      "hpc-software-eng"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/"
+    },
+    {
+     "name": "Specialisation: Numerical and Data Specialist for Science Domains (scientific computing, advanced HPC topics, AI/ML, HPDA)",
+     "topics": [
+      "numerics",
+      "simulation-apps",
+      "ml-dl",
+      "bigdata"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/"
+    },
+    {
+     "name": "Specialisation: System Architect (processor and supercomputer architectures, accelerators, low-power techniques, chip design)",
+     "topics": [
+      "arch",
+      "gpu-prog",
+      "energy",
+      "interconnect"
+     ],
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/"
+    },
+    {
+     "name": "FAU path: Practical Parallel Algorithms with MPI",
+     "topics": [
+      "mpi",
+      "parallel-algos"
+     ],
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+    },
+    {
+     "name": "FAU path: Architectures of Supercomputers",
+     "topics": [
+      "arch",
+      "interconnect"
+     ],
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+    },
+    {
+     "name": "FAU path: Programming Techniques for Supercomputers",
+     "topics": [
+      "openmp-threads",
+      "perf-model"
+     ],
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+    },
+    {
+     "name": "FAU path: High End Simulation in Practice",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+    },
+    {
+     "name": "FAU path: Deep Learning",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+    },
+    {
+     "name": "FAU path: Algorithms of Numerical Linear Algebra",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/"
+    }
+   ],
+   "capstone": "Master thesis or internship worth 30 ECTS in semester 4, topics proposed by universities, computing centres or industry.",
+   "machines_access": [
+    "MeluXina (Luxembourg; hosts the EUMaster4HPC student challenge and an FPGA workshop)"
+   ],
+   "industry_links": [
+    "Mandatory internships and industry-led workshops",
+    "Challenge organised by leading supercomputing centres",
+    "Collaboration with ETP4HPC and EuroHPC Virtual Academy (EVITA)",
+    "Supercomputing centre and industry partners per EuroHPC press release"
+   ],
+   "topic_coverage": {
+    "openmp-threads": 1,
+    "mpi": 2,
+    "gpu-prog": 1,
+    "perf-model": 2,
+    "arch": 2,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": 2,
+    "distributed-sys": 1,
+    "sysadmin": 2,
+    "scheduling": null,
+    "interconnect": 1,
+    "storage-io": 1,
+    "containers-k8s": 1,
+    "cloud": 1,
+    "bigdata": 2,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": 2,
+    "energy": 1,
+    "quantum-emerging": 1,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 2,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "New phase 2026-2032: pan-European MSc, up to 120 ECTS, nine awarding universities, Luxembourg coordinates",
+     "url": "https://www.eurohpc-ju.europa.eu/eumaster4hpc-programme-continues-advancing-hpc-skills-europe-new-phase-2026-2032-2026-07-29_en",
+     "quote": "Several hundred students will be selected over 4 cohorts, offering up to 120 ECTS",
+     "source": "web"
+    },
+    {
+     "claim": "Mandatory mobility across two countries",
+     "url": "https://eumaster4hpc.eu/how-to-apply/",
+     "quote": "students will study in two different countries over the course of the programme",
+     "source": "web"
+    },
+    {
+     "claim": "Year 1 fundamentals include parallel programming and computer architecture (incl. networking, cloud)",
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-one-fundamentals/",
+     "quote": "Providing the basic and advanced techniques for parallel programming, programming models, parallel languages, and software ecosystem.",
+     "source": "web"
+    },
+    {
+     "claim": "Year 2 System Development and Support specialisation covers operating systems, virtualisation, storage and system administration",
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/",
+     "quote": "Storage and System Administration",
+     "source": "web"
+    },
+    {
+     "claim": "Performance Analyst and Advisor specialisation focus",
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/",
+     "quote": "Focuses on algorithm analysis, knowledge of performance analysis tools and models, parallel and heterogeneous programming, heterogeneous system architecture",
+     "source": "web"
+    },
+    {
+     "claim": "AI and Quantum specialisations still being developed",
+     "url": "https://eumaster4hpc.eu/studies/curriculum/year-two-specialisation/",
+     "quote": "This specialisation is currently being developed by the Consortium.",
+     "source": "web"
+    },
+    {
+     "claim": "FAU path course: Practical Parallel Algorithms with MPI (5 ECTS)",
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/",
+     "quote": "Practical Parallel Algorithms with MPI",
+     "source": "web"
+    },
+    {
+     "claim": "FAU path course: Architectures of Supercomputers",
+     "url": "https://www.ce.studium.fau.eu/prospective-students/m-sc-program/eumaster4hpc/",
+     "quote": "Architectures of Supercomputers",
+     "source": "web"
+    },
+    {
+     "claim": "Student challenge runs on MeluXina",
+     "url": "https://eumaster4hpc.eu/studies/extracurricular-activities/",
+     "quote": "2025/2026: Benchmarking AI Factories on MeluXina supercomputer",
+     "source": "web"
+    },
+    {
+     "claim": "Thesis or internship worth 30 ECTS",
+     "url": "https://eumaster4hpc.eu/studies/extracurricular-activities/",
+     "quote": "It is called master thesis or internship and sums up to 30 ECTS.",
+     "source": "web"
+    },
+    {
+     "claim": "Entry requirement: STEM bachelor's degree",
+     "url": "https://eumaster4hpc.eu/how-to-apply/",
+     "quote": "A Bachelor’s degree in a STEM subject, computer science, or a related field.",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Consortium-level curriculum: courses are taught at the awarding universities, so coverage reflects the published curriculum areas/specialisations plus the FAU standard study plan (only course-level plan read); Luxembourg, UPC, Polimi, Sorbonne etc. course catalogues not read here. Coverage values for scheduling, ml-systems, viz, resilience and observability-sre are null (unknown). Application window for the 2026 intake closed 15 August 2026 per EuroHPC press release. Partner programmes (per awarded-degrees page): Polimi LM in HPC Engineering (120 credits, cloud infrastructures and data centres, quantum computing, GPUs and tensor cores), UPC MIRI-HPC, FU Berlin MSc Computational Sciences, Sorbonne, Sofia."
+  },
+  {
+   "id": "ch-eth-msc-cse",
+   "country": "CH",
+   "institution": "ETH Zurich (Department of Mathematics, D-MATH; with D-INFK, D-PHYS, D-MAVT etc.)",
+   "programme_name": "Master in Computational Science and Engineering (RW/CSE)",
+   "degree": "MSc",
+   "urls": [
+    "https://ethz.ch/en/studies/master/degree-programmes/engineering-sciences/computational-science-and-engineering.html",
+    "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+   ],
+   "duration": "4 semesters (three semesters of courses then a six-month master thesis) under Studienreglement 2024; programme page still shows 1.5 years for the older 90 ECTS regulation",
+   "credits": "120 ECTS (Studienreglement 2024; older cohorts 90 ECTS): main areas >= 74 incl. 2 core courses (>= 12), field of specialization 18, electives; case studies 6; term project 8; science in perspective 2; thesis 30",
+   "language": "English",
+   "delivery": "on-site",
+   "entry_requirements": "ETH RW/CSE Bachelor from D-MATH admitted directly; otherwise a Bachelor degree of at least 180 ECTS from a university, with admission by ETH procedure; students without the ETH CSE Bachelor must take extra courses (guidelines section 3.4-3.5).",
+   "focus": "cse",
+   "structure_summary": "Interdisciplinary CSE master: two core courses chosen from a list (AI in the Sciences and Engineering, Advanced Machine Learning, Advanced Numerical Methods for CSE, Probabilistic AI, Computational Statistics, Advanced Systems Lab, Optimization for Data Science), at least two fields of application (astrophysics, biology, chemistry, finance, electromagnetics, fluid dynamics, geophysics, physics, atmosphere, robotics, systems and control), electives, a case studies seminar, term project(s) and a 30-credit thesis. HPC is a skill inside simulation workflows, not the programme's identity; HPC-specific courses sit in D-INFK electives that were not enumerated in the guidelines.",
+   "core_courses": [
+    {
+     "name": "Advanced Systems Lab (replaces How To Write Fast Numerical Code; core option)",
+     "credits": "8 CP",
+     "topics": [
+      "perf-model",
+      "arch"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Advanced Numerical Methods for CSE (core option)",
+     "credits": "10 CP",
+     "topics": [
+      "numerics"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Advanced Machine Learning (core option)",
+     "credits": "10 CP",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "AI in the Sciences and Engineering (core option)",
+     "credits": "6-8 CP",
+     "topics": [
+      "ml-dl",
+      "simulation-apps"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Probabilistic Artificial Intelligence (core option)",
+     "credits": "8 CP",
+     "topics": [
+      "ml-dl"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Optimization for Data Science (core option)",
+     "credits": "10 CP",
+     "topics": [
+      "numerics",
+      "ml-dl"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Master thesis",
+     "credits": "30 ECTS",
+     "topics": [
+      "thesis-internship"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    }
+   ],
+   "electives": [
+    {
+     "name": "High Performance Computing for Weather and Climate (Physics of the Atmosphere field)",
+     "topics": [
+      "simulation-apps",
+      "gpu-prog"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Classical Simulation of (Bio)Molecular Systems (Chemistry field)",
+     "topics": [
+      "simulation-apps"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Computational Quantum Physics / Quantum Information Processing I: Concepts (Physics field)",
+     "topics": [
+      "quantum-emerging"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    },
+    {
+     "name": "Case Studies Seminar",
+     "topics": [
+      "soft-skills",
+      "thesis-internship"
+     ],
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf"
+    }
+   ],
+   "capstone": "Master thesis (30 ECTS, six months), plus at least one 8-credit semester/term project and a 6-credit Case Studies Seminar.",
+   "machines_access": [],
+   "industry_links": [],
+   "topic_coverage": {
+    "openmp-threads": null,
+    "mpi": null,
+    "gpu-prog": null,
+    "perf-model": 1,
+    "arch": null,
+    "numerics": 2,
+    "simulation-apps": 2,
+    "parallel-algos": null,
+    "distributed-sys": null,
+    "sysadmin": null,
+    "scheduling": null,
+    "interconnect": null,
+    "storage-io": null,
+    "containers-k8s": null,
+    "cloud": null,
+    "bigdata": null,
+    "ml-dl": 2,
+    "ml-systems": null,
+    "hpc-software-eng": null,
+    "energy": null,
+    "quantum-emerging": 1,
+    "viz": null,
+    "thesis-internship": 2,
+    "soft-skills": 1,
+    "resilience": null,
+    "observability-sre": null
+   },
+   "evidence": [
+    {
+     "claim": "Programme length and credits under the 2024 regulation",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "a minimum total of 120 ECTS credits",
+     "source": "web"
+    },
+    {
+     "claim": "Programme page still states the older 90 ECTS / 1.5 years",
+     "url": "https://ethz.ch/en/studies/master/degree-programmes/engineering-sciences/computational-science-and-engineering.html",
+     "quote": "90 ECTS | 1.5 years",
+     "source": "web"
+    },
+    {
+     "claim": "Programme focus includes HPC platforms",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "The focus is on mathematical modeling, numerical simulation, efficient implementation also on cutting-edge high-performance computing platforms",
+     "source": "web"
+    },
+    {
+     "claim": "Core course rule",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "two core courses with a total of at least 12 credit points have to be chosen from the list below",
+     "source": "web"
+    },
+    {
+     "claim": "Advanced Systems Lab is a core option (successor of How To Write Fast Numerical Code)",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "Advanced Systems Lab” has replaced the lecture on “How To Write Fast Numerical Scientific Computing",
+     "source": "web"
+    },
+    {
+     "claim": "HPC-specific elective in a field of application",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "High Performance Computing for Weather and Climate",
+     "source": "web"
+    },
+    {
+     "claim": "Thesis credits",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "30 ECTS credits are awarded for an accepted MSc thesis in CSE.",
+     "source": "web"
+    },
+    {
+     "claim": "Admission requirement for external applicants",
+     "url": "https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf",
+     "quote": "They have a Bachelor degree comprising at least 180 credit points (ECTS) from a university",
+     "source": "web"
+    }
+   ],
+   "confidence": "medium",
+   "notes": "Read: the ETH study guidelines PDF (Feb 2025) and the programme page. The ETH course catalogue (vvz) and the Advanced Systems Lab course site (acl.inf.ethz.ch) were unreachable, so course descriptions are not verified; topic_coverage is null wherever the guidelines do not name a course. HPC electives from D-INFK (e.g. parallel programming) are plausible but were not found in the guidelines. No machine access (CSCS/Alps) is stated on the pages read; therefore machines_access is empty rather than assumed. The programme page (90 ECTS) and guidelines (120 ECTS) disagree: guidelines say students who started before or in spring 2024 follow the older 90-ECTS rules."
+  }
+ ],
+ "ecosystem": [],
+ "blocked_sources": [
+  "https://acl.inf.ethz.ch/teaching/fastcode/2024/ - connection reset (Advanced Systems Lab course site)",
+  "https://www.lehrbetrieb.ethz.ch/Vorlesungsverzeichnis/lerneinheit.view?semkez=2025S&ansicht=GRUPPEN&lerneinheitId=189123&lang=en - ETH course catalogue 'application not available'",
+  "https://video.ethz.ch/lectures/d-infk/2024/spring/263-0007-00L.html - JS-only page, 0 characters of text"
+ ],
+ "verification": {
+  "status": "unverified",
+  "checked_claims": 0,
+  "corrected": 0,
+  "removed": 0,
+  "notes": ""
+ }
+}
