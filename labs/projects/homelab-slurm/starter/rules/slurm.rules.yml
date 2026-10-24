@@ -1,0 +1,13 @@
+# Thresholds are examples for a small lab cluster: calibrate them on yours.
+# TO COMPLETE (milestone 4): SlurmNodeUnhealthy, SlurmJobsPendingTooLong, SlurmSchedulerStuck — see the project page.
+groups:
+  - name: slurm
+    interval: 15s
+    rules:
+      - alert: SlurmExporterStale
+        expr: slurm_scrape_ok == 0 or absent(slurm_scrape_ok)
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "Slurm metrics are missing or stale"

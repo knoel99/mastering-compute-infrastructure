@@ -612,11 +612,13 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 
 ## Phase 5 — Production et leadership {#phase5}
 
-### Module 16 — Plateforme interne, sécurité, production et leadership (plan, 28 h) {#platform-leadership}
+### Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 28 h) {#platform-leadership}
 
 Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.
 
 **Prérequis :** module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).
+
+**Cours complet :** [Plateforme interne, sécurité, production et leadership](courses/platform-leadership/index.html).
 
 **Ce que vous saurez vérifier :**
 

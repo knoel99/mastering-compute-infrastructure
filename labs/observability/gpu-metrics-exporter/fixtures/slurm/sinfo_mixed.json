@@ -1,0 +1,55 @@
+{
+ "meta": {
+  "slurm": {
+   "version": {
+    "major": "23",
+    "micro": "4",
+    "minor": "11"
+   },
+   "release": "23.11.4",
+   "cluster": "sandbox"
+  },
+  "note": "sinfo --json captured on the author's Slurm 23.11.4 sandbox, reduced to the fields the exporter reads"
+ },
+ "sinfo": [
+  {
+   "partition": {
+    "name": "debug"
+   },
+   "node": {
+    "state": [
+     "MIXED"
+    ]
+   },
+   "nodes": {
+    "nodes": [
+     "vm"
+    ]
+   },
+   "cpus": {
+    "allocated": 3,
+    "idle": 1,
+    "other": 0,
+    "total": 4,
+    "minimum": 4,
+    "maximum": 4,
+    "load": {
+     "minimum": 34,
+     "maximum": 34
+    },
+    "per_node": {
+     "max": {
+      "set": false,
+      "infinite": true,
+      "number": 0
+     }
+    }
+   },
+   "reason": {
+    "description": "",
+    "time": 0,
+    "user": ""
+   }
+  }
+ ]
+}

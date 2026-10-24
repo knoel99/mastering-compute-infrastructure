@@ -1,0 +1,56 @@
+{
+ "meta": {
+  "slurm": {
+   "version": {
+    "major": "23",
+    "micro": "4",
+    "minor": "11"
+   },
+   "release": "23.11.4",
+   "cluster": "sandbox"
+  },
+  "note": "sinfo --json captured on the author's Slurm 23.11.4 sandbox, reduced to the fields the exporter reads"
+ },
+ "sinfo": [
+  {
+   "partition": {
+    "name": "debug"
+   },
+   "node": {
+    "state": [
+     "MIXED",
+     "DRAIN"
+    ]
+   },
+   "nodes": {
+    "nodes": [
+     "vm"
+    ]
+   },
+   "cpus": {
+    "allocated": 3,
+    "idle": 0,
+    "other": 1,
+    "total": 4,
+    "minimum": 4,
+    "maximum": 4,
+    "load": {
+     "minimum": 34,
+     "maximum": 34
+    },
+    "per_node": {
+     "max": {
+      "set": false,
+      "infinite": true,
+      "number": 0
+     }
+    }
+   },
+   "reason": {
+    "description": "health: gpu_xid:79",
+    "time": 1792864224,
+    "user": "root"
+   }
+  }
+ ]
+}

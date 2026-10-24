@@ -1,0 +1,178 @@
+{
+ "meta": {
+  "slurm": {
+   "version": {
+    "major": "23",
+    "micro": "4",
+    "minor": "11"
+   },
+   "release": "23.11.4",
+   "cluster": "sandbox"
+  },
+  "note": "squeue --json captured on the author's Slurm 23.11.4 sandbox while the node was draining, reduced to the fields the exporter reads"
+ },
+ "jobs": [
+  {
+   "job_id": 1,
+   "name": "train-llm",
+   "job_state": [
+    "RUNNING"
+   ],
+   "state_reason": "None",
+   "account": "research",
+   "partition": "debug",
+   "qos": "normal",
+   "user_name": "root",
+   "cpus": {
+    "set": true,
+    "infinite": false,
+    "number": 3
+   },
+   "submit_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864204
+   },
+   "start_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864205
+   }
+  },
+  {
+   "job_id": 2,
+   "name": "train-big",
+   "job_state": [
+    "PENDING"
+   ],
+   "state_reason": "Resources",
+   "account": "research",
+   "partition": "debug",
+   "qos": "normal",
+   "user_name": "root",
+   "cpus": {
+    "set": true,
+    "infinite": false,
+    "number": 3
+   },
+   "submit_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864204
+   },
+   "start_time": {
+    "set": true,
+    "infinite": false,
+    "number": 0
+   }
+  },
+  {
+   "job_id": 3,
+   "name": "eval",
+   "job_state": [
+    "PENDING"
+   ],
+   "state_reason": "Priority",
+   "account": "research",
+   "partition": "debug",
+   "qos": "normal",
+   "user_name": "root",
+   "cpus": {
+    "set": true,
+    "infinite": false,
+    "number": 1
+   },
+   "submit_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864204
+   },
+   "start_time": {
+    "set": true,
+    "infinite": false,
+    "number": 0
+   }
+  },
+  {
+   "job_id": 4,
+   "name": "held",
+   "job_state": [
+    "PENDING"
+   ],
+   "state_reason": "JobHeldUser",
+   "account": "research",
+   "partition": "debug",
+   "qos": "normal",
+   "user_name": "root",
+   "cpus": {
+    "set": true,
+    "infinite": false,
+    "number": 1
+   },
+   "submit_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864204
+   },
+   "start_time": {
+    "set": true,
+    "infinite": false,
+    "number": 0
+   }
+  },
+  {
+   "job_id": 5,
+   "name": "post",
+   "job_state": [
+    "PENDING"
+   ],
+   "state_reason": "Dependency",
+   "account": "research",
+   "partition": "debug",
+   "qos": "normal",
+   "user_name": "root",
+   "cpus": {
+    "set": true,
+    "infinite": false,
+    "number": 1
+   },
+   "submit_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864204
+   },
+   "start_time": {
+    "set": true,
+    "infinite": false,
+    "number": 0
+   }
+  },
+  {
+   "job_id": 6,
+   "name": "quick",
+   "job_state": [
+    "PENDING"
+   ],
+   "state_reason": "Priority",
+   "account": "research",
+   "partition": "debug",
+   "qos": "normal",
+   "user_name": "root",
+   "cpus": {
+    "set": true,
+    "infinite": false,
+    "number": 1
+   },
+   "submit_time": {
+    "set": true,
+    "infinite": false,
+    "number": 1792864204
+   },
+   "start_time": {
+    "set": true,
+    "infinite": false,
+    "number": 0
+   }
+  }
+ ]
+}

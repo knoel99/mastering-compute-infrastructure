@@ -1,0 +1,11 @@
+# Deliberately bad rules: lint_rules.py must reject this file (verify.sh checks that it does).
+groups:
+  - name: bad
+    rules:
+      - alert: GPUTooHot
+        expr: DCGM_FI_DEV_GPU_TMEP > 85
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "hot"

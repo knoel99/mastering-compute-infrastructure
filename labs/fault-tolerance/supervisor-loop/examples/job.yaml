@@ -1,0 +1,30 @@
+# Kubernetes Job whose pod-failure policy separates "the code is wrong" from "the node went away"
+# (NOT executed in the course sandbox: there is no cluster). Schema checked offline only for YAML syntax.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train-worker
+spec:
+  backoffLimit: 6
+  podFailurePolicy:
+    rules:
+      - action: FailJob            # exit code 2 = configuration error: do not retry
+        onExitCodes:
+          containerName: trainer
+          operator: In
+          values: [2]
+      - action: Ignore             # node drain / preemption: do not count against backoffLimit
+        onPodConditions:
+          - type: DisruptionTarget
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: trainer
+          image: registry.example.com/train:latest   # placeholder image
+          command: ["python", "train.py", "--ckpt-dir", "/ckpt", "--resume", "latest"]
+          volumeMounts:
+            - {name: ckpt, mountPath: /ckpt}
+      volumes:
+        - name: ckpt
+          persistentVolumeClaim: {claimName: ckpt}

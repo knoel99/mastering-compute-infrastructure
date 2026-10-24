@@ -1,0 +1,36 @@
+# Thresholds are examples for a small lab cluster: calibrate them on yours.
+groups:
+  - name: slurm
+    interval: 15s
+    rules:
+      - alert: SlurmExporterStale
+        expr: slurm_scrape_ok == 0 or absent(slurm_scrape_ok)
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "Slurm metrics are missing or stale"
+
+      - alert: SlurmNodeUnhealthy
+        expr: slurm_node_unhealthy == 1
+        for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "node {{ $labels.node }} unhealthy: {{ $labels.reason }}"
+
+      - alert: SlurmJobsPendingTooLong
+        expr: slurm_job_max_pending_seconds > 3600
+        for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "jobs in partition {{ $labels.partition }} have waited more than an hour"
+
+      - alert: SlurmSchedulerStuck
+        expr: sum(slurm_jobs{state="PENDING"}) > 0 and sum(slurm_jobs{state="RUNNING"}) == 0 and sum(slurm_nodes{state="idle"}) > 0
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "jobs are pending, none runs and nodes are idle: read the pending reasons (InvalidAccount?)"

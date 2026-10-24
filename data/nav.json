@@ -57,6 +57,14 @@
    "label": "Module 14 — Observabilité et fiabilité d'une flotte GPU"
   },
   {
+   "href": "courses/platform-leadership/index.html",
+   "label": "Module 16 — Plateforme interne, sécurité, production et leadership"
+  },
+  {
+   "href": "projects/homelab-slurm/index.html",
+   "label": "Projet 1 — Mini-cluster Slurm instrumenté"
+  },
+  {
    "href": "projects/scaling-study/index.html",
    "label": "Projet 2 — Étude de passage à l'échelle d'un entraînement"
   },

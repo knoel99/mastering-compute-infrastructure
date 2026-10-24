@@ -1,0 +1,22 @@
+# What histogram_quantile makes of the six REAL queue waits captured on a Slurm 23.11.4 sandbox (1, 2, 5, 8, 12, 17 s).
+# The bucket counts below are the ones lab 14.1 exposes for fixtures/slurm/sacct.txt.
+# Exact values (Python, numpy): median 6.5 s, 90th percentile 14.5 s (linear interpolation) or 17 s (nearest rank).
+# Prometheus can only interpolate inside a bucket: with buckets at 10 and 30 s it answers 24 s for the 90th percentile.
+rule_files: []
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - {series: 'slurm_job_wait_seconds_bucket{le="10.0",qos="normal"}', values: '4x5'}
+      - {series: 'slurm_job_wait_seconds_bucket{le="30.0",qos="normal"}', values: '6x5'}
+      - {series: 'slurm_job_wait_seconds_bucket{le="60.0",qos="normal"}', values: '6x5'}
+      - {series: 'slurm_job_wait_seconds_bucket{le="300.0",qos="normal"}', values: '6x5'}
+      - {series: 'slurm_job_wait_seconds_bucket{le="600.0",qos="normal"}', values: '6x5'}
+      - {series: 'slurm_job_wait_seconds_bucket{le="+Inf",qos="normal"}', values: '6x5'}
+    promql_expr_test:
+      - expr: round(histogram_quantile(0.5, sum by (le) (slurm_job_wait_seconds_bucket)), 0.001)
+        eval_time: 2m
+        exp_samples: [{labels: '{}', value: 7.5}]
+      - expr: round(histogram_quantile(0.9, sum by (le) (slurm_job_wait_seconds_bucket)), 0.001)
+        eval_time: 2m
+        exp_samples: [{labels: '{}', value: 24}]

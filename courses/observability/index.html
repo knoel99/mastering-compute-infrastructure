@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Observabilité et fiabilité d'une flotte GPU — Mastering Compute Infrastructure</title>
+<meta name="description" content="Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques DCGM, Prometheus, journaux, files d'attente Slurm, SLO de plateforme, goodput et détection de pannes silencieuses.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">Observabilité et fiabilité d'une flotte GPU</h1>
+<p class="subtitle">Module 14 · Phase 4 · 24 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable (sans GPU)</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> votre job de 512 GPU n'avance plus depuis vingt minutes, et personne ne le sait. Combien de temps faudra-t-il pour s'en apercevoir, pour trouver le rang fautif et pour relancer l'entraînement ? Sans observabilité, la réponse honnête est « jusqu'à ce qu'un chercheur se plaigne ». Avec elle, elle se compte en minutes.</p>
+<p>Ce module apprend à instrumenter une flotte GPU, à définir ce qu'on promet à ses utilisateurs (des objectifs de niveau de service, ou <em>SLO</em>), à détecter les pannes <strong>silencieuses</strong> et à relier une régression de courbe à sa cause, qu'elle vienne du matériel ou du modèle. Vous connaissez déjà Prometheus, Grafana et Terraform : ce module ne les réexplique pas. Il traite ce qui change quand la charge est un entraînement distribué synchrone sur du matériel qui tombe en panne sans bruit.</p>
+<p>Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriques GPU y sont <strong>simulées</strong> et étiquetées comme telles ; les captures de Slurm, de <code>promtool</code>, de <code>faulthandler</code> et de MLflow sont réelles et datées.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Une alerte est une promesse faite à une personne endormie : elle doit signaler un problème réel, que cette personne peut traiter, au bon moment. Chaque alerte de ce module est donc écrite avec trois choses : la durée avant laquelle elle se déclenche, le cas qui la fait taire, et le test qui prouve les deux.</p>
+</div>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>24 h, dont environ 9 h de lecture, 10 h de labs et 5 h d'exercices</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>2 : Kubernetes, Prometheus et Grafana maîtrisés ; Slurm vu au module 5</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a>, <a href="../slurm/index.html">Module 5 — Slurm</a></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : l'outillage Prometheus est acquis, la sémantique GPU, la détection de blocages et les SLO de calcul ne le sont pas</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un exportateur testé, des règles d'alerte testées par promtool et par mutation, un détecteur de blocage dont vous connaissez les fausses alarmes</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>un portable ou une VM Linux, <strong>sans GPU</strong> ; <code>promtool</code> (paquet apt <code>prometheus</code>), Python avec <code>prometheus_client</code>, <code>torch</code> CPU, <code>pytest</code>, <code>pyyaml</code> ; Slurm du module 5 pour la branche en direct</td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et pannes silencieuses</a>, <a href="../../projects/homelab-slurm/index.html">Projet 1 — Mini-cluster Slurm instrumenté</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Dire ce qu'une métrique GPU mesure vraiment, en particulier pourquoi <code>DCGM_FI_DEV_GPU_UTIL</code> ne dit pas si le GPU travaille (chapitres 1 et 2).</li>
+<li>Dimensionner un Prometheus pour une flotte (séries, échantillons, disque) et empêcher l'explosion de cardinalité (chapitre 3).</li>
+<li>Retrouver le rang fautif d'un job bloqué à partir des journaux et d'une trace de piles (chapitre 4).</li>
+<li>Exporter l'état d'une file Slurm avec des étiquettes bornées et en tirer un délai d'attente honnête (chapitre 5).</li>
+<li>Calculer un budget d'erreur, écrire une alerte à fenêtres multiples et la tester (chapitre 6).</li>
+<li>Mesurer le compromis entre fausses alarmes et délai de détection d'un blocage (chapitre 7).</li>
+<li>Distinguer, avec des métriques jointes dans MLflow, une régression du système d'une régression du modèle (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Dix séances, soit 24 h. Le niveau ne diminue jamais d'une séance à la suivante.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>2.5 h</td>
+<td>1</td>
+<td>ch. 1 Ce qu'on observe, le piège des moyennes</td>
+<td>Questions de positionnement ; Ex. 1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 2 Métriques GPU : DCGM</td>
+<td>Ex. 2</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 3 Prometheus et Grafana pour le calcul</td>
+<td>Lab 14.1 partie A ; Ex. 3</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>2 h</td>
+<td>2</td>
+<td>ch. 4 Journaux et traces</td>
+<td>Lecture de la partie B du lab 14.3 ; Ex. 4</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 5 Observabilité des ordonnanceurs</td>
+<td>Lab 14.1 partie B (Slurm) ; Ex. 5</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 6 SLO de plateforme et goodput</td>
+<td>Lab 14.2 première moitié ; Ex. 6</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 Pannes silencieuses</td>
+<td>Lab 14.2 mutation ; Ex. 7, 8</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>3 h</td>
+<td>3</td>
+<td>Lab 14.3 parties A et B</td>
+<td>Ex. 9</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>2 h</td>
+<td>3</td>
+<td>ch. 8 Suivi d'expériences et reproductibilité</td>
+<td>Lab 14.3 partie C ; Ex. 10</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>1.5 h</td>
+<td>3</td>
+<td>Checkpoint de sortie, démarrage du Projet 5</td>
+<td>Reprise de l'exercice 9</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module 15.</p>
+<ol type="1">
+<li><p><strong>Utilisation.</strong> Un GPU affiche 100 % d'utilisation (<code>GPU_UTIL</code>). Que pouvez-vous en conclure sur son travail utile ?</p></li>
+<li><p><strong>Moyennes.</strong> Un job de 64 GPU dont un seul GPU est ralenti affiche une fréquence moyenne quasi normale. Pourquoi cette moyenne est-elle le mauvais indicateur, et lequel la remplace ?</p></li>
+<li><p><strong>Étiquettes.</strong> Pourquoi ne pas ajouter l'identifiant du job comme étiquette sur chaque métrique GPU ?</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p>Presque rien. Selon la documentation de <code>nvidia-smi</code>, cette valeur est le pourcentage de temps, sur la période d'échantillonnage, pendant lequel <strong>un ou plusieurs noyaux</strong> s'exécutaient sur le GPU. Un seul noyau minuscule suffit à la rendre égale à 100 %. Voir le chapitre 2.</p></li>
+<li><p>Dans un entraînement synchrone, chaque étape attend le rang le plus lent : c'est le <strong>minimum</strong> (ou le maximum du temps de calcul) qui compte, pas la moyenne. Il faut surveiller les extrêmes et l'écart à la médiane. Voir les chapitres 1 et 7.</p></li>
+<li><p>Parce que chaque nouvelle valeur d'étiquette crée de nouvelles séries : un identifiant de job change à chaque job et fait grossir l'index. La documentation de Prometheus déconseille les étiquettes à forte cardinalité. On joint le job au moment de la requête. Voir le chapitre 3.</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. Ce qu'on observe</h2>
+<p>Avant de choisir un outil, il faut savoir quelles questions on veut pouvoir poser à la flotte, et à quelle couche chaque réponse se trouve. Ce chapitre pose le cadre et démonte le premier piège du métier : croire une moyenne.</p>
+<h3 id="cinq-couches-une-clé-de-corrélation">1.1. Cinq couches, une clé de corrélation</h3>
+<p>Une flotte d'entraînement se lit en cinq couches. Chacune a sa source, son rythme et ses pannes typiques.</p>
+<ul>
+<li><strong>Le modèle et l'entraîneur</strong> : perte, pas d'optimisation, tokens par seconde, durée des étapes. C'est la seule couche qui sait si le travail avance.</li>
+<li><strong>Les GPU</strong> : fréquences, température, puissance, mémoire, erreurs matérielles, activité des unités de calcul (DCGM, chapitre 2).</li>
+<li><strong>Le nœud</strong> : processeur, mémoire, disque, noyau, réseau. Les erreurs matérielles apparaissent aussi dans le journal du noyau.</li>
+<li><strong>Le réseau et le stockage</strong> : compteurs d'erreurs des cartes, débit de lecture des données, latence d'écriture des points de contrôle.</li>
+<li><strong>L'ordonnanceur</strong> : files, états des nœuds, jobs en attente ou en échec (chapitre 5).</li>
+</ul>
+<figure class="fig">
+<svg viewBox="0 0 680 290" role="img" aria-labelledby="f1-t f1-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="f1-t">
+Cinq sources, deux magasins, un chemin vers l'astreinte
+</title>
+<desc id="f1-d">Les métriques de l'entraîneur, des GPU, des nœuds et de l'ordonnanceur vont dans Prometheus ; les journaux vont dans Loki. Prometheus évalue des règles et envoie les alertes à Alertmanager, qui prévient l'astreinte. Les exécutions sont suivies dans MLflow.</desc> <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs> <rect x="8" y="14" width="190" height="42" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="18" y="32" font-size="13" font-weight="700" fill="currentColor">Entraîneur</text> <text x="18" y="48" font-size="11" fill="currentColor">pas, perte, tokens/s</text> <line x1="198" y1="35" x2="262" y2="70" stroke="currentColor" stroke-opacity=".6" marker-end="url(#ar)"/> <rect x="8" y="66" width="190" height="42" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="18" y="84" font-size="13" font-weight="700" fill="currentColor">GPU</text> <text x="18" y="100" font-size="11" fill="currentColor">DCGM : util., tensor, XID</text> <line x1="198" y1="87" x2="262" y2="70" stroke="currentColor" stroke-opacity=".6" marker-end="url(#ar)"/> <rect x="8" y="118" width="190" height="42" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="18" y="136" font-size="13" font-weight="700" fill="currentColor">Nœud</text> <text x="18" y="152" font-size="11" fill="currentColor">noyau, disque, réseau</text> <line x1="198" y1="139" x2="262" y2="70" stroke="currentColor" stroke-opacity=".6" marker-end="url(#ar)"/> <rect x="8" y="170" width="190" height="42" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="18" y="188" font-size="13" font-weight="700" fill="currentColor">Ordonnanceur</text> <text x="18" y="204" font-size="11" fill="currentColor">Slurm, Kubernetes</text> <line x1="198" y1="191" x2="262" y2="70" stroke="currentColor" stroke-opacity=".6" marker-end="url(#ar)"/> <rect x="8" y="222" width="190" height="42" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="18" y="240" font-size="13" font-weight="700" fill="currentColor">Journaux</text> <text x="18" y="256" font-size="11" fill="currentColor">rangs, noyau, Slurm</text> <line x1="198" y1="243" x2="262" y2="205" stroke="currentColor" stroke-opacity=".6" marker-end="url(#ar)"/> <rect x="264" y="40" width="130" height="64" rx="6" fill="none" stroke="var(--accent)" stroke-width="2.5"/> <text x="329" y="66" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Prometheus</text> <text x="329" y="84" text-anchor="middle" font-size="11" fill="currentColor">séries, règles</text> <rect x="264" y="178" width="130" height="54" rx="6" fill="none" stroke="var(--accent)" stroke-width="2.5"/> <text x="329" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Loki</text> <text x="329" y="220" text-anchor="middle" font-size="11" fill="currentColor">lignes, flux</text> <line x1="394" y1="72" x2="458" y2="72" stroke="currentColor" marker-end="url(#ar)"/> <rect x="460" y="40" width="150" height="64" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="535" y="66" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Alertmanager</text> <text x="535" y="84" text-anchor="middle" font-size="11" fill="currentColor">groupes, silences</text> <line x1="535" y1="104" x2="535" y2="140" stroke="currentColor" marker-end="url(#ar)"/> <rect x="460" y="142" width="150" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="535" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Astreinte</text> <line x1="394" y1="205" x2="458" y2="205" stroke="currentColor" stroke-opacity=".6" stroke-dasharray="5 4" marker-end="url(#ar)"/> <rect x="460" y="188" width="150" height="40" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4"/> <text x="535" y="213" text-anchor="middle" font-size="12" fill="currentColor">enquête (corrélation)</text> <text x="340" y="278" text-anchor="middle" font-size="12" fill="currentColor">La clé de corrélation commune : l'identifiant du job et le nom du nœud.</text>
+</svg>
+<figcaption>
+Les sources et leurs deux magasins. Les métriques servent à alerter, les journaux à comprendre. La jointure se fait sur le job et le nœud, pas dans les étiquettes de chaque série.
+</figcaption>
+</figure>
+<p>La difficulté n'est pas de collecter, c'est de <strong>relier</strong>. Un entraînement ralenti se manifeste dans la couche du modèle (tokens par seconde en baisse), son origine dans une autre (un GPU qui chauffe), et la décision dans une troisième (drainer le nœud dans Slurm). La clé commune est le couple « job, nœud » : tout le module revient sur la façon de la porter sans exploser le nombre de séries.</p>
+<h3 id="métriques-journaux-traces">1.2. Métriques, journaux, traces</h3>
+<p>Les trois formes de données répondent à trois questions différentes.</p>
+<ol type="1">
+<li><strong>Les métriques</strong> sont des séries numériques échantillonnées à intervalle fixe. Elles sont compactes, agrégeables, et servent à <strong>alerter</strong> : « combien, à quelle vitesse, depuis quand ».</li>
+<li><strong>Les journaux</strong> (<em>logs</em>) sont des événements textuels horodatés. Ils sont volumineux et coûteux à indexer, et servent à <strong>comprendre</strong> : « que s'est-il passé sur ce rang à cet instant ».</li>
+<li><strong>Les traces</strong> décomposent une opération en étapes imbriquées (des <em>spans</em>). Pour un entraînement, une étape se découpe en chargement des données, calcul, communication et écriture ; la trace dit où le temps passe.</li>
+</ol>
+<p>Une règle pratique : alertez sur des métriques, enquêtez dans les journaux, optimisez avec des traces. Inverser l'ordre coûte cher : une alerte fondée sur une recherche de texte dans des téraoctets de journaux est lente et fragile.</p>
+<h3 id="le-piège-de-la-moyenne">1.3. Le piège de la moyenne</h3>
+<p>Dans un entraînement synchrone, chaque étape se termine quand le rang le plus lent a fini. La fréquence moyenne des GPU, la température moyenne ou l'utilisation moyenne de la flotte sont donc des indicateurs <strong>aveugles à l'unique GPU qui compte</strong>.</p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Un GPU sur 64 à 60 % de sa fréquence</span> Un job occupe 64 GPU ; 63 tournent à 1 980 MHz et un seul à 1 188 MHz (60 %), par exemple à cause d'une limitation thermique. Les valeurs sont celles d'un calcul, pas d'une mesure.</p>
+<p>La fréquence moyenne est <span class="math inline">(63 \times 1980 + 1188)/64 = 1\,967{,}6</span> MHz : elle ne baisse que de 0,62 %. Elle donne l'impression que tout va bien.</p>
+<p>Supposons que 80 % d'une étape soit du calcul proportionnel à la fréquence et 20 % de la communication. Le rang lent allonge le calcul de <span class="math inline">1/0{,}6</span>, et tous les autres l'attendent :</p>
+<p><span class="math display">\text{durée relative d&#39;une étape} = 0{,}2 + \frac{0{,}8}{0{,}6} = 1{,}533</span></p>
+<p>Le débit tombe à <span class="math inline">1/1{,}533 = 65{,}2\ \%</span> de la normale : l'équivalent de 22,3 GPU sur 64 est perdu, alors que la moyenne est inchangée. Surveiller le <strong>minimum</strong> de la fréquence (ou le rapport minimum sur médiane) aurait montré 0,60 tout de suite. C'est exactement ce que calcule la métrique <code>gpu_node_sm_clock_min_over_median_ratio</code> du lab 14.1.</p>
+</div>
+<p>La même logique vaut pour tout agrégat : une moyenne lisse l'événement rare, qui est précisément ce qu'on cherche. Préférez le minimum, le maximum, un percentile ou le nombre d'éléments hors norme.</p>
+<h3 id="la-résolution-du-temps">1.4. La résolution du temps</h3>
+<p>Un événement plus court que l'intervalle d'échantillonnage peut passer entre deux mesures. Un échantillonnage toutes les 15 s voit un événement de 3 s avec une probabilité de <span class="math inline">3/15 = 20\ \%</span> (si les instants sont indépendants).</p>
+<p>Et l'exportateur de GPU a son propre rythme : la documentation de dcgm-exporter donne un intervalle de collecte par défaut de 30 000 ms. Prometheus qui grattera (<em>scrape</em>) toutes les 15 s relira donc chaque valeur deux fois, et la résolution réelle est celle du plus lent des deux. Pour un événement de 3 s, la probabilité d'être vu tombe à 10 %.</p>
+<div class="note">
+<p><span class="tag">Compter plutôt qu'échantillonner</span> Pour ne rien rater, on préfère les <strong>compteurs</strong> (erreurs, événements de limitation, énergie) aux jauges : un compteur garde la trace de ce qui s'est passé entre deux scrapes, une jauge non. Cette distinction fonde le choix des métriques au chapitre 2.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li>Cinq couches : modèle, GPU, nœud, réseau et stockage, ordonnanceur. La clé de corrélation est le couple job et nœud.</li>
+<li>Alertez sur des métriques, enquêtez dans les journaux, optimisez avec des traces.</li>
+<li>En synchrone, le rang le plus lent fixe le rythme : surveillez les extrêmes, pas la moyenne.</li>
+<li>Un événement plus court que l'intervalle d'échantillonnage peut être manqué ; préférez les compteurs aux jauges.</li>
+</ul>
+</div>
+<h2 id="ch2">2. Métriques GPU : DCGM et dcgm-exporter</h2>
+<p>NVIDIA fournit un gestionnaire de GPU de centre de données, DCGM, et un exportateur qui publie ses mesures au format Prometheus. Ce chapitre explique ce qu'ils exposent, avec une attention particulière aux métriques qu'on lit mal.</p>
+<h3 id="dcgm-et-son-exportateur">2.1. DCGM et son exportateur</h3>
+<p>DCGM (<em>Data Center GPU Manager</em>) tourne comme un service (<code>nv-hostengine</code>) qui interroge les GPU. <code>dcgm-exporter</code> l'embarque et publie ses mesures sur HTTP. D'après la documentation de NVIDIA lue le 24 octobre 2026, l'exportateur écoute par défaut sur le port 9400, collecte toutes les 30 000 ms, et active la correspondance entre GPU et pods Kubernetes avec l'option <code>-k</code>.</p>
+<p>Sa liste de métriques par défaut est le fichier <code>etc/default-counters.csv</code> du dépôt : 25 métriques par GPU et une étiquette statique (la version du pilote) dans la version lue ce jour. Les étiquettes de chaque série comprennent <code>gpu</code>, <code>UUID</code>, <code>device</code> et <code>Hostname</code>.</p>
+<p>Un point qui concerne Slurm : DCGM ne sait rien des jobs. Le code source de dcgm-exporter contient une option <code>--hpc-job-mapping-dir</code> (variable <code>DCGM_HPC_JOB_MAPPING_DIR</code>), décrite comme le chemin d'un répertoire de fichiers de correspondance entre GPU et jobs. Le format de ces fichiers n'a pas été relu pour ce module (voir « À vérifier »). Sans cette option, il faut produire soi-même la jointure, comme le font le lab 14.1 et le projet 5.</p>
+<h3 id="les-familles-de-métriques">2.2. Les familles de métriques</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Famille</th>
+<th>Exemples de la liste par défaut</th>
+<th>Type</th>
+<th>Sert à</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Horloges</td>
+<td><code>DCGM_FI_DEV_SM_CLOCK</code>, <code>MEM_CLOCK</code></td>
+<td>jauge</td>
+<td>repérer une limitation de fréquence</td>
+</tr>
+<tr class="even">
+<td>Température, puissance</td>
+<td><code>GPU_TEMP</code>, <code>MEMORY_TEMP</code>, <code>POWER_USAGE</code></td>
+<td>jauge</td>
+<td>chauffe, consommation</td>
+</tr>
+<tr class="odd">
+<td>Énergie</td>
+<td><code>TOTAL_ENERGY_CONSUMPTION</code></td>
+<td>compteur (mJ)</td>
+<td>coût énergétique d'un job</td>
+</tr>
+<tr class="even">
+<td>Utilisation</td>
+<td><code>GPU_UTIL</code>, <code>MEM_COPY_UTIL</code></td>
+<td>jauge</td>
+<td>présence de noyaux (voir 2.3)</td>
+</tr>
+<tr class="odd">
+<td>Profil</td>
+<td><code>PROF_GR_ENGINE_ACTIVE</code>, <code>PROF_PIPE_TENSOR_ACTIVE</code>, <code>PROF_DRAM_ACTIVE</code></td>
+<td>jauge</td>
+<td>intensité réelle du calcul</td>
+</tr>
+<tr class="even">
+<td>Mémoire</td>
+<td><code>FB_USED</code>, <code>FB_FREE</code></td>
+<td>jauge (MiB)</td>
+<td>risque de saturation</td>
+</tr>
+<tr class="odd">
+<td>Erreurs</td>
+<td><code>XID_ERRORS</code>, <code>UNCORRECTABLE_REMAPPED_ROWS</code>, <code>ROW_REMAP_FAILURE</code></td>
+<td>jauge</td>
+<td>santé matérielle</td>
+</tr>
+<tr class="even">
+<td>Bus</td>
+<td><code>PCIE_REPLAY_COUNTER</code>, <code>PROF_PCIE_TX_BYTES</code></td>
+<td>compteur, jauge</td>
+<td>liaisons dégradées</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Les métriques du groupe « profil » portent un commentaire dans le fichier : elles sont prises en charge sur les GPU de centre de données de génération Volta ou plus récente. Sur d'autres GPU, elles sont absentes : une règle qui en dépend doit gérer ce cas.</p>
+<div class="note">
+<p><span class="tag">Une jauge qui ressemble à un compteur</span> <code>DCGM_FI_DEV_XID_ERRORS</code> est une <strong>jauge</strong> dont le texte d'aide dit « valeur de la dernière erreur XID rencontrée ». Elle ne compte pas les erreurs : elle reste non nulle jusqu'à la réinitialisation du GPU, et un <code>rate()</code> dessus n'a aucun sens. Une règle correcte teste <code>&gt; 0</code> et la durée <code>for</code> évite les rebonds. Le projet 5 en fait un test.</p>
+</div>
+<h3 id="ce-que-lutilisation-gpu-ne-dit-pas">2.3. Ce que l'utilisation GPU ne dit pas</h3>
+<p>La documentation de <code>nvidia-smi</code> définit l'utilisation du GPU ainsi : « pourcentage de temps, sur la période d'échantillonnage écoulée, pendant lequel un ou plusieurs noyaux s'exécutaient sur le GPU », avec une période comprise entre 1 s et 1/6 s selon le produit. Rien n'est dit de la quantité de travail : un noyau qui occupe un seul multiprocesseur compte autant qu'un noyau qui les occupe tous.</p>
+<p>La documentation de DCGM décrit les métriques de profil, plus fines, en termes de cycles :</p>
+<ul>
+<li><code>PROF_GR_ENGINE_ACTIVE</code> : la fraction du temps où une partie du moteur graphique ou de calcul est active.</li>
+<li><code>PROF_SM_ACTIVE</code> : la fraction du temps où au moins un <em>warp</em> est actif sur un multiprocesseur, moyennée sur tous. Un <em>warp</em> en attente de la mémoire compte comme actif.</li>
+<li><code>PROF_PIPE_TENSOR_ACTIVE</code> : la fraction des cycles où l'unité de calcul matriciel (HMMA ou IMMA) est active.</li>
+</ul>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Deux noyaux à 100 % d'utilisation</span> La documentation de DCGM donne deux cas qui produisent le <strong>même</strong> <code>SM_ACTIVE</code> de 0,2 : un noyau qui lance <span class="math inline">N/5</span> blocs sur un GPU à <span class="math inline">N</span> multiprocesseurs pendant tout l'intervalle, ou un noyau qui lance <span class="math inline">N</span> blocs pendant un cinquième de l'intervalle, les multiprocesseurs restant sinon inactifs.</p>
+<p>Dans le premier cas, des noyaux s'exécutent tout le temps : <code>GPU_UTIL</code> vaut 100 %. Dans le second, un noyau s'exécute un cinquième du temps : <code>GPU_UTIL</code> vaut 20 %. Mais dans le premier cas, 80 % des multiprocesseurs sont inactifs en permanence. Deux GPU affichant 100 % d'utilisation peuvent donc différer d'un facteur 5 dans le travail effectué.</p>
+<p>La même documentation précise qu'une valeur de <code>SM_ACTIVE</code> de 0,8 ou plus est « nécessaire mais pas suffisante » pour un usage efficace, et qu'une valeur inférieure à 0,5 indique probablement un usage inefficace. Pour <code>TENSOR_ACTIVE</code>, 0,2 peut signifier 20 % des multiprocesseurs à pleine charge, ou tous à 20 %, ou toute combinaison intermédiaire.</p>
+</div>
+<p>Conséquence pour l'exploitation : l'utilisation GPU sert à détecter un GPU <strong>réservé et inactif</strong> (zéro prolongé), jamais à prouver que l'entraînement est sain. Un entraînement bloqué dans une communication collective peut, selon des témoignages d'utilisateurs, garder des noyaux d'attente en boucle et afficher une utilisation élevée avec une activité tensorielle nulle ; cette signature est une <strong>hypothèse</strong> utilisée par ce cours et par le projet 5, non une mesure faite ici. Elle est à valider sur vos GPU.</p>
+<h3 id="lire-un-scrape">2.4. Lire un scrape</h3>
+<p>Voici les lignes de la fixture du lab 14.1 qui correspondent aux trois GPU en difficulté. La fixture est <strong>simulée</strong> (aucun GPU) mais reprend les noms et le format de dcgm-exporter.</p>
+<pre class="text"><code>DCGM_FI_DEV_GPU_TEMP{gpu=&quot;3&quot;,UUID=&quot;GPU-sim-gpu-n01-3&quot;,device=&quot;nvidia3&quot;,modelName=&quot;SIM-GPU 80GB&quot;,Hostname=&quot;gpu-n01&quot;} 88
+DCGM_FI_DEV_SM_CLOCK{gpu=&quot;3&quot;,...} 1190
+DCGM_FI_DEV_GPU_UTIL{gpu=&quot;5&quot;,...} 99
+DCGM_FI_PROF_PIPE_TENSOR_ACTIVE{gpu=&quot;5&quot;,...} 0
+DCGM_FI_DEV_POWER_USAGE{gpu=&quot;5&quot;,...} 255
+DCGM_FI_DEV_XID_ERRORS{gpu=&quot;6&quot;,...} 79</code></pre>
+<p>Le GPU 3 est chaud et ralenti : un traînard thermique. Le GPU 5 a une utilisation de 99 %, une puissance nettement sous la normale (255 W contre environ 620 W) et un tensor à zéro : la signature du blocage supposée plus haut. Le GPU 6 a rapporté un code XID 79. Le catalogue XID de NVIDIA l'associe à « GPU has fallen off the bus » : le GPU n'est plus joignable sur le bus, ce qui impose en général une intervention sur le nœud.</p>
+<p>Les codes 94 et 95 du même catalogue concernent les GPU qui isolent les erreurs mémoire (à partir des A100) : le 94 reste confiné à une application, qu'il faut relancer, le 95 touche plusieurs applications et impose de réinitialiser le GPU.</p>
+<div class="note">
+<p><span class="tag"><code>promtool</code> refuse le format de dcgm-exporter</span> Sur le bac à sable (promtool 2.45.3, le 24 octobre 2026), <code>promtool check metrics</code> appliqué à un scrape au format de dcgm-exporter échoue avec le code de sortie 3 et un message par série du type « label names should be written in 'snake_case' not 'camelCase' », à cause des étiquettes <code>modelName</code> et <code>Hostname</code>.</p>
+<p>Ce n'est pas une erreur de l'exposition mais une règle de style que les étiquettes d'un fournisseur ne respectent pas. Conséquence : ne mettez pas ce lint en barrière sur la sortie d'un exportateur tiers, et gardez des noms conformes pour vos propres métriques (le lab 14.1 passe le lint). Source : sortie réelle de <code>promtool</code>, relevée par l'auteur.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li>dcgm-exporter publie par défaut sur le port 9400, collecte toutes les 30 s ; sa liste par défaut compte 25 métriques par GPU.</li>
+<li><code>GPU_UTIL</code> mesure la présence de noyaux, pas le travail ; les métriques de profil (<code>SM_ACTIVE</code>, <code>TENSOR_ACTIVE</code>) sont plus informatives mais ne disent pas tout.</li>
+<li><code>XID_ERRORS</code> est une jauge du dernier code, non un compteur ; le XID 79 est « GPU has fallen off the bus ».</li>
+<li>DCGM ne connaît pas les jobs : la jointure avec Slurm est à votre charge.</li>
+<li>La signature « utilisation haute, tensor nul » d'un blocage est une hypothèse à valider sur votre matériel.</li>
+</ul>
+</div>
+<h2 id="ch3">3. Prometheus et Grafana pour le calcul</h2>
+<p>Vous connaissez Prometheus. Ce chapitre ne reprend que ce qui change pour une flotte d'entraînement : le dimensionnement chiffré, la cardinalité des jobs, les règles d'enregistrement, et les cas où le modèle « on gratte des services qui vivent longtemps » ne tient pas.</p>
+<h3 id="dimensionner-avant-de-déployer">3.1. Dimensionner avant de déployer</h3>
+<p>La documentation de Prometheus donne une formule de planification et un ordre de grandeur : un échantillon occupe en moyenne <strong>1 à 2 octets</strong> sur disque, et</p>
+<p><span class="math display">\text{disque} = \text{rétention (s)} \times \text{échantillons par seconde} \times \text{octets par échantillon}</span></p>
+<p>La rétention par défaut est de 15 jours si aucune durée ni taille n'est donnée. Les échantillons sont regroupés en blocs de deux heures, compactés ensuite. Le disque n'est pas le seul coût : la mémoire dépend du nombre de séries actives, qu'il faut mesurer chez vous plutôt que d'en croire une règle générale.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — 1 024 GPU, 25 métriques, 15 secondes</span> Une flotte de 128 nœuds de 8 GPU, avec la liste par défaut de dcgm-exporter (25 métriques par GPU), donne <span class="math inline">1024 \times 25 = 25\,600</span> séries. Gratté toutes les 15 s, cela fait <span class="math inline">25\,600/15 = 1\,707</span> échantillons par seconde.</p>
+<p>Sur 15 jours (<span class="math inline">1\,296\,000</span> s), cela représente <span class="math inline">2{,}21 \times 10^9</span> échantillons, soit <strong>2,2 à 4,4 Go</strong> à 1–2 octets par échantillon. C'est un plancher : les métriques du nœud, de l'ordonnanceur et de l'entraîneur s'y ajoutent.</p>
+<p>Si vous grattez à 30 s, au rythme de collecte de l'exportateur, tout est divisé par deux (1,1 à 2,2 Go) sans perte d'information, puisque la valeur ne change qu'une fois par 30 s.</p>
+</div>
+<p>Le résultat surprend par sa modestie : le coût d'une flotte de GPU n'est pas dans le volume des échantillons mais dans la <strong>cardinalité</strong>, c'est-à-dire le nombre de séries distinctes que l'on crée au fil du temps.</p>
+<h3 id="la-cardinalité-et-le-piège-de-létiquette-job">3.2. La cardinalité et le piège de l'étiquette <code>job</code></h3>
+<p>La documentation de Prometheus avertit : chaque combinaison unique de paires clé-valeur d'étiquettes représente une nouvelle série, et il ne faut pas utiliser d'étiquettes pour stocker des dimensions à forte cardinalité (identifiants d'utilisateur, adresses électroniques, ensembles non bornés).</p>
+<p>Un identifiant de job est un tel ensemble non borné : il change à chaque job. Dans un cluster, la tentation est grande de l'ajouter à chaque métrique GPU pour pouvoir filtrer par job.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.2 — Le coût de l'étiquette <code>job</code></span> Même flotte (128 nœuds), jobs de 8 GPU qui durent 4 h en moyenne, et 10 métriques GPU portant l'étiquette <code>job</code>. Il y a 128 emplacements de job. Chaque jour : <span class="math inline">128 \times 24/4 = 768</span> jobs, donc <span class="math inline">768 \times 8 \times 10 = 61\,440</span> nouvelles séries.</p>
+<p>La flotte n'a que <span class="math inline">1024 \times 10 = 10\,240</span> séries de base. L'étiquette fait donc <strong>créer six fois plus de séries par jour</strong> que la flotte n'en compte, alors que le nombre de séries actives à un instant donné reste le même. L'index grossit, les blocs se compactent plus difficilement, et les requêtes sur plusieurs jours parcourent des milliers de séries de quelques heures. (Calcul arithmétique ; l'effet réel sur votre serveur est à mesurer.)</p>
+</div>
+<p>La parade est de <strong>joindre au moment de la requête</strong>. L'exportateur publie une métrique d'association qui vaut toujours 1, <code>slurm_job_gpu_allocated{Hostname, gpu, job}</code>, et les règles font la jointure :</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expr</span><span class="kw">:</span><span class="at"> avg by (job) (DCGM_FI_PROF_PIPE_TENSOR_ACTIVE</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">      * on (Hostname, gpu) group_left (job) slurm_job_gpu_allocated) &lt; 0.05</span></span></code></pre></div>
+<p>Cette règle est celle du projet 5 (<code>labs/projects/gpu-observability/reference/rules/gpu.rules.yml</code>), testée avec <code>promtool</code>. Seule la série d'association porte le job : elle apparaît et disparaît avec lui, les 25 séries du GPU restent stables. Deux protections complètent la parade : la limite <code>sample_limit</code> d'un travail de scrape, qui fait échouer le scrape entier si l'exportateur dépasse le nombre d'échantillons autorisé (le défaut 0 signifie aucune limite), et un test de budget de séries dans la suite de tests de l'exportateur, comme dans le lab 14.1.</p>
+<h3 id="règles-denregistrement">3.3. Règles d'enregistrement</h3>
+<p>Une règle d'enregistrement calcule une expression à intervalle fixe et la stocke comme une nouvelle série. Elle sert à deux choses : rendre rapide une requête coûteuse sur laquelle des tableaux de bord s'appuient, et donner un nom stable à une notion que plusieurs alertes partagent. La documentation recommande la forme <code>niveau:métrique:opérations</code>, où le niveau désigne l'agrégation et les étiquettes conservées.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">record</span><span class="kw">:</span><span class="at"> job:train_compute_seconds:median</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">expr</span><span class="kw">:</span><span class="at"> quantile by (job) (0.5, train_compute_seconds)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">record</span><span class="kw">:</span><span class="at"> node:train_compute_seconds:ratio_to_job_median</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">expr</span><span class="kw">:</span><span class="at"> train_compute_seconds / on (job) group_left () job:train_compute_seconds:median</span></span></code></pre></div>
+<div class="ex">
+<p><span class="tag">Exemple 3.3 — Un traînard par règle d'enregistrement, testé</span> Ces deux règles viennent du lab 14.2. La métrique <code>train_compute_seconds</code> est le temps de calcul local de la dernière étape, <strong>sans l'attente des collectives</strong> (voir le chapitre 7 : en synchrone, le temps d'étape complet est identique pour tous les rangs).</p>
+<p>Le test <code>tests/platform.rules.test.yml</code> fournit cinq rangs du job <code>j1</code> à 1,0 s et le rang 5 à 1,5 s, et un job <code>j2</code> dont un rang est à 1,2 s. La règle <code>NodeSlow</code> (seuil 1,3, <code>for: 10m</code>) ne répond rien à 9 minutes, puis à 12 minutes une seule alerte, <code>job j1: node n5 rank 5 computes 1.5x slower than the job median</code>. Le rang à 1,2 reste silencieux. Résultat de <code>promtool test rules</code> : <code>SUCCESS</code>, et le mutant « seuil 1,3 remplacé par 3 » est tué.</p>
+</div>
+<h3 id="ce-qui-change-avec-des-jobs-éphémères">3.4. Ce qui change avec des jobs éphémères</h3>
+<p>Trois particularités du calcul méritent d'être traitées explicitement.</p>
+<p><strong>Les séries de job naissent et meurent.</strong> Quand un job se termine, ses séries ne se mettent plus à jour et deviennent périmées (<em>stale</em>). Une alerte « plus de progrès » ne peut donc pas reposer sur l'absence : une série absente ne ressemble pas à une série qui stagne. Il faut deux alertes distinctes, l'une sur la stagnation d'un compteur présent (lab 14.3), l'autre sur la disparition d'un exportateur attendu (<code>up == 0</code>, lab 14.2).</p>
+<p><strong>Les métriques de fin de job.</strong> Pour exposer le code de retour ou la durée d'un job, le collecteur <em>textfile</em> de <code>node_exporter</code> lit tous les fichiers <code>*.prom</code> d'un répertoire. Son README recommande d'écrire dans un fichier temporaire puis de le renommer (<code>mv</code>), de façon atomique. Un <em>epilog</em> Slurm convient à cet usage. La <em>Pushgateway</em>, elle, n'est recommandée par la documentation que pour le résultat d'un traitement par lots <strong>au niveau du service</strong>, sans lien avec une machine ; elle n'oublie jamais une série poussée tant qu'on ne l'efface pas.</p>
+<p><strong>Les intervalles.</strong> Une étude de l'infrastructure LLM Acme (Hu et al., 2024) échantillonne Prometheus, DCGM et l'IPMI toutes les 15 s. C'est un bon point de départ, à condition de régler aussi l'intervalle de collecte de dcgm-exporter (30 s par défaut) : gratter plus vite que l'exportateur ne collecte ne sert à rien ; gratter plus lentement rate les événements courts du chapitre 1.</p>
+<div class="note">
+<p><span class="tag">Grafana : la hiérarchie compte plus que les panneaux</span> Un tableau de bord utile suit la hiérarchie que l'enquêteur parcourt : flotte, puis job, puis nœud, puis GPU. Trois niveaux de tableaux, liés par les variables <code>job</code> et <code>node</code>, valent mieux qu'un grand tableau de cent panneaux. Générez-les par code (le projet 5 produit un JSON de Grafana testé) plutôt que de les modifier à la main : un tableau qui n'est pas versionné dérive.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>Disque ≈ rétention × échantillons par seconde × (1 à 2 octets). 1 024 GPU × 25 métriques à 15 s : 2,2 à 4,4 Go pour 15 jours.</li>
+<li>Le vrai risque est la cardinalité : un identifiant de job en étiquette crée ici six fois plus de séries par jour que la flotte n'en compte.</li>
+<li>On joint le job à la requête, avec une métrique d'association qui vaut 1.</li>
+<li>Règles d'enregistrement : nom <code>niveau:métrique:opérations</code>, tests <code>promtool</code>.</li>
+<li>Une série absente n'est pas une série qui stagne : deux alertes distinctes.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Journaux et traces</h2>
+<p>Les métriques disent qu'un job ne va pas bien ; les journaux disent pourquoi. Ce chapitre traite de ce qu'on journalise, de la façon d'indexer sans se ruiner, et d'un exemple réel de localisation d'un rang fautif.</p>
+<h3 id="ce-quon-journalise-et-comment-on-lindexe">4.1. Ce qu'on journalise, et comment on l'indexe</h3>
+<p>Les sources utiles sont les journaux de chaque rang (une ligne JSON par événement : identifiant du job, rang, pas, événement), le journal du noyau (les erreurs XID des GPU y apparaissent), ceux de Slurm (<code>slurmd</code>, <code>slurmctld</code>) et ceux de NCCL quand ils sont activés. Écrivez des lignes <strong>structurées</strong> : un champ <code>job_id</code> et un champ <code>rank</code> dans chaque ligne rendent la corrélation triviale.</p>
+<p>Loki indexe des <strong>flux</strong> définis par leurs étiquettes, pas le contenu des lignes. Sa documentation dit que les étiquettes sont destinées à des valeurs de faible cardinalité décrivant la source des journaux, et recommande de n'ajouter une étiquette dynamique qu'avec parcimonie : trop de combinaisons produisent trop de flux, donc un gros index et de petits morceaux. Pour les valeurs à forte cardinalité que l'on cherche souvent, elle propose les métadonnées structurées. Appliqué à notre cas :</p>
+<ul>
+<li>étiquettes (bornées) : <code>cluster</code>, <code>node</code>, <code>source</code> (rang, noyau, slurm) ;</li>
+<li>métadonnées structurées ou filtre de texte : <code>job_id</code>, <code>rank</code>.</li>
+</ul>
+<pre class="text"><code>{cluster=&quot;train&quot;, node=&quot;gpu-n01&quot;} |= &quot;job_id=4412&quot; |= &quot;NCCL WARN&quot;</code></pre>
+<p>La requête ci-dessus est écrite d'après la syntaxe de LogQL et n'a <strong>pas</strong> été exécutée : il n'y a pas de Loki dans le bac à sable. ELK joue le même rôle avec un autre modèle de coût (index plein texte) ; le critère de choix est le volume et la durée de rétention de vos journaux, à mesurer.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — Le volume d'un journal par pas</span> Un job de 1 024 rangs journalise une ligne de 200 octets à chaque pas de 2 s. Débit : <span class="math inline">1024 \times 0{,}5 \times 200 = 102\,400</span> octets par seconde, soit 8,85 Go par jour pour <strong>un seul job</strong>. Journaliser un pas sur 50, plus chaque événement rare (point de contrôle, évaluation, erreur), le ramène à environ 0,18 Go par jour. Ces chiffres sont arithmétiques (taille de ligne et cadence supposées).</p>
+</div>
+<h3 id="localiser-un-rang-fautif">4.2. Localiser un rang fautif</h3>
+<p>Le journal le plus précieux d'un blocage est celui des <strong>entrées dans les collectives</strong>. Quand un rang ne rejoint jamais une opération collective, tous les autres l'attendent. Il suffit de comparer, rang par rang, le dernier pas où la collective a été <strong>entrée</strong> et celui où elle s'est <strong>terminée</strong> : le rang qui est resté en arrière est le fautif.</p>
+<p>C'est le principe du <em>flight recorder</em> de PyTorch, que Llama Team décrit comme une fonction qui capture les métadonnées des collectives et les piles dans un tampon circulaire, ce qui permet de diagnostiquer rapidement les blocages. Il s'active par <code>TORCH_NCCL_TRACE_BUFFER_SIZE</code> (une valeur positive, 2 000 recommandé selon le tutoriel) et <code>TORCH_NCCL_DUMP_ON_TIMEOUT</code>, qui écrit un fichier par rang à l'expiration du délai. Ce délai est, d'après la documentation de PyTorch 2.14, de 10 minutes par défaut avec NCCL et de 30 minutes avec les autres moteurs.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.2 — Un vrai blocage, localisé par les journaux et par les piles</span> Partie B du lab 14.3, <strong>réelle</strong> mais sur CPU : deux processus <code>torch.distributed</code> (moteur <code>gloo</code>), le rang 1 s'arrête avant la collective du pas 150 (un <code>time.sleep</code> injecté). Un observateur à l'horloge réelle voit le compteur de progression stagner 3 s ; le programme envoie <code>SIGUSR1</code> aux deux processus et <code>faulthandler</code> écrit leurs piles. Sortie capturée sur la VM du bac à sable, le 24 octobre 2026 :</p>
+<pre class="text"><code>ALARM: no progress for 3 s; last completed step = 149
+--- rank 0: innermost frames of the stack dump (faulthandler, SIGUSR1)
+    distributed_c10d.py:3913 in all_reduce
+    c10d_logger.py:83 in wrapper
+    real_hang.py:50 in child   -&gt; dist.all_reduce(t)
+--- rank 1: innermost frames of the stack dump (faulthandler, SIGUSR1)
+    real_hang.py:47 in child   -&gt; time.sleep(3600)  # the fault: this rank never joins the collective
+last collective entered: {0: 150, 1: 149}; last collective completed: {0: 149, 1: 149}
+rank(s) that never joined the last collective: [1]</code></pre>
+<p>Le rang 0 est bloqué dans <code>all_reduce</code> ; le rang 1 est dans <code>time.sleep</code>. Les journaux donnent la même réponse sans les piles : le rang 0 est entré dans la collective du pas 150, pas le rang 1. <strong>Ce qui n'est pas démontré ici</strong> : le cas GPU et NCCL, où la signature de l'utilisation GPU et le comportement du délai d'attente diffèrent.</p>
+</div>
+<h3 id="les-traces">4.3. Les traces</h3>
+<p>Dans OpenTelemetry, un <em>span</em> représente une unité de travail ou une opération, et les spans forment les traces. Pour un entraînement, un pas se découpe naturellement : chargement des données, calcul avant et arrière, communication, mise à jour, parfois écriture d'un point de contrôle. La trace dit si l'étape lente est le calcul (un traînard), la communication (le réseau) ou les données (le stockage).</p>
+<p>L'article MegaScale (Jiang et al., 2024) décrit un outil qui enregistre des événements CUDA à grain fin pour produire une carte de chaleur et une chronologie à l'échelle du système, et des messages de battement de cœur pour la détection d'anomalies en temps réel. Le coût d'une trace systématique est rédhibitoire : 1 024 rangs × 5 spans par pas de 2 s font <span class="math inline">2\,560</span> spans par seconde, soit 221 millions par jour. <strong>Échantillonnez</strong> : un pas sur cent produit 2,2 millions de spans par jour, et on trace en plus tous les pas plus lents qu'un seuil.</p>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li>Journalisez des lignes structurées avec <code>job_id</code> et <code>rank</code> ; indexez peu d'étiquettes, filtrez le reste.</li>
+<li>Dans un blocage, comparez par rang le dernier pas entré et le dernier pas terminé d'une collective : le rang en retard est le fautif.</li>
+<li>Le flight recorder de PyTorch automatise cela ; le délai par défaut est de 10 min avec NCCL.</li>
+<li>Une trace de pas se découpe en données, calcul, communication, mise à jour : échantillonnez-la.</li>
+</ul>
+</div>
+<h2 id="ch5">5. Observabilité des ordonnanceurs</h2>
+<p>L'ordonnanceur est la couche qui sait pourquoi un job attend, quels nœuds sont retirés de la production et combien de capacité reste. Ce chapitre exporte ces réponses sans exploser la cardinalité, et s'appuie sur des captures réelles de Slurm 23.11.4.</p>
+<h3 id="les-questions-de-la-file">5.1. Les questions de la file</h3>
+<p>Quatre questions suffisent à piloter une file : combien de jobs attendent et <strong>pourquoi</strong> ; depuis combien de temps le plus ancien attend ; combien de nœuds sont en panne ou drainés ; combien de CPU ou de GPU sont alloués, libres ou inutilisables. Les deux premières mesurent le service rendu aux utilisateurs, les deux dernières la capacité de la plateforme.</p>
+<h3 id="exporter-slurm">5.2. Exporter Slurm</h3>
+<p>Le lab 14.1 lit <code>squeue --json</code>, <code>sinfo --json</code> et <code>sacct</code>. Deux raisons d'utiliser le format JSON plutôt que d'analyser le texte. La première : un exportateur libre documente, dans son README lu le 24 octobre 2026, que la disposition textuelle de Slurm « n'est pas une API stable et a changé entre les versions », et exige Slurm 23.02 ou plus pour analyser le JSON. La seconde est que les noms de champs JSON sont explicites.</p>
+<p>Une précaution de charge : la page de manuel de <code>squeue</code> avertit que chaque appel envoie un appel de procédure distante à <code>slurmctld</code> et que, si trop de commandes arrivent à la fois, elles peuvent dégrader les performances du démon, jusqu'à un déni de service. Un exportateur doit donc <strong>mettre en cache</strong> et gratter à 30 ou 60 s, jamais à chaque requête de tableau de bord. Le lab interroge <code>sacct</code>, plus lourd, séparément toutes les 30 s.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Métrique du lab 14.1</th>
+<th>Type</th>
+<th>Étiquettes (bornées)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>slurm_jobs</code></td>
+<td>jauge</td>
+<td><code>state</code>, <code>reason_class</code></td>
+</tr>
+<tr class="even">
+<td><code>slurm_pending_oldest_age_seconds</code></td>
+<td>jauge</td>
+<td><code>reason_class</code></td>
+</tr>
+<tr class="odd">
+<td><code>slurm_nodes</code></td>
+<td>jauge</td>
+<td><code>partition</code>, <code>state</code></td>
+</tr>
+<tr class="even">
+<td><code>slurm_node_drain_info</code></td>
+<td>jauge (1)</td>
+<td><code>node</code>, <code>reason_class</code></td>
+</tr>
+<tr class="odd">
+<td><code>slurm_cpus</code></td>
+<td>jauge</td>
+<td><code>partition</code>, <code>state</code></td>
+</tr>
+<tr class="even">
+<td><code>slurm_job_wait_seconds</code></td>
+<td>histogramme</td>
+<td><code>qos</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Les exportateurs libres exposent aussi des métriques par compte et par utilisateur. C'est utile pour la facturation interne, mais le nombre d'utilisateurs borne la cardinalité : relisez la liste avant de l'activer sur une grande organisation.</p>
+<h3 id="pourquoi-un-job-attend">5.3. Pourquoi un job attend</h3>
+<p>La raison d'attente de Slurm (<code>Priority</code>, <code>Resources</code>, <code>JobHeldUser</code>, <code>Dependency</code>…) est la meilleure information de la file, mais elle prend des dizaines de valeurs, dont certaines changent de version en version. Exportez-la telle quelle comme étiquette et vous perdez le contrôle du nombre de séries. Le lab regroupe donc les raisons par <strong>responsable de l'action</strong> :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Classe</th>
+<th>Raisons (page de manuel de <code>squeue</code>)</th>
+<th>Qui agit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>capacity</code></td>
+<td><code>Priority</code>, <code>Resources</code>, <code>ReqNodeNotAvail</code>, « Nodes required for job are DOWN, DRAINED… »</td>
+<td>la plateforme</td>
+</tr>
+<tr class="even">
+<td><code>user</code></td>
+<td><code>JobHeldUser</code>, <code>Dependency</code>, <code>BeginTime</code></td>
+<td>l'utilisateur</td>
+</tr>
+<tr class="odd">
+<td><code>admin</code></td>
+<td><code>JobHeldAdmin</code>, <code>Reservation</code>, <code>PartitionDown</code></td>
+<td>un administrateur</td>
+</tr>
+<tr class="even">
+<td><code>config</code></td>
+<td><code>InvalidAccount</code>, <code>InvalidQOS</code></td>
+<td>l'administrateur, tout de suite</td>
+</tr>
+<tr class="odd">
+<td><code>other</code></td>
+<td>toute raison inconnue</td>
+<td>à examiner</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le regroupement est un choix de ce cours ; les raisons sont celles de Slurm. Son intérêt est de distinguer ce qui pèse sur le SLO de la plateforme (<code>capacity</code>) de ce qui n'y pèse pas (<code>user</code>).</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — La file vue par l'exportateur, sur un vrai Slurm</span> Sur le bac à sable (Slurm 23.11.4, 4 CPU), cinq jobs de 3 CPU se disputent le nœud, qui est ensuite drainé avec la raison <code>health: gpu_xid:79</code>. Sortie réelle de <code>exporter.py</code> en mode direct, le 24 octobre 2026 (la partie GPU, elle, provient de la fixture simulée) :</p>
+<pre class="text"><code>slurm_jobs{reason_class=&quot;capacity&quot;,state=&quot;pending&quot;} 4.0
+slurm_jobs{reason_class=&quot;none&quot;,state=&quot;running&quot;} 1.0
+slurm_pending_oldest_age_seconds{reason_class=&quot;capacity&quot;} 26.97
+slurm_nodes{partition=&quot;debug&quot;,state=&quot;draining&quot;} 1.0
+slurm_node_drain_info{node=&quot;vm&quot;,reason_class=&quot;health&quot;} 1.0
+slurm_cpus{partition=&quot;debug&quot;,state=&quot;allocated&quot;} 3.0
+slurm_cpus{partition=&quot;debug&quot;,state=&quot;idle&quot;} 0.0
+slurm_cpus{partition=&quot;debug&quot;,state=&quot;other&quot;} 1.0
+slurm_scrape_success 1.0</code></pre>
+<p>Lisez la file en trois lignes : quatre jobs attendent à cause de la <strong>plateforme</strong> (classe <code>capacity</code>), le plus ancien depuis 27 s ; le nœud est en cours de drainage pour une raison de santé ; il reste un CPU « autre » (inutilisable) et zéro CPU libre. Dans une autre capture de la même file (fixture <code>squeue_drained.json</code>), un job affiche la raison « Nodes required for job are DOWN, DRAINED or reserved for jobs in higher priority partitions » : le lab la classe en <code>capacity</code>, car c'est la plateforme, pas l'utilisateur, qui lui fait perdre du temps.</p>
+</div>
+<h3 id="le-délai-dattente-et-ses-seaux">5.4. Le délai d'attente et ses seaux</h3>
+<p>Le délai d'attente d'un job est la différence entre son démarrage et sa soumission. Exposé comme <strong>histogramme</strong> de Prometheus, chaque job est compté une fois, dans le seau de sa durée. Le lab 14.1 dédoublonne par identifiant de job : un histogramme ne doit que croître, et deux lectures du même <code>sacct</code> ne doivent pas compter deux fois.</p>
+<p>Pour une file réelle, la soumission est un mauvais départ : un job retenu par son propriétaire ou en attente d'une dépendance semble attendre des heures sans que la plateforme y soit pour rien. Le champ <code>Eligible</code> de <code>sacct</code> (début de l'éligibilité) est plus juste ; le lab utilise <code>Submit</code> pour rester simple, et cette limite est à lever en production.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.2 — Ce que <code>histogram_quantile</code> répond sur six attentes réelles</span> Six jobs ont attendu 1, 2, 5, 8, 12 et 17 s sur le bac à sable (capture réelle de <code>sacct</code>). Valeurs exactes : médiane 6,5 s, 90e centile 14,5 s par interpolation linéaire. Avec les seaux 10 et 30 s, Prometheus doit <strong>interpoler à l'intérieur d'un seau</strong> : <code>histogram_quantile</code> répond 7,5 s pour la médiane et 24 s pour le 90e centile, soit 65 % de trop. C'est ce qu'établit le test <code>tests/wait_quantile.test.yml</code> du lab 14.2, vérifié avec <code>promtool</code>.</p>
+<p>Avec des seaux plus fins à 5, 10, 15, 20 et 30 s, la même interpolation donne 5,0 s et 17,0 s (calcul de la même formule, non rejoué dans <code>promtool</code>). La leçon : mettez des <strong>bornes de seaux autour de vos seuils de SLO</strong>. Le seuil de 600 s du lab est une borne, donc le rapport de jobs sous 600 s est exact quelle que soit l'interpolation.</p>
+</div>
+<h3 id="kubernetes-mêmes-questions-autres-métriques">5.5. Kubernetes : mêmes questions, autres métriques</h3>
+<p>Sur Kubernetes, <code>kube-state-metrics</code> expose l'état des objets, par exemple <code>kube_pod_status_phase</code> (jauge) et <code>kube_pod_container_status_restarts_total</code> (compteur de redémarrages par conteneur, stable dans la documentation). Pour les files, Kueue publie <code>kueue_pending_workloads</code> (jauge par file et par statut, <code>active</code> ou <code>inadmissible</code>) et <code>kueue_admission_wait_time_seconds</code> (histogramme du temps entre la création d'une charge et son admission). Le délai d'attente est donc fourni nativement, contrairement à Slurm où il faut le reconstruire depuis <code>sacct</code>. Le module <a href="../kubernetes-gpu/index.html">12</a> traite Kueue ; avec <code>dcgm-exporter -k</code>, les métriques GPU sont associées aux pods.</p>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Quatre questions : combien attendent et pourquoi, depuis quand, quels nœuds sont retirés, quelle capacité reste.</li>
+<li>Lisez Slurm en JSON, mettez en cache, grattez à 30 ou 60 s : <code>squeue</code> charge <code>slurmctld</code>.</li>
+<li>Regroupez les raisons d'attente par responsable (<code>capacity</code>, <code>user</code>, <code>admin</code>, <code>config</code>, <code>other</code>) pour borner les étiquettes et isoler ce qui pèse sur la plateforme.</li>
+<li>Le délai d'attente est un histogramme dédoublonné ; placez des bornes de seaux autour de vos seuils.</li>
+<li>Kueue fournit un histogramme d'admission natif ; Slurm demande de le reconstruire.</li>
+</ul>
+</div>
+<h2 id="ch6">6. SLO de plateforme et goodput</h2>
+<p>Un seuil sur une métrique ne dit pas si les utilisateurs sont bien servis. Un SLO le dit, et il permet de décider quand réveiller quelqu'un. Ce chapitre construit trois objectifs pour une plateforme GPU et des alertes qui s'en déduisent.</p>
+<h3 id="sli-slo-et-budget-derreur">6.1. SLI, SLO et budget d'erreur</h3>
+<div class="def">
+<p><span class="tag">SLI, SLO, budget d'erreur</span> Un <strong>SLI</strong> (indicateur de niveau de service) est un rapport entre événements bons et événements totaux, par exemple la part des jobs démarrés en moins de 10 minutes. Un <strong>SLO</strong> fixe une cible pour cet indicateur sur une période, par exemple 95 % sur 30 jours. Le <strong>budget d'erreur</strong> est le complément : <span class="math inline">1 - \text{SLO}</span>, soit 5 % des jobs qui ont le droit d'attendre davantage.</p>
+</div>
+<p>Le budget d'erreur change la conversation : tant qu'il en reste, on peut prendre des risques (une maintenance, une mise à jour de pilote) ; quand il est épuisé, on ralentit. Il transforme « le cluster est lent » en un nombre que l'on peut dépenser.</p>
+<h3 id="trois-sli-pour-une-plateforme-gpu">6.2. Trois SLI pour une plateforme GPU</h3>
+<ol type="1">
+<li><strong>Disponibilité de la capacité</strong> : GPU-heures utilisables sur GPU-heures totales. Un nœud drainé ou en panne retire sa capacité. Source : <code>slurm_nodes</code> et <code>slurm_cpus</code> du chapitre 5. Décidez à l'avance si la maintenance planifiée compte comme une indisponibilité.</li>
+<li><strong>Délai d'attente</strong> : part des jobs dont l'attente imputable à la plateforme (classe <code>capacity</code>, depuis l'éligibilité) est sous un seuil, par QOS. Un seuil de 10 minutes pour la QOS normale et de quelques secondes pour une QOS urgente sont des exemples ; ils découlent de vos engagements.</li>
+<li><strong>Goodput</strong> : part du temps alloué qui produit des pas d'entraînement utiles (6.4).</li>
+</ol>
+<p>Les cibles chiffrées (95 %, 98 %) sont des <strong>choix</strong> de ce parcours pour les exemples, pas des normes.</p>
+<h3 id="des-alertes-qui-réveillent-pour-de-bonnes-raisons">6.3. Des alertes qui réveillent pour de bonnes raisons</h3>
+<p>Le Workbook SRE de Google compare les stratégies d'alerte selon quatre critères : la précision (part des alertes qui correspondent à une vraie menace), le rappel (part des vrais problèmes détectés), le délai de détection et le délai de réinitialisation. Un simple seuil sur le taux d'erreur échoue : avec un SLO de 99,9 %, un taux d'erreur de 0,1 % pendant 10 minutes déclenche l'alerte alors que seuls 0,02 % du budget mensuel ont été consommés.</p>
+<p>La stratégie la plus fidèle est l'alerte à <strong>vitesse de consommation</strong> (<em>burn rate</em>) sur <strong>fenêtres multiples</strong> : la vitesse de consommation est le rapport entre le taux d'erreur observé et le taux d'erreur permis par le SLO ; 1 consomme exactement le budget sur la période.</p>
+<p>L'alerte exige deux fenêtres à la fois, une longue et une courte, la courte valant 1/12 de la longue pour que l'alerte se réinitialise vite. Le Workbook recommande comme points de départ 2 % du budget en 1 h et 5 % en 6 h pour les pages, 10 % en 3 jours pour un ticket. La vitesse de consommation se déduit :</p>
+<p><span class="math display">\text{vitesse} = \frac{\text{part du budget consommée} \times \text{période}}{\text{fenêtre}}</span></p>
+<p>Pour 2 % en 1 h sur 30 jours (720 h) : <span class="math inline">0{,}02 \times 720/1 = 14{,}4</span>. Pour 5 % en 6 h : <span class="math inline">0{,}05 \times 720/6 = 6</span>. Pour 10 % en 3 jours (72 h) : <span class="math inline">0{,}10 \times 720/72 = 1</span>.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — Les trois alertes du SLO d'attente, générées et testées</span> Le lab 14.2 génère les règles du SLO « 95 % des jobs démarrent en moins de 600 s » à partir d'un seul modèle (<code>gen_rules.py</code>). Table imprimée par <code>python3 gen_rules.py --table</code> :</p>
+<pre class="text"><code>alert                 burn  long  short  error ratio &gt;  budget/long window    time to fire at 100 % errors
+JobWaitSLOFastBurn    14.4    1h     5m           0.72               2.0%                      43.2 min
+JobWaitSLOSlowBurn     6.0    6h    30m            0.3               5.0%                     108.0 min
+JobWaitSLOTicket       1.0    3d     6h           0.05              10.0%                     216.0 min</code></pre>
+<p>Le seuil est <span class="math inline">\text{vitesse} \times (1 - 0{,}95)</span> : <span class="math inline">14{,}4 \times 0{,}05 = 0{,}72</span>. Quatre scénarios sont <strong>simulés</strong> (compteurs synthétiques, deux minutes d'évaluation calculées par le modèle) et passés à <code>promtool test rules</code> :</p>
+<ul>
+<li>panne totale de 2 h : la page rapide se déclenche à la 44e minute (<span class="math inline">44/60 = 0{,}733 &gt; 0{,}72</span> ; à la 43e, <span class="math inline">0{,}717</span> ne suffit pas), puis se réinitialise 2 minutes après la fin de la panne grâce à la fenêtre de 5 min ;</li>
+<li>incident de 10 minutes : aucune des trois alertes, à aucun moment ;</li>
+<li>40 % d'erreurs pendant 8 h : la page lente se déclenche à la 270e minute, la rapide jamais ;</li>
+<li>20 % d'erreurs pendant 30 h : seul le ticket se déclenche, après 18 h (<span class="math inline">0{,}2 \times 18/72 = 0{,}05</span>).</li>
+</ul>
+<p>Les alertes n'ont volontairement <strong>pas</strong> de <code>for</code> : le Workbook déconseille les durées dans les alertes de SLO, car une série qui oscille autour du seuil remet le minuteur à zéro et n'alerte jamais. Les deux fenêtres jouent ce rôle de filtre.</p>
+</div>
+<div class="note">
+<p><span class="tag">Alertmanager : grouper plutôt que multiplier</span> Quand un rack perd son refroidissement, des dizaines d'alertes <code>GPUHot</code> partent en même temps. Alertmanager déduplique, groupe et route les alertes, et gère les silences et les inhibitions. Groupez par nom d'alerte et par une étiquette de domaine de panne (rack, commutateur). Sa documentation précise que si une alerte est résolue avant la fin de <code>group_wait</code>, aucune notification n'est envoyée pour elle, ce qui réduit le bruit des alertes instables. Cette configuration n'est pas exécutée dans le bac à sable.</p>
+</div>
+<h3 id="le-goodput">6.4. Le goodput</h3>
+<div class="def">
+<p><span class="tag">Goodput et ETTR</span> Le rapport technique de Llama 3 définit le temps d'entraînement effectif comme le temps passé en entraînement utile sur le temps écoulé, et rapporte plus de 90 % tout en acceptant des maintenances automatisées. Kokolis et al. (2024) définissent l'<em>Effective Training Time Ratio</em> (ETTR) comme le rapport entre le temps d'exécution productif et le temps réel disponible d'une exécution, et le goodput comme la quantité de travail productif accompli par unité de temps.</p>
+</div>
+<p>Pour piloter une plateforme, il faut décomposer ce rapport en pertes que l'on sait nommer. Pour un job qui s'arrête en moyenne toutes les <span class="math inline">M</span> secondes, qui écrit un point de contrôle toutes les <span class="math inline">\tau</span> secondes pour un coût <span class="math inline">\delta</span>, et dont chaque panne coûte une détection <span class="math inline">d</span>, un redémarrage <span class="math inline">R</span> et la moitié d'un intervalle de travail refait :</p>
+<p><span class="math display">G = 1 - \frac{\delta}{\tau} - \frac{d + R + \tau/2}{M}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 6.2 — Un job de sept jours, 256 GPU</span> Paramètres <strong>supposés</strong> pour l'exemple : <span class="math inline">M = 12</span> h, <span class="math inline">\tau = 30</span> min, <span class="math inline">\delta = 60</span> s, <span class="math inline">R = 10</span> min, 30 % des pannes sont des blocages détectés après <span class="math inline">d</span> secondes, les autres des plantages vus en 30 s. Avec une détection des blocages par le seul délai NCCL (<span class="math inline">d = 600</span> s, documenté) :</p>
+<p>Le coût des points de contrôle est <span class="math inline">\delta/\tau = 3{,}33\ \%</span>. La perte moyenne par panne est :</p>
+<p><span class="math display">0{,}3 \times (600 + 600 + 900) + 0{,}7 \times (30 + 600 + 900) = 1\,701\ \text{s}</span></p>
+<p>soit <span class="math inline">1701/43\,200 = 3{,}94\ \%</span>. Goodput : <strong>92,73 %</strong>.</p>
+<p>Avec un détecteur à phase déclarée à 246 s (lab 14.3, valeur <strong>simulée</strong>), la perte tombe à <span class="math inline">1\,595</span> s par panne, soit 3,69 % : goodput <strong>92,97 %</strong>. Gain : 0,246 point, soit 105,7 GPU-heures par semaine pour 256 GPU. Ce n'est pas énorme : la détection rapide n'est qu'un des leviers, et les 7,3 % de pertes se répartissent comme la figure ci-dessous. La seule valeur sûre est la méthode : décomposez avant d'optimiser.</p>
+<figure class="fig">
+<svg viewBox="0 0 640 170" role="img" aria-labelledby="f3-t f3-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="f3-t">
+Où passe le temps d'un job de sept jours
+</title>
+<desc id="f3-d">Barre de 100 pour cent : 92.7 pour cent de pas utiles, 3.3 pour cent de checkpoints, 0.5 pour cent de détection, 1.4 pour cent de redémarrage, 2.1 pour cent de travail refait.</desc> <rect x="20.0" y="30" width="556.4" height="44" fill="var(--accent)" fill-opacity="0.9" stroke="currentColor" stroke-width="1.2"/> <rect x="576.4" y="30" width="20.0" height="44" fill="currentColor" fill-opacity="0.5" stroke="currentColor" stroke-width="1.2"/> <rect x="596.4" y="30" width="2.8" height="44" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.2"/> <rect x="599.2" y="30" width="8.3" height="44" fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="1.2"/> <rect x="607.5" y="30" width="12.5" height="44" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="1.2"/> <text x="298.2" y="58" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">92.7 %</text> <line x1="586.4" y1="74" x2="586.4" y2="84" stroke="currentColor" stroke-opacity=".6"/> <text x="460.0" y="96" font-size="12" fill="currentColor">checkpoints : 3.33 %</text> <line x1="597.8" y1="74" x2="597.8" y2="101" stroke="currentColor" stroke-opacity=".6"/> <text x="460.0" y="113" font-size="12" fill="currentColor">détection : 0.47 %</text> <line x1="603.3" y1="74" x2="603.3" y2="118" stroke="currentColor" stroke-opacity=".6"/> <text x="460.0" y="130" font-size="12" fill="currentColor">redémarrage : 1.39 %</text> <line x1="613.8" y1="74" x2="613.8" y2="135" stroke="currentColor" stroke-opacity=".6"/> <text x="460.0" y="147" font-size="12" fill="currentColor">travail refait : 2.08 %</text> <text x="20" y="20" font-size="12" fill="currentColor">100 % du temps alloué</text>
+</svg>
+<figcaption>
+Budget de temps d'un job hypothétique (paramètres de l'exemple 6.2, tous supposés sauf le calcul). Le goodput est la part verte.
+</figcaption>
+</figure>
+<p>L'intervalle de point de contrôle voisin de l'optimum de Young et Daly, <span class="math inline">\sqrt{2\delta M} = 2\,277</span> s soit 38 minutes, donnerait un résultat très proche : voir le <a href="../../projects/resilient-trainer/index.html">projet 3</a> et le <a href="../fault-tolerance/index.html">module 10</a>.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li>SLI : un rapport bon sur total ; SLO : une cible sur une période ; budget d'erreur : le complément, que l'on dépense.</li>
+<li>Trois SLI de plateforme : disponibilité de capacité, délai d'attente imputable à la plateforme, goodput.</li>
+<li>Alerte à vitesses de consommation multiples (14,4 ; 6 ; 1) sur deux fenêtres (rapport 1/12), sans <code>for</code>, testée sur des scénarios.</li>
+<li>Goodput <span class="math inline">= 1 - \delta/\tau - (d + R + \tau/2)/M</span> : décomposez les pertes avant de les attaquer.</li>
+</ul>
+</div>
+<h2 id="ch7">7. Détecter les pannes silencieuses</h2>
+<p>Les pannes bruyantes se détectent toutes seules : un processus qui meurt, un nœud qui tombe. Les pannes <strong>silencieuses</strong> laissent les GPU réservés, facturés et apparemment occupés pendant que rien d'utile ne se passe. Ce chapitre apprend à les chiffrer, à les détecter et à mesurer le prix de la détection.</p>
+<h3 id="une-typologie">7.1. Une typologie</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Panne</th>
+<th>Signature visible</th>
+<th>Piège</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Blocage d'une collective</td>
+<td>le compteur de pas stagne ; l'utilisation GPU peut rester haute</td>
+<td>un seuil sur l'utilisation ne voit rien</td>
+</tr>
+<tr class="even">
+<td>Traînard (<em>straggler</em>)</td>
+<td>un rang calcule plus lentement ; tout le job ralentit</td>
+<td>le temps d'étape est identique pour tous les rangs</td>
+</tr>
+<tr class="odd">
+<td>Erreur matérielle</td>
+<td>code XID, erreur ECC, remappage de lignes mémoire</td>
+<td><code>XID_ERRORS</code> est le dernier code, pas un compteur</td>
+</tr>
+<tr class="even">
+<td>Dérive de débit</td>
+<td>tokens/s en baisse de quelques pour cent</td>
+<td>invisible sous un seuil fixe, masquée par le bruit</td>
+</tr>
+<tr class="odd">
+<td>Corruption silencieuse</td>
+<td>résultat faux sans erreur</td>
+<td>indétectable par les métriques d'état</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="war">
+<p><span class="tag">Ce que la production rapporte</span> Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a recensé 466 interruptions de job, dont 47 planifiées et 419 imprévues ; environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou suspectés (pannes de GPU ou de composants, corruption silencieuse de données…), les GPU représentant 58,7 % de toutes les causes imprévues.</p>
+<p>Le rapport décrit aussi les traînards : « Sometimes, hardware issues may cause still-functioning but slow stragglers that are hard to detect. Even a single straggler can slow down thousands of other GPUs, often appearing as functioning but slow communications. » Source : <a href="https://arxiv.org/abs/2407.21783">Dubey et al., <em>The Llama 3 Herd of Models</em>, section 3.3.4</a>.</p>
+</div>
+<h3 id="les-blocages-progrès-pas-activité">7.2. Les blocages : progrès, pas activité</h3>
+<p>La seule preuve qu'un entraînement avance est que son compteur de pas augmente. L'utilisation GPU, la puissance et l'activité tensorielle sont des indices ; le pas est la preuve. Deux détecteurs sont à distinguer :</p>
+<ul>
+<li>la <strong>vivacité</strong> (<em>heartbeat</em>) : le processus répond encore. Elle détecte un plantage, pas un blocage, car le fil d'exécution qui émet le signal continue de tourner pendant qu'une collective est bloquée ;</li>
+<li>le <strong>progrès</strong> : un compteur de pas, avec une fenêtre de stagnation.</li>
+</ul>
+<p>Le progrès a un défaut : l'entraînement s'arrête légitimement. Un point de contrôle, une évaluation, un blocage de données mettent le compteur à l'arrêt. Une fenêtre plus courte que la plus longue pause légitime déclenche de fausses alarmes ; plus longue, elle retarde la détection. Toute la difficulté est de choisir cette fenêtre en connaissance des pauses.</p>
+<p>L'astuce du lab 14.3 est que l'entraîneur <strong>déclare sa phase</strong> (<code>train</code>, <code>ckpt</code>, <code>eval</code>) : chaque phase reçoit alors sa propre tolérance, et la fenêtre de stagnation ne s'applique qu'à la phase d'entraînement.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — Fausses alarmes contre délai, sur séries simulées</span> Le lab 14.3 simule 150 runs sains, 150 blocages et 100 plantages de 6 h. Les durées de pauses sont <strong>supposées</strong> (checkpoint de 30 à 90 s, avec 10 % de lents de 120 à 420 s ; évaluation de 120 à 300 s ; blocage de données de 20 à 200 s). Sortie de <code>python3 evaluate.py</code>, graines fixes :</p>
+<pre class="text"><code>detector                             hangs found %  crashes found %  healthy runs alarmed %  delay median s
+UtilLow 300 s                                    0              100                     0.0               -
+TensorIdle 300 s                               100              100                    34.7             307
+StepStall 300 s                                100                0                    36.0             306
+StepStall 600 s                                100                0                     0.0             606
+Heartbeat 60 s                                   0              100                     0.0               -
+PhaseAware 240 s                               100                0                     0.0             246
+PhaseAware 240 s + Heartbeat 60 s              100              100                     0.0             246</code></pre>
+<p>Quatre enseignements, <strong>valables pour ces hypothèses</strong>. Le détecteur sur l'utilisation est aveugle aux blocages, par construction du modèle de blocage (utilisation haute) ; il voit les plantages parce qu'un GPU sans processus tombe à zéro. Le battement de cœur voit les plantages et jamais les blocages.</p>
+<p>Le compteur de pas seul n'est sans fausse alarme qu'à partir d'une fenêtre de 480 s ; à 600 s, c'est exactement le délai par défaut de NCCL.</p>
+<p>La phase déclarée donne zéro fausse alarme dès 246 s : la détection est 2,4 fois plus rapide. Il faut <strong>deux</strong> alertes, progrès par phase et vivacité, car l'absence d'une série n'est pas une stagnation.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 640 340" role="img" aria-labelledby="f2-t f2-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="f2-t">
+Fausses alarmes et délai de détection selon la fenêtre
+</title>
+<desc id="f2-d">Deux courbes sur des séries simulées. Avec le seul compteur de pas, les fausses alarmes restent élevées jusqu'à une fenêtre de 240 secondes puis tombent à zéro à 480 secondes. Avec la phase déclarée par l'entraîneur, elles tombent à zéro dès 240 secondes. Une ligne verticale marque le délai du chien de garde NCCL par défaut, 600 secondes.</desc> <line x1="64" y1="290.0" x2="620" y2="290.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="294.0" text-anchor="end" font-size="12" fill="currentColor">0</text> <line x1="64" y1="245.0" x2="620" y2="245.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="249.0" text-anchor="end" font-size="12" fill="currentColor">3</text> <line x1="64" y1="200.0" x2="620" y2="200.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="204.0" text-anchor="end" font-size="12" fill="currentColor">6</text> <line x1="64" y1="155.0" x2="620" y2="155.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="159.0" text-anchor="end" font-size="12" fill="currentColor">9</text> <line x1="64" y1="110.0" x2="620" y2="110.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="114.0" text-anchor="end" font-size="12" fill="currentColor">12</text> <line x1="64" y1="65.0" x2="620" y2="65.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="69.0" text-anchor="end" font-size="12" fill="currentColor">15</text> <line x1="64" y1="20.0" x2="620" y2="20.0" stroke="currentColor" stroke-opacity=".18"/> <text x="58" y="24.0" text-anchor="end" font-size="12" fill="currentColor">18</text> <line x1="64.0" y1="20" x2="64.0" y2="290" stroke="currentColor" stroke-opacity=".18"/> <text x="64.0" y="306" text-anchor="middle" font-size="12" fill="currentColor">0</text> <line x1="175.2" y1="20" x2="175.2" y2="290" stroke="currentColor" stroke-opacity=".18"/> <text x="175.2" y="306" text-anchor="middle" font-size="12" fill="currentColor">200</text> <line x1="286.4" y1="20" x2="286.4" y2="290" stroke="currentColor" stroke-opacity=".18"/> <text x="286.4" y="306" text-anchor="middle" font-size="12" fill="currentColor">400</text> <line x1="397.6" y1="20" x2="397.6" y2="290" stroke="currentColor" stroke-opacity=".18"/> <text x="397.6" y="306" text-anchor="middle" font-size="12" fill="currentColor">600</text> <line x1="508.8" y1="20" x2="508.8" y2="290" stroke="currentColor" stroke-opacity=".18"/> <text x="508.8" y="306" text-anchor="middle" font-size="12" fill="currentColor">800</text> <line x1="620.0" y1="20" x2="620.0" y2="290" stroke="currentColor" stroke-opacity=".18"/> <text x="620.0" y="306" text-anchor="middle" font-size="12" fill="currentColor">1000</text> <rect x="64" y="20" width="556" height="270" fill="none" stroke="currentColor" stroke-width="1.5"/> <line x1="397.6" y1="20" x2="397.6" y2="290" stroke="var(--accent)" stroke-dasharray="5 4" stroke-width="1.5"/> <text x="402.6" y="34" font-size="12" fill="currentColor">délai NCCL par défaut : 600 s</text> <polyline points="84.0,40.0 100.6,40.0 134.0,41.7 200.7,81.7 334.2,290.0 567.7,290.0" fill="none" stroke="currentColor" stroke-width="3"/> <circle cx="84.0" cy="40.0" r="4.5" fill="currentColor"/> <circle cx="100.6" cy="40.0" r="4.5" fill="currentColor"/> <circle cx="134.0" cy="41.7" r="4.5" fill="currentColor"/> <circle cx="200.7" cy="81.7" r="4.5" fill="currentColor"/> <circle cx="334.2" cy="290.0" r="4.5" fill="currentColor"/> <circle cx="567.7" cy="290.0" r="4.5" fill="currentColor"/> <polyline points="84.0,211.7 100.6,228.3 134.0,256.7 200.7,290.0 334.2,290.0 567.7,290.0" fill="none" stroke="var(--accent)" stroke-width="3"/> <circle cx="84.0" cy="211.7" r="4.5" fill="var(--accent)"/> <circle cx="100.6" cy="228.3" r="4.5" fill="var(--accent)"/> <circle cx="134.0" cy="256.7" r="4.5" fill="var(--accent)"/> <circle cx="200.7" cy="290.0" r="4.5" fill="var(--accent)"/> <circle cx="334.2" cy="290.0" r="4.5" fill="var(--accent)"/> <circle cx="567.7" cy="290.0" r="4.5" fill="var(--accent)"/> <text x="203.0" y="62.0" font-size="12" fill="currentColor">compteur de pas seul</text> <text x="136.3" y="206.0" font-size="12" fill="currentColor">avec la phase déclarée</text> <text x="342.0" y="328" text-anchor="middle" font-size="13" fill="currentColor">délai médian de détection d'un blocage (s)</text> <text x="14" y="155.0" text-anchor="middle" font-size="13" fill="currentColor" transform="rotate(-90 14 155.0)">runs sains alertés pour 100 h</text>
+</svg>
+<figcaption>
+Sortie du lab 14.3 (séries simulées, hypothèses dans <code>sim.py</code>). Six fenêtres de 30 à 900 s pour chaque détecteur ; chaque point est une fenêtre.
+</figcaption>
+</figure>
+<p>Zéro fausse alarme sur 900 heures de runs sains ne prouve pas que le taux soit nul : la règle des trois donne une borne supérieure d'environ <span class="math inline">3/900 = 0{,}0033</span> par heure à 95 %. Pour estimer un taux plus bas il faut plus d'heures, donc plus de runs : mesurez sur la production, pas seulement en simulation.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.2 — Ce que coûte le délai</span> Un blocage détecté en 600 s plutôt qu'en 246 s sur un job de 512 GPU gaspille <span class="math inline">(600 - 246)/3600 \times 512 = 50{,}3</span> GPU-heures de plus par incident. À l'inverse, une fausse alarme qui tue un job de 256 GPU et lui fait perdre en moyenne un quart d'heure de travail coûte <span class="math inline">0{,}25 \times 256 = 64</span> GPU-heures. La bonne fenêtre minimise la somme des deux, pondérée par la fréquence des blocages réels : voir l'exercice 6.</p>
+</div>
+<h3 id="les-traînards-mesurer-le-calcul-pas-létape">7.3. Les traînards : mesurer le calcul, pas l'étape</h3>
+<p>En entraînement synchrone, une étape se termine quand le dernier rang a fini : le temps d'étape complet est le même pour tous les rangs, et ne désigne donc pas le traînard. Ce qui le désigne est le <strong>temps de calcul local</strong> avant la collective, hors attente. C'est la raison d'être de <code>train_compute_seconds</code> dans le lab 14.2, et de l'alerte <code>NodeSlow</code> fondée sur le rapport à la médiane du job.</p>
+<p>L'espérance du maximum de <span class="math inline">p</span> rangs de dispersion <span class="math inline">\sigma</span> croît comme <span class="math inline">\sigma\sqrt{2\ln p}</span> (chapitre 5 du <a href="../perf-models/index.html">module 2</a>) : même sans panne, plus le job est grand, plus il est lent par rapport à la moyenne. Un traînard <strong>persistant</strong> est autre chose : il fixe le rythme.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.3 — Le coût d'un GPU lent dans un grand job</span> Reprenons l'exemple 1.1 : un GPU à 60 % de sa fréquence ramène le débit à 65,2 % si 80 % de l'étape est du calcul. Dans un job de 1 024 GPU, détecté après 6 h, cela représente <span class="math inline">1024 \times 6 \times (1 - 0{,}652) = 2\,137</span> GPU-heures perdues par un seul composant. Détecter par comparaison à la médiane (<code>NodeSlow</code>, 10 minutes) ramène cette perte à environ 60 GPU-heures plus le temps de la décision. Le calcul suppose la fraction de calcul de 80 %, à mesurer sur votre modèle.</p>
+</div>
+<h3 id="les-dérives-de-débit">7.4. Les dérives de débit</h3>
+<p>Un entraînement dont le débit baisse de 3 % ne dépasse jamais un seuil fixe à −10 %. Une somme cumulée (CUSUM) accumule les écarts à la cible : <span class="math inline">s_i = \max(0,\ s_{i-1} + (\mu - x_i) - k)</span> ; on alarme quand <span class="math inline">s_i &gt; h</span>, avec <span class="math inline">k = 0{,}5\sigma</span> et <span class="math inline">h</span> un multiple de <span class="math inline">\sigma</span>. La cible et <span class="math inline">\sigma</span> viennent d'une fenêtre d'échauffement.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.4 — CUSUM contre seuil fixe, sur séries simulées</span> Série de 400 échantillons à 1 % de bruit, baisse de 3 % à l'échantillon 200, 1 000 séries saines et 1 000 séries qui dérivent. Sortie de <code>python3 drift.py</code> :</p>
+<pre class="text"><code> h (sigma)  false-alarm series  drops found  delay median  delay p95
+         8                  73          973           2.0          4
+        12                   9          997           4.0          6
+        15                   3          998           5.0          7
+fixed threshold at -10 % finds 0 of 1000 drifting series</code></pre>
+<p>Le seuil fixe ne trouve aucune des 1 000 dérives ; le CUSUM en trouve plus de 97 % en 2 à 5 échantillons, soit environ une minute à 15 s par échantillon. Le prix est le taux de fausses alarmes : 0,9 % des séries saines avec <span class="math inline">h = 12\sigma</span>, 7,3 % avec <span class="math inline">h = 8\sigma</span>. <strong>Réglez-le sur votre bruit réel.</strong></p>
+</div>
+<p>Une précaution : le rapport de Llama 3 note une variation diurne de 1 à 2 % du débit, attribuée à des températures plus élevées à midi qui jouent sur la fréquence dynamique des GPU. Un CUSUM naïf la prend pour une dérive : comparez à la médiane de la flotte au même instant, ou à la même heure la veille.</p>
+<h3 id="tests-de-santé-continus">7.5. Tests de santé continus</h3>
+<p>Les métriques disent l'état passé ; un test de santé <strong>provoque</strong> l'erreur avant le job. DCGM fournit des diagnostics à trois niveaux (<code>dcgmi diag -r 1</code>, <code>-r 2</code>, <code>-r 3</code>) dont les durées documentées sont de l'ordre de la seconde, de 2 minutes et de 15 minutes ; la documentation réserve les niveaux moyen et long aux cas où un job a échoué ou un GPU est suspect, et à l'investigation de problèmes matériels. Le niveau court convient à un épilogue Slurm (module <a href="../slurm/index.html">5</a>).</p>
+<div class="war">
+<p><span class="tag">Des vérifications de santé périodiques, calibrées</span> Kokolis et al. (2024) décrivent, sur deux grappes de recherche à A100, des vérifications de santé exécutées toutes les cinq minutes sur chaque nœud, avec des codes de retour succès, échec ou avertissement, allant des erreurs XID aux points de montage manquants. Ils les calibrent de sorte que moins de 1 % des jobs terminés avec succès aient vu une vérification échouer, et un nœud qui échoue passe en remédiation et n'est plus ordonnancé. Source : <a href="https://arxiv.org/abs/2410.21680">arXiv:2410.21680</a>, section sur les vérifications de santé.</p>
+</div>
+<p>La conception recommandée est stratifiée : des vérifications <strong>bon marché et fréquentes</strong> (XID, ECC, fréquences, erreurs PCIe et NVLink) toutes les quelques minutes ; un diagnostic de niveau 1 ou 2 à l'épilogue de chaque job ; un diagnostic complet à la mise en service et après une réparation. Un nœud qui échoue est drainé avec une raison au préfixe convenu (<code>health:</code>, module 5) ; seules les raisons que le contrôle sait clore sans ambiguïté sont remises en service automatiquement.</p>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>Les pannes silencieuses sont celles qui laissent les GPU réservés sans travail utile ; en production, la majorité des interruptions imprévues rapportées pour Llama 3 sont matérielles ou suspectées de l'être.</li>
+<li>Le progrès (compteur de pas) prouve l'avancement ; la vivacité détecte les plantages ; il faut les deux, avec des phases déclarées pour les pauses légitimes.</li>
+<li>La fenêtre de stagnation arbitre fausses alarmes et délai : mesurez vos pauses et placez-la au-dessus de leur queue.</li>
+<li>Un traînard se mesure par le temps de calcul local, rapporté à la médiane du job.</li>
+<li>Les dérives de quelques pour cent demandent un CUSUM réglé sur votre bruit ; les vérifications de santé se calibrent sur le taux de fausses alarmes.</li>
+</ul>
+</div>
+<h2 id="ch8">8. Suivi d'expériences et reproductibilité</h2>
+<p>Une régression de courbe est un problème d'observabilité comme un autre, à condition que les métriques du système et celles du modèle se trouvent au même endroit et portent les mêmes clés. Ce chapitre montre comment, avec MLflow, et ce qu'il faut enregistrer pour pouvoir refaire un run.</p>
+<h3 id="ce-quun-run-doit-enregistrer">8.1. Ce qu'un run doit enregistrer</h3>
+<p>Pour qu'un run soit refaisable, il faut pouvoir reconstruire six choses. Un enregistrement qui en manque une est une anecdote.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Élément</th>
+<th>Exemple</th>
+<th>Où le mettre</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Code</td>
+<td>commit, branche, état « modifié »</td>
+<td>étiquettes (MLflow définit <code>mlflow.source.git.commit</code>, <code>.branch</code>, <code>.dirty</code>)</td>
+</tr>
+<tr class="even">
+<td>Configuration</td>
+<td>taux d'apprentissage, taille de lot globale</td>
+<td>paramètres</td>
+</tr>
+<tr class="odd">
+<td>Données</td>
+<td>version du jeu, empreinte</td>
+<td>étiquette ou paramètre</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>empreinte de l'image de conteneur, versions de bibliothèques</td>
+<td>étiquettes</td>
+</tr>
+<tr class="odd">
+<td>Aléa</td>
+<td>graines</td>
+<td>paramètres</td>
+</tr>
+<tr class="even">
+<td>Matériel et placement</td>
+<td>identifiant du job Slurm, liste des nœuds, modèle de GPU</td>
+<td>étiquettes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Weights &amp; Biases range la configuration dans la propriété <code>config</code> du run et la perte et les mesures de sortie dans le journal <code>log</code> ; MLflow sépare de la même façon les paramètres (<code>log_param</code>) et les métriques avec un pas (<code>log_metrics(..., step=)</code>). L'idée est la même.</p>
+<h3 id="mlflow-en-pratique">8.2. MLflow, en pratique</h3>
+<p>Le suivi de MLflow enregistre pour chaque run des paramètres, des métriques à pas et des étiquettes, dans un magasin de métadonnées (fichiers locaux ou base de données SQL). Ses métriques système (processeur, mémoire, GPU) s'activent par la variable <code>MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING</code> ; les métriques GPU demandent <code>nvidia-ml-py</code>, ce que le bac à sable ne peut pas exercer.</p>
+<div class="note">
+<p><span class="tag">Le magasin de fichiers est abandonné</span> Avec MLflow 3.17.2 installé le 24 octobre 2026 (<code>mlflow-skinny</code>), pointer le suivi sur un dossier local échoue avec : « The filesystem tracking backend (e.g., './mlruns') is in maintenance mode and will not receive further updates. Please migrate to a database backend (e.g., 'sqlite:///mlflow.db') ». Il faut soit une base (le lab utilise SQLite, avec <code>sqlalchemy</code> et <code>alembic</code>), soit la variable <code>MLFLOW_ALLOW_FILE_STORE=true</code>. Les tutoriels qui utilisent encore <code>mlruns</code> sont donc périmés ; lisez la documentation de votre version.</p>
+</div>
+<h3 id="système-ou-modèle">8.3. Système ou modèle ?</h3>
+<p>Devant un run qui se dégrade, la première question est de savoir à quel étage chercher. Une règle simple, avec un run de référence de même configuration :</p>
+<ol type="1">
+<li>le débit (tokens par seconde) change, la perte <strong>à pas égal</strong> ne change pas : le système est en cause (GPU lent, réseau, stockage) ;</li>
+<li>la perte à pas égal change, le débit non : le modèle ou les données (taux d'apprentissage, jeu de données) ;</li>
+<li>les deux changent : cause mixte, par exemple un redémarrage qui a changé de nœuds et de données ; il faut enquêter.</li>
+</ol>
+<p>Il faut pour cela tracer la perte <strong>en fonction du pas</strong> (pas du temps) et enregistrer à chaque pas le minimum de fréquence SM, ce que le lab 14.3 fait.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.1 — Deux régressions, deux verdicts</span> Partie C du lab 14.3 : trois runs <strong>simulés</strong> de 1 200 pas enregistrés par l'API de MLflow 3.17.2 (SQLite), l'un de référence, l'un où la fréquence du GPU le plus lent tombe à 65 % au pas 600 (<code>thermal</code>), l'autre où le taux d'apprentissage devient trois fois trop grand au pas 600 (<code>lrbug</code>). La physique est supposée (80 % de calcul). Sortie réelle :</p>
+<pre class="text"><code>thermal  tokens/s -30.1%  loss gap at equal step -0.003  slowest clock -35.0%  CUSUM alarm at step 600  -10 % threshold alarm at step 600
+         verdict: SYSTEM (throughput moved, loss per step did not; slowest SM clock moved too)
+lrbug    tokens/s +0.0%  loss gap at equal step +2.413  slowest clock +0.0%  CUSUM alarm at step None  -10 % threshold alarm at step None
+         verdict: MODEL or DATA (loss per step moved, throughput did not)</code></pre>
+<p>Le premier run perd 30,1 % de débit sans changer de courbe de perte à pas égal : la fréquence minimale a baissé de 35 %, la cause est le GPU. Le second garde son débit et sa fréquence, mais sa perte à pas égal s'écarte de la référence : aucune alerte de débit ne l'aurait vu, et c'est la courbe de perte qui l'accuse. Une plateforme qui ne surveille que le débit rate le second cas ; une équipe qui ne regarde que la perte confond le premier avec un problème de modèle.</p>
+</div>
+<h3 id="reproductibilité-viser-la-bonne-cible">8.4. Reproductibilité : viser la bonne cible</h3>
+<p>La reproductibilité bit à bit d'un entraînement distribué est rarement atteignable en pratique : l'ordre des réductions et les noyaux non déterministes y mettent obstacle. L'objectif réaliste est la <strong>reproductibilité statistique</strong> : mêmes code, configuration, données et graines doivent donner des courbes qui restent dans le bruit d'un run de référence. C'est précisément ce que le test de l'exemple 8.1 vérifie (écart de perte à pas égal inférieur à 0,05). Enregistrez donc toujours un run de référence pour chaque configuration que vous comptez comparer.</p>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Un run refaisable enregistre code, configuration, données, environnement, graines et placement.</li>
+<li>MLflow : paramètres, métriques à pas, étiquettes ; le magasin de fichiers est en mode maintenance en 3.17.2, utilisez une base.</li>
+<li>Débit qui change et perte à pas égal inchangée : le système ; l'inverse : le modèle ou les données.</li>
+<li>Visez la reproductibilité statistique, avec un run de référence par configuration.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Les trois labs s'exécutent sans GPU dans une VM Linux (testés sur 4 vCPU, 16 Go). Prérequis communs : <code>promtool</code> (<code>sudo apt-get install prometheus</code>, version 2.45.3 testée) et un Python avec <code>prometheus_client</code>, <code>pytest</code>, <code>pyyaml</code>, <code>torch</code> (version CPU) ; la partie C du lab 14.3 demande aussi <code>mlflow-skinny</code>, <code>sqlalchemy</code> et <code>alembic</code>. Chaque <code>verify.sh</code> respecte <code>${PYTHON:-python3}</code> et n'affirme rien sur une durée mesurée : la machine peut être partagée.</p>
+<div class="lab">
+<p><span class="tag">Lab 14.1 — Un exportateur de métriques de nœud testé</span></p>
+<p><strong>Objectif.</strong> Écrire et tester avec <code>prometheus_client</code> un exportateur qui publie un résumé de nœud GPU, l'état d'une file Slurm avec des étiquettes bornées et un histogramme de délai d'attente. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable CPU ; aucun GPU. La branche en direct demande le Slurm du module 5.</p>
+<p><strong>Ce qui est simulé, ce qui est réel.</strong> Le texte DCGM (<code>fixtures/dcgm_node.prom</code>) est <strong>simulé</strong> : noms et formats de dcgm-exporter, valeurs inventées, trois pannes plantées. Les fichiers <code>fixtures/slurm/*</code> sont des <strong>captures réelles</strong> de Slurm 23.11.4, réduites aux champs lus.</p>
+<ol type="1">
+<li>Lisez <code>labs/observability/gpu-metrics-exporter/exporter.py</code> : repérez les trois collecteurs, <code>reason_class</code>, et le fait qu'une source en échec ne produit <strong>aucune</strong> valeur et <code>*_scrape_success 0</code>.</li>
+<li>Lancez <code>python3 exporter.py --fixtures fixtures --once</code> et retrouvez les trois pannes plantées dans les métriques <code>gpu_node_*</code>.</li>
+<li>Lancez <code>bash verify.sh</code> : 14 tests, 6 mutants à tuer, <code>promtool check metrics</code>, un scrape HTTP réel.</li>
+<li>Ajoutez un septième mutant à <code>mutants.py</code> (par exemple, ne plus dédoublonner les identifiants de job) et vérifiez qu'il est tué ; sinon, écrivez le test qui manque.</li>
+<li>Avec le Slurm du module 5 démarré (<code>labs/slurm/slurm-sandbox/setup.sh</code>), lancez <code>LIVE_SLURM=1 bash verify.sh</code> pour la branche en direct, puis <code>teardown.sh</code>.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK mutants: 6/6 killed</code> puis <code>OK gpu-metrics-exporter</code> (sortie de l'auteur : <code>14 passed</code>, <code>slurm_job_wait_seconds_count{qos="normal"} 6.0</code>). La branche en direct a été exécutée une fois par l'auteur : <code>slurm_scrape_success 1.0</code> et <code>slurm_nodes{partition="debug",state="mixed"} 1.0</code>. <strong>Non vérifié</strong> : la lecture d'un vrai dcgm-exporter sur GPU.</p>
+<p><strong>Pour aller plus loin.</strong> Calculez le nombre de séries pour 500 nœuds de 8 GPU avec et sans le résumé de nœud. Remplacez la fixture par un <code>GET</code> sur un dcgm-exporter réel si vous avez un GPU.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 14.2 — Règles d'alerte testées avec promtool</span></p>
+<p><strong>Objectif.</strong> Écrire des règles d'alerte et d'enregistrement, générer les alertes de SLO à partir d'un modèle, les tester avec <code>promtool test rules</code>, et prouver que les tests protègent les règles par mutation. <strong>Durée.</strong> 3.5 h. <strong>Prérequis matériels.</strong> Un portable CPU ; <code>promtool</code>.</p>
+<p><strong>Ce qui est simulé.</strong> Toutes les séries des tests sont synthétiques ; les seuils sont illustratifs.</p>
+<ol type="1">
+<li>Lisez <code>labs/observability/alert-rules/rules/platform.rules.yml</code> et <code>runbooks/</code> : chaque alerte a une sévérité, un résumé et un runbook.</li>
+<li>Lancez <code>python3 gen_rules.py --table</code> puis <code>python3 gen_rules.py --check</code> : les règles et les tests de SLO sont générés par un même modèle.</li>
+<li>Lisez <code>tests/platform.rules.test.yml</code> : pour chaque alerte, repérez le cas qui se déclenche et le cas silencieux, avec des instants d'évaluation de part et d'autre de <code>for</code>.</li>
+<li>Lancez <code>bash verify.sh</code> (environ une minute) : <code>promtool check rules</code>, lint de politique (il doit <strong>rejeter</strong> <code>tests/bad.rules.yml</code>), deux suites de tests, puis 12 mutants.</li>
+<li>Changez le SLO de 95 % à 99 % dans <code>gen_rules.py</code>, régénérez, et relisez la table : que deviennent les seuils et les minutes de déclenchement ?</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK mutants: 12/12 killed</code> puis <code>OK alert-rules</code>. Si un mutant survit, c'est qu'un test manque : écrivez-le.</p>
+<p><strong>Pour aller plus loin.</strong> Écrivez <code>JobStuckPending</code> sur <code>slurm_pending_oldest_age_seconds{reason_class="capacity"}</code> et testez-la avec ses mutants ; ajoutez au lint une vérification que toute alerte <code>page</code> est atteignable depuis un SLO.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 14.3 — Détecteur de job bloqué</span></p>
+<p><strong>Objectif.</strong> Mesurer le compromis fausses alarmes et délai de plusieurs détecteurs de blocage sur séries simulées, observer un <strong>vrai</strong> blocage de collective sur CPU, puis séparer une régression du système d'une régression du modèle. <strong>Durée.</strong> 3.5 h. <strong>Prérequis matériels.</strong> Un portable CPU avec <code>torch</code> ; 2 cœurs libres suffisent.</p>
+<p><strong>Ce qui est simulé, ce qui est réel.</strong> Partie A : séries <strong>simulées</strong>, pauses et signature de blocage <strong>supposées</strong> (<code>sim.py</code>). Partie B : processus, <code>gloo</code>, collective bloquée et piles <strong>réels</strong>, mais sur CPU et avec un blocage injecté ; ce n'est pas NCCL. Partie C : trois runs <strong>simulés</strong> enregistrés par l'API réelle de MLflow.</p>
+<ol type="1">
+<li>Partie A : lisez <code>sim.py</code> (les hypothèses en tête de fichier) puis <code>detectors.py</code>, et lancez <code>python3 evaluate.py</code>. Retrouvez le tableau de l'exemple 7.1.</li>
+<li>Modifiez une hypothèse (par exemple, des checkpoints jusqu'à 900 s) et relancez : quels détecteurs cassent ? Quelle fenêtre faut-il ?</li>
+<li>Partie B : lisez <code>real_hang.py</code>, puis lancez <code>python3 real_hang.py</code>. Identifiez le rang fautif de deux façons : la pile et les journaux.</li>
+<li>Partie C : lancez <code>python3 regress.py</code> et relisez les deux verdicts de l'exemple 8.1.</li>
+<li>Lancez <code>bash verify.sh</code> (environ 30 secondes de calcul).</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK real-hang: localized rank 1 at step 150</code>, <code>OK part C: both regressions classified correctly</code> puis <code>OK hang-detector</code>. Aucune assertion ne porte sur une durée mesurée : seule la présence de l'alarme et la désignation du rang comptent.</p>
+<p><strong>Pour aller plus loin.</strong> Sur un nœud GPU, activez le flight recorder de PyTorch (<code>TORCH_NCCL_TRACE_BUFFER_SIZE</code>, <code>TORCH_NCCL_DUMP_ON_TIMEOUT</code>) sur un job de test dont vous bloquez un rang, et comparez son verdict à celui de la partie B. Mesurez l'utilisation GPU pendant ce blocage : c'est la validation que ce module n'a pas pu faire.</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★ — Un GPU lent dans un job de 128</span> Un job occupe 128 GPU. Un seul tourne à 75 % de la fréquence nominale de 1 980 MHz, les autres à 1 980 MHz. On suppose que 70 % d'une étape est du calcul proportionnel à la fréquence et 30 % de la communication. Calculez la fréquence moyenne et sa baisse en pourcentage, la durée relative d'une étape, le débit relatif et le nombre de GPU équivalents perdus. Que surveilleriez-vous à la place de la moyenne ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>La fréquence moyenne est <span class="math inline">(127 \times 1980 + 1485)/128 = 1\,976{,}1</span> MHz, soit une baisse de <strong>0,20 %</strong>.</p>
+<p>La durée relative d'une étape est :</p>
+<p><span class="math display">0{,}3 + \frac{0{,}7}{0{,}75} = 1{,}233</span></p>
+<p>Le débit relatif est <span class="math inline">1/1{,}233 = 81{,}1\ \%</span>, donc <span class="math inline">128 \times (1 - 0{,}811) = 24{,}2</span> GPU équivalents sont perdus alors que la moyenne n'a bougé que de 0,2 %. On surveille le <strong>minimum</strong> de la fréquence, ou le rapport minimum sur médiane (0,75 ici), et on alerte sur lui avec une durée <code>for</code>. Calcul refait en Python.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Trois GPU, trois verdicts</span> Voici trois GPU d'un même nœud, extraits de la fixture <strong>simulée</strong> du lab 14.1. Classez chacun (sain, bloqué, en panne) et justifiez avec les valeurs. Une alerte « utilisation GPU inférieure à 5 % pendant 10 minutes » les aurait-elle tous trouvés ?</p>
+<div class="tbl-wrap">
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>GPU</th>
+<th><code>GPU_UTIL</code></th>
+<th><code>TENSOR_ACTIVE</code></th>
+<th><code>POWER_USAGE</code> (W)</th>
+<th><code>SM_CLOCK</code> (MHz)</th>
+<th><code>XID_ERRORS</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>97,0</td>
+<td>0,542</td>
+<td>636</td>
+<td>1 968</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>99</td>
+<td>0</td>
+<td>255</td>
+<td>1 976</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>70</td>
+<td>345</td>
+<td>79</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>GPU 2 : sain.</strong> Utilisation, activité tensorielle (0,54), puissance (636 W) et fréquence sont cohérentes avec un entraînement en cours.</p>
+<p><strong>GPU 5 : bloqué (hypothèse du cours).</strong> Utilisation de 99 % mais activité tensorielle nulle et puissance à 255 W, très en dessous de 636 W : des noyaux tournent sans faire de calcul matriciel, comme dans une attente de collective. C'est une signature <strong>supposée</strong>, à valider sur votre matériel.</p>
+<p><strong>GPU 6 : en panne.</strong> Code XID 79 (« GPU has fallen off the bus » dans le catalogue de NVIDIA), utilisation nulle, puissance et fréquence au repos.</p>
+<p>L'alerte sur l'utilisation trouverait le GPU 6, déjà signalé par son XID, et <strong>manquerait le GPU 5</strong>, qui est le plus coûteux : il reste réservé et facturé.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★ — Dimensionner un Prometheus</span> Une flotte de 256 GPU expose 12 métriques par GPU, grattées toutes les 15 s, et la rétention est de 30 jours. Combien de séries, d'échantillons par seconde, d'échantillons sur la période, et quel espace disque (à 1 et 2 octets par échantillon, ordre de grandeur de la documentation) ? Que se passe-t-il si l'on ajoute l'étiquette <code>job</code> à ces séries ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Séries : <span class="math inline">256 \times 12 = 3\,072</span>. Échantillons par seconde : <span class="math inline">3072/15 = 204{,}8</span>. Sur 30 jours (<span class="math inline">2\,592\,000</span> s) : <span class="math inline">5{,}31 \times 10^8</span> échantillons. Disque : <strong>0,53 à 1,06 Go</strong>.</p>
+<p>L'étiquette <code>job</code> ne change pas le nombre de séries <strong>actives</strong> mais fait créer de nouvelles séries à chaque nouveau job : si la flotte exécute des jobs courts, le nombre de séries distinctes sur 30 jours dépasse largement 3 072 (exemple 3.2 : six fois plus de séries créées par jour dans le cas traité). On joint donc le job à la requête avec une métrique d'association.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★★ — Qui bloque la collective ?</span> Un job de 4 rangs ne progresse plus. Votre script (voir l'exemple 4.2) affiche ces lignes, <strong>fictives</strong>, avec la pile du rang suspect. (a) Quel rang est en cause et que faut-il vérifier ? (b) Que conclure si les quatre rangs avaient un dernier pas <strong>entré</strong> de 8 120 et un dernier pas <strong>terminé</strong> de 8 119 ?</p>
+<pre class="text"><code>last collective entered:   {0: 8120, 1: 8120, 2: 8119, 3: 8120}
+last collective completed: {0: 8119, 1: 8119, 2: 8119, 3: 8119}
+rank 2 innermost frame: train.py:212 in next_batch   -&gt; batch = next(data_iter)</code></pre>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li>Les rangs 0, 1 et 3 sont entrés dans la collective du pas 8 120 et attendent. Le rang 2 n'a pas dépassé le pas 8 119 : il n'a pas rejoint la collective, il est <strong>resté en arrière</strong>.</li>
+</ol>
+<p>Sa pile le place dans <code>next_batch</code>, c'est-à-dire dans la lecture des données, pas dans le calcul GPU ni dans le réseau. Il faut vérifier le chargeur de données de ce rang et le stockage qu'il lit : montage, débit, processus de chargement bloqués. Ce n'est pas la peine de drainer le nœud pour une panne GPU avant d'avoir regardé le stockage.</p>
+<ol start="2" type="a">
+<li>Si tous les rangs sont entrés dans la collective du pas 8 120 et qu'aucun ne l'a terminée, aucun rang n'est en retard : <strong>la collective elle-même est bloquée</strong>, ce qui oriente vers le réseau ou le moteur de communication (état des liens, erreurs de la carte réseau, journal NCCL), pas vers un rang.</li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★★ — Choisir les seaux d'un histogramme</span> Vingt jobs ont attendu (en secondes) : 3, 4, 6, 9, 15, 25, 40, 70, 90, 200, 350, 520, 580, 610, 900, 1 500, 2 400, 3 000, 3 300, 5 000 (valeurs <strong>fictives</strong>). Les seaux A sont 10, 60, 300, 600, 1 800, 3 600 et 7 200 s ; les seaux B sont 30, 120, 600, 1 800 et 7 200 s. Pour chaque jeu, calculez l'estimation que donnerait <code>histogram_quantile</code> pour la médiane et le 90e centile, et la part des jobs sous 600 s. Comparez aux valeurs exactes et concluez.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Valeurs exactes (interpolation linéaire) : médiane 275 s, 90e centile 3 030 s, part sous 600 s : 13 sur 20, soit <strong>65 %</strong>.</p>
+<p>Avec les seaux A, les décomptes cumulés sont 4, 7, 10, 13, 16, 19, 20. La médiane est le rang 10 : elle tombe pile sur la borne de 300 s (estimation <strong>300 s</strong>, +9 %). Le 90e centile est au rang 18 : dans le seau (1 800 ; 3 600] qui contient 3 jobs de 16 à 19 ; <span class="math inline">1\,800 + 1\,800 \times (18-16)/(19-16) = 3\,000</span> s (<strong>−1 %</strong>).</p>
+<p>Avec les seaux B, les décomptes sont 6, 9, 13, 16, 20. La médiane est au rang 10 dans (120 ; 600] : <span class="math inline">120 + 480 \times (10-9)/(13-9) = 240</span> s (−13 %). Le 90e centile est au rang 18 dans (1 800 ; 7 200] : <span class="math inline">1\,800 + 5\,400 \times (18-16)/(20-16) = 4\,500</span> s (<strong>+49 %</strong>).</p>
+<p>Pour les deux jeux, la part sous 600 s est exacte (65 %), car 600 est une borne. Conclusion : placez des bornes sur vos seuils de SLO ; pour les centiles élevés, resserrez les seaux là où la queue de la distribution se trouve. Calculs refaits en Python avec la formule d'interpolation de Prometheus ; elle a été vérifiée par <code>promtool</code> sur les données de l'exemple 5.2.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★★ — Un SLO à 99 %</span> Le SLO d'attente passe à « 99 % des jobs démarrent en moins de 600 s sur 30 jours ». (a) Quel budget d'erreur en minutes d'indisponibilité totale équivalente ? (b) Calculez les seuils de taux d'erreur et les délais de déclenchement à 100 % d'erreur des trois alertes (vitesses 14,4 ; 6 ; 1). (c) Une panne totale de 25 minutes : quelles alertes se déclenchent, et quelle part du budget consomme-t-elle ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">1\ \% \times 30 \times 24 \times 60 = 432</span> minutes, soit 7,2 h.</p></li>
+<li><p>Seuil <span class="math inline">=</span> vitesse <span class="math inline">\times\ 0{,}01</span> : <strong>0,144</strong> pour la page rapide (fenêtres 1 h et 5 min), <strong>0,06</strong> pour la page lente (6 h et 30 min), <strong>0,01</strong> pour le ticket (3 j et 6 h). À 100 % d'erreur, la fenêtre longue atteint le seuil après seuil × durée de la fenêtre : <span class="math inline">0{,}144 \times 60 = 8{,}64</span> min, <span class="math inline">0{,}06 \times 360 = 21{,}6</span> min, <span class="math inline">0{,}01 \times 4\,320 = 43{,}2</span> min. Ces valeurs sont celles que donne <code>python3 gen_rules.py --table</code> avec <code>SLO_TARGET = 0.99</code>.</p></li>
+<li><p>La page rapide se déclenche à la 9e minute, la page lente à la 22e, pas le ticket (il en faudrait 43,2). La panne consomme <span class="math inline">25/432 = 5{,}8\ \%</span> du budget mensuel.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★★ — Le déluge de 3 h 10</span> Chaque nuit à 3 h 10, l'alerte <code>JobNoProgress</code> (compteur de pas immobile sur une fenêtre de 10 minutes, <code>for: 2m</code>) page l'astreinte pour quatre jobs, puis se résout seule deux minutes plus tard. Un instantané du système de fichiers est lancé à 3 h 00 ; les points de contrôle de ces jobs durent alors 14 minutes. Expliquez le déclenchement par un calcul, proposez deux corrections et leur prix.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Quand le pas s'arrête à l'instant <span class="math inline">t_0</span>, la fenêtre de 10 minutes ne contient plus aucun pas à partir de <span class="math inline">t_0 + 10</span> min ; avec <code>for: 2m</code>, l'alerte se déclenche à <span class="math inline">t_0 + 12</span> min. Les points de contrôle durent 14 minutes : l'alerte est active de <span class="math inline">t_0 + 12</span> à <span class="math inline">t_0 + 14</span> min, soit environ <strong>deux minutes</strong>, ce que montre le cas « faux positif connu » de <code>tests/platform.rules.test.yml</code> (<code>promtool test rules</code>, <code>SUCCESS</code> : silence à 21 min, alerte à 33 min pour une pause qui commence à 20 min).</p>
+<p><strong>Correction 1 : élargir la fenêtre.</strong> Avec 15 minutes, la même pause de 14 minutes ne déclenche plus rien (vérifié avec <code>promtool</code> sur une copie de la règle). Prix : tout vrai blocage est détecté 5 minutes plus tard, soit pour 512 GPU <span class="math inline">5/60 \times 512 = 42{,}7</span> GPU-heures de plus par incident.</p>
+<p><strong>Correction 2 : déclarer la phase.</strong> L'entraîneur publie <code>train_phase</code> ; la règle de stagnation ne s'applique qu'en phase d'entraînement, la phase de point de contrôle a sa propre tolérance (lab 14.3). Prix : un contrat de plus avec l'équipe d'entraînement.</p>
+<p>Et surtout, un point de contrôle de 14 minutes est lui-même un problème (l'instantané qui le ralentit) : l'alerte vient de le révéler.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★ — Quelle fenêtre choisir ?</span> Vous gérez des jobs de 256 GPU. D'après le lab 14.3, le tableau suivant donne, sur séries simulées, les runs sains alertés pour 100 h de runs et le délai médian de détection. Une fausse alarme tue un job et lui fait perdre en moyenne 0,25 h de travail ; on suppose <strong>2 blocages réels pour 100 h de runs</strong> (hypothèse). Calculez le coût total en GPU-heures pour 100 h de runs et choisissez. À partir de quelle fréquence de blocages la fenêtre 120 s à phase déclarée battrait-elle celle de 240 s ?</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Détecteur</th>
+<th>alertés pour 100 h</th>
+<th>délai médian (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>compteur seul, 120 s</td>
+<td>16,56</td>
+<td>126</td>
+</tr>
+<tr class="even">
+<td>phase déclarée, 120 s</td>
+<td>2,22</td>
+<td>126</td>
+</tr>
+<tr class="odd">
+<td>phase déclarée, 240 s</td>
+<td>0,00</td>
+<td>246</td>
+</tr>
+<tr class="even">
+<td>compteur seul, 480 s</td>
+<td>0,00</td>
+<td>486</td>
+</tr>
+<tr class="odd">
+<td>compteur seul, 900 s</td>
+<td>0,00</td>
+<td>906</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Coût <span class="math inline">=</span> alertés <span class="math inline">\times\ 0{,}25 \times 256</span> <span class="math inline">+</span> <span class="math inline">2 \times</span> délai<span class="math inline">/3600 \times 256</span>.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Détecteur</th>
+<th>fausses alarmes (GPU-h)</th>
+<th>blocages (GPU-h)</th>
+<th>total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>compteur seul, 120 s</td>
+<td>1 059,8</td>
+<td>17,9</td>
+<td>1 077,8</td>
+</tr>
+<tr class="even">
+<td>phase déclarée, 120 s</td>
+<td>142,1</td>
+<td>17,9</td>
+<td>160,0</td>
+</tr>
+<tr class="odd">
+<td>phase déclarée, 240 s</td>
+<td>0,0</td>
+<td>35,0</td>
+<td><strong>35,0</strong></td>
+</tr>
+<tr class="even">
+<td>compteur seul, 480 s</td>
+<td>0,0</td>
+<td>69,1</td>
+<td>69,1</td>
+</tr>
+<tr class="odd">
+<td>compteur seul, 900 s</td>
+<td>0,0</td>
+<td>128,9</td>
+<td>128,9</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le meilleur choix est la <strong>phase déclarée à 240 s</strong>.</p>
+<p>Les fausses alarmes dominent tout : avec le compteur seul à 120 s, elles coûtent près de 60 fois plus que les blocages. Chaque blocage détecté coûte <span class="math inline">126 \times 256/3600 = 8{,}96</span> GPU-h à 120 s et <span class="math inline">17{,}49</span> GPU-h à 240 s. La fenêtre de 120 s ne gagnerait que si <span class="math inline">142{,}1 + 8{,}96\,n &lt; 17{,}49\,n</span>, soit <span class="math inline">n &gt; 16{,}7</span> blocages pour 100 h de runs : un toutes les 6 h, ce qui n'est pas un régime de fonctionnement. Les taux de fausses alarmes sont ici une <strong>borne basse</strong> (une seule première alarme par run) et viennent d'hypothèses de pauses simulées : refaites le calcul avec vos mesures.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★★★ — La pile d'observabilité de 2 048 GPU</span> Dimensionnez et décrivez la pile d'un cluster de 256 nœuds de 8 GPU : intervalles de collecte, nombre de séries et volume de disque pour 15 jours, jointure du job, alertes de page (six au plus), SLO. Hypothèses : 25 métriques par GPU, 1 000 séries par nœud pour les métriques du système (<strong>à mesurer</strong> chez vous). Comparez une collecte unique à 15 s et une collecte de 15 s pour les GPU et 60 s pour les nœuds.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Séries.</strong> GPU : <span class="math inline">2048 \times 25 = 51\,200</span>. Nœuds : <span class="math inline">256 \times 1000 = 256\,000</span>. Total : <strong>307 200</strong> (les métriques du nœud dominent).</p>
+<p><strong>Disque, 15 jours.</strong> Collecte unique à 15 s : <span class="math inline">307\,200/15 = 20\,480</span> échantillons par seconde, soit 26,5 à 53,1 Go. Collecte à deux rythmes (GPU 15 s, nœuds 60 s) : <span class="math inline">51\,200/15 + 256\,000/60 = 7\,680</span> échantillons par seconde, soit <strong>10,0 à 19,9 Go</strong>, 2,7 fois moins. La conclusion est que le coût se joue sur les métriques du nœud, pas sur celles des GPU.</p>
+<p><strong>Jointure.</strong> Pas d'étiquette <code>job</code> sur les 51 200 séries GPU : une série d'association <code>slurm_job_gpu_allocated</code> (modèle du projet 5), alimentée par un prolog Slurm ou l'option de correspondance de dcgm-exporter (format à relire).</p>
+<p><strong>Alertes de page (cinq).</strong> <code>JobNoProgress</code> à phase déclarée ; vitesse de consommation rapide du SLO d'attente ; vitesse rapide du SLO de capacité ; XID critique (79, 95) sur un GPU alloué ; télémétrie GPU absente sur plus de 5 % des nœuds. Tout le reste en ticket : <code>GPUHot</code>, <code>NodeSlow</code>, vitesses lentes.</p>
+<p><strong>SLO.</strong> Capacité utilisable 99,5 % (budget de 3,6 h sur 720 h) ; attente sous 10 min pour 95 % des jobs de QOS normale (hors classes <code>user</code> et <code>admin</code>) ; goodput suivi, sans engagement tant que vous ne l'avez pas mesuré.</p>
+<p><strong>Tableaux.</strong> Trois niveaux (flotte, job, nœud) générés par code. Pas de rétention au-delà de 15 jours sans stockage long terme, non traité ici.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 10 · ★★★ — Une courbe qui casse au pas 6 000</span> Un entraînement de 512 GPU, repris depuis un point de contrôle au pas 5 990 après le remplacement d'un nœud, montre à partir du pas 6 000 : débit en baisse de 12 % ; perte à pas égal supérieure de 0,4 à celle d'un run de référence de même configuration ; fréquence SM minimale en baisse de 3 %. Appliquez la règle du chapitre 8, dites ce que la fréquence explique, et proposez une enquête en trois temps avec les preuves attendues.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Classement.</strong> Le débit <strong>et</strong> la perte à pas égal ont changé : cause <strong>mixte</strong> (règle 3 du chapitre 8). Il y a donc probablement deux causes indépendantes, qui coïncident parce que le redémarrage les a introduites ensemble.</p>
+<p><strong>Ce que la fréquence explique.</strong> Avec 80 % de calcul proportionnel à la fréquence (hypothèse à mesurer), une baisse de 3 % donne <span class="math inline">1/(0{,}2 + 0{,}8/0{,}97) = 0{,}976</span>, soit <strong>−2,4 %</strong> de débit. Il reste environ 9,6 points non expliqués : la fréquence n'est pas la cause principale.</p>
+<p><strong>Enquête.</strong></p>
+<ol type="1">
+<li><em>Débit</em> : comparer le placement avant et après le remplacement (le nouveau nœud est-il sur un autre commutateur ?), le temps de calcul local par rang (<code>train_compute_seconds</code>, lab 14.2) et le temps de communication. Preuve : un rang ou un groupe de rangs dont le calcul ou la communication diffère.</li>
+<li><em>Perte</em> : un redémarrage correct restaure l'optimiseur, l'ordonnanceur de taux d'apprentissage, l'état de l'aléa et la position du chargeur de données. Relire dans MLflow le taux d'apprentissage enregistré avant et après le pas 5 990 et vérifier que les données ne sont pas rejouées. Preuve : une courbe de taux d'apprentissage continue, ou la cause trouvée.</li>
+<li><em>Contre-épreuve</em> : relancer depuis le même point de contrôle sur le placement d'origine. Si le débit revient, c'est le placement ; si la perte reste décalée, c'est la reprise.</li>
+</ol>
+<p>Un enregistrement de run qui contient le job Slurm, la liste des nœuds et le commit permet de faire cette enquête en une heure, pas en une semaine.</p>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux dire ce qu'une métrique GPU mesure et ce qu'elle ne mesure pas.</strong> Preuve : un tableau commenté de six métriques DCGM avec leur définition citée et, pour chacune, un cas où elle induit en erreur.</li>
+<li><strong>Je peux dimensionner un Prometheus et protéger sa cardinalité.</strong> Preuve : les exercices 3 et 9 refaits pour votre flotte, avec la jointure du job décrite.</li>
+<li><strong>Je peux écrire un exportateur testé.</strong> Preuve : le lab 14.1 avec un mutant de votre invention tué par un test que vous avez écrit.</li>
+<li><strong>Je peux écrire une alerte et prouver que ses tests la protègent.</strong> Preuve : le lab 14.2 avec une alerte de plus et 13 mutants tués.</li>
+<li><strong>Je peux définir un SLO et ses alertes à vitesse de consommation.</strong> Preuve : la table de <code>gen_rules.py</code> pour un SLO de votre choix et l'exercice 6.</li>
+<li><strong>Je peux détecter un blocage et chiffrer fausses alarmes et délai.</strong> Preuve : le tableau du lab 14.3 recalculé avec les durées de pause de <strong>votre</strong> entraîneur.</li>
+<li><strong>Je peux dire si une régression vient du système ou du modèle.</strong> Preuve : la partie C du lab 14.3 refaite sur un cas à vous, et l'exercice 10.</li>
+</ul>
+<p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
+<ol type="1">
+<li><p><em>Un job de 512 GPU affiche 100 % d'utilisation GPU mais n'avance plus. Que regardez-vous ?</em> Réponse-type : l'utilisation ne prouve rien, car elle indique la présence de noyaux ; je regarde le compteur de pas de l'entraîneur, l'activité tensorielle et la puissance, puis le dernier pas entré et terminé de chaque rang (ou le flight recorder) pour trouver le rang qui n'a pas rejoint la collective, et sa pile. Je vérifie les erreurs XID et le journal du noyau du nœud concerné.</p>
+<p>Le délai NCCL par défaut est de 10 minutes : mon détecteur doit agir plus tôt, avec une phase déclarée pour ne pas confondre un point de contrôle avec un blocage.</p></li>
+<li><p><em>Comment alertez-vous sur la file d'attente sans réveiller l'astreinte pour rien ?</em> Réponse-type : je définis un SLI d'attente imputable à la plateforme (raisons de capacité, depuis l'éligibilité), un SLO, et des alertes à vitesses de consommation multiples sur deux fenêtres, sans durée <code>for</code>, testées par scénarios avec <code>promtool</code>. Les attentes dues à l'utilisateur ou à l'administrateur ne comptent pas. Je groupe les alertes par domaine de panne.</p></li>
+<li><p><em>Votre Prometheus manque de mémoire après l'arrivée d'une nouvelle équipe. Que faites-vous ?</em> Réponse-type : je soupçonne la cardinalité, typiquement une étiquette à valeurs non bornées (job, pod, utilisateur) ; je cherche la métrique qui compte le plus de séries, je retire ou joins l'étiquette à la requête avec une métrique d'association, et je pose une limite <code>sample_limit</code> sur le travail de scrape pour qu'un exportateur fautif échoue au lieu d'étouffer le serveur. Je mesure ensuite le nombre de séries actives avant et après.</p></li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<ul>
+<li>Dubey et al. <a href="https://arxiv.org/abs/2407.21783"><em>The Llama 3 Herd of Models</em></a>, 2024, section 3.3.4 : 466 interruptions sur 54 jours, temps d'entraînement effectif supérieur à 90 %, flight recorder et traînards (chapitres 4, 6 et 7).</li>
+<li>Kokolis et al. <a href="https://arxiv.org/abs/2410.21680"><em>Revisiting Reliability in Large-Scale Machine Learning Research Clusters</em></a>, 2024 : définition de l'ETTR, vérifications de santé toutes les cinq minutes (chapitres 6 et 7).</li>
+<li>Jiang et al. <a href="https://arxiv.org/abs/2402.15627"><em>MegaScale</em></a>, 2024 : battements de cœur, événements CUDA et diagnostic à plus de 10 000 GPU (chapitres 4 et 7).</li>
+<li>Hu et al. <a href="https://arxiv.org/abs/2403.07648"><em>Characterization of Large Language Model Development in the Datacenter</em></a>, 2024 : échantillonnage à 15 s de Prometheus, DCGM et IPMI, utilisation GPU polarisée (chapitre 3).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html"><em>DCGM — Feature Overview</em></a> : métriques de profil (<code>SM_ACTIVE</code>, <code>PIPE_TENSOR_ACTIVE</code>) et niveaux de <code>dcgmi diag</code> (chapitres 2 et 7).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/datacenter/cloud-native/gpu-telemetry/latest/dcgm-exporter.html"><em>DCGM Exporter</em></a> et <a href="https://raw.githubusercontent.com/NVIDIA/dcgm-exporter/main/etc/default-counters.csv"><code>default-counters.csv</code></a> : port, intervalle, liste des métriques (chapitre 2).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/deploy/nvidia-smi/index.html"><em>nvidia-smi</em></a> et <a href="https://docs.nvidia.com/deploy/xid-errors/index.html"><em>Xid Errors</em></a> : définition de l'utilisation GPU, catalogue des codes XID (chapitre 2).</li>
+<li>Prometheus. <a href="https://prometheus.io/docs/prometheus/latest/storage/"><em>Storage</em></a>, <a href="https://prometheus.io/docs/practices/naming/"><em>Metric and label naming</em></a>, <a href="https://prometheus.io/docs/practices/rules/"><em>Recording rules</em></a>, <a href="https://prometheus.io/docs/practices/pushing/"><em>When to use the Pushgateway</em></a> : dimensionnement, cardinalité, nommage (chapitre 3).</li>
+<li>Prometheus. <a href="https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/"><em>Alerting rules</em></a> et <a href="https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/"><em>Unit testing for rules</em></a> : <code>for</code>, <code>keep_firing_for</code>, format des tests (chapitre 6 et lab 14.2).</li>
+<li>Beyer et al. <a href="https://sre.google/workbook/alerting-on-slos/"><em>The Site Reliability Workbook</em>, « Alerting on SLOs »</a> : alertes à vitesses de consommation multiples (chapitre 6).</li>
+<li>Grafana Labs. <a href="https://grafana.com/docs/loki/latest/get-started/labels/"><em>Loki — Labels</em></a> et <a href="https://grafana.com/docs/loki/latest/get-started/labels/bp-labels/"><em>bonnes pratiques</em></a> : étiquettes à faible cardinalité (chapitre 4).</li>
+<li>PyTorch. <a href="https://docs.pytorch.org/tutorials/unstable/flight_recorder_tutorial.html"><em>Debugging with Flight Recorder</em></a> et <a href="https://docs.pytorch.org/docs/2.14/distributed.html"><em>torch.distributed</em></a> : variables d'environnement et délais par défaut (chapitre 4).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/squeue.html"><em>squeue</em></a> et <a href="https://slurm.schedmd.com/sinfo.html"><em>sinfo</em></a> : raisons d'attente, format JSON, avertissement sur la charge de <code>slurmctld</code> (chapitre 5).</li>
+<li>Kueue. <a href="https://kueue.sigs.k8s.io/docs/reference/metrics/"><em>Metrics reference</em></a> et kube-state-metrics, <a href="https://raw.githubusercontent.com/kubernetes/kube-state-metrics/main/docs/metrics/workload/pod-metrics.md"><em>Pod metrics</em></a> : métriques de files et de pods (chapitre 5).</li>
+<li>MLflow. <a href="https://mlflow.org/docs/latest/ml/tracking/"><em>Tracking</em></a> et <a href="https://mlflow.org/docs/latest/ml/tracking/system-metrics/"><em>System metrics</em></a> ; W&amp;B, <a href="https://docs.coreweave.com/products/wandb/track/config"><em>Configure experiments</em></a> : suivi d'expériences (chapitre 8).</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les faits suivants ont été relus sur leurs sources le 24 octobre 2026. DCGM et dcgm-exporter : définition de l'utilisation GPU (<code>nvidia-smi</code>), des métriques de profil et des niveaux de diagnostic, port 9400, intervalle de collecte de 30 000 ms, option <code>-k</code>, liste de 25 métriques par défaut, existence de l'option <code>--hpc-job-mapping-dir</code> dans le code source, codes XID 79, 94 et 95. Prometheus : 1 à 2 octets par échantillon et la formule de capacité, rétention de 15 jours par défaut, blocs de deux heures, avertissement sur la cardinalité, nommage des règles d'enregistrement, usage de la Pushgateway, collecteur <em>textfile</em>, <code>keep_firing_for</code>, <code>sample_limit</code>, <code>group_wait</code>. Workbook SRE : vitesses de consommation, fenêtre courte au douzième, déconseil des durées, quatre critères. Llama 3 : 54 jours, 466, 47, 419, 78 %, 58,7 %, 90 %, variation diurne de 1 à 2 %. Kokolis et al. : définitions de l'ETTR et du goodput, contrôles toutes les cinq minutes, moins de 1 %. Acme : 15 s. MegaScale : battements de cœur et événements CUDA. PyTorch : délais de 10 et 30 minutes, variables du flight recorder. Loki, OpenTelemetry, Kueue, kube-state-metrics, MLflow (variable des métriques système, étiquettes <code>mlflow.source.git.*</code> lues dans le code source), W&amp;B (<code>config</code>), README du <code>prometheus-slurm-exporter</code> de vpenso (JSON, Slurm 23.02 minimum). Les comportements <strong>observés</strong> viennent d'exécutions du 24 octobre 2026 : Slurm 23.11.4, <code>promtool</code> 2.45.3, MLflow 3.17.2, PyTorch 2.14 (CPU, <code>gloo</code>), <code>prometheus_client</code> 0.26.0 ; les sorties citées en proviennent.</p>
+<p><strong>Recommandé.</strong> Les cinq couches, le regroupement des raisons d'attente en classes, les trois SLI de plateforme et leurs cibles (95 %, 99 %, 99,5 %), les seuils d'alerte (85 °C, rapport 1,3 à la médiane, 10 minutes sans pas), le contrat de l'entraîneur (<code>train_steps_total</code>, <code>train_compute_seconds</code>, phase déclarée), la conception de santé en trois strates, les réglages du CUSUM (<span class="math inline">k = 0{,}5\sigma</span>, <span class="math inline">h = 12\sigma</span>) et la cible de reproductibilité statistique sont des choix de ce parcours, pas des règles des outils. Tous les chiffres de pauses, de fractions de calcul (80 %, 70 %), de fréquence de pannes (12 h, 2 blocages pour 100 h) et de tailles de journaux sont des <strong>hypothèses d'exemple</strong>.</p>
+<p><strong>À vérifier.</strong> (1) La signature d'un blocage « utilisation haute, tensor nul, battement de cœur actif » n'a pas été mesurée sur GPU : le bac à sable n'a pas de GPU. (2) Le format des fichiers de l'option <code>--hpc-job-mapping-dir</code> n'a pas été relu. (3) Les étiquettes exactes de dcgm-exporter varient selon les versions (la présence de <code>modelName</code> n'a pas été vérifiée dans la documentation). (4) La requête LogQL, la configuration d'Alertmanager et les métriques de Kubernetes et de Kueue n'ont pas été exécutées : il n'y a pas de Loki, d'Alertmanager ni de cluster Kubernetes dans le bac à sable. (5) Les métriques GPU de MLflow demandent <code>nvidia-ml-py</code> et n'ont pas été exercées. (6) Le comportement du chien de garde NCCL n'a pas été observé : la partie B du lab 14.3 utilise <code>gloo</code>. (7) Le nombre de séries par nœud (1 000) et la mémoire par série sont à mesurer sur votre serveur. (8) Les champs JSON de <code>squeue</code> et de <code>sinfo</code> évoluent d'une version de Slurm à l'autre ; relisez la documentation de la vôtre. (9) Le tableau de <code>kube-state-metrics</code> marque <code>kube_pod_status_phase</code> comme expérimentale à la date de lecture.</p>
+<p><strong>Hors périmètre.</strong> La configuration complète d'Alertmanager (routage, inhibitions), le stockage de longue durée de Prometheus (écriture distante, Thanos, Mimir), le dimensionnement d'Elasticsearch, le déploiement de collecteurs OpenTelemetry, les compteurs réseau InfiniBand (module 7), la détection de corruption silencieuse de données, le profilage fin de noyaux (module 4), l'énergie et les coûts (module 15) et le déploiement de l'exportateur sur un vrai cluster de GPU.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/fault-tolerance/index.html"><span class="k">← Précédent</span>Module 10 — Pannes, checkpointing et reprise automatique</a><a class="next" href="../../courses/platform-leadership/index.html"><span class="k">Suivant →</span>Module 16 — Plateforme interne, sécurité, production et leadership</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

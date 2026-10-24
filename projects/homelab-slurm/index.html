@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Projet 1 — Mini-cluster Slurm instrumenté — Mastering Compute Infrastructure</title>
+<meta name="description" content="La comptabilité d'un cluster Slurm décrite en code et appliquée de façon idempotente par différence, un exportateur de métriques, des alertes testées par promtool, et une vérification en direct sur un vrai Slurm.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#projets">Projets</a></p>
+<header id="title-block-header">
+<h1 class="title">Projet 1 — Mini-cluster Slurm instrumenté</h1>
+<p class="subtitle">Projet 1 · 24 h · modules : linux-systems, provisioning, slurm, observability</p>
+<p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Tests hors ligne sur des sorties réelles de Slurm 23.11.4</span></p>
+</header>
+<h2 id="contexte">Contexte et objectif</h2>
+<p>Un cluster Slurm est un <strong>état</strong> : comptes, QOS, parts d'équité, utilisateurs, partitions. Tant que cet état n'existe que dans l'historique d'un terminal, personne ne peut le relire, le revoir ni le reconstruire. Ce projet vous fait décrire l'état voulu dans un fichier, calculer <strong>ce qui manque</strong> par rapport à l'état réel, l'appliquer, puis observer le cluster avec des métriques et des alertes que vous avez testées.</p>
+<p>Le point de départ est un constat fait en écrivant le <a href="../../courses/slurm/index.html">module Slurm</a>. Ses scripts de lab ajoutent <code>|| true</code> à chaque <code>sacctmgr</code>, ce qui les rend « idempotents » mais <strong>cache aussi les vraies erreurs</strong>. En effet, <code>sacctmgr add</code> sur un objet qui existe déjà se termine avec le code 1, exactement comme une faute de frappe. La bonne méthode est d'<strong>observer l'état réel et de n'ajouter que la différence</strong>.</p>
+<div class="key">
+<p><span class="tag">Objectif du projet</span> Un cluster que l'on sait décrire (<code>cluster.yml</code>), converger vers cette description sans jamais rien supprimer, et surveiller avec des alertes dont on a prouvé qu'elles se déclenchent, qu'elles se taisent quand il le faut, et que les tests qui les protègent détectent une règle modifiée.</p>
+</div>
+<p>Le projet se vérifie de deux façons. Hors ligne, avec des sorties <strong>réelles</strong> de Slurm 23.11.4 enregistrées dans <code>fixtures/</code> : aucun Slurm n'est nécessaire pour faire passer les tests. En direct, avec <code>verify-live.sh</code>, qui monte le Slurm du bac à sable du module 5, applique votre configuration deux fois et lit de vraies métriques.</p>
+<p><strong>État de la vérification en direct.</strong> <code>verify-live.sh</code> est écrit et passe <code>shellcheck</code>, mais il n'a <strong>pas encore été exécuté de bout en bout</strong> par l'auteur de ce parcours : le badge ne couvre donc que les tests hors ligne. Si vous l'exécutez, comparez sa sortie à la liste des étapes de la section « Cahier des charges » (R7) et signalez tout écart.</p>
+<h3 id="pre">Prérequis de connaissances</h3>
+<p>Le <a href="../../courses/slurm/index.html">module Slurm</a> (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; le chapitre sur la comptabilité explique ce que vous allez décrire en code. Les règles d'alerte et leurs tests reprennent la méthode du <a href="../gpu-observability/index.html">projet 5</a>, appliquée ici aux métriques d'un ordonnanceur et non d'un GPU.</p>
+<h2 id="cahier">Cahier des charges</h2>
+<p>Le dossier <code>labs/projects/homelab-slurm/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>fixtures/</code> (sorties réelles de Slurm), <code>tests/</code> (24 tests), <code>verify.sh</code> (hors ligne) et <code>verify-live.sh</code> (sur un vrai Slurm).</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Exigence</th>
+<th>Test qui la vérifie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R1</td>
+<td><strong>Validation</strong> de <code>cluster.yml</code> : parents inconnus, cycles, parts invalides, QOS ou comptes inconnus, noms en majuscules, tous signalés ensemble</td>
+<td><code>test_validate_reports_every_kind_of_mistake</code></td>
+</tr>
+<tr class="even">
+<td>R2</td>
+<td><strong>Lecture de l'état réel</strong> à partir des sorties <code>-nP</code> de <code>sacctmgr show assoc</code> et <code>show qos</code></td>
+<td><code>test_parse_state_reads_the_real_sacctmgr_output</code></td>
+</tr>
+<tr class="odd">
+<td>R3</td>
+<td><strong>Plan par différence</strong>, dans l'ordre (QOS, comptes parents d'abord, utilisateurs), avec la syntaxe vérifiée sur Slurm ; jamais destructif ; l'état réel capturé est déjà convergé</td>
+<td><code>test_plan_*</code>, <code>test_the_real_captured_state_is_already_converged</code></td>
+</tr>
+<tr class="even">
+<td>R4</td>
+<td><strong>Convergence</strong> : appliquer le plan puis recalculer donne un plan vide ; l'application s'arrête à la première erreur et la nomme</td>
+<td><code>test_applying_the_plan_converges_*</code>, <code>test_apply_stops_*</code></td>
+</tr>
+<tr class="odd">
+<td>R5</td>
+<td><strong>Exportateur</strong> : métriques sur nœuds, jobs, raisons d'attente, âge du plus vieux job en attente, parts d'équité ; étiquettes <strong>bornées</strong> ; séries à zéro ; <code>slurm_scrape_ok</code></td>
+<td><code>tests/test_exporter.py</code> (9 tests)</td>
+</tr>
+<tr class="even">
+<td>R6</td>
+<td><strong>Quatre alertes</strong> avec tests <code>promtool</code>, chacune avec un cas qui se déclenche et un cas silencieux, et des tests qui détectent une règle mutée</td>
+<td><code>tests/test_rules.py</code> (5 tests)</td>
+</tr>
+<tr class="odd">
+<td>R7</td>
+<td><strong>Vérification en direct</strong> : le second passage ne change rien, les métriques lues sur un vrai Slurm sont acceptées par <code>promtool</code>, un nœud drainé devient « mal portant »</td>
+<td><code>verify-live.sh</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Les quatre alertes sont <code>SlurmExporterStale</code> (métriques absentes ou périmées), <code>SlurmNodeUnhealthy</code> (nœud drainé ou en panne), <code>SlurmJobsPendingTooLong</code> (le plus vieux job attend depuis plus d'une heure) et <code>SlurmSchedulerStuck</code> (des jobs attendent, aucun ne tourne et des nœuds sont libres). La dernière est la panne classique du module 5 : un job qui attend à jamais avec la raison <code>InvalidAccount</code> alors que le nœud est libre.</p>
+<h2 id="jalons">Jalons</h2>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>N°</th>
+<th>Jalon</th>
+<th>Durée</th>
+<th>Preuve</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Validation et lecture de l'état (<code>config.py</code>, première moitié)</td>
+<td>4 h</td>
+<td><code>test_validate_*</code> et <code>test_parse_state_*</code> passent</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Plan, application, dérive et convergence</td>
+<td>6 h</td>
+<td>les 10 tests de <code>test_config.py</code> passent ; l'état réel capturé donne un plan vide</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Exportateur de métriques</td>
+<td>6 h</td>
+<td>les 9 tests de <code>test_exporter.py</code> passent, dont l'acceptation par <code>promtool check metrics</code></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Règles d'alerte et leurs tests</td>
+<td>4 h</td>
+<td><code>promtool test rules</code> passe et le test de mutation aussi</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Exécution en direct, runbook et ADR</td>
+<td>4 h</td>
+<td>la sortie de <code>verify-live.sh</code>, un runbook d'une page, un ADR</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> labs/projects/homelab-slurm</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> prometheus            <span class="co"># promtool</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span>/chemin/vers/python             <span class="co"># pytest et pyyaml</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">IMPL</span><span class="op">=</span>starter <span class="va">$PYTHON</span> <span class="at">-m</span> pytest <span class="at">-q</span> tests       <span class="co"># 22 échecs sur 24 au départ</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                  <span class="co"># référence verte, départ rouge</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> PYTHON=<span class="va">$PYTHON</span> IMPL=starter bash verify-live.sh   <span class="co"># votre code sur un vrai Slurm (root, bac à sable jetable)</span></span></code></pre></div>
+<p>Commencez par <strong>regarder</strong> les fixtures : ouvrez <code>fixtures/assoc.txt</code> et <code>fixtures/sshare.txt</code> et décrivez ce que vous voyez avant d'écrire un analyseur. L'indentation de <code>sshare</code>, par exemple, existe même avec l'option de sortie parsable ; on ne la découvre qu'en regardant.</p>
+<h2 id="livrables">Livrables</h2>
+<p>Votre dépôt public contient :</p>
+<ul>
+<li><code>cluster.yml</code>, <code>config.py</code> et <code>exporter.py</code> complétés, les règles et leurs tests, avec la commande unique qui lance tout ;</li>
+<li>la sortie de <code>verify-live.sh</code> sur votre machine, ou la mention honnête qu'elle n'a pas pu être exécutée ;</li>
+<li>un <strong>runbook</strong> d'une page : « des jobs attendent, des nœuds sont libres, que vérifier et dans quel ordre » ;</li>
+<li>un <strong>ADR</strong> d'une page.</li>
+</ul>
+<p>L'ADR tranche au moins quatre questions, en nommant l'alternative écartée :</p>
+<ol type="1">
+<li>Pourquoi calculer une différence plutôt qu'ignorer les erreurs avec <code>|| true</code>, et que perd-on quand la différence est calculée sur un état qui change pendant l'exécution ?</li>
+<li>Pourquoi le plan n'a-t-il aucune commande de suppression, et que faites-vous des objets qui ont dérivé ?</li>
+<li>Comment avez-vous borné les étiquettes de l'exportateur, et quelle série aurait explosé sans cela ?</li>
+<li>Pourquoi une alerte sur « rien ne tourne » exige-t-elle une série à zéro plutôt qu'une série absente ?</li>
+</ol>
+<h2 id="criteres">Critères de réussite</h2>
+<p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
+<ul>
+<li><strong>État réel converge.</strong> Pour <code>cluster.yml</code> et les sorties capturées dans <code>fixtures/</code>, <code>plan</code> renvoie une liste vide et <code>drift</code> ne signale rien. Commande : <code>pytest -k real_captured_state</code>.</li>
+<li><strong>Syntaxe vérifiée.</strong> Sur un cluster vierge, le plan est exactement : une QOS, deux comptes, deux utilisateurs et un <code>modify user … qos+=urgent</code>, dans l'ordre du test. Commande : <code>pytest -k plan_from_an_empty</code>.</li>
+<li><strong>Idempotence.</strong> Après application, un second plan est vide, avec un faux <code>sacctmgr</code> qui répond 1 sur un objet existant ; et en direct, le second passage de <code>config.py</code> n'affiche aucune commande. Commandes : <code>pytest -k converges</code> et <code>verify-live.sh</code>.</li>
+<li><strong>Jamais destructif.</strong> Aucune commande du plan ne contient <code>delete</code>, <code>remove</code> ni <code>-=</code>, et les objets en trop sont rapportés par <code>drift</code>.</li>
+<li><strong>Exportateur.</strong> Les sorties réelles donnent 4 jobs en attente dont 3 <code>Priority</code> et 1 <code>Resources</code>, et un nœud <code>drng</code> avec la raison bornée <code>gpu_xid</code>. L'exposition passe <code>promtool check metrics</code>.</li>
+<li><strong>Série à zéro.</strong> Un cluster au repos expose <code>slurm_jobs{state="RUNNING"} 0</code> et <code>PENDING 0</code>. Commande : <code>pytest -k zero_valued</code>.</li>
+<li><strong>Alertes.</strong> Chacune des six mutations (durée <code>for</code> portée à 90 minutes, comparaison inversée) fait échouer vos tests. Commande : <code>pytest tests/test_rules.py -k mutated</code>.</li>
+</ul>
+<h2 id="pistes">Pistes et indices</h2>
+<p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
+<p><strong>Syntaxe de <code>sacctmgr</code>.</strong> Ne la devinez pas : testez-la sur le Slurm du bac à sable. Les formes qui ont été exécutées avec succès sont <code>add account NOM parent=P fairshare=N</code>, <code>modify account where name=NOM set fairshare=N</code>, <code>add user NOM account=A</code>, <code>add qos NOM Priority=N Preempt=autre</code>, <code>modify qos where name=NOM set Priority=N</code> et <code>modify user where name=NOM set qos+=Q</code>.</p>
+<p><strong>Lire l'état.</strong> <code>sacctmgr -nP show assoc</code> mêle deux sortes de lignes : celles dont la colonne utilisateur est vide décrivent un compte (parent, part), les autres décrivent un utilisateur dans un compte (avec la liste de ses QOS). Un même utilisateur peut apparaître dans plusieurs comptes, comme <code>root</code> dans les fixtures.</p>
+<p><strong>Idempotence par différence.</strong> Deux idées distinctes : ne <strong>proposer</strong> que ce qui manque, et <strong>s'arrêter</strong> au premier échec avec un message qui nomme la commande. Un échec silencieux est exactement ce que <code>|| true</code> produisait.</p>
+<p><strong>Étiquettes bornées.</strong> Le texte libre d'une raison de nœud (<code>gpu_xid:79</code>, <code>health: …</code>) donnerait une série par message distinct. Gardez la partie avant le premier deux-points ou espace. De même, regroupez les raisons d'attente inconnues sous <code>other</code>.</p>
+<p><strong>Absence et zéro.</strong> Une alerte « des jobs attendent et aucun ne tourne » compare le nombre de jobs en cours à zéro. Si l'exportateur n'émet que les états qui existent, la série <code>RUNNING</code> <strong>n'existe pas</strong> quand rien ne tourne, et la comparaison ne donne rien : l'alerte ne se déclenche jamais, précisément dans le cas qu'elle doit couvrir. Émettez des zéros explicites.</p>
+<p><strong>États de nœud.</strong> <code>sinfo</code> affiche <code>drng</code> (en cours de drainage, des jobs tournent encore) puis <code>drain</code>. Les deux sont « mal portants » ; un suffixe comme <code>*</code> ou <code>~</code> doit disparaître avant de comparer.</p>
+<h3 id="reference-results">Résultats de la solution de référence</h3>
+<p>À lire <strong>après</strong> votre propre travail.</p>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Observé sur Slurm 23.11.4 (bac à sable, 2026-10-24).</strong></p>
+<pre class="text"><code>$ sacctmgr -i add account teama parent=research fairshare=1     # deuxième fois
+ Already existing account teama on cluster sandbox              # code de retour 1
+$ sacctmgr -i add qos urgent Priority=1000 Preempt=normal       # deuxième fois
+ Nothing new added.                                             # code de retour 1</code></pre>
+<p>Les deux commandes se terminent avec le code 1, comme n'importe quelle erreur : c'est la raison de calculer une différence plutôt que d'ignorer les échecs. La commande <code>modify … set</code> réussit avec le code 0.</p>
+<p><strong>Formats lus.</strong> <code>sshare -n -P</code> indente la première colonne (<code>root|root|1|0.5…</code>) ; <code>sinfo -N -o "%E"</code> écrit <code>none</code> quand il n'y a pas de raison ; un nœud qui draine alors qu'un job tourne est <code>drng</code>, puis <code>drain</code> quand le job est parti ; <code>squeue</code> donne la raison <code>None</code> pour un job qui tourne.</p>
+<p><strong>Résultat des tests.</strong> La référence passe 24 tests ; le code de départ en échoue 22 (seuls passent les deux tests qui vérifient la règle et son test fournis). Le test de mutation génère six mutants de la règle et les détecte tous.</p>
+</details>
+<h2 id="extensions">Extensions</h2>
+<ul>
+<li><strong>Contrôle de santé.</strong> Ajoutez la configuration <code>HealthCheckProgram</code> du lab 5.3 à <code>cluster.yml</code> et faites décrire par le code le nœud mis en quarantaine ; mesurez le délai entre la panne et l'alerte.</li>
+<li><strong>Plusieurs nœuds.</strong> Étendez le cluster à plusieurs <code>slurmd</code> et vérifiez que les métriques par nœud et les alertes se comportent de même.</li>
+<li><strong>API plutôt que lignes de commande.</strong> Remplacez les appels à <code>sinfo</code> et <code>squeue</code> par l'API REST <code>slurmrestd</code> et comparez la robustesse de l'analyse.</li>
+<li><strong>Tableau de bord.</strong> Générez un tableau de bord Grafana comme au projet 5, avec les quatre alertes en annotations.</li>
+<li><strong>Dérive.</strong> Faites supprimer, avec confirmation explicite, un objet signalé par <code>drift</code> ; décidez qui a le droit de lancer cette commande et comment le tracer.</li>
+</ul>
+<h2 id="portfolio">Pour le portfolio</h2>
+<p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : le problème (état du cluster non reproductible), le schéma description, plan, application, exportateur, alertes, la commande qui lance les 24 tests, la sortie de <code>verify-live.sh</code>, et un paragraphe sur ce que le projet ne couvre pas.</p>
+<p><strong>Ce qu'il faut montrer.</strong> Le plan vide au second passage, les alertes testées et le test de mutation, et le runbook. Le recruteur lira d'abord ce que vous faites des erreurs de <code>sacctmgr</code>.</p>
+<p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui décrit un cluster comme du code, qui sait pourquoi <code>|| true</code> est un défaut, qui sépare l'absence d'une mesure de sa valeur zéro, et qui teste ses alertes comme du code.</p>
+<div class="note">
+<p><span class="tag">Pourquoi une différence plutôt qu'un script « rejouable »</span> Un script qui rejoue tout en ignorant les échecs réussit dans tous les cas, y compris quand il n'a rien fait de ce qu'on voulait. Une différence calculée sur l'état réel dit ce qu'elle va faire <strong>avant</strong> de le faire, peut être relue, et devient vide quand le but est atteint : une liste vide est un résultat vérifiable.</p>
+</div>
+<p>Trois accroches <strong>honnêtes</strong>, à adapter à ce que vous avez réellement fait :</p>
+<ol type="1">
+<li>« J'ai décrit la comptabilité d'un cluster Slurm dans un fichier et écrit un outil qui n'ajoute que la différence avec l'état réel, avec un second passage vide, vérifié sur un vrai Slurm. »</li>
+<li>« J'ai écrit des alertes sur les files d'attente de Slurm dont les tests échouent quand on modifie la règle, dont une qui détecte des jobs en attente avec des nœuds libres. »</li>
+<li>« Je sais dire ce que ce projet ne couvre pas : un cluster multi-nœuds, l'API REST et la suppression d'objets. »</li>
+</ol>
+<h3 id="formules">Formules du projet</h3>
+<p>Ce projet n'introduit pas de formule nouvelle. L'âge du plus vieux job en attente, métrique de <code>SlurmJobsPendingTooLong</code>, est la différence entre l'instant de lecture et l'instant de soumission le plus ancien parmi les jobs en attente :</p>
+<p><span class="math display">\text{âge}_{\max} = t_{\text{lecture}} - \min_{j \in \text{PENDING}} t_{\text{soumission}}(j)</span></p>
+<h3 id="lectures">Pour aller plus loin</h3>
+<ul>
+<li>SchedMD, documentation de <a href="https://slurm.schedmd.com/sacctmgr.html"><code>sacctmgr</code></a>, <a href="https://slurm.schedmd.com/sinfo.html"><code>sinfo</code></a>, <a href="https://slurm.schedmd.com/squeue.html"><code>squeue</code></a> et <a href="https://slurm.schedmd.com/sshare.html"><code>sshare</code></a>.</li>
+<li>Le <a href="../gpu-observability/index.html">projet 5</a> pour la méthode des règles testées par mutation.</li>
+</ul>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/platform-leadership/index.html"><span class="k">← Précédent</span>Module 16 — Plateforme interne, sécurité, production et leadership</a><a class="next" href="../../projects/scaling-study/index.html"><span class="k">Suivant →</span>Projet 2 — Étude de passage à l'échelle d'un entraînement</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+# Platform rules for a GPU training fleet (course module 14, lab 14.2).
+# Thresholds are ILLUSTRATIVE: calibrate them on your own fleet (see chapter 7 of the course).
+# Inputs: dcgm-exporter metrics, the lab 14.1 exporter, and a trainer contract:
+#   train_steps_total{job,rank}          counter, optimizer steps completed by that rank
+#   train_compute_seconds{job,node,rank} gauge, local compute time of the last step (collective wait excluded)
+groups:
+  - name: platform-recording
+    interval: 30s
+    rules:
+      - record: job:train_compute_seconds:median
+        expr: quantile by (job) (0.5, train_compute_seconds)
+      - record: node:train_compute_seconds:ratio_to_job_median
+        expr: train_compute_seconds / on (job) group_left () job:train_compute_seconds:median
+      - record: job:train_steps:increase10m_max
+        expr: max by (job) (increase(train_steps_total[10m]))
+
+  - name: platform-alerts
+    interval: 30s
+    rules:
+      - alert: GPUHot
+        expr: DCGM_FI_DEV_GPU_TEMP > 85
+        for: 5m
+        keep_firing_for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "{{ $labels.Hostname }} gpu {{ $labels.gpu }} at {{ $value }} C"
+          runbook_url: "runbooks/GPUHot.md"
+
+      - alert: NodeSlow
+        expr: node:train_compute_seconds:ratio_to_job_median > 1.3
+        for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "job {{ $labels.job }}: node {{ $labels.node }} rank {{ $labels.rank }} computes {{ $value | humanize }}x slower than the job median"
+          runbook_url: "runbooks/NodeSlow.md"
+
+      - alert: JobNoProgress
+        expr: job:train_steps:increase10m_max == 0
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "job {{ $labels.job }}: no optimizer step completed in 10 minutes"
+          runbook_url: "runbooks/JobNoProgress.md"
+
+      - alert: GpuTelemetryDown
+        expr: up{job="dcgm"} == 0
+        for: 5m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "no GPU telemetry from {{ $labels.instance }}: the alerts above are blind on this node"
+          runbook_url: "runbooks/GpuTelemetryDown.md"

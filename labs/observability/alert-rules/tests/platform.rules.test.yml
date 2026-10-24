@@ -1,0 +1,95 @@
+# Hand-written promtool tests for rules/platform.rules.yml. Every alert has a case that fires AND a case that stays silent,
+# with evaluation times on both sides of the `for:` duration: that is what makes the mutants in mutate.py die.
+rule_files:
+  - ../rules/platform.rules.yml
+evaluation_interval: 30s
+group_eval_order:
+  - platform-recording
+  - platform-alerts
+
+tests:
+  # --- GPUHot: 90 C from minute 10 to 20 on gpu 0, then 70 C. for: 5m, keep_firing_for: 10m. gpu 1 stays cool.
+  - interval: 30s
+    input_series:
+      - series: 'DCGM_FI_DEV_GPU_TEMP{Hostname="n1",gpu="0"}'
+        values: '60x20 90x20 70x80'
+      - series: 'DCGM_FI_DEV_GPU_TEMP{Hostname="n1",gpu="1"}'
+        values: '62x120'
+    alert_rule_test:
+      - {eval_time: 14m, alertname: GPUHot, exp_alerts: []}          # hot for 4 min only: still pending
+      - eval_time: 16m
+        alertname: GPUHot
+        exp_alerts:
+          - exp_labels: {severity: ticket, Hostname: n1, gpu: "0"}
+            exp_annotations: {summary: "n1 gpu 0 at 90 C", runbook_url: "runbooks/GPUHot.md"}
+      - eval_time: 25m                      # cooled at minute 20, kept firing 10 more minutes; the annotation keeps the
+        alertname: GPUHot                   # value of the last evaluation where the condition held (90 C), not the current 70 C
+        exp_alerts:
+          - exp_labels: {severity: ticket, Hostname: n1, gpu: "0"}
+            exp_annotations: {summary: "n1 gpu 0 at 90 C", runbook_url: "runbooks/GPUHot.md"}
+      - {eval_time: 32m, alertname: GPUHot, exp_alerts: []}          # resolved
+
+  # --- NodeSlow: rank 5 of job j1 computes 1.5x slower than the median for the whole run; job j2 is only 1.2x slower.
+  - interval: 30s
+    input_series:
+      - {series: 'train_compute_seconds{job="j1",node="n0",rank="0"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j1",node="n1",rank="1"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j1",node="n2",rank="2"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j1",node="n3",rank="3"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j1",node="n4",rank="4"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j1",node="n5",rank="5"}', values: '1.5x60'}
+      - {series: 'train_compute_seconds{job="j2",node="m0",rank="0"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j2",node="m1",rank="1"}', values: '1.0x60'}
+      - {series: 'train_compute_seconds{job="j2",node="m2",rank="2"}', values: '1.2x60'}
+    alert_rule_test:
+      - {eval_time: 9m, alertname: NodeSlow, exp_alerts: []}          # 1.5x for 9 min: pending
+      - eval_time: 12m
+        alertname: NodeSlow
+        exp_alerts:                                                    # only j1/rank 5; j2 at 1.2x is below 1.3
+          - exp_labels: {severity: ticket, job: j1, node: n5, rank: "5"}
+            exp_annotations: {summary: "job j1: node n5 rank 5 computes 1.5x slower than the job median", runbook_url: "runbooks/NodeSlow.md"}
+
+  # --- JobNoProgress: j1 stops at minute 20; j2 keeps going; j3 pauses 8 minutes (a checkpoint) and must NOT alert.
+  - interval: 30s
+    input_series:
+      - {series: 'train_steps_total{job="j1",rank="0"}', values: '0+1x40 40+0x80'}
+      - {series: 'train_steps_total{job="j1",rank="1"}', values: '0+1x40 40+0x80'}
+      - {series: 'train_steps_total{job="j2",rank="0"}', values: '0+1x120'}
+      - {series: 'train_steps_total{job="j3",rank="0"}', values: '0+1x20 20+0x16 20+1x84'}
+    alert_rule_test:
+      - {eval_time: 25m, alertname: JobNoProgress, exp_alerts: []}   # the 10-minute window still contains progress
+      - {eval_time: 29m, alertname: JobNoProgress, exp_alerts: []}
+      - eval_time: 34m
+        alertname: JobNoProgress
+        exp_alerts:
+          - exp_labels: {severity: page, job: j1}
+            exp_annotations: {summary: "job j1: no optimizer step completed in 10 minutes", runbook_url: "runbooks/JobNoProgress.md"}
+      - eval_time: 18m                                                # j3 is mid-pause here: window of 10 min still holds steps
+        alertname: JobNoProgress
+        exp_alerts: []
+
+  # --- GpuTelemetryDown: n1's exporter dies at minute 5, n2 stays up.
+  - interval: 30s
+    input_series:
+      - {series: 'up{job="dcgm",instance="n1:9400"}', values: '1x10 0x50'}
+      - {series: 'up{job="dcgm",instance="n2:9400"}', values: '1x60'}
+    alert_rule_test:
+      - {eval_time: 9m, alertname: GpuTelemetryDown, exp_alerts: []}
+      - eval_time: 11m
+        alertname: GpuTelemetryDown
+        exp_alerts:
+          - exp_labels: {severity: ticket, job: dcgm, instance: "n1:9400"}
+            exp_annotations: {summary: "no GPU telemetry from n1:9400: the alerts above are blind on this node", runbook_url: "runbooks/GpuTelemetryDown.md"}
+
+  # --- KNOWN FALSE POSITIVE of a window-only rule: a 14-minute checkpoint pause (longer than window 10m + for 2m) pages.
+  # The fix is not to hide this test but to declare the training phase (lab 14.3) or to widen the window and accept the delay.
+  - interval: 30s
+    input_series:
+      - {series: 'train_steps_total{job="j4",rank="0"}', values: '0+1x40 40+0x28 40+1x60'}
+    alert_rule_test:
+      - {eval_time: 21m, alertname: JobNoProgress, exp_alerts: []}
+      - eval_time: 33m
+        alertname: JobNoProgress
+        exp_alerts:
+          - exp_labels: {severity: page, job: j4}
+            exp_annotations: {summary: "job j4: no optimizer step completed in 10 minutes", runbook_url: "runbooks/JobNoProgress.md"}

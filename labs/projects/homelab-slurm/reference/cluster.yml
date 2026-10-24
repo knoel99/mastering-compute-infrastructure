@@ -1,0 +1,11 @@
+# Desired accounting state of the cluster. Slurm lower-cases account names: write them in lower case.
+accounts:
+  research: {parent: root, fairshare: 1}
+  teama:    {parent: research, fairshare: 2}
+  teamb:    {parent: research, fairshare: 3}
+qos:
+  normal: {priority: 0}
+  urgent: {priority: 2000, preempt: [normal]}
+users:
+  alice: {account: teama, qos: [normal, urgent]}
+  bob:   {account: teamb, qos: [normal]}

@@ -1,0 +1,13 @@
+# SYNTHETIC fixture written by hand for the course, in the format shown by NVIDIA's Xid documentation
+# ("NVRM: Xid (0000:03:00): 14, Channel 00000001"). It is NOT a capture from a real machine.
+[Sat Oct 24 02:10:01 2026] systemd[1]: Started Session 4412 of User trainer.
+[Sat Oct 24 02:14:37 2026] NVRM: Xid (0000:3b:00): 63, Row remapping event
+[Sat Oct 24 02:51:12 2026] NVRM: Xid (0000:5e:00): 13, Graphics Engine Exception
+[Sat Oct 24 03:02:44 2026] NVRM: Xid (0000:3b:00): 48, An uncorrectable double bit error (DBE) has been detected
+[Sat Oct 24 03:02:44 2026] NVRM: Xid (0000:3b:00): 154, GPU recovery action changed
+[Sat Oct 24 03:02:45 2026] NVRM: Xid (0000:3b:00): 45, Ch 00000012, Preemptive removal
+[Sat Oct 24 03:02:45 2026] NVRM: Xid (0000:3b:00): 45, Ch 00000013, Preemptive removal
+[Sat Oct 24 04:40:19 2026] NVRM: Xid (0000:86:00): 74, NVLink error
+[Sat Oct 24 04:40:20 2026] NVRM: Xid (0000:86:00): 74, NVLink error
+[Sat Oct 24 04:40:20 2026] NVRM: Xid (0000:86:00): 74, NVLink error
+[Sat Oct 24 05:01:00 2026] CPU: 12 PID: 77123 Comm: python Not tainted
