@@ -1,0 +1,71 @@
+---
+title: "Parcours"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../generated/chrome-d1.html
+    include-after-body: ../assets/closing-d1.html
+---
+
+Cette page décrit l'écart entre la pratique de Kim et le poste de Compute Infrastructure Lead, offre A, dans une startup robotique. L'offre B, l'entraînement à grande échelle, vient après.
+
+::: note
+Les cinq sessions ROMEO n'annoncent pas de certificat. Il possède déjà FinOps for AI et les fondamentaux Azure. Un certificat Kubernetes reste facultatif. Le poste de Compute Infrastructure Lead lira un portefeuille, pas un badge.
+:::
+
+## Acquis
+
+Il a douze ans de pratique comme ingénieur IA et LLM. Il enseigne déjà le deep learning. Au travail, il utilise déjà les outils suivants.
+
+- Python, au quotidien
+- Kubernetes et Helm
+- Prometheus, Grafana et DCGM
+- vLLM pour l'inférence sur site
+- Azure et Terraform
+- FinOps sur la dépense cloud
+- la simulation numérique
+
+## À consolider
+
+Il a peu pratiqué Slurm en opérateur. Tenir une file, ouvrir un compte et préempter un job ne sont pas des gestes courants.
+
+Il ne configure pas InfiniBand. Il ne place pas un job selon la topologie. Il n'a pas encore enchaîné une préemption et une reprise depuis un checkpoint. Il ne répartit pas un entraînement entre plusieurs fournisseurs. L'entraînement distribué s'arrête au laptop.
+
+Les GPU qu'il opère sont ceux de l'inférence. Une flotte d'entraînement n'est pas en place. Prometheus et Grafana montrent si une machine répond. La trace d'un job d'entraînement n'est pas là.
+
+FinOps couvre les jetons et les services. Un contrat d'heures GPU n'est pas en place. Kubernetes porte ses applications. Il ne s'en sert pas comme ordonnanceur de batch. Il connaît le stockage objet et HDFS. Il n'a pas de chemin de données pour l'entraînement.
+
+## À apprendre
+
+Le travail d'opérateur Slurm commence dans les premières pages du parcours. Les pages suivantes couvrent les autres manques.
+
+La page Socle PyTorch pour l'infra lui demande d'arriver capable de lire une boucle d'entraînement et de nommer train, val et test. Il enseigne déjà le deep learning. Cette page n'est pas un manuel.
+
+La recherche multi-GPU des paramètres d'un modèle tient en une grille sur un GPU ou sur CPU. Après la séance, il écrit une note sur le passage à plusieurs GPU.
+
+La page Réseau et stockage d'entraînement relie InfiniBand, RoCE, la topologie et la copie des données avant le job. Le travail tient sur papier, plus iperf ou un banc disque sur le laptop.
+
+La page Préemption et reprise lui fait écrire un checkpoint, puis relancer une petite boucle au dernier pas sain.
+
+La page Placement multi-fournisseurs nomme Ray et SkyPilot comme la classe d'outil. Il y traite le quota, le débordement et le basculement, sur un placement papier de deux types de GPU.
+
+La page Observabilité et coût de flotte part de Prometheus, Grafana et DCGM, déjà en place. Cette page ajoute la trace des jobs et le coût en heures GPU. Le travail prévu est un croquis et une feuille.
+
+La page Capstone portefeuille Lead est le dossier de l'offre A. Un relecteur lance un dépôt sur un laptop, avec un job préempté, une reprise et une note de coût.
+
+Quatre pages sont dans l'offre B.
+
+Sur la page Parallélismes et MFU, il nomme DDP, FSDP, le parallélisme tensoriel, le parallélisme pipeline et le parallélisme expert. Il estime la mémoire sur un seul GPU. Il définit MFU comme le rapport entre les opérations du modèle réellement exécutées et le pic annoncé du GPU.
+
+Sur la page Profilage et noyaux, il nomme Nsight et Triton. Le travail prévu est une liste de contrôle de profilage.
+
+La page Débogage numérique traite les pertes aberrantes et le déterminisme. Le travail prévu est un script CPU qui compare deux graines.
+
+La page Infra d'entraînement par renforcement décrit les rollouts, le schéma actor-learner et le tampon de replay. Le travail prévu est un diagramme de séquence et une petite boucle CPU.
+
+{{< include ../generated/parcours-sequence.md >}}

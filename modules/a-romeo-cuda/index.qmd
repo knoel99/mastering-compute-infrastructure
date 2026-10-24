@@ -1,0 +1,413 @@
+---
+title: "ROMEO2025 et CUDA Python"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 3
+  jalon: "Confirmé. Jeu. 5 nov. 2026, 13h-17h. CUDA Python. Présentiel seulement."
+---
+
+## Objectifs
+
+Confirmé. L'après-midi du jeudi 5 novembre 2026, de 13 h à 17 h, est une séance CUDA Python en présentiel seulement. La préparation se fait sur le portable.
+
+Kim s'y prépare pour le poste Compute Infrastructure Lead dans une startup robotique. Il laisse l'offre B, l'entraînement à grande échelle, aux modules suivants.
+
+Il repart avec un script d'addition de vecteurs, ou avec le même calcul écrit en boucles sur CPU. Une note dit dans quel environnement le run a tourné. Il cite ensuite un chiffre de ROMEO2025 avec le mot Confirmé ou le mot Anticipé qui le porte. Le glossaire en bas de page fixe les mots des modules suivants.
+
+## Prérequis
+
+Python 3 et NumPy sont installés sur le portable. Il lit une ligne de tableau et il lance une commande dans un terminal.
+
+Un GPU n'est pas requis. Si aucun GPU CUDA n'est visible, il garde le jumeau CPU et le dessin sur papier. Il installe `numba-cuda` seulement quand un GPU CUDA répond déjà. L'import reste `from numba import cuda`.
+
+Le compte ROMEO n'est pas un prérequis. Il existe quand les organisateurs l'ont créé. Un GPU de cloud peu cher est une branche facultative, avec un environnement créé sur ce GPU. Le chemin par défaut reste le portable.
+
+## Notes de cours
+
+### Grille, bloc, thread
+
+Un lancement CUDA crée une grille. La grille est l'ensemble des threads de cet appel. Elle se découpe en blocs. Un bloc est le groupe de threads qu'un SM reçoit. Le thread porte un indice et traite un élément.
+
+::: {.def}
+<span class="tag">Indice</span>
+
+L'indice vaut `block_idx * threads + thread_idx`. Quand l'indice atteint `n`, le thread ne touche pas la mémoire.
+:::
+
+`cuda.grid(1)` calcule cet indice dans un kernel Numba. Pour un tableau de 10 éléments et des blocs de 4 threads, la formule donne 3 blocs. Les indices lancés vont de 0 à 11. Les indices 10 et 11 tombent hors du tableau.
+
+### Forme du kernel Numba
+
+Numba compile un sous-ensemble de Python en kernel CUDA. Le premier appel compile. Son temps mélange la compilation et le calcul. Il mesure un second appel.
+
+```python
+from numba import cuda
+
+@cuda.jit
+def vector_add(x, y, out):
+    i = cuda.grid(1)
+    if i < out.size:
+        out[i] = x[i] + y[i]
+```
+
+Les crochets du lancement portent d'abord le nombre de blocs, puis le nombre de threads du bloc.
+
+```python
+threads = 128
+blocks = (n + threads - 1) // threads
+vector_add[blocks, threads](d_x, d_y, d_out)
+```
+
+Le jumeau CPU parcourt les mêmes indices de bloc et de thread. Sans GPU, le script prend ce jumeau. Sur papier, ce jumeau est le corrigé.
+
+```python
+def vector_add_cpu(x, y, out):
+    threads = 128
+    blocks = (x.size + threads - 1) // threads
+    for block_idx in range(blocks):
+        for thread_idx in range(threads):
+            i = block_idx * threads + thread_idx
+            if i < out.size:
+                out[i] = x[i] + y[i]
+```
+
+### Copie ou kernel
+
+Numba appelle le CPU l'hôte et le GPU le device. `cuda.to_device` copie un tableau de l'hôte vers le device. `copy_to_host` ramène le résultat vers l'hôte. `cuda.device_array` alloue sur le device. Cette allocation ne copie pas les valeurs d'un tableau hôte.
+
+La ligne qui porte `[blocks, threads]` lance le kernel. Le corps du kernel lit et écrit la mémoire du device. Il ne déplace pas le tableau entier entre l'hôte et le device.
+
+S'il passe un tableau NumPy au kernel, Numba peut copier à sa place. La copie disparaît alors du texte du script. Il garde les appels explicites pour chronométrer le transport à part du calcul.
+
+```python
+d_x = cuda.to_device(x)
+d_y = cuda.to_device(y)
+d_out = cuda.device_array(x.size, dtype=x.dtype)
+vector_add[blocks, threads](d_x, d_y, d_out)
+out = d_out.copy_to_host()
+```
+
+### Venv du portable sur un nœud aarch64
+
+Un venv fige l'interpréteur de la machine qui l'a créé, et les extensions compilées avec lui. Un portable x86_64 produit un exécutable x86_64. Le nœud GPU décrit dans le journal public est aarch64. Le chargeur de ce nœud refuse l'exécutable du portable. Le message usuel est exec format error. Une roue marquée pour x86_64 échoue aussi à l'import.
+
+Il construit le venv sur la machine qui va l'exécuter. Sur le portable, le venv du portable lance le kernel si un GPU CUDA répond, et le jumeau CPU sinon. Sur un GPU de cloud peu cher, il crée un venv sur ce GPU. Sur un nœud ROMEO, il crée un environnement aarch64, et seulement une fois le compte reçu des organisateurs. Copier le dossier du venv du portable ne crée pas le compte. Le binaire copié garde l'architecture du portable.
+
+### Liste de juin 2026
+
+Confirmé. Le système 180311, dans la liste TOP500 de juin 2026, a le rang 192.
+
+Le Rmax est 9,86 PFlop/s. Le Rpeak est 16,32 PFlop/s. La puissance est 160,16 kW. Le nombre de cœurs est 47 328. Le modèle est BullSequana XH3000. L'interconnexion est quad-rail InfiniBand NDR200. Le système d'exploitation est RHEL, Red Hat Enterprise Linux.
+
+En novembre 2024, le rang de ce système était 122. Le Rpeak de cette ligne de novembre 2024 était 11,20 PFlop/s.
+
+### Communiqué du 30 mai 2024
+
+Confirmé. Le 30 mai 2024, Eviden annonce 58 nœuds quad-GH200, soit 232 superpuces. La partition CPU compte 44 nœuds et 8 448 cœurs. Le même communiqué annonce environ 25 000 cœurs CPU.
+
+Le Linpack annoncé vaut environ 8 PFlop/s. Le Rmax TOP500 vaut 9,86 PFlop/s. Ce sont deux chiffres distincts.
+
+::: {.note}
+<span class="tag">Deux rédactions</span>
+
+TOP500 écrit 47 328 cœurs. Le communiqué écrit environ 25 000 cœurs CPU, et il écrit 8 448 cœurs pour la partition CPU. Ces décomptes divergent. Chacun reste cité avec sa source.
+
+Le communiqué anglais écrit 2,8 Po de stockage IBM ESS. Le PDF français écrit 2 Po de stockage IBM ESS. Les deux formulations divergent. Les deux restent citées telles quelles.
+:::
+
+### Journal public ISC26
+
+Confirmé. Ceci est un journal public ISC26, distinct de la documentation du centre.
+
+Le 22 juillet 2025, sur le nœud romeo-a005, nvidia-smi affiche NVIDIA GH200 120GB et 97871 MiB. Les deux champs restent cités tels quels. Le même affichage donne le pilote 560.35.03.
+
+lscpu affiche aarch64 et Neoverse-V2. La ligne `CPU(s)` vaut 288, soit 4 sockets de 72 cœurs. Cette page écrit ce décompte « 288 CPUs ».
+
+ibstat affiche quatre cartes InfiniBand, mlx5_0, mlx5_1, mlx5_2 et mlx5_3. Le drapeau Slurm écrit dans le journal est constraint=armgpu.
+
+Les frontales nommées sont romeo1.univ-reims.fr et romeo2.univ-reims.fr. Le nom de compte vient des organisateurs.
+
+### Dossier de préparation
+
+::: {.note}
+<span class="tag">Anticipé</span>
+
+Le dossier de préparation nomme les fonctions romeo_load_armgpu_env et romeo_load_x64cpu_env. Le journal public montre le drapeau Slurm des nœuds GPU. Le journal ne montre pas ces noms de fonctions.
+
+Le dossier épingle Slurm 23.11 et Spack 1.0. Ces numéros viennent du dossier. Le document du centre n'a pas été relu.
+
+NVLink-C2C à 900 Go/s est le chiffre NVIDIA pour le lien Grace-Hopper d'une GH200. Ce chiffre est repris sans mesure sur ROMEO. Cette section ne donne aucune URL.
+:::
+
+## Exercices
+
+### Exercice 1. Compter les threads hors borne
+
+Il prend un tableau de 22 éléments et des blocs de 8 threads. Il calcule le nombre de blocs avec `(n + threads - 1) // threads`. Il liste les indices lancés. Il marque ceux que le test `i < n` écarte.
+
+Il travaille sur papier. Le portable suffit. Il obtient 3 blocs, des indices de 0 à 23, et les threads 22 et 23 sans écriture.
+
+### Exercice 2. Exécuter l'addition sur le portable
+
+Il enregistre le script suivant et le lance avec `python` dans le venv du portable. S'il existe un GPU CUDA et que `numba-cuda` est installé, le script prend le kernel. Sinon il prend le jumeau CPU. Les valeurs attendues sont 0, 2, 4, 6, 8, 10, 12 et 14.
+
+Un GPU de cloud peu cher est une branche. Il y recrée l'environnement, puis il relance le même fichier. Un nœud ROMEO est une autre branche, une fois le compte reçu des organisateurs. Il y construit un environnement aarch64. Il n'y copie pas ce venv.
+
+```python
+import numpy as np
+
+def vector_add_cpu(x, y, out):
+    threads = 32
+    blocks = (x.size + threads - 1) // threads
+    for block_idx in range(blocks):
+        for thread_idx in range(threads):
+            i = block_idx * threads + thread_idx
+            if i < out.size:
+                out[i] = x[i] + y[i]
+
+def gpu_module():
+    try:
+        from numba import cuda
+    except ImportError:
+        return None
+    if not cuda.is_available():
+        return None
+    return cuda
+
+def main():
+    cuda = gpu_module()
+    n = 8
+    x = np.arange(n, dtype=np.float32)
+    y = np.arange(n, dtype=np.float32)
+    if cuda is None:
+        out = np.empty(n, dtype=np.float32)
+        vector_add_cpu(x, y, out)
+        print("cpu", out)
+        return
+    @cuda.jit
+    def vector_add(x, y, out):
+        i = cuda.grid(1)
+        if i < out.size:
+            out[i] = x[i] + y[i]
+    d_x = cuda.to_device(x)
+    d_y = cuda.to_device(y)
+    d_out = cuda.device_array(n, dtype=np.float32)
+    vector_add[1, 32](d_x, d_y, d_out)
+    print("gpu", d_out.copy_to_host())
+
+if __name__ == "__main__":
+    main()
+```
+
+### Exercice 3. Nommer la copie et le lancement
+
+Il reprend les quatre lignes ci-dessous. Il classe chacune en copie, allocation, ou lancement. Il le fait sur papier. Si un GPU est là, il les lance après une première compilation, puis il dit quelle ligne il chronomètre pour le kernel seul.
+
+```python
+d_x = cuda.to_device(x)
+d_out = cuda.device_array(x.size, dtype=x.dtype)
+vector_add[blocks, threads](d_x, d_y, d_out)
+out = d_out.copy_to_host()
+```
+
+`to_device` et `copy_to_host` copient. `device_array` alloue. Les crochets lancent le kernel.
+
+### Exercice 4. Lire l'architecture du venv
+
+Dans le venv du portable, il lance la commande suivante.
+
+```bash
+python -c "import platform; print(platform.machine())"
+```
+
+Il écrit la valeur imprimée. Il écrit ensuite pourquoi un interpréteur x86_64 copié sur le nœud aarch64 ne démarre pas. Il nomme le chargeur et le format du binaire. Il rappelle la branche portable, la branche cloud, et la branche ROMEO liée au compte des organisateurs.
+
+## Projet solo
+
+Il produit un fichier `vector_add.py` qui additionne deux vecteurs `float32`. Le kernel GPU et le jumeau CPU utilisent le même indice, `block_idx * threads + thread_idx`, et le même test de borne.
+
+Le script passe par le kernel si `numba.cuda` importe et si un GPU répond. Sinon il passe par le jumeau CPU. Il refuse un résultat différent de `x + y`. Il imprime `platform.machine()` et le chemin pris, `cpu` ou `gpu`.
+
+```python
+import platform
+import numpy as np
+
+def vector_add_cpu(x, y, out):
+    threads = 128
+    blocks = (x.size + threads - 1) // threads
+    for block_idx in range(blocks):
+        for thread_idx in range(threads):
+            i = block_idx * threads + thread_idx
+            if i < out.size:
+                out[i] = x[i] + y[i]
+
+def run_gpu(x, y, cuda):
+    @cuda.jit
+    def vector_add(x, y, out):
+        i = cuda.grid(1)
+        if i < out.size:
+            out[i] = x[i] + y[i]
+    n = x.size
+    threads = 128
+    blocks = (n + threads - 1) // threads
+    d_x = cuda.to_device(x)
+    d_y = cuda.to_device(y)
+    d_out = cuda.device_array(n, dtype=np.float32)
+    vector_add[blocks, threads](d_x, d_y, d_out)
+    vector_add[blocks, threads](d_x, d_y, d_out)
+    return d_out.copy_to_host()
+
+def main():
+    try:
+        from numba import cuda
+    except ImportError:
+        cuda = None
+    else:
+        if not cuda.is_available():
+            cuda = None
+    n = 1024
+    x = np.arange(n, dtype=np.float32)
+    y = np.ones(n, dtype=np.float32)
+    if cuda is None:
+        out = np.empty(n, dtype=np.float32)
+        vector_add_cpu(x, y, out)
+        path = "cpu"
+    else:
+        out = run_gpu(x, y, cuda)
+        path = "gpu"
+    if not np.allclose(out, x + y):
+        raise SystemExit("écart")
+    print(platform.machine(), path, out[:4])
+
+if __name__ == "__main__":
+    main()
+```
+
+Il ajoute trois lignes sous le script, dans sa note. La première répète la machine imprimée. La deuxième dit `cpu` ou `gpu`. La troisième dit où ce fichier tournerait ensuite. Sur le portable, c'est le venv courant. Sur un GPU de cloud peu cher, c'est un venv créé là-bas. Sur ROMEO, il reprend le nom de fonction du dossier de préparation, il garde le mot Anticipé dans cette note, et il indique que le compte vient des organisateurs.
+
+Le second lancement GPU du script est celui qui suit la compilation. Le chemin CPU n'a pas cette compilation.
+
+## Projet de groupe
+
+À deux. L'un prend le motif coalescé. L'autre prend le motif à pas de 32. S'il prépare seul avant la séance, il fait les deux rôles l'un après l'autre et il signe chaque décompte.
+
+Sur papier, un warp compte 32 threads, un élément `float32` compte 4 octets, et le tableau commence sur une frontière de 128 octets. La personne du motif coalescé fait lire l'élément `i` au thread `i`. La personne du motif à pas de 32 fait lire l'élément `i * 32` au thread `i`. Chacun écrit le nombre de lignes de 128 octets touchées par ce warp.
+
+Le décompte papier attendu est 1 ligne pour le motif coalescé et 32 lignes pour le pas de 32. Ce décompte est le modèle papier du cours.
+
+Si un GPU CUDA est visible, chacun chronomètre son kernel après un premier lancement de compilation. Prenez `n` égal à 1 048 576 et des blocs de 128 threads. Notez les deux temps en secondes, à côté du décompte papier. Le portable est le chemin par défaut. Un GPU de cloud peu cher, ou un nœud ROMEO quand le compte existe, est une branche. Dans cette branche, l'environnement est créé sur place.
+
+```python
+def coalesced_index(i):
+    return i
+
+def strided_index(i):
+    return i * 32
+```
+
+Sur GPU, les corps deviennent `out[i] = a[i]` et `out[i] = a[i * 32]`. Le tableau du motif à pas de 32 doit couvrir l'indice `i * 32`.
+
+## Examen
+
+### Question 1. Séparer compilation et lancement
+
+Le premier appel à un kernel Numba est lent. Où passe ce temps ? Quelle ligne du script est le kernel, et quelles lignes sont des copies entre l'hôte et le device ?
+
+### Question 2. Dire pourquoi le venv x86 échoue
+
+Un venv créé sur un portable x86_64 est copié sur le nœud GPU aarch64. Que contient ce venv qui empêche `python` de démarrer ? Quel message le chargeur rend-il ?
+
+### Question 3. Citer deux chiffres qui divergent
+
+Le Linpack annoncé par Eviden et le Rmax TOP500 sont-ils le même chiffre ? Les deux formulations de la capacité de stockage IBM ESS disent-elles la même chose ? Répondez en gardant chaque formulation avec sa source.
+
+## Glossaire
+
+### epoch
+
+Un epoch est un passage complet du jeu d'entraînement dans le modèle.
+
+### batch
+
+Un batch est le paquet d'exemples traité avant une mise à jour des poids.
+
+### transfer learning
+
+Le transfer learning réutilise les poids d'un modèle déjà entraîné pour une tâche nouvelle.
+
+### kernel CUDA
+
+Un kernel CUDA est la fonction lancée par l'hôte et exécutée en parallèle sur le GPU.
+
+### warp
+
+Un warp est le groupe de 32 threads qu'un GPU NVIDIA exécute ensemble.
+
+### SM
+
+Un SM est le multiprocesseur du GPU qui reçoit les blocs et exécute leurs warps.
+
+### coalescence
+
+La coalescence fusionne les lectures voisines d'un warp en peu de transactions mémoire.
+
+### HBM3
+
+HBM3 est une mémoire empilée à haute bande passante, utilisée comme mémoire du GPU.
+
+### NVLink
+
+NVLink est le lien NVIDIA qui relie un CPU Grace et un GPU Hopper, ou bien des GPU entre eux.
+
+### NCCL
+
+NCCL est la bibliothèque NVIDIA qui exécute les collectives entre plusieurs GPU.
+
+### all-reduce
+
+Un all-reduce additionne les tableaux de tous les ranks et renvoie le résultat à chacun.
+
+### rank
+
+Un rank est l'entier qui identifie un processus dans un groupe de communication.
+
+### DDP/FSDP
+
+DDP garde une copie entière du modèle sur chaque rank, et FSDP répartit les paramètres entre les ranks.
+
+### Spack
+
+Spack construit un logiciel scientifique et ses dépendances dans un environnement isolé.
+
+### Slurm
+
+Slurm choisit des nœuds libres et y démarre le job.
+
+### TPE
+
+Anticipé. TPE choisit le prochain essai à partir d'un modèle des essais déjà observés.
+
+### Hyperband/ASHA
+
+Anticipé. Hyperband et ASHA arrêtent tôt les essais faibles et reportent le budget sur les essais qui restent.
+
+## Sources
+
+Confirmé. Les URL suivantes portent les faits marqués Confirmé. Les faits Anticipé de cette page n'ont pas d'URL.
+
+- Système TOP500 180311. <https://www.top500.org/system/180311/>
+- Communiqué anglais Eviden du 30 mai 2024. <https://www.globenewswire.com/news-release/2024/05/30/2890561/0/en/the-university-of-reims-champagne-ardenne-urca-chooses-eviden-for-its-new-romeo-supercomputer-powered-by-nvidia-and-designed-for-grand-est-scientific-research-communities.html>
+- PDF français du même communiqué. <https://ml-eu.globenewswire.com/Resource/Download/7ad5d21f-ec77-4c61-a982-71365e1e42fd>
+- Journal public HPC-Works, Getting Started with ROMEO Supercomputer, ISC26 SCC. <https://hpcadvisorycouncil.atlassian.net/wiki/spaces/HPCWORKS/pages/3698655270/Getting+Started+with+ROMEO+Supercomputer+-+ISC26+SCC>
+- Fiche CUDA Python. <https://romeo.univ-reims.fr/21_formations.html/339/Programmation_GPU_avec_CUDA_Python>
+- Vue d'ensemble CUDA de Numba. <https://numba.readthedocs.io/en/stable/cuda/overview.html>

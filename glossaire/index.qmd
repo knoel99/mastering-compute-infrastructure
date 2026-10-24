@@ -1,0 +1,17 @@
+---
+title: "Glossaire"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../generated/chrome-d1.html
+    include-after-body: ../assets/closing-d1.html
+---
+
+Il consulte ici les définitions tenues dans l'annexe. Le fragment inclus ci-dessous les reprend, et cette page n'en ajoute pas.
+
+{{< include ../generated/glossaire.md >}}

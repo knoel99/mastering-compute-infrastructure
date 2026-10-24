@@ -1,0 +1,28 @@
+---
+title: "Préemption et reprise"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 8
+---
+
+## Objectifs
+
+Un job peut perdre son GPU au milieu d'un entraînement. Il sait relancer un pod. Il ne sait pas encore reprendre un calcul au dernier état sain.
+
+Il écrit un checkpoint, il arrête le processus, et il reprend au pas sauvegardé. Le même fichier est celui qu'un autre fournisseur relirait plus tard. L'offre A lui demande cette reprise pour la startup robotique.
+
+## Travaux pratiques prévus
+
+Sur le laptop, il écrit `reprise.py` avec la bibliothèque standard. La boucle compte de 0 à 20. Quand le numéro est un multiple de 5, elle écrit `checkpoint.json` avant de continuer. Le fichier contient le numéro et une perte égale à ce numéro divisé par dix. Il arrête le processus pendant l'itération 7, après l'écriture du 5 et avant celle du 10. Il relance le script. La boucle reprend à 5, puis elle va jusqu'à 20. Il vérifie que la perte relue vaut un demi.
+
+Une branche cloud peu cher, ou ROMEO si le compte existe, n'est qu'une variante du même fichier. Il rend le script du laptop.

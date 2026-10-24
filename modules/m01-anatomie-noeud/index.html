@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Anatomie d’un nœud Linux et GPU</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-html-435ba6093e6f0817aa7405139811e7b1.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<link rel="stylesheet" href="../../assets/paper.css">
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script><script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous"></head>
+
+<body>
+
+<!-- derived from module front matter. build_site overwrites this file. -->
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+<button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span class="tb-label">Sommaire</span></button>
+<a class="brand" href="../../index.html">Infra de calcul</a>
+<span class="tb-title" id="tb-title"></span>
+<button type="button" class="tb-btn" id="theme-toggle">Thème</button>
+</header>
+<div class="layout">
+<nav id="sidetoc" class="sidetoc" aria-label="Sommaire"></nav>
+<div class="content">
+<nav id="mci-nav">
+<a href="../../index.html">Accueil</a>
+<a href="../../parcours/index.html">Parcours</a>
+<a href="../../glossaire/index.html">Glossaire</a>
+<a href="../../programmes/index.html">Programmes</a>
+<a href="../../programmes/france.html">France</a>
+<a href="../../programmes/usa.html">États-Unis</a>
+<a href="../../programmes/chine.html">Chine</a>
+<a href="../../programmes/monde.html">Reste du monde</a>
+<a href="../../programmes/synthese.html">Synthèse</a>
+<a href="../../modules/m01-anatomie-noeud/">Anatomie d'un nœud Linux et GPU</a>
+<a href="../../modules/m02-ordonnancement/">Ordonnancement Slurm et Kubernetes</a>
+<a href="../../modules/a-romeo-cuda/">ROMEO2025 et CUDA Python</a>
+<a href="../../modules/m03-pytorch-nccl/">PyTorch distribué et NCCL</a>
+<a href="../../modules/m00-socle-dl/">Socle PyTorch pour l'infra</a>
+<a href="../../modules/m04-hpo/">Recherche d'hyperparamètres multi-GPU</a>
+<a href="../../modules/m05-reseau-stockage/">Réseau et stockage d'entraînement</a>
+<a href="../../modules/m06-reprise/">Préemption et reprise</a>
+<a href="../../modules/m07-multi-fournisseurs/">Placement multi-fournisseurs</a>
+<a href="../../modules/m08-observabilite-cout/">Observabilité et coût de flotte</a>
+<a href="../../modules/m09-capstone/">Capstone portefeuille Lead</a>
+<a href="../../modules/m10-parallelismes/">Parallélismes et MFU</a>
+<a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
+<a href="../../modules/m12-numerique/">Débogage numérique</a>
+<a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+</nav>
+<main id="main">
+
+<header id="title-block-header">
+<h1 class="title">Anatomie d’un nœud Linux et GPU</h1>
+
+</header>
+
+
+<h2 id="objectifs" class="anchored">Objectifs</h2>
+<p>Il prépare ce module avant le 4 novembre 2026. Le volume est de douze heures. Ce temps couvre les notes, quatre exercices sur un portable Linux, une page de rapport, un travail à deux et trois questions courtes.</p>
+<p>À la fin, il sait lire un nœud avant d’y lancer un entraînement.</p>
+<ul>
+<li>Il distingue le nœud de login, le nœud de calcul et le job.</li>
+<li>Il lit les cœurs, les threads, les sockets et les nœuds NUMA avec <code>lscpu</code> et <code>/proc/cpuinfo</code>.</li>
+<li>Il sépare la RAM de l’hôte et la mémoire du GPU.</li>
+<li>Il lit dans <code>nvidia-smi</code> le nom, la mémoire, le mode persistence et la puissance.</li>
+<li>Il reconnaît un GPU silencieux, un GPU occupé et un GPU qui attend le CPU.</li>
+<li>Il dit, comme culture générale, ce que relient PCIe et NVLink, sans citer un débit du cluster du centre de calcul.</li>
+<li>Il montre avec <code>df</code> pourquoi un jeu de données posé sur un répertoire personnel lent laisse le GPU inactif.</li>
+</ul>
+<p>L’offre A, Compute Infrastructure Lead, commence par cette lecture. L’offre B, large-scale training, reprend la même lecture quand un job occupe les GPU d’un nœud de calcul.</p>
+<h2 id="prérequis" class="anchored">Prérequis</h2>
+<p>Il fait déjà tourner de l’inférence GPU sur les machines de la startup robotique, avec vLLM, DCGM et Kubernetes. Il sait ouvrir un terminal et copier une sortie.</p>
+<p>Le système des exercices est Linux. Les lectures passent par <code>/proc</code>. Les commandes obligatoires existent sur un portable Linux sans GPU.</p>
+<p><code>nvidia-smi</code> est une branche, seulement si la commande est déjà là. Un GPU loué à l’heure est une branche, seulement s’il en a déjà un. Le cluster du centre de calcul, y compris ROMEO, est une branche seulement si son compte existe déjà.</p>
+<p>Ce module lui demande de lire des compteurs. Le mode persistence se constate. La réservation d’un nœud et l’installation d’un logiciel attendent la suite du parcours.</p>
+<h2 id="notes-de-cours" class="anchored">Notes de cours</h2>
+<p>Un nœud d’entraînement est une machine Linux qui porte des GPU. Il connaît déjà cette lecture du côté de l’inférence. Ici, la machine du calcul et la machine de la session sont deux machines.</p>
+<h3 id="le-nœud-de-login-le-nœud-de-calcul-et-le-job" class="anchored">Le nœud de login, le nœud de calcul et le job</h3>
+<div class="def">
+<p><span class="tag">Nœud de login</span></p>
+<p>Le nœud de login accepte la session. Il y dépose des fichiers, édite un script et soumet un job. L’entraînement démarre sur le nœud que le job reçoit.</p>
+</div>
+<div class="def">
+<p><span class="tag">Nœud de calcul</span></p>
+<p>Le nœud de calcul exécute le job. Ses CPU, sa RAM, ses GPU et son disque local sont les ressources de la réservation. Le processus d’entraînement vit sur cette machine.</p>
+</div>
+<div class="def">
+<p><span class="tag">Job</span></p>
+<p>Un job est une réservation limitée dans le temps. L’ordonnanceur choisit un nœud de calcul, ou une partie de ses GPU, et y démarre le processus. À la fin du job, la réservation disparaît. Sur un centre de calcul, le nom usuel de cet ordonnanceur est Slurm.</p>
+</div>
+<p>Kubernetes place un pod sur une machine d’inférence. L’ordonnanceur place un job sur un nœud de calcul. Dans les deux cas, un processus finit sur une machine qui a des GPU. Ici, cette machine est différente de celle où il a ouvert la session.</p>
+<p>vLLM garde un GPU alloué entre les requêtes. Un job d’entraînement garde le GPU le temps de la réservation, puis le rend. DCGM publie déjà l’utilisation et la puissance des GPU d’inférence. <code>nvidia-smi</code> affiche ces grandeurs dans le terminal du nœud.</p>
+<h3 id="cœurs-threads-et-numa" class="anchored">Cœurs, threads et NUMA</h3>
+<p>Un socket est un boîtier physique. Un cœur est une unité d’exécution dans ce boîtier. Un thread matériel partage un cœur. Linux compte un CPU logique par thread matériel.</p>
+<p><code>lscpu</code> rassemble cette topologie depuis sysfs et <code>/proc/cpuinfo</code>, comme l’écrit son manuel. Ce manuel prévient que la sortie par défaut peut changer. Pour ce module, il lit la sortie humaine et il garde la commande à côté des nombres.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">lscpu</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il relève les lignes suivantes.</p>
+<ul>
+<li><code>CPU(s)</code></li>
+<li><code>Thread(s) per core</code></li>
+<li><code>Core(s) per socket</code></li>
+<li><code>Socket(s)</code></li>
+<li><code>NUMA node(s)</code></li>
+<li><code>Model name</code></li>
+<li>chaque ligne <code>NUMA nodeN CPU(s)</code></li>
+</ul>
+<p>Il multiplie <code>Thread(s) per core</code> par <code>Core(s) per socket</code>, puis par <code>Socket(s)</code>. Il compare le produit à <code>CPU(s)</code>. Les valeurs égales décrivent les CPU en ligne. Un écart demande la ligne <code>On-line CPU(s) list</code>, quand elle est imprimée. Des CPU hors ligne expliquent souvent cet écart. Il écrit les nombres tels qu’ils sont imprimés.</p>
+<p><code>NUMA node(s)</code> compte les domaines de mémoire. Les lignes suivantes disent quels CPU logiques sont dans chaque domaine. Un cœur accède plus vite à la mémoire de son domaine qu’à la mémoire d’un autre. Il note cette répartition. Le déplacement des processus vient plus tard.</p>
+<p>Sur un portable, <code>NUMA node(s)</code> vaut souvent 1. Il écrit 1 quand c’est le nombre imprimé.</p>
+<h3 id="proccpuinfo" class="anchored">/proc/cpuinfo</h3>
+<p><code>/proc/cpuinfo</code> est la source brute. Le manuel dit que le contenu dépend de l’architecture. Deux entrées communes sont <code>processor</code> et <code>bogomips</code>. <code>processor</code> numérote un CPU logique. Une machine à plusieurs CPU a un bloc par CPU logique.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-c</span> <span class="st">'^processor'</span> /proc/cpuinfo</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">awk</span> <span class="st">'NF==0 { exit } { print }'</span> /proc/cpuinfo</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La première commande compte les CPU logiques. Ce compte rejoint <code>CPU(s)</code> dans <code>lscpu</code>. La seconde imprime le premier bloc, et elle s’arrête à la ligne vide. Il cherche <code>model name</code> dans ce bloc quand la ligne existe.</p>
+<p>Sur beaucoup de machines x86, le bloc contient aussi <code>physical id</code>, <code>core id</code> et <code>cpu cores</code>. <code>physical id</code> désigne le socket. <code>core id</code> désigne le cœur dans ce socket. <code>cpu cores</code> donne le nombre de cœurs du socket. Le manuel prévient que la liste change avec l’architecture. Pour une ligne manquante, il écrit <code>absent</code>. <code>lscpu</code> reste la lecture des sockets, des cœurs, des threads et de NUMA.</p>
+<h3 id="la-ram-de-lhôte" class="anchored">La RAM de l’hôte</h3>
+<p>La RAM de l’hôte est la mémoire de la machine. Le processus, le cache des fichiers et les lots de données en attente de copie y vivent. <code>free</code> lit <code>/proc/meminfo</code>.</p>
+<p>Le manuel de <code>free</code> nomme les colonnes. <code>total</code> est la mémoire utilisable. <code>available</code> estime ce qu’un nouveau programme peut prendre sans swap. <code>used</code> est calculé comme <code>total</code> moins <code>available</code>. <code>free</code> est la part inutilisée. Elle est plus basse que <code>available</code>, parce que le noyau peut rendre une partie du cache.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-h</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">awk</span> <span class="st">'/^MemTotal:|^MemAvailable:/ { print }'</span> /proc/meminfo</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Les deux commandes décrivent la même RAM. <code>free -h</code> change l’unité. <code>/proc/meminfo</code> imprime des kB. Les chiffres diffèrent parce que l’unité diffère. Il retient <code>total</code>, <code>available</code>, <code>MemTotal</code> et <code>MemAvailable</code>.</p>
+<p>Il surveille <code>available</code> avant un job. Si cette valeur tombe très bas et que le swap a encore de la place, le noyau y déplace des pages. Le CPU qui nourrit le GPU attend alors le disque.</p>
+<p>La ligne Swap de <code>free</code> se copie aussi. Une valeur used égale à zéro se copie comme les autres. Une valeur used différente de zéro veut dire que des pages sont déjà sur le disque.</p>
+<h3 id="le-device-et-les-deux-mémoires" class="anchored">Le device et les deux mémoires</h3>
+<p>Dans <code>nvidia-smi</code>, un device est un GPU, avec un index qui part de zéro. Chaque device a sa mémoire. La RAM de l’hôte est commune aux CPU.</p>
+<p><code>nvidia-smi</code> montre la mémoire du GPU comme une taille utilisée et une taille totale. Sur un GPU d’entraînement de centre de calcul, cette mémoire est de la HBM. Sur un portable, le type peut être différent. Le champ donne ces deux tailles.</p>
+<p>Un poids qui est encore dans la RAM de l’hôte occupe la mémoire du GPU seulement après une copie. Un processus sur le CPU lit le fichier dans la RAM de l’hôte. Une copie envoie ensuite les octets vers le device à travers PCIe.</p>
+<h3 id="nom-mémoire-persistence-et-puissance" class="anchored">Nom, mémoire, persistence et puissance</h3>
+<p>Sans argument, <code>nvidia-smi</code> affiche une table par device. Il y cherche le nom du produit, le mode persistence, l’usage de la mémoire, et la puissance sous la forme d’une consommation et d’une limite.</p>
+<p>La page de <code>nvidia-smi</code> décrit ces grandeurs. Le nom du produit est une chaîne. Le mode persistence vaut <code>Enabled</code> ou <code>Disabled</code>. <code>Enabled</code> garde le pilote chargé quand aucun client n’est connecté. Le premier programme évite alors l’attente du chargement.</p>
+<p>Après un redémarrage, la valeur par défaut documentée est <code>Disabled</code>. Changer ce mode demande root. Au redémarrage suivant, la valeur documentée redevient <code>Disabled</code>. La documentation du mode persistence le présente comme un mécanisme en fin de vie, remplacé par un démon de persistance. Il copie la valeur imprimée. Dans cet exercice, elle reste telle quelle.</p>
+<p>La puissance instantanée est la dernière mesure du device, en watts. La limite est le plafond demandé par le logiciel. Les deux nombres se lisent ensemble. Au repos, la mesure reste basse face à la limite. Quand le GPU calcule, la mesure s’en rapproche.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nvidia-smi</span> <span class="at">--query-gpu</span><span class="op">=</span>name,memory.total,memory.used,persistence_mode,power.draw.instant,power.limit <span class="at">--format</span><span class="op">=</span>csv</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Cette requête utilise les clés usuelles de ces champs. La page de <code>nvidia-smi</code> donne <code>persistence_mode</code> comme exemple de <code>--query-gpu</code>, et elle nomme <code>power.draw.instant</code> pour la mesure instantanée. Si une clé est refusée, la liste de ce pilote est <code>nvidia-smi --help-query-gpu</code>. Il remplace seulement la clé refusée, puis il relance la requête.</p>
+<h3 id="un-gpu-silencieux" class="anchored">Un GPU silencieux</h3>
+<p>Deux silences se séparent par la forme de la sortie.</p>
+<p>Le premier a une table. Le nom du produit est présent, donc le pilote voit le device. <code>memory.used</code> reste bas devant <code>memory.total</code>. La puissance instantanée reste loin sous la limite. Aucun processus n’est listé. <code>nvidia-smi pmon</code> imprime alors des tirets pour ce device. La page de <code>nvidia-smi</code> le dit, pour un device sans processus. Un <code>Disabled</code> sur un portable au repos est une lecture normale. Il copie la valeur imprimée.</p>
+<p>Le second silence n’a pas de table. La commande <code>nvidia-smi</code> est absente, ou elle quitte en erreur parce que le pilote ne répond pas. Il copie le message. Il laisse vide la case du nom de produit.</p>
+<h3 id="pcie-et-le-lien-entre-gpu" class="anchored">PCIe et le lien entre GPU</h3>
+<div class="note">
+<p><span class="tag">Culture générale</span></p>
+<p>Le bus PCIe relie un GPU au CPU et à la RAM de l’hôte. NVLink relie des GPU entre eux, pour qu’ils s’échangent des données sans repasser par le CPU. Sur certaines machines, un lien de la même famille relie aussi un GPU à son CPU. Ce paragraphe est de la culture générale. Ce paragraphe ne donne aucun débit du cluster du centre de calcul. Le débit utile se mesure sur la machine du job.</p>
+</div>
+<h3 id="disque-local-et-système-de-fichiers-partagé" class="anchored">Disque local et système de fichiers partagé</h3>
+<p><code>df</code> affiche le système de fichiers qui contient un chemin. L’option <code>-h</code> rend les tailles lisibles. L’option <code>-T</code> ajoute le type. L’option <code>-l</code> ne garde que les systèmes que <code>df</code> classe comme locaux. Le manuel définit ces trois options.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span> <span class="at">-T</span> <span class="st">"</span><span class="va">$HOME</span><span class="st">"</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span> <span class="at">-T</span> <span class="at">-l</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span> <span class="at">-T</span> /tmp</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il lit <code>Filesystem</code> et <code>Type</code> sur la ligne du répertoire personnel. Il cherche la même valeur <code>Filesystem</code> dans la sortie de <code>df -h -T -l</code>. Si elle y figure, <code>df</code> classe ce système comme local. Sinon, le répertoire personnel n’est pas local au sens de <code>df</code>. Il compare ensuite <code>Filesystem</code> pour <code>/tmp</code>. Deux valeurs différentes veulent dire deux systèmes de fichiers.</p>
+<p>Une ligne de type <code>tmpfs</code> est de la mémoire. Un jeu de données reste sur un disque. Une copie sur <code>tmpfs</code> occuperait la RAM de l’hôte dont le CPU a besoin pour préparer les lots.</p>
+<p>Sur un portable, <code>$HOME</code> et <code>/tmp</code> ont souvent la même source. Il écrit cette source, quelle qu’elle soit. Sur un nœud de calcul, il relance les trois commandes et il garde une sortie par machine.</p>
+<h3 id="un-jeu-de-données-qui-fait-attendre-le-gpu" class="anchored">Un jeu de données qui fait attendre le GPU</h3>
+<p>Le goulot est la ressource qui fait attendre les autres. Le GPU calcule sur des octets déjà présents dans sa mémoire. Si le lot suivant est encore sur un système de fichiers lent, il n’est pas prêt. Un processus sur le CPU lit ce lot vers la RAM de l’hôte. Une copie le transfère vers le device, à travers PCIe. Pendant cette lecture, le GPU a fini son pas et attend. Sa mémoire peut déjà contenir le modèle. Son utilisation reste basse. Le goulot est la lecture.</p>
+<p><code>ps</code> montre le processus qui lit. La première lettre <code>D</code> de <code>stat</code> veut dire un sommeil non interruptible, en général une entrée-sortie. Le manuel de <code>ps</code> le dit. Un <code>%CPU</code> élevé veut dire que ce processus occupe un CPU. <code>nvidia-smi pmon</code> montre le pid côté GPU, avec une utilisation SM basse. Un état <code>D</code> pointe vers le disque. Un <code>%CPU</code> élevé pointe vers le CPU. L’utilisation SM basse dit que le GPU attend. Le goulot est celui que ces lignes montrent.</p>
+<p>La copie de travail va sur un système que <code>df -h -T -l</code> classe comme local au nœud de calcul. L’original peut rester sur le système partagé. Le processus d’entraînement lit la copie locale.</p>
+<div class="thm">
+<p><span class="tag">GPU en attente</span></p>
+<p>Un GPU dont la mémoire est allouée et dont l’utilisation reste basse attend le processus qui doit lui donner le lot suivant.</p>
+</div>
+<h3 id="ps-et-nvidia-smi-pmon" class="anchored">ps et nvidia-smi pmon</h3>
+<p><code>ps</code> lit <code>/proc</code>. Le manuel définit <code>%CPU</code> comme le temps CPU divisé par le temps écoulé depuis le démarrage du processus. Ce ratio couvre toute la vie du processus. <code>psr</code> est le CPU logique sur lequel le processus a tourné en dernier. La première lettre de <code>stat</code> est l’état. <code>R</code> veut dire en exécution, ou en file pour l’être. <code>D</code> veut dire sommeil non interruptible, en général une entrée-sortie. D’autres lettres peuvent suivre. Il lit la première.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-eo</span> pid,psr,stat,pcpu,pmem,comm <span class="at">--sort</span><span class="op">=</span>-pcpu <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 8</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il lit l’en-tête, puis les lignes de tête. Un processus lancé la veille peut afficher un <code>%CPU</code> modeste pendant qu’il occupe un cœur. Le temps passé au repos depuis le démarrage entre dans le ratio. Un <code>bash</code> dont toute la vie est une boucle de calcul affiche un <code>%CPU</code> élevé, parce que la moyenne et l’instant coïncident. vLLM, déjà en service depuis longtemps sur les machines d’inférence, se lit avec cette distinction.</p>
+<p><code>nvidia-smi pmon</code> suit les processus de calcul et d’affichage sur chaque device. La page de <code>nvidia-smi</code> dit que chaque relevé donne le pid, le nom de la commande, et l’utilisation moyenne depuis le relevé précédent. Cette utilisation couvre SM, la mémoire, l’encodeur et le décodeur. L’intervalle par défaut est d’une seconde. L’option <code>-c</code> fixe le nombre de relevés, puis la commande s’arrête. Sans processus, les métriques valent <code>-</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nvidia-smi</span> pmon <span class="at">-c</span> 1</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>pmon dit ce que le GPU fait sur le dernier intervalle. <code>ps</code> dit quel processus existe, et quelle part de sa vie a occupé un CPU. Il garde les deux sorties. La page de <code>nvidia-smi</code> réserve pmon à certains produits. Sur un portable, il copie un refus à la place de la table.</p>
+<h3 id="un-gpu-occupé-et-un-gpu-qui-attend-le-cpu" class="anchored">Un GPU occupé et un GPU qui attend le CPU</h3>
+<p>Un GPU occupé a un pid dans pmon. L’utilisation SM reste haute sur plusieurs relevés. <code>power.draw.instant</code> se rapproche de <code>power.limit</code>. <code>memory.used</code> a augmenté. Le même pid existe dans <code>ps</code>. L’occupation se voit dans SM et dans la puissance. <code>%CPU</code> reste le ratio sur la vie du processus.</p>
+<p>Un GPU qui attend le CPU a aussi un pid. L’utilisation SM reste basse d’un relevé au suivant. Dans <code>ps</code>, ce pid, ou le processus qui prépare les données, montre un <code>%CPU</code> élevé ou un état <code>D</code>. Un job déjà démarré laisse encore cette lecture possible. L’occupation se confirme dans l’utilisation SM et dans la puissance.</p>
+<h2 id="exercices" class="anchored">Exercices</h2>
+<div class="note">
+<p><span class="tag">Portable</span></p>
+<p>Les quatre exercices se font sur un portable Linux. Il colle la commande et les lignes demandées. Une ligne absente s’écrit <code>absent</code>. Les exercices 1 à 3 utilisent <code>lscpu</code>, <code>/proc</code>, <code>free</code>, <code>df</code> et <code>ps</code>. L’exercice 4 ajoute la branche <code>nvidia-smi</code>. La ligne <code>nvidia-smi absent</code> est alors une réponse juste.</p>
+</div>
+<p>S’il a déjà un GPU loué à l’heure, ou déjà un compte sur le cluster du centre de calcul, il peut refaire la lecture sur cette machine après les exercices. Il range ces sorties à part. Le travail rendu pour les exercices reste celui du portable.</p>
+<h3 id="exercice-1.-lire-le-cpu" class="anchored">Exercice 1. Lire le CPU</h3>
+<p>Il exécute les trois commandes suivantes.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">lscpu</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-c</span> <span class="st">'^processor'</span> /proc/cpuinfo</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">awk</span> <span class="st">'NF==0 { exit } { print }'</span> /proc/cpuinfo</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il écrit une phrase qui contient quatre nombres lus sur la machine.</p>
+<ul>
+<li>Le nombre de lignes <code>processor</code>.</li>
+<li>La valeur <code>CPU(s)</code>.</li>
+<li>Le produit de <code>Thread(s) per core</code>, de <code>Core(s) per socket</code> et de <code>Socket(s)</code>.</li>
+<li>La valeur <code>NUMA node(s)</code>, avec la liste des CPU du premier nœud.</li>
+</ul>
+<p>Il ajoute le <code>Model name</code>. Si le premier bloc contient <code>physical id</code>, <code>core id</code> et <code>cpu cores</code>, il les copie. Sinon, il écrit <code>absent</code> pour chacune des lignes manquantes.</p>
+<p>Le compte <code>processor</code> et <code>CPU(s)</code> se rejoignent. Le produit de la topologie rejoint <code>CPU(s)</code>, ou bien il cite <code>On-line CPU(s) list</code> pour expliquer l’écart. Un seul nœud NUMA est une lecture réussie sur un portable.</p>
+<h3 id="exercice-2.-lire-la-ram-de-lhôte" class="anchored">Exercice 2. Lire la RAM de l’hôte</h3>
+<p>Il exécute les deux commandes suivantes.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-h</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">awk</span> <span class="st">'/^MemTotal:|^MemAvailable:/ { print }'</span> /proc/meminfo</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il écrit trois relevés.</p>
+<ul>
+<li><code>total</code> et <code>available</code> dans la sortie de <code>free -h</code>.</li>
+<li>Les lignes <code>MemTotal</code> et <code>MemAvailable</code>.</li>
+<li>La ligne Swap, avec la colonne used.</li>
+</ul>
+<p>Il nomme la colonne à surveiller avant un programme lourd. Cette colonne est <code>available</code>. Le manuel de <code>free</code> la définit comme l’estimation pour démarrer une application sans swap. Il rappelle que <code>free -h</code> et <code>/proc/meminfo</code> n’impriment pas la même unité.</p>
+<h3 id="exercice-3.-lire-le-disque-du-répertoire-personnel" class="anchored">Exercice 3. Lire le disque du répertoire personnel</h3>
+<p>Il exécute les trois commandes suivantes.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span> <span class="at">-T</span> <span class="st">"</span><span class="va">$HOME</span><span class="st">"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span> <span class="at">-T</span> <span class="at">-l</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span> <span class="at">-T</span> /tmp</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il écrit une phrase. Elle donne le type et la source du répertoire personnel. Elle dit si cette source apparaît dans la liste obtenue avec <code>-l</code>. Elle donne la source de <code>/tmp</code>. S’il voit une ligne <code>tmpfs</code>, il écrit que ce n’est pas un disque pour un jeu de données.</p>
+<p>Les trois commandes se terminent. La même source pour <code>$HOME</code> et <code>/tmp</code> est une lecture valide sur un portable.</p>
+<h3 id="exercice-4.-lire-les-processus" class="anchored">Exercice 4. Lire les processus</h3>
+<p>Il exécute la commande suivante.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-eo</span> pid,psr,stat,pcpu,pmem,comm <span class="at">--sort</span><span class="op">=</span>-pcpu <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 8</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il copie l’en-tête et les trois premiers processus. Il écrit ce que <code>%CPU</code> mesure. La phrase attendue dit que c’est le ratio depuis le démarrage du processus. Il note la première lettre de <code>stat</code> pour le processus en tête.</p>
+<p>Il lance ensuite la branche GPU.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">command</span> <span class="at">-v</span> nvidia-smi <span class="op">&gt;</span>/dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nvidia-smi</span> <span class="at">--query-gpu</span><span class="op">=</span>name,memory.total,memory.used,persistence_mode,power.draw.instant,power.limit <span class="at">--format</span><span class="op">=</span>csv</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nvidia-smi</span> pmon <span class="at">-c</span> 1</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">"nvidia-smi absent"</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Il colle la sortie entière de cette branche. Si une clé de la requête est refusée, il ouvre <code>nvidia-smi --help-query-gpu</code>, il remplace cette clé, et il relance la requête. Si pmon répond qu’il n’est pas pris en charge, il colle ce message.</p>
+<p>Il ajoute une phrase sur le device. Sans pid, le GPU est au repos, ou la commande était absente. Avec un pid, il dit si l’utilisation SM du relevé est haute ou basse.</p>
+<h2 id="projet-solo" class="anchored">Projet solo</h2>
+<p>Il rend une page, sur une seule machine. Par défaut, la machine est le portable Linux des exercices. S’il a déjà un GPU loué à l’heure, il peut décrire cette machine à la place. S’il a déjà un compte sur le cluster du centre de calcul, y compris ROMEO, il peut décrire un nœud de calcul à la place. Il choisit une machine et une seule.</p>
+<p>Il commence par ces trois commandes.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hostname</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span> <span class="at">-Is</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">uname</span> <span class="at">-srm</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Le titre reprend <code>hostname</code>. La première ligne reprend la date et <code>uname</code>. Le corps reprend, en phrases courtes, les relevés des quatre exercices pour la machine choisie. Il garde les lignes nommées dans les exercices, et il laisse de côté le reste de <code>/proc/cpuinfo</code> et de <code>df</code>.</p>
+<p>La page se ferme sur un jugement. Il dit où il poserait un jeu de données pour un entraînement sur cette machine. Il cite la ligne de <code>df</code> qui justifie l’endroit. Si <code>nvidia-smi</code> est absent, le jugement le dit et s’appuie sur le disque et sur la RAM.</p>
+<h2 id="projet-de-groupe" class="anchored">Projet de groupe</h2>
+<p>Il fait ce travail avec une autre personne. Ils utilisent une machine à la fois. Chacun lance au moins une fois une commande de mesure. A désigne la personne qui lance la charge. B désigne la personne qui mesure.</p>
+<p>L’étape limitée par le CPU dure trente secondes. A lance la boucle. B, sur la même machine, lance <code>ps</code> deux fois pendant ces trente secondes.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> <span class="at">-c</span> <span class="st">'end=$((SECONDS+30)); x=0; while (( SECONDS &lt; end )); do x=$((x+1)); done; echo "$x"'</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-eo</span> pid,psr,stat,pcpu,pmem,comm <span class="at">--sort</span><span class="op">=</span>-pcpu <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 8</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Ils notent le pid du <code>bash</code>, <code>psr</code>, la première lettre de <code>stat</code> et <code>%CPU</code>. Le goulot de cette étape est un CPU logique. Le signe attendu est ce <code>bash</code> en tête, avec un état <code>R</code>, pendant que la boucle tourne.</p>
+<p>L’étape GPU a quatre cas. Ils s’arrêtent au premier cas qui s’applique.</p>
+<p><strong>Cas 1.</strong> <code>nvidia-smi</code> est absent. Ils écrivent <code>Mesure GPU absente</code>.</p>
+<p><strong>Cas 2.</strong> <code>nvidia-smi pmon -c 1</code> montre déjà un pid. Ce processus est l’étape GPU. C’est le cas d’un serveur d’inférence déjà en service. Ils lancent <code>nvidia-smi pmon -c 5</code>, puis la commande suivante en remplaçant PID par le nombre lu. Le manuel de <code>ps</code> dit que les sélections s’additionnent, et que <code>-e</code> prend tous les processus. Pour un seul pid, ils utilisent <code>-p</code> sans <code>-e</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-p</span> PID <span class="at">-o</span> pid,psr,stat,pcpu,pmem,comm</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Cas 3.</strong> pmon n’a aucun pid, et la commande suivante imprime <code>True</code>. A lance alors le produit de matrices. B lance <code>nvidia-smi pmon -c 5</code> pendant ces vingt secondes.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-c</span> <span class="st">'import torch; print(torch.cuda.is_available())'</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-</span> <span class="op">&lt;&lt;'PY'</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="st">import time</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="st">import torch</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="st">size = 2048</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="st">a = torch.randn(size, size, device="cuda")</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="st">b = torch.randn(size, size, device="cuda")</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="st">torch.cuda.synchronize()</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="st">start = time.perf_counter()</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="st">steps = 0</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="st">while time.perf_counter() - start &lt; 20:</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="st">    c = a @ b</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="st">    steps += 1</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="st">torch.cuda.synchronize()</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="st">print(steps)</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="op">PY</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Cas 4.</strong> Les autres situations s’écrivent <code>Mesure GPU absente</code>. Un message d’erreur de pmon ou de Python se colle avec cette ligne. Le module ne demande pas d’installer un logiciel pour obtenir un GPU.</p>
+<p>Le texte commun tient en une demi-page.</p>
+<ul>
+<li>Pour l’étape CPU, une ligne réelle de <code>ps</code>, puis la phrase de goulot.</li>
+<li>Pour l’étape GPU, une ligne réelle de pmon et une ligne réelle de <code>ps</code>, puis la phrase de goulot. Une utilisation SM haute, avec une puissance qui monte vers la limite, veut dire que le GPU est le goulot. Une utilisation SM basse, avec un <code>%CPU</code> élevé ou un état <code>D</code>, veut dire que le GPU attend. Ils disent s’il attend le CPU ou le disque, et ils citent la ligne qui le montre.</li>
+<li>Si la mesure GPU manque, la ligne <code>Mesure GPU absente</code>, puis une phrase marquée <code>prédiction</code>. Cette phrase décrit le signe pmon d’un GPU occupé et le signe pmon d’un GPU en attente. Un pourcentage n’y entre que s’il a été imprimé par une commande.</li>
+</ul>
+<p>Si les deux personnes ont des portables différents, ils refont l’étape CPU sur la seconde machine. L’étape GPU reste sur la seule machine qui peut la mesurer.</p>
+<h2 id="examen" class="anchored">Examen</h2>
+<p>Trois questions courtes. Quelques phrases suffisent pour chacune. Les réponses portent sur les situations ci-dessous.</p>
+<h3 id="question-1.-où-va-le-processus" class="anchored">Question 1. Où va le processus</h3>
+<p>Il soumet un job depuis le nœud de login. Où le processus d’entraînement s’exécute-t-il ? Quel travail reste sur le nœud de login pendant que le job tourne ?</p>
+<h3 id="question-2.-deux-lectures" class="anchored">Question 2. Deux lectures</h3>
+<p>Lecture A. <code>nvidia-smi</code> affiche un nom de produit. <code>persistence_mode</code> vaut <code>Disabled</code>. La puissance instantanée est loin sous la limite. Aucun processus n’est listé. <code>pmon</code> imprime des tirets.</p>
+<p>Lecture B. Un pid est listé. Sur cinq relevés de <code>pmon</code>, l’utilisation SM reste basse. <code>ps</code> montre ce pid, ou le processus qui lit les données, avec un <code>%CPU</code> élevé.</p>
+<p>Que décrit chaque lecture ? Laquelle est un GPU qui attend le CPU ?</p>
+<h3 id="question-3.-le-jeu-de-données" class="anchored">Question 3. Le jeu de données</h3>
+<p>Le processus lit le jeu de données dans le répertoire personnel. La source <code>Filesystem</code> de ce répertoire est absente de <code>df -h -T -l</code>. La mémoire du GPU est allouée. L’utilisation SM reste basse. Qu’est-ce que le GPU attend ? Où faut-il placer la copie de travail ? Quelle commande montre que cette destination est locale ?</p>
+<h2 id="sources" class="anchored">Sources</h2>
+<ul>
+<li><a href="https://man7.org/linux/man-pages/man1/lscpu.1.html">manuel lscpu</a>. Topologie des CPU, threads, cœurs, sockets et nœuds NUMA. La commande lit sysfs et <code>/proc/cpuinfo</code>. La sortie par défaut peut changer.</li>
+<li><a href="https://man7.org/linux/man-pages/man5/proc_cpuinfo.5.html">manuel proc_cpuinfo</a>. Fichier <code>/proc/cpuinfo</code>, contenu lié à l’architecture, entrées communes <code>processor</code> et <code>bogomips</code>.</li>
+<li><a href="https://man7.org/linux/man-pages/man1/free.1.html">manuel free</a>. Colonnes <code>total</code>, <code>used</code>, <code>free</code>, <code>available</code> et swap. <code>free</code> analyse <code>/proc/meminfo</code>. <code>used</code> vaut <code>total</code> moins <code>available</code>.</li>
+<li><a href="https://man7.org/linux/man-pages/man1/ps.1.html">manuel ps</a>. <code>%CPU</code> comme ratio depuis le démarrage du processus, champ <code>psr</code>, état <code>R</code>, état <code>D</code> pour un sommeil non interruptible en général lié à une entrée-sortie.</li>
+<li><a href="https://man7.org/linux/man-pages/man1/df.1.html">manuel df</a>. Espace des systèmes de fichiers, option <code>-T</code> pour le type, option <code>-l</code> pour la liste locale.</li>
+<li><a href="https://docs.nvidia.com/deploy/nvidia-smi/index.html">nvidia-smi</a>. Nom du produit, mode persistence, lectures de puissance, <code>--query-gpu</code>, et <code>nvidia-smi pmon</code> avec des tirets quand aucun processus ne tourne.</li>
+<li><a href="https://docs.nvidia.com/deploy/driver-persistence/persistence-mode-legacy.html">mode persistence</a>. Mécanisme en fin de vie, remplacé par un démon de persistance. La page montre la lecture du champ dans <code>nvidia-smi</code>.</li>
+</ul>
+
+</main>
+</div>
+</div>
+<script src="../../assets/theme.js"></script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

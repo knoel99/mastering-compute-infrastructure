@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Ordonnancement Slurm et Kubernetes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-html-435ba6093e6f0817aa7405139811e7b1.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<link rel="stylesheet" href="../../assets/paper.css">
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script><script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous"></head>
+
+<body>
+
+<!-- derived from module front matter. build_site overwrites this file. -->
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+<button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span class="tb-label">Sommaire</span></button>
+<a class="brand" href="../../index.html">Infra de calcul</a>
+<span class="tb-title" id="tb-title"></span>
+<button type="button" class="tb-btn" id="theme-toggle">Thème</button>
+</header>
+<div class="layout">
+<nav id="sidetoc" class="sidetoc" aria-label="Sommaire"></nav>
+<div class="content">
+<nav id="mci-nav">
+<a href="../../index.html">Accueil</a>
+<a href="../../parcours/index.html">Parcours</a>
+<a href="../../glossaire/index.html">Glossaire</a>
+<a href="../../programmes/index.html">Programmes</a>
+<a href="../../programmes/france.html">France</a>
+<a href="../../programmes/usa.html">États-Unis</a>
+<a href="../../programmes/chine.html">Chine</a>
+<a href="../../programmes/monde.html">Reste du monde</a>
+<a href="../../programmes/synthese.html">Synthèse</a>
+<a href="../../modules/m01-anatomie-noeud/">Anatomie d'un nœud Linux et GPU</a>
+<a href="../../modules/m02-ordonnancement/">Ordonnancement Slurm et Kubernetes</a>
+<a href="../../modules/a-romeo-cuda/">ROMEO2025 et CUDA Python</a>
+<a href="../../modules/m03-pytorch-nccl/">PyTorch distribué et NCCL</a>
+<a href="../../modules/m00-socle-dl/">Socle PyTorch pour l'infra</a>
+<a href="../../modules/m04-hpo/">Recherche d'hyperparamètres multi-GPU</a>
+<a href="../../modules/m05-reseau-stockage/">Réseau et stockage d'entraînement</a>
+<a href="../../modules/m06-reprise/">Préemption et reprise</a>
+<a href="../../modules/m07-multi-fournisseurs/">Placement multi-fournisseurs</a>
+<a href="../../modules/m08-observabilite-cout/">Observabilité et coût de flotte</a>
+<a href="../../modules/m09-capstone/">Capstone portefeuille Lead</a>
+<a href="../../modules/m10-parallelismes/">Parallélismes et MFU</a>
+<a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
+<a href="../../modules/m12-numerique/">Débogage numérique</a>
+<a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+</nav>
+<main id="main">
+
+<header id="title-block-header">
+<h1 class="title">Ordonnancement Slurm et Kubernetes</h1>
+
+</header>
+
+
+<h2 id="objectifs" class="anchored">Objectifs</h2>
+<p>Kim exploite déjà Kubernetes, Helm et la CI dans une startup robotique. Il vise le poste de Compute Infrastructure Lead. Slurm est nouveau pour lui.</p>
+<p>Il fait les six actions suivantes.</p>
+<ul>
+<li>Il dit ce que l’ordonnanceur tranche avant de lancer un job. La partition, la priorité, le fairshare, la limite de temps et la préemption entrent dans cette décision.</li>
+<li>Il écrit un script sbatch minimal et explique chaque ligne sans cluster.</li>
+<li>Il lit <code>squeue</code>, arrête le bon job avec <code>scancel</code>, et ouvre le fichier de sortie.</li>
+<li>Il explique pourquoi un Deployment ne porte pas un travail qui doit se terminer.</li>
+<li>Il écrit le Job Kubernetes de la même commande courte. Il nomme Kueue comme file possible, sans l’installer.</li>
+<li>Avant le jeudi 5 novembre 2026, de 9h30 à 12h, il a un compte d’accès demandé et une clé ed25519. Il ne devine pas le nom du serveur.</li>
+</ul>
+<p>L’autre voie est l’entraînement à grande échelle. Cet entraînement est aussi un travail fini, avec une limite de temps. Ce module s’arrête avant cet entraînement.</p>
+<h2 id="prérequis" class="anchored">Prérequis</h2>
+<p>Il publie déjà des Deployments, souvent par une release Helm. Il lit les logs d’un pod et le résultat d’un job de CI. Il utilise un shell sur son portable.</p>
+<p>Slurm n’est pas installé chez lui au départ. Docker n’est pas à installer. Un cluster Kubernetes local n’est pas à installer. Le calculateur de la séance du 5 novembre ne sert que si le compte d’accès existe déjà. Le travail du portable se valide sans ce compte.</p>
+<h2 id="notes-de-cours" class="anchored">Notes de cours</h2>
+<p>L’ordonnanceur choisit quels jobs reçoivent des nœuds, dans quel ordre, et pour combien de temps. Un Deployment ne fait pas ce tri. Un Deployment maintient un service.</p>
+<h3 id="décisions-de-lordonnanceur" class="anchored">Décisions de l’ordonnanceur</h3>
+<p>Un job Slurm demande une allocation. L’allocation est l’ensemble de nœuds réservés jusqu’à la fin du script, ou jusqu’à la limite de temps. Le script de ce module demande un seul nœud.</p>
+<div class="def">
+<p>Une partition est le nom Slurm d’un groupe de nœuds et de la file des jobs qui y attendent. Le mot anglais courant pour cette file est queue. L’option à écrire, le jour où les organisateurs donnent un nom, est <code>--partition</code>, avec ce nom exact. Sans nom, Slurm prend la partition par défaut.</p>
+</div>
+<p>L’ordre des décisions est stable.</p>
+<ol type="1">
+<li>Le job entre dans une partition.</li>
+<li>Slurm vérifie que la demande peut exister. Être le premier de la file ne suffit pas. Les CPU, la mémoire et le nombre de nœuds doivent tenir. La limite de temps doit être acceptable pour la partition.</li>
+<li>Parmi les jobs en attente qui tiennent, la priorité fixe l’ordre. Le fairshare et l’âge de l’attente sont deux facteurs de cette priorité. Les poids dépendent du site et restent hors du module.</li>
+<li>L’ordonnanceur lance le job quand les nœuds sont libres. Avec le backfill, un job plus court et moins prioritaire peut prendre un créneau libre. Ce départ n’est permis que si ce job finit avant le début réservé d’un job plus prioritaire. Un débordement laisse le job en attente.</li>
+<li>La préemption, si le site l’a activée, peut libérer des nœuds en arrêtant un job déjà en cours. Ce module ne l’active pas.</li>
+</ol>
+<p>Un exemple fixe les durées. La partition a deux nœuds. Le backfill est actif. La préemption est inactive. Le job 10 occupe un nœud. Son allocation se termine dans 20 minutes. Le job 11 demande deux nœuds, avec une priorité haute. Le job 12 demande un nœud, avec une priorité basse et une limite de 5 minutes. Le job 12 tient dans ces 20 minutes. Le backfill peut le lancer. Avec une limite de 40 minutes, le job 12 déborderait sur le début réservé du job 11. Les deux jobs en attente resteraient PD.</p>
+<p>La commande <code>sprio -j</code>, suivie du numéro de job, affiche la priorité et le facteur fairshare quand le binaire existe. L’absence de <code>sprio</code> ne retire pas le mécanisme. Sur un Slurm de portable sans comptabilité, le fairshare est souvent inactif. L’idée sert surtout le jour de la séance, si le site l’a branchée.</p>
+<div class="def">
+<p>Le fairshare baisse la priorité d’un compte qui a déjà beaucoup consommé, et la remonte quand l’usage ancien s’efface. Ce facteur, seul, ne refuse pas le job. Une partition inoccupée peut encore lancer le job. Un ResourceQuota Kubernetes refuse l’objet quand le plafond est atteint. Un site peut ajouter des plafonds durs à côté du fairshare. Ce module ne les règle pas.</p>
+</div>
+<p>La limite de temps est une durée d’horloge murale sur l’allocation, pas un temps CPU cumulé. L’option est <code>--time</code>. Le format utilisé ici est <code>heures:minutes:secondes</code>. <code>00:02:00</code> vaut 2 minutes, pas 2 heures.</p>
+<p>Le manuel de sbatch fixe la résolution à une minute. Slurm arrondit les secondes à la minute supérieure. Une option <code>00:00:30</code> est donc retenue comme 1 minute. Une option <code>00:02:00</code> reste 2 minutes. Une limite de zéro demanderait l’absence de limite. Ce module n’utilise pas zéro.</p>
+<p>Si la limite demandée dépasse celle de la partition, le job reste PD. Le manuel de sbatch précise que cette attente peut durer sans date de fin.</p>
+<p>À l’échéance, Slurm envoie SIGTERM, puis SIGKILL. L’écart entre les deux signaux est le paramètre de configuration KillWait. Ce module ne modifie pas KillWait. L’état final s’appelle TIMEOUT. Un site peut autoriser un dépassement. Ce module n’utilise pas cette tolérance.</p>
+<div class="def">
+<p>La préemption est l’arrêt d’un job en cours pour donner ses nœuds à un autre job. Le site peut annuler le job, le remettre en file, ou le suspendre. Le mode se règle hors de ce module. Un job qui disparaît n’a donc pas toujours échoué dans le script. L’état PREEMPTED désigne ce cas, quand la comptabilité l’affiche.</p>
+</div>
+<p>Un pod Kubernetes peut aussi être préempté par une PriorityClass. Le pod d’un Deployment est recréé, parce que le nombre de répliques reste demandé. Un job Slurm préempté ne revient que si le site le remet en file. Le Job Kubernetes de ce module ne fixe pas de PriorityClass.</p>
+<h3 id="script-sbatch-minimal" class="anchored">Script sbatch minimal</h3>
+<p>Le script du module tient en huit lignes. Il recopie le script dans <code>sommeil.sbatch</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --job-name=sommeil</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --output=sommeil-%j.out</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --time=00:02:00</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --mem=1G</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">hostname</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sleep</span> 30</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Chaque ligne a un rôle.</p>
+<ol type="1">
+<li><code>#!/bin/bash</code> dit au noyau de lancer bash. Pour Slurm, cette ligne est un commentaire. Les options <code>#SBATCH</code> qui suivent comptent encore.</li>
+<li><code>--job-name=sommeil</code> fixe le nom vu dans <code>squeue</code>. Sans cette option, le nom vient du fichier.</li>
+<li><code>--output=sommeil-%j.out</code> fixe le fichier de sortie. Slurm remplace <code>%j</code> par le numéro du job. Bash ne le remplace pas, parce que la ligne est un commentaire. Slurm lit ces options lui-même. Une variable de shell dans une directive reste du texte brut. Il n’écrit donc pas de <code>$HOME</code> dans une option.</li>
+<li><code>--time=00:02:00</code> pose une limite de 2 minutes. Le <code>sleep 30</code> tient dedans, y compris après l’arrondi à la minute.</li>
+<li><code>--cpus-per-task=1</code> demande un CPU pour la tâche. Le défaut est déjà un CPU. La ligne rend la demande visible dans le script.</li>
+<li><code>--mem=1G</code> demande 1 gibioctet de mémoire réelle sur le nœud. Le manuel de sbatch compte aussi la mémoire de <code>slurmstepd</code> dans le job, d’ordinaire entre 20 et 200 mébioctets. Une demande minuscule peut donc tuer le job avant <code>hostname</code>. <code>1G</code> laisse de la marge. Le script ne combine pas <code>--mem</code> avec une autre option de mémoire.</li>
+<li><code>hostname</code> écrit le nom du nœud qui exécute le script. Slurm lance une seule copie du script. Sans <code>--batch</code>, que ce script n’utilise pas, cette copie tourne en général sur le premier nœud. Le fichier de sortie est créé sur ce même nœud. <code>hostname</code> n’écrit pas les autres nœuds.</li>
+<li><code>sleep 30</code> suspend le processus pendant 30 secondes. Le CPU ne tourne pas en boucle. L’allocation reste prise pendant ces 30 secondes. <code>squeue</code> peut donc montrer le job.</li>
+</ol>
+<p>Une ligne vide n’arrête pas la lecture des directives. La première ligne de commande l’arrête. Une option <code>#SBATCH</code> placée sous <code>hostname</code> ne compte plus.</p>
+<p><code>sbatch sommeil.sbatch</code> envoie le fichier au contrôleur et se termine tout de suite. La ligne affichée contient le numéro du job. Sur un contrôleur courant, elle contient aussi <code>Submitted batch job</code>. Un code de sortie 0 signifie que le contrôleur a accepté le script. Ce code ne signifie pas que <code>hostname</code> a déjà tourné. Dans la CI qu’il connaît, un code 0 signifie que l’étape a réussi. Ici, la réussite du script se lit plus tard, dans le fichier de sortie ou dans <code>sacct</code>.</p>
+<p>Le répertoire de travail est celui depuis lequel il lance <code>sbatch</code>, sauf avec <code>--chdir</code>. Il ne passe pas <code>--chdir</code>. Slurm crée le fichier de sortie dans ce répertoire, sur le premier nœud. Slurm ne copie aucun autre fichier. Le fichier apparaît quand l’allocation commence, pas au moment de <code>sbatch</code>. Il voit <code>sommeil-17.out</code> depuis l’endroit de la soumission seulement si ce répertoire est partagé. Le numéro 17 est un exemple. Le numéro à lire est celui que <code>sbatch</code> vient d’imprimer.</p>
+<p>Sans <code>--error</code>, la sortie standard et l’erreur standard vont dans le même fichier. Le manuel de sbatch décrit ce défaut. Sans <code>--output</code>, le nom par défaut est <code>slurm-%j.out</code>.</p>
+<p><code>hostname</code> se termine avant <code>sleep</code>. En quittant, <code>hostname</code> écrit sa ligne dans le fichier. Pendant les 30 secondes de sommeil, le fichier peut donc déjà contenir le nom du nœud, dès que le répertoire est visible.</p>
+<p>Si les organisateurs donnent un nom de partition, il ajoute une ligne <code>#SBATCH --partition=</code> avec ce nom, au-dessus de <code>hostname</code>. Si les organisateurs donnent un compte Slurm, il ajoute <code>#SBATCH --account=</code> avec ce nom, au même endroit. Le compte Slurm facture le job. Le compte d’accès ouvre la séance. Les deux noms peuvent différer. Il ne met pas le compte d’accès dans <code>--account</code>. Tant que les organisateurs n’ont rien donné, le script reste sans ces deux options.</p>
+<h3 id="sortie-squeue-et-scancel" class="anchored">Sortie, squeue et scancel</h3>
+<p>Il lance <code>squeue</code> pendant le <code>sleep</code>, pas après. Après 30 secondes, le job a souvent déjà quitté la file.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="st">"</span><span class="va">$USER</span><span class="st">"</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Les colonnes utiles sont JOBID, PARTITION, NAME, ST et TIME. NAME vaut <code>sommeil</code> grâce à <code>--job-name</code>. TIME montre le temps déjà écoulé, pas la limite demandée. ST est l’état court.</p>
+<ul>
+<li><code>PD</code> signifie que le job attend.</li>
+<li><code>R</code> signifie que le job tourne.</li>
+<li><code>CG</code> signifie que le job libère les nœuds.</li>
+</ul>
+<p>Pour un job PD, <code>squeue</code> peut afficher la raison <code>Priority</code> ou la raison <code>Resources</code>. <code>Priority</code> veut dire qu’un autre job passe devant. <code>Resources</code> veut dire que la demande ne tient pas encore sur les nœuds libres.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scancel</span> 17</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>scancel 17</code> demande l’arrêt du job 17, à lancer pendant le <code>sleep</code> si l’arrêt est voulu. Il remplace 17 par le numéro reçu. Sans numéro, ce n’est pas le geste du module. <code>scancel -u</code> suivi d’un nom Linux annule tous les jobs de cette personne. Il ne lance pas cette forme ici.</p>
+<p>Quand le job a quitté <code>squeue</code>, l’état final a un autre nom.</p>
+<ul>
+<li><code>COMPLETED</code> suit une fin normale, ici le code 0 de <code>sleep</code>.</li>
+<li><code>TIMEOUT</code> suit la limite de temps.</li>
+<li><code>CANCELLED</code> suit <code>scancel</code>.</li>
+<li><code>FAILED</code> suit un code de sortie non nul du script.</li>
+<li><code>PREEMPTED</code> suit une préemption.</li>
+</ul>
+<p>Si <code>sacct</code> répond, il interroge le numéro.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sacct</span> <span class="at">-j</span> 17 <span class="at">--format</span><span class="op">=</span>JobID,State,ExitCode,Elapsed</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Sans <code>sacct</code>, le fichier <code>sommeil-17.out</code> reste la trace. Un Slurm de portable n’a pas toujours la comptabilité. L’absence de <code>sacct</code> n’invalide pas le script.</p>
+<p>Une option <code>--time=00:00:10</code> ne dure pas 10 secondes. Slurm la retient comme 1 minute, et <code>sleep 30</code> tient dans cette minute. Un TIMEOUT observable demanderait <code>--time=00:01:00</code> et <code>sleep 90</code>. <code>hostname</code> écrirait sa ligne, puis Slurm enverrait SIGTERM. Ce second script n’est pas le livrable. Le livrable garde <code>sleep 30</code> et <code>00:02:00</code>.</p>
+<h3 id="deployment-et-job-fini" class="anchored">Deployment et job fini</h3>
+<div class="thm">
+<p>Un Deployment maintient le nombre de répliques demandé. Un job Slurm se termine, et rien ne le relance.</p>
+</div>
+<p>Le même enchaînement <code>hostname</code>, puis <code>sleep 30</code>, placé dans un Deployment, devient un service qui ne s’arrête pas.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> apps/v1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Deployment</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> sommeil</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">replicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">selector</span><span class="kw">:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">matchLabels</span><span class="kw">:</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">app</span><span class="kw">:</span><span class="at"> sommeil</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">labels</span><span class="kw">:</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">app</span><span class="kw">:</span><span class="at"> sommeil</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> sommeil</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox:1.36</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">command</span><span class="kw">:</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> sh</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> -c</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> hostname; sleep 30</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>replicas: 1</code> demande un pod en permanence. Le sélecteur et le label <code>app: sommeil</code> disent quels pods appartiennent à ce Deployment. Le champ <code>command</code> remplace le point d’entrée de l’image. <code>sh -c</code> enchaîne les deux programmes, parce que ce champ n’est pas un script de plusieurs lignes.</p>
+<p>Le <code>restartPolicy</code> d’un pod de Deployment vaut Always, et l’API refuse une autre valeur. Quand <code>sleep</code> se termine avec le code 0, kubelet relance le conteneur. <code>hostname</code> s’exécute de nouveau. Le travail fini est devenu une boucle.</p>
+<p>Il n’applique pas ce Deployment. Sur un cluster partagé, la boucle tournerait jusqu’à une suppression manuelle.</p>
+<p>Une release Helm qui installe un Deployment maintient les pods de la même façon. Il s’en sert déjà pour les services joignables de la startup robotique. Il ne range pas ce sleep dans un chart. Un job de CI se termine, comme le calcul voulu ici. Le job Slurm se termine aussi. La partition, la priorité, le fairshare et la limite de temps s’ajoutent, parce que les nœuds sont partagés entre équipes.</p>
+<h3 id="job-kubernetes" class="anchored">Job Kubernetes</h3>
+<p>Le Job Kubernetes est l’objet qui se termine. Le YAML suivant exécute la même commande courte.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> batch/v1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Job</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> sommeil</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">backoffLimit</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">activeDeadlineSeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">restartPolicy</span><span class="kw">:</span><span class="at"> Never</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> sommeil</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox:1.36</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">command</span><span class="kw">:</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> sh</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> -c</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> hostname; sleep 30</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>backoffLimit: 0</code> interdit un second pod après un échec. La valeur par défaut est 6. Cette valeur autorise d’autres pods. <code>activeDeadlineSeconds: 120</code> tue les pods du Job 120 secondes après que le Job est devenu actif. <code>--time</code> annonce à l’ordonnanceur combien de temps l’allocation va durer. Cette annonce permet le backfill. <code>activeDeadlineSeconds</code> ne réserve pas de place dans une file.</p>
+<p><code>restartPolicy: Never</code> est requis pour un Job. L’autre valeur admise est OnFailure. Never évite de relancer le conteneur dans le même pod. L’image <code>busybox:1.36</code> fournit <code>sh</code>, <code>hostname</code> et <code>sleep</code>. Il peut la remplacer par une image qu’il a déjà, si ces trois programmes y sont.</p>
+<p><code>kubectl apply -f sommeil-job.yaml</code> fait accepter l’objet par l’API. Un code 0 de <code>kubectl</code> signifie cette acceptation, pas que <code>hostname</code> a déjà écrit sa ligne. Le parallèle avec <code>sbatch</code> est direct.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> logs <span class="at">--selector</span> job-name=sommeil</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Le contrôleur pose le label <code>job-name</code> égal au nom du Job. Les logs contiennent le nom du pod, pas le nom du portable, quand le pod tourne dans un cluster. Ce nom peut donc différer du <code>hostname</code> d’un job Slurm lancé à côté. Les deux sorties restent justes. Chacune nomme l’endroit qui a exécuté la commande.</p>
+<p>Un second <code>kubectl apply</code> sur le même nom ne relance pas <code>hostname</code>. Le Job existe déjà, et son gabarit est immuable. Pour un second passage, il supprime l’objet, puis il applique de nouveau.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete job sommeil</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>sbatch</code>, à l’inverse, crée un nouveau numéro à chaque envoi. Deux envois produisent deux numéros. Chaque numéro donne un fichier <code>sommeil-%j.out</code> quand l’allocation commence.</p>
+<p>Kubernetes démarre ce Job dès qu’un nœud a la place. Rien dans le YAML ne le fait attendre pour un fairshare entre équipes.</p>
+<p>Kueue est le projet qui ajoute cette attente devant les Jobs. Kueue laisse le Job suspendu, puis passe le champ <code>suspend</code> à faux quand le quota de la file autorise le démarrage. La file demandée par l’équipe s’appelle LocalQueue. Il nomme Kueue et LocalQueue. Il n’installe pas Kueue. Il n’écrit pas de LocalQueue. Le Job du module ne porte pas de label de file.</p>
+<h3 id="séance-du-5-novembre" class="anchored">Séance du 5 novembre</h3>
+<p>La séance est le jeudi 5 novembre 2026, de 9h30 à 12h. Le compte d’accès et la clé se préparent avant ce matin-là. La soumission sur le calculateur de la séance attend que le compte existe. Le script du portable n’attend pas cette date.</p>
+<p>Il demande le compte d’accès par le canal que les organisateurs ont indiqué. S’il a déjà ce compte, il n’en demande pas un second. Il note la date de la demande, ou la date à laquelle il a vérifié que le compte était ouvert.</p>
+<p>La clé est une clé ed25519, séparée de ses clés habituelles. S’il a déjà le fichier <code>id_ed25519_romeo</code>, il le garde et il refuse l’écrasement.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-t</span> ed25519 <span class="at">-f</span> <span class="st">"</span><span class="va">$HOME</span><span class="st">/.ssh/id_ed25519_romeo"</span> <span class="at">-C</span> <span class="st">"seance-novembre"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-lf</span> <span class="st">"</span><span class="va">$HOME</span><span class="st">/.ssh/id_ed25519_romeo.pub"</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La première commande demande une passphrase, deux fois. Il en choisit une. Il n’ajoute pas d’option pour la laisser vide. La seconde commande affiche l’empreinte de la clé publique. Il vérifie que le type affiché est ed25519.</p>
+<p>Il transmet le fichier dont le nom finit par <code>.pub</code> seulement si les organisateurs le demandent. L’autre fichier reste sur le portable. Il ne colle pas la clé privée dans un ticket, un chat, ou <code>acces.md</code>.</p>
+<div class="note">
+<p>Il se connecte seulement au nœud de login indiqué par les organisateurs. Inventer ce nom est une erreur. Tant que les organisateurs ne l’ont pas écrit, il ne lance pas de client SSH vers la séance.</p>
+</div>
+<h3 id="portable-sans-cluster" class="anchored">Portable sans cluster</h3>
+<div class="note">
+<p>S’il a déjà lancé Slurm dans Docker, <code>sinfo</code> répond dans cet environnement. Il y soumet le même <code>sommeil.sbatch</code>. Installer Docker, ou choisir une image, ne fait pas partie du travail. Sans <code>sinfo</code>, le livrable est le script plus une phrase par ligne.</p>
+</div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sinfo</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Si <code>sinfo</code> affiche une partition, il soumet le script, il interroge <code>squeue</code> pendant le <code>sleep</code>, puis il ouvre le fichier <code>sommeil-%j.out</code>. Si <code>sinfo</code> est introuvable, il s’arrête après le script et l’explication. Cette absence n’est pas un échec.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get nodes</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Si <code>kubectl get nodes</code> liste des nœuds, il peut appliquer le Job, lire les logs, puis supprimer le Job. Sinon, le YAML et les phrases suffisent. Il n’installe pas de cluster pour finir le module.</p>
+<h2 id="exercices" class="anchored">Exercices</h2>
+<p>Les quatre exercices se font sur le portable. Aucun ne demande d’installer Slurm, Docker, Kueue, ou un cluster.</p>
+<h3 id="exercice-1.-écrire-le-script-et-expliquer-chaque-ligne" class="anchored">Exercice 1. Écrire le script et expliquer chaque ligne</h3>
+<p>Il crée <code>sommeil.sbatch</code> avec les huit lignes des notes, dans le même ordre. Il crée <code>lignes.md</code>. Ce fichier contient une phrase par ligne du script, dans l’ordre, plus trois réponses courtes.</p>
+<ul>
+<li>Que devient une option <code>#SBATCH</code> écrite après <code>hostname</code>?</li>
+<li>Quelle durée Slurm enregistre pour l’option <code>--time=00:00:30</code>?</li>
+<li>Quel fichier reçoit la sortie standard et l’erreur standard quand <code>--error</code> est absent?</li>
+</ul>
+<p>Il n’a pas besoin de soumettre le script pour cet exercice. S’il a déjà un Slurm qui répond à <code>sinfo</code>, y compris dans Docker, il peut soumettre en plus et coller la ligne <code>Submitted batch job</code> dans <code>lignes.md</code>. Sans <code>sinfo</code>, les deux fichiers ferment l’exercice.</p>
+<h3 id="exercice-2.-prévoir-le-prochain-job" class="anchored">Exercice 2. Prévoir le prochain job</h3>
+<p>Il écrit <code>decision.md</code>. Le cluster n’intervient pas. La partition de l’énoncé a deux nœuds. Le backfill est actif. La préemption est inactive.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Job</th>
+<th>État</th>
+<th>Nœuds</th>
+<th>Priorité</th>
+<th>Durée</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>51</td>
+<td>R</td>
+<td>1</td>
+<td>basse</td>
+<td>10 minutes restantes</td>
+</tr>
+<tr class="even">
+<td>52</td>
+<td>PD</td>
+<td>2</td>
+<td>haute</td>
+<td>limite 1 heure</td>
+</tr>
+<tr class="odd">
+<td>53</td>
+<td>PD</td>
+<td>1</td>
+<td>basse</td>
+<td>limite 40 minutes</td>
+</tr>
+</tbody>
+</table>
+<p>Il répond à trois questions.</p>
+<ol type="1">
+<li>Quels jobs en attente restent PD, et pour quelle raison chacun?</li>
+<li>Quelle commande <code>scancel</code> arrête seulement le job 51?</li>
+<li>Après cet arrêt, quel job part, et pourquoi l’autre reste PD?</li>
+</ol>
+<h3 id="exercice-3.-refuser-le-deployment" class="anchored">Exercice 3. Refuser le Deployment</h3>
+<p>Il écrit <code>refus.md</code>. Il y explique, en quelques phrases, ce que fait le Deployment des notes quand <code>sleep</code> sort avec le code 0. Il écrit aussi pourquoi il n’applique pas cet objet.</p>
+<p>Il écrit <code>sommeil-job.yaml</code> à partir du Job des notes, avec une seule différence. <code>backoffLimit</code> vaut 1 dans son fichier. Dans <code>refus.md</code>, il dit ce que le contrôleur fait après un code de sortie non nul.</p>
+<p>Une phrase de <code>refus.md</code> nomme Kueue et rappelle que ce module ne l’installe pas.</p>
+<p>Si <code>kubectl get nodes</code> liste des nœuds, il applique son Job, il garde la ligne de log de <code>hostname</code>, puis il supprime le Job. Sinon, les deux fichiers suffisent. Il n’installe rien pour obtenir cette liste.</p>
+<h3 id="exercice-4.-préparer-le-compte-et-la-clé" class="anchored">Exercice 4. Préparer le compte et la clé</h3>
+<p>Il prépare la séance du jeudi 5 novembre 2026, de 9h30 à 12h.</p>
+<p>Il demande le compte d’accès, ou il vérifie que ce compte est déjà ouvert. Il génère la clé ed25519 des notes si le fichier n’existe pas. Il affiche l’empreinte de la clé publique.</p>
+<p>Il écrit <code>acces.md</code> avec quatre éléments.</p>
+<ul>
+<li>La date de la demande, ou la date de la vérification.</li>
+<li>Le chemin de la clé publique.</li>
+<li>L’empreinte, et le type ed25519.</li>
+<li>La phrase recopiée. Connexion uniquement vers le nœud de login indiqué par les organisateurs.</li>
+</ul>
+<p>Il ne met pas la clé privée dans <code>acces.md</code>. Il ne lance pas de client SSH vers la séance dans cet exercice.</p>
+<h2 id="projet-solo" class="anchored">Projet solo</h2>
+<p>Il rend un job Slurm CPU qui dort 30 secondes et qui écrit le nom du nœud. Le script est <code>sommeil.sbatch</code>. S’il a déjà rendu ce fichier à l’exercice 1, il le reprend tel quel, à condition que la liste suivante soit vraie.</p>
+<ul>
+<li>La première ligne est <code>#!/bin/bash</code>.</li>
+<li>Les options <code>--job-name=sommeil</code>, <code>--output=sommeil-%j.out</code>, <code>--time=00:02:00</code>, <code>--cpus-per-task=1</code> et <code>--mem=1G</code> sont présentes, toutes avant la première commande.</li>
+<li>Les deux commandes sont <code>hostname</code>, puis <code>sleep 30</code>.</li>
+<li>Aucune option <code>#SBATCH</code> ne suit <code>hostname</code>.</li>
+<li><code>explication.md</code> contient une phrase par ligne, y compris le shebang. Ce fichier peut être le <code>lignes.md</code> de l’exercice 1, recopié sous le nom demandé.</li>
+</ul>
+<p>Deux branches existent. La branche obligatoire est le portable, même sans <code>sinfo</code>.</p>
+<p>Sur le portable, si <code>sinfo</code> ne répond pas, les deux fichiers suffisent. Docker n’est pas à installer pour créer cette réponse. Si <code>sinfo</code> répond, y compris dans un Slurm Docker déjà lancé, il soumet une fois. Il lance <code>squeue -u "$USER"</code> pendant le <code>sleep</code>. Il ouvre le fichier dont le nom contient le numéro annoncé. Il colle dans <code>explication.md</code> la ligne de <code>hostname</code> et la ligne de <code>squeue</code> qui montre l’état R. Cette ligne de <code>hostname</code> nomme le nœud de l’allocation. Elle peut différer du nom de la machine où il a tapé <code>sbatch</code>. Il écrit si les deux noms coïncident. Il nomme le nœud du job.</p>
+<p>Quand le compte d’accès existe, il peut soumettre le même script sur le nœud de login indiqué par les organisateurs. Il n’ajoute <code>--partition</code> ou <code>--account</code> que si les organisateurs lui ont donné les noms. Cette branche ne remplace pas le portable. Sans compte, cette branche reste fermée.</p>
+<h2 id="projet-de-groupe" class="anchored">Projet de groupe</h2>
+<p>Deux personnes comparent un job Slurm et un Job Kubernetes sur la même commande courte. La commande est <code>hostname</code>, puis <code>sleep 30</code>. Dans le conteneur, le champ <code>command</code> contient <code>hostname; sleep 30</code>. Ce champ n’est pas un script de plusieurs lignes.</p>
+<p>Il tient <code>sommeil.sbatch</code>. Le script conforme du projet solo se réutilise sans changement. Le collègue tient <code>sommeil-job.yaml</code>, conforme au Job des notes, avec <code>backoffLimit: 0</code> et <code>activeDeadlineSeconds: 120</code>. Il relit le YAML avant la comparaison, car il exploite déjà Kubernetes.</p>
+<p>Ensemble, ils écrivent <code>comparaison.md</code> en quatre paragraphes.</p>
+<ol type="1">
+<li>Démarrage. Quelle commande soumet le travail, et quelle condition peut le laisser en attente.</li>
+<li>Arrêt. Quelle limite peut tuer le travail, et ce qui se passe après un code 0.</li>
+<li>Sortie. Où la ligne de <code>hostname</code> apparaît pour le job Slurm, et où elle apparaît pour le Job Kubernetes.</li>
+<li>Second passage. Quelle action fait exécuter <code>hostname</code> une seconde fois de chaque côté.</li>
+</ol>
+<p>Une dernière phrase nomme Kueue et dit que cette file n’est pas installée. Ce Job, sans Kueue, n’a pas de fairshare.</p>
+<p>S’ils ont <code>sinfo</code>, ils soumettent le script une fois et ils gardent la ligne de <code>hostname</code>. S’ils ont <code>kubectl get nodes</code>, ils appliquent le Job, ils gardent la ligne de log, puis ils suppriment le Job. Les deux noms peuvent différer sans que l’un soit faux. Si une des deux commandes manque, le fichier de ce côté et les paragraphes suffisent. Ils n’installent ni Slurm, ni Kueue, ni un cluster pour égaliser les deux côtés.</p>
+<h2 id="examen" class="anchored">Examen</h2>
+<p>L’examen est écrit. Il répond sans cluster, en quelques phrases par question. Chaque réponse nomme le mécanisme et l’effet.</p>
+<h3 id="question-1.-expliquer-une-attente" class="anchored">Question 1. Expliquer une attente</h3>
+<p>Un job reste PD. La partition a des nœuds libres. La limite de temps demandée est inférieure à celle de la partition. <code>sprio</code> montre un fairshare très bas, et d’autres jobs PD ont une priorité plus haute.</p>
+<p>Pourquoi ce job reste en attente? Que change un fairshare qui remonte après une baisse de l’usage récent? La réponse dit aussi quel fait de l’énoncé ne fait pas partir le job.</p>
+<h3 id="question-2.-attribuer-le-service-et-la-conversion" class="anchored">Question 2. Attribuer le service et la conversion</h3>
+<p>La startup robotique a deux besoins. Un service doit répondre sur un port en continu. Une conversion de journaux doit s’exécuter une fois, écrire son résultat, et s’arrêter.</p>
+<p>Quel objet porte le service, et quel objet porte la conversion, entre un Deployment et un job Slurm? Que fait le Deployment si le processus de conversion sort avec le code 0?</p>
+<h3 id="question-3.-retrouver-la-sortie-et-annuler" class="anchored">Question 3. Retrouver la sortie et annuler</h3>
+<p>Le script contient <code>hostname</code>, puis <code>sleep 30</code>. L’option de sortie est <code>--output=sommeil-%j.out</code>. <code>sbatch</code> a annoncé le numéro 17. Le job est encore dans son <code>sleep</code>.</p>
+<p>Où est le fichier, et quel texte peut déjà s’y trouver? Quelle commande arrête seulement ce job? Que signifie le code 0 déjà renvoyé par <code>sbatch</code>?</p>
+<h2 id="sources" class="anchored">Sources</h2>
+<p>Fiche de la séance du jeudi 5 novembre 2026, de 9h30 à 12h.</p>
+<p><a href="https://romeo.univ-reims.fr/21_formations.html/341/Utiliser_ROMEO2025_et_ses_GPU_pour_le_HPC_et_l_IA" class="uri">https://romeo.univ-reims.fr/21_formations.html/341/Utiliser_ROMEO2025_et_ses_GPU_pour_le_HPC_et_l_IA</a></p>
+<p>Manuel de <code>sbatch</code>. La résolution d’une minute, le fichier de sortie, et l’arrêt de la lecture des directives viennent de cette page.</p>
+<p><a href="https://slurm.schedmd.com/sbatch.html" class="uri">https://slurm.schedmd.com/sbatch.html</a></p>
+
+</main>
+</div>
+</div>
+<script src="../../assets/theme.js"></script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>
