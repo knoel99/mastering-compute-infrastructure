@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Slurm et exploitation d'un cluster HPC — Mastering Compute Infrastructure</title>
+<meta name="description" content="L'ordonnanceur de référence du calcul scientifique et de l'entraînement : jobs, politique d'équité, préemption, GPU et topologie, comptabilité, santé des nœuds.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">Slurm et exploitation d'un cluster HPC</h1>
+<p class="subtitle">Module 05 · Phase 2 · 32 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés sur un vrai Slurm 23.11</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> comment partager équitablement et efficacement quelques centaines de GPU entre des équipes qui ne s'entendent pas toujours, sans qu'un job oublié ne bloque un entraînement de deux semaines ? Slurm est la réponse la plus répandue dans les centres de calcul et chez de nombreux fournisseurs de GPU.</p>
+<p>Ce module vous apprend à <strong>lire</strong> un cluster Slurm (états, raisons d'attente, comptabilité), à <strong>écrire</strong> des jobs corrects, à <strong>configurer</strong> une politique (partitions, équité, préemption) et à <strong>exploiter</strong> les nœuds (GPU, santé, conteneurs). Tout est vérifié sur un vrai Slurm 23.11 lancé dans un bac à sable, pas sur des exemples écrits de mémoire.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Un ordonnanceur est un contrat social écrit en configuration. Chaque paramètre répond à la question « qui passe en premier quand tout le monde veut la même chose ? ». Si vous ne savez pas formuler la réponse en une phrase, ne touchez pas au paramètre.</p>
+</div>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>32 h, dont environ 12 h de lecture, 12 h de labs et 8 h d'exercices</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>2 : à l'aise avec Linux en ligne de commande (module 1)</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : aucune expérience de Slurm dans le profil, écart de 3 sur 4</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un Slurm de test reproductible par script, avec comptes, QOS, préemption et vérification de santé</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>une VM ou un conteneur Linux jetable avec accès root ; aucun GPU</td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/homelab-slurm/index.html">Projet 1 — Mini-cluster Slurm instrumenté</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Écrire et soumettre des jobs en lot, des tableaux et des chaînes de dépendances avec des ressources GPU (chapitres 1 et 2).</li>
+<li>Lire une file d'attente et expliquer pourquoi un job attend (chapitres 1 et 3).</li>
+<li>Configurer partitions, comptes, QOS, équité et préemption pour une politique donnée (chapitres 3 et 4).</li>
+<li>Décrire la configuration d'un nœud GPU et une topologie réseau pour le placement (chapitre 5).</li>
+<li>Mesurer l'utilisation d'un cluster avec <code>sacct</code>, <code>sreport</code> et <code>sshare</code> (chapitre 6).</li>
+<li>Diagnostiquer et mettre en quarantaine un nœud défaillant, automatiquement (chapitre 7).</li>
+<li>Situer Slurm face aux conteneurs et à Kubernetes (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Douze séances, soit 32 h : huit de 3 h et quatre de 2 h. Le niveau ne diminue jamais d'une séance à la suivante.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3 h</td>
+<td>1</td>
+<td>ch. 1 Architecture et vie d'un job</td>
+<td>Ex. 1 ; questions de positionnement</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3 h</td>
+<td>1</td>
+<td>ch. 2 Soumettre des jobs, première moitié</td>
+<td>Lab 5.1 partie A</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2 h</td>
+<td>1</td>
+<td>ch. 2 Tableaux, dépendances, scripts robustes</td>
+<td>Lab 5.1 partie B ; Ex. 2, 3</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 3 Partitions, associations, QOS, priorité</td>
+<td>Ex. 4</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 3 Équité (Fair Tree) et backfill</td>
+<td>Lab 5.2 partie A ; Ex. 5, 6</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>2 h</td>
+<td>2</td>
+<td>ch. 4 Préemption, réservations, limites</td>
+<td>Lab 5.2 partie B</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 5 GPU et topologie</td>
+<td>Ex. 7</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>2 h</td>
+<td>2</td>
+<td>ch. 6 Comptabilité et reporting</td>
+<td>Ex. 8</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 Santé des nœuds</td>
+<td>Lab 5.3</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 suite, ch. 8 Conteneurs</td>
+<td>Ex. 9</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 8 Slurm sur Kubernetes, synthèse</td>
+<td>Ex. 10</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>2 h</td>
+<td>3</td>
+<td>Checkpoint de sortie, démarrage du Projet 1</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module 6.</p>
+<ol type="1">
+<li><p><strong>Trois commandes.</strong> Quelle différence entre <code>sbatch</code>, <code>srun</code> et <code>salloc</code> ?</p></li>
+<li><p><strong>Équité.</strong> Deux équipes partagent un cluster. L'équipe A a consommé beaucoup de GPU-heures ce mois-ci, l'équipe B presque rien. Quel mécanisme de Slurm fait passer B devant A, et de quelles données dépend-il ?</p></li>
+<li><p><strong>Durée déclarée.</strong> Pourquoi faut-il déclarer pour chaque job une durée limite réaliste plutôt que la plus grande possible ?</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p><code>sbatch</code> dépose un script qui s'exécutera plus tard, quand les ressources seront libres. <code>srun</code> lance une commande en parallèle ; dans une allocation existante elle crée une <em>étape</em> du job, en dehors elle demande une allocation puis attend. <code>salloc</code> obtient une allocation et ouvre un shell dans celle-ci. Voir les chapitres 1 et 2.</p></li>
+<li><p>Le mécanisme est l'<strong>équité</strong> (<em>fairshare</em>) : la priorité d'un job dépend de la part de ressources promise à son compte et de la consommation récente de ce compte, mesurée par la comptabilité et atténuée au cours du temps. Voir le chapitre 3.</p></li>
+<li><p>Le <em>backfill</em> fait passer devant un petit job seulement s'il ne retarde pas le job prioritaire, ce qu'il juge sur la durée déclarée. Une limite trop grande empêche le comblement des trous ; une limite trop petite fait tuer le job. Voir le chapitre 3 et l'exercice 6.</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. Architecture et vie d'un job</h2>
+<p>Avant de configurer quoi que ce soit, il faut pouvoir lire l'état d'un cluster. Ce chapitre présente les pièces de Slurm et le cycle de vie d'un job, avec des sorties réelles du bac à sable du module.</p>
+<h3 id="les-démons">1.1. Les démons</h3>
+<p>Un cluster Slurm est fait de quelques démons qui se parlent par un canal authentifié.</p>
+<ul>
+<li><strong><code>slurmctld</code></strong> est le contrôleur : il tient l'état de tous les nœuds et jobs, décide de l'ordonnancement et répond aux commandes des utilisateurs.</li>
+<li><strong><code>slurmd</code></strong> tourne sur chaque nœud de calcul : il lance les jobs, les surveille et rapporte l'état du nœud.</li>
+<li><strong><code>slurmdbd</code></strong> écrit la comptabilité dans une base de données (MariaDB dans notre bac à sable). Il est facultatif pour exécuter des jobs, mais indispensable à l'équité, aux limites par compte et aux rapports.</li>
+<li><strong><code>munge</code></strong> authentifie les échanges : tous les nœuds partagent une clé secrète.</li>
+</ul>
+<p>Un démon de plus, <code>slurmrestd</code>, expose une API REST ; nous ne l'utiliserons pas ici.</p>
+<div class="note">
+<p><span class="tag">Un constat de ce module : sans comptabilité, le job reste en attente</span> En installant Slurm 23.11 sur un bac à sable sans <code>slurmdbd</code>, un premier job soumis par <code>root</code> reste indéfiniment en attente avec la raison <code>InvalidAccount</code>, même si le nœud est libre :</p>
+<pre class="text"><code>JOBID PARTITION  NAME  USER ST  TIME NODES NODELIST(REASON)
+    1     debug  wrap  root PD  0:00     1 (InvalidAccount)</code></pre>
+<p>La cause est que le contrôleur cherche une association (cluster, compte, utilisateur) introuvable. Le script <code>labs/slurm/slurm-sandbox/setup.sh</code> règle le problème en installant MariaDB et <code>slurmdbd</code>, puis en créant un compte. Ce constat vient d'un test de l'auteur sur cette version, non d'une documentation : il illustre qu'un ordonnanceur « de test » sans comptabilité ne ressemble pas à un cluster réel.</p>
+</div>
+<h3 id="les-entités">1.2. Les entités</h3>
+<ul>
+<li>Un <strong>cluster</strong> regroupe des nœuds sous un contrôleur.</li>
+<li>Une <strong>partition</strong> est un groupe de nœuds avec des limites et une politique propres, qu'on peut voir comme une file d'attente.</li>
+<li>Un <strong>job</strong> est une demande de ressources suivie d'un programme à exécuter. Une <strong>étape</strong> (<em>step</em>) est un lancement parallèle dans un job, créé par <code>srun</code>.</li>
+<li>Les ressources suivies s'appellent des <strong>TRES</strong> (<em>trackable resources</em>) : processeurs, mémoire, nœuds, et GRES comme les GPU.</li>
+<li>Une <strong>association</strong> relie un cluster, un compte, un utilisateur et éventuellement une partition ; c'est sur elle que portent les parts d'équité et les limites.</li>
+</ul>
+<h3 id="le-cycle-de-vie-dun-job">1.3. Le cycle de vie d'un job</h3>
+<p>Un job passe par des états que <code>squeue</code> et <code>sacct</code> affichent. Les principaux : <code>PENDING</code> (en attente), <code>RUNNING</code>, <code>COMPLETING</code> (en nettoyage), puis un état final comme <code>COMPLETED</code>, <code>FAILED</code>, <code>CANCELLED</code>, <code>TIMEOUT</code>, <code>NODE_FAIL</code>, <code>PREEMPTED</code> ou <code>OUT_OF_MEMORY</code>.</p>
+<p>Un job en <code>PENDING</code> porte une <strong>raison</strong>, la clé du diagnostic. La documentation de <code>squeue</code> en donne la liste ; les plus utiles à connaître :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Raison</th>
+<th>Sens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Priority</code></td>
+<td>un ou plusieurs jobs de priorité supérieure existent pour cette partition ou cette réservation</td>
+</tr>
+<tr class="even">
+<td><code>Resources</code></td>
+<td>le job attend que les ressources demandées se libèrent</td>
+</tr>
+<tr class="odd">
+<td><code>Dependency</code></td>
+<td>le job dépend d'un autre job qui n'a pas terminé comme demandé</td>
+</tr>
+<tr class="even">
+<td><code>BeginTime</code></td>
+<td>l'heure de début au plus tôt n'est pas atteinte (c'est aussi la raison d'un job remis en file)</td>
+</tr>
+<tr class="odd">
+<td><code>ReqNodeNotAvail</code></td>
+<td>un nœud explicitement demandé n'est pas disponible</td>
+</tr>
+<tr class="even">
+<td><code>PartitionTimeLimit</code></td>
+<td>la durée demandée dépasse la limite de la partition</td>
+</tr>
+<tr class="odd">
+<td><code>JobHeldUser</code></td>
+<td>le job est retenu par son propriétaire</td>
+</tr>
+<tr class="even">
+<td><code>InvalidAccount</code></td>
+<td>le compte du job n'est pas valide</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Une raison de la famille <code>Assoc…Limit</code> (par exemple <code>AssocGrpCPULimit</code>) signale qu'une limite attachée à l'association du job est atteinte : la file n'est pas pleine, c'est la politique qui retient.</p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Lire l'état d'un nœud et d'un job</span> Voici les sorties réelles du bac à sable après le démarrage de <code>setup.sh</code> (une machine à 4 processeurs) puis l'exécution du lab 5.1.</p>
+<pre class="text"><code>$ sinfo
+PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+debug*       up   infinite      1   idle vm
+
+$ sacct -X --format=JobID%14,JobName%10,State%10,Elapsed
+         JobID    JobName      State    Elapsed
+-------------- ---------- ---------- ----------
+             2       wrap  COMPLETED   00:00:00
+           1_1      hello  COMPLETED   00:00:01
+           1_2      hello  COMPLETED   00:00:01
+           1_3      hello  COMPLETED   00:00:02</code></pre>
+<p>La partition <code>debug</code> (l'étoile signale la partition par défaut) a une limite de temps infinie et un nœud <code>idle</code>. Les trois jobs <code>1_1</code> à <code>1_3</code> sont les tâches d'un <strong>tableau</strong> (<code>--array</code>), le job <code>2</code> est un job isolé. <code>sacct</code> lit la base de comptabilité : il retrace les jobs même après leur disparition de <code>squeue</code>.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li><code>slurmctld</code> décide, <code>slurmd</code> exécute, <code>slurmdbd</code> mémorise, <code>munge</code> authentifie.</li>
+<li>Un cluster se lit par partitions, nœuds, jobs, étapes et associations ; les ressources suivies sont des TRES.</li>
+<li>Un job <code>PENDING</code> a toujours une raison : c'est le premier réflexe de diagnostic.</li>
+<li>Sans <code>slurmdbd</code>, pas d'équité, pas de limites par compte ni de rapports ; sur la version testée, un job de test restait même bloqué.</li>
+</ul>
+</div>
+<h2 id="ch2">2. Soumettre des jobs</h2>
+<p>Écrire un script de soumission paraît trivial. Les jobs qui coûtent cher en pratique sont pourtant ceux dont le script ignore la façon dont l'ordonnanceur les arrête et les relance.</p>
+<h3 id="les-trois-commandes">2.1. Les trois commandes</h3>
+<ul>
+<li><strong><code>sbatch script</code></strong> dépose un script ; les options <code>#SBATCH</code> du script sont les options de la ligne de commande. Le job tourne plus tard, sa sortie va dans un fichier.</li>
+<li><strong><code>srun commande</code></strong> lance une commande en parallèle. Dans un script <code>sbatch</code>, chaque <code>srun</code> crée une étape ; seul, il demande une allocation et attend.</li>
+<li><strong><code>salloc</code></strong> obtient une allocation interactive et ouvre un shell dedans, utile pour déboguer sur les mêmes machines que l'entraînement.</li>
+</ul>
+<h3 id="demander-des-ressources">2.2. Demander des ressources</h3>
+<p>Les options de ressources les plus utiles à retenir sont celles de la documentation de <code>sbatch</code> :</p>
+<ul>
+<li><code>--nodes=N</code> et <code>--ntasks-per-node=M</code> : nombre de nœuds et de tâches par nœud ;</li>
+<li><code>--cpus-per-task=C</code> : processeurs par tâche, à fixer pour les chargeurs de données multi-processus ;</li>
+<li><code>--mem=M</code> : mémoire par nœud (<code>--mem=0</code> demande toute la mémoire du nœud) ;</li>
+<li><code>--gpus-per-node=[type:]N</code> ou <code>--gres=gpu:[type:]N</code> : GPU par nœud ; <code>-G</code> / <code>--gpus</code> compte à l'échelle du job ;</li>
+<li><code>--exclusive</code> : le job ne partage pas ses nœuds ;</li>
+<li><code>--time=D-HH:MM:SS</code> : durée limite, dont le chapitre 3 explique l'importance.</li>
+</ul>
+<p>Pour un entraînement distribué, la règle est de <strong>demander des nœuds entiers</strong>, avec toutes leurs ressources, plutôt que des fractions : le réseau, le NUMA et le bruit des voisins rendent les placements partiels imprévisibles.</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Un entraînement sur deux nœuds de huit GPU</span> Le script <code>labs/slurm/slurm-sandbox/examples/train_multinode.sbatch</code> demande deux nœuds exclusifs de huit GPU, lance un <code>torchrun</code> par nœud avec un point de rendez-vous sur le premier nœud, et prévoit la reprise :</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --job-name=train-70b</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --nodes=2</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --ntasks-per-node=1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --gpus-per-node=8</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --cpus-per-task=96</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --mem=0</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --exclusive</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --time=12:00:00</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --signal=B:USR1@300</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --requeue</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --output=logs/%x-%j.out</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="va">head_node</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="ex">scontrol</span> show hostnames <span class="st">&quot;</span><span class="va">$SLURM_JOB_NODELIST</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 1<span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OMP_NUM_THREADS</span><span class="op">=</span>8</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--kill-on-bad-exit</span><span class="op">=</span>1 <span class="dt">\</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  torchrun <span class="at">--nnodes</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$SLURM_NNODES</span><span class="st">&quot;</span> <span class="at">--nproc_per_node</span><span class="op">=</span>8 <span class="dt">\</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">--rdzv_backend</span><span class="op">=</span>c10d <span class="at">--rdzv_endpoint</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${head_node}</span><span class="st">:29500&quot;</span> <span class="at">--rdzv_id</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$SLURM_JOB_ID</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>           train.py <span class="at">--config</span> config.yaml <span class="at">--resume-latest</span></span></code></pre></div>
+<p>Ce script a passé <code>shellcheck</code> mais n'a <strong>pas</strong> été exécuté ici : il demande des GPU. Les valeurs (96 processeurs par tâche, huit threads OpenMP, port 29500) sont des exemples à adapter. L'option <code>--kill-on-bad-exit=1</code> fait arrêter tout le job quand un rang tombe, plutôt que de laisser les autres bloqués dans une collective.</p>
+</div>
+<h3 id="tableaux-et-dépendances">2.3. Tableaux et dépendances</h3>
+<p>Un <strong>tableau de jobs</strong> (<code>--array=1-100</code>) soumet cent jobs presque identiques d'un coup ; chacun lit sa variable <code>SLURM_ARRAY_TASK_ID</code>. Le suffixe <code>%10</code> limite la concurrence : <code>--array=1-100%10</code> n'en laisse jamais plus de dix en cours. Les tableaux sont le bon outil pour un balayage d'hyperparamètres ou le traitement de milliers de fichiers, et un mauvais outil pour un job unique long.</p>
+<p>Les <strong>dépendances</strong> chaînent des jobs : <code>--dependency=afterok:ID</code> attend que le job <code>ID</code> se soit terminé avec succès, <code>afterany</code> attend sa fin quelle qu'elle soit, <code>singleton</code> n'autorise qu'un job du même nom à la fois. Le lab 5.1 chaîne ainsi un traitement final après un tableau.</p>
+<h3 id="écrire-un-script-qui-survit-à-slurm">2.4. Écrire un script qui survit à Slurm</h3>
+<p>Slurm arrête les jobs : dépassement de durée, préemption, panne de nœud, annulation. Un script robuste prévoit ces cas.</p>
+<ol type="1">
+<li><strong>Mettez <code>set -euo pipefail</code></strong> en tête : une erreur silencieuse en milieu de script ne doit pas produire un succès apparent.</li>
+<li><strong>Demandez un signal avant la fin.</strong> <code>--signal=B:USR1@300</code> envoie <code>SIGUSR1</code> au shell du script 300 secondes avant la limite de durée (<code>B:</code> limite l'envoi au shell du script). Le script le transmet au programme, qui sauvegarde son état.</li>
+<li><strong>Autorisez la remise en file</strong> avec <code>--requeue</code> : Slurm relance alors le job depuis le début de son script, et c'est votre programme qui doit reprendre à son dernier point de sauvegarde.</li>
+<li><strong>Écrivez de façon atomique.</strong> Un checkpoint écrit dans un fichier temporaire puis renommé ne laisse jamais un fichier à moitié écrit.</li>
+</ol>
+<div class="ex">
+<p><span class="tag">Exemple 2.2 — Un entraîneur qui sauvegarde sur signal et reprend</span> Le script <code>examples/trainer.py</code> du lab 5.1 simule un entraînement : il compte des étapes, sauvegarde dans un fichier JSON quand il reçoit <code>SIGUSR1</code>, et reprend depuis ce fichier au démarrage suivant.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save(step):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> CKPT <span class="op">+</span> <span class="st">&quot;.tmp&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(tmp, <span class="st">&quot;w&quot;</span>) <span class="im">as</span> f:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        json.dump({<span class="st">&quot;step&quot;</span>: step}, f)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        f.flush()</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        os.fsync(f.fileno())</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    os.replace(tmp, CKPT)  <span class="co"># atomic: a crash never leaves a half-written checkpoint</span></span></code></pre></div>
+<p>Le script <code>checkpoint_on_signal.sbatch</code> transmet le signal du shell au programme et attend vraiment la fin de celui-ci : <code>wait</code> revient dès qu'un signal intercepté arrive (avec un statut supérieur à 128), d'où la boucle qui vérifie avec <code>kill -0</code> que le programme a bien disparu, puis la sortie avec <strong>son</strong> code de retour.</p>
+<p>Deux pièges réels, tous deux rencontrés en écrivant ce lab. Premier piège : Slurm exécute une <strong>copie</strong> du script depuis son répertoire d'attente, de sorte que <code>${BASH_SOURCE[0]}</code> ne désigne plus votre dépôt ; on utilise <code>SLURM_SUBMIT_DIR</code>, qui est le répertoire d'où <code>sbatch</code> a été lancé (et non celui de <code>--chdir</code>). Second piège : une première version du script avalait le code de retour, et le job affichait <code>COMPLETED 0:0</code> alors que Python n'avait même pas trouvé son fichier. Un job qui échoue doit finir en échec.</p>
+<p>Le lab 5.1 envoie <code>scancel --signal=USR1 --batch</code> et vérifie que le checkpoint existe, puis que le job suivant reprend à l'étape sauvegardée.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li><code>sbatch</code> dépose, <code>srun</code> lance une étape, <code>salloc</code> ouvre une allocation interactive.</li>
+<li>Un entraînement distribué demande des nœuds entiers, exclusifs, avec leurs GPU et leur mémoire.</li>
+<li>Tableaux (<code>--array</code>, <code>%N</code> pour limiter) et dépendances (<code>afterok</code>, <code>afterany</code>) chaînent les jobs.</li>
+<li>Un script robuste : <code>set -euo pipefail</code>, <code>--signal</code> avant la fin, <code>--requeue</code>, checkpoint atomique.</li>
+</ul>
+</div>
+<h2 id="ch3">3. Partitions, comptes, QOS et priorité</h2>
+<p>Ce chapitre répond à la question centrale d'un ordonnanceur : quand tout le monde veut la même chose, qui passe en premier ? La réponse se construit en quatre couches : où tourne un job (partition), pour qui il tourne (association), selon quelles règles (QOS) et avec quelle priorité.</p>
+<h3 id="partitions">3.1. Partitions</h3>
+<p>Une <strong>partition</strong> est un groupe de nœuds avec ses propres limites, notamment une durée maximale. Les utilisateurs soumettent à une partition, et un nœud peut appartenir à plusieurs. Une partition d'entraînement et une partition de développement n'ont pas les mêmes limites de durée : une heure pour le développement garantit que quelqu'un peut déboguer sans attendre une semaine.</p>
+<p>Une règle d'exploitation, issue de l'expérience et non de la documentation : <strong>évitez de multiplier les partitions</strong>. Chaque partition est une file séparée et morcelle la capacité : des nœuds libres dans l'une ne servent pas une demande bloquée dans l'autre. Préférez des QOS pour distinguer les politiques, et réservez les partitions aux différences matérielles (types de GPU).</p>
+<h3 id="associations-lorganigramme-dans-la-base">3.2. Associations : l'organigramme dans la base</h3>
+<p>La comptabilité organise les utilisateurs en arbre : un <strong>cluster</strong> contient des <strong>comptes</strong>, qui contiennent des sous-comptes et des <strong>utilisateurs</strong>. Chaque feuille est une <em>association</em>, c'est elle qui porte les parts d'équité et les limites. On gère l'arbre avec <code>sacctmgr</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add account teama parent=research fairshare=1</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add account teamb parent=research fairshare=1</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add user alice account=teama</span></code></pre></div>
+<p>La valeur <code>fairshare=N</code> est le nombre de <strong>parts</strong> promises au compte, relativement à ses frères. Le paramètre <code>AccountingStorageEnforce=associations,limits,qos</code> rend ces règles obligatoires : sans lui, qui est la valeur par défaut, la documentation précise que les limites ne sont pas appliquées. C'est le piège classique d'un cluster où « les limites ne marchent pas » : on les a déclarées sans les faire respecter.</p>
+<div class="note">
+<p><span class="tag">Slurm met les noms de compte en minuscules</span> En créant un compte <code>TeamA</code> dans le lab 5.2, on constate que Slurm l'enregistre sous le nom <code>teama</code>. Notez-le dans vos scripts : une comparaison de chaînes sensible à la casse sur un nom de compte échoue silencieusement.</p>
+</div>
+<h3 id="qos-un-jeu-de-règles-nommé">3.3. QOS : un jeu de règles nommé</h3>
+<p>Une <strong>QOS</strong> (<em>quality of service</em>) regroupe une priorité, des limites et une règle de préemption sous un nom, qu'un job réclame avec <code>--qos=</code> et qu'un utilisateur n'obtient que si son association l'y autorise.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add qos urgent Priority=1000 Preempt=normal</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> modify user alice set qos+=urgent</span></code></pre></div>
+<p>Cette QOS <code>urgent</code> a une priorité élevée et peut préempter les jobs de la QOS <code>normal</code> (chapitre 4). Les limites s'expriment par des paramètres comme <code>GrpTRES</code>, <code>MaxTRESPerUser</code>, <code>MaxJobs</code> ou <code>MaxWall</code>, que la page « Resource Limits » de la documentation décrit en détail.</p>
+<h3 id="la-priorité-multifactorielle">3.4. La priorité multifactorielle</h3>
+<p>Avec <code>PriorityType=priority/multifactor</code>, la priorité d'un job est une somme pondérée de facteurs, chacun compris entre 0 et 1. La documentation donne la formule :</p>
+<p><span class="math display">\text{priorité} = \text{site} + W_{\text{âge}}\,f_{\text{âge}} + W_{\text{assoc}}\,f_{\text{assoc}} + W_{\text{équité}}\,f_{\text{équité}} + W_{\text{taille}}\,f_{\text{taille}} + W_{\text{partition}}\,f_{\text{partition}} + W_{\text{QOS}}\,f_{\text{QOS}} + \text{TRES} - \text{nice}</span></p>
+<p>Chaque poids <span class="math inline">W</span> se règle par un paramètre <code>PriorityWeight…</code> de <code>slurm.conf</code>. La commande <code>sprio -w</code> affiche les poids en vigueur, <code>sprio -j ID</code> les facteurs d'un job donné. Le choix des poids <strong>est</strong> la politique : mettre un poids énorme sur l'équité rend le cluster équitable mais impatient, un poids sur l'âge évite qu'un job attende indéfiniment.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — De l'équité à la priorité</span> Dans le lab 5.2, le poids de l'équité est <span class="math inline">W_{\text{équité}} = 10\,000</span>. Un job du compte peu actif obtient un facteur d'équité de 0,75 et un job du compte gros consommateur 0,25. Leurs priorités sont donc <span class="math inline">10\,000 \times 0{,}75 = 7500</span> et <span class="math inline">10\,000 \times 0{,}25 = 2500</span>, ce que <code>sprio</code> affiche :</p>
+<pre class="text"><code>$ sprio -o &quot;%i %a %Y %f&quot; -j 10,11
+JOBID ACCOUNT PRIORITY FAIRSHARE
+10    teama   2500     0.2500000
+11    teamb   7500     0.7500000</code></pre>
+<p>Quand un nœud se libère, c'est le job 11, de priorité 7 500, qui démarre en premier, bien qu'il ait été soumis après le job 10.</p>
+</div>
+<h3 id="léquité-fair-tree">3.5. L'équité : Fair Tree</h3>
+<p>Pour chaque association, Slurm suit la consommation de ressources (en CPU-secondes ou en TRES), <strong>atténuée dans le temps</strong> : la demi-vie <code>PriorityDecayHalfLife</code> vaut 7 jours par défaut, de sorte que la consommation d'il y a une semaine compte moitié moins. Le contrôleur recalcule ces valeurs toutes les <code>PriorityCalcPeriod</code> minutes, 5 par défaut.</p>
+<p>Depuis Slurm 19.05, l'algorithme par défaut est <strong>Fair Tree</strong>. Au lieu de calculer un facteur pour chaque utilisateur isolément, il compare des frères entre eux : si le compte A a un meilleur <em>Level FS</em> que son frère B, tous les enfants de A passent devant tous les enfants de B, à chaque niveau de l'arbre. Un <em>Level FS</em> supérieur à 1 signale une association sous-servie, entre 0 et 1 une association sur-servie ; il est infini pour une association sans consommation.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.2 — Lire sshare</span> Après que huit jobs du compte <code>teama</code> ont consommé 36 secondes de CPU et ceux de <code>teamb</code> rien, <code>sshare -l</code> affiche (extrait réel du lab 5.2, deux comptes de parts égales sous un même parent) :</p>
+<pre class="text"><code>Account   User  NormShares  RawUsage  NormUsage  EffectvUsage  LevelFS  FairShare
+teama           0.333333        36   1.000000      1.000000  0.333333
+ teama  root    1.000000        36   1.000000      1.000000  1.000000  0.250000
+teamb           0.333333         0   0.000000      0.000000       inf
+ teamb  root    1.000000         0   0.000000      0.000000       inf  0.750000</code></pre>
+<p><code>RawUsage</code> est la consommation en CPU-secondes, <code>NormUsage</code> sa part normalisée parmi les frères : <code>teama</code> en a consommé 100 %. Le <em>Level FS</em> d'une association vaut ici sa part normalisée divisée par sa consommation normalisée : <span class="math inline">0{,}333/1{,}0 = 0{,}333</span> pour le compte <code>teama</code>, supérieur à 1 pour une association sous-servie, et infini pour <code>teamb</code> qui n'a rien consommé, comme l'annonce la documentation. Le facteur d'équité est un <strong>classement</strong> : <code>teamb</code> obtient 0,75 et <code>teama</code> 0,25, d'où les priorités de l'exemple précédent.</p>
+<p>Le lab 5.2 attend que <code>PriorityCalcPeriod</code> (réglé à une minute) rafraîchisse ces chiffres avant de soumettre ses jobs de comparaison.</p>
+</div>
+<h3 id="le-backfill">3.6. Le backfill</h3>
+<p>Sans <em>backfill</em>, chaque partition est servie strictement par ordre de priorité : si le premier job attend 64 nœuds, les petits jobs derrière lui attendent aussi, même si des nœuds restent libres. Le plugin <code>sched/backfill</code>, chargé par défaut d'après la documentation, démarre des jobs de moindre priorité <strong>si cela ne retarde pas la date de début prévue des jobs plus prioritaires</strong>.</p>
+<p>Il ne peut le juger que sur les durées déclarées : « des limites de temps raisonnablement exactes sont importantes pour que le backfill fonctionne bien », dit la documentation. Un job sans durée précise ne peut pas combler un trou, un job avec une durée trop courte est tué.</p>
+<div class="key">
+<p><span class="tag">Déclarez la durée la plus juste, pas la plus grande</span> Une durée gonflée « pour être tranquille » retarde votre propre job (il ne peut combler aucun trou) et les autres. Une durée trop serrée le fait tuer. Mesurez la durée réelle de vos jobs avec <code>sacct</code>, ajoutez 20 à 30 % de marge, et utilisez <code>--signal</code> (chapitre 2) pour sauvegarder avant la limite.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>Partition : où et avec quelles limites ; peu de partitions, plusieurs QOS.</li>
+<li>Association : l'arbre cluster, compte, utilisateur porte les parts et les limites ; <code>AccountingStorageEnforce</code> les rend effectives.</li>
+<li>QOS : priorité, limites et préemption sous un nom.</li>
+<li>Priorité : somme pondérée de facteurs entre 0 et 1 ; les poids sont la politique.</li>
+<li>Équité Fair Tree : classement par parts et consommation atténuée ; <code>sshare</code> et <code>sprio</code> la montrent.</li>
+<li>Backfill : comble les trous sans retarder le prioritaire, à condition de déclarer des durées justes.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Préemption, réservations et limites</h2>
+<p>Ce chapitre traite les cas où la politique « premier par priorité » ne suffit pas : une urgence qui doit passer maintenant, une maintenance planifiée, un compte qui ne doit pas dépasser un quota.</p>
+<h3 id="la-préemption-par-qos">4.1. La préemption par QOS</h3>
+<p>La <strong>préemption</strong> libère des ressources en interrompant un job moins prioritaire. Deux paramètres de <code>slurm.conf</code> la configurent : <code>PreemptType</code> choisit le critère (ici <code>preempt/qos</code>, la QOS d'un job décide s'il peut en préempter un autre) et <code>PreemptMode</code> choisit le mécanisme.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>PreemptMode</code></th>
+<th>Ce qui arrive au job préempté</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>REQUEUE</code></td>
+<td>il est remis en file s'il est « requeueable », annulé sinon</td>
+</tr>
+<tr class="even">
+<td><code>CANCEL</code></td>
+<td>il est annulé</td>
+</tr>
+<tr class="odd">
+<td><code>SUSPEND,GANG</code></td>
+<td>il est suspendu puis repris, en partageant les ressources par tranches de temps</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Avec <code>preempt/qos</code>, <code>PreemptMode</code> peut aussi se fixer par QOS. Le paramètre <code>GraceTime</code> d'une QOS ou d'une partition donne au job préempté un délai pour finir proprement : c'est le moment de sauvegarder (voir le chapitre 2). Retenez la règle de fond : <strong>la préemption n'a de sens que si les jobs préemptibles savent reprendre</strong>. Un entraînement qui ne sait pas reprendre depuis un checkpoint perd tout son travail à chaque préemption.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — Un job urgent préempte un job normal</span> Le lab 5.2, partie B, occupe les quatre processeurs avec un job <code>normal</code> de 120 secondes, puis soumet un job <code>urgent</code> d'un processeur. Observation réelle sur Slurm 23.11 :</p>
+<pre class="text"><code>$ squeue -o &quot;%i %q %T %r&quot;
+JOBID QOS    STATE   REASON
+12    normal PENDING BeginTime
+13    urgent RUNNING None
+
+$ scontrol show job 12 | grep -E &#39;JobState|Restarts&#39;
+   JobState=PENDING Reason=BeginTime Dependency=(null)
+   Requeue=1 Restarts=1 BatchFlag=1 Reboot=0 ExitCode=0:0
+$ sacct -X -n -j 12 --format=JobID,State
+12            PREEMPTED</code></pre>
+<p>Le job urgent a démarré aussitôt. Le job normal a été <strong>préempté puis remis en file</strong> : <code>sacct</code> garde la trace <code>PREEMPTED</code> de son premier passage, <code>Restarts=1</code> compte la remise en file, et sa raison d'attente <code>BeginTime</code> s'explique par un délai avant la reprise. Si ce job ne savait pas reprendre depuis un checkpoint, il repartirait de zéro.</p>
+</div>
+<h3 id="les-réservations">4.2. Les réservations</h3>
+<p>Une <strong>réservation</strong> retire des nœuds du pool pour une période donnée : maintenance planifiée, démonstration, fenêtre dédiée à une équipe. La documentation donne l'exemple d'une maintenance de deux heures sur tous les nœuds :</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scontrol</span> create reservation starttime=2026-11-06T16:00:00 <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  duration=120 user=root flags=maint,ignore_jobs nodes=ALL</span></code></pre></div>
+<p>La durée est en minutes. Slurm cessera de lancer les jobs dont la durée déclarée chevaucherait le début de la réservation : c'est une conséquence directe du chapitre précédent, et la raison pour laquelle des jobs « en attente avec des nœuds libres » avant une maintenance sont normaux.</p>
+<h3 id="les-limites">4.3. Les limites</h3>
+<p>Les limites s'attachent aux associations et aux QOS : nombre de jobs en cours ou soumis par utilisateur (<code>MaxJobs</code>, <code>MaxSubmitJobs</code>), durée maximale (<code>MaxWall</code>), ressources totales d'un groupe (<code>GrpTRES</code>) ou par utilisateur (<code>MaxTRESPerUser</code>). Si une limite est définie à plusieurs niveaux, la documentation de « Resource Limits » explique que celle de plus bas niveau s'applique d'abord et que les niveaux supérieurs complètent ce qu'elle laisse indéfini.</p>
+<p>Un job retenu par une limite porte une raison <code>Assoc…Limit</code> ou <code>QOS…Limit</code>, qu'on lit dans <code>squeue</code> (chapitre 1). Rappelez-vous la condition du chapitre 3 : sans <code>AccountingStorageEnforce=…limits</code>, ces limites sont lisibles dans la base mais <strong>jamais appliquées</strong>.</p>
+<h3 id="gros-jobs-et-fragmentation">4.4. Gros jobs et fragmentation</h3>
+<p>Un job de 64 nœuds exclusifs peut attendre longtemps : les petits jobs qui passent devant occupent des nœuds épars, et les 64 nœuds ne sont jamais libres ensemble. Le backfill réserve en principe les ressources du job prioritaire dans le futur, mais seulement tant que les durées déclarées sont justes. Trois leviers d'exploitation :</p>
+<ul>
+<li><strong>Des durées maximales par partition ou QOS</strong>, pour que les petits jobs finissent en un temps prévisible.</li>
+<li><strong>Une QOS « gros jobs »</strong> avec un poids de priorité plus élevé et une limite minimale de nœuds.</li>
+<li><strong>Des fenêtres réservées</strong> (réservations récurrentes) pour les gros entraînements, quand la politique de l'organisation l'exige.</li>
+</ul>
+<p>Le réglage fin du backfill passe par des paramètres <code>SchedulerParameters</code> de la forme <code>bf_…</code> (par exemple <code>bf_continue</code>, <code>bf_max_job_test</code>), dont les valeurs dépendent de la taille de la file : consultez la documentation de votre version avant de les modifier.</p>
+<h3 id="une-politique-pour-trois-équipes">4.5. Une politique pour trois équipes</h3>
+<p>Voici l'architecture d'une politique cohérente, à titre d'exemple. Trois équipes partagent un cluster : la recherche (gros entraînements), les applications (expériences moyennes) et le développement (jobs courts interactifs).</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Besoin</th>
+<th>Mécanisme</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Chaque équipe obtient une part garantie à long terme</td>
+<td>une association par équipe avec des parts d'équité proportionnelles</td>
+</tr>
+<tr class="even">
+<td>Un job interactif court démarre en moins d'une minute</td>
+<td>QOS <code>interactive</code>, priorité élevée, <code>MaxWall=04:00:00</code>, <code>MaxTRESPerUser=gres/gpu=2</code></td>
+</tr>
+<tr class="odd">
+<td>Les gros entraînements ne sont pas bloqués par les petits</td>
+<td>QOS <code>large</code> avec priorité suffisante et durée longue</td>
+</tr>
+<tr class="even">
+<td>Les jobs de reprise peu coûteuse utilisent les GPU inactifs</td>
+<td>QOS <code>scavenger</code> préemptible, <code>PreemptMode=REQUEUE</code></td>
+</tr>
+<tr class="odd">
+<td>Personne ne dépasse un quota</td>
+<td><code>GrpTRES</code> par compte, appliqué grâce à <code>AccountingStorageEnforce</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>L'exercice 7 vous demande de traduire cette table en commandes <code>sacctmgr</code> et de les valider.</p>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li><code>preempt/qos</code> et <code>PreemptMode=REQUEUE</code> : un job urgent préempte un job normal, qui est remis en file ; il faut qu'il sache reprendre.</li>
+<li>Une réservation retire des nœuds pour une période ; les jobs trop longs n'y entrent pas avant elle.</li>
+<li>Les limites ne sont appliquées que si <code>AccountingStorageEnforce</code> inclut <code>limits</code>.</li>
+<li>Les gros jobs souffrent de la fragmentation : durées justes, QOS dédiée, fenêtres réservées.</li>
+<li>Une politique complète combine parts d'équité, QOS, préemption et quotas, sans multiplier les partitions.</li>
+</ul>
+</div>
+<h2 id="ch5">5. GPU et topologie</h2>
+<p>Un nœud GPU n'est pas un sac de GPU : processeurs, GPU et cartes réseau y ont une géographie, et un placement ignorant cette géographie ralentit l'entraînement sans produire la moindre erreur. Ce chapitre montre comment Slurm la décrit et comment la demander.</p>
+<h3 id="déclarer-les-gpu-à-slurm">5.1. Déclarer les GPU à Slurm</h3>
+<p>Trois fichiers de configuration décrivent un nœud GPU. Les extraits suivants sont des <strong>exemples non exécutés</strong> (ils exigent des GPU NVIDIA) ; les noms de fichiers et les clés viennent de la documentation de Slurm.</p>
+<pre class="text"><code># slurm.conf (extrait)
+GresTypes=gpu
+AccountingStorageTRES=gres/gpu
+SelectType=select/cons_tres
+ProctrackType=proctrack/cgroup
+TaskPlugin=task/cgroup,task/affinity
+NodeName=gpu[001-016] Sockets=2 CoresPerSocket=48 RealMemory=2000000 Gres=gpu:h100:8
+PartitionName=train Nodes=gpu[001-016] MaxTime=7-00:00:00 State=UP
+
+# gres.conf
+AutoDetect=nvml
+
+# cgroup.conf
+ConstrainCores=yes
+ConstrainRAMSpace=yes
+ConstrainDevices=yes</code></pre>
+<ul>
+<li><code>GresTypes=gpu</code> déclare la ressource générique ; <code>Gres=gpu:h100:8</code> annonce huit GPU de type <code>h100</code> sur chaque nœud.</li>
+<li><code>AccountingStorageTRES=gres/gpu</code> fait suivre les GPU par la comptabilité : sans cette ligne, <code>sreport</code> ne sait pas compter des GPU-heures.</li>
+<li><code>AutoDetect=nvml</code> demande à <code>slurmd</code> de détecter les GPU NVIDIA par la bibliothèque NVML, avec leurs fichiers de périphérique, leurs cœurs voisins et leurs liens. Sans détection, <code>gres.conf</code> liste à la main chaque <code>File=/dev/nvidia0</code> et son affinité.</li>
+<li><code>proctrack/cgroup</code> est « fortement recommandé » par la documentation pour suivre tous les processus d'un job.</li>
+<li>La documentation recommande d'empiler <code>task/cgroup,task/affinity</code> pour contraindre les cœurs et fixer l'affinité.</li>
+<li><code>ConstrainDevices=yes</code> limite les périphériques visibles d'un job à ses GRES alloués : un job qui a demandé deux GPU ne voit que deux GPU.</li>
+</ul>
+<p>Les valeurs de mémoire, de cœurs et de durée sont celles d'un exemple : relevez les vôtres avec <code>slurmd -C</code>, qui affiche la configuration détectée d'un nœud.</p>
+<h3 id="demander-des-gpu-et-les-lier-correctement">5.2. Demander des GPU et les lier correctement</h3>
+<p>La demande se fait par <code>--gpus-per-node=[type:]N</code>, <code>--gpus-per-task=[type:]N</code> ou <code>--gres=gpu:[type:]N</code>. Pour un entraînement multi-nœuds, <code>--gpus-per-node</code> avec <code>--exclusive</code> est la forme la plus lisible.</p>
+<p>Reste la <strong>liaison</strong>. Deux options de la documentation comptent.</p>
+<ul>
+<li><code>--gres-flags=enforce-binding</code> restreint les processeurs d'un job à ceux qui sont liés aux GPU alloués : le job ne reçoit plus des cœurs du mauvais socket.</li>
+<li><code>--gpu-bind=closest</code> (avec <code>srun</code>) attache chaque tâche au GPU le plus proche d'elle.</li>
+</ul>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — Huit tâches, un GPU chacune, le plus proche</span> Pour lancer huit processus par nœud, chacun avec son GPU voisin :</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--nodes</span><span class="op">=</span>1 <span class="at">--ntasks</span><span class="op">=</span>8 <span class="at">--gpus-per-task</span><span class="op">=</span>1 <span class="at">--gpu-bind</span><span class="op">=</span>closest <span class="dt">\</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">--cpus-per-task</span><span class="op">=</span>12 python worker.py</span></code></pre></div>
+<p>Sans <code>--gpu-bind=closest</code>, la répartition peut envoyer une tâche vers un GPU rattaché à l'autre socket, ce qui ajoute un détour par le lien inter-socket à chaque transfert. Cette commande est un exemple non exécuté : elle demande des GPU.</p>
+</div>
+<h3 id="partager-un-gpu">5.3. Partager un GPU</h3>
+<p>Un GPU entier pour une petite expérience est du gaspillage. NVIDIA propose le partitionnement matériel <strong>MIG</strong> (<em>Multi-Instance GPU</em>) sur certains modèles ; la page « GRES » de la documentation de Slurm contient une section « MIG Management ». Elle précise qu'avec la détection <code>nvidia</code>, Slurm ne détecte pas les instances MIG ni les liens NVLink, et que NVML ne fournit pas de métriques d'utilisation pour les instances MIG : la comptabilité de la mémoire et de l'utilisation GPU n'existe donc pas pour elles.</p>
+<p>La conséquence pour l'exploitation : MIG convient aux petites charges d'inférence ou de développement, pas à l'entraînement multi-GPU. Le partage par tranches de temps (<em>time-slicing</em>) relève plutôt de Kubernetes (module 12).</p>
+<h3 id="topologie-du-réseau">5.4. Topologie du réseau</h3>
+<p>Si deux nœuds d'un même commutateur de bordure communiquent plus vite qu'à travers deux niveaux de commutateurs, un job de huit nœuds a intérêt à tenir sous le même commutateur. Slurm le sait avec le plugin <code>topology/tree</code> et un fichier <code>topology.conf</code> qui décrit les commutateurs. L'exemple de la documentation :</p>
+<pre class="text"><code>SwitchName=s0 Nodes=tux[0-1]
+SwitchName=s1 Nodes=tux[2-3]
+SwitchName=s2 Nodes=tux[4-5]
+SwitchName=s3 Nodes=tux[6-7]
+SwitchName=s4 Switches=s[0-1]
+SwitchName=s5 Switches=s[2-3]
+SwitchName=s6 Switches=s[4-5]</code></pre>
+<p>Les commutateurs de feuille (<code>s0</code> à <code>s3</code>) listent leurs nœuds, ceux des niveaux supérieurs listent leurs sous-commutateurs. Selon la documentation, l'algorithme identifie le commutateur de plus bas niveau qui peut contenir l'allocation, puis choisit les nœuds sur ses commutateurs de feuille avec un algorithme de meilleur ajustement (<em>best fit</em>).</p>
+<p>L'option <code>--switches=N@HH:MM</code> d'un job fixe le nombre maximal de commutateurs de feuille souhaité et la durée d'attente maximale pour l'obtenir. Un job qui préfère attendre une heure plutôt que de s'étaler sur deux commutateurs écrit <code>--switches=1@01:00</code>.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.2 — Choisir entre attendre et s'étaler</span> Sur les huit nœuds de la topologie ci-dessus, un job demande quatre nœuds. Les nœuds <code>tux0</code> et <code>tux1</code> sont libres, <code>tux2</code> aussi, tandis que <code>tux3</code> est occupé ; sous <code>s2</code>, <code>tux4</code> et <code>tux5</code> sont libres. Quatre nœuds libres existent donc, mais sur trois commutateurs de feuille (<code>s0</code>, <code>s1</code>, <code>s2</code>).</p>
+<p>Avec <code>--switches=2@00:30</code>, Slurm attendra jusqu'à 30 minutes une allocation sur au plus deux commutateurs de feuille avant de céder et d'accepter ce qu'il trouve. Le compromis est classique : attendre améliore la communication mais retarde le démarrage ; pour un job de plusieurs jours, 30 minutes d'attente sont négligeables, pour un job d'une heure elles sont prohibitives.</p>
+</div>
+<p>Les versions récentes de la documentation décrivent aussi un plugin <code>topology/block</code>, qui impose une structure hiérarchique de blocs pour que les jobs restent dans un bloc ; il vise notamment les domaines NVLink de grande taille. Ses détails et sa disponibilité dépendent de votre version : voir la page « Topology » de la documentation de la version installée.</p>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Un nœud GPU se déclare dans <code>slurm.conf</code> (<code>Gres=</code>), <code>gres.conf</code> (<code>AutoDetect=nvml</code>) et <code>cgroup.conf</code> (<code>ConstrainDevices=yes</code>).</li>
+<li><code>--gpus-per-node</code>, <code>--gres-flags=enforce-binding</code> et <code>--gpu-bind=closest</code> décrivent la demande et la liaison CPU-GPU.</li>
+<li>MIG partage un GPU sans comptabilité d'utilisation GPU : réservez-le aux petites charges.</li>
+<li><code>topology/tree</code> et <code>--switches=N@HH:MM</code> arbitrent entre attente et étalement sur le réseau.</li>
+</ul>
+</div>
+<h2 id="ch6">6. Comptabilité et reporting</h2>
+<p>Ce qui ne se mesure pas ne se pilote pas : l'utilisation d'un cluster, le temps d'attente des utilisateurs et la part de calcul perdue se lisent dans la comptabilité. Ce chapitre apprend à les extraire sans se tromper de commande.</p>
+<h3 id="ce-que-la-comptabilité-enregistre">6.1. Ce que la comptabilité enregistre</h3>
+<p><code>slurmdbd</code> enregistre, pour chaque job, les ressources allouées et la durée, ainsi que l'état final. La comptabilité fonctionne en deux temps : les <strong>enregistrements bruts</strong> par job (lus par <code>sacct</code>) et des <strong>agrégats</strong> par heure, jour et mois calculés par <code>slurmdbd</code> (lus par <code>sreport</code>). La différence est essentielle, comme on le verra plus bas.</p>
+<p>La commande de base est <code>sacct</code>. L'option <code>-X</code> n'affiche que l'allocation du job et non chacune de ses étapes, ce qui suffit presque toujours ; <code>--format</code> choisit les colonnes ; <code>-S</code> et <code>-E</code> bornent la période.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — Lire sacct</span> Trois petits jobs, un job qui échoue volontairement avec le code 3 et un job encore en cours, sur le bac à sable (extrait réel) :</p>
+<pre class="text"><code>$ sacct -X --format=JobID,JobName%10,Account,AllocCPUS,State%12,ExitCode,Elapsed,CPUTimeRAW
+JobID           JobName    Account  AllocCPUS        State ExitCode    Elapsed CPUTimeRAW
+------------ ---------- ---------- ---------- ------------ -------- ---------- ----------
+22                 wrap   research          2    COMPLETED      0:0   00:00:03          6
+23                 wrap   research          2    COMPLETED      0:0   00:00:04          8
+24                 wrap   research          2    COMPLETED      0:0   00:00:04          8
+25                 wrap   research          1       FAILED      3:0   00:00:03          3
+26                 wrap   research          1      RUNNING      0:0   00:00:02          2</code></pre>
+<p><code>ExitCode</code> s'écrit <code>code:signal</code> : d'après la documentation, c'est le code de sortie le plus élevé des étapes du job, suivi après les deux-points du signal qui a éventuellement terminé le processus. Le job 25 s'est donc terminé avec le code 3 et sans signal. <code>CPUTimeRAW</code> est le produit du nombre de processeurs alloués par la durée, en secondes : <span class="math inline">2 \times 3 = 6</span> pour le job 22. C'est cette quantité, sommée par compte, qui alimente l'équité du chapitre 3.</p>
+</div>
+<h3 id="sreport-et-ses-agrégats">6.2. sreport et ses agrégats</h3>
+<p><code>sreport</code> produit des rapports par cluster, compte, utilisateur ou QOS. Sa documentation précise que les données viennent de <strong>cumuls horaires, quotidiens et mensuels</strong> de la base, et que le rapport choisit la table de cumul la plus longue qui permet de répondre à la période demandée. L'option <code>-T</code> (<code>--tres</code>) choisit les ressources à rapporter, par exemple <code>-T gres/gpu</code> pour des GPU-heures, à condition que <code>AccountingStorageTRES=gres/gpu</code> soit configuré (chapitre 5).</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sreport</span> <span class="at">-t</span> hours cluster utilization start=2026-10-17 end=2026-10-24 <span class="at">-T</span> gres/gpu</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sreport</span> <span class="at">-t</span> hours cluster AccountUtilizationByUser start=2026-10-01 <span class="at">-T</span> gres/gpu</span></code></pre></div>
+<div class="note">
+<p><span class="tag">Un cluster neuf affiche des rapports vides</span> Sur le bac à sable, juste après les jobs de l'exemple 6.1, <code>sreport cluster utilization</code> et <code>sreport cluster AccountUtilizationByUser</code> n'affichent que leurs en-têtes : aucune ligne de données. Les agrégats ne sont pas encore calculés, alors que <code>sacct</code> voit déjà tous les jobs. Conséquence pratique : pour une vérification immédiate (« mon job a-t-il compté ? »), utilisez <code>sacct</code> ; pour un suivi de période, <code>sreport</code>, en sachant que les chiffres de l'heure en cours manquent. Cette observation a été faite sur Slurm 23.11 ; elle est cohérente avec le fonctionnement par cumuls décrit dans la documentation.</p>
+</div>
+<h3 id="les-trois-indicateurs-à-suivre">6.3. Les trois indicateurs à suivre</h3>
+<p>Trois grandeurs répondent à trois questions différentes. Ne les mélangez pas.</p>
+<ol type="1">
+<li><strong>L'utilisation</strong> répond à « les machines sont-elles occupées ? ». Elle se calcule sur une période :</li>
+</ol>
+<p><span class="math display">U = \frac{\text{GPU-heures allouées}}{\text{GPU-heures totales}}</span></p>
+<p>Variante utile : rapporter l'allocation à la capacité <em>disponible</em>, c'est-à-dire sans les nœuds drainés. Le calcul est celui de l'exercice 8.</p>
+<ol start="2" type="1">
+<li><p><strong>L'attente</strong> répond à « les utilisateurs sont-ils servis rapidement ? ». Pour chaque job, c'est l'écart entre sa soumission et son démarrage ; on suit la médiane et un percentile élevé par QOS, car une moyenne cache les jobs qui attendent des jours.</p></li>
+<li><p><strong>Le gaspillage</strong> répond à « combien de calcul est perdu ? ». Il se mesure par la part des GPU-heures allouées consommée par des jobs qui échouent, sont préemptés sans checkpoint ou sont tués pour dépassement de durée (états <code>FAILED</code>, <code>TIMEOUT</code>, <code>NODE_FAIL</code>, <code>PREEMPTED</code>).</p></li>
+</ol>
+<p>Un script court suffit pour la deuxième : il lit la sortie de <code>sacct</code> au format parsable et calcule les percentiles.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statistics <span class="im">import</span> median, quantiles</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> subprocess.run([<span class="st">&quot;sacct&quot;</span>, <span class="st">&quot;-X&quot;</span>, <span class="st">&quot;-P&quot;</span>, <span class="st">&quot;-n&quot;</span>, <span class="st">&quot;--format=Submit,Start&quot;</span>, <span class="st">&quot;-S&quot;</span>, <span class="st">&quot;now-7days&quot;</span>],</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                     capture_output<span class="op">=</span><span class="va">True</span>, text<span class="op">=</span><span class="va">True</span>, check<span class="op">=</span><span class="va">True</span>).stdout</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>waits <span class="op">=</span> []</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> out.splitlines():</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    submit, start <span class="op">=</span> line.split(<span class="st">&quot;|&quot;</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> start <span class="kw">not</span> <span class="kw">in</span> (<span class="st">&quot;Unknown&quot;</span>, <span class="st">&quot;None&quot;</span>, <span class="st">&quot;&quot;</span>):</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        waits.append((datetime.fromisoformat(start) <span class="op">-</span> datetime.fromisoformat(submit)).total_seconds())</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;jobs: </span><span class="sc">{</span><span class="bu">len</span>(waits)<span class="sc">}</span><span class="ss">  median wait: </span><span class="sc">{</span>median(waits)<span class="sc">:.0f}</span><span class="ss"> s  p90: </span><span class="sc">{</span>quantiles(waits, n<span class="op">=</span><span class="dv">10</span>)[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.0f}</span><span class="ss"> s&quot;</span>)</span></code></pre></div>
+<p>Lancé sur le bac à sable après quatre jobs d'une seconde, ce script affiche <code>jobs: 4  median wait: 6 s  p90: 12 s</code> : même sur un cluster vide, l'attente n'est pas nulle. Il suppose au moins deux jobs démarrés, car <code>quantiles</code> exige deux valeurs.</p>
+<h3 id="du-rapport-au-pilotage">6.4. Du rapport au pilotage</h3>
+<p>Une revue hebdomadaire d'un cluster tient en quatre chiffres : utilisation brute, utilisation rapportée à la capacité disponible, médiane et percentile 90 de l'attente par QOS, part de GPU-heures perdues. Comparer deux semaines vaut mieux que lire une semaine seule. Le module 14 branche ces mêmes grandeurs sur Prometheus et Grafana ; le module 15 les convertit en coûts.</p>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li><code>sacct</code> lit les jobs enregistrés ; <code>sreport</code> lit des cumuls horaires, quotidiens et mensuels : un cluster neuf ou l'heure en cours y est absent.</li>
+<li><code>ExitCode</code> s'écrit <code>code:signal</code> ; <code>CPUTimeRAW</code> est le produit processeurs par durée en secondes.</li>
+<li>Pour compter des GPU, <code>AccountingStorageTRES=gres/gpu</code> est indispensable.</li>
+<li>Trois indicateurs distincts : utilisation, attente, gaspillage.</li>
+</ul>
+</div>
+<h2 id="ch7">7. Santé des nœuds</h2>
+<p>Sur un cluster de plusieurs centaines de GPU, des nœuds tombent tous les jours. La question n'est pas d'éviter les pannes mais de <strong>ne pas y envoyer de jobs</strong> : un job lancé sur un nœud défaillant coûte des heures de GPU puis une enquête.</p>
+<h3 id="les-états-dun-nœud">7.1. Les états d'un nœud</h3>
+<p><code>sinfo</code> affiche l'état de chaque nœud. Les états de la documentation que vous rencontrerez le plus :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>État</th>
+<th>Sens</th>
+<th>Action typique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>idle</code></td>
+<td>libre</td>
+<td>rien</td>
+</tr>
+<tr class="even">
+<td><code>mixed</code></td>
+<td>partiellement alloué</td>
+<td>rien</td>
+</tr>
+<tr class="odd">
+<td><code>allocated</code></td>
+<td>entièrement alloué</td>
+<td>rien</td>
+</tr>
+<tr class="even">
+<td><code>draining</code></td>
+<td>marqué <em>drain</em> mais des jobs tournent encore</td>
+<td>attendre la fin des jobs</td>
+</tr>
+<tr class="odd">
+<td><code>drained</code></td>
+<td>marqué <em>drain</em>, plus aucun job</td>
+<td>enquêter, réparer, remettre en service</td>
+</tr>
+<tr class="even">
+<td><code>down</code></td>
+<td>considéré en panne, jobs perdus</td>
+<td>enquêter en priorité</td>
+</tr>
+<tr class="odd">
+<td><code>fail</code> / <code>failing</code></td>
+<td>une défaillance est annoncée mais les jobs en cours peuvent finir</td>
+<td>traiter avant la fin des jobs</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Un nœud <em>drained</em> ne reçoit aucun nouveau job mais n'interrompt pas les jobs en cours : c'est la mise en quarantaine douce. Le mettre en <code>down</code> est plus radical. Les commandes :</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scontrol</span> update nodename=gpu007 state=drain reason=<span class="st">&quot;gpu_ecc_errors&quot;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sinfo</span> <span class="at">-R</span>                                  <span class="co"># liste les nœuds retirés et leur raison</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">scontrol</span> update nodename=gpu007 state=resume</span></code></pre></div>
+<p>Donner une <strong>raison</strong> est la règle : sans elle, le nœud devient un mystère pour l'équipe suivante.</p>
+<h3 id="le-contrôle-de-santé-périodique">7.2. Le contrôle de santé périodique</h3>
+<p>Slurm exécute périodiquement, sur chaque nœud, un programme de votre choix. Trois paramètres de <code>slurm.conf</code> : <code>HealthCheckProgram</code> (le chemin), <code>HealthCheckInterval</code> (la période en secondes) et <code>HealthCheckNodeState</code> (les états de nœud concernés). Le projet <strong>LBNL Node Health Check</strong> (NHC) est l'implémentation courante : il fournit une bibliothèque de tests (processeurs, mémoire, systèmes de fichiers, réseau, GPU) conçue pour Slurm et d'autres ordonnanceurs.</p>
+<p>Quelle que soit l'implémentation, un bon contrôle :</p>
+<ol type="1">
+<li><strong>est rapide</strong> : quelques secondes au plus, car il tourne à intervalle fixe sur tous les nœuds ;</li>
+<li><strong>est idempotent</strong> : le relancer ne change rien tant que rien n'a changé ;</li>
+<li><strong>draine avec une raison</strong> qui identifie le contrôle qui a échoué ;</li>
+<li><strong>ne remet en service que ce qu'il a drainé lui-même</strong> : un nœud mis en quarantaine par un humain doit le rester.</li>
+</ol>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — Un contrôle qui draine et remet en service</span> Le script <code>labs/slurm/node-health/node_check.sh</code> vérifie l'espace libre dans <code>/tmp</code>, la présence de <code>python3</code> et un compteur d'erreurs GPU <strong>simulé</strong> par un fichier. Sa logique de décision tient en quelques lignes :</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">${</span><span class="op">#</span><span class="va">reasons</span><span class="op">[@]</span><span class="va">}</span><span class="st">&quot;</span> <span class="ot">-gt</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> <span class="st">&quot;</span><span class="va">$state</span><span class="st">&quot;</span> <span class="kw">in</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">*</span><span class="ss">DRAIN</span><span class="pp">*</span><span class="kw">)</span> <span class="cf">;;</span>  <span class="co"># already drained: keep the first reason</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="pp">*</span><span class="kw">)</span> <span class="ex">scontrol</span> update nodename=<span class="st">&quot;</span><span class="va">$node</span><span class="st">&quot;</span> state=drain reason=<span class="st">&quot;health: </span><span class="va">${reasons</span><span class="op">[*]</span><span class="va">}</span><span class="st">&quot;</span> <span class="cf">;;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">esac</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> <span class="st">&quot;</span><span class="va">$current_reason</span><span class="st">&quot;</span> <span class="kw">in</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="ss">health:</span><span class="pp">*</span><span class="kw">)</span> <span class="ex">scontrol</span> update nodename=<span class="st">&quot;</span><span class="va">$node</span><span class="st">&quot;</span> state=resume <span class="cf">;;</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="cf">esac</span></span></code></pre></div>
+<p>Le préfixe <code>health:</code> de la raison est la signature du script : lui seul peut remettre le nœud en service. Le lab 5.3 écrit un faux compteur d'erreurs, attend que <code>sinfo -R</code> affiche <code>health: gpu_xid:79</code> (valeur simulée), supprime le fichier et attend que le nœud redevienne <code>idle</code>.</p>
+</div>
+<h3 id="prolog-et-epilog">7.3. Prolog et epilog</h3>
+<p>Un <strong>prolog</strong> est un script exécuté sur le nœud avant un job, un <strong>epilog</strong> après. La page « Prolog and Epilog Guide » de la documentation précise deux points qui surprennent.</p>
+<ul>
+<li>Par défaut, le prolog ne s'exécute sur un nœud que lorsqu'il voit <strong>la première étape d'une nouvelle allocation</strong>. Un job qui n'a lancé aucune étape ne déclenche jamais le prolog, sauf si <code>PrologFlags=Alloc</code> force l'exécution dès l'allocation. L'epilog, lui, s'exécute toujours.</li>
+<li>Si le <strong>prolog échoue</strong> (code de sortie non nul), le nœud passe en état <code>DRAIN</code> et le job est remis en file ; si l'<strong>epilog échoue</strong>, le nœud passe aussi en <code>DRAIN</code>.</li>
+</ul>
+<p>Un prolog est donc une barrière : un job ne démarre pas sur un nœud qui échoue au contrôle.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.2 — Ce que fait un prolog qui échoue</span> Le lab 5.3 configure <code>Prolog=prolog_gate.sh</code>, qui échoue quand le compteur d'erreurs simulé est non nul, puis soumet un job. Observation sur Slurm 23.11 :</p>
+<pre class="text"><code>$ squeue -o &quot;%i %T %r&quot;
+JOBID STATE REASON
+15 PENDING launch failed requeued held
+$ sinfo -R
+Prolog error | vm</code></pre>
+<p>Le nœud est drainé avec la raison <code>Prolog error</code> et le job repart en attente dans l'état <strong>retenu</strong> (<em>held</em>) : même une fois le nœud réparé, il faut le libérer avec <code>scontrol release</code>. C'est une surprise fréquente de l'exploitation : le job ne repart pas tout seul.</p>
+</div>
+<h3 id="remettre-un-nœud-en-service">7.4. Remettre un nœud en service</h3>
+<p>Une procédure écrite évite les remises en service précipitées.</p>
+<ol type="1">
+<li><strong>Drainer</strong> avec une raison précise.</li>
+<li><strong>Enquêter</strong> sur la cause : journaux du noyau, erreurs ECC, état des liens, compteurs GPU (modules 6 et 14).</li>
+<li><strong>Réparer ou remplacer</strong> : redémarrage, mise à jour de micrologiciel, échange de composant chez le fournisseur.</li>
+<li><strong>Valider</strong> par un test de recette court : un test GPU et un test de communication (module 6).</li>
+<li><strong>Remettre en service</strong> avec <code>state=resume</code>, et surveiller le nœud pendant les premières heures.</li>
+</ol>
+<p>Un nœud qui est drainé plusieurs fois en peu de temps est un nœud à retirer pour réparation plutôt qu'à remettre en service : fixez une règle, par exemple trois drains en sept jours. C'est un choix de politique de ce parcours, pas une règle de Slurm.</p>
+<div class="war">
+<p><span class="tag">À grande échelle, la santé des nœuds est un travail d'automatisation</span> Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 419 interruptions imprévues de job, attribuées à environ 78 % à des problèmes matériels confirmés ou suspectés ; les GPU représentaient 58,7 % de toutes les causes imprévues. L'équipe n'a eu besoin d'une intervention manuelle significative que trois fois : le reste a été traité par l'automatisation. Source : <a href="https://arxiv.org/abs/2407.21783">article Llama 3, section 3.3.4</a>.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>Drainer avec une raison : le nœud reçoit plus de jobs, les jobs en cours finissent.</li>
+<li><code>HealthCheckProgram</code> exécute un contrôle périodique ; NHC (LBNL) est l'implémentation de référence.</li>
+<li>Un bon contrôle est rapide, idempotent, drainé avec raison, et ne remet en service que ses propres drains.</li>
+<li>Un prolog en échec draine le nœud et retient le job : il faut le libérer.</li>
+<li>La remise en service suit une procédure écrite ; un nœud qui flotte doit sortir de la production.</li>
+</ul>
+</div>
+<h2 id="ch8">8. Conteneurs, environnements et Slurm sur Kubernetes</h2>
+<p>Les chercheurs veulent <em>leur</em> environnement logiciel, et pas celui de l'administrateur. Ce chapitre montre comment Slurm l'accueille et ce qu'on obtient quand on le place sur Kubernetes.</p>
+<h3 id="environnements-logiciels">8.1. Environnements logiciels</h3>
+<p>Les centres de calcul gèrent classiquement des piles logicielles multiples avec des gestionnaires d'environnement (Environment Modules ou Lmod, qui modifient le <code>PATH</code> à la demande) et des outils de compilation de piles comme Spack. C'est une pratique courante du calcul scientifique : elle donne la reproductibilité de la compilation mais pas l'isolation des dépendances Python d'un entraînement.</p>
+<h3 id="conteneurs-sous-slurm">8.2. Conteneurs sous Slurm</h3>
+<p>Pour l'entraînement, l'unité de livraison est de plus en plus une image de conteneur. <strong>Pyxis</strong> est un plugin SPANK de Slurm qui ajoute à <code>srun</code> les options <code>--container-image</code> et <code>--container-mounts</code>, et <strong>Enroot</strong> est l'exécuteur sans privilèges qui les prend en charge. D'après le dépôt de Pyxis :</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--container-image</span><span class="op">=</span>almalinux:9 grep PRETTY /etc/os-release</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--container-image</span><span class="op">=</span>almalinux:9 <span class="at">--container-mounts</span><span class="op">=</span>/etc/os-release:/host/os-release grep PRETTY /host/os-release</span></code></pre></div>
+<p>Une contrainte d'exploitation à retenir : depuis Slurm 21.08, Pyxis doit être <strong>compilé contre la version de Slurm déployée</strong> sur le cluster, sinon Slurm refuse de le charger avec l'erreur <code>Incompatible plugin version</code>. Chaque mise à jour de Slurm entraîne donc une recompilation de Pyxis : c'est une ligne de votre procédure de mise à jour.</p>
+<h3 id="slurm-sur-kubernetes">8.3. Slurm sur Kubernetes</h3>
+<p>Beaucoup d'organisations ont des années d'investissement dans des scripts Slurm et veulent pourtant la gestion d'infrastructure de Kubernetes. <strong>Slinky</strong> est un projet ouvert développé par SchedMD (désormais rattaché à NVIDIA) qui permet d'exécuter et de gérer des clusters Slurm à l'intérieur de Kubernetes. Il comprend notamment un opérateur (<code>slurm-operator</code>) qui déploie les démons Slurm comme des ressources Kubernetes. Le module 12 reprend cette comparaison.</p>
+<h3 id="slurm-kubernetes-ou-les-deux">8.4. Slurm, Kubernetes ou les deux ?</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Critère</th>
+<th>Slurm natif</th>
+<th>Kubernetes</th>
+<th>Slurm sur Kubernetes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Modèle de charge</td>
+<td>jobs finis, gros jobs parallèles</td>
+<td>services et jobs</td>
+<td>jobs finis dans une plateforme de services</td>
+</tr>
+<tr class="even">
+<td>File d'attente, équité, préemption</td>
+<td>natifs et matures</td>
+<td>à ajouter (Kueue, Volcano)</td>
+<td>natifs de Slurm</td>
+</tr>
+<tr class="odd">
+<td>Gang scheduling</td>
+<td>natif</td>
+<td>à ajouter</td>
+<td>natif de Slurm</td>
+</tr>
+<tr class="even">
+<td>Outillage des utilisateurs</td>
+<td>scripts <code>sbatch</code>, familiers aux chercheurs</td>
+<td>manifestes et images</td>
+<td>scripts <code>sbatch</code> conservés</td>
+</tr>
+<tr class="odd">
+<td>Exploitation de l'infrastructure</td>
+<td>spécialisée HPC</td>
+<td>commune avec les services</td>
+<td>double compétence</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Ce tableau est un jugement de ce parcours, pas une mesure. Le bon choix dépend surtout de l'équipe qui opère et des habitudes des utilisateurs.</p>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Pyxis et Enroot lancent des conteneurs avec <code>srun --container-image</code> ; Pyxis doit être compilé contre la version de Slurm déployée.</li>
+<li>Environment Modules, Lmod et Spack gèrent les piles logicielles des centres de calcul.</li>
+<li>Slinky exécute des clusters Slurm dans Kubernetes pour concilier habitudes HPC et exploitation cloud-native.</li>
+<li>Le choix Slurm, Kubernetes ou hybride dépend de l'équipe d'exploitation et des utilisateurs avant la technique.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Les trois labs s'exécutent sur un <strong>vrai Slurm 23.11</strong> (paquets Ubuntu 24.04) dans une machine ou un conteneur Linux <strong>jetable</strong> avec accès root : les scripts écrivent dans <code>/etc/slurm</code> et démarrent des démons en <code>root</code>. Aucun GPU n'est requis. Installation préalable :</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> DEBIAN_FRONTEND=noninteractive apt-get install <span class="at">-y</span> munge slurm-wlm slurmdbd mariadb-server</span></code></pre></div>
+<div class="lab">
+<p><span class="tag">Lab 5.1 — Un Slurm réel dans le bac à sable</span></p>
+<p><strong>Objectif.</strong> Démarrer un Slurm mono-nœud avec comptabilité, soumettre un tableau et une dépendance, puis faire sauvegarder et reprendre un entraîneur sur signal. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Une VM ou un conteneur Linux jetable, 2 processeurs et 4 Go de mémoire au minimum, accès root.</p>
+<ol type="1">
+<li>Lisez <code>labs/slurm/slurm-sandbox/setup.sh</code> : repérez la clé <code>munge</code>, la base MariaDB, <code>slurmdbd.conf</code>, <code>slurm.conf</code> et la création du compte <code>research</code>.</li>
+<li>Lancez <code>sudo bash setup.sh</code>, puis <code>sinfo</code>, <code>sbatch --wrap='hostname'</code>, <code>squeue</code> et <code>sacct -X</code>.</li>
+<li>Soumettez le tableau et la dépendance de la partie A de <code>verify.sh</code> en les écrivant vous-même, puis comparez.</li>
+<li>Lisez <code>examples/trainer.py</code> et <code>examples/checkpoint_on_signal.sbatch</code> ; lancez la partie B : un <code>scancel --signal=USR1 --batch</code> déclenche le checkpoint, le job suivant reprend à l'étape sauvegardée.</li>
+<li>Terminez par <code>sudo bash teardown.sh</code>.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « OK part A » puis « OK slurm-sandbox: parts A and B », avec la ligne <code>start at step N</code> de la reprise où <code>N</code> est l'étape sauvegardée. Temps d'exécution : environ une minute.</p>
+<p><strong>Pour aller plus loin.</strong> Enlevez <code>slurmdbd</code> de <code>slurm.conf</code> et constatez la raison <code>InvalidAccount</code> du chapitre 1. Ajoutez un deuxième nœud simulé (<code>NodeName=... NodeHostname=...</code> avec plusieurs <code>slurmd</code>) si votre version de Slurm l'autorise.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 5.2 — Fairshare, QOS et préemption</span></p>
+<p><strong>Objectif.</strong> Constater qu'un compte peu actif passe devant un compte gros consommateur, et qu'une QOS urgente préempte une QOS normale. <strong>Durée.</strong> 4 h. <strong>Prérequis matériels.</strong> Ceux du lab 5.1.</p>
+<ol type="1">
+<li>Lisez <code>labs/slurm/fairshare-qos/configure.sh</code> : <code>PriorityCalcPeriod=1</code>, <code>PreemptType=preempt/qos</code>, <code>PreemptMode=REQUEUE</code>, comptes, QOS <code>urgent</code>.</li>
+<li>Partie A : huit jobs courts du compte <code>teama</code> créent de la consommation ; attendez que <code>sshare</code> affiche un facteur d'équité inférieur à celui de <code>teamb</code>.</li>
+<li>Soumettez un job bloqueur, puis un job de chaque compte ; lisez <code>sprio</code> et vérifiez l'ordre de démarrage dans <code>sacct</code>.</li>
+<li>Partie B : lancez un job <code>normal</code> de quatre processeurs, puis un job <code>urgent</code> ; vérifiez <code>Restarts=1</code> et l'état <code>PREEMPTED</code>.</li>
+<li>Changez les poids (<code>PriorityWeightFairshare</code>, <code>PriorityWeightAge</code>) et relisez <code>sprio -w</code>.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « OK part A » et « OK part B ». Comptez environ quatre minutes : le facteur d'équité n'est recalculé qu'à chaque <code>PriorityCalcPeriod</code>.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez un <code>GraceTime</code> à la QOS <code>normal</code> et vérifiez que le job reçoit un signal avant d'être préempté.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 5.3 — Drain, prolog et vérification de santé</span></p>
+<p><strong>Objectif.</strong> Automatiser la mise en quarantaine d'un nœud défaillant et observer le comportement d'un prolog qui échoue. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Ceux du lab 5.1.</p>
+<ol type="1">
+<li>Lisez <code>labs/slurm/node-health/node_check.sh</code> : repérez les trois contrôles, le préfixe <code>health:</code> et la règle de remise en service.</li>
+<li>Partie A : configurez <code>HealthCheckProgram</code>, simulez une erreur GPU avec <code>echo 79 &gt; /tmp/fake_gpu_xid</code>, attendez que <code>sinfo -R</code> affiche <code>health: gpu_xid:79</code>, supprimez le fichier, attendez le retour à <code>idle</code>.</li>
+<li>Partie B : configurez <code>Prolog=prolog_gate.sh</code>, recréez l'erreur, soumettez un job et observez <code>launch failed requeued held</code> et la raison <code>Prolog error</code>.</li>
+<li>Libérez le job avec <code>scontrol release</code> après avoir remis le nœud en service.</li>
+<li>Ajoutez un contrôle de votre choix (par exemple l'espace libre d'un volume) et testez-le.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « OK part A », « OK part B » et « OK node-health ». Durée d'exécution : environ une minute.</p>
+<p><strong>Pour aller plus loin.</strong> Remplacez le compteur simulé par une vraie lecture : <code>dmesg</code> pour des erreurs matérielles, ou <code>nvidia-smi</code> sur un nœud GPU (module 14).</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★ — Lire une file d'attente</span> Voici la file d'un cluster, <strong>fictive</strong>. Expliquez en une phrase la raison de chaque job en attente et dites lequel nécessite une action de l'utilisateur ou de l'administrateur.</p>
+<pre class="text"><code>JOBID PARTITION NAME  USER  ST TIME NODES NODELIST(REASON)
+8841  train     big   alice PD 0:00 16    (Resources)
+8842  train     small bob   PD 0:00 1     (Priority)
+8843  train     post  alice PD 0:00 1     (Dependency)
+8844  dev       test  carol PD 0:00 1     (PartitionTimeLimit)
+8845  train     tune  dave  PD 0:00 1     (JobHeldUser)</code></pre>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><code>8841</code> attend que 16 nœuds se libèrent : rien à faire, c'est de la file normale. <code>8842</code> est derrière des jobs de priorité supérieure : à vérifier avec <code>sprio</code> si l'attente s'éternise. <code>8843</code> attend la fin du job dont il dépend, vraisemblablement <code>8841</code> : rien à faire. <code>8844</code> demande une durée supérieure à la limite de la partition <code>dev</code> : <strong>action de l'utilisateur</strong>, réduire <code>--time</code> ou changer de partition, car il n'ira jamais plus loin sinon. <code>8845</code> est retenu par son propriétaire : <strong>action de l'utilisateur</strong>, <code>scontrol release 8845</code>.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Écrire une soumission</span> Écrivez le script <code>sbatch</code> d'un entraînement sur 4 nœuds de 8 GPU, 6 jours maximum, nœuds exclusifs, qui reçoit un signal 10 minutes avant la fin, peut être remis en file et lance <code>torchrun</code> sur chaque nœud avec rendez-vous sur le premier. Quelle erreur de chemin guette un script lancé depuis un dépôt ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Les options clés sont <code>--nodes=4</code>, <code>--gpus-per-node=8</code>, <code>--exclusive</code>, <code>--time=6-00:00:00</code>, <code>--signal=B:USR1@600</code> et <code>--requeue</code>. Le lancement reprend la structure de l'exemple 2.1, avec le nombre de nœuds alloués passé à <code>torchrun</code>. L'erreur de chemin est celle du lab 5.1 : Slurm exécute une <strong>copie</strong> du script depuis son répertoire d'attente, de sorte que <code>${BASH_SOURCE[0]}</code> ne désigne plus votre dépôt. Utilisez <code>SLURM_SUBMIT_DIR</code> (le répertoire d'où <code>sbatch</code> a été lancé) ou un chemin absolu, et lancez <code>sbatch</code> depuis le répertoire du projet.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★ — Un tableau avec limite de concurrence</span> Vous devez évaluer 100 points de contrôle. Chaque évaluation dure 12 minutes sur un GPU et vous n'avez le droit d'en occuper que 10 à la fois. Écrivez l'option de tableau et calculez le temps total en supposant que la file ne vous retarde pas.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>L'option est <code>--array=1-100%10</code>. Dix tâches tournent en parallèle, donc il faut <span class="math inline">\lceil 100/10 \rceil = 10</span> vagues de 12 minutes, soit 120 minutes. Sans la limite <code>%10</code>, les 100 tâches pourraient occuper 100 GPU à la fois : l'équité envers les autres équipes se jouerait alors sur la priorité seule.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★★ — Calculer une priorité</span> Avec <span class="math inline">W_{\text{âge}} = 1000</span>, <span class="math inline">W_{\text{équité}} = 10\,000</span> et <span class="math inline">W_{\text{QOS}} = 2000</span> (les autres poids sont nuls), le job A a un facteur d'âge de 0,4, d'équité de 0,3 et de QOS de 0,5. Le job B a un âge de 1,0, une équité de 0,1 et une QOS de 0. Calculez les deux priorités et dites lequel démarre en premier. Que feriez-vous pour que l'attente prolongée finisse par l'emporter sur l'équité ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Pour A, la priorité vaut :</p>
+<p><span class="math display">1000 \times 0{,}4 + 10\,000 \times 0{,}3 + 2000 \times 0{,}5 = 4400</span></p>
+<p>Pour B :</p>
+<p><span class="math display">1000 \times 1{,}0 + 10\,000 \times 0{,}1 + 0 = 2000</span></p>
+<p>A démarre en premier. Dans cette configuration, l'âge (au plus 1000 points) ne peut jamais compenser un écart d'équité de plus de 0,1 (<span class="math inline">10\,000 \times 0{,}1</span>) : pour qu'une longue attente finisse par gagner, il faut augmenter <span class="math inline">W_{\text{âge}}</span> ou réduire <span class="math inline">W_{\text{équité}}</span>. C'est un choix de politique : plus d'impatience tolérée ou plus d'équité garantie.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★★ — Qui est sous-servi ?</span> Deux comptes frères A et B ont des parts de 3 et de 1. Leurs consommations normalisées parmi les frères sont de 0,8 pour A et de 0,2 pour B. Calculez, pour chaque compte, le rapport entre sa part normalisée et sa consommation normalisée, dites lequel est sous-servi, et lequel passera devant selon Fair Tree.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Les parts normalisées sont 0,75 pour A (<span class="math inline">3/4</span>) et 0,25 pour B (<span class="math inline">1/4</span>). Les rapports valent <span class="math inline">0{,}75/0{,}8 = 0{,}9375</span> pour A et <span class="math inline">0{,}25/0{,}2 = 1{,}25</span> pour B. Selon la documentation, une valeur supérieure à 1 désigne une association sous-servie et une valeur entre 0 et 1 une association sur-servie : B est sous-servi, A légèrement sur-servi. Fair Tree classe les frères par cette valeur : tous les enfants de B passent devant tous ceux de A, quelle que soit leur propre consommation.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★★ — Qui peut combler un trou ?</span> Un nœud de 8 GPU exécute un job qui en occupe 4 et se termine dans 1 h. Le job prioritaire X demande les 8 GPU pour 4 h : il démarrera donc dans 1 h. Trois jobs plus petits attendent : (a) 4 GPU, limite de 50 min ; (b) 4 GPU, limite de 90 min ; (c) 2 GPU, sans limite déclarée. Lesquels le backfill peut-il lancer maintenant, et pourquoi ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Seul (a) peut démarrer : il termine en 50 min, avant l'heure de début prévue de X, donc il ne retarde pas X. Le job (b) occuperait ses 4 GPU 30 minutes de plus que l'heure de début de X et le retarderait : refusé. Le job (c) n'a aucune durée déclarée, donc la durée maximale de la partition s'applique, sans doute très longue : le backfill ne peut pas garantir qu'il libère ses GPU à temps, il est refusé. La documentation insiste sur ce point : des limites de temps raisonnablement exactes sont importantes pour que le backfill fonctionne.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★★★ — Traduire une politique en commandes</span> Traduisez la table du paragraphe 4.5 en commandes <code>sacctmgr</code> : trois comptes de parts 5, 3 et 2 sous un compte parent, une QOS <code>interactive</code> (priorité 2000, 4 h au plus, 2 GPU par utilisateur au plus), une QOS <code>scavenger</code> (priorité 10) que la QOS <code>normal</code> peut préempter, et un quota total de 64 GPU pour le compte de la recherche. Précisez deux paramètres de <code>slurm.conf</code> indispensables à son application, puis dites comment vous vérifieriez chaque règle.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Les commandes, <strong>exécutées avec succès dans le bac à sable</strong> en remplaçant <code>gres/gpu</code> par <code>cpu</code>, faute de GPU :</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add account recherche parent=research fairshare=5</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add account applis parent=research fairshare=3</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add account dev parent=research fairshare=2</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add qos interactive Priority=2000 MaxWall=04:00:00 MaxTRESPerUser=gres/gpu=2</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> add qos scavenger Priority=10</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> modify qos normal set Preempt+=scavenger</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="ex">sacctmgr</span> <span class="at">-i</span> modify account recherche set GrpTRES=gres/gpu=64</span></code></pre></div>
+<p>Deux paramètres sont indispensables : <code>AccountingStorageEnforce=associations,limits,qos</code> (sans lui les limites ne sont pas appliquées) et <code>AccountingStorageTRES=gres/gpu</code> (pour que les GPU soient suivis). La préemption exige aussi <code>PreemptType=preempt/qos</code> et un <code>PreemptMode</code>. On vérifie : les parts avec <code>sshare</code>, la QOS interactive en soumettant trois GPU pour un utilisateur (le job doit être retenu par une raison de limite), le quota en soumettant au-delà de 64 GPU, et la préemption comme au lab 5.2.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★ — Mesurer l'utilisation d'un cluster</span> Un cluster compte 16 nœuds de 8 GPU. Sur une semaine, <code>sreport</code> donne 11 200 GPU-heures allouées. Cinq nœuds ont été drainés pendant 12 heures chacun. Calculez l'utilisation brute, l'utilisation rapportée à la capacité disponible, et le temps de GPU réellement productif si 20 % des GPU-heures allouées ont été perdues en redémarrages.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Capacité totale : <span class="math inline">16 \times 8 \times 168 = 21\,504</span> GPU-heures. Utilisation brute : <span class="math inline">11\,200/21\,504 \approx 52{,}1</span> %. Capacité retirée par les drains : <span class="math inline">5 \times 8 \times 12 = 480</span> GPU-heures, donc disponible <span class="math inline">21\,024</span> et utilisation rapportée à la disponibilité <span class="math inline">11\,200/21\,024 \approx 53{,}3</span> %. Avec 20 % de pertes, le travail productif est <span class="math inline">0{,}8 \times 11\,200 = 8960</span> GPU-heures, soit 41,7 % de la capacité totale. Ces trois chiffres répondent à trois questions différentes (occupation, qualité du service, efficacité), et un rapport honnête les distingue.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★★★ — Un nœud qui draine toutes les nuits</span> Le nœud <code>gpu-n07</code> est drainé chaque nuit vers 3 h avec la raison <code>health: gpu_xid:79</code> (valeur simulée), puis remis en service par le contrôle de santé le matin, car l'erreur disparaît. Trois jobs ont été perdus cette semaine. Proposez une démarche d'enquête, une décision de remise en service, et deux changements de politique.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Enquête.</strong> Corréler les drains avec la charge : quels jobs tournaient à 3 h, y a-t-il une tâche planifiée (sauvegarde, mise à jour) à cette heure ? Lire les journaux du noyau et l'état des GPU autour de l'incident (module 14), comparer avec les nœuds voisins.</p>
+<p><strong>Décision.</strong> Un nœud qui draine plusieurs fois en peu de temps n'est pas « réparé » parce que l'erreur a disparu. Il faut le sortir de la production par un drainage manuel dont la raison n'a pas le préfixe <code>health:</code> (il ne sera donc pas remis en service automatiquement), le faire passer en recette complète, et ouvrir un dossier fournisseur si la panne se répète.</p>
+<p><strong>Politique.</strong> Compter les drains par nœud sur sept jours et retirer automatiquement au troisième. Ne remettre en service automatiquement que les raisons que le contrôle sait clore sans ambiguïté.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 10 · ★★★ — Slurm, Kubernetes ou les deux ?</span> Pour chacun des trois cas, recommandez Slurm natif, Kubernetes ou Slurm sur Kubernetes et justifiez en trois critères. (a) Un laboratoire de 40 chercheurs qui entraînent des modèles sur 200 GPU et connaissent <code>sbatch</code>. (b) Une start-up dont l'essentiel de la charge est de l'inférence servie 24 h sur 24, avec quelques entraînements. (c) Une grande entreprise avec une plateforme Kubernetes existante et une équipe de recherche qui exige ses scripts Slurm.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Il n'y a pas de réponse unique ; voici une réponse défendable.</p>
+<ol type="a">
+<li><p><strong>Slurm natif.</strong> Charge de jobs finis, utilisateurs formés, besoin d'équité et de préemption natifs, une seule technologie à exploiter.</p></li>
+<li><p><strong>Kubernetes.</strong> L'inférence est un service, qu'on déploie, met à l'échelle et supervise comme tel ; les rares entraînements se traitent avec une file (Kueue) plutôt qu'avec un second ordonnanceur.</p></li>
+<li><p><strong>Slurm sur Kubernetes</strong> (par exemple avec Slinky). La plateforme existante reste l'infrastructure commune, les scripts de la recherche sont conservés ; le coût est une double compétence d'exploitation.</p></li>
+</ol>
+<p>Une bonne réponse nomme le coût caché de chaque choix.</p>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux lire un cluster Slurm.</strong> Preuve : un compte rendu de <code>sinfo</code>, <code>squeue</code> et <code>sacct</code> du bac à sable qui explique chaque état et chaque raison.</li>
+<li><strong>Je peux écrire un job qui survit à Slurm.</strong> Preuve : le lab 5.1, partie B, refait avec votre propre script.</li>
+<li><strong>Je peux configurer une politique d'équité et de préemption.</strong> Preuve : le lab 5.2 et les commandes de l'exercice 7.</li>
+<li><strong>Je peux décrire un nœud GPU et une topologie.</strong> Preuve : un <code>slurm.conf</code> et un <code>gres.conf</code> commentés pour un nœud de votre choix, avec leurs sources.</li>
+<li><strong>Je peux mesurer l'utilisation d'un cluster honnêtement.</strong> Preuve : l'exercice 8 refait sur les chiffres d'un cluster réel ou simulé.</li>
+<li><strong>Je peux automatiser la quarantaine d'un nœud.</strong> Preuve : le lab 5.3 et un contrôle de votre choix.</li>
+</ul>
+<p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
+<ol type="1">
+<li><em>Un job de 64 GPU attend depuis trois jours. Que regardez-vous ?</em> Réponse-type : la raison dans <code>squeue</code>, la priorité et ses facteurs avec <code>sprio</code>, l'équité de son compte avec <code>sshare</code>, sa durée déclarée (backfill), les réservations, les nœuds drainés qui retirent de la capacité, et la fragmentation due aux petits jobs.</li>
+<li><em>Comment partager 256 GPU entre quatre équipes sans gaspiller les GPU inactifs ?</em> Réponse-type : parts d'équité par équipe, une QOS préemptible pour utiliser la capacité inactive à condition que ces jobs sachent reprendre, des quotas de groupe et une mesure d'utilisation hebdomadaire.</li>
+<li><em>Un nœud draine toutes les nuits puis revient seul. Que faites-vous ?</em> Réponse-type : ne pas se fier au retour spontané, enquêter sur les causes corrélées, sortir le nœud de la production après plusieurs drains, le valider par une recette complète.</li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<ul>
+<li>SchedMD. <a href="https://slurm.schedmd.com/priority_multifactor.html"><em>Multifactor Priority Plugin</em></a> : la formule de priorité et les poids (chapitre 3).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/fair_tree.html"><em>Fair Tree Fairshare Algorithm</em></a> : l'algorithme d'équité par défaut (chapitre 3).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/sched_config.html"><em>Scheduling Configuration Guide</em></a> : le backfill et l'importance des durées (chapitre 3).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/resource_limits.html"><em>Resource Limits</em></a> et <a href="https://slurm.schedmd.com/preempt.html"><em>Preemption</em></a> : limites, <code>AccountingStorageEnforce</code>, <code>PreemptMode</code> (chapitre 4).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/reservations.html"><em>Reservations</em></a> : syntaxe des réservations (chapitre 4).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/gres.html"><em>Generic Resource (GRES) Scheduling</em></a>, <a href="https://slurm.schedmd.com/cgroup.conf.html"><em>cgroup.conf</em></a> et <a href="https://slurm.schedmd.com/topology.html"><em>Topology Guide</em></a> : GPU, isolation, topologie (chapitre 5).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/prolog_epilog.html"><em>Prolog and Epilog Guide</em></a> et <a href="https://slurm.schedmd.com/sbatch.html"><em>sbatch</em></a> : prolog, signaux, remise en file (chapitres 2 et 7).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/sinfo.html"><em>sinfo</em></a> et <a href="https://slurm.schedmd.com/squeue.html"><em>squeue</em></a> : états de nœud et raisons d'attente (chapitres 1 et 7).</li>
+<li>NVIDIA. <a href="https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md"><em>Pyxis</em></a> : conteneurs sous <code>srun</code> (chapitre 8).</li>
+<li>LBNL. <a href="https://raw.githubusercontent.com/mej/nhc/master/README.md"><em>Node Health Check (NHC)</em></a> : contrôle de santé de référence (chapitre 7).</li>
+<li>SchedMD et NVIDIA. <a href="https://www.nvidia.com/en-us/software/slinky/"><em>Slinky</em></a> : Slurm dans Kubernetes (chapitre 8).</li>
+<li>Dubey et al. <a href="https://arxiv.org/abs/2407.21783"><em>The Llama 3 Herd of Models</em></a>, section 3.3.4 : interruptions et automatisation à 16 000 GPU (chapitre 7).</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, <code>sbatch</code>, <code>sinfo</code>, <code>squeue</code>) ont été relus sur les pages officielles de SchedMD le 24 octobre 2026. Les faits sur Pyxis, NHC et Slinky ont été relus sur leurs pages. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent.</p>
+<p><strong>Recommandé.</strong> L'ordre des chapitres, la règle « peu de partitions, plusieurs QOS », le seuil de trois drains en sept jours, la marge de 20 à 30 % sur les durées et le tableau comparatif Slurm, Kubernetes et hybride sont des choix de ce parcours, pas des règles de Slurm.</p>
+<p><strong>À vérifier.</strong> La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (<code>topology/block</code>) et la préemption ; lisez la documentation de votre version. Les extraits de <code>slurm.conf</code>, <code>gres.conf</code> et les scripts GPU des chapitres 2 et 5 n'ont <strong>pas</strong> été exécutés (ils demandent des GPU) ; les scripts ont seulement passé <code>shellcheck</code>. L'article fondateur de Slurm (Yoo, Jette et Grondona, 2003) est cité de mémoire et n'a pas été rouvert pour ce module.</p>
+<p><strong>Hors périmètre.</strong> L'installation d'un cluster multi-nœuds réel et du réseau d'interconnexion (modules 6 et 7), Slurm en mode cloud avec nœuds éphémères, l'API REST <code>slurmrestd</code>, les accélérateurs non NVIDIA, et l'administration de la base de comptabilité en production (sauvegardes, purge).</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/perf-models/index.html"><span class="k">← Précédent</span>Module 02 — Architecture matérielle et modèles de performance</a><a class="next" href="../../resources/index.html"><span class="k">Suivant →</span>Ressources</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

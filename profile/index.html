@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <h2 id="ecart">L'écart, domaine par domaine</h2>
-<p>Le niveau visé est celui que décrit une offre de <em>lead</em> en infrastructure de calcul pour l'entraînement (relevé d'octobre 2026, voir plus bas). Il est de 3 presque partout, car un lead doit pouvoir opérer lui-même ce qu'il dirige.</p>
+<p>Le niveau visé est celui que décrit une offre de <em>lead</em> en infrastructure de calcul pour l'entraînement (relevé d'octobre 2026, voir <a href="#offres">Ce que demandent les offres</a>). Il est de 3 presque partout, car un lead doit pouvoir opérer lui-même ce qu'il dirige.</p>
 <div class="tbl-wrap">
 <table style="width:100%;">
 <colgroup>
@@ -195,6 +195,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>11</td>
 </tr>
 <tr class="even">
+<td>Langages de systèmes (Go, Rust, C++)</td>
+<td>Python, Java, Bash, Fortran ; ni Go, ni Rust, ni C++</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>aucun module dédié : C++ et Python dans les modules 3 et 4</td>
+</tr>
+<tr class="odd">
 <td>Kubernetes pour l'IA</td>
 <td>Kubernetes, OpenShift, Helm en production ; inférence GPU ; pas d'ordonnancement d'entraînement</td>
 <td>2</td>
@@ -202,7 +210,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>1</td>
 <td>12</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Multi-cloud et fournisseurs GPU</td>
 <td>Déploiements sur trois hyperscalers, Terraform ; pas de capacité GPU négociée</td>
 <td>2</td>
@@ -210,7 +218,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>1</td>
 <td>13</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Observabilité et fiabilité</td>
 <td>Prometheus, Grafana, Loki, SLI/SLO, astreinte, gestion d'incident</td>
 <td>3</td>
@@ -218,7 +226,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>0</td>
 <td>14</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>FinOps, capacité, achats</td>
 <td>Certification FinOps pour l'IA, suivi de coûts GPU et de jetons ; pas d'achat de capacité</td>
 <td>2</td>
@@ -226,7 +234,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>1</td>
 <td>15</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Plateforme, sécurité, leadership</td>
 <td>Rôles de lead, atelier avec les métiers, sécurité (Zero Trust, Kerberos), prise de parole</td>
 <td>3</td>
@@ -237,6 +245,102 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
+<h2 id="offres">Ce que demandent les offres</h2>
+<p>Pour fonder le niveau visé sur autre chose qu'une impression, douze offres publiques de postes d'infrastructure de calcul ont été lues en octobre 2026 : six chez des fournisseurs de GPU, trois dans des laboratoires d'IA, une dans un centre de calcul et deux d'une même start-up. Chaque compétence relevée est appuyée par une citation vérifiée dans le texte de l'offre. L'échantillon est petit : lisez les nombres comme des ordres de grandeur.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Compétence</th>
+<th>Offres qui la citent (sur 12)</th>
+<th>Dont exigées</th>
+<th>Niveau estimé du profil</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Kubernetes</td>
+<td>10</td>
+<td>8</td>
+<td>2 à 3 : un atout</td>
+</tr>
+<tr class="even">
+<td>Python</td>
+<td>9</td>
+<td>9</td>
+<td>3 : un atout</td>
+</tr>
+<tr class="odd">
+<td>Astreinte et fiabilité (SRE)</td>
+<td>9</td>
+<td>9</td>
+<td>3 : un atout</td>
+</tr>
+<tr class="even">
+<td>Langages de systèmes (Go, Rust, C++)</td>
+<td>8</td>
+<td>7</td>
+<td>1 : un écart</td>
+</tr>
+<tr class="odd">
+<td>Expérience HPC</td>
+<td>8</td>
+<td>6</td>
+<td>1 : un écart</td>
+</tr>
+<tr class="even">
+<td>Administration Linux</td>
+<td>7</td>
+<td>7</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>InfiniBand et RoCE</td>
+<td>7</td>
+<td>4</td>
+<td>0 : un écart</td>
+</tr>
+<tr class="even">
+<td>Planification de capacité</td>
+<td>6</td>
+<td>6</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>Slurm</td>
+<td>5</td>
+<td>2</td>
+<td>0 : un écart</td>
+</tr>
+<tr class="even">
+<td>Prometheus et Grafana</td>
+<td>5</td>
+<td>4</td>
+<td>3 : un atout</td>
+</tr>
+<tr class="odd">
+<td>Conception d'ordonnanceur</td>
+<td>5</td>
+<td>4</td>
+<td>0 à 1 : un écart</td>
+</tr>
+<tr class="even">
+<td>Provisioning bare-metal</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Deux lectures. D'abord, <strong>les compétences les plus citées (Kubernetes, Python, fiabilité) sont celles où le profil est déjà fort</strong> : il est proche des postes de fournisseurs de GPU, où l'infrastructure ressemble à celle du cloud. Ensuite, <strong>les compétences propres au calcul haute performance (HPC, InfiniBand, Slurm, ordonnanceurs) sont celles où le profil est vide</strong>, et ce sont aussi celles que les masters enseignent le moins (voir l'<a href="../masters/index.html">enquête</a>).</p>
+<p>Sept offres indiquent un nombre d'années d'expérience : de 3 à 15 ans, avec une médiane de 8. Aucune de ces années ne se remplace par un parcours d'apprentissage ; elles se remplacent en partie par des preuves publiques (voir plus bas).</p>
 <h2 id="lecture">Ce que cet écart dit</h2>
 <p><strong>Le cœur du parcours est exactement là où le profil est le plus vide.</strong> Les écarts de 2 ou 3 se concentrent sur l'ordonnancement HPC, le réseau d'entraînement, l'entraînement distribué, les pannes d'entraînement, le stockage, les modèles de performance et Ray : c'est le noyau technique qu'aucune expérience de plateforme classique ne remplace.</p>
 <p><strong>Les appuis sont réels.</strong> Kubernetes en production, observabilité, FinOps, certifications cloud, expérience de lead et goût de la communication sont des atouts rares chez les candidats venus du calcul scientifique. Ils réduisent le temps nécessaire sur les modules 12, 14, 15 et 16, mais ne les rendent pas superflus : ils portent surtout sur les services, pas sur les machines.</p>
@@ -311,7 +415,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Gardez le tableau dans votre journal d'apprentissage : il documente votre progression de façon vérifiable.</li>
 </ol>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les compétences listées dans la colonne « profil » proviennent du <code>CAREER.md</code> du dépôt Certifications (version d'octobre 2026) ; les exigences du métier proviennent de deux annonces publiques et de l'enquête sur les offres d'emploi.</p>
+<p><strong>Documenté.</strong> Les compétences listées dans la colonne « profil » proviennent du <code>CAREER.md</code> du dépôt Certifications (version d'octobre 2026) ; les fréquences de compétences viennent de douze offres publiques, relevées le 22 octobre 2026 et citées dans le dossier <code>data/jobs/</code>.</p>
 <p><strong>Recommandé.</strong> Les niveaux estimés et visés, les priorités A, B et C, et l'ordre de travail sont des choix de ce parcours. Ils ne sont ni mesurés, ni validés par un tiers.</p>
 <p><strong>À vérifier.</strong> Les niveaux de chaque domaine pour une autre personne que le profil de référence : refaites le diagnostic.</p>
 <p><strong>Hors périmètre.</strong> Les aspects contractuels d'un recrutement, les salaires et toute promesse d'embauche.</p>

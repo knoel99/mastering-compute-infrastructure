@@ -34,7 +34,7 @@ Les deux premiers modules (performance, systèmes) donnent le langage commun ; l
 
 ## L'écart, domaine par domaine {#ecart}
 
-Le niveau visé est celui que décrit une offre de *lead* en infrastructure de calcul pour l'entraînement (relevé d'octobre 2026, voir plus bas). Il est de 3 presque partout, car un lead doit pouvoir opérer lui-même ce qu'il dirige.
+Le niveau visé est celui que décrit une offre de *lead* en infrastructure de calcul pour l'entraînement (relevé d'octobre 2026, voir [Ce que demandent les offres](#offres)). Il est de 3 presque partout, car un lead doit pouvoir opérer lui-même ce qu'il dirige.
 
 | Domaine | Ce que le profil documente | Estimé | Visé | Écart | Module |
 |---|---|---|---|---|---|
@@ -49,11 +49,35 @@ Le niveau visé est celui que décrit une offre de *lead* en infrastructure de c
 | Entraînement distribué | Cours sur les réseaux de neurones et le matériel d'inférence ; pas de DDP ni FSDP | 1 | 3 | 2 | 9 |
 | Pannes et checkpointing d'entraînement | Réduction de 94 % des incidents critiques sur une plateforme d'événements ; pas d'entraînement | 1 | 3 | 2 | 10 |
 | Ray et infrastructure d'apprentissage par renforcement | Aucune trace | 0 | 2 | 2 | 11 |
+| Langages de systèmes (Go, Rust, C++) | Python, Java, Bash, Fortran ; ni Go, ni Rust, ni C++ | 1 | 2 | 1 | aucun module dédié : C++ et Python dans les modules 3 et 4 |
 | Kubernetes pour l'IA | Kubernetes, OpenShift, Helm en production ; inférence GPU ; pas d'ordonnancement d'entraînement | 2 | 3 | 1 | 12 |
 | Multi-cloud et fournisseurs GPU | Déploiements sur trois hyperscalers, Terraform ; pas de capacité GPU négociée | 2 | 3 | 1 | 13 |
 | Observabilité et fiabilité | Prometheus, Grafana, Loki, SLI/SLO, astreinte, gestion d'incident | 3 | 3 | 0 | 14 |
 | FinOps, capacité, achats | Certification FinOps pour l'IA, suivi de coûts GPU et de jetons ; pas d'achat de capacité | 2 | 3 | 1 | 15 |
 | Plateforme, sécurité, leadership | Rôles de lead, atelier avec les métiers, sécurité (Zero Trust, Kerberos), prise de parole | 3 | 3 | 0 | 16 |
+
+## Ce que demandent les offres {#offres}
+
+Pour fonder le niveau visé sur autre chose qu'une impression, douze offres publiques de postes d'infrastructure de calcul ont été lues en octobre 2026 : six chez des fournisseurs de GPU, trois dans des laboratoires d'IA, une dans un centre de calcul et deux d'une même start-up. Chaque compétence relevée est appuyée par une citation vérifiée dans le texte de l'offre. L'échantillon est petit : lisez les nombres comme des ordres de grandeur.
+
+| Compétence | Offres qui la citent (sur 12) | Dont exigées | Niveau estimé du profil |
+|---|---|---|---|
+| Kubernetes | 10 | 8 | 2 à 3 : un atout |
+| Python | 9 | 9 | 3 : un atout |
+| Astreinte et fiabilité (SRE) | 9 | 9 | 3 : un atout |
+| Langages de systèmes (Go, Rust, C++) | 8 | 7 | 1 : un écart |
+| Expérience HPC | 8 | 6 | 1 : un écart |
+| Administration Linux | 7 | 7 | 2 |
+| InfiniBand et RoCE | 7 | 4 | 0 : un écart |
+| Planification de capacité | 6 | 6 | 2 |
+| Slurm | 5 | 2 | 0 : un écart |
+| Prometheus et Grafana | 5 | 4 | 3 : un atout |
+| Conception d'ordonnanceur | 5 | 4 | 0 à 1 : un écart |
+| Provisioning bare-metal | 5 | 4 | 2 |
+
+Deux lectures. D'abord, **les compétences les plus citées (Kubernetes, Python, fiabilité) sont celles où le profil est déjà fort** : il est proche des postes de fournisseurs de GPU, où l'infrastructure ressemble à celle du cloud. Ensuite, **les compétences propres au calcul haute performance (HPC, InfiniBand, Slurm, ordonnanceurs) sont celles où le profil est vide**, et ce sont aussi celles que les masters enseignent le moins (voir l'[enquête](../masters/index.html)).
+
+Sept offres indiquent un nombre d'années d'expérience : de 3 à 15 ans, avec une médiane de 8. Aucune de ces années ne se remplace par un parcours d'apprentissage ; elles se remplacent en partie par des preuves publiques (voir plus bas).
 
 ## Ce que cet écart dit {#lecture}
 
@@ -101,7 +125,7 @@ Les deux postes partagent Python, PyTorch distribué, NCCL, la reprise des jobs 
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les compétences listées dans la colonne « profil » proviennent du `CAREER.md` du dépôt Certifications (version d'octobre 2026) ; les exigences du métier proviennent de deux annonces publiques et de l'enquête sur les offres d'emploi.
+**Documenté.** Les compétences listées dans la colonne « profil » proviennent du `CAREER.md` du dépôt Certifications (version d'octobre 2026) ; les fréquences de compétences viennent de douze offres publiques, relevées le 22 octobre 2026 et citées dans le dossier `data/jobs/`.
 
 **Recommandé.** Les niveaux estimés et visés, les priorités A, B et C, et l'ordre de travail sont des choix de ce parcours. Ils ne sont ni mesurés, ni validés par un tiers.
 

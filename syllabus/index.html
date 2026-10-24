@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Plans détaillés des modules — Mastering Compute Infrastructure</title>
+<meta name="description" content="Plan de chacun des 16 modules : ce qui est rédigé est signalé, le reste est un plan prêt à être rédigé.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+
+<link rel="stylesheet" href="../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../index.html">Accueil</a></p>
+<header id="title-block-header">
+<h1 class="title">Plans détaillés des modules</h1>
+<p class="subtitle">Acquis visés, chapitres, labs et sources à lire pour chacun des modules du parcours</p>
+</header>
+<h2 id="lecture">Comment lire cette page</h2>
+<p>Cette page donne le plan de <strong>chaque module du parcours</strong>, qu'il soit déjà rédigé ou non. Un module rédigé a sa page complète (fiche, plan de séances, chapitres, labs vérifiés, exercices corrigés) ; un module marqué « plan » n'a pas encore son cours : ses chapitres, ses labs prévus et ses sources à lire sont donnés pour que vous puissiez commencer à travailler dessus avec les références officielles en attendant.</p>
+<p>Les sources citées dans les rubriques « Sources à lire et faits à vérifier » ne sont <strong>pas</strong> des faits établis : ce sont les références sur lesquelles le futur cours devra s'appuyer, et les affirmations chiffrées qu'il faudra relire à la source avant de les écrire.</p>
+<h2 id="phase0">Phase 0 — Fondations : machines et performance</h2>
+<h3 id="linux-systems">Module 01 — Linux, systèmes et diagnostic de performance (plan, 24 h)</h3>
+<p>Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Cartographier une machine (CPU, NUMA, PCIe, NIC, GPU) et dire quel chemin les données empruntent</li>
+<li>Expliquer cgroups v2 et namespaces, et ce que Slurm et Kubernetes en font</li>
+<li>Mener un diagnostic de nœud lent avec la méthode USE et les outils standard</li>
+<li>Écrire un script d'exploitation Bash/Python robuste (codes retour, idempotence, journalisation)</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Modèle d'exécution Linux : processus, signaux, ordonnanceur, mémoire virtuelle, page cache, OOM killer</li>
+<li>cgroups v2 et namespaces : hiérarchie, contrôleurs cpu/memory/io, ce que font conteneurs et ordonnanceurs</li>
+<li>Topologie matérielle et NUMA : lscpu, hwloc, numactl, affinités, topologie PCIe, nvidia-smi topo</li>
+<li>Mesurer avant d'optimiser : méthode USE, perf, vmstat/iostat/sar, flamegraphs, introduction à bpftrace</li>
+<li>systemd, journald, limites (memlock, nofile), hugepages, paramètres noyau utiles aux nœuds de calcul</li>
+<li>Réseau Linux : ip, ss, ethtool, MTU, bonding, tc ; premiers pas RDMA (renvoi au module réseau)</li>
+<li>Stockage Linux : blocs, NVMe, xfs/ext4, fio, page cache, O_DIRECT</li>
+<li>Pannes matérielles vues du système : dmesg, EDAC/ECC, SMART, ipmitool/Redfish ; scripts d'exploitation robustes</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Cartographier une machine</strong> (bac à sable, sans GPU) : Script qui produit un rapport JSON (CPU, NUMA, mémoire, disques, interfaces) à partir de lscpu/numactl/sysfs ; tests sur la sortie.</li>
+<li><strong>cgroups v2 à la main</strong> (bac à sable, sans GPU) : Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire.</li>
+<li><strong>fio et page cache</strong> (bac à sable, sans GPU) : Mesurer lecture/écriture avec et sans page cache, comprendre O_DIRECT ; script qui compare et trace.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Brendan Gregg, méthode USE et Systems Performance (2e éd., 2020)</li>
+<li>Documentation noyau cgroup v2 (kernel.org)</li>
+<li>Comportement du OOM killer et de memory.max</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 1.</p>
+<h3 id="perf-models">Module 02 — Architecture matérielle et modèles de performance (rédigé, 24 h)</h3>
+<p>Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.</p>
+<p><strong>Cours complet :</strong> <a href="courses/perf-models/index.html">Architecture matérielle et modèles de performance</a>.</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Calculer l'intensité arithmétique d'un noyau et le situer sur un roofline</li>
+<li>Prédire le gain maximal d'une parallélisation (Amdahl, Gustafson) et le comparer à une mesure</li>
+<li>Estimer le temps d'un all-reduce avec le modèle α-β puis le valider par une mesure</li>
+<li>Calculer le MFU d'un entraînement à partir de ses FLOP et de son temps par pas</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Du transistor au nœud : cœurs, SIMD, hiérarchie mémoire, bande passante, latence</li>
+<li>Le GPU vu comme machine à débit : SM, warps, HBM, tenseurs ; comparaison CPU/GPU</li>
+<li>Mesurer proprement : benchmarks, variance, warm-up, minimum vs médiane, STREAM, GEMM</li>
+<li>Le modèle roofline : intensité arithmétique, bornes mémoire et calcul, lecture de profils</li>
+<li>Passage à l'échelle : loi d'Amdahl, loi de Gustafson, scalabilité forte et faible, efficacité parallèle</li>
+<li>Le modèle de communication α-β (Hockney) et les collectives : arbre, anneau, bande passante optimale</li>
+<li>FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres/optimiseur/activations</li>
+<li>Études de passage à l'échelle reproductibles : plan d'expérience, tracé, rapport honnête</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>STREAM et GEMM : bandes passantes et pic</strong> (bac à sable, sans GPU) : Mesurer la bande passante mémoire et le débit GEMM de la machine (NumPy), tracer son roofline, comparer au pic théorique du CPU.</li>
+<li><strong>α-β : prédire puis mesurer</strong> (bac à sable, sans GPU) : Avec torch.distributed gloo sur 4 processus : mesurer des all-reduce de tailles variées, ajuster α et β par régression, comparer la prédiction du modèle en anneau.</li>
+<li><strong>Calculateur de MFU</strong> (bac à sable, sans GPU) : Outil Python testé qui calcule FLOP/pas d'un transformeur donné et MFU à partir d'un temps mesuré ; cas de test tirés de valeurs publiées et citées.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Williams, Waterman, Patterson (2009), roofline, CACM</li>
+<li>Hockney (1994) et Thakur et al. (2005) pour les collectives</li>
+<li>Chowdhery et al. (PaLM, 2022) pour la définition du MFU</li>
+<li>FLOP de l'attention : formules de Kaplan et al. 2020 / Megatron-LM</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2, Projet 6.</p>
+<h2 id="phase1">Phase 1 — Calcul parallèle et GPU</h2>
+<h3 id="parallel-programming">Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (plan, 30 h)</h3>
+<p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p>
+<p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Paralléliser une boucle avec OpenMP en justifiant partage, réduction et ordonnancement</li>
+<li>Écrire un programme MPI avec communications point-à-point et collectives, sans interblocage</li>
+<li>Mener une étude de scalabilité forte et faible et expliquer l'écart au modèle</li>
+<li>Relier les collectives MPI à ce que NCCL fait pour l'entraînement</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Parallélisme : tâches, données, pipeline ; mémoire partagée contre mémoire distribuée</li>
+<li>OpenMP : régions parallèles, partage, réductions, ordonnancement, faux partage, tâches</li>
+<li>MPI, les bases : rangs, communicateurs, point-à-point bloquant et non bloquant, interblocages</li>
+<li>MPI, les collectives : broadcast, reduce, allreduce, alltoall ; algorithmes et coûts</li>
+<li>Décomposition de domaine, halos et recouvrement calcul/communication</li>
+<li>E/S parallèles et reproductibilité numérique : MPI-IO, sommes non associatives, graines</li>
+<li>Hybride MPI+OpenMP, placement et binding ; lancement sous Slurm</li>
+<li>Étudier la scalabilité : plan d'expérience, efficacité, goulots, rapport</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>OpenMP : réduction et faux partage</strong> (bac à sable, sans GPU) : Programme C avec OpenMP : somme, faux partage, effet du schedule ; mesures et comparaison au modèle.</li>
+<li><strong>MPI : anneau, halo et all-reduce</strong> (bac à sable, sans GPU) : Implémenter un all-reduce en anneau à la main avec MPI (OpenMPI/mpi4py dans le bac à sable, 4 rangs locaux), comparer à MPI_Allreduce.</li>
+<li><strong>Jacobi 2D : étude de scalabilité</strong> (bac à sable, sans GPU) : Solveur Jacobi avec décomposition de domaine ; scalabilité forte/faible sur les cœurs disponibles ; tracé et analyse.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Norme MPI (mpi-forum.org), spécification OpenMP (openmp.org)</li>
+<li>Patarasuk &amp; Yuan (2009), all-reduce optimal en bande passante</li>
+<li>Cours de référence cités par les masters (EPCC, Berkeley CS267)</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2.</p>
+<h3 id="gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (plan, 30 h)</h3>
+<p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p>
+<p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Écrire un noyau CUDA (Numba) avec mémoire partagée et le comparer à une version vectorisée</li>
+<li>Expliquer la coalescence, l'occupation et la divergence de warps sur un exemple chiffré</li>
+<li>Lire un profil Nsight/PyTorch Profiler et nommer le goulot (calcul, mémoire, lancement)</li>
+<li>Expliquer ce qu'apporte FlashAttention, la fusion de noyaux et la précision mixte</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Le modèle d'exécution CUDA : grille, blocs, warps, SM ; synchronisation</li>
+<li>Hiérarchie mémoire GPU : globale, partagée, registres, constantes ; coalescence et conflits de bancs</li>
+<li>Écrire des noyaux : réduction, produit matriciel par tuiles, scan ; erreurs classiques</li>
+<li>Streams, événements, copies asynchrones, mémoire épinglée, recouvrement transfert/calcul</li>
+<li>Triton : programmer par blocs, auto-réglage, quand préférer Triton à CUDA</li>
+<li>Précision numérique : FP32, TF32, BF16, FP16, FP8 ; sommes, mise à l'échelle de perte, déterminisme</li>
+<li>Profiler : Nsight Systems/Compute, PyTorch Profiler, métriques clés, lecture d'une trace</li>
+<li>Techniques d'accélération : fusion, FlashAttention, torch.compile, CUDA graphs, quand elles paient</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Noyaux CUDA dans le simulateur Numba</strong> (bac à sable, sans GPU) : Noyaux Numba (réduction, matmul par tuiles) exécutés avec NUMBA_ENABLE_CUDASIM=1 ; tests de justesse ; version GPU réelle documentée mais non exécutée.</li>
+<li><strong>Triton en mode interpréteur</strong> (bac à sable, sans GPU) : Noyau Triton d'addition fusionnée et softmax exécutés avec TRITON_INTERPRET=1 si l'installation CPU est possible ; sinon lab 'gpu' documenté et linté.</li>
+<li><strong>Lire une trace de profil</strong> (bac à sable, sans GPU) : Profil PyTorch Profiler sur CPU d'un petit transformeur ; exporter la trace Chrome, identifier les opérateurs dominants ; transposition au profil GPU expliquée.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation CUDA C++ Programming Guide (NVIDIA)</li>
+<li>Dao et al. (2022) FlashAttention</li>
+<li>Tillet et al. (2019) Triton</li>
+<li>Documentation Numba CUDA simulator et Triton interpreter : vérifier la disponibilité sur CPU</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2.</p>
+<h2 id="phase2">Phase 2 — Exploiter un cluster</h2>
+<h3 id="slurm">Module 05 — Slurm et exploitation d'un cluster HPC (rédigé, 32 h)</h3>
+<p>L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.</p>
+<p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
+<p><strong>Cours complet :</strong> <a href="courses/slurm/index.html">Slurm et exploitation d'un cluster HPC</a>.</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Écrire et soumettre des jobs (batch, tableaux, dépendances, interactifs) avec ressources GPU</li>
+<li>Configurer partitions, QOS, fairshare et préemption pour une politique donnée</li>
+<li>Lire sacct/sreport et expliquer l'utilisation et les files d'attente d'un cluster</li>
+<li>Diagnostiquer un nœud drainé et un job en attente (raisons Slurm)</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Architecture : slurmctld, slurmd, slurmdbd, munge ; flux de vie d'un job</li>
+<li>Soumettre : sbatch, srun, salloc ; ressources, GRES/GPU, tableaux, dépendances, scripts robustes</li>
+<li>Politique : partitions, QOS, associations, fairshare, priorité multifactorielle, backfill</li>
+<li>Préemption, réservations, limites, gang scheduling, jobs de grande taille et fragmentation</li>
+<li>GPU et topologie : gres.conf, cgroups, MIG, binding, topology.conf, placement sensible au réseau</li>
+<li>Comptabilité et reporting : sacct, sreport, sshare, tableaux de bord d'utilisation</li>
+<li>Santé des nœuds : drain, prolog/epilog, NHC, burn-in, remise en service</li>
+<li>Conteneurs et environnements : pyxis/enroot, apptainer, modules/Spack ; Slurm sur Kubernetes (aperçu)</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Un Slurm réel dans le bac à sable</strong> (bac à sable, sans GPU) : Installer munge, MariaDB, slurmdbd et slurmctld/slurmd sur une seule machine (apt, Slurm 23.11), créer comptes et QOS, soumettre des jobs. Constat de départ : sans base de comptabilité, les jobs restent en InvalidAccount ; documenter la solution (slurmdbd) et fournir un script d'installation reproductible.</li>
+<li><strong>Fairshare, QOS et préemption</strong> (bac à sable, sans GPU) : Deux comptes concurrents, un QOS préemptif ; observer sshare/sprio/squeue ; critères chiffrés.</li>
+<li><strong>Drain, prolog et vérification de santé</strong> (bac à sable, sans GPU) : Script de vérification de nœud appelé en prolog/epilog ; drainer automatiquement sur échec ; tests.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation officielle Slurm (slurm.schedmd.com) : slurm.conf, gres.conf, cgroup.conf, sacctmgr, priority multifactor</li>
+<li>Yoo, Jette, Grondona (2003)</li>
+<li>Version testée et date à indiquer ; ne pas écrire 'dernière version' sans lecture de la source officielle</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 1, Projet 6.</p>
+<h3 id="provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (plan, 24 h)</h3>
+<p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p>
+<p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Décrire la chaîne PXE → image → configuration → enregistrement dans l'ordonnanceur</li>
+<li>Écrire des rôles Ansible idempotents et des modules Terraform pour un cluster</li>
+<li>Valider un nœud GPU avant mise en service (pilote, DCGM diag, burn-in, bande passante)</li>
+<li>Concevoir une procédure de remplacement et de mise à jour sans interrompre la production</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Cycle de vie d'un nœud : recette, installation, exploitation, retrait</li>
+<li>Démarrage réseau et images : PXE/iPXE, outils de provisioning bare-metal (MAAS, Warewulf, BCM : forces et limites)</li>
+<li>Gestion de configuration : Ansible, idempotence, inventaires, secrets</li>
+<li>Terraform pour l'infrastructure : état, modules, environnements, dérive</li>
+<li>La pile GPU : pilote, CUDA, Fabric Manager, DCGM, conteneurs GPU ; compatibilités et pièges de versions</li>
+<li>Recette et burn-in : DCGM diagnostics, gpu-burn, nccl-tests, tests mémoire/PCIe/NVLink</li>
+<li>Mises à jour et pannes : rolling updates, firmware, gestion des RMA, traçabilité</li>
+<li>BMC, Redfish, IPMI et supervision hors bande</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Un rôle Ansible de nœud de calcul</strong> (bac à sable, sans GPU) : Rôle Ansible (muni de molecule ou ansible-playbook --check) qui configure limites, sysctl, services ; tests d'idempotence en local connection.</li>
+<li><strong>Terraform : une flotte décrite en code</strong> (bac à sable, sans GPU) : Module Terraform avec provider local/null et sorties ; terraform validate/plan en local ; gestion de la dérive expliquée.</li>
+<li><strong>Recette d'un nœud GPU</strong> (GPU requis) : Script de recette qui enchaîne nvidia-smi, DCGM diag, gpu-burn, nccl-tests ; lint et simulation des sorties pour le test ; exécution réelle documentée (GPU requis).</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation NVIDIA DCGM (dcgmi diag) et Fabric Manager</li>
+<li>Documentation Ansible et Terraform</li>
+<li>Capacités actuelles des outils de provisioning HPC (vérifier sur sites officiels)</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 1, Projet 6.</p>
+<h3 id="networking">Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (plan, 28 h)</h3>
+<p>Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.</p>
+<p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Comparer InfiniBand et RoCE (contrôle de congestion, perte, configuration) et choisir selon le besoin</li>
+<li>Dimensionner une topologie fat-tree et un taux de sur-souscription</li>
+<li>Expliquer comment NCCL choisit anneau/arbre et lire ses journaux (NCCL_DEBUG)</li>
+<li>Mesurer bande passante et latence (ib_write_bw, nccl-tests) et interpréter un écart</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Rappels réseau : latence, bande passante, débit utile, MTU, contrôle de flux et de congestion</li>
+<li>RDMA et verbs : pourquoi contourner le noyau ; GPUDirect RDMA et GPUDirect Storage</li>
+<li>InfiniBand : sous-réseau, SM, routage, adaptive routing, NDR/XDR ; opérations quotidiennes</li>
+<li>Ethernet pour l'IA : RoCE v2, PFC, ECN, DCQCN, problèmes de perte ; comparaison honnête avec IB</li>
+<li>Topologies : fat-tree, rail-optimized, dragonfly ; sur-souscription ; placement sensible à la topologie</li>
+<li>Dans le nœud : NVLink, NVSwitch, PCIe, affinité GPU-NIC</li>
+<li>NCCL : algorithmes (anneau, arbre, CollNet/SHARP), protocoles, variables d'environnement utiles, journaux</li>
+<li>Mesure et diagnostic : nccl-tests, perftest, hangs, liens dégradés, erreurs silencieuses</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Dimensionner un fat-tree</strong> (bac à sable, sans GPU) : Calculateur Python testé : nombre de commutateurs/câbles pour N GPU, sur-souscription, bande passante de bissection ; comparaison à des configurations publiées et citées.</li>
+<li><strong>Lire un journal NCCL</strong> (bac à sable, sans GPU) : Analyseur de logs NCCL_DEBUG (jeux de logs d'exemple fournis et étiquetés comme synthétiques ou publics) qui extrait topologie, algorithme, interfaces ; tests.</li>
+<li><strong>nccl-tests sur un vrai cluster</strong> (GPU requis) : Procédure et script pour exécuter nccl-tests (all_reduce_perf) sous Slurm et interpréter busbw ; lint ; exécution réelle documentée.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation NCCL (docs.nvidia.com/deeplearning/nccl) et dépôt nccl-tests</li>
+<li>Guides InfiniBand/RoCE de NVIDIA (Mellanox) ; DCQCN (Zhu et al. 2015)</li>
+<li>Chiffres de bande passante par génération (NVLink, NDR) : citer les fiches constructeur</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2, Projet 6.</p>
+<h3 id="storage">Module 08 — Stockage et E/S pour l'entraînement (plan, 24 h)</h3>
+<p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p>
+<p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Choisir entre système de fichiers parallèle, NFS et stockage objet pour un usage donné</li>
+<li>Dimensionner le débit nécessaire pour un entraînement et pour un checkpoint</li>
+<li>Diagnostiquer un entraînement limité par ses données (profilage du chargeur)</li>
+<li>Concevoir un cache de données à plusieurs niveaux</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Besoins d'E/S d'un entraînement : lecture de jeu de données, checkpoints, journaux, artefacts</li>
+<li>Systèmes de fichiers parallèles : Lustre, GPFS/Storage Scale, BeeGFS, WEKA : architecture, métadonnées, striping</li>
+<li>NFS, objet (S3), FUSE et caches : cohérence, latence, coût ; comparaisons honnêtes</li>
+<li>Formats de données pour l'entraînement : shards, WebDataset, Parquet, Arrow, mmap, tokens pré-packés</li>
+<li>Chargeurs de données : workers, prefetch, pinned memory, goulots CPU ; mesurer avec un profileur</li>
+<li>E/S de checkpoint : débit, atomicité, asynchrone, parallèle ; coût d'un checkpoint</li>
+<li>Mise en cache : NVMe local, cache distribué, pré-chauffage ; invalidation ; GPUDirect Storage</li>
+<li>Capacité, durée de vie des données, sauvegardes, quotas, coût au To</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Démasquer un chargeur de données lent</strong> (bac à sable, sans GPU) : Boucle PyTorch avec Dataset synthétique ; varier workers/prefetch ; mesurer débit et temps d'attente GPU simulé ; tableau de décision.</li>
+<li><strong>Shards et lecture séquentielle</strong> (bac à sable, sans GPU) : Convertir un jeu en shards tar/Parquet ; comparer lecture aléatoire et séquentielle avec fio/Python ; chiffrer l'écart.</li>
+<li><strong>Coût d'un checkpoint</strong> (bac à sable, sans GPU) : Écrire des checkpoints de tailles variées (sync/async/fsync) et modéliser débit et temps de blocage.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation Lustre (lustre.org), BeeGFS, GPFS ; Mohan et al. (CheckFreq, FAST 2021)</li>
+<li>Chiffres de débit par fournisseur : à citer ou ordre de grandeur</li>
+<li>Documentation PyTorch DataLoader et WebDataset</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 3, Projet 6.</p>
+<h2 id="phase3">Phase 3 — Systèmes d'entraînement distribué</h2>
+<h3 id="distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (plan, 36 h)</h3>
+<p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p>
+<p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Choisir DDP, FSDP, tensor, pipeline ou expert parallelism pour un modèle et un cluster donnés, chiffres à l'appui</li>
+<li>Estimer la mémoire par GPU (paramètres, gradients, optimiseur, activations) et la réduire (ZeRO, checkpointing d'activations)</li>
+<li>Lancer un job multi-processus avec torchrun et déboguer un deadlock de collective</li>
+<li>Distinguer un bug de distribution d'une instabilité numérique et rendre un run reproductible</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Panorama : données, modèle, pipeline, experts, séquence ; la grille de parallélismes 3D/4D</li>
+<li>DDP : buckets, recouvrement, synchronisation, torchrun, rendezvous ; erreurs classiques</li>
+<li>Mémoire d'un entraînement : paramètres, gradients, états d'optimiseur, activations ; ZeRO 1/2/3 et FSDP</li>
+<li>Parallélisme tensoriel et de séquence ; parallélisme pipeline et bulles ; parallélisme d'experts</li>
+<li>Choisir et dimensionner : placer les dimensions sur la topologie, règle du pouce, exemples chiffrés</li>
+<li>MFU en pratique : mesurer, expliquer l'écart, leviers (taille de lot, recouvrement, fusion, précision)</li>
+<li>Numérique et déterminisme : pics de perte, normes de gradient, NaN, reproductibilité bit-à-bit et ses limites</li>
+<li>Déboguer le distribué : deadlocks, hangs, désynchronisation, divergence entre un run mono-GPU et distribué ; outils</li>
+<li>Écosystème : Megatron-LM, DeepSpeed, TorchTitan, Accelerate/Lightning ; comment lire leurs configurations</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>DDP à quatre processus sur CPU</strong> (bac à sable, sans GPU) : Entraînement DDP avec torchrun --nproc_per_node=4 backend gloo ; vérifier l'équivalence avec un run mono-processus à la tolérance près ; mesurer le coût de communication.</li>
+<li><strong>FSDP : mesurer la mémoire par rang</strong> (bac à sable, sans GPU) : FSDP2/fully_shard sur CPU gloo ; comparer à DDP ; calculer la mémoire attendue et la comparer à la mesure (par tailles de tenseurs).</li>
+<li><strong>Reproduire et diagnostiquer un hang</strong> (bac à sable, sans GPU) : Script où un rang saute une collective ; utiliser le watchdog/timeout et les traces pour localiser ; procédure d'enquête reproductible.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Narayanan et al. (2021) Megatron-LM</li>
+<li>Rajbhandari et al. (2020) ZeRO ; Zhao et al. (2023) PyTorch FSDP</li>
+<li>Documentation PyTorch : torchrun, DDP, fully_shard (FSDP2), DTensor</li>
+<li>Hugging Face Ultra-Scale Playbook ; Austin et al. How to Scale Your Model</li>
+<li>Llama 3 (Dubey et al. 2024) : MFU et configuration de parallélisme, à citer depuis le papier</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2, Projet 3, Projet 6.</p>
+<h3 id="fault-tolerance">Module 10 — Pannes, checkpointing et reprise automatique (plan, 28 h)</h3>
+<p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p>
+<p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Modéliser la fiabilité d'un job (MTBF d'un cluster, temps perdu, intervalle de checkpoint optimal)</li>
+<li>Écrire un checkpoint atomique, complet (modèle, optimiseur, RNG, curseur de données) et le tester par injection de pannes</li>
+<li>Concevoir une boucle de reprise automatique qui détecte, isole le nœud fautif et relance</li>
+<li>Expliquer les pannes GPU/réseau courantes (Xid, ECC, liens, hangs NCCL) et les premières actions</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Pannes à grande échelle : taxonomie (matériel, réseau, logiciel, humaine), données publiées, loi des grands nombres</li>
+<li>Modèle de coût : formule de Young/Daly, goodput, temps perdu, arbitrage fréquence/coût de checkpoint</li>
+<li>Checkpoint correct : atomicité, état complet, reproductibilité de la reprise, sharding, formats (DCP, safetensors)</li>
+<li>Checkpoints rapides : asynchrones, en mémoire, multi-niveaux, couche de stockage, déduplication</li>
+<li>Détection : watchdogs, heartbeats, timeouts NCCL, métriques de lenteur, nœuds 'stragglers' et silencieux</li>
+<li>Reprise et élasticité : torchrun élastique, retrait d'un nœud, redimensionnement ; pipeline de relance sous Slurm/Kubernetes</li>
+<li>Erreurs GPU courantes : Xid, ECC, thermique, liens NVLink/IB dégradés ; conduite à tenir</li>
+<li>Tests de chaos et procédures : injection de pannes, game days, runbooks, post-mortems sans blâme</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Intervalle de checkpoint optimal</strong> (bac à sable, sans GPU) : Simulation Monte-Carlo de pannes ; comparer l'intervalle de Young/Daly au minimum simulé ; tracé et tests.</li>
+<li><strong>Checkpoint atomique et reprise exacte</strong> (bac à sable, sans GPU) : Entraîneur PyTorch CPU avec checkpoint complet (modèle, optimiseur, RNG, itérateur de données) ; kill -9 aléatoire ; vérifier que la perte reprend sans saut et que le résultat final est identique.</li>
+<li><strong>Superviseur de relance</strong> (bac à sable, sans GPU) : Superviseur qui détecte un hang par heartbeat, tue et relance depuis le dernier checkpoint valide, avec limite de relances ; tests.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Llama 3 (Dubey et al. 2024) : interruptions sur 54 jours, répartition des causes ; citer chiffres exacts depuis le papier</li>
+<li>Kokolis et al. (2024) fiabilité des clusters de recherche ML de Meta ; Hu et al. (NSDI 2024)</li>
+<li>Young (1974), Daly (2006) ; Mohan et al. CheckFreq ; Wang et al. Gemini (SOSP 2023) ; documentation PyTorch DCP et torch.distributed.elastic</li>
+<li>Documentation NVIDIA sur les codes Xid</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 3, Projet 6.</p>
+<h3 id="ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (plan, 28 h)</h3>
+<p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p>
+<p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Expliquer le modèle de Ray (tâches, acteurs, objets) et choisir quand l'utiliser</li>
+<li>Concevoir une architecture acteur-apprenant avec synchronisation de politique et tampon de rejeu</li>
+<li>Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)</li>
+<li>Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Pourquoi un framework distribué général : tâches, acteurs, ressources, ordonnancement dans Ray</li>
+<li>Ray en pratique : objets partagés, placement groups, gestion de la mémoire, tolérance aux pannes, autoscaling</li>
+<li>Ray Train et Ray Data : entraînement distribué, ingestion, traitement par lots et en flux</li>
+<li>RL pour un ingénieur d'infrastructure : boucle observation-action-récompense, PPO/GRPO en une page, post-entraînement des modèles</li>
+<li>Architectures acteur-apprenant : rollouts distribués, synchronisation de poids, obsolescence, tampons de rejeu</li>
+<li>Boucles en ligne et temps réel : latence de bout en bout, files, contre-pression, déséquilibre acteurs/apprenants</li>
+<li>Hétérogénéité : GPU d'entraînement, GPU d'évaluation moins chers, CPU ; placement et files par type</li>
+<li>Ray sur Kubernetes (KubeRay) et sur Slurm ; observabilité d'une application Ray ; alternatives (Dask, Spark, Kubeflow)</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Acteurs et tâches Ray</strong> (bac à sable, sans GPU) : Pipeline de traitement avec tâches/acteurs Ray local ; mesure d'efficacité, tolérance à la mort d'un acteur ; tests.</li>
+<li><strong>Boucle acteur-apprenant minimale</strong> (bac à sable, sans GPU) : Environnement jouet, N acteurs, un apprenant, tampon de rejeu, synchronisation de politique ; mesurer obsolescence et débit ; courbe d'apprentissage reproductible.</li>
+<li><strong>Modèle de débit d'une boucle en ligne</strong> (bac à sable, sans GPU) : Modèle analytique + simulation événementielle : combien d'acteurs pour saturer un apprenant ; tests de cohérence modèle/simulation.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Moritz et al. (2018) Ray (OSDI) ; documentation Ray 2.x</li>
+<li>Documentation KubeRay</li>
+<li>Descriptions publiques d'architectures acteur-apprenant (IMPALA, Espeholt et al. 2018 ; documentation d'outils RLHF/GRPO open source)</li>
+<li>Vérifier l'installation de ray sur le bac à sable (CPU) avant d'annoncer des labs 'vérifiés'</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 6.</p>
+<h2 id="phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</h2>
+<h3 id="kubernetes-gpu">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (plan, 28 h)</h3>
+<p>Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.</p>
+<p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Exposer des GPU à des pods (device plugin, GPU Operator, MIG, time-slicing) et en comprendre les limites</li>
+<li>Mettre en place files d'attente et gang scheduling (Kueue ou Volcano) avec quotas et préemption</li>
+<li>Lancer un entraînement multi-nœuds avec JobSet/Kubeflow Trainer et un cluster Ray avec KubeRay</li>
+<li>Choisir Slurm, Kubernetes ou les deux (Slurm sur Kubernetes) selon l'équipe et la charge</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Rappel d'architecture : ce qui est acquis pour un lecteur déjà exploitant de Kubernetes, et ce qui change avec les GPU</li>
+<li>GPU dans Kubernetes : device plugin, GPU Operator, runtime conteneur, MIG, time-slicing, DRA (Dynamic Resource Allocation)</li>
+<li>Files d'attente et gang scheduling : Kueue, Volcano, ClusterQueue, quotas, préemption, équité</li>
+<li>Charges d'entraînement : JobSet, Kubeflow Trainer (ex Training Operator), indexed jobs, rendez-vous, réseau haute performance (RDMA, multus)</li>
+<li>Topologie et placement : affinités, topology-aware scheduling, étiquettes de nœuds, pannes de nœud</li>
+<li>Stockage et données : volumes, CSI, caches, accès objet, performances</li>
+<li>Slurm ou Kubernetes ? Retours publics sur les deux, modèles hybrides (Slurm sur K8s), critères de choix</li>
+<li>Exploitation : mises à jour, sécurité (RBAC, Pod Security, réseau), multi-tenance, coûts</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Kueue : files, quotas, préemption</strong> (bac à sable, sans GPU) : Manifestes ClusterQueue/LocalQueue/WorkloadPriorityClass validés hors ligne (kubernetes-validate/kubeconform si installable) et simulation de la logique d'admission en Python testée ; exécution sur cluster documentée.</li>
+<li><strong>JobSet : un entraînement multi-nœuds</strong> (cluster) : Manifestes JobSet/Trainer pour torchrun multi-nœuds ; validation de schéma ; exécution réelle documentée.</li>
+<li><strong>Matrice de décision Slurm / Kubernetes</strong> (bac à sable, sans GPU) : Grille de critères pondérée avec scénarios d'équipes ; script de calcul de score testé ; justification écrite.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation Kubernetes (device plugins, DRA), NVIDIA GPU Operator, Kueue (kueue.sigs.k8s.io), Volcano, JobSet, KubeRay</li>
+<li>Retours publics sur Slurm sur Kubernetes (Slinky/SchedMD, CoreWeave SUNK) : vérifier les pages officielles</li>
+<li>Vérifier l'état de DRA et des versions de Kubernetes à la date du jour</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 6.</p>
+<h3 id="multi-cloud">Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (plan, 28 h)</h3>
+<p>Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.</p>
+<p><strong>Prérequis :</strong> module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 10 (Pannes, checkpointing et reprise automatique).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Cartographier l'offre GPU (hyperscalers, GPU clouds, centres HPC, colocation) et ses modèles de capacité</li>
+<li>Décrire un job indépendant du fournisseur (SkyPilot ou équivalent) et son placement sensible aux coûts</li>
+<li>Concevoir une stratégie de débordement et de bascule qui survit à la préemption</li>
+<li>Identifier les coûts cachés (sorties de données, stockage, réseau, latence d'accès)</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Le paysage de l'offre GPU : hyperscalers, GPU clouds, fournisseurs européens, centres nationaux, colocation</li>
+<li>Modèles de capacité : à la demande, réservé, spot/préemptible, engagements, contrats de capacité</li>
+<li>Abstraire le fournisseur : SkyPilot, Terraform multi-fournisseurs, Kubernetes fédéré ; ce que chacun résout</li>
+<li>Données et gravité : où vivent les données, sorties de données, caches régionaux, résidence et conformité</li>
+<li>Placement et files : politiques de coût, de latence et de fiabilité ; préemption et reprise entre fournisseurs</li>
+<li>Réseau et identité : VPN/peering, identités fédérées, comptes, quotas, segmentation</li>
+<li>HPC publics : accès aux centres nationaux et européens (appels à projets, quotas), articulation avec le cloud</li>
+<li>Gouvernance : inventaire, étiquetage, coûts par équipe, nettoyage des ressources oubliées</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Simulateur de placement sensible aux coûts</strong> (bac à sable, sans GPU) : Simulateur Python : offres de plusieurs fournisseurs (prix/disponibilité synthétiques, étiquetés), jobs préemptibles ; comparer politiques ; tests.</li>
+<li><strong>Un job SkyPilot indépendant du fournisseur</strong> (cluster) : YAML SkyPilot avec ressources, file_mounts, setup/run, restart on preemption ; validation de schéma/linter ; exécution réelle documentée (compte cloud requis).</li>
+<li><strong>Coût réel d'un déménagement de données</strong> (bac à sable, sans GPU) : Calculateur (avec barèmes cités et datés) de sortie de données, stockage et temps de transfert ; scénarios ; tests.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Yang et al. (2023) SkyPilot (NSDI) ; documentation SkyPilot</li>
+<li>Pages tarifaires officielles : toujours citer la source et la date, ne jamais figer un prix sans lien</li>
+<li>Pages d'accès aux centres HPC (GENCI/Jean Zay, EuroHPC JU AI Factories, TACC/ACCESS) : citer les appels en cours</li>
+<li>Capacités et offres des GPU clouds : changent vite, section 'à vérifier'</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 4, Projet 6.</p>
+<h3 id="observability">Module 14 — Observabilité et fiabilité d'une flotte GPU (plan, 24 h)</h3>
+<p>Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.</p>
+<p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Instrumenter une flotte GPU (DCGM, node exporter, exportateurs Slurm/Kubernetes) avec Prometheus</li>
+<li>Définir des SLI/SLO de plateforme (disponibilité de capacité, délai d'attente, goodput) et des alertes utiles</li>
+<li>Détecter automatiquement un job bloqué, un nœud lent et un GPU dégradé</li>
+<li>Relier métriques système et métriques de modèle (MLflow/W&amp;B) pour trouver la cause d'une régression</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>Ce qu'on observe : système, GPU, réseau, jobs, modèle ; le piège des métriques moyennes</li>
+<li>Métriques GPU : DCGM et dcgm-exporter (utilisation, mémoire, température, puissance, Xid, NVLink) ; ce que l'utilisation GPU ne dit pas</li>
+<li>Prometheus et Grafana pour le calcul : modèle de données, règles d'enregistrement, cardinalité, rétention ; spécificités HPC</li>
+<li>Journaux et traces : Loki/ELK, corrélation par job, traçage distribué des étapes d'entraînement</li>
+<li>Observabilité des ordonnanceurs : exportateurs Slurm, kube-state-metrics, files d'attente, temps d'attente</li>
+<li>SLO de plateforme : disponibilité, délai d'attente, goodput ; alertes qui réveillent pour de bonnes raisons</li>
+<li>Détection de pannes silencieuses : hangs NCCL, stragglers, erreurs ECC, dérives de débit ; tests de santé continus</li>
+<li>Suivi d'expériences et reproductibilité : MLflow, W&amp;B, configuration, versions de code et de données</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Un exportateur de métriques de nœud testé</strong> (bac à sable, sans GPU) : Exportateur Prometheus Python (prometheus_client) pour une source de métriques simulée au format dcgm-exporter ; tests ; scrape local.</li>
+<li><strong>Règles d'alerte testées avec promtool</strong> (bac à sable, sans GPU) : Règles Prometheus (job bloqué, nœud lent, GPU chaud) testées avec promtool test rules (paquet apt prometheus si disponible).</li>
+<li><strong>Détecteur de job bloqué</strong> (bac à sable, sans GPU) : Détecteur par stagnation de métriques + heartbeat ; faux positifs et faux négatifs chiffrés sur séries simulées.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Documentation NVIDIA DCGM et dcgm-exporter</li>
+<li>Documentation Prometheus (règles, promtool), Grafana, Loki, MLflow</li>
+<li>Pièges d'interprétation de DCGM_FI_DEV_GPU_UTIL : citer la documentation</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 5, Projet 1, Projet 6.</p>
+<h3 id="finops-capacity">Module 15 — FinOps, capacité, énergie et achats de calcul (plan, 24 h)</h3>
+<p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p>
+<p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Construire un modèle de coût total (TCO) comparant achat, colocation, réservation et à la demande</li>
+<li>Prévoir la demande de calcul d'une équipe de recherche et en déduire la capacité à contractualiser</li>
+<li>Lire un contrat de capacité GPU (SLA, remplacement, engagement, sorties) et repérer les clauses à négocier</li>
+<li>Estimer puissance, refroidissement et densité par rack, et leur effet sur le coût et le calendrier</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>FinOps pour l'IA : cadre, unités (GPU-heure, coût par token, coût par expérience), allocation et responsabilité</li>
+<li>Utilisation réelle : taux d'occupation, goodput, gaspillage, files d'attente et coût de l'inactivité</li>
+<li>Prévoir la demande : modèles d'usage d'une équipe de recherche, scénarios, marges, plans de capacité</li>
+<li>Modèle de coût total : achat, colocation, location à long terme, réservé, spot ; amortissement, valeur résiduelle</li>
+<li>Énergie et datacenter : puissance par GPU et par rack, refroidissement (air, liquide), PUE, délais de raccordement</li>
+<li>Lire un contrat de capacité : SLA, disponibilité, remplacement de nœud, engagement minimum, transfert, support</li>
+<li>Négocier : leviers, alternatives crédibles, calendrier, bonnes et mauvaises pratiques ; rôle de l'ingénieur dans l'achat</li>
+<li>Matrices de décision et RFP techniques ; indicateurs de pilotage trimestriels</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Modèle de TCO paramétrable</strong> (bac à sable, sans GPU) : Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'.</li>
+<li><strong>Prévision de demande de calcul</strong> (bac à sable, sans GPU) : Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests.</li>
+<li><strong>Lecture d'un contrat de capacité</strong> (bac à sable, sans GPU) : Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>FinOps Foundation Framework et 'FinOps for AI' (pages officielles)</li>
+<li>Chiffres de puissance par GPU/rack : fiches constructeur datées ; ordres de grandeur sinon</li>
+<li>Aucun prix ni condition contractuelle réels sans lien et date ; les exemples sont fictifs et marqués comme tels</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 4, Projet 6.</p>
+<h2 id="phase5">Phase 5 — Production et leadership</h2>
+<h3 id="platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (plan, 28 h)</h3>
+<p>Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.</p>
+<p><strong>Prérequis :</strong> module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).</p>
+<p><strong>Ce que vous saurez vérifier :</strong></p>
+<ul>
+<li>Concevoir une plateforme de calcul self-service (sessions interactives, files, quotas, modèles de jobs)</li>
+<li>Définir un modèle de sécurité multi-locataire (identité, isolation, secrets, audit) pour des GPU partagés</li>
+<li>Instituer des pratiques de production : astreinte, gestion d'incident, post-mortems, revues de conception</li>
+<li>Préparer un entretien de compute infrastructure lead : conception, dépannage, leadership, négociation</li>
+</ul>
+<p><strong>Chapitres :</strong></p>
+<ol type="1">
+<li>La plateforme comme produit : utilisateurs, besoins, adoption, mesure de la vélocité des chercheurs</li>
+<li>Sessions interactives et environnements de développement : VM/conteneurs GPU, notebooks, partage de matériel</li>
+<li>Sécurité d'une plateforme GPU partagée : identité, isolation, secrets, réseau, chaîne d'approvisionnement logicielle, audit</li>
+<li>Fiabilité de production : SLO, astreinte, gestion d'incident, post-mortems, revues de conception (RFC/ADR)</li>
+<li>Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs</li>
+<li>Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication</li>
+<li>Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible</li>
+<li>Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser</li>
+</ol>
+<p><strong>Labs :</strong></p>
+<ul>
+<li><strong>Écrire une RFC de plateforme</strong> (bac à sable, sans GPU) : Modèle de RFC/ADR avec grille de relecture automatisée (sections, décisions, alternatives, risques, métriques) et script de lint ; exemple complet fourni.</li>
+<li><strong>Post-mortem d'un incident simulé</strong> (bac à sable, sans GPU) : Jeu de logs et chronologie synthétiques (clairement étiquetés) ; trouver la cause, écrire le post-mortem ; corrigé détaillé.</li>
+<li><strong>Exercice de conception : de 8 à 256 GPU</strong> (bac à sable, sans GPU) : Énoncé d'entretien de conception avec grille d'évaluation et réponses de niveaux différents ; calculateur de dimensionnement testé.</li>
+</ul>
+<p><strong>Sources à lire et faits à vérifier :</strong></p>
+<ul>
+<li>Google SRE Book / SRE Workbook (accès libre)</li>
+<li>Documentation Open OnDemand, JupyterHub, Slurm ; modèles de menaces pour GPU partagés (documentation NVIDIA, CNCF)</li>
+<li>Aucune promesse d'emploi ou de salaire</li>
+</ul>
+<p><strong>Projets qui s'appuient sur ce module :</strong> Projet 6.</p>
+<h2 id="projets">Projets</h2>
+<h3 id="homelab-slurm">Projet 1 — Mini-cluster Slurm instrumenté (24 h)</h3>
+<p>Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.</p>
+<p><strong>Modules mobilisés :</strong> 1, 6, 5, 14.</p>
+<p><strong>Plan :</strong> Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana en JSON. Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension.</p>
+<h3 id="scaling-study">Projet 2 — Étude de passage à l'échelle d'un entraînement (20 h)</h3>
+<p>Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.</p>
+<p><strong>Modules mobilisés :</strong> 2, 3, 4, 7, 9.</p>
+<p><strong>Plan :</strong> Entraînement DDP/FSDP (gloo, CPU) à 1, 2, 4 processus ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif.</p>
+<h3 id="resilient-trainer">Projet 3 — Entraîneur tolérant aux pannes (24 h)</h3>
+<p>Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.</p>
+<p><strong>Modules mobilisés :</strong> 8, 9, 10.</p>
+<p><strong>Plan :</strong> Entraîneur PyTorch CPU avec checkpoint atomique complet, superviseur de relance, injection de pannes, tests qui prouvent la reprise exacte (perte continue, état RNG et données), rapport de coût de checkpoint et de goodput.</p>
+<h3 id="multi-provider-scheduler">Projet 4 — Placement multi-fournisseurs sensible aux coûts (24 h)</h3>
+<p>Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.</p>
+<p><strong>Modules mobilisés :</strong> 13, 15, 12.</p>
+<p><strong>Plan :</strong> Simulateur Python d'offres (données synthétiques étiquetées), politique de placement et de bascule, comparaison chiffrée de politiques, fichiers SkyPilot/Terraform/Kueue validés hors ligne, ADR sur les compromis coût/fiabilité/latence.</p>
+<h3 id="gpu-observability">Projet 5 — Observabilité GPU et détection de pannes silencieuses (20 h)</h3>
+<p>Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqué ou un GPU dégradé en quelques minutes.</p>
+<p><strong>Modules mobilisés :</strong> 14, 5, 10.</p>
+<p><strong>Plan :</strong> Exportateur de métriques au format dcgm-exporter alimenté par un simulateur de nœuds, règles Prometheus avec tests promtool, détecteur de job bloqué et de straggler avec taux de faux positifs mesurés, tableau de bord et runbook.</p>
+<h3 id="capstone-rfc">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU (40 h)</h3>
+<p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.</p>
+<p><strong>Modules mobilisés :</strong> 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16.</p>
+<p><strong>Plan :</strong> RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité/coût testé, politique d'ordonnancement, plan de fiabilité et d'observabilité, plan de migration, runbooks, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../path/index.html"><span class="k">← Précédent</span>Feuille de route</a><a class="next" href="../courses/perf-models/index.html"><span class="k">Suivant →</span>Module 02 — Architecture matérielle et modèles de performance</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../assets/theme.js"></script>
+</body>
+</html>

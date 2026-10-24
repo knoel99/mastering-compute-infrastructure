@@ -39,10 +39,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesquelles on entraîne les modèles d'IA : clusters GPU, ordonnanceurs, réseaux, stockage, fiabilité, coût. Ce site rassemble de quoi apprendre ce métier de manière structurée : 16 modules en 6 phases, 6 projets de portfolio, des labs exécutables et une enquête sourcée sur les masters HPC en France, aux États-Unis, en Chine et dans le monde.
 </p>
 <div class="hero-actions">
-<p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a> <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a></p>
+<p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a> <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a></p>
 </div>
 <h2 id="etat">État du chantier</h2>
-<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>1 module(s) sur 16 et 0 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
+<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>2 module(s) sur 16 et 0 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
 <ul>
 <li><strong>Documenté</strong> : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.</li>
 <li><strong>Vérifié</strong> : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (<code>verify.sh</code>), les pages passent des contrôles mécaniques (<code>tools/check_gates.py</code>).</li>
@@ -167,17 +167,17 @@ Phase 2 — Exploiter un cluster
 Provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
 </p>
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed">
+<a class="card" href="courses/slurm/index.html">
 <h4>
 Slurm et exploitation d'un cluster HPC
 </h4>
 <p class="meta">
-Module 05 · 32 h · Cœur · en préparation
+Module 05 · 32 h · Cœur
 </p>
 <p>
 L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.
 </p>
-</div>
+</a>
 <div class="card" style="opacity:.78;border-style:dashed">
 <h4>
 Provisioning, images et santé des nœuds GPU

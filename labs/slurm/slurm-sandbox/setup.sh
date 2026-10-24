@@ -73,7 +73,11 @@ CONF
 wait_for() {  # wait_for <seconds> <description> <command...>
   local t=$1 what=$2; shift 2; local end=$((SECONDS + t))
   until "$@" >/dev/null 2>&1; do
-    [ "$SECONDS" -ge "$end" ] && { echo "setup: timeout waiting for $what" >&2; exit 1; }
+    if [ "$SECONDS" -ge "$end" ]; then
+      echo "setup: timeout waiting for $what" >&2
+      { sinfo -R; scontrol show node | grep -E 'State=|Reason='; tail -n 4 /var/log/slurm/slurmd.log /var/log/slurm/slurmctld.log; } >&2 2>/dev/null || true
+      exit 1
+    fi
     sleep 1
   done
 }

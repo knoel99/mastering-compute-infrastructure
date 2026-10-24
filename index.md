@@ -9,13 +9,14 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 <div class="hero-actions">
 <a class="cta" href="#cours">Voir les cours</a>
 <a class="cta cta-ghost" href="path/index.html">Feuille de route</a>
+<a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
 <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>
 </div>
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **1 module(s) sur 16 et 0 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **2 module(s) sur 16 et 0 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
@@ -61,7 +62,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Provisionner, ordonnancer, relier et alimenter en données un cluster GPU.</p>
 
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Slurm et exploitation d'un cluster HPC</h4><p class="meta">Module 05 · 32 h · Cœur · en préparation</p><p>L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.</p></div>
+<a class="card" href="courses/slurm/index.html"><h4>Slurm et exploitation d'un cluster HPC</h4><p class="meta">Module 05 · 32 h · Cœur</p><p>L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.</p></a>
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Provisioning, images et santé des nœuds GPU</h4><p class="meta">Module 06 · 24 h · Cœur · en préparation</p><p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p></div>
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Réseaux haute performance : InfiniBand, RoCE et NCCL</h4><p class="meta">Module 07 · 28 h · Cœur · en préparation</p><p>Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.</p></div>
 <div class="card" style="opacity:.78;border-style:dashed"><h4>Stockage et E/S pour l'entraînement</h4><p class="meta">Module 08 · 24 h · Cœur · en préparation</p><p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p></div>

@@ -89,6 +89,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 <div class="hero-actions">
 <a class="cta" href="#cours">Voir les cours</a>
 <a class="cta cta-ghost" href="path/index.html">Feuille de route</a>
+<a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
 {'<a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>' if masters_ready else ''}
 </div>
@@ -208,6 +209,51 @@ Le [point de départ](../profile/index.html) compare un profil de référence au
     write("path/index.md", txt)
 
 
+def syllabus():
+    out = ["""---
+title: "Plans détaillés des modules"
+subtitle: "Acquis visés, chapitres, labs et sources à lire pour chacun des modules du parcours"
+description: "Plan de chacun des 16 modules : ce qui est rédigé est signalé, le reste est un plan prêt à être rédigé."
+---
+
+## Comment lire cette page {#lecture}
+
+Cette page donne le plan de **chaque module du parcours**, qu'il soit déjà rédigé ou non. Un module rédigé a sa page complète (fiche, plan de séances, chapitres, labs vérifiés, exercices corrigés) ; un module marqué « plan » n'a pas encore son cours : ses chapitres, ses labs prévus et ses sources à lire sont donnés pour que vous puissiez commencer à travailler dessus avec les références officielles en attendant.
+
+Les sources citées dans les rubriques « Sources à lire et faits à vérifier » ne sont **pas** des faits établis : ce sont les références sur lesquelles le futur cours devra s'appuyer, et les affirmations chiffrées qu'il faudra relire à la source avant de les écrire.
+"""]
+    for ph in sorted(PHASES):
+        out.append(f"\n## Phase {ph} — {PHASES[ph]['title']} {{#phase{ph}}}\n")
+        for m in [m for m in C["modules"] if m["phase"] == ph]:
+            done = has_course(m["id"])
+            tag = "rédigé" if done else "plan"
+            title = f"[{m['title']}](courses/{m['id']}/index.html)" if done else m["title"]
+            out.append(f"### Module {m['number']:02d} — {m['title']} ({tag}, {m['hours']} h) {{#{m['id']}}}\n")
+            out.append(f"{m['summary']}\n")
+            if m["prerequisites"]:
+                out.append("**Prérequis :** " + ", ".join(f"module {MODS[i]['number']} ({MODS[i]['title']})" for i in m["prerequisites"]) + ".\n")
+            if done:
+                out.append(f"**Cours complet :** {title}.\n")
+            out.append("**Ce que vous saurez vérifier :**\n")
+            out += [f"-   {o}" for o in m["outcomes"]]
+            out.append("\n**Chapitres :**\n")
+            out += [f"{i}.  {c}" for i, c in enumerate(m["chapters"], 1)]
+            out.append("\n**Labs :**\n")
+            out += [f"-   **{l['title']}** ({'bac à sable, sans GPU' if l['kind'] == 'sandbox' else 'cluster' if l['kind'] == 'cluster' else 'GPU requis'}) : {l['idea']}" for l in m["labs"]]
+            out.append("\n**Sources à lire et faits à vérifier :**\n")
+            out += [f"-   {f}" for f in m["facts"]]
+            feeds = [PROJ[i] for i in m.get("feeds", []) if i in PROJ]
+            if feeds:
+                out.append("\n**Projets qui s'appuient sur ce module :** " + ", ".join(f"Projet {p['number']}" for p in feeds) + ".\n")
+    out.append("\n## Projets {#projets}\n")
+    for p in C["projects"]:
+        out.append(f"### {p['title']} ({p['hours']} h) {{#{p['id']}}}\n")
+        out.append(f"{p['summary']}\n")
+        out.append("**Modules mobilisés :** " + ", ".join(f"{MODS[i]['number']}" for i in p["modules"]) + ".\n")
+        out.append(f"**Plan :** {p['idea']}\n")
+    write("syllabus/index.md", "\n".join(out) + "\n")
+
+
 def nav():
     seq = []
 
@@ -220,6 +266,7 @@ def nav():
                        ("masters/world", "Masters dans le monde")):
         add(rel, label)
     add("path", "Feuille de route")
+    add("syllabus", "Plans détaillés des modules")
     add("lab-setup", "Environnement de travail")
     for m in sorted(C["modules"], key=lambda m: m["number"]):
         add(f"courses/{m['id']}", f"Module {m['number']:02d} — {m['title']}")
@@ -233,5 +280,6 @@ if __name__ == "__main__":
     nav()
     home()
     roadmap()
+    syllabus()
     nav()
     print("generated index.md, path/index.md, data/nav.json")

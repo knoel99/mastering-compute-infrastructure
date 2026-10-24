@@ -13,7 +13,9 @@ wait_until() {  # wait_until <seconds> <shell condition evaluated in this shell>
     sleep 2
   done
 }
-fs() { sshare -n -a -P -o Account,User,FairShare | awk -F'|' -v a="$1" '$1==a && $2=="root" {print $3}'; }
+fs() {  # sshare indents child accounts with spaces even in parsable mode: strip them before comparing
+  sshare -n -a -P -o Account,User,FairShare | awk -F'|' -v a="$1" '{gsub(/ /,"",$1); gsub(/ /,"",$2)} $1==a && $2=="root" {print $3}'
+}
 fs_ready() { local a b; a=$(fs teama); b=$(fs teamb); [ -n "$a" ] && [ -n "$b" ] && awk -v a="$a" -v b="$b" 'BEGIN{exit !(a+0 < b+0)}'; }
 
 echo "--- Part A: fairshare"

@@ -29,8 +29,16 @@
    "label": "Feuille de route"
   },
   {
+   "href": "syllabus/index.html",
+   "label": "Plans détaillés des modules"
+  },
+  {
    "href": "courses/perf-models/index.html",
    "label": "Module 02 — Architecture matérielle et modèles de performance"
+  },
+  {
+   "href": "courses/slurm/index.html",
+   "label": "Module 05 — Slurm et exploitation d'un cluster HPC"
   },
   {
    "href": "resources/index.html",

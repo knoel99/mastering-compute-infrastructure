@@ -29,7 +29,7 @@ echo "OK part A: array of 3 + afterok dependency completed, accounting recorded"
 
 echo "--- Part B: checkpoint on SIGUSR1, then resume"
 export CKPT_FILE="$out/ckpt.json"
-j1=$(sbatch --parsable --chdir="$PWD/examples" --export=ALL,TOTAL_STEPS=100000 -o "$out/run1.out" examples/checkpoint_on_signal.sbatch)
+j1=$(cd examples && sbatch --parsable --export=ALL,TOTAL_STEPS=100000 -o "$out/run1.out" checkpoint_on_signal.sbatch)
 for _ in $(seq 1 30); do [ "$(squeue -h -j "$j1" -o %T)" = "RUNNING" ] && break; sleep 1; done
 sleep 3
 scancel --signal=USR1 --batch "$j1"
@@ -37,7 +37,7 @@ for _ in $(seq 1 30); do sacct -X -n -j "$j1" --format=State | grep -q COMPLETED
 cat "$out/run1.out"
 saved=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['step'])" "$CKPT_FILE")
 [ "$saved" -gt 0 ] || { echo "FAIL: no checkpoint written"; exit 1; }
-j2=$(sbatch --parsable --chdir="$PWD/examples" --export=ALL,TOTAL_STEPS=$((saved + 5)) -o "$out/run2.out" examples/checkpoint_on_signal.sbatch)
+j2=$(cd examples && sbatch --parsable --export=ALL,TOTAL_STEPS=$((saved + 5)) -o "$out/run2.out" checkpoint_on_signal.sbatch)
 for _ in $(seq 1 30); do sacct -X -n -j "$j2" --format=State | grep -q COMPLETED && break; sleep 1; done
 cat "$out/run2.out"
 grep -q "start at step $saved" "$out/run2.out"
