@@ -7,18 +7,23 @@
 set +e
 purge=0; [ "${1:-}" = "--purge-db" ] && purge=1
 
+# On Ubuntu the daemons run as slurmctld-wlm and slurmd-wlm (slurmctld and slurmd are symlinks to them), so a
+# process is looked up under "<name>" and "<name>-wlm": `pgrep -x slurmctld` alone never finds the controller.
+# (pgrep -x refuses patterns longer than 15 characters, hence two plain names instead of one regular expression.)
+alive() { pgrep -x "$1" >/dev/null 2>&1 || pgrep -x "$1-wlm" >/dev/null 2>&1; }
+signal() { pkill "$1" -x "$2" 2>/dev/null; pkill "$1" -x "$2-wlm" 2>/dev/null; }
 stop() {  # stop <process name> <seconds to wait before SIGKILL>
-  pgrep -x "$1" >/dev/null || return 0
-  pkill -x "$1"
-  for _ in $(seq 1 "$2"); do pgrep -x "$1" >/dev/null || return 0; sleep 1; done
-  pkill -9 -x "$1"
-  for _ in $(seq 1 10); do pgrep -x "$1" >/dev/null || return 0; sleep 1; done
+  alive "$1" || return 0
+  signal -TERM "$1"
+  for _ in $(seq 1 "$2"); do alive "$1" || return 0; sleep 1; done
+  signal -KILL "$1"
+  for _ in $(seq 1 10); do alive "$1" || return 0; sleep 1; done
 }
 
 squeue -h -o %i 2>/dev/null | xargs -r scancel >/dev/null 2>&1 || true   # scancel has no --all option
 stop slurmd 30
 stop slurmctld 60
-stop slurmscriptd 5
+signal -KILL slurmscriptd   # a leftover zombie of an earlier controller would make stop() wait for nothing
 if [ "$purge" -eq 1 ] && pgrep -x mariadbd >/dev/null; then
   mariadb -e 'DROP DATABASE IF EXISTS slurm_acct_db' >/dev/null 2>&1
 fi

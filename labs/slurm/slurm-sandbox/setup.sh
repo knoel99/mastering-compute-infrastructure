@@ -85,9 +85,9 @@ wait_for() {  # wait_for <seconds> <description> <command...>
 # stdout open for as long as the daemon runs (a pipe reader such as `| tail` would never see EOF).
 if ! pgrep -x slurmdbd >/dev/null; then nohup slurmdbd -D >/var/log/slurm/dbd.out 2>&1 </dev/null & fi
 wait_for 60 "slurmdbd" sacctmgr -n list cluster
-if ! pgrep -x slurmctld >/dev/null; then nohup slurmctld -D >/var/log/slurm/ctld.out 2>&1 </dev/null & fi
+if ! pgrep -x slurmctld >/dev/null && ! pgrep -x slurmctld-wlm >/dev/null; then nohup slurmctld -D >/var/log/slurm/ctld.out 2>&1 </dev/null & fi
 wait_for 60 "slurmctld" scontrol ping
-if ! pgrep -x slurmd >/dev/null; then nohup slurmd -D >/var/log/slurm/d.out 2>&1 </dev/null & fi
+if ! pgrep -x slurmd >/dev/null && ! pgrep -x slurmd-wlm >/dev/null; then nohup slurmd -D >/var/log/slurm/d.out 2>&1 </dev/null & fi
 
 sacctmgr -i add cluster sandbox >/dev/null 2>&1 || true
 sacctmgr -i add account research Description=research Organization=lab >/dev/null 2>&1 || true

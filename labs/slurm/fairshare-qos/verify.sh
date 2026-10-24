@@ -20,10 +20,12 @@ fs_ready() { local a b; a=$(fs teama); b=$(fs teamb); [ -n "$a" ] && [ -n "$b" ]
 
 echo "--- Part A: fairshare"
 for _ in $(seq 1 8); do sbatch -A teama --cpus-per-task=1 --wrap='sleep 4' -o /dev/null >/dev/null; done
+# shellcheck disable=SC2016  # the condition is evaluated later by wait_until, on purpose
 wait_until 120 '[ -z "$(squeue -h)" ]'
 echo "teama has consumed CPU time; waiting for slurmctld to recompute the fairshare factors (PriorityCalcPeriod=1 min)"
 wait_until 240 fs_ready
 sshare -a -l -o Account,User,NormShares,RawUsage,NormUsage,EffectvUsage,LevelFS,FairShare | grep -E 'Account|team'
+# shellcheck disable=SC2034  # the blocker job only has to exist
 blocker=$(sbatch --parsable -A teamb --cpus-per-task=4 --time=2 --wrap='sleep 25' -o /dev/null)
 ja=$(sbatch --parsable -A teama --cpus-per-task=2 --wrap='sleep 2' -o /dev/null)
 jb=$(sbatch --parsable -A teamb --cpus-per-task=2 --wrap='sleep 2' -o /dev/null)
@@ -31,6 +33,7 @@ sleep 2
 sprio -o "%i %a %Y %f" -j "$ja,$jb"
 fa=$(sprio -h -o "%f" -j "$ja"); fb=$(sprio -h -o "%f" -j "$jb")
 awk -v a="$fa" -v b="$fb" 'BEGIN{exit !(b>a)}' || { echo "FAIL: fairshare factor of teamb ($fb) should exceed teama ($fa)"; exit 1; }
+# shellcheck disable=SC2016  # the condition is evaluated later by wait_until, on purpose
 wait_until 120 '[ -z "$(squeue -h)" ]'
 sa=$(sacct -X -n -j "$ja" --format=Start | head -1); sb=$(sacct -X -n -j "$jb" --format=Start | head -1)
 sacct -X -j "$ja,$jb" --format=JobID,Account,Start%22
@@ -45,7 +48,7 @@ wait_until 30 "squeue -h -j $hi -o %T | grep -q RUNNING"
 squeue -o "%i %q %T %r"
 restarts=$(scontrol show job "$low" | sed -n 's/.*Restarts=\([0-9]*\).*/\1/p')
 [ "$restarts" -ge 1 ] || { echo "FAIL: low-priority job was not requeued"; exit 1; }
-sacct -X -n -j "$low" --format=JobID,State | grep -q PREEMPTED
+wait_until 30 "sacct -X -n -j $low --format=JobID,State | grep -q PREEMPTED" || { echo "FAIL: no PREEMPTED record in the accounting"; exit 1; }   # slurmdbd gets the record a moment after the preemption
 scancel "$low"
 echo "OK part B: urgent job started, normal job preempted and requeued (Restarts=$restarts)"
 echo "OK fairshare-qos"
