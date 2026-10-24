@@ -17,7 +17,10 @@ jobs:
       - name: Install PyYAML
         run: pip install -r requirements.txt
       - name: Check gates
-        run: python3 tools/check_gates.py
+        run: |
+          python3 tools/check_gates.py
+          python3 programmes/check_links.py --self-test
+          python3 programmes/check_links.py --check
 
   drift:
     runs-on: ubuntu-latest

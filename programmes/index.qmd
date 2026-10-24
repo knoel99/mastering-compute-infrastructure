@@ -1,9 +1,10 @@
 ---
-title: "Programmes"
+title: "Masters en HPC et calcul distribué"
 lang: fr
 format:
   html:
     theme: none
+    title-block-style: none
     css: ../assets/paper.css
     html-math-method:
       method: katex
@@ -12,6 +13,4 @@ format:
     include-after-body: ../assets/closing-d1.html
 ---
 
-## À venir
-
-Une passe ultérieure ajoutera l'état des lieux des masters HPC dans d'autres fichiers de programmes/.
+{{< include index.md >}}

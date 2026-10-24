@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Reste du monde</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="monde_files/libs/clipboard/clipboard.min.js"></script>
+<script src="monde_files/libs/quarto-html/tabby.min.js"></script>
+<script src="monde_files/libs/quarto-html/popper.min.js"></script>
+<script src="monde_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="monde_files/libs/quarto-html/anchor.min.js"></script>
+<link href="monde_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="monde_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="monde_files/libs/quarto-html/quarto-html-435ba6093e6f0817aa7405139811e7b1.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="monde_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<link rel="stylesheet" href="../assets/paper.css">
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script><script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous"></head>
+
+<body>
+
+<!-- derived from module front matter. build_site overwrites this file. -->
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+<button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span class="tb-label">Sommaire</span></button>
+<a class="brand" href="../index.html">Infra de calcul</a>
+<span class="tb-title" id="tb-title"></span>
+<button type="button" class="tb-btn" id="theme-toggle">Thème</button>
+</header>
+<div class="layout">
+<nav id="sidetoc" class="sidetoc" aria-label="Sommaire"></nav>
+<div class="content">
+<nav id="mci-nav">
+<a href="../index.html">Accueil</a>
+<a href="../parcours/index.html">Parcours</a>
+<a href="../glossaire/index.html">Glossaire</a>
+<a href="../programmes/index.html">Programmes</a>
+<a href="../programmes/france.html">France</a>
+<a href="../programmes/usa.html">États-Unis</a>
+<a href="../programmes/chine.html">Chine</a>
+<a href="../programmes/monde.html">Reste du monde</a>
+<a href="../programmes/synthese.html">Synthèse</a>
+<a href="../modules/m01-anatomie-noeud/">Anatomie d'un nœud Linux et GPU</a>
+<a href="../modules/m02-ordonnancement/">Ordonnancement Slurm et Kubernetes</a>
+<a href="../modules/a-romeo-cuda/">ROMEO2025 et CUDA Python</a>
+<a href="../modules/m03-pytorch-nccl/">PyTorch distribué et NCCL</a>
+<a href="../modules/m00-socle-dl/">Socle PyTorch pour l'infra</a>
+<a href="../modules/m04-hpo/">Recherche d'hyperparamètres multi-GPU</a>
+<a href="../modules/m05-reseau-stockage/">Réseau et stockage d'entraînement</a>
+<a href="../modules/m06-reprise/">Préemption et reprise</a>
+<a href="../modules/m07-multi-fournisseurs/">Placement multi-fournisseurs</a>
+<a href="../modules/m08-observabilite-cout/">Observabilité et coût de flotte</a>
+<a href="../modules/m09-capstone/">Capstone portefeuille Lead</a>
+<a href="../modules/m10-parallelismes/">Parallélismes et MFU</a>
+<a href="../modules/m11-noyaux/">Profilage et noyaux</a>
+<a href="../modules/m12-numerique/">Débogage numérique</a>
+<a href="../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+</nav>
+<main id="main">
+
+<header id="title-block-header">
+<h1 class="title">Reste du monde</h1>
+
+</header>
+
+
+<h1 id="reste-du-monde">Reste du monde</h1>
+<p>Ces pages décrivent le curriculum. Elles ne décrivent pas un projet de déménagement.</p>
+<h2 id="technische-universität-dresden-master-of-science-in-computer-science-piste-distributed-systems-engineering" class="anchored">Technische Universität Dresden, Master of Science in Computer Science, piste Distributed Systems Engineering</h2>
+<p>Identifiant : <code>de-dresden-dse</code></p>
+<h3 id="page-officielle" class="anchored">Page officielle</h3>
+<p>https://tu-dresden.de/ing/informatik/studium/studienangebot/master-studiengaenge/m-sc-computer-science?set_language=en consulté le 2026-10-24</p>
+<h3 id="lieu" class="anchored">Lieu</h3>
+<p>Dresde, Allemagne</p>
+<h3 id="langue" class="anchored">Langue</h3>
+<p>anglais</p>
+<h3 id="crédits" class="anchored">Crédits</h3>
+<p>120 Leistungspunkte</p>
+<p>https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc" class="anchored">Cours de tronc</h3>
+<p>https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24</p>
+<ul>
+<li>Distributed Systems. Pflichtbereich de la piste, plan d’hiver 2026/2027, 6 LP. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Systems Engineering. Pflichtbereich de la piste, 6 LP. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Scalable Data Management. Pflichtbereich de la piste, 6 LP. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Design Patterns and Frameworks. Pflichtbereich de la piste, 6 LP. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Network and Distributed Systems Security. Pflichtbereich de la piste, 6 LP. Sujets : Réseau. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Advanced Operating Systems. Pflichtbereich de la piste, 6 LP. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Advanced Computer Networks. Module du Wahlpflichtbereich, nommé sur le plan. La page anglaise reprend le nom sans crédit. Sujets : Réseau. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs" class="anchored">Électifs</h3>
+<p>https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24</p>
+<ul>
+<li>Operating-System Construction. Module du choix de 36 Leistungspunkte. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Foundations of Concurrent and Distributed Systems. Module du même choix. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Concurrent and Distributed Systems Lab. Module du même choix. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Linux Cluster in Theorie und Praxis. Module électif, 6 LP. Le plan ne dit pas qu’un compte est fourni. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Microkernel Construction. Module du même choix. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+<li>Decentralized Systems. Module du même choix. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</li>
+</ul>
+<h3 id="projet-ou-mémoire" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Abschlussarbeit et colloque. Le quatrième semestre est réservé au mémoire et au colloque. Le plan imprime l’Abschlussarbeit sur 29 LP et le colloque sur 1 LP, à côté du total 120. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</p>
+<h3 id="accès-matériel" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. Le plan nomme un module Linux Cluster et ne dit pas qu’un compte est ouvert. https://tu-dresden.de/ing/informatik/ressourcen/dateien/studium/studien_und_pruefungsordnungen/2026-2027-WiSe-MA-Computer-Science-StAP.pdf?lang=de consulté le 2026-10-24.</p>
+<h3 id="prérequis" class="anchored">Prérequis</h3>
+<p>https://tu-dresden.de/ing/informatik/studium/studienangebot/master-studiengaenge/m-sc-computer-science/admission consulté le 2026-10-24</p>
+<ul>
+<li>Licence d’informatique et 90 ECTS ciblés. La page d’admission demande un premier diplôme en informatique et 90 ECTS sans recouvrement, dont des volumes minimaux en systèmes, théorie, mathématiques, architecture et programmation. https://tu-dresden.de/ing/informatik/studium/studienangebot/master-studiengaenge/m-sc-computer-science/admission consulté le 2026-10-24.</li>
+<li>Anglais C1. La page demande le niveau C1, avec des exemples TOEFL iBT et IELTS. https://tu-dresden.de/ing/informatik/studium/studienangebot/master-studiengaenge/m-sc-computer-science/admission consulté le 2026-10-24.</li>
+</ul>
+<h2 id="indian-institute-of-science-m.tech.-in-computational-and-data-science" class="anchored">Indian Institute of Science, M.Tech. in Computational and Data Science</h2>
+<p>Identifiant : <code>in-iisc-cds</code></p>
+<h3 id="page-officielle-1" class="anchored">Page officielle</h3>
+<p>https://cds.iisc.ac.in/admissions/course-degrees/ consulté le 2026-10-24</p>
+<h3 id="lieu-1" class="anchored">Lieu</h3>
+<p>Bengaluru, Inde</p>
+<h3 id="langue-1" class="anchored">Langue</h3>
+<p>Non vérifié. La page d’admission 2026 et la page de curriculum ne disent pas la langue d’enseignement.</p>
+<h3 id="crédits-1" class="anchored">Crédits</h3>
+<p>64 crédits</p>
+<p>https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-1" class="anchored">Cours de tronc</h3>
+<p>https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24</p>
+<ul>
+<li>DS 215 Introduction to Data Science. Hard core, tous obligatoires, pour 14 crédits au total du bloc. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 221 Introduction to Scalable Systems. Hard core obligatoire. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 284 Numerical Linear Algebra. Hard core obligatoire. Sujets : Méthodes numériques. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 288 Numerical Methods. Hard core obligatoire. Sujets : Méthodes numériques. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 200 Research Methods. Hard core, cours de compétences, à prendre en deuxième année au terme d’août. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-1" class="anchored">Électifs</h3>
+<p>https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24</p>
+<ul>
+<li>DS 295 Parallel Programming. Soft core. Le bloc soft core demande au moins 10 crédits et trois cours. Le titre ne dit pas OpenMP. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 256 Scalable Systems for Data Science. Soft core. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 289 Numerical Solution of Differential Equations. Soft core. Sujets : Méthodes numériques. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 290 Modelling and Simulation. Soft core. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 244 Hardware-aware Scientific Computing. Électif nommé sur la page. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+<li>DS 393 High-performance Computing for Quantum Modeling of Materials. Électif nommé sur la page. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</li>
+</ul>
+<h3 id="projet-ou-mémoire-1" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>DS 299 Dissertation Project. La page de curriculum indique 28 crédits sur un an. La page d’admission parle d’un projet de dissertation d’un an. https://cds.iisc.ac.in/academics/mtechcds/ consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-1" class="anchored">Accès matériel</h3>
+<p>SahasraT et cluster turing. La page des moyens cite le Cray XC40 SahasraT et le cluster d’enseignement turing, 24 nœuds, avec MPI et PBS, plus un nœud GPU NVIDIA Tesla K40M. Sujets : MPI. https://cds.iisc.ac.in/internal-resources/computing-resources/ consulté le 2026-10-24.</p>
+<h3 id="prérequis-1" class="anchored">Prérequis</h3>
+<p>https://cds.iisc.ac.in/admissions/course-degrees/ consulté le 2026-10-24</p>
+<ul>
+<li>BE, B Tech ou M Sc avec GATE. Pour le terme d’août 2026, la page demande ce diplôme et un GATE dans une liste de papiers, plus un écrit en présentiel. https://cds.iisc.ac.in/admissions/course-degrees/ consulté le 2026-10-24.</li>
+<li>Écrit de mathématiques et de programmation. Le syllabus de l’écrit couvre l’algèbre linéaire, les probabilités, la combinatoire, le calcul, les structures de données et une programmation de base. https://cds.iisc.ac.in/admissions/course-degrees/ consulté le 2026-10-24.</li>
+</ul>
+<h2 id="politecnico-di-milano-laurea-magistrale-in-high-performance-computing-engineering" class="anchored">Politecnico di Milano, Laurea Magistrale in High Performance Computing Engineering</h2>
+<p>Identifiant : <code>it-polimi-hpc</code></p>
+<h3 id="page-officielle-2" class="anchored">Page officielle</h3>
+<p>https://www.polimi.it/en/education/laurea-magistrale-programmes/programme-detail/high-performance-computing-engineering consulté le 2026-10-24</p>
+<h3 id="lieu-2" class="anchored">Lieu</h3>
+<p>Milan, Italie</p>
+<h3 id="langue-2" class="anchored">Langue</h3>
+<p>anglais</p>
+<h3 id="crédits-2" class="anchored">Crédits</h3>
+<p>120 CFU</p>
+<p>https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-2" class="anchored">Cours de tronc</h3>
+<p>https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24</p>
+<ul>
+<li>Parallel Computing. Plan préapprouvé HPC, première année, 5,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Advanced Methods for Scientific Computing. Première année, 5,0 CFU. Le titre ne dit pas méthodes numériques. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Numerical Linear Algebra. Première année, 5,0 CFU. Sujets : Méthodes numériques. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Numerical Methods for Partial Differential Equations. Première année, 5,0 CFU. Sujets : Méthodes numériques. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Software Engineering for HPC. Première année, 5,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Advanced Computer Architectures. Première année, 5,0 CFU. Sujets : Architecture. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Computing Infrastructures. Première année, 5,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Artificial Neural Networks and Deep Learning. Paire obligatoire de deuxième année, 5,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Systems and Methods for Big and Unstructured Data. Paire obligatoire de deuxième année, 5,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-2" class="anchored">Électifs</h3>
+<p>https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24</p>
+<ul>
+<li>Distributed Systems. Titre du groupe ICT, 5,0 CFU. Le groupe ICT vaut 10 CFU au choix. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Performance Evaluation and Applications. Titre du groupe ICT, 5,0 CFU. Sujets : Ingénierie de performance. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>Code Transformation and Optimization. Titre du groupe ICT, 5,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+<li>High Performance Scientific Computing in Aerospace. Titre du groupe multidisciplinaire, 10,0 CFU. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</li>
+</ul>
+<h3 id="projet-ou-mémoire-2" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Thesis and final exam. Le règlement attribue 20,0 CFU à la thèse et à l’examen final, dont un crédit pour l’anglais. La thèse peut être en italien ou en anglais, avec un résumé en anglais. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-2" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. Le règlement ouvre les installations du Politecnico et cite des centres de supercalcul partenaires, sans compte nommé. https://onlineservices.polimi.it/manifesti/manifesti/controller/extra/RegolamentoPublic.do?EVN_DEFAULT=evento&amp;aa=2026&amp;jaf_currentWFID=main&amp;k_corso_la=550&amp;lang=EN consulté le 2026-10-24.</p>
+<h3 id="prérequis-2" class="anchored">Prérequis</h3>
+<p>https://www.polimi.it/en/education/laurea-magistrale-programmes/programme-detail/high-performance-computing-engineering consulté le 2026-10-24</p>
+<ul>
+<li>Licence et secteurs ECTS. La page demande une licence d’au moins 180 ECTS, avec des minima dans les secteurs informatiques, mathématiques et physiques, ou une admission automatique pour certains cursus de Milan avec une moyenne d’au moins 24 sur 30. https://www.polimi.it/en/education/laurea-magistrale-programmes/programme-detail/high-performance-computing-engineering consulté le 2026-10-24.</li>
+</ul>
+<h2 id="university-of-aizu-masters-program-graduate-department-of-computer-and-information-systems" class="anchored">University of Aizu, Master’s Program, Graduate Department of Computer and Information Systems</h2>
+<p>Identifiant : <code>jp-aizu-cis</code></p>
+<h3 id="page-officielle-3" class="anchored">Page officielle</h3>
+<p>https://u-aizu.ac.jp/en/curriculum/graduate/master/ consulté le 2026-10-24</p>
+<h3 id="lieu-3" class="anchored">Lieu</h3>
+<p>Aizu-Wakamatsu, Japon</p>
+<h3 id="langue-3" class="anchored">Langue</h3>
+<p>anglais</p>
+<h3 id="crédits-3" class="anchored">Crédits</h3>
+<p>30 crédits académiques</p>
+<p>https://u-aizu.ac.jp/files/page/intro/regulations/reg005_e.pdf consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-3" class="anchored">Cours de tronc</h3>
+<p>Non indiqué sur la page. Le règlement ne nomme pas de cours HPC obligatoire. Il demande des cours réguliers, des séminaires et un cours de recherche. https://u-aizu.ac.jp/files/page/intro/regulations/reg005_e.pdf consulté le 2026-10-24.</p>
+<h3 id="électifs-3" class="anchored">Électifs</h3>
+<p>https://web-ext.u-aizu.ac.jp/official/curriculum/syllabus/2026_2_E_002.html consulté le 2026-10-24</p>
+<ul>
+<li>CSA20 High Performance Computing. Syllabus 2026, 2 crédits. Le texte couvre les architectures parallèles, la programmation MPI et la programmation OpenMP. Il n’est pas marqué obligatoire pour tous. Sujets : Architecture, MPI, OpenMP. https://web-ext.u-aizu.ac.jp/official/curriculum/syllabus/2026_2_E_002.html consulté le 2026-10-24.</li>
+<li>CSA24 Advanced Distributed Networking. Syllabus 2026, 2 crédits, aspects algorithmiques des systèmes distribués. Non marqué obligatoire pour tous. Sujets : Réseau. https://web-ext.u-aizu.ac.jp/official/curriculum/syllabus/2026_2_E_002.html consulté le 2026-10-24.</li>
+</ul>
+<h3 id="projet-ou-mémoire-3" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Thesis Research. La page du master exige le cours Thesis Research et la rédaction du mémoire. Le règlement attribue 6 crédits académiques aux cours de recherche. https://u-aizu.ac.jp/files/page/intro/regulations/reg005_e.pdf consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-3" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. La page du master, le règlement et le syllabus CSA20 ne nomment ni cluster ni compte. https://u-aizu.ac.jp/en/curriculum/graduate/master/ consulté le 2026-10-24.</p>
+<h3 id="prérequis-3" class="anchored">Prérequis</h3>
+<p>https://u-aizu.ac.jp/files/admissions/2027_m_out_e.pdf consulté le 2026-10-24</p>
+<ul>
+<li>Licence et accord d’un encadrant. Le guide AY2027 demande une licence ou seize années d’études, et l’accord du membre qui suivra le projet. https://u-aizu.ac.jp/files/admissions/2027_m_out_e.pdf consulté le 2026-10-24.</li>
+<li>Score d’anglais. Le guide demande TOEIC, TOEFL, IELTS ou Duolingo de moins de deux ans, avec un plancher TOEIC 500, sauf exemption. https://u-aizu.ac.jp/files/admissions/2027_m_out_e.pdf consulté le 2026-10-24.</li>
+</ul>
+<h2 id="eumaster4hpc-european-master-degree-in-hpc" class="anchored">EUMaster4HPC, European Master Degree in HPC</h2>
+<p>Identifiant : <code>lu-eumaster4hpc</code></p>
+<h3 id="page-officielle-4" class="anchored">Page officielle</h3>
+<p>https://www.eurohpc-ju.europa.eu/research-innovation/our-projects/eumaster4hpc-phase-2_en consulté le 2026-10-24</p>
+<h3 id="lieu-4" class="anchored">Lieu</h3>
+<p>Luxembourg, Luxembourg</p>
+<h3 id="langue-4" class="anchored">Langue</h3>
+<p>Non vérifié. Le site exige l’anglais à l’admission et ne dit pas que chaque module est enseigné en anglais.</p>
+<h3 id="crédits-4" class="anchored">Crédits</h3>
+<p>120 ECTS</p>
+<p>https://www.eurohpc-ju.europa.eu/research-innovation/our-projects/eumaster4hpc-phase-2_en consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-4" class="anchored">Cours de tronc</h3>
+<p>https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24</p>
+<ul>
+<li>Mathematics and Statistics. Cours fondamental de première année sur la page de curriculum. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</li>
+<li>Software Engineering. Cours fondamental de première année. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</li>
+<li>Parallel Programming. Cours fondamental de première année. Le titre ne nomme ni MPI ni OpenMP. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</li>
+<li>Computer Architecture. Cours fondamental de première année. Sujets : Architecture. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</li>
+<li>Transversal Skills. Cours fondamental de première année. La page y range l’éthique, la méthode scientifique et la propriété intellectuelle. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-4" class="anchored">Électifs</h3>
+<p>Non indiqué sur la page. La page nomme quatre spécialisations de deuxième année, pas une liste de cours au choix. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</p>
+<h3 id="projet-ou-mémoire-4" class="anchored">Projet ou mémoire</h3>
+<p>Projet ou mémoire</p>
+<p>Mastership. Le site combine les cours avec un Mastership, stage ou mémoire de master. Le crédit du mémoire n’est pas imprimé sur les pages lues. https://eumaster4hpc.eu/studies/curriculum/ consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-4" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. Le site cite des centres de supercalcul partenaires et des stages, sans login sur une machine nommée. https://eumaster4hpc.eu/ consulté le 2026-10-24.</p>
+<h3 id="prérequis-4" class="anchored">Prérequis</h3>
+<p>https://eumaster4hpc.eu/ consulté le 2026-10-24</p>
+<ul>
+<li>Licence STEM et anglais B2. Le site demande au moins un bachelor en STEM et un anglais B2, attesté par IELTS ou TOEFL de moins de deux ans. https://eumaster4hpc.eu/ consulté le 2026-10-24.</li>
+</ul>
+<h2 id="vrije-universiteit-amsterdam-et-university-of-amsterdam-masters-computer-science-spécialisation-computer-systems-and-infrastructure" class="anchored">Vrije Universiteit Amsterdam et University of Amsterdam, Master’s Computer Science, spécialisation Computer Systems and Infrastructure</h2>
+<p>Identifiant : <code>nl-amsterdam-csi</code></p>
+<h3 id="page-officielle-5" class="anchored">Page officielle</h3>
+<p>https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24</p>
+<h3 id="lieu-5" class="anchored">Lieu</h3>
+<p>Amsterdam, Pays-Bas</p>
+<h3 id="langue-5" class="anchored">Langue</h3>
+<p>anglais</p>
+<h3 id="crédits-5" class="anchored">Crédits</h3>
+<p>120 ECTS</p>
+<p>https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-5" class="anchored">Cours de tronc</h3>
+<p>https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24</p>
+<ul>
+<li>Programming Large-scale Parallel Systems. Cours propre à la spécialisation. La page VU n’imprime pas d’ECTS par cours. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+<li>Distributed Systems. Cours propre à la spécialisation. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+<li>Parallel Programming Practical. Cours propre à la spécialisation. Le titre ne dit pas OpenMP. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+<li>Reliable Computing. Cours propre à la spécialisation. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+<li>Multi-core Processor Systems. Cours propre à la spécialisation. Le titre ne dit pas architecture. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+<li>Accelerator-Centric Computing Ecosystem. Cours propre à la spécialisation. Le titre ne dit pas CUDA. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+<li>Energy-efficient Edge Computing. Cours propre à la spécialisation. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-5" class="anchored">Électifs</h3>
+<p>Non indiqué sur la page. La page annonce cinq cours au choix contraint et cinq électifs sans en donner les titres. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</p>
+<h3 id="projet-ou-mémoire-5" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Mémoire de deuxième année. La page VU dit que le mémoire s’écrit en deuxième année. La page UvA parle d’un projet de recherche de 30 ECTS, en général dans un groupe de l’UvA ou de la VU. https://www.uva.nl/shared-content/programmas/en/masters/computer-science-computer-systems-and-infrastructure/study-programme/study-programme.html consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-5" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. Ni la page VU ni la page UvA ne nomment de cluster ou de compte. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/curriculum consulté le 2026-10-24.</p>
+<h3 id="prérequis-5" class="anchored">Prérequis</h3>
+<p>https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/admissions consulté le 2026-10-24</p>
+<ul>
+<li>Licence et 180 ECTS. La page d’admission demande un bachelor d’université de recherche, au moins trois ans et 180 ECTS, dont une part en informatique. https://vu.nl/en/education/master/computer-science-joint-degree-vu-uva/admissions consulté le 2026-10-24.</li>
+</ul>
+<h2 id="the-university-of-edinburgh-high-performance-computing-msc" class="anchored">The University of Edinburgh, High Performance Computing MSc</h2>
+<p>Identifiant : <code>uk-edinburgh-hpc</code></p>
+<h3 id="page-officielle-6" class="anchored">Page officielle</h3>
+<p>https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing consulté le 2026-10-24</p>
+<h3 id="lieu-6" class="anchored">Lieu</h3>
+<p>Édimbourg, Royaume-Uni</p>
+<h3 id="langue-6" class="anchored">Langue</h3>
+<p>Non vérifié. Le degree finder et la page EPCC ne disent pas la langue d’enseignement.</p>
+<h3 id="crédits-6" class="anchored">Crédits</h3>
+<p>180 crédits</p>
+<p>https://www.epcc.ed.ac.uk/education-training/masters-programmes consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-6" class="anchored">Cours de tronc</h3>
+<p>https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24</p>
+<ul>
+<li>Message-Passing Programming. Cours obligatoire EPCC11002, 10 crédits, au tableau 2026/27. Sujets : MPI. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Threaded Programming. Cours obligatoire EPCC11003, 10 crédits. Le titre ne dit pas OpenMP. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Practical Software Development. Cours obligatoire EPCC11001, 20 crédits. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Project Preparation. Cours obligatoire EPCC11008, 10 crédits. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>HPC Architectures. Cours obligatoire EPCC11004, 10 crédits. Sujets : Architecture. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-6" class="anchored">Électifs</h3>
+<p>https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24</p>
+<ul>
+<li>Numerical Algorithms for High Performance Computing. Liste optionnelle EPCC du groupe A, 10 crédits. Le groupe demande exactement 60 crédits. Sujets : Méthodes numériques. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Design and Analysis of Parallel Algorithms. Liste optionnelle EPCC, 10 crédits. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Performance Programming. Liste optionnelle EPCC, 10 crédits. Sujets : Ingénierie de performance. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Parallel Design Patterns. Liste optionnelle EPCC, 10 crédits. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Advanced Message-Passing Programming. Liste optionnelle EPCC, 10 crédits. Sujets : MPI. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Programming Languages for HPC. Liste optionnelle EPCC, 10 crédits. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Accelerated Systems: Principles and Practice. Liste optionnelle EPCC, 10 crédits. Le titre ne dit pas CUDA. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+<li>Machine Learning at Scale. Jusqu’à 20 crédits peuvent venir de cette liste, à côté du HPC. Le titre ne décrit pas un système d’apprentissage. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</li>
+</ul>
+<h3 id="projet-ou-mémoire-6" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Dissertation High Performance Computing. Après les cours, un projet individuel de trois mois mène à la dissertation. Le tableau la liste à 60 crédits, code EPCC11015. https://www.drps.ed.ac.uk/26-27/dpt/ptmschpcmp1f.htm consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-6" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. Le degree finder promet l’accès à des plateformes HPC et à des moyens de calcul propres, sans nommer de machine. https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing consulté le 2026-10-24.</p>
+<h3 id="prérequis-6" class="anchored">Prérequis</h3>
+<p>https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing consulté le 2026-10-24</p>
+<ul>
+<li>Licence scientifique et un langage. Pour 2027-28, un honours 2:1 ou équivalent en informatique, physique, mathématiques, ingénierie ou géosciences, et une pratique de C, C++, Python ou Fortran. https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing consulté le 2026-10-24.</li>
+<li>Anglais IELTS 7,0. Le degree finder cite IELTS Academic 7,0 avec au moins 6,0 par composante, parmi d’autres tests. https://study.ed.ac.uk/programmes/postgraduate-taught/187-high-performance-computing consulté le 2026-10-24.</li>
+</ul>
+<h2 id="eth-zurich-master-of-science-eth-in-computational-science-and-engineering" class="anchored">ETH Zurich, Master of Science ETH in Computational Science and Engineering</h2>
+<p>Identifiant : <code>ch-eth-cse</code></p>
+<h3 id="page-officielle-7" class="anchored">Page officielle</h3>
+<p>https://ethz.ch/en/studies/master/degree-programmes/engineering-sciences/computational-science-and-engineering.html consulté le 2026-10-24</p>
+<h3 id="lieu-7" class="anchored">Lieu</h3>
+<p>Zurich, Suisse</p>
+<h3 id="langue-7" class="anchored">Langue</h3>
+<p>anglais</p>
+<h3 id="crédits-7" class="anchored">Crédits</h3>
+<p>120 ECTS</p>
+<p>https://rw.ethz.ch/the-programme/master.html consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-7" class="anchored">Cours de tronc</h3>
+<p>https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24</p>
+<ul>
+<li>Advanced Numerical Methods for CSE. Cours de tronc d’automne dans le guide, 10 crédits. Deux cours de tronc sont à choisir, pour au moins 12 crédits. Sujets : Méthodes numériques. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</li>
+<li>Advanced Machine Learning. Cours de tronc d’automne, 10 crédits. Il est exclusif avec Probabilistic Artificial Intelligence. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</li>
+<li>Computational Statistics. Cours de tronc de printemps, 8 crédits. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</li>
+<li>Advanced Systems Lab. Cours de tronc de printemps, 8 crédits. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</li>
+<li>Optimization for Data Science. Cours de tronc de printemps, 10 crédits. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</li>
+<li>AI in the Sciences and Engineering. Le guide le liste à 6 crédits en automne et à 8 au printemps, et renvoie au catalogue si la table est périmée. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-7" class="anchored">Électifs</h3>
+<p>Non indiqué sur la page. Le guide demande des électifs et nomme des domaines, pas une liste fermée de titres. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</p>
+<h3 id="projet-ou-mémoire-7" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Master thesis. Le guide attribue 30 ECTS à un mémoire accepté, pour un travail à plein temps d’environ 26 semaines, et au plus 28 semaines. https://ethz.ch/content/dam/ethz/special-interest/study-programme-websites/ms-compsci-and-eng-dam/documents/master-programme/MSc-CSE-GL-curr.pdf consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-7" class="anchored">Accès matériel</h3>
+<p>Non indiqué sur la page. La page du diplôme, le site du programme et le guide ne nomment ni cluster ni compte. https://ethz.ch/en/studies/master/degree-programmes/engineering-sciences/computational-science-and-engineering.html consulté le 2026-10-24.</p>
+<h3 id="prérequis-7" class="anchored">Prérequis</h3>
+<p>https://ethz.ch/content/dam/ethz/common/docs/master-profile/englisch/naturwissenschaften/MSc-Computational-Science-Engineering-Appendix.pdf consulté le 2026-10-24</p>
+<ul>
+<li>Bachelor de 180 ECTS et profil. L’annexe demande un bachelor d’université d’au moins 180 ECTS, et un profil de discipline de 100 ECTS. https://ethz.ch/content/dam/ethz/common/docs/master-profile/englisch/naturwissenschaften/MSc-Computational-Science-Engineering-Appendix.pdf consulté le 2026-10-24.</li>
+<li>High Performance Computing for Science and Engineering. L’annexe place ce titre dans les connaissances de base, avec Numerical Methods for Partial Differential Equations et Software Engineering. https://ethz.ch/content/dam/ethz/common/docs/master-profile/englisch/naturwissenschaften/MSc-Computational-Science-Engineering-Appendix.pdf consulté le 2026-10-24.</li>
+<li>Anglais C1. L’annexe demande une preuve d’anglais de niveau C1. La langue d’enseignement y est l’anglais. https://ethz.ch/content/dam/ethz/common/docs/master-profile/englisch/naturwissenschaften/MSc-Computational-Science-Engineering-Appendix.pdf consulté le 2026-10-24.</li>
+</ul>
+<h2 id="kth-royal-institute-of-technology-msc-computer-science-sous-piste-high-performance-computing" class="anchored">KTH Royal Institute of Technology, MSc Computer Science, sous-piste High Performance Computing</h2>
+<p>Identifiant : <code>se-kth-hpc</code></p>
+<h3 id="page-officielle-8" class="anchored">Page officielle</h3>
+<p>https://www.kth.se/en/studies/master/computer-science/msc-computer-science-1.419974 consulté le 2026-10-24</p>
+<h3 id="lieu-8" class="anchored">Lieu</h3>
+<p>Stockholm, Suède</p>
+<h3 id="langue-8" class="anchored">Langue</h3>
+<p>anglais</p>
+<h3 id="crédits-8" class="anchored">Crédits</h3>
+<p>120 ECTS</p>
+<p>https://www.kth.se/en/studies/master/computer-science/msc-computer-science-1.419974 consulté le 2026-10-24</p>
+<h3 id="cours-de-tronc-8" class="anchored">Cours de tronc</h3>
+<p>https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24</p>
+<ul>
+<li>Introduction to the Philosophy of Science and Research Methodology. Cours obligatoire du programme, DA2210, 6 crédits, rentrée 2027. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Program Integrating Course in Computer Science. Cours obligatoire DD2300, 2 crédits. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Artificial Intelligence. Cours obligatoire DD2380, 6 crédits. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Computer Security. Cours obligatoire DD2395, 6 crédits. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Advanced Algorithms. Cours obligatoire DD2440, 6 crédits. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Protocols and Principles of the Internet. Cours obligatoire IK2218, 6 crédits. Le titre nomme l’Internet, pas un cours de réseau. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Introduction to High Performance Computing. DD2358, obligatoire dans la sous-piste High Performance Computing. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Methods in High Performance Computing. DD2356, obligatoire dans la même sous-piste. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Applied GPU Programming. DD2360, obligatoire dans la même sous-piste. Sujets : CUDA. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+</ul>
+<h3 id="électifs-8" class="anchored">Électifs</h3>
+<p>https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24</p>
+<ul>
+<li>Project Course in High-Performance Computing. DD2375, au moins un cours de cette liste est à prendre. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Parallel and Distributed Computing. DD2443, dans la même liste. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Networked Systems for Machine Learning. IK2221, dans la même liste. Sujets : Réseau, Systèmes pour l’apprentissage. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Scalable Machine Learning and Deep Learning. ID2223, dans la même liste. Le titre ne dit pas système. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+<li>Computational Methods for Electromagnetics. DD2370, dans la même liste. Le titre ne dit pas méthodes numériques. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</li>
+</ul>
+<h3 id="projet-ou-mémoire-8" class="anchored">Projet ou mémoire</h3>
+<p>Mémoire</p>
+<p>Projet de master. Le programme se termine par un projet de master en milieu académique ou industriel. La page des cours réserve le dernier terme à ce projet, d’environ 30 ECTS, sans code ni crédit exact. https://www.kth.se/en/studies/master/computer-science/courses-computer-science-1.502267 consulté le 2026-10-24.</p>
+<h3 id="accès-matériel-8" class="anchored">Accès matériel</h3>
+<p>PDC Center for High Performance Computing. La page présente le PDC comme fournisseur de systèmes HPC, de stockage court et long, et d’aide d’experts. Elle ne dit pas que chaque étudiant reçoit un compte. Sujets : Stockage et entrées-sorties. https://www.kth.se/en/studies/master/computer-science/msc-computer-science-1.419974 consulté le 2026-10-24.</p>
+<h3 id="prérequis-8" class="anchored">Prérequis</h3>
+<p>https://www.kth.se/en/studies/master/computer-science/entry-requirements-computer-science-1.419975 consulté le 2026-10-24</p>
+<ul>
+<li>Licence de 180 ECTS, mathématiques et informatique. La page demande une licence de 180 ECTS, 28,5 ECTS de mathématiques sur quatre sujets, et 22,5 ECTS d’informatique sur trois sujets. https://www.kth.se/en/studies/master/computer-science/entry-requirements-computer-science-1.419975 consulté le 2026-10-24.</li>
+<li>Anglais. La page demande un anglais équivalent au cours suédois English 6, et donne en exemple IELTS 6,5 ou TOEFL 4,5. https://www.kth.se/en/studies/master/computer-science/entry-requirements-computer-science-1.419975 consulté le 2026-10-24.</li>
+</ul>
+
+</main>
+</div>
+</div>
+<script src="../assets/theme.js"></script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

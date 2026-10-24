@@ -318,6 +318,37 @@ class GateTests(unittest.TestCase):
                     _show(report),
                 )
 
+    def test_synthese_without_step_anchor_fails(self) -> None:
+        text = (REPO / "programmes" / "synthese.md").read_text(encoding="utf-8")
+        lines = text.splitlines()
+        start = lines.index("## Auto-formation") + 1
+        items: list[str] = []
+        for line in lines[start:]:
+            if not line.strip():
+                continue
+            if line.startswith("#"):
+                break
+            number, dot, rest = line.partition(". ")
+            if number.isdigit() and dot:
+                items.append("<li>" + rest + "</li>")
+        body = '<ol type="1">\n' + "\n".join(items) + "\n</ol>"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            programme = root / "programmes"
+            programme.mkdir()
+            for name in ("records.py", "domain.py", "check_links.py"):
+                shutil.copyfile(REPO / "programmes" / name, programme / name)
+            _fill(root, "programmes/synthese.html", _html(body))
+            report = check_gates(root)
+        self.assertFalse(report.ok, _show(report))
+        self.assertTrue(
+            any(
+                item.code == Code.PROGRAMMES and item.message.startswith("ancre absente : etape-")
+                for item in report.findings
+            ),
+            _show(report),
+        )
+
     def test_skeleton_prerequis_forbidden(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

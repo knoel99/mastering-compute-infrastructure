@@ -30,6 +30,7 @@ A fixture test drives the same function.
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import re
 import subprocess
@@ -138,7 +139,6 @@ FORBIDDEN_CLAIMS = (
 )
 EXERCISE_PREFIX = "Exercice"
 QUESTION_PREFIX = "Question"
-PROGRAMMES_HEADING = "À venir"
 REQUIRED_TERMS = frozenset(
     {
         "epoch",
@@ -211,7 +211,6 @@ class SiteKind(StrEnum):
     HOME = "home"
     PARCOURS = "parcours"
     GLOSSAIRE = "glossaire"
-    PROGRAMMES = "programmes"
 
 
 class Code(StrEnum):
@@ -394,6 +393,65 @@ class HtmlPage:
     depth: int
     html: str
     require_titles: bool
+
+
+_GAP_MODULE: tuple[tuple[str, str], ...] = (
+    ("mpi", "m10-parallelismes"),
+    ("openmp", "m10-parallelismes"),
+    ("cuda-programming", "a-romeo-cuda"),
+    ("slurm", "m02-ordonnancement"),
+    ("infiniband", "m05-reseau-stockage"),
+    ("nccl", "m03-pytorch-nccl"),
+    ("multi-cloud-gpu", "m07-multi-fournisseurs"),
+    ("ray", "m07-multi-fournisseurs"),
+    ("skypilot", "m07-multi-fournisseurs"),
+    ("cost", "m08-observabilite-cout"),
+    ("observability", "m08-observabilite-cout"),
+)
+
+
+@dataclass(frozen=True)
+class _ProgrammeLink:
+    """One survey page derived from output_pages()."""
+
+    md_name: str
+    qmd_rel: str
+    html_rel: str
+    nav_label: str
+    page_title: str
+
+
+@dataclass(frozen=True)
+class _GapTarget:
+    """One gap on one study step, resolved through _GAP_MODULE."""
+
+    gap_id: str
+    gap_title: str
+    module_slug: str
+
+
+@dataclass(frozen=True)
+class _StudyAnchor:
+    """One auto-formation step. The anchor id is etape- plus study_id."""
+
+    study_id: str
+    order: int
+    title: str
+    gaps: tuple[_GapTarget, ...]
+
+    @property
+    def anchor(self) -> str:
+        return f"etape-{self.study_id}"
+
+
+@dataclass(frozen=True)
+class _ProgrammePublication:
+    """Pure description of the survey publication. No paths are written."""
+
+    links: tuple[_ProgrammeLink, ...]
+    anchors: tuple[_StudyAnchor, ...]
+    markdown: tuple[tuple[str, str], ...]
+    findings: tuple[Finding, ...]
 
 
 class _Heading(NamedTuple):
@@ -613,13 +671,11 @@ SITE_PAGES: tuple[SitePage, ...] = (
     SitePage("index.qmd", 0, SiteKind.HOME),
     SitePage("parcours/index.qmd", 1, SiteKind.PARCOURS),
     SitePage("glossaire/index.qmd", 1, SiteKind.GLOSSAIRE),
-    SitePage("programmes/index.qmd", 1, SiteKind.PROGRAMMES),
 )
 SITE_INCLUDES = {
     SiteKind.HOME: HOME_CARDS,
     SiteKind.PARCOURS: "../" + PARCOURS_SEQUENCE,
     SiteKind.GLOSSAIRE: "../" + GLOSSARY_FRAGMENT,
-    SiteKind.PROGRAMMES: None,
 }
 
 
@@ -753,17 +809,6 @@ def _front_mapping(text: str) -> dict[str, object] | None:
     if not isinstance(loaded, dict):
         raise ValueError("front matter illisible")
     return loaded
-
-
-def _front_has_mci(text: str) -> bool:
-    match = _FRONT.match(text)
-    if match is None:
-        return re.search(r"(?m)^mci:\s*", text) is not None
-    try:
-        data = yaml.safe_load(match.group(1))
-    except yaml.YAMLError:
-        return re.search(r"(?m)^mci:\s*", match.group(1)) is not None
-    return isinstance(data, dict) and "mci" in data
 
 
 def _parse_module(slug: str, text: str, rel: str) -> tuple[Module | None, tuple[Finding, ...]]:
@@ -904,6 +949,591 @@ def _card_lines(modules: Sequence[Module], depth: int) -> tuple[str, ...]:
     return tuple(lines)
 
 
+_SURVEY_CACHE: dict[str, object] = {}
+_ANCHOR_TAG = re.compile(r'<a id="etape-[a-z0-9-]+"></a>')
+_OL_BLOCK = re.compile(r"<ol\b([^>]*)>(.*?)</ol>", re.IGNORECASE | re.DOTALL)
+_LI_BLOCK = re.compile(r"<li\b[^>]*>(.*?)</li>", re.IGNORECASE | re.DOTALL)
+_OL_START = re.compile(r"""\bstart\s*=\s*['"]?(\d+)""", re.IGNORECASE)
+_SHELL_URL = re.compile(r"""https?://[^\s"'<>]+""")
+
+
+def _survey_module(root: Path):
+    """Import check_links from root/programmes."""
+    programmes = (root / "programmes").resolve()
+    key = str(programmes)
+    cached = _SURVEY_CACHE.get(key)
+    if cached is not None:
+        return cached
+    script = programmes / "check_links.py"
+    for name in ("check_links", "domain", "records"):
+        loaded = sys.modules.get(name)
+        loaded_file = getattr(loaded, "__file__", None) if loaded is not None else None
+        if loaded_file is None:
+            continue
+        if Path(loaded_file).resolve().parent != programmes:
+            del sys.modules[name]
+    sys.path.insert(0, str(programmes))
+    try:
+        spec = importlib.util.spec_from_file_location("check_links", script)
+        if spec is None or spec.loader is None:
+            raise ImportError(str(script))
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["check_links"] = module
+        try:
+            spec.loader.exec_module(module)
+        except Exception:
+            sys.modules.pop("check_links", None)
+            raise
+    finally:
+        while sys.path and sys.path[0] == str(programmes):
+            sys.path.pop(0)
+    _SURVEY_CACHE[key] = module
+    return module
+
+
+def _activate_survey(survey) -> None:
+    """Bind domain and records to the survey file that was just imported."""
+    programmes = Path(survey.__file__).resolve().parent
+    sys.modules["domain"] = survey.domain
+    records_path = (programmes / "records.py").resolve()
+    current = sys.modules.get("records")
+    current_file = getattr(current, "__file__", None) if current is not None else None
+    if current_file is not None and Path(current_file).resolve() == records_path:
+        return
+    sys.modules.pop("records", None)
+    if not records_path.is_file():
+        return
+    sys.path.insert(0, str(programmes))
+    try:
+        __import__("records")
+    finally:
+        while sys.path and sys.path[0] == str(programmes):
+            sys.path.pop(0)
+
+
+def _load_corpus(survey):
+    _activate_survey(survey)
+    return survey.load_corpus()
+
+
+def _markdown_h1(text: str) -> str | None:
+    lines = text.splitlines()
+    if not lines:
+        return None
+    line = lines[0]
+    if not line.startswith("# "):
+        return None
+    title = line[2:].strip()
+    if not title:
+        return None
+    return title
+
+
+def _gap_findings(corpus, modules: Sequence[Module]) -> tuple[Finding, ...]:
+    findings: list[Finding] = []
+    seen: set[str] = set()
+    catalog = {module.slug for module in modules}
+    for gap_id, slug in _GAP_MODULE:
+        if gap_id in seen:
+            findings.append(
+                Finding(
+                    Code.PROGRAMMES,
+                    "tools/gates.py",
+                    f"identifiant de lacune répété : {gap_id}",
+                )
+            )
+        seen.add(gap_id)
+        if _SLUG.fullmatch(slug) is None:
+            findings.append(
+                Finding(Code.PROGRAMMES, "tools/gates.py", f"slug hors grammaire : {slug}")
+            )
+        elif slug not in catalog:
+            findings.append(
+                Finding(
+                    Code.PROGRAMMES,
+                    "tools/gates.py",
+                    f"slug absent du catalogue : {slug}",
+                )
+            )
+    corpus_ids = {gap.id.value for gap in corpus.meta.gaps}
+    for gap_id in sorted(corpus_ids - seen):
+        findings.append(
+            Finding(Code.PROGRAMMES, "programmes/records.py", f"lacune sans module : {gap_id}")
+        )
+    for gap_id in sorted(seen - corpus_ids):
+        findings.append(
+            Finding(
+                Code.PROGRAMMES,
+                "tools/gates.py",
+                f"identifiant absent du corpus : {gap_id}",
+            )
+        )
+    for gap in corpus.meta.gaps:
+        if "[" in gap.title_fr or "]" in gap.title_fr:
+            findings.append(
+                Finding(
+                    Code.PROGRAMMES,
+                    "programmes/records.py",
+                    f"titre de lacune illisible : {gap.id.value}",
+                )
+            )
+    return tuple(findings)
+
+
+def _study_anchors(corpus, domain) -> tuple[_StudyAnchor, ...]:
+    gap_by_id = {gap.id.value: gap for gap in corpus.meta.gaps}
+    anchors: list[_StudyAnchor] = []
+    steps = sorted(corpus.meta.self_study, key=lambda item: item.order)
+    for step in steps:
+        body = step.body
+        if isinstance(body, domain.StudyResource):
+            study_id = body.id.value
+            title = body.title
+        elif isinstance(body, domain.StudyNone):
+            study_id = body.id.value
+            title = body.title_fr
+        else:
+            continue
+        wanted = {gap_id.value for gap_id in step.gap_ids}
+        targets: list[_GapTarget] = []
+        for gap_id, slug in _GAP_MODULE:
+            if gap_id not in wanted:
+                continue
+            gap = gap_by_id.get(gap_id)
+            if gap is None:
+                continue
+            targets.append(_GapTarget(gap_id, gap.title_fr, slug))
+        anchors.append(_StudyAnchor(study_id, step.order, title, tuple(targets)))
+    return tuple(anchors)
+
+
+def _title_findings(anchors: Sequence[_StudyAnchor]) -> tuple[Finding, ...]:
+    findings: list[Finding] = []
+    titles = [anchor.title for anchor in anchors]
+    for index, anchor in enumerate(anchors):
+        if not anchor.title.strip():
+            findings.append(
+                Finding(
+                    Code.PROGRAMMES,
+                    "programmes/synthese.md",
+                    f"titre d'étape vide : {anchor.study_id}",
+                )
+            )
+            continue
+        for other_index, other in enumerate(titles):
+            if index != other_index and anchor.title in other:
+                findings.append(
+                    Finding(
+                        Code.PROGRAMMES,
+                        "programmes/synthese.md",
+                        f"titre d'étape inclus dans un autre : {anchor.title}",
+                    )
+                )
+                break
+    return tuple(findings)
+
+
+def _describe_programmes(root: Path, modules: Sequence[Module]) -> _ProgrammePublication:
+    """Load the corpus from root/programmes and describe the publication.
+
+    A tree with no records.py returns an empty publication and no finding.
+    A CorpusError becomes one programmes finding per error string and an
+    otherwise empty publication. Map, title, and h1 problems accumulate
+    beside the rendered markdown.
+    """
+    if not (root / "programmes" / "records.py").is_file():
+        return _ProgrammePublication((), (), (), ())
+    if not (root / "programmes" / "check_links.py").is_file():
+        return _ProgrammePublication(
+            (),
+            (),
+            (),
+            (Finding(Code.PROGRAMMES, "programmes/check_links.py", "check_links.py manquant"),),
+        )
+    survey = _survey_module(root)
+    try:
+        corpus = _load_corpus(survey)
+    except survey.domain.CorpusError as exc:
+        return _ProgrammePublication(
+            (),
+            (),
+            (),
+            tuple(
+                Finding(Code.PROGRAMMES, "programmes/records.py", f"erreur du corpus : {error}")
+                for error in exc.errors
+            ),
+        )
+    except (ImportError, ValueError) as exc:
+        return _ProgrammePublication(
+            (),
+            (),
+            (),
+            (Finding(Code.PROGRAMMES, "programmes/records.py", f"erreur du corpus : {exc}"),),
+        )
+    pages = survey.render(corpus)
+    names = tuple(survey.output_pages())
+    markdown = tuple((name, pages[name]) for name in names)
+    findings: list[Finding] = []
+    links: list[_ProgrammeLink] = []
+    for name, text in markdown:
+        h1 = _markdown_h1(text)
+        if h1 is None or '"' in h1:
+            findings.append(
+                Finding(Code.PROGRAMMES, f"programmes/{name}", "titre de page illisible")
+            )
+            continue
+        stem = name[:-3] if name.endswith(".md") else name
+        links.append(
+            _ProgrammeLink(
+                md_name=name,
+                qmd_rel=f"programmes/{stem}.qmd",
+                html_rel=f"programmes/{stem}.html",
+                nav_label="Programmes" if name == "index.md" else h1,
+                page_title=h1,
+            )
+        )
+    findings.extend(_gap_findings(corpus, modules))
+    anchors = _study_anchors(corpus, survey.domain)
+    findings.extend(_title_findings(anchors))
+    return _ProgrammePublication(tuple(links), anchors, markdown, tuple(findings))
+
+
+def _programme_shell(link: _ProgrammeLink) -> str:
+    """Return the depth-1 qmd shell that includes the sibling markdown."""
+    include = "{{< include " + link.md_name + " >}}"
+    return (
+        "---\n"
+        f'title: "{link.page_title}"\n'
+        "lang: fr\n"
+        "format:\n"
+        "  html:\n"
+        "    theme: none\n"
+        "    title-block-style: none\n"
+        f"    css: {_css_ref(1)}\n"
+        "    html-math-method:\n"
+        "      method: katex\n"
+        f'      url: "{KATEX_JS_URL}"\n'
+        f"    include-before-body: {_chrome_ref(1)}\n"
+        f"    include-after-body: {_closing_ref(1)}\n"
+        "---\n"
+        "\n"
+        f"{include}\n"
+    )
+
+
+def _foreign_urls(text: str) -> tuple[str, ...]:
+    return tuple(url for url in _SHELL_URL.findall(text) if url != KATEX_JS_URL)
+
+
+def _study_suffix(module: Module, anchors: Sequence[_StudyAnchor], depth: int) -> str:
+    """Return the parcours auto-formation suffix for one module, or "". """
+    labels: list[str] = []
+    for anchor in anchors:
+        for gap in anchor.gaps:
+            if gap.module_slug != module.slug:
+                continue
+            href = _site_href(depth, "programmes/synthese.html") + "#" + anchor.anchor
+            labels.append(f"[{gap.gap_title}]({href})")
+    if not labels:
+        return ""
+    return ". Auto-formation : " + ", ".join(labels)
+
+
+def _write_programme_files(root: Path, publication: _ProgrammePublication) -> None:
+    """Write the survey markdown through write_pages, then the qmd shells."""
+    if not publication.markdown:
+        return
+    survey = _survey_module(root)
+    corpus = _load_corpus(survey)
+    survey.write_pages(corpus, root / "programmes")
+    for link in publication.links:
+        _atomic_write(root / link.qmd_rel, _programme_shell(link))
+
+
+def _find_all(haystack: str, needle: str) -> tuple[int, ...]:
+    if not needle:
+        return ()
+    found: list[int] = []
+    start = 0
+    while True:
+        index = haystack.find(needle, start)
+        if index < 0:
+            return tuple(found)
+        found.append(index)
+        start = index + len(needle)
+
+
+def _title_at(content: str, title: str) -> tuple[int, int] | None:
+    if not title:
+        return None
+    index = 0
+    while index < len(content) and content[index].isspace():
+        index += 1
+    prefix = _ANCHOR_TAG.match(content, index)
+    if prefix is not None:
+        index = prefix.end()
+    for needle in (title, escape(title, quote=False)):
+        if content.startswith(needle, index):
+            return index, len(needle)
+    return None
+
+
+def _list_item_spans(html: str, anchor: _StudyAnchor) -> tuple[tuple[int, int], ...]:
+    spans: list[tuple[int, int]] = []
+    for block in _OL_BLOCK.finditer(html):
+        start_match = _OL_START.search(block.group(1))
+        number = int(start_match.group(1)) if start_match else 1
+        body_start = block.start(2)
+        for item in _LI_BLOCK.finditer(block.group(2)):
+            if number == anchor.order:
+                found = _title_at(item.group(1), anchor.title)
+                if found is not None:
+                    offset = body_start + item.start(1) + found[0]
+                    spans.append((offset, offset + found[1]))
+            number += 1
+    return tuple(spans)
+
+
+def _marker_spans(html: str, anchor: _StudyAnchor) -> tuple[tuple[int, int], ...]:
+    """Locate {order}. {title}, or the ordered-list item Quarto emits for it."""
+    if not anchor.title:
+        return ()
+    needles = [f"{anchor.order}. {anchor.title}"]
+    escaped = escape(anchor.title, quote=False)
+    if escaped != anchor.title:
+        needles.append(f"{anchor.order}. {escaped}")
+    for needle in needles:
+        hits = _find_all(html, needle)
+        if hits:
+            return tuple((index, index + len(needle)) for index in hits)
+    return _list_item_spans(html, anchor)
+
+
+def _module_links(anchor: _StudyAnchor, title_of: Mapping[str, str]) -> str:
+    parts: list[str] = []
+    for gap in anchor.gaps:
+        href = _href(1, ModuleId(gap.module_slug))
+        parts.append(f'<a href="{href}">{escape(title_of[gap.module_slug])}</a>')
+    return " ".join(parts)
+
+
+def _weave_html(
+    html: str,
+    anchors: Sequence[_StudyAnchor],
+    title_of: Mapping[str, str],
+) -> str:
+    """Insert the step anchor and the module links around each study marker.
+
+    The anchor sits immediately before {order}. {title}. The module links
+    sit immediately after the title. Quarto drops the ordinal when it writes
+    an ordered list, so that list item is the same marker. A second call
+    returns the same string. A missing or repeated marker raises RuntimeError.
+    """
+    edits: list[tuple[int, str]] = []
+    for anchor in anchors:
+        hits = _marker_spans(html, anchor)
+        if len(hits) != 1:
+            raise RuntimeError(f"marqueur d'étape introuvable ou répété : {anchor.study_id}")
+        start, end = hits[0]
+        tag = f'<a id="{anchor.anchor}"></a>'
+        links = _module_links(anchor, title_of)
+        if start < len(tag) or html[start - len(tag) : start] != tag:
+            edits.append((start, tag))
+        if links and html[end : end + len(links)] != links:
+            edits.append((end, links))
+    for index, text in sorted(edits, key=lambda item: item[0], reverse=True):
+        html = html[:index] + text + html[index:]
+    return html
+
+
+def _weave_synthese(
+    root: Path,
+    publication: _ProgrammePublication,
+    modules: Sequence[Module],
+) -> None:
+    """Weave programmes/synthese.html and atomic-write it when the text changes."""
+    if not publication.anchors:
+        return
+    path = root / "programmes" / "synthese.html"
+    html = _read_text(path)
+    if html is None:
+        raise RuntimeError("programmes/synthese.html")
+    title_of = {module.slug: module.title for module in modules}
+    woven = _weave_html(html, publication.anchors, title_of)
+    if woven != html:
+        _atomic_write(path, woven)
+
+
+def _unescape_survey_html(html: str) -> str:
+    return (
+        html.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+        .replace("&amp;", "&")
+    )
+
+
+def _citation_findings(root: Path, publication: _ProgrammePublication) -> tuple[Finding, ...]:
+    survey = _survey_module(root)
+    corpus = _load_corpus(survey)
+    findings: list[Finding] = []
+    citations = survey.domain.iter_sources(corpus)
+    for name, text in publication.markdown:
+        stem = name[:-3] if name.endswith(".md") else name
+        html = _read_text(root / "programmes" / f"{stem}.html")
+        if html is None:
+            continue
+        plain = _unescape_survey_html(html)
+        rel = f"programmes/{stem}.html"
+        for citation in citations:
+            url = citation.url.value
+            if url not in text:
+                continue
+            phrase = (
+                "consulté le "
+                f"{citation.accessed.year:04d}-"
+                f"{citation.accessed.month:02d}-"
+                f"{citation.accessed.day:02d}"
+            )
+            if url not in plain:
+                findings.append(Finding(Code.PROGRAMMES, rel, f"URL absente du HTML : {url}"))
+            if phrase not in plain:
+                findings.append(Finding(Code.PROGRAMMES, rel, f"mention absente : {phrase}"))
+    return tuple(findings)
+
+
+def _anchor_findings(html: str | None, anchors: Sequence[_StudyAnchor]) -> tuple[Finding, ...]:
+    if not anchors or html is None:
+        return ()
+    findings: list[Finding] = []
+    spans: list[tuple[int, int] | None] = []
+    for anchor in anchors:
+        hits = _marker_spans(html, anchor)
+        if len(hits) != 1:
+            label = "marqueur répété" if len(hits) > 1 else "marqueur absent"
+            findings.append(
+                Finding(
+                    Code.PROGRAMMES,
+                    "programmes/synthese.html",
+                    f"{label} : {anchor.anchor}",
+                )
+            )
+            spans.append(None)
+            continue
+        spans.append(hits[0])
+    for index, anchor in enumerate(anchors):
+        located = spans[index]
+        if located is None:
+            continue
+        start, end = located
+        tag = f'<a id="{anchor.anchor}"></a>'
+        if start < len(tag) or html[start - len(tag) : start] != tag:
+            findings.append(
+                Finding(
+                    Code.PROGRAMMES,
+                    "programmes/synthese.html",
+                    f"ancre absente : {anchor.anchor}",
+                )
+            )
+        next_at = len(html)
+        for later in spans[index + 1 :]:
+            if later is not None:
+                next_at = later[0]
+                break
+        window = html[end:next_at]
+        for gap in anchor.gaps:
+            href = _href(1, ModuleId(gap.module_slug))
+            if href not in window:
+                findings.append(
+                    Finding(
+                        Code.PROGRAMMES,
+                        "programmes/synthese.html",
+                        f"lien de module absent : {href}",
+                    )
+                )
+    return tuple(findings)
+
+
+def _parcours_anchor_findings(
+    html: str | None,
+    modules: Sequence[Module],
+    anchors: Sequence[_StudyAnchor],
+) -> tuple[Finding, ...]:
+    findings: list[Finding] = []
+    for module in modules:
+        suffix = _study_suffix(module, anchors, 1)
+        if not suffix:
+            continue
+        for href in re.findall(r"\(([^)]+)\)", suffix):
+            if html is None or href not in html:
+                findings.append(
+                    Finding(
+                        Code.PROGRAMMES,
+                        "parcours/index.html",
+                        f"parcours sans auto-formation : {href}",
+                    )
+                )
+    return tuple(findings)
+
+
+def _programme_findings(
+    root: Path,
+    modules: Sequence[Module],
+    publication: _ProgrammePublication,
+    pages: Sequence[HtmlPage],
+) -> tuple[Finding, ...]:
+    """Compare the committed survey publication to the description."""
+    findings: list[Finding] = list(publication.findings)
+    if not publication.markdown:
+        return tuple(findings)
+    by_name = {link.md_name: link for link in publication.links}
+    for name, text in publication.markdown:
+        rel = f"programmes/{name}"
+        path = root / rel
+        if not path.is_file() or path.read_bytes() != text.encode("utf-8"):
+            findings.append(Finding(Code.PROGRAMMES, rel, "markdown différent du corpus"))
+        if "modules/" in text:
+            findings.append(Finding(Code.PROGRAMMES, rel, "le markdown contient modules/"))
+        if "etape-" in text:
+            findings.append(Finding(Code.PROGRAMMES, rel, "le markdown contient etape-"))
+        link = by_name.get(name)
+        if link is None:
+            continue
+        expected_shell = _programme_shell(link)
+        if "modules/" in expected_shell:
+            findings.append(
+                Finding(Code.PROGRAMMES, link.qmd_rel, "la coquille contient modules/")
+            )
+        if _foreign_urls(expected_shell):
+            findings.append(
+                Finding(Code.PROGRAMMES, link.qmd_rel, "la coquille contient une URL")
+            )
+        if _read_text(root / link.qmd_rel) != expected_shell:
+            findings.append(Finding(Code.PROGRAMMES, link.qmd_rel, "shell différent"))
+        html = _read_text(root / link.html_rel)
+        if html is None:
+            findings.append(Finding(Code.PROGRAMMES, link.html_rel, "HTML manquant"))
+        elif 'lang="fr"' not in html:
+            findings.append(Finding(Code.PROGRAMMES, link.html_rel, 'lang="fr" manquant'))
+    findings.extend(_citation_findings(root, publication))
+    findings.extend(
+        _anchor_findings(_read_text(root / "programmes" / "synthese.html"), publication.anchors)
+    )
+    findings.extend(
+        _parcours_anchor_findings(
+            _read_text(root / "parcours" / "index.html"),
+            modules,
+            publication.anchors,
+        )
+    )
+    for page in pages:
+        for link in publication.links:
+            href = _site_href(page.depth, link.html_rel)
+            if href not in page.html:
+                findings.append(Finding(Code.PROGRAMMES, page.rel_html, f"lien absent : {href}"))
+    return tuple(findings)
+
+
 def _derive_home_cards(modules: Sequence[Module]) -> str:
     """Return the depth-0 listing that index.qmd includes.
 
@@ -915,37 +1545,38 @@ def _derive_home_cards(modules: Sequence[Module]) -> str:
     return f"{DERIVED_MARK}\n{body}"
 
 
-def _derive_parcours(modules: Sequence[Module]) -> str:
+def _derive_parcours(modules: Sequence[Module], anchors: Sequence[_StudyAnchor]) -> str:
     """Return the depth-1 sequence that parcours/index.qmd includes.
 
-    Same parts as the home cards, from _card_lines at depth 1. Number the
-    lines from 1 using ``f"{n}. "``. Same marker and trailing newline as the
-    home listing.
+    Same numbered card lines as before, each followed by _study_suffix.
+    Same marker and single trailing newline.
     """
-    body = "".join(
-        f"{number}. {line}\n"
-        for number, line in enumerate(_card_lines(modules, 1), start=1)
-    )
-    return f"{DERIVED_MARK}\n{body}"
+    lines: list[str] = []
+    for number, module in enumerate(modules, start=1):
+        card = _card_lines((module,), 1)[0]
+        suffix = _study_suffix(module, anchors, 1)
+        if suffix and card.endswith("."):
+            suffix = suffix[1:]
+        lines.append(f"{number}. {card}{suffix}\n")
+    return f"{DERIVED_MARK}\n{''.join(lines)}"
 
 
-def _derive_chrome(modules: Sequence[Module], depth: int) -> str:
+def _derive_chrome(
+    modules: Sequence[Module],
+    depth: int,
+    programmes: Sequence[_ProgrammeLink],
+) -> str:
     """Return the opening chrome for one relative depth.
 
-    Start with DERIVED_MARK. Include a skip link "Aller au contenu", a top
-    bar whose brand is "Infra de calcul", a Sommaire button, and a Thème
-    button. Include an empty side TOC nav#sidetoc. Include nav#mci-nav with
-    Accueil, Parcours, Glossaire, and Programmes via _site_href, then one
-    anchor per module via _href(depth, slug) and the module title. Open
-    main#main and do not close it. The matching close lives in the static
-    closing file for that depth. No module list belongs in theme.js.
+    Same document as before. An empty programmes sequence keeps the single
+    Programmes link. Otherwise one anchor per publication link replaces it.
+    Module anchors follow, unchanged.
     """
     if depth not in CHROME:
         raise ValueError("depth")
     home = _site_href(depth, "index.html")
     parcours = _site_href(depth, "parcours/index.html")
     glossaire = _site_href(depth, "glossaire/index.html")
-    programmes = _site_href(depth, "programmes/index.html")
     lines = [
         DERIVED_MARK,
         _THEME_BOOT,
@@ -967,8 +1598,14 @@ def _derive_chrome(modules: Sequence[Module], depth: int) -> str:
         f'<a href="{home}">Accueil</a>',
         f'<a href="{parcours}">Parcours</a>',
         f'<a href="{glossaire}">Glossaire</a>',
-        f'<a href="{programmes}">Programmes</a>',
     ]
+    if programmes:
+        for link in programmes:
+            lines.append(
+                f'<a href="{_site_href(depth, link.html_rel)}">{escape(link.nav_label)}</a>'
+            )
+    else:
+        lines.append(f'<a href="{_site_href(depth, "programmes/index.html")}">Programmes</a>')
     for module in modules:
         lines.append(f'<a href="{_href(depth, module.slug)}">{escape(module.title)}</a>')
     lines.extend(["</nav>", '<main id="main">'])
@@ -1205,11 +1842,9 @@ def _site_findings(
     is None, emit missing-html. A qmd that matches _HAND_LINK is hand-link.
     When SITE_INCLUDES[kind] is a path, the qmd must contain that path or
     the finding is include. PARCOURS must contain each GapHeading or the
-    finding is gap. PROGRAMMES must contain a single level-2
-    PROGRAMMES_HEADING and must not contain an mci block. Any extra level-2
-    heading on that page is programmes. A present qmd must contain lang: fr,
-    _css_ref(page.depth), _chrome_ref(page.depth), and _closing_ref(page.depth).
-    Present html must contain lang="fr".
+    finding is gap. A present qmd must contain lang: fr, _css_ref(page.depth),
+    _chrome_ref(page.depth), and _closing_ref(page.depth). Present html must
+    contain lang="fr".
     """
     findings: list[Finding] = []
     html_rel = Path(page.rel_qmd).with_suffix(".html").as_posix()
@@ -1228,13 +1863,6 @@ def _site_findings(
                     findings.append(
                         Finding(Code.GAP, page.rel_qmd, f"rubrique manquante : {gap.value}")
                     )
-        if page.kind == SiteKind.PROGRAMMES:
-            if _h2_texts(qmd) != (PROGRAMMES_HEADING,):
-                findings.append(
-                    Finding(Code.PROGRAMMES, page.rel_qmd, "un seul titre À venir est requis")
-                )
-            if _front_has_mci(qmd):
-                findings.append(Finding(Code.PROGRAMMES, page.rel_qmd, "bloc mci interdit"))
         if re.search(r"lang:\s*fr\b", qmd) is None:
             findings.append(Finding(Code.LANG, page.rel_qmd, "lang: fr manquant"))
         for ref in (_css_ref(page.depth), _chrome_ref(page.depth), _closing_ref(page.depth)):
@@ -1260,22 +1888,32 @@ def _derived_findings(
     modules: Sequence[Module],
     annex_qmd: str | None,
     files: Mapping[str, str | None],
+    programmes: Sequence[_ProgrammeLink],
+    anchors: Sequence[_StudyAnchor],
+    *,
+    include_navigation: bool,
 ) -> tuple[Finding, ...]:
     """Compare committed generated files to the derivers.
 
-    HOME_CARDS must equal _derive_home_cards. PARCOURS_SEQUENCE must equal
-    _derive_parcours. Each CHROME depth must equal _derive_chrome.
-    GLOSSARY_FRAGMENT must equal _derive_glossary(annex_qmd). A mismatch or
-    a missing file is listing-drift, chrome-drift, or glossary-drift.
+    HOME_CARDS must equal _derive_home_cards. When include_navigation is
+    set, PARCOURS_SEQUENCE must equal _derive_parcours and each CHROME depth
+    must equal _derive_chrome. GLOSSARY_FRAGMENT must equal
+    _derive_glossary(annex_qmd). A mismatch or a missing file is
+    listing-drift, chrome-drift, or glossary-drift.
     """
-    expected = (
+    expected: list[tuple[str, str, Code]] = [
         (HOME_CARDS, _derive_home_cards(modules), Code.LISTING_DRIFT),
-        (PARCOURS_SEQUENCE, _derive_parcours(modules), Code.LISTING_DRIFT),
-        (CHROME[0], _derive_chrome(modules, 0), Code.CHROME_DRIFT),
-        (CHROME[1], _derive_chrome(modules, 1), Code.CHROME_DRIFT),
-        (CHROME[2], _derive_chrome(modules, 2), Code.CHROME_DRIFT),
-        (GLOSSARY_FRAGMENT, _derive_glossary(annex_qmd), Code.GLOSSARY_DRIFT),
-    )
+    ]
+    if include_navigation:
+        expected.extend(
+            (
+                (PARCOURS_SEQUENCE, _derive_parcours(modules, anchors), Code.LISTING_DRIFT),
+                (CHROME[0], _derive_chrome(modules, 0, programmes), Code.CHROME_DRIFT),
+                (CHROME[1], _derive_chrome(modules, 1, programmes), Code.CHROME_DRIFT),
+                (CHROME[2], _derive_chrome(modules, 2, programmes), Code.CHROME_DRIFT),
+            )
+        )
+    expected.append((GLOSSARY_FRAGMENT, _derive_glossary(annex_qmd), Code.GLOSSARY_DRIFT))
     findings: list[Finding] = []
     for rel, want, code in expected:
         got = files.get(rel)
@@ -1358,7 +1996,10 @@ def _publishing_files(root: Path, html_rels: Sequence[str]) -> dict[str, str | N
     return files
 
 
-def _publishing_findings(files: Mapping[str, str | None]) -> tuple[Finding, ...]:
+def _publishing_findings(
+    files: Mapping[str, str | None],
+    programme_pages: tuple[str, ...] | None,
+) -> tuple[Finding, ...]:
     """Check theme, KaTeX, brand, nojekyll, and the workflow text.
 
     .nojekyll must exist. paper.css must contain prefers-color-scheme,
@@ -1398,7 +2039,7 @@ def _publishing_findings(files: Mapping[str, str | None]) -> tuple[Finding, ...]
         elif src not in closing:
             findings.append(Finding(Code.THEME, rel, f"script de thème absent : {src}"))
     for rel, text in files.items():
-        if text is None or not _published_html(rel):
+        if text is None or not _published_html(rel, programme_pages):
             continue
         for tag in (KATEX_JS_TAG, KATEX_CSS_TAG):
             if text.count(tag) != 1:
@@ -1444,16 +2085,18 @@ def _publishing_findings(files: Mapping[str, str | None]) -> tuple[Finding, ...]
     return tuple(findings)
 
 
-def _published_html(rel: str) -> bool:
-    if rel in {
-        "index.html",
-        "parcours/index.html",
-        "glossaire/index.html",
-        "programmes/index.html",
-    }:
+def _published_html(rel: str, programme_pages: tuple[str, ...] | None) -> bool:
+    if rel in {"index.html", "parcours/index.html", "glossaire/index.html"}:
         return True
     parts = rel.split("/")
-    return len(parts) == 3 and parts[0] == "modules" and parts[2] == "index.html"
+    if len(parts) == 3 and parts[0] == "modules" and parts[2] == "index.html":
+        return True
+    if len(parts) != 2 or parts[0] != "programmes" or not parts[1].endswith(".html"):
+        return False
+    stem = parts[1][: -len(".html")]
+    if programme_pages is None:
+        return stem == "index"
+    return f"{stem}.md" in programme_pages
 
 
 def _html_rel(rel_qmd: str) -> str:
@@ -1479,16 +2122,19 @@ def check_gates(root: Path) -> CheckReport:
     3. Each module's _page_findings, _fact_findings, in catalog order.
     4. _glossary_findings.
     5. _site_findings in SITE_PAGES order.
-    6. _link_findings.
-    7. _publishing_findings.
+    6. _link_findings, after programme HTML pages are appended.
+    7. _programme_findings.
+    8. _publishing_findings.
 
     report.ok is true only when that tuple is empty. Module HTML is depth 2.
     Pass require_titles for index.html and parcours/index.html only.
+    Programme HTML is depth 1 and does not require titles.
     """
     root = root.resolve()
     if not root.is_dir():
         raise FileNotFoundError(root)
     catalog = _load_catalog(root)
+    publication = _describe_programmes(root, catalog.modules)
     module_text: dict[str, str] = {}
     module_html: dict[str, str | None] = {}
     for module in catalog.modules:
@@ -1502,7 +2148,16 @@ def check_gates(root: Path) -> CheckReport:
         for rel in (HOME_CARDS, PARCOURS_SEQUENCE, GLOSSARY_FRAGMENT, *CHROME.values())
     }
     findings: list[Finding] = list(catalog.findings)
-    findings.extend(_derived_findings(catalog.modules, annex_qmd, derived))
+    findings.extend(
+        _derived_findings(
+            catalog.modules,
+            annex_qmd,
+            derived,
+            publication.links,
+            publication.anchors,
+            include_navigation=bool(publication.markdown) or not publication.findings,
+        )
+    )
     for module in catalog.modules:
         rel = f"modules/{module.slug}/index.qmd"
         html_rel = f"modules/{module.slug}/index.html"
@@ -1544,9 +2199,25 @@ def check_gates(root: Path) -> CheckReport:
         html = module_html[html_rel]
         if html is not None:
             pages.append(HtmlPage(html_rel, 2, html, False))
+    if publication.markdown:
+        for name, _text in publication.markdown:
+            stem = name[:-3] if name.endswith(".md") else name
+            html_rel = f"programmes/{stem}.html"
+            html = _read_text(root / html_rel)
+            if html is not None:
+                pages.append(HtmlPage(html_rel, 1, html, False))
     findings.extend(_link_findings(catalog.modules, pages))
+    findings.extend(
+        _programme_findings(root, catalog.modules, publication, pages)
+    )
+    if (root / "programmes" / "check_links.py").is_file():
+        programme_names: tuple[str, ...] | None = tuple(_survey_module(root).output_pages())
+    else:
+        programme_names = None
     html_rels = [page.rel_html for page in pages]
-    findings.extend(_publishing_findings(_publishing_files(root, html_rels)))
+    findings.extend(
+        _publishing_findings(_publishing_files(root, html_rels), programme_names)
+    )
     return CheckReport(tuple(findings))
 
 
@@ -1621,36 +2292,41 @@ def _render_qmd(quarto: str, root: Path, rel_qmd: str) -> None:
 
 
 def build_site(root: Path, *, quarto: str = "quarto") -> CheckReport:
-    """Write derived files, render every author page, restore KaTeX, and re-check.
+    """Write derived files, publish the survey, render, weave, and re-check.
 
     Raise QuartoMissing before any write when quarto cannot be started.
-    Write each derived file by os.replace from a temporary file in the same
-    directory. Render every parsed module and every site qmd, even when
-    index.html already exists. Make KATEX_JS_TAG and KATEX_CSS_TAG occur once
-    in each published HTML file, replacing an unpinned katex 0.19.0 tag when
-    one is present and inserting the tag before </head> when it is absent.
-    Raise RenderFailed with rel_qmd and returncode when a render exits
-    non-zero. Return check_gates(root) after a complete render. A second run
-    on an unchanged tree leaves identical bytes.
+    When the publication has findings, return check_gates(root) without
+    writing and without rendering. Otherwise write the derived files, the
+    survey markdown, and the shells, then render every parsed module, every
+    existing site qmd, and every programme shell. Restore KaTeX inside
+    _render_qmd. Weave programmes/synthese.html after those renders. Return
+    check_gates(root). Do not fetch a URL. A second run on an unchanged tree
+    leaves identical bytes.
     """
     root = root.resolve()
     if not root.is_dir():
         raise FileNotFoundError(root)
     _require_quarto(quarto)
     catalog = _load_catalog(root)
+    publication = _describe_programmes(root, catalog.modules)
+    if publication.findings:
+        return check_gates(root)
     annex_qmd = _annex_qmd(root, catalog.modules)
     derived = {
         HOME_CARDS: _derive_home_cards(catalog.modules),
-        PARCOURS_SEQUENCE: _derive_parcours(catalog.modules),
-        CHROME[0]: _derive_chrome(catalog.modules, 0),
-        CHROME[1]: _derive_chrome(catalog.modules, 1),
-        CHROME[2]: _derive_chrome(catalog.modules, 2),
+        PARCOURS_SEQUENCE: _derive_parcours(catalog.modules, publication.anchors),
+        CHROME[0]: _derive_chrome(catalog.modules, 0, publication.links),
+        CHROME[1]: _derive_chrome(catalog.modules, 1, publication.links),
+        CHROME[2]: _derive_chrome(catalog.modules, 2, publication.links),
         GLOSSARY_FRAGMENT: _derive_glossary(annex_qmd),
     }
     for rel, text in derived.items():
         _atomic_write(root / rel, text)
+    _write_programme_files(root, publication)
     targets = [f"modules/{module.slug}/index.qmd" for module in catalog.modules]
     targets.extend(page.rel_qmd for page in SITE_PAGES if (root / page.rel_qmd).is_file())
+    targets.extend(link.qmd_rel for link in publication.links)
     for rel in targets:
         _render_qmd(quarto, root, rel)
+    _weave_synthese(root, publication, catalog.modules)
     return check_gates(root)
