@@ -41,6 +41,10 @@
    "label": "Module 05 — Slurm et exploitation d'un cluster HPC"
   },
   {
+   "href": "projects/scaling-study/index.html",
+   "label": "Projet 2 — Étude de passage à l'échelle d'un entraînement"
+  },
+  {
    "href": "projects/resilient-trainer/index.html",
    "label": "Projet 3 — Entraîneur tolérant aux pannes"
   },
