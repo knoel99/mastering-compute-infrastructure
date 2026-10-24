@@ -1,0 +1,11 @@
+# SYNTHETIC INCIDENT LOG. Invented for this exercise: no real system, cluster or person is described.
+# Format: ISO-8601 UTC | source | KIND | message. KIND is one of ANOMALY DETECT ACK DIAG MITIGATE RESOLVE INFO.
+2026-03-14T01:33:00Z|job-8841|INFO|checkpoint written at step 18400
+2026-03-14T02:11:40Z|gpu-17|ANOMALY|kernel: NVRM: Xid (PCI:0000:5a:00): 79, GPU has fallen off the bus.
+2026-03-14T02:11:55Z|job-8841|ANOMALY|rank 41 stopped writing its log; the collective timeout has not been reached yet
+2026-03-14T02:12:10Z|dashboard|INFO|GPU utilisation of job-8841 still reads 98 %
+2026-03-14T03:51:40Z|chat|DETECT|a researcher reports a flat loss curve for job-8841 since about 02:10
+2026-03-14T03:55:40Z|on-call|ACK|acknowledged, looking at job-8841
+2026-03-14T04:03:00Z|on-call|DIAG|rank 41 is silent on gpu-17; dmesg shows Xid 79
+2026-03-14T04:09:40Z|on-call|MITIGATE|gpu-17 drained, job-8841 requeued from checkpoint step 18400
+2026-03-14T04:31:40Z|slurm|RESOLVE|job-8841 runs again at full throughput on the remaining nodes
