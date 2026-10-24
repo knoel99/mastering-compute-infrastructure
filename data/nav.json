@@ -33,6 +33,10 @@
    "label": "Plans détaillés des modules"
   },
   {
+   "href": "lab-setup/index.html",
+   "label": "Environnement de travail"
+  },
+  {
    "href": "courses/perf-models/index.html",
    "label": "Module 02 — Architecture matérielle et modèles de performance"
   },
