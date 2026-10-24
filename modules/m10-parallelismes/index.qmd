@@ -1,0 +1,30 @@
+---
+title: "Parallélismes et MFU"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 12
+---
+
+## Objectifs
+
+L'offre B est l'entraînement à grande échelle. Il connaît l'inférence. Il n'a pas encore entraîné au-delà d'un laptop.
+
+Il nomme cinq façons de couper un modèle. DDP duplique le modèle et synchronise les gradients par un all-reduce. FSDP découpe les poids entre les processus. Le parallélisme tensoriel découpe une couche. Le parallélisme pipeline découpe le modèle en étages. Le parallélisme expert place les experts sur des processus différents. MFU est le rapport entre les opérations flottantes réellement exécutées et le pic annoncé du GPU.
+
+## Travaux pratiques prévus
+
+Il lit une page courte sur ces cinq coupes. Pour chaque coupe, il écrit la situation où il la choisirait. Il définit MFU dans la même note. Il ne le mesure pas sur une grande machine.
+
+Ensuite, sur un seul GPU du laptop, ou sur le CPU si le laptop n'a pas de GPU, il estime la mémoire d'un modèle fictif de dix millions de paramètres en float32. Chaque paramètre pèse quatre octets. Les poids font quarante millions d'octets. Les gradients en font autant. Les deux états Adam en font quatre-vingts millions d'octets. Le total de ces trois postes est cent soixante millions d'octets. Ce total laisse les activations de côté. Il choisit une taille de batch et il ajoute un ordre de grandeur pour elles. Il compare la somme à la mémoire libre. Il ne lance pas un entraînement distribué.
+
+Une branche centre ou cloud peu cher attend un compte. L'estimation se fait sur le laptop.

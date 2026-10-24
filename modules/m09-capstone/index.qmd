@@ -1,0 +1,30 @@
+---
+title: "Capstone portefeuille Lead"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 11
+---
+
+## Objectifs
+
+Le poste de Compute Infrastructure Lead, offre A, lira un dépôt. Il assemble ce dépôt pour la startup robotique.
+
+Le dépôt montre un job préempté, une reprise, et une note de coût. Un relecteur le clone et le lance sur un laptop, avec Python seul.
+
+## Travaux pratiques prévus
+
+Il crée le dépôt `lead-demo`, avec `train.py`, `note-cout.md` et un `README`. Le README donne une commande, `python3 train.py`, à lancer deux fois.
+
+Sans `checkpoint.json`, le script boucle sur CPU. À la fin de l'itération 4, il écrit le fichier et s'arrête, comme si le GPU avait été repris. Le second lancement lit le fichier, commence à l'itération 5, et finit à 8. `note-cout.md` donne la durée des huit itérations et un prix d'heure qu'il choisit. Le coût est cette durée multipliée par ce prix. La durée réelle du laptop est une fraction d'heure. Il la convertit quand même en heures GPU.
+
+Une branche cloud ou ROMEO reste hors du README, et seulement si le compte existe. Le dépôt se lance sur un laptop.
