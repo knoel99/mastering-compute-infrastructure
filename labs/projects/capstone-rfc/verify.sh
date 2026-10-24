@@ -6,10 +6,12 @@ cd "$(dirname "$0")"
 PY="${PYTHON:-python3}"
 export PYTHON="$PY"
 "$PY" -c "import pytest, yaml" 2>/dev/null || { echo "FAIL: PYTHON needs pytest and pyyaml" >&2; exit 2; }
+LOG="$(mktemp)"
+trap 'rm -f "$LOG"' EXIT
 IMPL=reference "$PY" -m pytest -q -p no:cacheprovider tests
 echo "--- starter (failures expected) ---"
-if IMPL=starter "$PY" -m pytest -q -p no:cacheprovider tests > /tmp/cap-starter.log 2>&1; then
+if IMPL=starter "$PY" -m pytest -q -p no:cacheprovider tests > "$LOG" 2>&1; then
   echo "starter passes all tests: the tests do not discriminate"; exit 1
 fi
-tail -1 /tmp/cap-starter.log
+tail -1 "$LOG"
 echo "ok: reference passes, starter fails as intended"

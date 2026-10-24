@@ -14,6 +14,6 @@ Chaque critère est noté de 0 à 2 : 0 absent ou faux, 1 partiel, 2 solide. Les
 | Compromis | une seule option | deux options | compare des options avec un critère et dit laquelle il choisit et pourquoi |
 | Communication | confuse | claire mais longue | structurée, avec ce qu'il ne sait pas dit explicitement |
 
-**Barèmes indicatifs.** Moins de 8 points sur 14 : réponse insuffisante. De 8 à 11 : solide. 12 à 14 avec les deux critères éliminatoires à 2 : excellente. Ces seuils sont un repère pour s'entraîner, pas un standard.
+**Barèmes indicatifs.** Moins de 8 points sur 14 : réponse insuffisante. De 8 à 11 : solide. 12 à 14 avec les deux critères éliminatoires à 2 : excellente. Un critère ★ noté 0 rend la réponse insuffisante quel que soit le total ; 12 points ou plus avec un critère ★ à 1 restent « solide ». Ces seuils sont un repère pour s'entraîner, pas un standard.
 
 **Calculs de référence** (`python3 sizing.py`, voir `README.md`) : 8,4e23 FLOP ; 96,0 jours à 256 GPU avec un MFU de 0,40 ; 248 GPU suffisent « sur le papier » pour 100 jours, mais avec les pannes supposées la durée passe à 99,6 jours à 256 GPU, c'est-à-dire presque sans marge.

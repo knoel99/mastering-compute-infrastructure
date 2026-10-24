@@ -16,7 +16,7 @@ dry=0
 apply=0
 pairs=()
 
-usage() { sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+usage() { sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >&2; }
 
 while [ $# -gt 0 ]; do
@@ -32,18 +32,20 @@ while [ $# -gt 0 ]; do
 done
 [ "${#pairs[@]}" -gt 0 ] || usage
 
+# the value is later used in a sed replacement: refuse the characters that sed would interpret (| & \)
+pair_re='^[a-z0-9_]+(\.[a-z0-9_-]+)+=[^[:space:]|&\\]+$'
 for p in "${pairs[@]}"; do
-  [[ "$p" =~ ^[a-z0-9_]+(\.[a-z0-9_-]+)+=[^[:space:]]+$ ]] || { echo "invalid key=value: $p" >&2; exit 2; }
+  [[ "$p" =~ $pair_re ]] || { echo "invalid key=value: $p" >&2; exit 2; }
 done
 
 value_of() { # value configured for key $2 in file $1, nothing if the key is absent
-  awk -v k="$2" -F'[[:space:]]*=[[:space:]]*' '$1 == k { v = $2 } END { if (v != "") print v }' "$1"
+  awk -v k="$2" -F'[[:space:]]*=[[:space:]]*' '{ sub(/^[[:space:]]+/, "") } $1 == k { v = $2 } END { if (v != "") print v }' "$1"
 }
 
+if [ "$dry" = 0 ]; then mkdir -p "$(dirname "$conf")"; fi  # before mktemp: the temporary file must sit next to $conf for mv to be atomic
 tmp="$(mktemp "${conf}.XXXXXX" 2>/dev/null || mktemp)"
 trap 'rm -f "$tmp"' EXIT
 if [ -e "$conf" ]; then cp "$conf" "$tmp"; else : > "$tmp"; fi
-if [ "$dry" = 0 ]; then mkdir -p "$(dirname "$conf")"; fi
 
 changed=0
 for p in "${pairs[@]}"; do

@@ -33,7 +33,7 @@ def test_state_and_reason_normalisation():
     assert len(exporter.bounded_reason("x" * 200)) <= 24
 
 
-def test_parsers_read_the_real_captured_outputs():
+def test_parsers_read_the_real_captured_outputs(monkeypatch):
     jobs = exporter.parse_squeue(fx("squeue_mixed.txt"))
     assert [j["state"] for j in jobs].count("PENDING") == 4 and jobs[-1]["state"] == "RUNNING"
     assert jobs[0]["submit"] == T0 and jobs[0]["account"] == "teamb"
@@ -42,6 +42,11 @@ def test_parsers_read_the_real_captured_outputs():
     shares = exporter.parse_sshare(fx("sshare.txt"))
     assert shares[1]["account"] == "root" and shares[1]["user"] == "root"  # the indentation of sshare is stripped
     assert shares[0]["fairshare"] is None and shares[1]["fairshare"] == 1.0
+    # squeue prints LOCAL time and the parser reads UTC: the commands must run with TZ=UTC
+    seen = {}
+    monkeypatch.setattr(exporter.subprocess, "run", lambda argv, **kw: seen.update(kw) or subprocess.CompletedProcess(argv, 0, "", ""))
+    exporter.run_cmd(["squeue"])
+    assert seen["env"]["TZ"] == "UTC"
 
 
 def test_samples_from_a_busy_cluster():
@@ -51,6 +56,7 @@ def test_samples_from_a_busy_cluster():
     assert metric(m, "slurm_jobs_pending_by_reason", reason="Priority") == 3
     assert metric(m, "slurm_jobs_pending_by_reason", reason="Resources") == 1
     assert metric(m, "slurm_job_max_pending_seconds", partition="debug") == 100
+    assert len(m["slurm_account_norm_shares"]) == 4  # one per account row; the user rows must not add duplicate series
     assert metric(m, "slurm_account_norm_shares", account="teama") == pytest.approx(0.333333)
     assert m["slurm_node_unhealthy"] == []
 
@@ -65,6 +71,8 @@ def test_a_drained_node_is_unhealthy_with_a_bounded_reason():
     for name in ("sinfo_draining.txt", "sinfo_drained.txt"):
         m = exporter.samples(fx(name), "", "", T0)
         assert metric(m, "slurm_node_unhealthy", node="vm", reason="gpu_xid") == 1
+    m = exporter.samples("debug*|vm|down*|4|12872|Not responding\n", "", "", T0)  # the most common unhealthy state, with its flag
+    assert metric(m, "slurm_nodes", state="down") == 1 and metric(m, "slurm_node_unhealthy", node="vm") == 1
 
 
 def test_idle_cluster_still_emits_zero_valued_job_series():
@@ -78,6 +86,8 @@ def test_a_failing_command_gives_scrape_ok_zero_and_nothing_else():
         raise RuntimeError("slurmctld unreachable")
     out = exporter.collect(broken, now=T0)
     assert "slurm_scrape_ok 0" in out and "slurm_jobs" not in out and "slurm_nodes" not in out
+    garbled = {"sinfo": "", "squeue": "1|debug|u|a|PENDING|Priority|not-a-date\n", "sshare": ""}  # unparsable output is a failed scrape too
+    assert "slurm_scrape_ok 0" in exporter.collect(lambda argv: garbled[argv[0]], now=T0)
 
 
 def test_collect_with_working_commands_reports_ok():

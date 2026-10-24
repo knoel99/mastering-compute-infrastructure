@@ -9,7 +9,11 @@ IMPL="${IMPL:-reference}"
 SANDBOX=../../slurm/slurm-sandbox
 [ "$(id -u)" = 0 ] || { echo "FAIL: root is required (the sandbox writes /etc/slurm)" >&2; exit 2; }
 command -v promtool >/dev/null || { echo "FAIL: promtool not found" >&2; exit 2; }
-cleanup() { scancel --all >/dev/null 2>&1 || true; bash "$SANDBOX/teardown.sh" --purge-db >/dev/null 2>&1 || true; }
+cleanup() {
+  scancel -u "$(id -un)" >/dev/null 2>&1 || true   # not `--all`: scancel 23.11 has no such option
+  for _ in $(seq 1 15); do [ -z "$(squeue -h 2>/dev/null)" ] && break; sleep 1; done   # let slurmd kill the jobs before it is stopped
+  bash "$SANDBOX/teardown.sh" --purge-db >/dev/null 2>&1 || true
+}
 trap cleanup EXIT
 bash "$SANDBOX/teardown.sh" --purge-db >/dev/null 2>&1 || true   # start from an empty accounting database
 bash "$SANDBOX/setup.sh" >/dev/null
@@ -28,8 +32,10 @@ echo "converged: 0 commands"
 sacctmgr -nP show assoc format=Account,User,Share,QOS | grep -E '^teama\|alice\|' || { echo "FAIL: alice not in teama" >&2; exit 1; }
 
 echo "--- 3. real metrics from a real queue"
-sacctmgr -i add user root account=teama >/dev/null 2>&1 || true
-for i in 1 2 3 4; do sbatch -J lv$i -o /dev/null -A teama -N1 -n4 --wrap 'sleep 300' >/dev/null; done
+# root submits the jobs below: give it an association in teama (observe first, no `|| true`: see the project page)
+sacctmgr -nP show assoc format=Account,User | grep -qx 'teama|root' || sacctmgr -i add user root account=teama >/dev/null
+cpus="$(sinfo -h -N -o %c | head -1)"   # each job takes the whole node, whatever its size: 1 runs, 3 wait
+for i in 1 2 3 4; do sbatch -J lv$i -o /dev/null -A teama -N1 -n"$cpus" --wrap 'sleep 300' >/dev/null; done
 for _ in $(seq 1 30); do squeue -h -t R | grep -q . && break; sleep 1; done
 metrics="$("$PY" "$IMPL/exporter.py" --once)"
 echo "$metrics" | grep -E '^slurm_(scrape_ok|jobs)\{?' | head -8
@@ -44,7 +50,8 @@ echo "RUNNING=$running PENDING=$pending, promtool accepts the exposition"
 echo "--- 4. a drained node becomes slurm_node_unhealthy"
 scontrol update nodename="$node" state=drain reason="gpu_xid:79"
 sleep 1
-"$PY" "$IMPL/exporter.py" --once | grep -E '^slurm_node_unhealthy\{' | tee /dev/stderr | grep -q 'reason="gpu_xid"} 1' \
-  || { echo "FAIL: the drained node is not reported unhealthy" >&2; exit 1; }
+unhealthy="$("$PY" "$IMPL/exporter.py" --once | grep -E '^slurm_node_unhealthy\{' || true)"
+echo "$unhealthy"
+grep -q 'reason="gpu_xid"} 1' <<<"$unhealthy" || { echo "FAIL: the drained node is not reported unhealthy" >&2; exit 1; }
 scontrol update nodename="$node" state=resume
 echo "OK homelab-slurm (live)"

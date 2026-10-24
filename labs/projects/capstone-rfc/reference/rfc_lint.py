@@ -118,10 +118,10 @@ def lint(text, req):
             if not result["all_slo_ok"]:
                 bad = [k for k, v in result["classes"].items() if not v["slo_ok"]]
                 errs.append(f"the chosen design violates the SLO of: {', '.join(bad)}")
-        except (ValueError, KeyError) as exc:
+        except (ValueError, KeyError, TypeError, AttributeError, ArithmeticError) as exc:
             errs.append(f"design block cannot be evaluated: {exc}")
-    if "Hypothèses et limites" not in cap:
-        errs.append("Capacité et coûts needs a 'Hypothèses et limites' part")
+    if not re.search(r"^#{3,4} Hypothèses et limites\s*$", cap, re.M):  # a heading, not a passing mention
+        errs.append("Capacité et coûts needs a '### Hypothèses et limites' part")
     return errs
 
 

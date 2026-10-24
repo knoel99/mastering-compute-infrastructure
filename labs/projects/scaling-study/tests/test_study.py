@@ -71,6 +71,8 @@ def test_report_has_required_sections_and_numbers():
         assert needle in text, needle
     assert "| strong | 2 | 0.0650 |" in text
     assert "0.77" in text  # efficiency 0.100 / (2 * 0.065)
+    threats = text.split("## Threats to validity")[1]
+    assert sum(line.startswith("- ") for line in threats.splitlines()) >= 4  # at least four threats, one per bullet
 
 
 def test_report_adds_breakdown_when_runs_are_decomposed():

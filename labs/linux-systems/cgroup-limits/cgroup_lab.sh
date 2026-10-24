@@ -26,6 +26,10 @@ case "$mode" in
     memdir="$CG/memory/$name"; cpudir="$CG/cpu/$name"
     mkdir "$memdir" "$cpudir"
     echo $((LIMIT_MIB * 1024 * 1024)) > "$memdir/memory.limit_in_bytes"
+    if [ -e "$memdir/memory.memsw.limit_in_bytes" ]; then  # without a swap limit, a machine with swap would page out instead of killing
+      echo $((LIMIT_MIB * 1024 * 1024)) > "$memdir/memory.memsw.limit_in_bytes" 2>/dev/null \
+        || echo "note: swap accounting is off; on a machine with swap the allocator may not be killed" >&2
+    fi
     echo 100000 > "$cpudir/cpu.cfs_period_us"
     echo $((QUOTA_PCT * 1000)) > "$cpudir/cpu.cfs_quota_us"
     join()      { echo "$BASHPID" > "$memdir/cgroup.procs"; echo "$BASHPID" > "$cpudir/cgroup.procs"; }
@@ -44,17 +48,17 @@ case "$mode" in
     cleanup()   { rmdir "$d" 2>/dev/null || true; }
     ;;
 esac
-trap cleanup EXIT
+out="$(mktemp)"
+trap 'cleanup; rm -f "$out"' EXIT
 
 echo "--- memory: allocate 300 MiB in a ${LIMIT_MIB} MiB cgroup"
 rc=0
-( join; exec "$PY" "$here/alloc.py" ) > "$here/.alloc.out" 2>&1 || rc=$?
-tail -1 "$here/.alloc.out"
+( join; exec "$PY" "$here/alloc.py" ) > "$out" 2>&1 || rc=$?
+tail -1 "$out"
 kills="$(oom_kills)"
 echo "exit status: $rc, oom_kill counter: $kills"
 [ "$rc" = 137 ] || die "expected the allocator to be killed (status 137), got $rc"
 [ "$kills" -ge 1 ] || die "the kernel did not count an OOM kill"
-rm -f "$here/.alloc.out"
 
 echo "--- cpu: a busy loop limited to ${QUOTA_PCT}% of one CPU"
 share="$( ( join; exec "$PY" "$here/burn.py" 4 ) )"

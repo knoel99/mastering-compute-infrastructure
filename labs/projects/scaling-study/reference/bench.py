@@ -76,6 +76,8 @@ def worker(rank, world, args, port):
         recs.append((t1 - t0, t2 - t1, t3 - t2, pack, wait, allr))
     gathered = [None] * world
     dist.all_gather_object(gathered, recs)
+    sums = [None] * world  # data parallelism means identical weights on every rank after the last step
+    dist.all_gather_object(sums, sum(float(p.detach().double().sum()) for p in params))
     if rank == 0:
         steps = range(args.warmup, args.warmup + args.steps)
         phase = lambda k: [max(gathered[r][s][k] for r in range(world)) for s in steps]
@@ -85,7 +87,7 @@ def worker(rank, world, args, port):
             "batch_per_rank": args.batch_per_rank, "steps": args.steps, "warmup": args.warmup,
             "grad_bytes": 4 * n_params, "flops_per_step_per_rank": 6 * n_params * args.batch_per_rank,
             "step_s": total, "compute_s": phase(0), "comm_s": phase(1), "opt_s": phase(2),
-            "torch": torch.__version__, "cpu_count": os.cpu_count(),
+            "torch": torch.__version__, "cpu_count": os.cpu_count(), "param_sum_by_rank": sums,
         }
         if args.decompose:
             result.update({"decomposed": True, "pack_s": phase(3), "wait_s": phase(4), "allreduce_s": phase(5)})

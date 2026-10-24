@@ -16,7 +16,7 @@ badges:
 
 Quand on double le nombre de processus d'un entraînement, va-t-il deux fois plus vite ? Presque jamais, et la bonne réponse d'un ingénieur d'infrastructure n'est pas « oui » ou « non » mais un **chiffre accompagné de sa cause** : de combien, pourquoi, et jusqu'où l'on peut extrapoler. Ce projet vous fait produire une telle réponse, avec des mesures que vous pouvez défendre en entretien.
 
-Vous allez concevoir un plan d'expériences, mesurer un entraînement data-parallel sur 1, 2 et 4 processus, ajuster le modèle α-β de l'all-reduce avec un intervalle de confiance, calculer accélération, efficacité et fraction sérielle de Karp-Flatt, **prédire** le temps d'un pas à partir d'une seule mesure, puis expliquer l'écart entre prédiction et mesure. Le tout tient dans un rapport qu'une seule commande régénère.
+Vous allez concevoir un plan d'expériences, mesurer un entraînement data-parallel sur 1, 2 et 4 processus, ajuster le modèle α-β de l'all-reduce avec un intervalle de confiance, calculer accélération, efficacité et fraction sérielle de Karp-Flatt (formules en fin de page), **prédire** le temps d'un pas à partir d'une seule mesure, puis expliquer l'écart entre prédiction et mesure. Le tout tient dans un rapport qu'une seule commande régénère.
 
 ::: key
 [Objectif du projet]{.tag} Un rapport honnête vaut mieux qu'un beau graphe. Un résultat négatif (« ça ne passe pas à l'échelle ») correctement mesuré, modélisé et expliqué est un excellent livrable ; une accélération flatteuse sans barre d'erreur, sans modèle et sans limites n'en est pas un.
@@ -41,7 +41,7 @@ Le dossier `labs/projects/scaling-study/` contient `starter/` (à compléter), `
 | R3 | **Ajustement α-β** par moindres carrés sur l'erreur relative, avec exclusion des petits messages et **intervalle de confiance bootstrap** reproductible | `tests/test_fit.py` (7 tests) |
 | R4 | **Métriques** : accélération, efficacité, fraction sérielle de Karp-Flatt, médiane et interquartile | `test_speedup_efficiency_karp_flatt`, `test_summarize` |
 | R5 | **Prédiction** du temps d'un pas à partir d'**une seule** mesure à p = 1 et du modèle | `test_predict_step_strong_and_weak` |
-| R6 | **Utilisation** (MFU de l'étude) avec un pic mesuré, jamais pris sur une fiche technique | `test_utilization`, `test_analyze_*` |
+| R6 | **Utilisation** (MFU de l'étude) avec un pic mesuré, jamais pris sur une fiche technique | `test_utilization`, `test_analyze_*` (ils vérifient la formule ; l'origine du pic est à votre charge) |
 | R7 | **Décomposition** de la communication (empaquetage, attente, all-reduce) et explication de l'écart modèle-mesure | `test_decompose_*`, `test_report_adds_breakdown_*` |
 | R8 | **Rapport** régénérable en une commande, avec définitions et menaces à la validité | `test_report_has_required_sections_and_numbers` |
 
@@ -69,7 +69,16 @@ IMPL=starter $PYTHON -m pytest -q tests           # 20 échecs sur 23 au départ
 PYTHON=$PYTHON bash verify.sh                      # référence verte, départ rouge
 ~~~
 
-Pour le balayage des tailles de message qui alimente l'ajustement, réutilisez `labs/perf-models/allreduce-model/bench_allreduce.py` du lab 2.2 (lancé avec `torch.distributed.run` sur 2 puis 4 processus).
+Pour le balayage des tailles de message qui alimente l'ajustement, réutilisez `labs/perf-models/allreduce-model/bench_allreduce.py` du lab 2.2, lancé avec `torchrun --nproc_per_node=2` puis `=4` (une sortie JSON par valeur de p ; `fit_model.load_rows` la relit).
+
+Les jalons 4 et 5 s'enchaînent ainsi. Les options de `report.py` ne sont pas imposées par les tests : ce sont celles de la référence. `fit.json` contient les deux clés `alpha_s` et `B_bytes_per_s`, que vous écrivez à partir du résultat de `fit_model.fit`.
+
+~~~bash
+$PYTHON starter/run_study.py --out results.json                   # 18 exécutions, quelques minutes
+$PYTHON starter/run_study.py --decompose --out results_dec.json   # même plan, avec décomposition
+$PYTHON -c "import json,sys; a,b=(json.load(open(f)) for f in sys.argv[1:3]); a['points']+=b['points']; json.dump(a,open('all.json','w'))" results.json results_dec.json
+$PYTHON starter/report.py --results all.json --fit fit.json --out report.md
+~~~
 
 ## Livrables {#livrables}
 
@@ -104,7 +113,7 @@ Chaque critère est mesurable ; la commande qui le montre est indiquée.
 
 Ces indices ne donnent pas la solution ; essayez d'abord sans.
 
-**Mesurer.** Écartez les premiers pas (caches, allocations, initialisation de `gloo`) : `bench.py` le fait déjà et le test vérifie que la série n'en contient pas. Fixez `OMP_NUM_THREADS=1` et `torch.set_num_threads(1)` : sans cela, chaque processus lance plusieurs fils et vous mesurez la contention entre processus, pas le passage à l'échelle. Sur une machine à quatre processeurs, quatre processus occupent tout : le système et le lanceur se disputent les mêmes cœurs.
+**Mesurer.** Écartez les premiers pas (caches, allocations, initialisation de `gloo`) : `bench.py` le fait déjà et le test vérifie que la série n'en contient pas. Fixez `OMP_NUM_THREADS=1` et `torch.set_num_threads(1)` : sans cela, chaque processus lance plusieurs fils et vous mesurez la contention entre processus, pas le passage à l'échelle. Sur une machine à quatre processeurs, quatre processus occupent tout : le système et tout autre processus actif se disputent les mêmes cœurs.
 
 **Plan.** Un enchaînement « toutes les mesures à p = 1, puis toutes à p = 2 » confond le facteur étudié avec la dérive de la machine (fréquence, voisins bruyants). Mélangez, avec une graine pour pouvoir rejouer. Trois répétitions sont un minimum : l'intervalle interquartile de trois valeurs est grossier, signalez-le.
 
@@ -128,7 +137,11 @@ Ces indices ne donnent pas la solution ; essayez d'abord sans.
 | 2 | 164 µs (91 à 189) | 1,08 Go/s (0,93 à 1,31) |
 | 4 | 300 µs (260 à 429) | 1,05 Go/s (0,98 à 1,26) |
 
-La bande passante est stable, mais α **n'est pas** une constante de la machine : il est presque doublé à p = 4. Quand tous les cœurs sont occupés, l'ordonnanceur ajoute de la latence ; le modèle suppose un α fixe par saut.
+Les intervalles de B se recouvrent : rien ne dit que la bande passante change. En revanche les intervalles de α ne se recouvrent pas : α **n'est pas** une constante de la machine, il est nettement plus grand à p = 4 (×1,8 ici). Le modèle suppose un α fixe par saut. Une cause plausible, non testée ici, est que les quatre processus occupent les quatre processeurs et que l'ordonnanceur ajoute de la latence.
+
+Ces nombres ne se reproduisent pas à l'identique : un second balayage dans le même bac à sable a donné α = 250 puis 332 µs et B = 1,43 puis 1,21 Go/s (p = 2 puis 4). Seuls l'ordre de grandeur et le sens de l'écart de α sont stables ; c'est une raison de plus de publier les barres d'erreur.
+
+Le rapport de référence utilise un **seul** couple (α, B), celui de p = 4 (300 µs ; 1,05 Go/s), pour toutes les prédictions, y compris à p = 2. C'est une simplification, et donc une limite à nommer dans vos menaces à la validité.
 
 **Étude complète (jalon 4).** Pas médian en millisecondes, accélération fort S, efficacité E, part de communication :
 
@@ -141,16 +154,20 @@ La bande passante est stable, mais α **n'est pas** une constante de la machine 
 | faible | 2 | 17,2 | | 0,43 | 55 % | 30 % |
 | faible | 4 | 28,9 | | 0,26 | 71 % | 47 % |
 
-**Lecture.** Dans cette configuration, la parallélisation de données **ne passe pas à l'échelle** : à quatre processus, le pas du régime fort est plus lent qu'à un seul (accélération de 0,67). La cause est un rapport calcul sur communication défavorable : un pas de calcul de 64 exemples dure quelques millisecondes, alors que l'échange de 4,2 Mo de gradients à environ 1 Go/s en demande déjà quatre.
+**Lecture.** Dans cette configuration, la parallélisation de données **ne passe pas à l'échelle** : à quatre processus, le pas du régime fort est plus lent qu'à un seul (accélération de 0,67).
 
-**Décomposition (exécution avec `--decompose`).** À p = 2, l'all-reduce mesuré dure 4,4 ms contre 4,6 ms prédites : le modèle est bon, à 4 % près. L'écart de 29 % sur le pas vient d'**ailleurs** : 2,8 ms d'aplatissement et de recopie des gradients, et 2,1 ms d'attente du rang le plus lent. À p = 4, l'all-reduce dure 11,4 ms pour 7,8 ms prédites (rapport de 1,46) : les quatre processus se disputent les quatre processeurs.
+Rejouée une seconde fois, l'étude donne la même conclusion (accélération de 0,72 à p = 4) avec des nombres différents de quelques pour cent à plusieurs dizaines de pour cent : retenez les ordres de grandeur. La cause est un rapport calcul sur communication défavorable : un pas de calcul de 64 exemples dure quelques millisecondes, alors que l'échange de 4,2 Mo de gradients à environ 1 Go/s en demande déjà quatre (p = 2) à six (p = 4), sans compter la latence.
+
+**Décomposition (exécution avec `--decompose`).** À p = 2, l'all-reduce mesuré dure 4,4 ms contre 4,6 ms prédites : le modèle est bon, à 4 % près. L'écart de 29 % sur le pas (5,8 ms) vient pour l'essentiel d'**ailleurs** : 2,8 ms d'aplatissement et de recopie des gradients, et 2,1 ms d'attente du rang le plus lent, soit 4,9 ms.
+
+Le reste tient notamment au calcul, qui ne diminue pas comme 1/p quand le lot par processus baisse : le pas à p = 1 dure 7,5 ms pour 64 exemples et 17,7 ms pour 256, un rapport de 2,4 et non de 4. À p = 4, l'all-reduce dure 11,4 ms pour 7,8 ms prédites (rapport de 1,46) : l'hypothèse la plus probable est que les quatre processus se disputent les quatre processeurs (non isolée ici : comparez avec trois processus).
 :::
 
 ## Extensions {#extensions}
 
 - **Seuil de rentabilité.** Avec le modèle, prédisez le lot par processus à partir duquel le régime faible atteint une efficacité de 0,8, puis vérifiez par une mesure. L'écart entre prédiction et mesure vous dit ce que le modèle ignore.
 - **`DistributedDataParallel`.** Remplacez l'entraîneur élémentaire par `torch.nn.parallel.DistributedDataParallel` et mesurez la part de communication cachée derrière la passe arrière. Prédisez-la avant de la mesurer.
-- **Un pic mesuré.** Utilisez le lab 2.1 (STREAM et GEMM) pour obtenir le pic d'un cœur, puis calculez l'utilisation (MFU) de chaque point. Discutez : une utilisation de 5 % est-elle un problème de calcul ou de communication ?
+- **Un pic mesuré.** Utilisez le lab 2.1 (STREAM et GEMM), lancé avec `OMP_NUM_THREADS=1` pour que le pic soit celui d'un seul cœur, puis calculez l'utilisation (MFU) de chaque point. Discutez : une utilisation de 5 % est-elle un problème de calcul ou de communication ?
 - **Deux machines.** Placez deux VM sur le même réseau et refaites le balayage avec `gloo` entre elles ; comparez α et B à ceux de la boucle locale.
 - **Variante GPU.** Même étude avec `nccl` sur un ou deux GPU, un modèle plus gros et un `peak` pris sur votre propre micro-benchmark GEMM. Le coût dépend du fournisseur : relevez-le le jour de l'essai.
 
@@ -163,13 +180,13 @@ La bande passante est stable, mais α **n'est pas** une constante de la machine 
 **Ce qu'un recruteur d'infrastructure de calcul cherche.** Quelqu'un qui ne confond pas la collective et le pas, qui sait qu'un modèle de performance se valide contre des mesures, et qui ose écrire « ça ne passe pas à l'échelle, voici pourquoi ».
 
 ::: note
-[Mesurer la couverture d'un intervalle de confiance]{.tag} Un intervalle à 95 % devrait contenir la vraie valeur dans 95 % des cas. Sur 40 jeux synthétiques de 11 points avec 3 % de bruit multiplicatif, l'intervalle bootstrap par percentiles de B contient la vraie valeur 34 fois sur 40 (85 %), et celui de α 36 fois sur 40 (90 %) : avec si peu de points, il est trop optimiste. Le test `test_bootstrap_coverage_is_close_to_but_below_nominal` l'inscrit ; retenez que « intervalle à 95 % » ne veut pas dire « 95 % de chances » sans vérification.
+[Mesurer la couverture d'un intervalle de confiance]{.tag} Un intervalle à 95 % devrait contenir la vraie valeur dans 95 % des cas. Sur 40 jeux synthétiques de 9 points (les tailles d'au moins 64 Kio parmi 15) avec 3 % de bruit multiplicatif, l'intervalle bootstrap par percentiles de B contient la vraie valeur 34 fois sur 40 (85 %), et celui de α 36 fois sur 40 (90 %) : avec si peu de points, il est trop optimiste. Le test `test_bootstrap_coverage_is_close_to_but_below_nominal` l'inscrit ; retenez que « intervalle à 95 % » ne veut pas dire « 95 % de chances » sans vérification.
 :::
 
 Trois accroches **honnêtes**, à adapter à ce que vous avez réellement mesuré (ne reprenez pas ces chiffres s'ils ne sont pas les vôtres) :
 
 1. « J'ai mesuré qu'un entraînement data-parallel d'un petit réseau ne passait pas à l'échelle sur quatre processeurs virtuels, et j'ai expliqué pourquoi avec un modèle α-β et une décomposition du temps de communication. »
-2. « J'ai validé un modèle d'all-reduce contre des mesures avec un intervalle de confiance, et montré qu'il prédit la collective à 4 % près mais pas le pas complet. »
+2. « J'ai validé un modèle d'all-reduce contre des mesures avec un intervalle de confiance, et montré qu'il prédit la collective à 4 % près à deux processus, observe un all-reduce 46 % plus lent que prévu à quatre, et ne prédit pas le pas complet. »
 3. « Je sais dire ce que cette étude ne permet pas de conclure : le comportement sur GPU, sur un vrai réseau, et à grande échelle. »
 
 ### Formules du projet {#formules}

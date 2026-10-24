@@ -16,7 +16,7 @@ badges:
 
 Un cluster Slurm est un **état** : comptes, QOS, parts d'équité, utilisateurs, partitions. Tant que cet état n'existe que dans l'historique d'un terminal, personne ne peut le relire, le revoir ni le reconstruire. Ce projet vous fait décrire l'état voulu dans un fichier, calculer **ce qui manque** par rapport à l'état réel, l'appliquer, puis observer le cluster avec des métriques et des alertes que vous avez testées.
 
-Le point de départ est un constat fait en écrivant le [module Slurm](../../courses/slurm/index.html). Ses scripts de lab ajoutent `|| true` à chaque `sacctmgr`, ce qui les rend « idempotents » mais **cache aussi les vraies erreurs**. En effet, `sacctmgr add` sur un objet qui existe déjà se termine avec le code 1, exactement comme une faute de frappe. La bonne méthode est d'**observer l'état réel et de n'ajouter que la différence**.
+Le point de départ est un constat fait en écrivant le [module Slurm](../../courses/slurm/index.html). Ses scripts de lab ajoutent `|| true` à chaque `sacctmgr`, ce qui les rend « idempotents » mais **cache aussi les vraies erreurs**. En effet, `sacctmgr add` sur un objet qui existe déjà se termine avec le code 1, exactement comme une faute de frappe. La bonne méthode est d'**observer l'état réel et de n'ajouter que la différence**, comme le fait `terraform plan` : lire l'état réel, afficher l'écart, ne l'appliquer qu'ensuite.
 
 ::: key
 [Objectif du projet]{.tag} Un cluster que l'on sait décrire (`cluster.yml`), converger vers cette description sans jamais rien supprimer, et surveiller avec des alertes dont on a prouvé qu'elles se déclenchent, qu'elles se taisent quand il le faut, et que les tests qui les protègent détectent une règle modifiée.
@@ -24,13 +24,13 @@ Le point de départ est un constat fait en écrivant le [module Slurm](../../cou
 
 Le projet se vérifie de deux façons. Hors ligne, avec des sorties **réelles** de Slurm 23.11.4 enregistrées dans `fixtures/` : aucun Slurm n'est nécessaire pour faire passer les tests. En direct, avec `verify-live.sh`, qui monte le Slurm du bac à sable du module 5, applique votre configuration deux fois et lit de vraies métriques.
 
-**État de la vérification en direct.** Le 2026-10-24, `verify-live.sh` a été exécuté de bout en bout trois fois sur le code de référence, avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes `sacctmgr`, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par `promtool`) et voit un nœud drainé devenir `slurm_node_unhealthy{reason="gpu_xid"} 1`.
+**État de la vérification en direct.** Le 2026-10-24, `verify-live.sh` a été exécuté avec succès de bout en bout plusieurs fois sur le code de référence (dont deux fois sur la version finale), avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes `sacctmgr`, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par `promtool`) et voit un nœud drainé devenir `slurm_node_unhealthy{reason="gpu_xid"} 1`.
 
-Limites : le drainage est provoqué à la main avec `scontrol update … reason=gpu_xid:79`, sans panne de GPU réelle, et les jobs sont des `sleep` sur processeur.
+Limites : le drainage est provoqué à la main avec `scontrol update … reason=gpu_xid:79`, sans panne de GPU réelle, et les jobs sont des `sleep` sur processeur. L'exportateur lit `sshare` sans `-a` : il ne voit que les associations de l'utilisateur qui le lance (ici `root`), pas celles des autres utilisateurs.
 
 ### Prérequis de connaissances {#pre}
 
-Le [module Slurm](../../courses/slurm/index.html) (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; le chapitre sur la comptabilité explique ce que vous allez décrire en code. Les règles d'alerte et leurs tests reprennent la méthode du [projet 5](../gpu-observability/index.html), appliquée ici aux métriques d'un ordonnanceur et non d'un GPU.
+Le [module Slurm](../../courses/slurm/index.html) (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; le chapitre sur la comptabilité explique ce que vous allez décrire en code. Les règles d'alerte et leurs tests reprennent la méthode du [projet 5](../gpu-observability/index.html), appliquée ici aux métriques d'un ordonnanceur et non d'un GPU. Ce projet vous fournit le test de mutation déjà écrit ; le projet 5 l'explique en détail.
 
 ## Cahier des charges {#cahier}
 
@@ -101,13 +101,15 @@ Chaque critère est mesurable ; la commande qui le montre est indiquée.
 
 Ces indices ne donnent pas la solution ; essayez d'abord sans.
 
-**Syntaxe de `sacctmgr`.** Ne la devinez pas : testez-la sur le Slurm du bac à sable. Les formes qui ont été exécutées avec succès sont `add account NOM parent=P fairshare=N`, `modify account where name=NOM set fairshare=N`, `add user NOM account=A`, `add qos NOM Priority=N Preempt=autre`, `modify qos where name=NOM set Priority=N` et `modify user where name=NOM set qos+=Q`.
+**Syntaxe de `sacctmgr`.** Ne la devinez pas : testez-la sur le Slurm du bac à sable. Les formes qui ont été exécutées avec succès sont `add account NOM parent=P fairshare=N`, `modify account where name=NOM set fairshare=N`, `add user NOM account=A`, `add qos NOM Priority=N Preempt=autre`, `modify qos where name=NOM set Priority=N Preempt=a,b`, `modify user where name=NOM set qos+=Q` et `add user NOM account=A` pour un utilisateur déjà présent dans un autre compte.
 
 **Lire l'état.** `sacctmgr -nP show assoc` mêle deux sortes de lignes : celles dont la colonne utilisateur est vide décrivent un compte (parent, part), les autres décrivent un utilisateur dans un compte (avec la liste de ses QOS). Un même utilisateur peut apparaître dans plusieurs comptes, comme `root` dans les fixtures.
 
 **Idempotence par différence.** Deux idées distinctes : ne **proposer** que ce qui manque, et **s'arrêter** au premier échec avec un message qui nomme la commande. Un échec silencieux est exactement ce que `|| true` produisait.
 
 **Étiquettes bornées.** Le texte libre d'une raison de nœud (`gpu_xid:79`, `health: …`) donnerait une série par message distinct. Gardez la partie avant le premier deux-points ou espace. De même, regroupez les raisons d'attente inconnues sous `other`.
+
+**Fuseau horaire.** `squeue` écrit l'heure de soumission (`%V`) dans le fuseau **local** de la machine. L'analyseur la lit comme de l'UTC : lancez donc les commandes avec `TZ=UTC`, sinon l'âge de chaque job en attente est faux du décalage horaire (observé : `TZ=America/New_York` donnait 14402 s pour un job soumis 2 s plus tôt, de quoi déclencher `SlurmJobsPendingTooLong` aussitôt).
 
 **Absence et zéro.** Une alerte « des jobs attendent et aucun ne tourne » compare le nombre de jobs en cours à zéro. Si l'exportateur n'émet que les états qui existent, la série `RUNNING` **n'existe pas** quand rien ne tourne, et la comparaison ne donne rien : l'alerte ne se déclenche jamais, précisément dans le cas qu'elle doit couvrir. Émettez des zéros explicites.
 
@@ -132,6 +134,12 @@ Les deux commandes se terminent avec le code 1, comme n'importe quelle erreur : 
 **Formats lus.** `sshare -n -P` indente la première colonne (` root|root|1|0.5…`) ; `sinfo -N -o "%E"` écrit `none` quand il n'y a pas de raison ; un nœud qui draine alors qu'un job tourne est `drng`, puis `drain` quand le job est parti ; `squeue` donne la raison `None` pour un job qui tourne.
 
 **Résultat des tests.** La référence passe 24 tests ; le code de départ en échoue 22 (seuls passent les deux tests qui vérifient la règle et son test fournis). Le test de mutation génère six mutants de la règle et les détecte tous.
+
+**Ce que les tests ne couvrent pas.**
+
+- Le test de mutation ne produit que deux sortes de mutants (durée `for` à 90 minutes, première comparaison inversée). Un seuil ou une durée légèrement décalés, comme `> 3500` au lieu de `> 3600`, ne sont attrapés que par les cas ajoutés à la main dans `slurm.rules.test.yml`.
+- `modify qos … Preempt=` **remplace** toute la liste (vérifié sur Slurm 23.11.4). Si le cluster préempte une QOS de plus que le fichier, le plan la retire, ce qui contredit « jamais destructif ».
+- Si `preempt` est absent du fichier alors que le cluster en a un, le plan émet un `modify` qui ne change rien et ne converge jamais. Ces deux cas ne sont pas testés.
 :::
 
 ## Extensions {#extensions}

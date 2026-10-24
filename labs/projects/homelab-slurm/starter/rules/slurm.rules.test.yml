@@ -13,6 +13,9 @@ tests:
       - alertname: SlurmExporterStale
         eval_time: 8m
         exp_alerts: []
+      - alertname: SlurmExporterStale   # scrape_ok has been 0 for 4m45s only: `for: 5m` is not over yet
+        eval_time: 15m
+        exp_alerts: []
       - alertname: SlurmExporterStale
         eval_time: 17m
         exp_alerts:

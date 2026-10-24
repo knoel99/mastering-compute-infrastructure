@@ -52,9 +52,9 @@ def validate(cfg):
     return True
 
 
-def parse_state(assoc_text, qos_text, users_text=""):
-    """Live state from `sacctmgr -nP show assoc format=Cluster,Account,User,ParentName,Share,QOS`,
-    `show qos format=Name,Priority,Preempt` and `show user format=User,DefaultAccount`."""
+def parse_state(assoc_text, qos_text):
+    """Live state from `sacctmgr -nP show assoc format=Cluster,Account,User,ParentName,Share,QOS` and
+    `sacctmgr -nP show qos format=Name,Priority,Preempt`."""
     accounts, user_accounts, user_qos = {}, {}, {}
     for line in assoc_text.splitlines():
         if not line.strip():

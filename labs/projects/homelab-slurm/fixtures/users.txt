@@ -1,3 +1,0 @@
-alice|teama
-bob|teamb
-root|research

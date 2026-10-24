@@ -43,6 +43,7 @@ def test_durations_are_hand_checkable():
 def test_gpu_hours_and_human_format():
     assert timeline.gpu_hours_idle(128, EV) == pytest.approx(128 * 7080 / 3600)
     assert timeline.human(6000) == "1 h 40 min" and timeline.human(240) == "4 min" and timeline.human(7080) == "1 h 58 min"
+    assert timeline.human(6031) == "1 h 41 min" and timeline.human(3660) == "1 h 01 min"  # rounded to the minute, minutes zero-padded
 
 
 def test_the_example_postmortem_passes_with_the_log_it_describes():
@@ -61,6 +62,10 @@ def test_each_missing_section_is_reported(title):
 
 def test_blame_vocabulary_is_flagged_in_the_analysis_sections():
     assert any("blame" in e for e in errs("La perte du GPU de gpu-17 a laissé", "L'ingénieur a oublié de surveiller : la perte du GPU a laissé"))
+    assert any("blame" in e for e in errs("La perte du GPU de gpu-17 a laissé", "Par erreur de Paul, la perte du GPU a laissé"))
+    # system descriptions that merely contain the same words are not blame
+    for ok in ("Par erreur de configuration, la perte du GPU de gpu-17 a laissé", "Faute de métrique adaptée, la perte du GPU de gpu-17 a laissé"):
+        assert not any("blame" in e for e in errs("La perte du GPU de gpu-17 a laissé", ok))
 
 
 def test_actions_need_owner_date_and_a_verification():

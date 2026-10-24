@@ -13,7 +13,9 @@ import timeline
 
 SECTIONS = ["Résumé", "Impact", "Chronologie", "Cause racine", "Facteurs contributifs", "Ce qui a bien marché",
             "Ce qui a mal marché", "Actions", "Leçons"]
-BLAME = re.compile(r"\b(a oublié|ont oublié|par négligence|incompétent|faute de|par erreur de [A-Z][a-z]+|c'est la faute)\b", re.I)
+# 'par erreur de' is flagged only before a capitalised name (a person); the group is case-sensitive although the rest is not.
+# 'faute de' (= for lack of) is NOT flagged: "faute de métrique" describes the system.
+BLAME = re.compile(r"\b(a oublié|ont oublié|par négligence|incompétent|par erreur de (?-i:[A-Z][a-z]+)|c['’]est la faute|sa faute|leur faute)\b", re.I)
 FORBIDDEN = re.compile(r"\b(TODO|TBD|XXX|à compléter)\b", re.I)
 
 

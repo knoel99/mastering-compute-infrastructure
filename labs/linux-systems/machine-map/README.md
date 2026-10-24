@@ -9,7 +9,7 @@ python3 machine_map.py --sysroot fixtures/sysroot-2socket --lscpu-json fixtures/
 PYTHON=python3 bash verify.sh
 ```
 
-`fixtures/sysroot-2socket/` est un serveur à deux sockets et huit GPU **fabriqué à la main** pour tester la
+`fixtures/sysroot-2socket/` est un serveur à deux sockets et quatre GPU **fabriqué à la main** pour tester la
 logique de localité : ce n'est pas la capture d'une machine réelle. `lscpu-sandbox.json` et `lsblk-sandbox.json`
 sont, eux, des captures de la machine du bac à sable (Xeon virtualisé, 4 vCPU, un seul nœud NUMA).
 

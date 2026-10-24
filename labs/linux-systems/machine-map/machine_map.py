@@ -96,8 +96,13 @@ def cpu_summary(lscpu_json):
             "cores_per_socket": int(f["Core(s) per socket"]), "threads_per_core": int(f["Thread(s) per core"])}
 
 
+def _flag(v):
+    """lsblk --json prints rota as a boolean, and older util-linux versions print the strings "0"/"1" (bool("0") is True)."""
+    return str(v).lower() in ("1", "true")
+
+
 def disk_summary(lsblk_json):
-    return [{"name": d["name"], "size_bytes": int(d["size"]), "rotational_flag": bool(d["rota"])}
+    return [{"name": d["name"], "size_bytes": int(d["size"]), "rotational_flag": _flag(d["rota"])}
             for d in lsblk_json["blockdevices"] if d["type"] == "disk" and int(d["size"]) > 0]
 
 

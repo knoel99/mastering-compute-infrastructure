@@ -14,6 +14,9 @@ tests:
       - alertname: GPUXidError
         eval_time: 2m
         exp_alerts: []
+      - alertname: GPUXidError   # pending: the value is non-zero since 2m45 but `for` (1m) has not elapsed
+        eval_time: 3m
+        exp_alerts: []
       - alertname: GPUXidError
         eval_time: 5m
         exp_alerts:

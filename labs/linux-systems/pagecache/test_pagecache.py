@@ -36,5 +36,8 @@ def test_resident_bytes_of_an_empty_file_is_zero(tmp_path):
     assert pc.resident_bytes(f) == 0
 
 
-def test_dirty_kib_is_a_non_negative_integer():
+def test_dirty_kib_reads_the_dirty_line_and_not_writeback(tmp_path):
+    m = tmp_path / "meminfo"
+    m.write_text("MemTotal:  100 kB\nDirty:  262540 kB\nWriteback:  7 kB\n")
+    assert pc.dirty_kib(str(m)) == 262540
     assert pc.dirty_kib() >= 0

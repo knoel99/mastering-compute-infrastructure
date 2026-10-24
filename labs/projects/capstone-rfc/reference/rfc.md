@@ -37,11 +37,11 @@ Toutes les classes tournent sur de la capacité à la demande. Avantages : aucun
 
 ### Option B — Tout réservé, un pool par classe
 
-Pools réservés de 256, 32, 16 et 4 GPU. Avantages : tous les objectifs sont tenus, attente nulle ou faible, comportement prévisible. Inconvénients : coût de **1 349 040 u**, soit trois fois le budget, avec une utilisation moyenne très basse des petits pools ; engagement de durée difficile à défaire.
+Pools réservés de 256, 32, 16 et 4 GPU. Avantages : tous les objectifs sont tenus, attente nulle ou faible, comportement prévisible. Inconvénients : coût de **1 349 040 u**, soit trois fois le budget, avec une utilisation très basse de tous les pools (de 18 à 27 %) ; 308 GPU au total, au-delà du plafond de 256 GPU fixé par les non-objectifs ; engagement de durée difficile à défaire.
 
 ### Option C — Hybride : développement réservé, reste élastique, pré-entraînement préemptible
 
-Quatre GPU réservés pour le développement ; réglage fin et évaluation à la demande ; pré-entraînement sur capacité préemptible avec checkpoints et reprise automatique. Avantages : tous les objectifs tenus pour **317 161 u**, soit 29,5 % sous le budget ; seul le pool qui exige une latence de quelques minutes est réservé. Inconvénients : le pré-entraînement subit environ 52 interruptions par job ; le modèle suppose qu'un job de 128 GPU trouve de la capacité préemptible d'un seul tenant, ce qui est l'hypothèse la plus fragile ; deux modes d'exploitation à maintenir.
+Quatre GPU réservés pour le développement ; réglage fin et évaluation à la demande ; pré-entraînement sur capacité préemptible avec checkpoints et reprise automatique. Avantages : tous les objectifs tenus pour **317 161 u**, soit 29,5 % sous le budget ; seul le pool qui exige une latence de quelques minutes est réservé. Inconvénients : le pré-entraînement subit environ 52 incidents par job, dont environ 45 interruptions de la capacité préemptible ; le modèle suppose qu'un job de 128 GPU trouve de la capacité préemptible d'un seul tenant, ce qui est l'hypothèse la plus fragile ; deux modes d'exploitation à maintenir.
 
 ### Option D — Hybride avec pré-entraînement à la demande
 
@@ -60,7 +60,7 @@ Les critères et leurs poids sont ceux du groupe ; les notes de 1 à 5 sont un *
 | Réversibilité | 10 | 5 | 1 | 4 | 5 |
 | Total | 100 | 2,7 | 3,0 | 4,3 | 3,7 |
 
-**Décision : option C.** Elle est la seule qui tient le budget **et** les objectifs de niveau de service. Son principal risque, l'indisponibilité de capacité préemptible pour 128 GPU, est traité par une règle de bascule vers la capacité à la demande, voir « Migration » et « Risques ». Si ce risque se réalise souvent, la décision se rapproche de l'option D et dépasse le budget : c'est un seuil à surveiller, pas une certitude.
+**Décision : option C.** Elle est la seule qui tient le budget **et** les objectifs de niveau de service. Son principal risque, l'indisponibilité de capacité préemptible pour 128 GPU, est traité par une règle de bascule vers la capacité à la demande, voir « Migration » et « Risques ». Si ce risque se réalise souvent, la décision se rapproche de l'option D et dépasse le budget : c'est un seuil à surveiller, pas une certitude. La décision dépend aussi des poids : avec cinq poids égaux de 20, les options C et D sont à égalité à 4,0 ; C reste la seule qui tient le budget, ce qui est une contrainte avant d'être un critère.
 
 ## Capacité et coûts
 
@@ -95,18 +95,18 @@ Seul le coût du pré-entraînement dépend de ce paramètre. Les valeurs ci-des
 | 0,60 | 0,555 | 332 236 |
 | 1,00 | 0,374 | 493 088 |
 
-À partir d'environ **1,0 interruption par heure de job**, le pré-entraînement préemptible coûte autant que le pré-entraînement à la demande (492 741 u). Tant que le taux réel reste très en dessous, l'option C est la moins chère.
+À partir d'environ **1,0 interruption par heure de job**, le pré-entraînement préemptible coûte autant que le pré-entraînement à la demande (492 741 u). Tant que le taux réel reste très en dessous, l'option C est la moins chère. Ce seuil vient du modèle du premier ordre, qui devient pessimiste quand les pannes sont fréquentes (voir « Hypothèses et limites ») : le seuil du modèle exact du projet 3 est plus élevé, donc 1,0 est une valeur prudente.
 
 ### Hypothèses et limites
 
-- Le modèle suppose des arrivées de Poisson et des durées exponentielles par classe ; il ignore les rafales, les priorités et la fragmentation entre pools : les attentes sont une **borne optimiste**.
+- Le modèle suppose des arrivées de Poisson et des durées exponentielles par classe ; il ignore les rafales, les priorités et la fragmentation entre pools : les attentes sont **probablement optimistes** (l'attente croît avec la variabilité des arrivées et des durées), sans être une borne garantie.
 - Il suppose que la capacité à la demande et préemptible est toujours disponible au volume demandé, après 15 minutes. C'est l'hypothèse la plus forte.
 - Prix, taux de panne et taux d'interruption sont inventés. Aucune de ces valeurs n'est une donnée de marché.
-- La disponibilité utile suppose un checkpoint à la période de Young et Daly, sans perte liée à l'écriture sur le stockage partagé.
+- La disponibilité utile suppose un checkpoint à la période de Young et Daly, sans perte liée à l'écriture sur le stockage partagé. Elle vient du modèle du premier ordre, fiable tant que la période de checkpoint reste petite devant le temps moyen entre incidents (ce rapport vaut 0,15 au taux supposé de 0,15 interruption par heure de job, et 0,37 à 1,0). Le modèle exact du projet 3 donne une disponibilité un peu plus haute au taux supposé et beaucoup plus haute à 1,0.
 
 ## Fiabilité
 
-Sur capacité préemptible, un job de 128 GPU subit un taux d'incident de 0,1756 par heure (matériel : 128 × 0,0002, plus 0,15 d'interruptions), soit un temps moyen entre incidents de 342 minutes. La période de checkpoint de Young et Daly est d'environ 52 minutes ; sur un job de 240 heures de calcul, la durée réelle est d'environ 299 heures et l'on attend environ 52 interruptions.
+Sur capacité préemptible, un job de 128 GPU subit un taux d'incident de 0,1756 par heure (matériel : 128 × 0,0002, plus 0,15 d'interruptions), soit un temps moyen entre incidents de 342 minutes. La période de checkpoint de Young et Daly est d'environ 52 minutes ; sur un job de 240 heures de calcul, la durée réelle est d'environ 299 heures et l'on attend environ 52 incidents, dont environ 45 interruptions de la capacité préemptible.
 
 Chaque interruption doit être absorbée **sans intervention humaine**, l'astreinte étant limitée aux heures ouvrées : écriture atomique des checkpoints avec somme de contrôle et repli sur le précédent, relance automatique avec détection de blocage, reprise à l'identique vérifiée par des tests. Ces mécanismes sont ceux du projet 3 ; l'objectif de disponibilité utile du pré-entraînement est de 80 %.
 
@@ -137,7 +137,7 @@ Retour arrière : chaque phase peut revenir à la précédente en changeant le m
 | Risque | Probabilité | Impact | Mitigation |
 |---|---|---|---|
 | Capacité préemptible indisponible pour 128 GPU d'un seul tenant | moyenne | élevée | règle de bascule à 30 minutes vers la demande ; surveiller la fréquence des bascules ; revoir la décision si elle dépasse une fois sur quatre |
-| Taux d'interruption réel très supérieur à 0,15 par heure | moyenne | élevée | mesurer le taux dès la phase 2 ; le seuil d'indifférence est d'environ 1,0 |
+| Taux d'interruption réel très supérieur à 0,15 par heure | moyenne | élevée | mesurer le taux dès la phase 2 ; le seuil d'indifférence est d'environ 1,0 (valeur prudente du modèle) |
 | Corruption silencieuse d'un checkpoint | faible | élevée | somme de contrôle, repli sur le précédent, test de reprise exacte en intégration continue |
 | Dépassement du budget par des jobs inactifs | moyenne | moyenne | alerte d'allocation inactive, expiration automatique des sessions interactives |
 | Perte de la seule personne qui connaît la plateforme | moyenne | élevée | runbooks relus par un second ingénieur, exercice de panne trimestriel |
@@ -149,4 +149,4 @@ Quelle part du pré-entraînement peut tolérer une interruption sans checkpoint
 
 ## Annexes
 
-Reproduire les chiffres : `python3 rfc_lint.py rfc.md --requirements requirements.yaml` évalue la conception du bloc JSON de la section « Capacité et coûts » et refuse un coût différent de celui du modèle. Briques utilisées : projet 2 pour la mesure de passage à l'échelle, projet 3 pour la reprise après panne, projet 4 pour la comparaison de politiques de placement, projet 5 pour l'observabilité. Vérification croisée de la formule d'attente : `mmc_sim.py` simule la file et retrouve la formule d'Erlang à moins de 1 % en moyenne sur six graines de 600 000 arrivées (sur une seule graine de 60 000 arrivées, l'écart atteint 7 à 18 % : les attentes sont corrélées).
+Reproduire les chiffres : `python3 rfc_lint.py rfc.md --requirements requirements.yaml` évalue la conception du bloc JSON de la section « Capacité et coûts » et refuse un coût différent de celui du modèle. Briques utilisées : projet 2 pour la mesure de passage à l'échelle, projet 3 pour la reprise après panne, projet 4 pour la comparaison de politiques de placement, projet 5 pour l'observabilité. Vérification croisée de la formule d'attente : `mmc_sim.py` simule la file et retrouve la formule d'Erlang à moins de 1 % en moyenne sur six graines de 600 000 arrivées (sur une seule graine de 60 000 arrivées, l'écart va de 2 à 22 % selon la graine : les attentes sont corrélées).

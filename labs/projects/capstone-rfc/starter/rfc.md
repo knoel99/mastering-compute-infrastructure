@@ -28,7 +28,7 @@ Avantages : … Inconvénients : …
 ## Capacité et coûts
 
 À compléter : le bloc ```json de votre conception, le tableau du modèle, « Coût mensuel total : N u », une sensibilité, puis
-« Hypothèses et limites ».
+un sous-titre `### Hypothèses et limites`.
 
 ## Fiabilité
 

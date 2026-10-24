@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Volume</td>
-<td>24 h, dont environ 9 h de lecture, 10 h de labs et 5 h d'exercices</td>
+<td>24 h, dont environ 9 h de lecture, 8 h de labs et 7 h d'exercices, de synthèse et de checkpoint</td>
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
@@ -94,7 +94,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="even">
 <td>Environnement</td>
-<td>une machine Linux sans GPU suffit. Lab 1.4 : accès root. Labs 1.2 et 1.3 : <code>stress-ng</code> et <code>fio</code> pour le premier, rien de plus pour le second. Voir la page <a href="../../lab-setup/index.html">environnement de travail</a></td>
+<td>une machine Linux sans GPU suffit. Lab 1.4 : accès root. Lab 1.2 : <code>stress-ng</code> et <code>fio</code>. Lab 1.3 : <code>fio</code> pour la partie B seulement. Lab 1.5 : <code>shellcheck</code> et <code>systemd-analyze</code>. Voir la page <a href="../../lab-setup/index.html">environnement de travail</a></td>
 </tr>
 <tr class="odd">
 <td>Projets qui s'appuient sur ce module</td>
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>2.5 h</td>
 <td>1</td>
 <td>Chapitre 1 : processus, signaux, ordonnanceur, charge, mémoire virtuelle</td>
-<td>exercices 1 et 2</td>
+<td>exercice 1</td>
 </tr>
 <tr class="even">
 <td>2</td>
@@ -158,7 +158,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>3 h</td>
 <td>1</td>
 <td>Chapitre 4 : mesurer avant d'optimiser, méthode USE, pression PSI</td>
-<td>lab 1.2, exercices 5 et 8</td>
+<td>lab 1.2, exercices 2 et 5</td>
 </tr>
 <tr class="odd">
 <td>5</td>
@@ -186,14 +186,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>2.5 h</td>
 <td>2</td>
 <td>Chapitre 8 : pannes matérielles vues du système, scripts d'exploitation robustes</td>
-<td>lab 1.5, exercice 11</td>
+<td>lab 1.5 (qui inclut l'exercice 11)</td>
 </tr>
 <tr class="odd">
 <td>9</td>
 <td>2.5 h</td>
 <td>3</td>
 <td>Synthèse : dimensionner, diagnostiquer un cas ouvert, checkpoint de sortie</td>
-<td>exercice 7, checkpoint</td>
+<td>exercices 7 et 8, checkpoint</td>
 </tr>
 </tbody>
 </table>
@@ -217,7 +217,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Ce chapitre fixe quatre idées que tout le module réutilise : un processus a un état et reçoit des signaux, l'ordonnanceur répartit les cœurs, la mémoire est virtuelle et allouée à la demande, et le cache de pages place les fichiers en mémoire.</p>
 <h3 id="processus-états-et-signaux">1.1. Processus, états et signaux</h3>
 <p>Un <em>processus</em> est un programme en cours d'exécution, avec son espace d'adresses, ses descripteurs de fichiers et un identifiant (PID). À chaque instant, il est dans un état : <code>R</code> (exécutable), <code>S</code> (en sommeil, réveillable par un signal), <code>D</code> (sommeil ininterruptible, typiquement en attente d'une entrée-sortie), <code>T</code> (arrêté) ou <code>Z</code> (zombie : terminé, mais pas encore récolté par son parent).</p>
-<p>Les <em>signaux</em> sont les messages que le noyau ou un autre processus envoie. <code>SIGTERM</code> (15) demande l'arrêt et peut être intercepté. <code>SIGKILL</code> (9) et <code>SIGSTOP</code> ne le peuvent pas : la page <a href="https://man7.org/linux/man-pages/man7/signal.7.html">signal(7)</a> le dit en une phrase, « The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored ». Un processus tué par un signal se termine avec le statut 128 plus le numéro du signal.</p>
+<p>Les <em>signaux</em> sont les messages que le noyau ou un autre processus envoie. <code>SIGTERM</code> (15) demande l'arrêt et peut être intercepté. <code>SIGKILL</code> (9) et <code>SIGSTOP</code> ne le peuvent pas : la page <a href="https://man7.org/linux/man-pages/man7/signal.7.html">signal(7)</a> le dit en une phrase, « The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored ». Un processus tué par un signal est rapporté par le shell avec le statut 128 plus le numéro du signal (convention des shells : le parent lit dans le statut d'attente que le fils est mort d'un signal et affiche 128 + n).</p>
 <div class="ex">
 <p><span class="tag">Exemple 1.1 — Les états d'un processus au fil des signaux</span> Capturé dans le bac à sable (Linux 6.18). On lance <code>sleep 300</code>, puis on l'arrête, on le reprend, on le termine :</p>
 <pre class="text"><code>  PID STAT WCHAN          CMD
@@ -240,7 +240,7 @@ after waitpid: gone                       # une fois récolté, il disparaît</c
 <div class="ex">
 <p><span class="tag">Exemple 1.2 — Huit tâches sur quatre cœurs</span> On lance huit boucles actives (<code>stress-ng --cpu 8</code>) sur une machine de quatre cœurs et on lit <code>/proc/loadavg</code> après environ 62 secondes. La récurrence ci-dessus donne 5,06 après 60 s et 5,29 après 65 s (calcul Python). Capturé :</p>
 <pre class="text"><code>5.58 1.82 0.88 9/119 20326       # charge à 1, 5 et 15 minutes</code></pre>
-<p>La valeur lue, 5,58, est un peu supérieure à la prédiction : d'autres tâches du système étaient exécutables en même temps, ce que le modèle ignore. L'ordre de grandeur est le bon, et la leçon aussi : <strong>la charge ne dit pas combien de cœurs sont saturés</strong>, seulement combien de tâches sont en file. Le chapitre 4 la remplace par une mesure directe de l'attente.</p>
+<p>La valeur lue, 5,58, est un peu supérieure à la prédiction : la charge de départ n'était pas nulle et d'autres tâches du système étaient exécutables en même temps, deux choses que le modèle ignore (on suppose <span class="math inline">L_0 = 0</span>). L'ordre de grandeur est le bon, et la leçon aussi : <strong>la charge ne dit pas combien de cœurs sont saturés</strong>, seulement combien de tâches sont en file. Le chapitre 4 la remplace par une mesure directe de l'attente.</p>
 </div>
 <h3 id="mémoire-virtuelle-et-allocation-à-la-demande">1.3. Mémoire virtuelle et allocation à la demande</h3>
 <p>Chaque processus voit un espace d'adresses virtuel que le noyau relie à des pages physiques de 4 Kio (<code>getconf PAGESIZE</code> renvoie 4096 sur la machine de test). Il ne fournit une page physique qu'au <strong>premier accès</strong> : c'est l'allocation à la demande. <code>VmSize</code> mesure ce qui est réservé, <code>VmRSS</code> ce qui est réellement présent en mémoire (<em>resident set size</em>).</p>
@@ -286,15 +286,16 @@ hugetlb                                 # un seul contrôleur côté v2</code></
 <p><span class="tag">Exemple 2.2 — Une mise à mort par manque de mémoire, lue de bout en bout</span> Le lab 1.4 place un programme dans un cgroup limité à 100 Mio, puis lui fait allouer 300 Mio par blocs de 10 Mio. Capturé (cgroup v1) :</p>
 <pre class="text"><code>allocated 90 MiB                           # dernier message affiché
 exit status: 137, oom_kill counter: 1      # tué par SIGKILL
-Memory cgroup out of memory: Killed process 20024 (python3) total-vm:116776kB, anon-rss:102016kB, file-rss:5724kB</code></pre>
-<p>Lecture : la limite est de 102 400 kB ; la mémoire anonyme au moment de la mise à mort est de 102 016 kB, soit 99,6 % de la limite. Les 90 Mio touchés valent 92 160 kB ; il reste 9 856 kB, environ 9,6 Mio, pour l'interpréteur Python lui-même, ce qui est cohérent avec les 9 Mio de <code>VmRSS</code> d'un Python au repos mesurés à l'exemple 1.3. Le dixième bloc n'a jamais fini d'être touché : le noyau a tué avant que « allocated 100 MiB » s'affiche.</p>
+Memory cgroup out of memory: Killed process 28868 (python3) total-vm:116780kB, anon-rss:102016kB, file-rss:5836kB</code></pre>
+<p>Lecture : la limite est de 102 400 kB ; la mémoire anonyme au moment de la mise à mort est de 102 016 kB, soit 99,6 % de la limite. Les 90 Mio de blocs terminés valent 92 160 kB ; il reste 9 856 kB (environ 9,6 Mio).</p>
+<p>Ils se partagent entre l'interpréteur (un Python 3 au repos a environ 2,9 Mio de mémoire anonyme, <code>RssAnon</code> lu dans <code>/proc/self/status</code>) et la partie du dixième bloc déjà touchée quand le noyau a tué, soit environ 6,8 Mio par différence. Le dixième bloc n'a jamais fini d'être touché : « allocated 100 MiB » ne s'est jamais affiché.</p>
 </div>
 <p>C'est la raison pour laquelle un job qui demande 100 Go dans Slurm ou Kubernetes <strong>meurt</strong> au lieu d'être ralenti quand il dépasse : la limite mémoire est dure. Pour un entraînement, prévoir de la marge dans la demande et un <code>memory.high</code> en dessous de <code>memory.max</code> transforme une mise à mort en ralentissement visible.</p>
 <h3 id="limiter-le-processeur">2.3. Limiter le processeur</h3>
 <p>Une limite de processeur est un <strong>quota par période</strong> : en v2, <code>cpu.max</code> est de la forme <code>$MAX $PERIOD</code>, avec la valeur par défaut <code>max 100000</code> (aucune limite sur une période de 100 000 µs). <code>20000 100000</code> accorde 20 000 µs de processeur par période de 100 000 µs, soit 20 % d'un cœur. En v1, ce sont <code>cpu.cfs_quota_us</code> et <code>cpu.cfs_period_us</code>.</p>
 <p>Un quota n'est pas une priorité : il plafonne même si la machine est vide. Pour répartir sans plafonner, on utilise des poids (<code>cpu.weight</code> en v2), qui n'agissent qu'en cas de concurrence.</p>
 <div class="ex">
-<p><span class="tag">Exemple 2.3 — Un quota de 20 % mesuré</span> Le lab 1.4 lance une boucle active pendant 4 secondes dans un groupe limité à 20 % d'un cœur et mesure le temps processeur obtenu sur le temps écoulé. Capturé : <code>share of one CPU obtained: 0.197</code>. C'est 98,5 % du quota (0,197 sur 0,20) ; le test accepte entre 0,10 et 0,35 pour tolérer le bruit d'une machine partagée.</p>
+<p><span class="tag">Exemple 2.3 — Un quota de 20 % mesuré</span> Le lab 1.4 lance une boucle active pendant 4 secondes dans un groupe limité à 20 % d'un cœur et mesure le temps processeur obtenu sur le temps écoulé. Capturé : <code>share of one CPU obtained: 0.197</code> (0,199 et 0,200 sur deux autres exécutions). C'est 98,5 % du quota (0,197 sur 0,20) ; le test accepte entre 0,10 et 0,35 pour tolérer le bruit d'une machine partagée.</p>
 </div>
 <h3 id="la-règle-des-processus-internes-v2">2.4. La règle des processus internes (v2)</h3>
 <p>En v2, un cgroup qui délègue des contrôleurs à ses enfants ne peut en principe pas contenir de processus lui-même : c'est la contrainte « no internal process ». La documentation précise que le cgroup racine en est exempté. C'est pourquoi un gestionnaire de services comme systemd place chaque service dans une feuille de l'arbre, et pourquoi un conteneur est une feuille sous un cgroup de pod.</p>
@@ -349,12 +350,13 @@ node 0 size: 7901 MB
 node 0 free: 7391 MB
 $ head -1 /proc/meminfo
 MemTotal:       16477348 kB          # soit 16 091 Mio</code></pre>
-<p><code>numactl</code> annonce 7 901 Mo pour l'unique nœud, <code>MemTotal</code> en annonce 16 091 : le nœud ne couvre que 49 % de la mémoire de la machine virtuelle. Sur une machine virtuelle, <strong>ne supposez pas</strong> que la somme des nœuds égale la mémoire totale. Sur une machine physique, un écart est un signal à expliquer (mémoire non attachée à un nœud, dispositif de mémoire particulier) avant de dimensionner quoi que ce soit.</p>
+<p><code>numactl</code> annonce 7 901 Mo pour l'unique nœud, <code>MemTotal</code> en annonce 16 091 : le nœud ne couvre que 49 % de la mémoire de la machine virtuelle (la taille du nœud varie dans ce bac à sable : une relecture, plus tard, a donné 7 773 Mo). Sur une machine virtuelle, <strong>ne supposez pas</strong> que la somme des nœuds égale la mémoire totale. Sur une machine physique, un écart est un signal à expliquer (mémoire non attachée à un nœud, dispositif de mémoire particulier) avant de dimensionner quoi que ce soit.</p>
 </div>
 <h3 id="qui-est-branché-où-gpu-carte-réseau-disque-nvme">3.3. Qui est branché où : GPU, carte réseau, disque NVMe</h3>
-<p>Chaque périphérique PCI déclare dans <code>/sys/bus/pci/devices/&lt;adresse&gt;/numa_node</code> le nœud auquel il est rattaché, avec <code>-1</code> pour « aucune affinité déclarée ». Croiser cette information avec la classe du périphérique (3D controller pour un GPU, InfiniBand, NVMe) donne une <strong>table de localité</strong> : pour chaque nœud, les GPU, les cartes réseau et les disques qui y sont directement branchés. Le lab 1.1 la construit.</p>
+<p>Chaque périphérique PCI déclare dans <code>/sys/bus/pci/devices/&lt;adresse&gt;/numa_node</code> le nœud auquel il est rattaché, avec <code>-1</code> pour « aucune affinité déclarée ». Croiser cette information avec la classe du périphérique (3D controller pour un GPU, InfiniBand, NVMe ; le code de classe est lu dans <code>/sys/bus/pci/devices/&lt;adresse&gt;/class</code>) donne une <strong>table de localité</strong> : pour chaque nœud, les GPU, les cartes réseau et les disques qui y sont directement branchés. Le lab 1.1 la construit.</p>
+<p>Il classe une carte d'après ce code : une carte RDMA configurée en Ethernet (RoCE) peut y apparaître comme <code>ethernet</code> plutôt qu'<code>infiniband</code> ; ce point n'a pas été vérifié (voir « À vérifier »).</p>
 <div class="ex">
-<p><span class="tag">Exemple 3.3 — Quelle carte réseau pour quel GPU ?</span> Le lab 1.1 est exécuté sur un serveur à deux sockets et huit GPU <strong>fabriqué à la main</strong> (ce n'est pas la capture d'une machine réelle : il sert à tester la logique). La sortie <code>locality</code> est :</p>
+<p><span class="tag">Exemple 3.3 — Quelle carte réseau pour quel GPU ?</span> Le lab 1.1 est exécuté sur un serveur à deux sockets et quatre GPU <strong>fabriqué à la main</strong> (ce n'est pas la capture d'une machine réelle : il sert à tester la logique). La section <code>locality</code> du rapport JSON, remise en forme à la main, donne :</p>
 <pre class="text"><code>nœud  0 : GPU 0000:18:00.0, 0000:3b:00.0   InfiniBand 0000:5e:00.0   NVMe 0000:5f:00.0
 nœud  1 : GPU 0000:86:00.0, 0000:af:00.0   InfiniBand 0000:c1:00.0   NVMe 0000:c2:00.0
 nœud -1 : Ethernet 0000:00:1f.6                                       # aucune affinité déclarée</code></pre>
@@ -455,7 +457,7 @@ io:     some avg10=0.08 avg60=0.12 avg300=0.07 total=83469838</code></pre>
 </div>
 <p>Les outils de profilage d'échantillonnage, <code>perf</code> avec ses graphes de flammes et <code>bpftrace</code> pour tracer le noyau, complètent cette liste. Ils ne sont pas installés dans le bac à sable : ce cours les décrit sans en montrer de sortie. Pour les utiliser, partez d'une hypothèse issue de la table USE, pas de l'envie d'essayer.</p>
 <h3 id="quatre-charges-quatre-lectures">4.4. Quatre charges, quatre lectures</h3>
-<p>Le lab 1.2 fait tourner <code>triage.py</code> pendant quatre situations réelles et vérifie que chacune est reconnue. Résultats capturés (fractions du temps, sauf <code>aqu-sz</code>) :</p>
+<p>Le lab 1.2 fait tourner <code>triage.py</code> pendant quatre situations réelles et vérifie que chacune est reconnue. Résultats d'une exécution (fractions du temps, sauf <code>aqu-sz</code>, la taille moyenne de file du disque, au nom de la colonne de <code>iostat -x</code>) :</p>
 <div class="tbl-wrap">
 <table style="width:100%;">
 <colgroup>
@@ -507,7 +509,7 @@ io:     some avg10=0.08 avg60=0.12 avg300=0.07 total=83469838</code></pre>
 <td>tâches bloquées sur le disque</td>
 </tr>
 <tr class="even">
-<td>lectures asynchrones profondes</td>
+<td>écritures asynchrones profondes (4 Kio aléatoires, <code>O_DIRECT</code>)</td>
 <td>0,34</td>
 <td>0,02</td>
 <td>0,00</td>
@@ -518,8 +520,10 @@ io:     some avg10=0.08 avg60=0.12 avg300=0.07 total=83469838</code></pre>
 </tbody>
 </table>
 </div>
+<p>D'une exécution à l'autre, les chiffres bougent : deux autres exécutions ont donné, pour les écritures synchrones, <code>io_psi</code> de 0,19 et 0,28 et <code>disk_util</code> de 0,45 et 0,55. Seules les conclusions de <code>classify</code> et les ordres de grandeur sont reproductibles, et <code>verify.sh</code> ne vérifie que les conclusions.</p>
 <div class="war">
-<p><span class="tag">L'angle mort de la pression PSI</span> La dernière ligne est la leçon du chapitre. Avec des entrées-sorties asynchrones (<code>libaio</code> et une file de 32 requêtes), le disque est occupé à 93 % mais <strong>aucune tâche n'est bloquée</strong> : la pression PSI <code>io</code> reste à zéro. Un diagnostic qui ne lirait que PSI conclurait « le disque va bien ». Il faut lire en plus l'occupation du disque et la taille de sa file dans <code>/proc/diskstats</code>. Constaté sur ce disque virtuel, avec ce noyau ; reproduisez-le avec <code>verify.sh</code> avant de généraliser.</p>
+<p><span class="tag">L'angle mort de la pression PSI</span> La dernière ligne est la leçon du chapitre. Avec des entrées-sorties asynchrones (<code>libaio</code> et une file de 32 requêtes), le disque est occupé à 93 % mais <strong>aucune tâche n'est bloquée</strong> : la pression PSI <code>io</code> reste à zéro. Un diagnostic qui ne lirait que PSI conclurait « le disque va bien ». Il faut lire en plus l'occupation du disque et la taille de sa file dans <code>/proc/diskstats</code>.</p>
+<p>Constaté sur ce disque virtuel, avec ce noyau ; reproduisez-le avec <code>verify.sh</code> avant de généraliser. Source : mesure de ce module (lab 1.2) ; la définition de <code>some</code> est celle de la <a href="https://docs.kernel.org/accounting/psi.html">documentation PSI</a>, qui ne parle pas de ce cas.</p>
 </div>
 <div class="recap">
 <p><span class="tag">Points clés</span></p>
@@ -580,7 +584,7 @@ always [madvise] never</code></pre>
 <tr class="odd">
 <td><code>vm.swappiness</code></td>
 <td>60</td>
-<td>valeur entre 0 et 100 réglant la propension du noyau à écrire des pages en swap ; défaut 60</td>
+<td>coût relatif estimé des E/S de swap par rapport aux E/S de fichiers, entre 0 et 200 ; à 100 le noyau les traite à égalité ; défaut 60</td>
 </tr>
 <tr class="even">
 <td><code>vm.overcommit_memory</code></td>
@@ -676,7 +680,7 @@ TCP:   19 (estab 15, closed 1, orphaned 0, timewait 1)</code></pre>
 <h3 id="regroupement-contrôle-de-trafic-et-ce-quon-ne-peut-pas-tester-ici">6.4. Regroupement, contrôle de trafic et ce qu'on ne peut pas tester ici</h3>
 <p>Le <em>bonding</em> regroupe plusieurs interfaces en une seule pour la redondance ou le débit. <code>tc</code> (<em>traffic control</em>) configure les files d'attente d'une interface, ce qui permet d'émuler un lien lent ou perdant avec le module <code>netem</code>. Dans le bac à sable, cette émulation n'est pas possible : le noyau répond <code>Error: Specified qdisc kind is unknown.</code> à <code>tc qdisc add dev lo root netem delay 20ms</code>. C'est un constat sur ce noyau précis ; sur une machine de laboratoire, ces tests d'impact d'un lien dégradé sont précieux pour vérifier que vos outils de supervision détectent le problème.</p>
 <h3 id="premiers-pas-rdma">6.5. Premiers pas RDMA</h3>
-<p>Dans une communication TCP, le noyau copie les données entre le programme et la carte. Avec le <em>RDMA</em> (<em>remote direct memory access</em>), la carte lit et écrit directement la mémoire du programme, sans passer par le noyau pour chaque transfert : c'est ce qui permet les latences basses et les débits élevés des réseaux de calcul (InfiniBand, RoCE). Le programme <strong>enregistre</strong> d'abord des zones mémoire auprès de la carte, ce qui explique les limites <code>memlock</code> du chapitre 5.</p>
+<p>Dans une communication TCP, le noyau copie les données entre le programme et la carte. Avec le <em>RDMA</em> (<em>remote direct memory access</em>), la carte lit et écrit directement la mémoire du programme, sans passer par le noyau pour chaque transfert : c'est ce qui permet les latences basses et les débits élevés des réseaux de calcul (InfiniBand, ou RoCE, c'est-à-dire du RDMA sur Ethernet). Le programme <strong>enregistre</strong> d'abord des zones mémoire auprès de la carte, ce qui explique les limites <code>memlock</code> du chapitre 5.</p>
 <p>Le module réseau du parcours détaille les protocoles, la topologie et la mesure. Retenez ici deux choses : le chemin des données change, donc les outils de diagnostic aussi, et un nœud dont la limite <code>memlock</code> est basse peut échouer à initialiser sa communication.</p>
 <div class="recap">
 <p><span class="tag">Points clés</span></p>
@@ -698,7 +702,7 @@ TCP:   19 (estab 15, closed 1, orphaned 0, timewait 1)</code></pre>
 NAME  TYPE  SIZE ROTA MOUNTPOINT
 vda   disk  256G    1 /
 vdb   disk  9.6M    1 /opt/rclone</code></pre>
-<p>Tous les disques virtio annoncent <code>ROTA=1</code>, comme s'ils étaient des disques durs mécaniques. Un disque virtuel transmet ce que son hôte lui dit, pas la nature du support. Un script qui choisirait un ordonnanceur d'E/S ou une stratégie de lecture d'après <code>ROTA</code> se tromperait ici : <strong>vérifiez avec une mesure</strong>, comme celle de la section suivante.</p>
+<p>Tous les disques virtio annoncent <code>ROTA=1</code>, comme s'ils étaient des disques durs mécaniques. Un disque virtuel ne connaît pas la nature du support qui se trouve derrière lui sur l'hôte : le drapeau n'est pas une mesure. Un script qui choisirait un ordonnanceur d'E/S ou une stratégie de lecture d'après <code>ROTA</code> se tromperait ici : <strong>vérifiez avec une mesure</strong>, comme celle de la section suivante.</p>
 </div>
 <h3 id="mesurer-un-disque-avec-fio-la-loi-de-little">7.2. Mesurer un disque avec <code>fio</code> : la loi de Little</h3>
 <p><code>fio</code> génère des charges d'entrée-sortie contrôlées. La <strong>loi de Little</strong> relie trois quantités d'un système stable : le nombre moyen de requêtes en cours est le produit du débit par le temps moyen de traitement.</p>
@@ -713,7 +717,7 @@ iodepth=32  iops=   60341  mean latency=  529.3 us  iops x latency = 31.94</code
 <h3 id="cache-de-pages-fsync-et-o_direct">7.3. Cache de pages, <code>fsync</code> et <code>O_DIRECT</code></h3>
 <p>Une lecture normale passe par le cache de pages ; l'indicateur <code>O_DIRECT</code> de <a href="https://man7.org/linux/man-pages/man2/open.2.html">open(2)</a> demande de « minimize cache effects of the I/O to and from this file » et exige des tampons alignés. <code>posix_fadvise</code> avec <code>POSIX_FADV_DONTNEED</code> « attempts to free cached pages » d'un fichier (<a href="https://man7.org/linux/man-pages/man2/posix_fadvise.2.html">posix_fadvise(2)</a>), et <a href="https://man7.org/linux/man-pages/man2/mincore.2.html">mincore(2)</a> permet de « determine whether pages are resident in memory ». Avec ces trois appels, le lab 1.3 raconte l'histoire du cache avec des compteurs.</p>
 <div class="ex">
-<p><span class="tag">Exemple 7.3 — Ce que le noyau a fait de 256 Mio</span> Résultat du lab 1.3, partie A (reproductible : trois exécutions donnent les mêmes valeurs à quelques kio près) :</p>
+<p><span class="tag">Exemple 7.3 — Ce que le noyau a fait de 256 Mio</span> Résultat du lab 1.3, partie A (les colonnes « résident » et « lu sur le périphérique » ont été identiques sur trois exécutions ; <code>dirty KiB</code> varie de quelques centaines de kio, car c'est le compteur <code>Dirty</code> de <strong>toute la machine</strong>, pas celui du fichier) :</p>
 <pre class="text"><code>stage                  dirty KiB  resident MiB  device read MiB
 after write()             262540           256                -
 after fsync()                404           256                -
@@ -721,13 +725,15 @@ after DONTNEED               404             0                -
 cold buffered read           404           256              256
 warm buffered read           408           256                0
 O_DIRECT read                408             0              256</code></pre>
-<p>Lecture ligne à ligne : après <code>write()</code>, 262 540 kio de pages sont sales, c'est-à-dire pas encore sur le disque, mais les 256 Mio sont déjà <strong>résidents</strong>. <code>fsync()</code> ramène les pages sales à 404 kio sans les évincer. <code>DONTNEED</code> vide le cache du fichier. La lecture à froid lit 256 Mio <strong>sur le périphérique</strong> ; la lecture à chaud n'en lit aucun ; la lecture <code>O_DIRECT</code> lit 256 Mio sur le périphérique et <strong>ne remplit pas</strong> le cache.</p>
+<p>Lecture ligne à ligne : après <code>write()</code>, 262 540 kio de pages sont sales, c'est-à-dire pas encore sur le disque (256 Mio font 262 144 kio ; le reste est le bruit de fond de la machine), mais les 256 Mio sont déjà <strong>résidents</strong>. <code>fsync()</code> ramène les pages sales à 404 kio sans les évincer. <code>DONTNEED</code> vide le cache du fichier. La lecture à froid lit 256 Mio <strong>sur le périphérique</strong> ; la lecture à chaud n'en lit aucun ; la lecture <code>O_DIRECT</code> lit 256 Mio sur le périphérique et <strong>ne remplit pas</strong> le cache.</p>
 </div>
 <div class="war">
-<p><span class="tag">Pourquoi ce lab compte des octets et pas des secondes</span> Dans le bac à sable, une lecture « à froid » après <code>drop_caches</code> va aussi vite qu'une lecture « à chaud » : le disque virtuel est mis en cache par l'hôte, et des processus de la plateforme écrivent eux-mêmes dans <code>drop_caches</code>, ce que le journal du noyau trahit (<code>dmesg</code> : « process_api (1): drop_caches: 10 », « tokio-rt-worker (77): drop_caches: 3 »). Un chronomètre ne distingue donc rien ici. Les compteurs d'octets lus sur le périphérique, eux, restent exacts. Même sur du matériel, préférez le compteur : il ne dépend pas de l'humeur de l'hôte.</p>
+<p><span class="tag">Pourquoi ce lab compte des octets et pas des secondes</span> Dans le bac à sable, une lecture « à froid » de 256 Mio ne prend que 0,10 s (2,6 Gio/s) contre 0,04 s à chaud, soit un rapport de 2,5 seulement (trois mesures le 2026-10-24). Le chronomètre ne dit pas si ces octets viennent d'un disque rapide ou d'un cache de l'hôte sous le disque virtuel (hypothèse, non vérifiée).</p>
+<p>Des processus de la plateforme écrivent aussi dans <code>drop_caches</code>, ce que le journal du noyau garde en mémoire au démarrage (<code>dmesg</code> : « process_api (1): drop_caches: 10 », « tokio-rt-worker (77): drop_caches: 3 »). Un chronomètre brouille donc la lecture.</p>
+<p>Les compteurs d'octets lus sur le périphérique, eux, restent exacts, à une réserve près : ils comptent tout le disque, donc la lecture d'un autre processus les fausse (raisonnement sur le code, non provoqué en pratique : cause possible d'un échec de <code>verify.sh</code> sur une machine partagée). Même sur du matériel, préférez le compteur. Source : mesures de ce module et journal du noyau du bac à sable.</p>
 </div>
 <h3 id="écrire-un-checkpoint">7.4. Écrire un checkpoint</h3>
-<p>Pour écrire un état de plusieurs gigaoctets, trois choix s'offrent. Écrire normalement et laisser le cache de pages absorber l'écriture est rapide, mais laisse jusqu'à la taille du fichier en mémoire sale puis résidente : sur un nœud où le jeu de données est lui aussi en cache, il le chasse. Appeler <code>fsync()</code> rend l'écriture <strong>durable</strong> avant de répondre. Écrire en <code>O_DIRECT</code> évite de polluer le cache, au prix d'alignements et de tailles de bloc à respecter.</p>
+<p>Pour écrire un état de plusieurs gigaoctets, trois choix s'offrent. Écrire normalement et laisser le cache de pages absorber l'écriture est rapide, mais laisse jusqu'à la taille du fichier en mémoire sale puis résidente : sur un nœud où le jeu de données est lui aussi en cache, elle peut le chasser. Appeler <code>fsync()</code> rend l'écriture <strong>durable</strong> avant de répondre. Écrire en <code>O_DIRECT</code> évite de polluer le cache, au prix d'alignements et de tailles de bloc à respecter.</p>
 <p>L'enseignement du lab 1.3 est que ces choix se <strong>lisent</strong> dans des compteurs. Le <a href="../../projects/resilient-trainer/index.html">projet 3</a> en tire les conséquences pour un checkpoint atomique : écrire dans un fichier temporaire, <code>fsync</code>, renommer, puis synchroniser le dossier.</p>
 <div class="recap">
 <p><span class="tag">Points clés</span></p>
@@ -742,7 +748,7 @@ O_DIRECT read                408             0              256</code></pre>
 <h2 id="ch8">8. Pannes matérielles vues du système, et scripts d'exploitation robustes</h2>
 <p>Sur une flotte de GPU, une partie des pannes vient du matériel. Ce chapitre apprend où le système les rend visibles et comment écrire les scripts d'exploitation qui réagissent sans aggraver la situation.</p>
 <h3 id="où-le-système-voit-une-panne-matérielle">8.1. Où le système voit une panne matérielle</h3>
-<p>Le noyau journalise ce qu'il détecte : <code>dmesg</code> lit ce journal. Pour la mémoire, le sous-système <strong>EDAC</strong> expose par contrôleur des compteurs d'erreurs corrigées par le code correcteur (ECC) et non corrigées sous <code>/sys/devices/system/edac/mc/</code> (<a href="https://docs.kernel.org/driver-api/edac.html">documentation EDAC</a>). Pour les disques, <code>smartctl</code> lit les attributs SMART. Pour le serveur lui-même, le contrôleur de gestion (BMC) tient un journal d'événements que <code>ipmitool sel</code> affiche ; une machine moderne l'expose aussi en réseau.</p>
+<p>Le noyau journalise ce qu'il détecte : <code>dmesg</code> lit ce journal. Pour la mémoire, le sous-système <strong>EDAC</strong> expose par contrôleur des compteurs d'erreurs corrigées par le code correcteur (ECC) et non corrigées sous <code>/sys/devices/system/edac/mc/</code> (<a href="https://docs.kernel.org/driver-api/edac.html">documentation EDAC</a>). Pour les disques, <code>smartctl</code> lit les attributs SMART (l'auto-surveillance intégrée au disque). Pour le serveur lui-même, le contrôleur de gestion (BMC) tient un journal d'événements que <code>ipmitool sel</code> affiche ; une machine moderne l'expose aussi en réseau.</p>
 <div class="ex">
 <p><span class="tag">Exemple 8.1 — Quand l'instrument est absent</span> Dans le bac à sable (machine virtuelle), les trois sources de panne matérielle sont <strong>absentes</strong>. Capturé :</p>
 <pre class="text"><code>$ ls /sys/devices/system/edac
@@ -760,9 +766,9 @@ Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such fi
 <p>Un journal se lit champ par champ. Voici la mise à mort par manque de mémoire de l'exemple 2.2, telle que le noyau l'a journalisée dans le bac à sable :</p>
 <div class="ex">
 <p><span class="tag">Exemple 8.2 — Les lignes du noyau après une mise à mort par manque de mémoire</span> Extrait capturé de <code>dmesg</code> :</p>
-<pre class="text"><code>oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/mci-oom,task_memcg=/mci-oom,task=python3,pid=20024,uid=0
-Memory cgroup out of memory: Killed process 20024 (python3) total-vm:116776kB, anon-rss:102016kB, file-rss:5724kB, shmem-rss:0kB, UID:0 pgtables:268kB oom_score_adj:0</code></pre>
-<p><code>constraint=CONSTRAINT_MEMCG</code> dit que la mise à mort est due à la <strong>limite d'un cgroup</strong> et non à la mémoire de la machine entière ; <code>oom_memcg=/mci-oom</code> nomme le groupe fautif. <code>anon-rss</code> est la mémoire anonyme (tas, piles) du processus tué : c'est elle qui a atteint la limite. Sans cette ligne, un job « disparu » sans message est un mystère ; avec elle, c'est un diagnostic.</p>
+<pre class="text"><code>oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/mci-lab-28861,task_memcg=/mci-lab-28861,task=python3,pid=28868,uid=0
+Memory cgroup out of memory: Killed process 28868 (python3) total-vm:116780kB, anon-rss:102016kB, file-rss:5836kB, shmem-rss:0kB, UID:0 pgtables:260kB oom_score_adj:0</code></pre>
+<p><code>constraint=CONSTRAINT_MEMCG</code> dit que la mise à mort est due à la <strong>limite d'un cgroup</strong> et non à la mémoire de la machine entière ; <code>oom_memcg=/mci-lab-28861</code> nomme le groupe fautif (le lab le nomme <code>mci-lab-</code> suivi du PID du script). <code>anon-rss</code> est la mémoire anonyme (tas, piles) du processus tué : c'est elle qui a atteint la limite. Sans cette ligne, un job « disparu » sans message est un mystère ; avec elle, c'est un diagnostic.</p>
 </div>
 <h3 id="écrire-un-script-dexploitation-robuste">8.4. Écrire un script d'exploitation robuste</h3>
 <p>Un script d'exploitation tourne sans surveillance, souvent à un moment critique. Cinq règles lui évitent d'aggraver une panne.</p>
@@ -779,13 +785,13 @@ Memory cgroup out of memory: Killed process 20024 (python3) total-vm:116776kB, a
 <pre class="text"><code>1) function called as an if condition:
   check_disk went on after a failure
   -&gt; condition true
-2) the same function called alone:
+2) the same function in a subshell on the left of ||:
   check_disk went on after a failure
 3) pipeline without pipefail:
   status: 0
 4) pipeline with pipefail:
   status: 1</code></pre>
-<p>Dans une condition <code>if</code> ou une liste <code>||</code>, <code>set -e</code> est <strong>neutralisé</strong> : la fonction continue après <code>false</code> et la condition est vraie. Sans <code>set -o pipefail</code>, <code>false | cat</code> retourne 0 car seul le statut de la dernière commande compte. Un contrôle de santé écrit sans ces précautions peut donc déclarer sain un nœud qui ne l'est pas.</p>
+<p>Dans une condition <code>if</code> ou à gauche d'un <code>||</code> (cas 2, ici dans un sous-shell), <code>set -e</code> est <strong>neutralisé</strong> : la fonction continue après <code>false</code> ; dans le cas 1, la condition est vraie. Sans <code>set -o pipefail</code>, <code>false | cat</code> retourne 0 car seul le statut de la dernière commande compte. Un contrôle de santé écrit sans ces précautions peut donc déclarer sain un nœud qui ne l'est pas.</p>
 </div>
 <div class="ex">
 <p><span class="tag">Exemple 8.4 — Un script idempotent, appliqué deux fois</span> Premier appel sur un fichier qui contient <code>vm.swappiness = 60</code>, puis le même appel, capturés :</p>
@@ -806,10 +812,10 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 </ul>
 </div>
 <h2 id="labs">Labs</h2>
-<p>Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). <code>verify.sh</code> de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Installation préalable des outils des labs 1.2, 1.3 et 1.5 : <code>sudo apt-get install -y stress-ng fio shellcheck</code>. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter.</p>
+<p>Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). <code>verify.sh</code> de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Installation préalable des outils des labs 1.2, 1.3 et 1.5 : <code>sudo apt-get install -y stress-ng fio shellcheck</code>. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter. Lancez chaque commande depuis le dossier du lab (<code>cd labs/linux-systems/&lt;lab&gt;</code>). Les durées de lab indiquées sont celles du travail guidé ; elles tiennent dans les séances du plan.</p>
 <div class="lab">
 <p><span class="tag">Lab 1.1 — Cartographier une machine</span></p>
-<p><strong>Objectif.</strong> Produire un rapport JSON de la machine (processeurs, NUMA, mémoire, PCI, interfaces, disques) et sa <strong>table de localité</strong> GPU, carte réseau et NVMe. <strong>Durée.</strong> 2 h. <strong>Prérequis matériels.</strong> Un portable Linux ; aucun GPU.</p>
+<p><strong>Objectif.</strong> Produire un rapport JSON de la machine (processeurs, NUMA, mémoire, PCI, interfaces, disques) et sa <strong>table de localité</strong> GPU, carte réseau et NVMe. <strong>Durée.</strong> 1.5 h. <strong>Prérequis matériels.</strong> Un portable Linux ; aucun GPU.</p>
 <ol type="1">
 <li>Lisez <code>labs/linux-systems/machine-map/machine_map.py</code> : repérez comment <code>numa_node</code> et la classe PCI sont croisés.</li>
 <li>Lancez <code>python3 machine_map.py</code> sur votre machine et repérez ce qui est vide (nœuds NUMA, PCI) et pourquoi.</li>
@@ -817,38 +823,38 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <li>Ajoutez au rapport la somme de la mémoire des nœuds et comparez-la à <code>MemTotal</code> (exemple 3.2).</li>
 <li>Écrivez un test pour votre ajout et lancez <code>bash verify.sh</code>.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « fixture: 2 NUMA nodes, 4 GPUs, 2 InfiniBand NICs », puis « live: 4 logical CPUs, 1 NUMA node(s), 15.7 GiB (MemTotal) » sur le bac à sable, puis « OK machine-map ». Huit tests unitaires passent.</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « fixture: 2 NUMA nodes, 4 GPUs, 2 InfiniBand NICs », puis « live: 4 logical CPUs, 1 NUMA node(s), 15.7 GiB (MemTotal) » sur le bac à sable, puis « OK machine-map ». Neuf tests unitaires passent.</p>
 <p><strong>Pour aller plus loin.</strong> Sur une machine à GPU, comparez <code>locality</code> avec <code>nvidia-smi topo -m</code> et signalez toute divergence.</p>
 </div>
 <div class="lab">
 <p><span class="tag">Lab 1.2 — Triage avec la méthode USE et la pression PSI</span></p>
-<p><strong>Objectif.</strong> Reconnaître, avec des compteurs du noyau, quatre situations réelles : repos, processeur saturé, tâches bloquées sur le disque, et l'angle mort de PSI. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Linux avec PSI, <code>stress-ng</code> et <code>fio</code>.</p>
+<p><strong>Objectif.</strong> Reconnaître, avec des compteurs du noyau, quatre situations réelles : repos, processeur saturé, tâches bloquées sur le disque, et l'angle mort de PSI. <strong>Durée.</strong> 1.5 h. <strong>Prérequis matériels.</strong> Linux avec PSI, <code>stress-ng</code> et <code>fio</code>.</p>
 <ol type="1">
 <li>Lisez <code>labs/linux-systems/psi-triage/triage.py</code> : <code>compute</code> transforme deux instantanés en fractions du temps, <code>classify</code> en conclusions.</li>
 <li>Lancez <code>python3 triage.py --seconds 5</code> sur votre machine au repos.</li>
 <li>Provoquez une charge de processeur avec <code>stress-ng --cpu 8 --timeout 10s</code> et relancez.</li>
 <li>Provoquez des écritures synchrones puis asynchrones avec <code>fio</code> (voir les deux commandes de <code>verify.sh</code>) et comparez <code>io_psi</code> et <code>disk_util</code>.</li>
-<li>Ajoutez un seuil pour la mémoire et écrivez son test.</li>
+<li>Le seuil mémoire (<code>mem_psi</code>) et son test existent déjà : ajoutez à la place la détection d'une activité de swap (<code>pswpin</code> et <code>pswpout</code> de <code>/proc/vmstat</code>, lus deux fois) et écrivez son test.</li>
 </ol>
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche quatre lignes JSON dont les conclusions sont « cpu: saturated (busy and tasks waiting) », « io: tasks are stalled waiting for the disk » et « disk: busy, but no task stalls », puis « OK psi-triage ». Durée d'exécution : environ 30 secondes.</p>
 <p><strong>Pour aller plus loin.</strong> Créez de la pression mémoire dans un cgroup (lab 1.4) et vérifiez que PSI <code>memory</code> la voit.</p>
 </div>
 <div class="lab">
 <p><span class="tag">Lab 1.3 — Page cache : mesurer ce qui touche le disque</span></p>
-<p><strong>Objectif.</strong> Raconter, avec trois compteurs du noyau, ce que deviennent 256 Mio écrits puis relus, et vérifier la loi de Little. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Linux avec un système de fichiers sur disque (pas <code>tmpfs</code>) ; <code>fio</code> pour la partie B.</p>
+<p><strong>Objectif.</strong> Raconter, avec trois compteurs du noyau, ce que deviennent 256 Mio écrits puis relus, et vérifier la loi de Little. <strong>Durée.</strong> 1.5 h. <strong>Prérequis matériels.</strong> Linux avec un système de fichiers sur disque (pas <code>tmpfs</code>) ; <code>fio</code> pour la partie B.</p>
 <ol type="1">
 <li>Lisez <code>pagecache.py</code> : <code>resident_bytes</code> (mincore), <code>parse_diskstats</code>, <code>drop_file_cache</code> (fadvise).</li>
 <li>Lancez <code>python3 pagecache.py</code> et expliquez chaque ligne avec le tableau de l'exemple 7.3.</li>
 <li>Remplacez <code>os.fsync</code> par rien et observez ce qui change dans la colonne <code>dirty KiB</code>.</li>
 <li>Lancez <code>bash littles_law.sh</code> et vérifiez le produit débit × latence pour deux profondeurs de file.</li>
-<li>Sur un support de votre choix (disque USB, NFS si disponible), refaites la partie A et comparez.</li>
+<li>Sur un autre disque local de votre choix (un disque USB par exemple, avec <code>--dir</code> et au besoin <code>--device</code>), refaites la partie A et comparez. Un partage NFS ne convient pas : ses lectures ne passent pas par un périphérique de bloc local et n'apparaissent pas dans <code>/proc/diskstats</code>.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche le tableau (lecture à froid : 256 Mio lus sur le périphérique ; à chaud : 0 ; <code>O_DIRECT</code> : 256 Mio et 0 Mio résidents), « OK pagecache », puis « iodepth=32 … iops x latency = 31.94 » et « OK littles-law ». Reproductible : exécuté trois fois.</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche le tableau (lecture à froid : 256 Mio lus sur le périphérique ; à chaud : 0 ; <code>O_DIRECT</code> : 256 Mio et 0 Mio résidents), « OK pagecache », puis « iodepth=32 … iops x latency » proche de 32 (31,9 dans nos exécutions) et « OK littles-law ». Les colonnes de comptage ont été identiques sur trois exécutions ; <code>iodepth=32</code> doit rester à 25 % près de 32.</p>
 <p><strong>Pour aller plus loin.</strong> Écrivez un checkpoint par blocs de 1 Gio avec <code>fsync</code> et <code>DONTNEED</code> après chaque bloc, et mesurez la mémoire résidente maximale.</p>
 </div>
 <div class="lab">
 <p><span class="tag">Lab 1.4 — cgroups : limite mémoire, mise à mort, quota de processeur</span></p>
-<p><strong>Objectif.</strong> Mettre un programme dans un cgroup, constater sa mise à mort par manque de mémoire, mesurer un quota de processeur. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Linux, <strong>root</strong>, une machine jetable. <strong>Branche exécutée.</strong> Le script détecte la version : la branche <strong>cgroup v1</strong> a été exécutée dans le bac à sable ; la branche <strong>cgroup v2</strong> suit la documentation du noyau et <strong>n'a pas pu être exécutée</strong> (le bac à sable est en v1, avec seulement <code>hugetlb</code> côté v2).</p>
+<p><strong>Objectif.</strong> Mettre un programme dans un cgroup, constater sa mise à mort par manque de mémoire, mesurer un quota de processeur. <strong>Durée.</strong> 1.5 h. <strong>Prérequis matériels.</strong> Linux, <strong>root</strong>, une machine jetable. <strong>Branche exécutée.</strong> Le script détecte la version : la branche <strong>cgroup v1</strong> a été exécutée dans le bac à sable ; la branche <strong>cgroup v2</strong> suit la documentation du noyau et <strong>n'a pas pu être exécutée</strong> (le bac à sable est en v1, avec seulement <code>hugetlb</code> côté v2).</p>
 <ol type="1">
 <li>Lisez <code>labs/linux-systems/cgroup-limits/cgroup_lab.sh</code> : repérez la détection de version (<code>stat -fc %T</code>) et les deux branches.</li>
 <li>Lancez <code>sudo bash verify.sh</code>. Le script alloue 300 Mio dans un cgroup limité à 100 Mio.</li>
@@ -856,20 +862,20 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <li>Changez la limite mémoire, relancez, et prédisez à quelle étape le programme est tué.</li>
 <li>Sur une machine en cgroup v2, exécutez la branche v2 et <strong>signalez tout écart</strong> avec la page.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « exit status: 137, oom_kill counter: 1 », « share of one CPU obtained: 0.197 » (entre 0,10 et 0,35 pour un quota de 20 %) et « OK cgroup-limits (v1) ».</p>
+<p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « exit status: 137, oom_kill counter: 1 », « share of one CPU obtained » proche de 0,20 (0,197 à 0,200 dans nos exécutions ; le script accepte de 0,10 à 0,35 pour un quota de 20 %, ce qui suppose une machine peu chargée) et « OK cgroup-limits (v1) ».</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez <code>memory.high</code> en v2 et montrez que le groupe est ralenti sans être tué.</p>
 </div>
 <div class="lab">
 <p><span class="tag">Lab 1.5 — Un script d'exploitation idempotent</span></p>
-<p><strong>Objectif.</strong> Écrire et tester un script qui fixe des paramètres noyau de façon idempotente, vérifier une unité systemd hors ligne, et constater les angles morts de <code>set -e</code>. <strong>Durée.</strong> 2.5 h. <strong>Prérequis matériels.</strong> Linux, <code>shellcheck</code> ; aucun accès root requis (le test <code>--apply</code> ne s'exécute qu'en root et sans effet).</p>
+<p><strong>Objectif.</strong> Écrire et tester un script qui fixe des paramètres noyau de façon idempotente, vérifier une unité systemd hors ligne, et constater les angles morts de <code>set -e</code>. <strong>Durée.</strong> 2 h, exercice 11 compris. <strong>Prérequis matériels.</strong> Linux, <code>shellcheck</code> et <code>systemd-analyze</code> (paquet <code>systemd</code>) ; aucun accès root requis (le test <code>--apply</code> ne s'exécute qu'en root et sans effet).</p>
 <ol type="1">
 <li>Lisez <code>ensure_sysctl.sh</code> : cinq règles du chapitre 8, dont les codes de retour 0, 10, 2 et 1.</li>
-<li>Exécutez-le deux fois de suite avec <code>--conf /tmp/90-mci.conf</code> et comparez les codes de retour.</li>
+<li>Exécutez-le deux fois de suite, par exemple <code>./ensure_sysctl.sh --conf /tmp/90-mci.conf vm.swappiness=10</code>, et comparez les codes de retour (<code>echo $?</code>).</li>
 <li>Lancez <code>bash test_ensure_sysctl.sh</code> ; cassez volontairement une ligne du script et vérifiez que le test échoue.</li>
 <li>Lancez <code>./check_unit.sh units/bad.service</code> et expliquez pourquoi <code>systemd-analyze verify</code> seul ne suffit pas.</li>
 <li>Écrivez <code>ensure_line.sh</code> (exercice 11) puis comparez avec <code>solutions/ensure_line.sh</code>.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « ALL OK » pour les 19 contrôles de <code>ensure_sysctl.sh</code>, « ok: the broken unit is rejected although systemd-analyze itself exits 0 », les deux compteurs « check_disk went on after a failure », puis « OK ops-script ».</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « ALL OK » pour les contrôles de <code>ensure_sysctl.sh</code> (22 hors root, 24 en root), « ok: the broken unit is rejected although systemd-analyze itself exits 0 », les deux compteurs « check_disk went on after a failure », puis « OK ops-script ».</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez un code de retour 3 « non observable » à un contrôle SMART qui échoue sur un disque virtuel.</p>
 </div>
 <h2 id="ex">Exercices</h2>
@@ -894,11 +900,12 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <p>Ensuite : la pression PSI <code>io</code> pour confirmer, <code>iostat -x</code> pour l'occupation et la file du disque, et <code>pidstat -d</code> pour trouver <strong>quel processus</strong> lit. Attention à l'angle mort du chapitre 4 : si PSI <code>io</code> reste à zéro mais que le disque est occupé, la charge est asynchrone.</p>
 </details>
 <div class="exo">
-<p><span class="tag">Exercice 3 · ★★ — Lire une mise à mort et dimensionner la limite</span> L'exemple 2.2 donne : limite de 100 Mio, dernier message « allocated 90 MiB », <code>anon-rss:102016kB</code>. (a) Quelle part de la limite représente <code>anon-rss</code> ? (b) Estimez la mémoire anonyme de base de l'interpréteur. (c) Quelle limite <code>memory.max</code> donneriez-vous à un programme qui a besoin de 90 Mio de données, avec 20 % de marge ?</p>
+<p><span class="tag">Exercice 3 · ★★ — Lire une mise à mort et dimensionner la limite</span> L'exemple 2.2 donne : limite de 100 Mio, dernier message « allocated 90 MiB », <code>anon-rss:102016kB</code>. (a) Quelle part de la limite représente <code>anon-rss</code> ? (b) Donnez un majorant de la mémoire anonyme de base de l'interpréteur. (c) Quelle limite <code>memory.max</code> donneriez-vous à un programme qui a besoin de 90 Mio de données, avec 20 % de marge ?</p>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <ol type="a">
-<li>102 016 / 102 400 = <strong>99,6 %</strong> de la limite. (b) 90 Mio valent 92 160 kB ; 102 016 moins 92 160 donnent <strong>9 856 kB, soit 9,6 Mio</strong> de base (cohérent avec les 9 Mio de <code>VmRSS</code> d'un Python au repos de l'exemple 1.3). (c) Besoin total : 90 + 9,6 = 99,6 Mio ; avec 20 % de marge : 99,6 × 1,2 = 119,55, soit une limite d'environ <strong>120 Mio</strong>. Une limite à 100 Mio, juste au besoin, tue le programme à la moindre variation ; c'est exactement ce que le lab 1.4 provoque.</li>
+<li><p>102 016 / 102 400 = <strong>99,6 %</strong> de la limite. (b) 90 Mio valent 92 160 kB ; 102 016 moins 92 160 donnent <strong>9 856 kB, soit 9,6 Mio</strong>. C'est un <strong>majorant</strong> de la base, pas la base : le dixième bloc était déjà en partie touché quand le noyau a tué (un Python au repos n'a qu'environ 2,9 Mio de mémoire anonyme, <code>RssAnon</code>).</p></li>
+<li><p>Par prudence, on prend le majorant : besoin total 90 + 9,6 = 99,6 Mio ; avec 20 % de marge : 99,6 × 1,2 ≈ 119,5, soit une limite d'environ <strong>120 Mio</strong>. Une limite à 100 Mio, juste au besoin, tue le programme à la moindre variation ; c'est exactement ce que le lab 1.4 provoque.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -916,10 +923,10 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 </ol>
 </details>
 <div class="exo">
-<p><span class="tag">Exercice 6 · ★★ — Trois façons d'écrire un checkpoint</span> Un nœud de 512 Gio de mémoire contient 300 Gio de jeu de données en cache de pages et 150 Gio occupés par les processus. Il doit écrire un checkpoint de 100 Gio. Option A : écriture normale puis <code>fsync</code>. Option B : écriture par blocs, avec <code>fsync</code> puis <code>DONTNEED</code> après chaque bloc. Option C : <code>O_DIRECT</code>. <strong>Hypothèse de l'exercice</strong> : le stockage relit à 2 Gio/s. Comparez la mémoire de cache évincée et le coût en relecture de A, puis dites laquelle vous choisissez et ce que vous mesureriez.</p>
+<p><span class="tag">Exercice 6 · ★★ — Trois façons d'écrire un checkpoint</span> Un nœud de 512 Gio de mémoire contient 300 Gio de jeu de données en cache de pages et 150 Gio occupés par les processus. Il doit écrire un checkpoint de 100 Gio. Option A : écriture normale puis <code>fsync</code> à la fin. Option B : écriture par blocs, avec <code>fsync</code> puis <code>DONTNEED</code> après chaque bloc. Option C : <code>O_DIRECT</code>. <strong>Hypothèse de l'exercice</strong> : le stockage relit à 2 Gio/s. Comparez la mémoire de cache évincée et le coût en relecture de A, puis dites laquelle vous choisissez et ce que vous mesureriez.</p>
 </div>
 <details class="sol"><summary>Corrigé</summary>
-<p>Mémoire libre : 512 − (300 + 150) = <strong>62 Gio</strong>. <strong>A</strong> : le checkpoint occupe 100 Gio de cache ; il en manque 38, le noyau évince <strong>38 Gio du jeu de données</strong>. Les relire à 2 Gio/s coûte 38 / 2 = <strong>19 s</strong> de relecture qui s'ajoutent à l'entraînement, sans compter l'effet sur l'écriture elle-même.</p>
+<p>Mémoire libre : 512 − (300 + 150) = <strong>62 Gio</strong>. <strong>A</strong> : le checkpoint occupe 100 Gio de cache ; il en manque 38, donc au pire le noyau évince <strong>38 Gio du jeu de données</strong>. Relus à 2 Gio/s, ils coûtent 38 / 2 = <strong>19 s</strong> qui s'ajoutent à l'entraînement, sans compter l'effet sur l'écriture elle-même. C'est une borne haute : le noyau peut aussi évincer les pages déjà écrites du checkpoint, qu'on ne relira pas, avant celles du jeu de données relues souvent ; seule la mesure tranche.</p>
 <p><strong>B</strong> : l'empreinte du cache reste de l'ordre d'un bloc, aucune éviction notable. <strong>C</strong> : aucune empreinte, mais des tampons alignés et des tailles de bloc à respecter.</p>
 <p>Choix : <strong>B</strong> si votre code d'écriture est simple et doit rester portable, <strong>C</strong> si vous maîtrisez l'alignement.</p>
 <p>Mesure à faire : <code>resident MiB</code> et octets lus sur le périphérique avant et après (lab 1.3), car l'éviction se voit dans ces deux compteurs.</p>
@@ -929,7 +936,7 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <p>Mémoire des jobs : 1 024 × 0,9 = 921,6 Gio, soit 115,2 Gio par job ; on arrondit <strong>à la baisse</strong> à <strong>115 Gio</strong> (8 × 115 = 920 Gio, sous la réserve). <code>memory.max = 123480309760</code> octets (115 × 2^30). <code>memory.high</code> plus bas, par exemple <strong>108 Gio</strong> = <code>115964116992</code> octets, pour que le groupe soit <strong>ralenti</strong> avant d'être tué.</p>
-<p>Processeurs : 128 / 8 = 16 par job, soit <code>cpu.max = 1600000 100000</code> (16 périodes de 100 000 µs de quota par période de 100 000 µs) ; un <code>cpuset</code> épinglé sur le nœud NUMA du GPU (exercice 4) serait préférable pour la localité.</p>
+<p>Processeurs : 128 / 8 = 16 par job, soit <code>cpu.max = 1600000 100000</code> (un quota de 1 600 000 µs par période de 100 000 µs, c'est-à-dire 16 cœurs) ; un <code>cpuset</code> épinglé sur le nœud NUMA du GPU (exercice 4) serait préférable pour la localité.</p>
 <p>Si la somme des <code>memory.max</code> dépasse la mémoire disponible, les limites ne protègent plus : le noyau peut manquer de mémoire <strong>avant</strong> qu'un groupe n'atteigne la sienne, et l'OOM killer global choisira une victime parmi tous. Une limite n'est une garantie que si la somme des limites tient dans la machine.</p>
 <p>Les valeurs de marge (10 %, 108 Gio) sont des choix d'exercice, à mesurer sur votre charge.</p>
 </details>
@@ -942,11 +949,14 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <p>Aucune de ces trois lectures ne prouve à elle seule quel nœud est « le lent » : comparez aussi le débit applicatif de chaque nœud.</p>
 </details>
 <div class="exo">
-<p><span class="tag">Exercice 9 · ★ — Une unité qui passe l'outil et échoue en production</span> L'unité suivante contient <code>Restart=sometimes</code>. (a) Que renvoie <code>systemd-analyze verify</code> ? (b) Quelle commande ou quel script mettez-vous en intégration continue pour la refuser ?</p>
+<p><span class="tag">Exercice 9 · ★ — Une unité qui passe l'outil et échoue en production</span> Le fichier <code>ex9.service</code> ci-dessous contient une valeur invalide pour <code>Restart=</code>. (a) Que renvoie <code>systemd-analyze verify ex9.service</code> ? (b) Quelle commande ou quel script mettez-vous en intégration continue pour la refuser ?</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Service]</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="dt">ExecStart</span><span class="ot">=</span><span class="st">/usr/bin/python3 -m http.server 9400</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Restart</span><span class="ot">=</span><span class="st">sometimes</span></span></code></pre></div>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <ol type="a">
-<li>Il affiche <code>units/bad.service:9: Failed to parse service restart specifier, ignoring: sometimes</code> et <strong>retourne 0</strong> : la valeur invalide est ignorée, le service serait lancé sans politique de redémarrage. (b) Le script <code>check_unit.sh</code> du lab 1.5 traite toute sortie comme un échec et retourne 1 ; équivalent en une ligne : <code>test -z "$(systemd-analyze verify unit.service 2&gt;&amp;1)"</code>. Le test du lab vérifie que <code>bad.service</code> est rejetée et <code>gpu-exporter.service</code> acceptée.</li>
+<li>Il affiche <code>ex9.service:3: Failed to parse service restart specifier, ignoring: sometimes</code> et <strong>retourne 0</strong> (essayé avec systemd 255) : la valeur invalide est ignorée, le service serait lancé sans politique de redémarrage. (b) Le script <code>check_unit.sh</code> du lab 1.5 traite toute sortie comme un échec et retourne 1 ; équivalent en une ligne : <code>test -z "$(systemd-analyze verify unit.service 2&gt;&amp;1)"</code>. Le test du lab vérifie que <code>bad.service</code> est rejetée et <code>gpu-exporter.service</code> acceptée.</li>
 </ol>
 </details>
 <div class="exo">
@@ -960,18 +970,18 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <p>Solution de référence, fichier <code>labs/linux-systems/ops-script/solutions/ensure_line.sh</code> (testée, <code>shellcheck</code> propre) :</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="va">$#</span> <span class="ot">-eq</span> 2 <span class="bu">]</span> <span class="kw">||</span> <span class="kw">{</span> <span class="bu">echo</span> <span class="st">&quot;usage: </span><span class="va">$0</span><span class="st"> FILE LINE&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span><span class="kw">;</span> <span class="bu">exit</span> 2<span class="kw">;</span> <span class="kw">}</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="va">file</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span><span class="kw">;</span> <span class="va">line</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$2</span><span class="st">&quot;</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-e</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="fu">grep</span> <span class="at">-qxF</span> <span class="at">--</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 0</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-s</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">tail</span> <span class="at">-c1</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span><span class="va">)</span><span class="st">&quot;</span> <span class="ot">-eq</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="bu">printf</span> <span class="st">&#39;\n&#39;</span> <span class="op">&gt;&gt;</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> 10</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> <span class="va">$#</span> <span class="ot">-eq</span> 2 <span class="bu">]</span> <span class="kw">||</span> <span class="kw">{</span> <span class="bu">echo</span> <span class="st">&quot;usage: </span><span class="va">$0</span><span class="st"> FILE LINE&quot;</span> <span class="op">&gt;&amp;</span><span class="dv">2</span><span class="kw">;</span> <span class="bu">exit</span> 2<span class="kw">;</span> <span class="kw">}</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="va">file</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span><span class="kw">;</span> <span class="va">line</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$2</span><span class="st">&quot;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-e</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="fu">grep</span> <span class="at">-qxF</span> <span class="at">--</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 0</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-s</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">tail</span> <span class="at">-c1</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">wc</span> <span class="at">-l</span><span class="va">)</span><span class="st">&quot;</span> <span class="ot">-eq</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="bu">printf</span> <span class="st">&#39;\n&#39;</span> <span class="op">&gt;&gt;</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="bu">printf</span> <span class="st">&#39;%s\n&#39;</span> <span class="st">&quot;</span><span class="va">$line</span><span class="st">&quot;</span> <span class="op">&gt;&gt;</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> 10</span></code></pre></div>
 <p><code>grep -x</code> impose la correspondance de ligne entière et <code>-F</code> désactive les expressions régulières ; <code>tail -c1 | wc -l</code> vaut 0 quand le dernier octet n'est pas un retour à la ligne. Le test <code>solutions/test_ensure_line.sh</code> couvre : fichier absent, second appel sans effet, ligne différente, une ligne par entrée, dernière ligne sans retour, ligne plus longue qui contient le texte, usage invalide : huit contrôles, tous « ok ».</p>
 </details>
 <h2 id="exit">Checkpoint de sortie</h2>
@@ -991,6 +1001,7 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <li><em>Pourquoi un conteneur « n'a que 8 Go » mais un <code>VmSize</code> de 50 Go ?</em> Réponse-type : la mémoire virtuelle est réservée à la demande ; <code>VmRSS</code> et la limite du cgroup comptent la mémoire réellement présente ; une limite dure tue au lieu de ralentir, d'où <code>memory.high</code> plus bas que <code>memory.max</code>.</li>
 </ol>
 <h2 id="refs">Lectures et références</h2>
+<p>Les pages web ci-dessous ont été consultées le 2026-10-24 ; la documentation du noyau et les pages man7 sont mises à jour en continu et n'ont donc pas d'année de publication propre.</p>
 <ul>
 <li>Brendan Gregg. <a href="https://www.brendangregg.com/usemethod.html"><em>The USE Method</em></a> : la méthode du chapitre 4 ; du même auteur, <em>Systems Performance</em>, 2e édition, Addison-Wesley, 2020, ouvrage de référence sur le sujet.</li>
 <li>Noyau Linux. <a href="https://docs.kernel.org/accounting/psi.html"><em>PSI — Pressure Stall Information</em></a> : les lignes <code>some</code> et <code>full</code> (chapitre 4).</li>
@@ -1006,9 +1017,9 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <li>SchedMD. <a href="https://slurm.schedmd.com/cgroup.conf.html"><em>cgroup.conf</em></a> : Slurm et les cgroups (chapitre 2).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les définitions de PSI, de la méthode USE, de <code>memory.max</code>, <code>memory.high</code> et <code>cpu.max</code>, des espaces de noms, de la charge moyenne, de <code>RLIMIT_MEMLOCK</code>, des paramètres <code>vm.*</code>, de <code>O_DIRECT</code>, <code>DONTNEED</code> et <code>mincore</code>, de la THP, du format des messages Xid et des options <code>cgroup.conf</code> de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18, Ubuntu 24.04, 4 processeurs) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.</p>
+<p><strong>Documenté.</strong> Les définitions de PSI, de la méthode USE, de <code>memory.max</code>, <code>memory.high</code> et <code>cpu.max</code>, des espaces de noms, de la charge moyenne, de <code>RLIMIT_MEMLOCK</code>, des paramètres <code>vm.*</code>, de <code>O_DIRECT</code>, <code>DONTNEED</code> et <code>mincore</code>, de la THP, du format des messages Xid et des options <code>cgroup.conf</code> de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18.44, Ubuntu 24.04, 4 processeurs ; outils testés le 2026-10-24 : systemd 255, fio 3.36, stress-ng 0.17.06, iperf3 3.16, util-linux 2.39.3, procps-ng 4.0.4, ShellCheck 0.9.0) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.</p>
 <p><strong>Recommandé.</strong> La table USE du chapitre 4, le code de retour 3 pour « non observable », les cinq règles du script d'exploitation, le choix de <code>memory.high</code> sous <code>memory.max</code> et l'ordre des chapitres sont des choix de cours, pas des normes.</p>
-<p><strong>À vérifier.</strong> Le comportement de PSI <code>io</code> sous E/S asynchrones profondes a été constaté <strong>sur ce disque virtuel et ce noyau</strong> seulement. La branche cgroup v2 du lab 1.4 n'a pas été exécutée. Le serveur à deux sockets du lab 1.1 est fabriqué. Les extraits <code>vmstat</code> de l'exercice 2 et les valeurs de l'exercice 8 sont fabriqués. La mise à jour de EEVDF depuis le noyau 6.6 est celle que décrit la documentation du noyau : lisez-la pour votre version.</p>
+<p><strong>À vérifier.</strong> Le comportement de PSI <code>io</code> sous E/S asynchrones profondes a été constaté <strong>sur ce disque virtuel et ce noyau</strong> seulement. La branche cgroup v2 du lab 1.4 n'a pas été exécutée. Le serveur à deux sockets du lab 1.1 est fabriqué. Les extraits <code>vmstat</code> de l'exercice 2 et les valeurs de l'exercice 8 sont fabriqués. La mise à jour de EEVDF depuis le noyau 6.6 est celle que décrit la documentation du noyau : lisez-la pour votre version. Que <code>systemd-analyze verify</code> retourne 0 sur un avertissement a été constaté avec systemd 255 seulement. L'écart de vitesse entre lecture à froid et à chaud du lab 1.3 (rapport 2,5) et son explication par un cache de l'hôte sont une hypothèse. Le code de classe PCI d'une carte RDMA configurée en Ethernet (RoCE), que le lab 1.1 classerait comme <code>ethernet</code>, n'a pas été vérifié. Les labs 1.2 et 1.3 lisent des compteurs de toute la machine ou de tout le disque : sur une machine partagée, une autre charge peut les faire échouer ; deux exécutions consécutives de chaque <code>verify.sh</code> ont réussi lors de la revue, ce qui ne prouve pas la robustesse.</p>
 <p><strong>Hors périmètre.</strong> <code>perf</code>, les graphes de flammes et <code>bpftrace</code> (non installés dans le bac à sable, décrits sans sortie), <code>tc netem</code> (module absent de ce noyau), les lectures SMART, EDAC et BMC réelles (absentes en machine virtuelle), <code>nvidia-smi topo -m</code> et les messages Xid réels (aucun GPU), le réglage fin du noyau et l'administration d'un système de fichiers parallèle.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../lab-setup/index.html"><span class="k">← Précédent</span>Environnement de travail</a><a class="next" href="../../courses/perf-models/index.html"><span class="k">Suivant →</span>Module 02 — Architecture matérielle et modèles de performance</a></nav>

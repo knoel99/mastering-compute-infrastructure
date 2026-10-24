@@ -4,6 +4,6 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 bash -n cgroup_lab.sh
-command -v shellcheck >/dev/null && shellcheck cgroup_lab.sh || echo "shellcheck not installed: skipped"
+if command -v shellcheck >/dev/null; then shellcheck cgroup_lab.sh; else echo "shellcheck not installed: skipped"; fi
 "${PYTHON:-python3}" -m py_compile alloc.py burn.py
 bash cgroup_lab.sh

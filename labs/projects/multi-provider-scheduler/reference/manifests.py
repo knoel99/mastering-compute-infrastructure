@@ -28,8 +28,10 @@ def skypilot_task(name, gpu, count, spot, run, candidates, ordered=True, recover
 def plan_tasks(job_name, gpu, count, ranked_offers, infra_map, run):
     """From offers ranked best-first by a policy, build one task per market (spot first when it ranks first).
 
-    A SkyPilot task has a single use_spot flag, so a spot-then-on-demand fallback is two tasks, launched in order
-    by whatever orchestrates the jobs. infra_map maps "provider/region" of the synthetic data to a real infra string.
+    This generator keeps ONE use_spot value per task (simple to read and to validate), so a spot-then-on-demand
+    fallback is two tasks, launched in order by whatever orchestrates the jobs. SkyPilot can also hold both in one
+    task (`any_of: [{use_spot: true}, {use_spot: false}]`, see its managed-jobs page); job_recovery applies to
+    managed jobs (`sky jobs launch`). infra_map maps "provider/region" of the synthetic data to a real infra string.
     """
     groups = {}
     for o in ranked_offers:

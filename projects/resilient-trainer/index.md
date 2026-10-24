@@ -14,9 +14,9 @@ badges:
 
 ## Contexte et objectif {#contexte}
 
-Un entraînement qui dure des semaines sur des milliers de GPU sera interrompu, c'est une certitude statistique et non un risque. Le rapport technique de Llama 3 donne l'ordre de grandeur : « During a 54-day snapshot period of pre-training, we experienced a total of 466 job interruptions », dont 47 prévues et « the remaining 419 were unexpected » ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)). Environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou soupçonnés, et les GPU en forment la première catégorie, avec 58,7 %.
+Un entraînement qui dure des semaines sur des milliers de GPU sera interrompu, c'est une certitude statistique et non un risque. Le rapport technique de Llama 3 (§ 3.3.4) donne l'ordre de grandeur : « During a 54-day snapshot period of pre-training, we experienced a total of 466 job interruptions », dont 47 prévues et « the remaining 419 were unexpected » ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)). Environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou soupçonnés, et les GPU en forment la première catégorie, avec 58,7 %.
 
-Cela fait 419 pannes en 1 296 heures : une toutes les 3,1 heures en moyenne, soit un intervalle moyen entre pannes (MTBF) d'environ 11 100 secondes pour l'ensemble de la machine. Le même rapport annonce pourtant « higher than 90% effective training time », avec une intervention manuelle importante seulement trois fois (« only three times during this period »). L'écart entre ces deux faits, c'est l'ingénierie de la reprise automatique : c'est elle que vous construisez ici, à petite échelle.
+Cela fait 419 interruptions imprévues, que nous assimilons ici à des pannes, en 1 296 heures : une toutes les 3,1 heures en moyenne, soit un intervalle moyen entre pannes (MTBF) d'environ 11 100 secondes pour l'ensemble de la machine. Le même rapport annonce pourtant « higher than 90% effective training time », avec une intervention manuelle importante seulement trois fois (« only three times during this period »). L'écart entre ces deux faits, c'est l'ingénierie de la reprise automatique : c'est elle que vous construisez ici, à petite échelle.
 
 ::: key
 [Objectif du projet]{.tag} Écrire un entraîneur et son superviseur tels que, après une panne quelconque, l'entraînement reprend **à l'identique** (mêmes pertes à chaque pas, au bit près), sans intervention humaine, et être capable de chiffrer ce que la tolérance aux pannes coûte et rapporte.
@@ -56,7 +56,7 @@ Le code de départ est volontairement naïf. Il fonctionne un jour normal et per
 
 ### Prérequis de connaissances {#pre}
 
-Vous devez savoir lire un entraînement PyTorch (modèle, optimiseur, boucle, `state_dict`) et vous servir d'un terminal Linux. Les notions de signaux et de groupes de processus sont rappelées dans le [module Slurm](../../courses/slurm/index.html), chapitre 1, et son lab 5.1 montre un premier checkpoint sur signal. Les modules « stockage », « entraînement distribué » et « tolérance aux pannes » du parcours approfondissent ce que ce projet pratique ; vous pouvez le faire avant de les lire, quitte à y revenir ensuite.
+Vous devez savoir lire un entraînement PyTorch (modèle, optimiseur, boucle, `state_dict`) et vous servir d'un terminal Linux. Les signaux (`SIGTERM`, `SIGKILL`, `SIGUSR1`) sont rappelés dans le [module Slurm](../../courses/slurm/index.html), § 2.4, et son lab 5.1 montre un premier checkpoint sur signal ; les groupes de processus sont expliqués ici, dans les pistes du superviseur. Les modules « stockage », « entraînement distribué » et « tolérance aux pannes » du parcours approfondissent ce que ce projet pratique ; vous pouvez le faire avant de les lire, quitte à y revenir ensuite.
 
 ## Cahier des charges {#cahier}
 
@@ -64,16 +64,18 @@ Le dossier `labs/projects/resilient-trainer/` contient `starter/` (à compléter
 
 | ID | Exigence | Test qui la vérifie |
 |---|---|---|
-| R1 | Écriture **atomique** : jamais de fichier de checkpoint à moitié écrit sous son nom final ; fichier temporaire puis `os.replace`, avec `fsync` du fichier et du dossier | `test_no_temporary_file_left`, `test_torn_checkpoint_write_is_survived` |
+| R1 | Écriture **atomique** : jamais de fichier de checkpoint à moitié écrit sous son nom final ; fichier temporaire puis `os.replace`, avec `fsync` du fichier et du dossier | `test_no_temporary_file_left` (un espion sur `os.fsync` constate les deux appels : la coupure de courant elle-même n'est pas testée), `test_torn_checkpoint_write_is_survived` |
 | R2 | **Intégrité** : une somme de contrôle dans le fichier ; un checkpoint corrompu ou tronqué est écarté et le précédent est utilisé | `test_flipped_byte_falls_back_to_previous`, `test_corrupt_latest_checkpoint_falls_back` |
 | R3 | **État complet** : poids, état de l'optimiseur, états des générateurs aléatoires (PyTorch et Python), numéro de pas | `test_optimizer_and_rng_state_are_saved`, `test_kill9_resumes_bit_exactly` |
-| R4 | **Rotation** : ne garder que les K derniers checkpoints valides, après que le nouveau est durable | `test_rotation_keeps_newest` |
+| R4 | **Rotation** : ne garder que les K derniers checkpoints (par numéro de pas, sans les revalider), en supprimant les anciens seulement après que le nouveau est durable | `test_rotation_keeps_newest` |
 | R5 | **Superviseur** : relance après un code de sortie non nul, au plus N fois, puis abandon avec le code 1 | `test_gives_up_after_max_restarts` |
-| R6 | **Blocage** : un entraîneur dont le fichier de pulsation n'est plus touché depuis le délai fixé est tué (tout son groupe de processus) puis relancé | `test_hung_trainer_is_killed_and_restarted` |
+| R6 | **Blocage** : un entraîneur dont le fichier de pulsation n'est plus touché depuis le délai fixé est tué (tout son groupe de processus) puis relancé | `test_hung_trainer_is_killed_and_restarted` (le test ne crée pas de petit-enfant : la mort du groupe entier n'est pas vérifiée) |
 | R7 | **Arrêt propre** : à la réception de SIGTERM, le superviseur le transmet à l'enfant, ne relance pas et sort avec 143 | `test_sigterm_stops_supervisor_and_child` |
-| R8 | **Goodput** : la période de Young-Daly, le modèle du premier ordre et une simulation de Monte-Carlo en accord | `tests/test_goodput.py` (5 tests) |
+| R8 | **Goodput** (part du temps réel passée à calculer ce qui sera conservé, voir les [formules](#formules)) : la période de Young-Daly, le modèle du premier ordre et une simulation de Monte-Carlo en accord | `tests/test_goodput.py` (5 tests) |
 
-L'entraîneur fourni, `train.py`, est identique dans `starter/` et `reference/`. Il contient trois crochets d'injection de panne, activés par la variable `FAULT` et déclenchés une seule fois par dossier de travail : `kill:N` (SIGKILL juste avant le pas N), `hang:N` (blocage éternel juste avant le pas N) et `torn:N` (arrêt brutal au milieu de l'écriture du checkpoint du pas N). Il est déterministe : le lot de données dépend uniquement du couple (graine, pas), et le réseau contient un *dropout*, qui consomme le générateur aléatoire global. C'est ce détail qui rend l'état des générateurs indispensable à la reprise exacte.
+L'entraîneur fourni, `train.py`, est identique dans `starter/` et `reference/`. Il contient trois crochets d'injection de panne, activés par la variable `FAULT` et déclenchés une seule fois par dossier de travail : `kill:N` (SIGKILL juste avant le pas N), `hang:N` (blocage éternel juste avant le pas N) et `torn:N` (arrêt brutal au milieu de l'écriture du checkpoint du pas N).
+
+Il est déterministe : le lot de données (synthétique : une régression linéaire bruitée) dépend uniquement du couple (graine, pas), et le réseau contient un *dropout*, qui consomme le générateur aléatoire global. C'est ce détail qui rend l'état du générateur PyTorch indispensable à la reprise exacte. L'état du générateur Python est sauvegardé par principe, mais rien dans `train.py` ne le consomme : aucun test ne détecte son oubli.
 
 **Hors périmètre** du cœur du projet : l'entraînement multi-processus, les checkpoints répartis par rang, l'écriture asynchrone et le stockage objet. Ce sont des extensions.
 
@@ -81,24 +83,26 @@ L'entraîneur fourni, `train.py`, est identique dans `starter/` et `reference/`.
 
 | N° | Jalon | Durée | Preuve |
 |---|---|---|---|
-| 1 | Faire échouer le code de départ et **diagnostiquer chaque échec** | 2 h | sortie de `pytest` sauvegardée et un paragraphe de diagnostic par test en échec |
+| 1 | Faire échouer le code de départ et **diagnostiquer chaque échec** | 2 h | sortie de `pytest` sauvegardée et un paragraphe de diagnostic par cause d'échec (les 5 tests de goodput échouent tous pour la même raison) |
 | 2 | Checkpoint durable : `pack`, `unpack`, `save`, `load_latest` | 5 h | les 8 tests de `tests/test_ckpt.py` passent |
-| 3 | État complet et reprise exacte | 4 h | `test_kill9_resumes_bit_exactly` et `test_torn_checkpoint_write_is_survived` passent |
+| 3 | État complet et reprise exacte | 4 h | une reprise à la main (`FAULT=kill:57`, puis relance) redonne les mêmes pertes qu'une exécution sans panne ; `test_kill9_resumes_bit_exactly` et `test_torn_checkpoint_write_is_survived` passent dès que le superviseur du jalon 4 existe |
 | 4 | Superviseur : relance, blocage, SIGTERM | 5 h | les trois tests du superviseur passent ; `supervisor.jsonl` d'une exécution avec blocage joint au dépôt |
 | 5 | Goodput : modèle, simulation, mesure | 4 h | les 5 tests de `test_goodput.py` passent ; tableau du coût de checkpoint pour quatre tailles d'état |
 | 6 | Rapport, ADR et runbook | 4 h | un `README`, un ADR d'une page, un runbook d'une page |
 
 Commencez toujours par le jalon 1. Lancez les tests contre le code de départ et lisez **chaque** message d'échec avant d'écrire une ligne : l'exercice consiste à comprendre pourquoi un script ordinaire échoue, pas à deviner la solution.
 
+Certains échecs en cachent d'autres : les tests de reprise échouent d'abord parce que le superviseur n'existe pas, et `test_corrupt_latest_checkpoint_falls_back` échoue d'abord sur `KeyError: 'opt'` (l'état de l'optimiseur n'est pas sauvegardé) avant de révéler, selon l'octet touché, un chargeur qui accepte sans broncher un fichier altéré. Pour voir ces pannes sans superviseur, lancez `train.py` à la main : `FAULT=kill:57 $PYTHON starter/train.py --workdir /tmp/w1`, puis relancez la même commande sans `FAULT`.
+
 ~~~bash
 cd labs/projects/resilient-trainer
 export PYTHON=/chemin/vers/python-avec-torch     # PyTorch CPU suffit
-IMPL=starter $PYTHON -m pytest -q tests/test_ckpt.py   # 5 échecs attendus au départ
-IMPL=starter $PYTHON -m pytest -q tests                # 16 échecs sur 19 attendus
+IMPL=starter $PYTHON -m pytest -q tests/test_ckpt.py   # 6 échecs sur 8 attendus au départ
+IMPL=starter $PYTHON -m pytest -q tests                # 17 échecs sur 19 attendus
 PYTHON=$PYTHON bash verify.sh                          # prouve référence verte, départ rouge
 ~~~
 
-Le script `verify.sh` fait deux choses : il vérifie que la solution de référence passe les 19 tests, et que le code de départ en échoue au moins un. Un test qui passe aussi sur le code naïf ne prouve rien, et ce second contrôle le garantit.
+Le script `verify.sh` fait deux choses : il vérifie que la solution de référence passe les 19 tests, et que le code de départ en échoue au moins un. Un test qui passe aussi sur le code naïf ne prouve rien, et ce second contrôle le garantit. Il échoue donc dès que `starter/` est complété : travaillez dans une copie (`cp -r starter mon-code`, puis `IMPL=mon-code`).
 
 ## Livrables {#livrables}
 
@@ -121,35 +125,39 @@ L'ADR doit trancher au moins quatre questions de conception, en nommant l'altern
 
 Chaque critère est mesurable ; la commande qui le montre est indiquée.
 
-- **Reprise exacte.** Après `FAULT=kill:57`, la perte de chaque pas 1 à 120 est identique, au bit près, à celle d'une exécution sans panne ; les pas 51 à 56 apparaissent deux fois dans `loss.jsonl`, avec la même valeur. Commande : `IMPL=starter pytest tests/test_resume.py -k kill9`.
-- **Aucun checkpoint cassé sous son nom final.** Après `FAULT=torn:60`, le dernier `ckpt-*.pt` valide est celui du pas 50 et la relance reprend de 50. Commande : `pytest -k torn`.
+- **Reprise exacte.** Après `FAULT=kill:57`, la perte de chaque pas 1 à 120 est identique, au bit près, à celle d'une exécution sans panne ; les pas 51 à 56 apparaissent deux fois dans `loss.jsonl`, avec la même valeur. Commande : `IMPL=mon-code pytest tests/test_resume.py -k kill9`.
+- **Aucun checkpoint cassé sous son nom final.** Après `FAULT=torn:60`, aucun fichier `ckpt-00000060.pt` n'existe, le dernier `ckpt-*.pt` valide est celui du pas 50 et la relance reprend de 50. Commande : `pytest -k torn`.
 - **Repli sur corruption.** Avec un octet du checkpoint 80 modifié, la relance reprend de 70 et `events.jsonl` nomme le fichier écarté. Commande : `pytest -k corrupt_latest`.
-- **Détection de blocage bornée.** Avec `FAULT=hang:45` et `--stall-timeout 3`, le superviseur écrit un événement `stall_kill`, relance, et l'entraînement se termine avec la même trajectoire. Commande : `pytest -k hung`.
+- **Détection de blocage bornée.** Avec `FAULT=hang:45` et `--stall-timeout 3`, le superviseur écrit un événement `stall_kill` dont le champ `silent_for` est compris entre 3 et 30 s (le délai de grâce au démarrage), relance, et l'entraînement se termine avec la même trajectoire. Commande : `pytest -k hung`.
 - **Goodput.** La simulation à la période T\* est à moins de 2 points de pourcentage du modèle du premier ordre, et T\* donne un meilleur goodput que 0,25 T\* et 4 T\*. Commande : `pytest tests/test_goodput.py`.
 - **Mesure.** Le rapport donne le coût de checkpoint **mesuré** pour au moins trois tailles d'état (option `--pad-mb`), la commande qui l'a produit et le MTBF **supposé**, avec sa source.
-- **Tout ensemble.** `bash verify.sh` se termine par « ok: reference passes, starter fails as intended » sur la référence, et `IMPL=starter pytest tests` passe en entier sur **votre** code.
+- **Tout ensemble.** `bash verify.sh`, lancé sur le dépôt tel que fourni, se termine par « ok: reference passes, starter fails as intended », et `IMPL=mon-code pytest tests` passe en entier sur **votre** code.
 
 ## Pistes et indices {#pistes}
 
 Ces indices ne donnent pas la solution ; ils indiquent où chercher. Essayez d'abord sans.
 
-**Écriture atomique.** `os.replace` est atomique sur un système de fichiers POSIX local, mais seulement si le fichier temporaire est sur le **même** système de fichiers que la cible. Sans `fsync`, le renommage peut survivre à une coupure de courant alors que les données non : le fichier final existe, vide ou partiel. Pensez aussi à synchroniser le **dossier**. Sur un système de fichiers réseau ou parallèle, lisez la documentation des garanties de renommage avant de supposer quoi que ce soit.
+**Écriture atomique.** `os.replace` est atomique sur un système de fichiers POSIX local, mais seulement si le fichier temporaire est sur le **même** système de fichiers que la cible. Sans `fsync`, le renommage peut survivre à une coupure de courant alors que les données non : le fichier final existe, vide ou partiel (c'est le problème « zero-length » que la [documentation d'ext4](https://docs.kernel.org/admin-guide/ext4.html) décrit à propos de l'option `auto_da_alloc`). Pensez aussi à synchroniser le **dossier**. Sur un système de fichiers réseau ou parallèle, lisez la documentation des garanties de renommage avant de supposer quoi que ce soit.
 
-**Somme de contrôle.** Placer un en-tête (marque de format, empreinte SHA-256) devant la charge utile permet de valider le fichier sans le désérialiser ; un format sérialisé par `pickle` ne doit jamais être chargé avant validation. Dans la solution fournie, `torch.load(..., weights_only=True)` limite en plus ce que le fichier peut contenir.
+**Somme de contrôle.** Placer un en-tête (marque de format, empreinte SHA-256) devant la charge utile permet de valider le fichier sans le désérialiser ; un format sérialisé par `pickle` ne doit jamais être chargé avant validation. Une empreinte SHA-256 stockée dans le fichier détecte la corruption accidentelle, pas un adversaire qui la recalcule : dans la solution fournie, `torch.load(..., weights_only=True)` limite en plus ce que le fichier peut contenir.
 
-**Rotation.** Supprimez les anciens checkpoints **après** que le nouveau est durable, jamais avant : une panne entre la suppression et l'écriture ne laisserait rien. Ignorez et nettoyez les fichiers `.tmp` orphelins au démarrage.
+**Rotation.** Supprimez les anciens checkpoints **après** que le nouveau est durable, jamais avant : une panne entre la suppression et l'écriture ne laisserait rien. Ignorez les fichiers `.tmp` orphelins et nettoyez-les avant l'écriture suivante (la solution le fait dans `save`). La solution compte les K derniers fichiers par numéro de pas, sans revérifier leur somme de contrôle : si les K derniers sont corrompus, il ne reste rien à quoi se replier, ce que votre ADR doit assumer.
 
 **Reprise exacte.** Posez-vous la question pour chaque source d'aléa : qui consomme le générateur, et son état est-il dans le checkpoint ? Le curseur de données est ici le numéro de pas. Dans un vrai chargeur de données avec mélange, il faut sauvegarder la position dans la permutation.
 
-**Superviseur.** Lancez l'enfant dans son propre groupe de processus (`start_new_session=True`) pour pouvoir tuer ses descendants. Mesurez le blocage sur la date de modification du fichier de pulsation, avec un délai de grâce plus long avant la première pulsation (l'import de PyTorch prend plusieurs secondes). Ajoutez un délai d'attente croissant entre relances, plafonné, pour ne pas saturer la machine en cas de panne immédiate et répétée.
+**Superviseur.** Lancez l'enfant dans son propre groupe de processus (`start_new_session=True`, qui appelle `setsid`) : un signal envoyé au groupe avec `os.killpg` atteint aussi ses descendants, par exemple les processus de chargement de données. Mesurez le blocage sur la date de modification du fichier de pulsation, avec un délai de grâce plus long avant la première pulsation (l'import de PyTorch prend de l'ordre de 2 s sur un système chaud, bien plus à froid). Ajoutez un délai d'attente croissant entre relances, plafonné, pour ne pas saturer la machine en cas de panne immédiate et répétée (aucun test ne le vérifie).
 
-**Goodput.** Le modèle du premier ordre est une approximation valable quand C est petit devant M. Rappelez-vous ce qu'il néglige : une panne pendant un checkpoint, et la loi de la position de la panne dans la période.
+**Pulsation et temps.** Le délai de blocage doit dépasser largement la durée d'un checkpoint, car la pulsation n'est pas émise pendant l'écriture : avec 256 Mo d'état, C vaut environ 3 s et un délai de 3 s tuerait un entraîneur sain.
+
+Les tests de reprise utilisent un délai de 3 s : c'est leur principale dépendance au temps. Ils sont restés verts ici sous une charge d'environ trois processus par processeur avec écritures disque concurrentes, mais une machine plus saturée pourrait provoquer un faux positif. Enfin, la solution attend indéfiniment un enfant qui ignorerait `SIGTERM` ; en production on ajoute un délai puis `SIGKILL`.
+
+**Goodput.** Le modèle du premier ordre est une approximation valable quand C est petit devant M. Rappelez-vous ce qu'il néglige : une panne pendant un checkpoint, et la loi de la position de la panne dans la période. Il suppose aussi C petit devant T : sans panne, le goodput réel vaut T/(T + C) et non 1 − C/T.
 
 ## Extensions {#extensions}
 
 - **Plusieurs processus.** Lancer l'entraîneur avec `torchrun` sur deux ou quatre processus (backend `gloo`) et sauvegarder l'état réparti avec `torch.distributed.checkpoint`. Que doit-il se passer si un seul rang est tué ?
 - **Écriture asynchrone.** Copier l'état en mémoire puis l'écrire dans un fil séparé. Mesurez l'effet sur C et prouvez que l'atomicité tient encore.
-- **Intégration Slurm.** Reprendre le script `checkpoint_on_signal.sbatch` du lab 5.1 pour que le job soit remis en file avec `--requeue` et reçoive un signal de préavis ; le superviseur disparaît alors, car Slurm assume son rôle.
+- **Intégration Slurm.** Adapter le script `checkpoint_on_signal.sbatch` du lab 5.1, qui demande déjà `--requeue` et un signal de préavis (`--signal=B:USR1@30`), pour qu'il lance `train.py`, lequel doit alors sauvegarder sur `SIGUSR1`. Slurm remet un job en file après une panne de nœud ou une préemption ([`sbatch --requeue`](https://slurm.schedmd.com/sbatch.html)), mais pas après un code de sortie non nul (sauf `RequeueExit` dans [`slurm.conf`](https://slurm.schedmd.com/slurm.conf.html)) ni après un blocage du programme : la relance et la détection de blocage du superviseur ne disparaissent donc que partiellement.
 - **Corruption silencieuse.** Provoquer une altération d'un poids sans panne visible, puis la détecter en comparant les pertes de deux répliques. C'est la catégorie « soupçonnée » du rapport de Llama 3.
 - **Variante GPU.** Même code, un GPU, un modèle plus gros. Le coût dépend du fournisseur et de la région : **relevez-le vous-même** le jour de l'essai plutôt que de vous fier à un chiffre d'une page.
 
@@ -162,9 +170,9 @@ Ces indices ne donnent pas la solution ; ils indiquent où chercher. Essayez d'a
 **Ce qu'un recruteur d'infrastructure de calcul cherche.** Que vous raisonnez sur les pannes comme sur un cas courant, que vous savez les reproduire pour les tester, que vous distinguez le mesuré du supposé et que vous nommez les limites de votre travail.
 
 ::: note
-[Mesures de départ, à refaire chez vous]{.tag} Dans le bac à sable de référence (VM à quatre processeurs, disque virtuel), le coût médian d'un checkpoint mesuré par `train.py` a été d'environ 0,014 s pour 1 Mo d'état, 0,2 s pour 16 Mo, 1,0 s pour 64 Mo et 3,9 s pour 256 Mo, avec une forte variabilité d'un checkpoint à l'autre.
+[Mesures de départ, à refaire chez vous]{.tag} Dans le bac à sable de référence (VM à quatre processeurs, système de fichiers ext4 sur disque virtuel), le coût médian d'un checkpoint de la solution de référence, mesuré par `train.py --pad-mb`, a été lors de deux exécutions d'environ 0,009 s pour 1 Mo d'état, 0,12 à 0,17 s pour 16 Mo, 0,5 à 0,7 s pour 64 Mo et 2,8 à 3,1 s pour 256 Mo. D'un checkpoint à l'autre, le plus lent peut valoir deux fois le plus rapide.
 
-Avec le MTBF de 11 100 s calculé plus haut et R = 300 s, la période T\* de Young-Daly est alors d'environ 17, 66, 150 et 293 s. Ce sont des ordres de grandeur d'une machine précise : votre disque donnera d'autres valeurs, et le MTBF d'un cluster de 16 000 GPU n'est pas celui d'un ordinateur portable.
+Avec le MTBF de 11 100 s calculé plus haut et un coût de redémarrage R = 300 s **supposé** (sans source : c'est un ordre de grandeur de reprise, à remplacer par votre mesure), la période T\* de Young-Daly est alors d'environ 14, 52, 105 et 250 s (en prenant le bas de chaque fourchette : C = 0,009 ; 0,12 ; 0,5 et 2,8 s). Ce sont des ordres de grandeur d'une machine précise : votre disque donnera d'autres valeurs, et le MTBF d'un cluster de 16 000 GPU n'est pas celui d'un ordinateur portable.
 :::
 
 Trois accroches **honnêtes**, à adapter à ce que vous avez réellement fait :
@@ -183,10 +191,10 @@ Le travail perdu vaut en moyenne T/2 parce que la panne tombe, en moyenne, au mi
 
 $$T^{*} = \sqrt{2\,C\,M}$$
 
-Le goodput est alors 1 − W : la part du temps réel passée à calculer ce qui sera effectivement conservé. Ces résultats viennent de Young (1974) et de Daly (2006), qui ajoute des termes d'ordre supérieur. Le test `test_simulation_agrees_with_model_near_optimum` vérifie ici que votre simulation et votre modèle s'accordent à 2 points près.
+Le goodput est alors 1 − W : la part du temps réel passée à calculer ce qui sera effectivement conservé. Ces résultats viennent de Young (1974) et de Daly (2006), qui ajoute des termes d'ordre supérieur. Le test `test_simulation_agrees_with_model_near_optimum` vérifie ici que votre simulation et votre modèle s'accordent à 2 points près, puis compare la simulation à une référence exacte là où les pannes sont fréquentes : avec des pannes exponentielles, une panne pendant un checkpoint qui le perd et aucune panne pendant un redémarrage, sécuriser un segment de T + C secondes prend en moyenne $(M + R)\,(e^{(T+C)/M} - 1)$ secondes.
 
 ### Pour aller plus loin {#lectures}
 
-- Llama Team, *The Llama 3 Herd of Models*, 2024 : section sur la fiabilité de l'entraînement, [arxiv.org/abs/2407.21783](https://arxiv.org/abs/2407.21783).
+- Llama Team, *The Llama 3 Herd of Models*, 2024 : § 3.3.4 « Reliability and Operational Challenges », [arxiv.org/abs/2407.21783](https://arxiv.org/abs/2407.21783).
 - J. W. Young, « A first order approximation to the optimum checkpoint interval », *Communications of the ACM* 17(9), 1974.
 - J. T. Daly, « A higher order estimate of the optimum checkpoint interval for restart dumps », *Future Generation Computer Systems* 22(3), 2006.

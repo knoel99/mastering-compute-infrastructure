@@ -27,6 +27,7 @@ def read_psi(root="/"):
 def read_cpu(root="/"):
     with open(os.path.join(root, "proc/stat")) as f:
         fields = [int(x) for x in f.readline().split()[1:]]
+    fields = fields[:8]  # user nice system idle iowait irq softirq steal; guest and guest_nice are already inside user/nice
     idle = fields[3] + fields[4]  # idle + iowait
     return {"busy": sum(fields) - idle, "total": sum(fields)}
 
@@ -91,6 +92,8 @@ def main():
     ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
     disk = a.disk or root_disk()
+    if not disk:
+        sys.exit("cannot find the block device of / in /proc/diskstats (LVM, overlayfs, network root?): pass --disk NAME")
     s0 = snapshot(disk)
     time.sleep(a.seconds)
     m = compute(s0, snapshot(disk))

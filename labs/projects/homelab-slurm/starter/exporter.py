@@ -8,12 +8,13 @@ Label values are BOUNDED on purpose: a free-text node reason or an unknown pendi
 series per distinct string.
 """
 import calendar
+import os
 import re
 import subprocess
 import time
 
 KNOWN_PENDING = {"Priority", "Resources", "Dependency", "InvalidAccount", "AssocGrpCpuLimit", "QOSMaxJobsPerUserLimit",
-                 "ReqNodeNotAvail", "JobHeldUser", "BeginTime", "Licenses", "Partition_Down"}
+                 "ReqNodeNotAvail", "JobHeldUser", "BeginTime", "Licenses", "PartitionDown"}
 UNHEALTHY = {"drain", "drng", "down", "fail", "failg", "maint"}
 
 
@@ -57,7 +58,7 @@ def samples(sinfo_text, squeue_text, sshare_text, now):
 
 HELP = {
     "slurm_nodes": "Number of nodes by partition and normalised state.",
-    "slurm_node_unhealthy": "1 for a node that is drained, draining, down or failed; reason is a bounded label.",
+    "slurm_node_unhealthy": "1 for a node that is drained, draining, down, failing or in a maintenance reservation; reason is a bounded label.",
     "slurm_jobs": "Number of jobs by partition and state.",
     "slurm_jobs_pending_by_reason": "Pending jobs by scheduler reason (unknown reasons are grouped as other).",
     "slurm_job_max_pending_seconds": "Age of the oldest pending job, by partition.",
@@ -73,7 +74,9 @@ def render(m, ok=True):
 
 
 def run_cmd(argv):
-    r = subprocess.run(argv, capture_output=True, text=True, timeout=20)
+    # squeue prints submit times in the LOCAL time zone and parse_squeue reads them as UTC: force UTC, otherwise every
+    # pending age is off by the UTC offset (observed: TZ=America/New_York gave 14402 s for a job submitted 2 s earlier).
+    r = subprocess.run(argv, capture_output=True, text=True, timeout=20, env={**os.environ, "TZ": "UTC"})
     if r.returncode != 0:
         raise RuntimeError(f"{argv[0]} failed: {r.stderr.strip()[:200]}")
     return r.stdout

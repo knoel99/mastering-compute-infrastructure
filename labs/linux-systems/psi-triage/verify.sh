@@ -8,7 +8,7 @@ for t in stress-ng fio; do command -v "$t" >/dev/null || { echo "FAIL: $t is req
 [ -r /proc/pressure/cpu ] || { echo "FAIL: this kernel has no PSI (/proc/pressure)" >&2; exit 2; }
 "$PY" -m pytest -q -p no:cacheprovider test_triage.py
 work="$(mktemp -d)"
-trap 'rm -rf "$work"; pkill -x stress-ng 2>/dev/null || true; pkill -x fio 2>/dev/null || true' EXIT
+trap 'rm -rf "$work"; jobs -p | xargs -r kill 2>/dev/null || true' EXIT  # only the jobs started here, never other users' fio or stress-ng
 run() { "$PY" triage.py --seconds 4 --json; }
 field() { "$PY" -c "import json,sys; d=json.load(sys.stdin); print($1)"; }
 

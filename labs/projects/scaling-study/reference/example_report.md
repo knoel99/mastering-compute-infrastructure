@@ -39,7 +39,7 @@ The extra barrier of `--decompose` perturbs the step time: use these runs to exp
 
 ## Threats to validity
 
-- The "processes" share the same four virtual CPUs and communicate over the loopback interface:
+- The "processes" share the same 4 logical CPUs and communicate over the loopback interface:
   the measured all-reduce is a property of this machine, not of a GPU cluster.
 - Few repetitions: the interquartile range is the spread of the per-run medians, with 3 runs per point.
 - The communication time includes the wait for the slowest rank (load imbalance and scheduler noise).

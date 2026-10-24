@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checkpoint interval model — TO WRITE (milestone 4).
+"""Checkpoint interval model — TO WRITE (milestone 5).
 
 Notation (seconds): C = cost of one checkpoint, M = mean time between failures,
 R = restart cost, T = compute time between two checkpoints.

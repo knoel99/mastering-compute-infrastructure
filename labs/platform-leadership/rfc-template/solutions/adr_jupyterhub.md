@@ -14,7 +14,7 @@ Nous déployons un JupyterHub qui lance un serveur mono-utilisateur par session 
 
 ## Alternatives écartées
 
-- **Portail de lancement de jobs de type Open OnDemand** : bonne intégration avec un ordonnanceur HPC et des applications interactives variées. Écartée parce que la plateforme retenue n'exécute pas les sessions sous Slurm et que l'équipe n'a pas de capacité pour maintenir un second ordonnanceur.
+- **Portail de lancement de jobs de type Open OnDemand** : bonne intégration avec un ordonnanceur HPC et des applications interactives variées. Écartée parce que la plateforme retenue n'exécute pas les sessions sous Slurm ; Open OnDemand dispose d'un adaptateur Kubernetes, mais son coût d'exploitation face à celui d'un hub n'a pas été comparé, ce qui est le point à mesurer si le signal de révision se déclenche.
 - **Accès SSH direct aux machines** : aucune infrastructure à écrire. Écartée parce qu'il n'y a ni isolation entre utilisateurs ni expiration automatique des sessions, donc des GPU réservés oubliés.
 
 ## Conséquences

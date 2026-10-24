@@ -9,7 +9,7 @@ from statistics import median
 import analysis
 
 THREATS = """\
-- The "processes" share the same four virtual CPUs and communicate over the loopback interface:
+- The "processes" share the same {cpus} logical CPUs and communicate over the loopback interface:
   the measured all-reduce is a property of this machine, not of a GPU cluster.
 - Few repetitions: the interquartile range is the spread of the per-run medians, with {reps} runs per point.
 - The communication time includes the wait for the slowest rank (load imbalance and scheduler noise).
@@ -61,7 +61,7 @@ def build(results, fitres, peak_gflops=None):
             "- utilisation (MFU of this study) = `6 * params * batch_per_rank / compute_time / peak`; "
             "`peak` must be measured (GEMM micro-benchmark), here: "
             + (f"{peak_gflops} GFLOP/s." if peak_gflops else "not provided, column left empty."),
-            "", "## Threats to validity", "", THREATS.format(reps=reps)]
+            "", "## Threats to validity", "", THREATS.format(reps=reps, cpus=pts[0]['cpu_count'])]
     return "\n".join(out), rows
 
 

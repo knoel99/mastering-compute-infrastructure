@@ -39,8 +39,15 @@ check "no file created by dry-run" test ! -e "$d/never.conf"
 
 expect_rc "rejects a malformed pair" 2 "$S" --conf "$d/x.conf" 'bad key=1'
 expect_rc "rejects a key without a dot" 2 "$S" --conf "$d/x.conf" swappiness=1
+expect_rc "rejects a value that sed would interpret (|)" 2 "$S" --conf "$d/x.conf" 'kernel.core_pattern=|/bin/x'
+check "nothing written for a rejected pair" test ! -e "$d/x.conf"
 expect_rc "requires at least one pair" 2 "$S" --conf "$d/x.conf"
 expect_rc "rejects an unknown option" 2 "$S" --nope vm.swappiness=1
+
+printf '  vm.swappiness = 10\n' > "$d/indented.conf"
+expect_rc "an indented line holding the wanted value is unchanged" 0 "$S" --conf "$d/indented.conf" vm.swappiness=10
+check "usage text is the header comment only" test "$("$S" 2>&1 | grep -c 'set -euo')" = 0
+expect_rc "the temporary file is created next to a new target even if TMPDIR is unusable" 10 env TMPDIR=/nonexistent "$S" --conf "$d/fresh/dir/90.conf" vm.swappiness=10
 
 if [ "$(id -u)" = 0 ] && [ -w /proc/sys/vm/swappiness ]; then
   cur="$(cat /proc/sys/vm/swappiness)"

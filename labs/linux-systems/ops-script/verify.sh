@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 bash -n ensure_sysctl.sh test_ensure_sysctl.sh check_unit.sh errexit_demo.sh
-command -v shellcheck >/dev/null && shellcheck ensure_sysctl.sh test_ensure_sysctl.sh check_unit.sh errexit_demo.sh || echo "shellcheck not installed: skipped"
+if command -v shellcheck >/dev/null; then shellcheck ensure_sysctl.sh test_ensure_sysctl.sh check_unit.sh errexit_demo.sh; else echo "shellcheck not installed: skipped"; fi
 bash test_ensure_sysctl.sh
 echo "--- systemd units (offline verification, systemd need not be running)"
 ./check_unit.sh units/gpu-exporter.service
@@ -17,6 +17,6 @@ grep -q '^  status: 0$' <<<"$out" || { echo "FAIL: pipeline without pipefail sho
 grep -q '^  status: 1$' <<<"$out" || { echo "FAIL: pipeline with pipefail should report 1" >&2; exit 1; }
 echo "--- exercise 11 reference solution"
 bash -n solutions/ensure_line.sh solutions/test_ensure_line.sh
-command -v shellcheck >/dev/null && shellcheck solutions/ensure_line.sh solutions/test_ensure_line.sh || true
+if command -v shellcheck >/dev/null; then shellcheck solutions/ensure_line.sh solutions/test_ensure_line.sh; else echo "shellcheck not installed: skipped"; fi
 bash solutions/test_ensure_line.sh
 echo "OK ops-script"

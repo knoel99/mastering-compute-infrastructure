@@ -15,7 +15,7 @@ stop() {  # stop <process name> <seconds to wait before SIGKILL>
   for _ in $(seq 1 10); do pgrep -x "$1" >/dev/null || return 0; sleep 1; done
 }
 
-scancel --all >/dev/null 2>&1
+squeue -h -o %i 2>/dev/null | xargs -r scancel >/dev/null 2>&1 || true   # scancel has no --all option
 stop slurmd 30
 stop slurmctld 60
 stop slurmscriptd 5

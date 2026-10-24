@@ -1,3 +1,7 @@
+import os
+import stat
+
+import pytest
 import torch
 
 import ckpt
@@ -30,16 +34,35 @@ def test_empty_dir_returns_none(tmp_path):
     assert ckpt.load_latest(tmp_path) == (None, None, [])
 
 
-def test_no_temporary_file_left(tmp_path):
+def test_no_temporary_file_left(tmp_path, monkeypatch):
+    synced = []
+    real_fsync = os.fsync
+
+    def spy(fd):
+        synced.append(stat.S_IFMT(os.fstat(fd).st_mode))
+        return real_fsync(fd)
+
+    monkeypatch.setattr(os, "fsync", spy)
     ckpt.save(tmp_path, 1, state(1))
     names = sorted(p.name for p in (tmp_path / "ckpt").iterdir())
     assert names == ["ckpt-00000001.pt"]
+    # durability (R1): the file itself and its directory are fsync'ed (a power cut is not testable here)
+    assert stat.S_IFREG in synced and stat.S_IFDIR in synced
 
 
-def test_rotation_keeps_newest(tmp_path):
+def test_rotation_keeps_newest(tmp_path, monkeypatch):
     for s in range(1, 7):
         ckpt.save(tmp_path, s, state(s), keep=3)
     names = sorted(p.name for p in (tmp_path / "ckpt").iterdir())
+    assert names == ["ckpt-00000004.pt", "ckpt-00000005.pt", "ckpt-00000006.pt"]
+    # an old checkpoint is deleted only after the new one is durable: a failing write costs nothing
+    def boom(fd):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(os, "fsync", boom)
+    with pytest.raises(OSError):
+        ckpt.save(tmp_path, 7, state(7), keep=3)
+    names = sorted(p.name for p in (tmp_path / "ckpt").glob("ckpt-*.pt"))
     assert names == ["ckpt-00000004.pt", "ckpt-00000005.pt", "ckpt-00000006.pt"]
 
 

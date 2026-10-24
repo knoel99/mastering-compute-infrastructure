@@ -3,6 +3,7 @@ import re
 import subprocess
 import urllib.error
 import urllib.request
+from dataclasses import replace
 
 import pytest
 
@@ -44,6 +45,9 @@ def test_labels_follow_dcgm_exporter_and_join_metric_covers_allocated_gpus(sampl
         assert label in line
     joins = [x for x in text.splitlines() if x.startswith("slurm_job_gpu_allocated{")]
     assert len(joins) == len(samples) and all('job="42"' in x and x.endswith(" 1") for x in joins)
+    free = [replace(samples[0], job="")] + samples[1:]  # an unallocated GPU must not appear in the join metric
+    joins = [x for x in exporter.render(free).splitlines() if x.startswith("slurm_job_gpu_allocated{")]
+    assert len(joins) == len(samples) - 1 and not any('job=""' in x for x in joins)
 
 
 def test_values_are_plain_floats(samples):

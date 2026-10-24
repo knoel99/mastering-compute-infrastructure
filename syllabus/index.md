@@ -677,11 +677,11 @@ Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'
 
 **Modules mobilisés :** 2, 3, 4, 7, 9.
 
-**Plan :** Entraînement DDP/FSDP (gloo, CPU) à 1, 2, 4 processus ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif.
+**Plan :** Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif.
 
 ### Projet 3 — Entraîneur tolérant aux pannes (24 h) {#resilient-trainer}
 
-Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.
+Un entraînement qui survit à kill -9, aux blocages et aux checkpoints corrompus, avec preuves automatisées.
 
 **Modules mobilisés :** 8, 9, 10.
 
@@ -705,9 +705,9 @@ Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqu
 
 ### Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU (40 h) {#capstone-rfc}
 
-Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.
+Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.
 
 **Modules mobilisés :** 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16.
 
-**Plan :** RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité/coût testé, politique d'ordonnancement, plan de fiabilité et d'observabilité, plan de migration, runbooks, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types.
+**Plan :** RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité et de coût testé, choix du marché par classe de charge, plan de fiabilité et d'observabilité, plan de migration par phases, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types.
 

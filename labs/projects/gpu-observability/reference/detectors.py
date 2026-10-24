@@ -89,7 +89,8 @@ def run(detector, sim, duration_s, faults=()):
 
 
 def false_alarm_rate(make_detector, make_sim, seeds, duration_s):
-    """Alerts per GPU-hour on fault-free runs. Zero alerts only bounds the rate: about 3/GPU-hours at 95 %."""
+    """Alerts per GPU-hour on fault-free runs. Zero alerts only bounds the rate: about 3/GPU-hours at 95 %.
+    The GPU-hours are duration x GPUs; frames() also yields t = duration_s, one scrape more (0.1 % of exposure)."""
     n_alerts = gpu_hours = 0
     for seed in seeds:
         sim = make_sim(seed)

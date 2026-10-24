@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Restart supervisor — TO WRITE (milestone 3).
+"""Restart supervisor — TO WRITE (milestone 4).
 
 usage: supervisor.py --workdir W [--max-restarts 5] [--stall-timeout 30] [--startup-grace 60] -- CMD ...
 

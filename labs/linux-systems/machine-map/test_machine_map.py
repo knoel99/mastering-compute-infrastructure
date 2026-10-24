@@ -52,6 +52,13 @@ def test_recorded_lscpu_and_lsblk_summaries():
     assert disks and all(d["size_bytes"] > 0 for d in disks)
 
 
+def test_rotational_flag_accepts_booleans_and_old_style_strings():
+    def blk(rota):
+        return {"blockdevices": [{"name": "d", "type": "disk", "size": 1, "rota": rota}]}
+    flags = [mm.disk_summary(blk(r))[0]["rotational_flag"] for r in (True, False, "1", "0", 1, 0)]
+    assert flags == [True, False, True, False, True, False]
+
+
 def test_live_machine_is_consistent_with_the_kernel():
     rep = mm.build_report("/")
     assert rep["memory_total_kb"] > 0

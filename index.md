@@ -104,10 +104,10 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 <div class="cards">
 <a class="card" href="projects/homelab-slurm/index.html"><h4>Mini-cluster Slurm instrumenté</h4><p class="meta">Projet 1 · 24 h</p><p>Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.</p></a>
 <a class="card" href="projects/scaling-study/index.html"><h4>Étude de passage à l'échelle d'un entraînement</h4><p class="meta">Projet 2 · 20 h</p><p>Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.</p></a>
-<a class="card" href="projects/resilient-trainer/index.html"><h4>Entraîneur tolérant aux pannes</h4><p class="meta">Projet 3 · 24 h</p><p>Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.</p></a>
+<a class="card" href="projects/resilient-trainer/index.html"><h4>Entraîneur tolérant aux pannes</h4><p class="meta">Projet 3 · 24 h</p><p>Un entraînement qui survit à kill -9, aux blocages et aux checkpoints corrompus, avec preuves automatisées.</p></a>
 <a class="card" href="projects/multi-provider-scheduler/index.html"><h4>Placement multi-fournisseurs sensible aux coûts</h4><p class="meta">Projet 4 · 24 h</p><p>Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.</p></a>
 <a class="card" href="projects/gpu-observability/index.html"><h4>Observabilité GPU et détection de pannes silencieuses</h4><p class="meta">Projet 5 · 20 h</p><p>Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqué ou un GPU dégradé en quelques minutes.</p></a>
-<a class="card" href="projects/capstone-rfc/index.html"><h4>RFC et prototype : une plateforme de calcul de 8 à 256 GPU</h4><p class="meta">Projet 6 · 40 h</p><p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.</p></a>
+<a class="card" href="projects/capstone-rfc/index.html"><h4>RFC et prototype : une plateforme de calcul de 8 à 256 GPU</h4><p class="meta">Projet 6 · 40 h</p><p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.</p></a>
 </div>
 
 ## Enquête sur les masters HPC {#masters}

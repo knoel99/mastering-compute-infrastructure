@@ -38,7 +38,9 @@ def run_point(item, args):
                "--hidden", str(args.hidden), "--layers", str(args.layers),
                "--batch-per-rank", str(item["batch_per_rank"]), "--steps", str(args.steps),
                "--warmup", str(args.warmup), "--out", str(out)] + (["--decompose"] if args.decompose else [])
-        subprocess.run(cmd, check=True, env={**os.environ, "OMP_NUM_THREADS": "1"}, capture_output=True, text=True)
+        r = subprocess.run(cmd, env={**os.environ, "OMP_NUM_THREADS": "1"}, capture_output=True, text=True)
+        if r.returncode:  # keep the reason: the captured stderr is otherwise lost
+            raise RuntimeError(f"bench.py failed for {item}:\n{r.stderr[-800:]}")
         return {**item, **json.loads(out.read_text())}
 
 

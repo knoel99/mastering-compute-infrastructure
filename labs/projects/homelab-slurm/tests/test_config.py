@@ -80,6 +80,16 @@ def test_changes_become_modify_commands():
     cmds = [" ".join(c) for c in config.plan(cfg, real_state())]
     assert cmds == ["sacctmgr -i modify qos where name=urgent set Priority=3000 Preempt=normal",
                     "sacctmgr -i modify account where name=teama set fairshare=5"]
+    cfg = copy.deepcopy(CFG)  # a decrease, a change of Preempt alone and a new account for an existing user are changes too
+    cfg["accounts"]["teamb"]["fairshare"] = 1
+    cfg["qos"]["low"] = {"priority": 1}
+    cfg["qos"]["urgent"]["preempt"] = ["normal", "low"]
+    cfg["users"]["bob"]["account"] = "teama"
+    assert [" ".join(c) for c in config.plan(cfg, real_state())] == [
+        "sacctmgr -i add qos low Priority=1",
+        "sacctmgr -i modify qos where name=urgent set Priority=2000 Preempt=low,normal",
+        "sacctmgr -i modify account where name=teamb set fairshare=1",
+        "sacctmgr -i add user bob account=teama"]
 
 
 def test_applying_the_plan_converges_and_a_second_plan_is_empty():

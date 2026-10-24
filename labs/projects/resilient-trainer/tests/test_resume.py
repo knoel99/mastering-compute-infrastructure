@@ -60,6 +60,10 @@ def test_kill9_resumes_bit_exactly(tmp_path, py, impl, baseline):
 
 
 def test_torn_checkpoint_write_is_survived(tmp_path, py, impl, baseline):
+    # the crash itself: nothing half-written may sit under a final checkpoint name
+    crashed = run(py, impl, ["--workdir", str(tmp_path / "crash"), "--steps", str(STEPS)], env={"FAULT": "torn:60"})
+    assert crashed.returncode != 0
+    assert "ckpt-00000060.pt" not in [p.name for p in (tmp_path / "crash" / "ckpt").iterdir()]
     r = supervised(py, impl, tmp_path, ["--steps", str(STEPS)], env={"FAULT": "torn:60"})
     assert r.returncode == 0, r.stderr
     assert [s["resumed_from"] for s in events(tmp_path)] == [0, 50]
@@ -82,8 +86,11 @@ def test_corrupt_latest_checkpoint_falls_back(tmp_path, py, impl, baseline):
 def test_hung_trainer_is_killed_and_restarted(tmp_path, py, impl, baseline):
     r = supervised(py, impl, tmp_path, ["--steps", str(STEPS)], env={"FAULT": "hang:45"}, stall=3)
     assert r.returncode == 0, r.stderr
-    kinds = [e["event"] for e in events(tmp_path, "supervisor.jsonl")]
+    sup = events(tmp_path, "supervisor.jsonl")
+    kinds = [e["event"] for e in sup]
     assert "stall_kill" in kinds and kinds[-1] == "success"
+    # detected after --stall-timeout (3 s), not after --startup-grace (30 s)
+    assert 3 <= next(e for e in sup if e["event"] == "stall_kill")["silent_for"] < 30
     assert_same_as_baseline(tmp_path, baseline)
 
 

@@ -56,6 +56,8 @@ def main():
     ap.add_argument("--mtbf-hours", type=float, required=True)
     ap.add_argument("--restart-seconds", type=float, default=300.0)
     args = ap.parse_args()
+    if args.ckpt_seconds is None and not args.workdir:
+        ap.error("give --ckpt-seconds or --workdir")
     c = args.ckpt_seconds if args.ckpt_seconds is not None else measured_cost(args.workdir)
     m = args.mtbf_hours * 3600.0
     t_opt = young_daly(c, m)

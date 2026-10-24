@@ -33,7 +33,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 
 | Clé | Valeur |
 |---|---|
-| Volume | 28 h, dont environ 10 h de lecture, 10 h de labs et 8 h d'exercices |
+| Volume | 28 h, dont environ 10 h de lecture, 7 h de labs et 11 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
 | Niveau d'entrée | 3 : vous avez déjà exploité un cluster ou une plateforme de calcul |
 | Prérequis | [Module 5 — Slurm](../slurm/index.html), module 12 — Kubernetes pour l'IA, module 14 — Observabilité |
 | Statut pour le lecteur de référence | cœur : l'écriture de décisions, la gestion d'incident et la direction d'équipe sont le cœur du métier visé, au-delà de l'outillage |
@@ -58,13 +58,13 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 | 1 | 3 h | 2 | Chapitre 1 : la plateforme comme produit, quatre mesures d'adoption | exercice 3 |
 | 2 | 3 h | 2 | Chapitre 2 : sessions interactives, MIG et partage de GPU | exercice 6 |
 | 3 | 3 h | 2 | Chapitre 3 : sécurité d'une plateforme GPU partagée | exercice 8 |
-| 4 | 3 h | 2 | Chapitre 4, première moitié : SLO, budget d'erreur, astreinte | exercices 1 et 2, lab 16.2 (début) |
-| 5 | 3 h | 3 | Chapitre 4, seconde moitié : incident, post-mortem, ADR et RFC | labs 16.1 et 16.2, exercices 4 et 11 |
-| 6 | 3 h | 3 | Chapitre 5 : évolutions et migrations | exercice 7 |
-| 7 | 3 h | 3 | Chapitre 6 : diriger une petite équipe d'infrastructure | exercice 5 |
+| 4 | 3 h | 2 | Chapitre 4, première moitié (4.1 à 4.3) : SLO, budget d'erreur, astreinte, jalons d'un incident | exercices 1, 2 et 4, lab 16.2 (étapes 1 à 3) |
+| 5 | 3 h | 3 | Chapitre 4, seconde moitié (4.4 et 4.5) : post-mortem, ADR et RFC | lab 16.2 (étapes 4 et 5), exercice 11 |
+| 6 | 3 h | 3 | Chapitre 5 : évolutions et migrations | exercice 7, lab 16.1 (étapes 1 à 3) |
+| 7 | 3 h | 3 | Chapitre 6 : diriger une petite équipe d'infrastructure | exercice 5, lab 16.1 (étapes 4 et 5) |
 | 8 | 3 h | 3 | Chapitre 7 : contribuer et se rendre visible, puis chapitre 8 (début) | exercice 10 |
-| 9 | 2 h | 3 | Chapitre 8 : exercice de conception | lab 16.3, exercice 9 |
-| 10 | 2 h | 3 | Synthèse et checkpoint de sortie | checkpoint |
+| 9 | 2 h | 3 | Chapitre 8 : exercice de conception | lab 16.3 (étapes 1 à 3) |
+| 10 | 2 h | 3 | Synthèse et checkpoint de sortie | lab 16.3 (étapes 4 et 5), exercice 9, checkpoint |
 
 ## Avant de commencer {#avant}
 
@@ -92,7 +92,7 @@ Un cluster est une machine ; une plateforme est un **service que des gens choisi
 
 Dans un groupe de recherche, quatre profils reviennent : le chercheur qui développe en interactif, celui qui lance des évaluations par rafales, celui qui règle finement un modèle pendant quelques heures, et le petit nombre qui conduit un pré-entraînement de plusieurs jours. Leurs besoins s'opposent : le premier veut une réponse en minutes, le dernier veut une longue réservation fiable. Une plateforme qui n'a qu'une file pour tous les contente mal chacun.
 
-Interrogez-les. Trois entretiens de vingt minutes avec des utilisateurs réels vous apprennent plus que n'importe quel tableau de bord : ce qui les bloque, ce qu'ils contournent, ce qu'ils copient d'un voisin faute de documentation.
+Interrogez-les. Trois entretiens de vingt minutes avec des utilisateurs réels vous apprennent souvent plus qu'un tableau de bord : ce qui les bloque, ce qu'ils contournent, ce qu'ils copient d'un voisin faute de documentation.
 
 ### 1.2. Quatre mesures, pas quarante
 
@@ -106,11 +106,11 @@ Quatre mesures suffisent pour piloter, et chacune se calcule à partir des donn�
 ::: ex
 [Exemple 1.1 — Mesurer une classe de charge avec la loi de Little]{.tag} Dans le cahier des charges fictif du projet 6, 650 sessions interactives de 1,2 heure de travail arrivent chaque mois de 730 heures. Le taux d'arrivée est de 650 / 730 = 0,890 session par heure.
 
-La loi de Little (le nombre moyen de requêtes en cours est le taux d'arrivée multiplié par la durée moyenne) donne 0,890 × 1,2 = **1,07 session simultanée** en moyenne. Quatre GPU réservés l'absorbent à 26,7 % d'utilisation, avec une attente moyenne de 37 secondes.
+La loi de Little (le nombre moyen de requêtes en cours est le taux d'arrivée multiplié par la durée moyenne) donne 0,890 × 1,2 = **1,07 session simultanée** en moyenne. Quatre GPU réservés l'absorbent à 26,7 % d'utilisation, avec une attente moyenne de 37 secondes (file M/M/c et formule d'Erlang C : [module 15, chapitre 2](../finops-capacity/index.html#ch2)).
 
 Le modèle du projet 6 ajoute le surcoût des pannes et des reprises à la durée de service et publie **26,9 %** et **38 secondes**. À vue d'œil le pool est « sous-utilisé », et pourtant l'attente est justement dans l'objectif.
 
-Une utilisation basse est ici le **prix d'une latence basse** : avec 2 GPU, l'attente au 90e centile monterait à 1,72 heure selon le projet 6 (1,69 heure sans le surcoût des pannes). Données fictives ; la méthode, elle, est celle à appliquer à vos mesures.
+Une utilisation basse est ici le **prix d'une latence basse** : avec 2 GPU, l'attente au 90e centile monterait à 1,72 heure selon le projet 6 (1,69 heure sans le surcoût des pannes). Données fictives. Le modèle suppose des arrivées indépendantes et des durées exponentielles : il peut être optimiste pour des sessions à queue lourde (le notebook oublié), donc comparez-le à l'attente mesurée. La méthode est celle à appliquer à vos mesures.
 :::
 
 ### 1.3. Mesurer sans se tromper de cible
@@ -137,15 +137,15 @@ Le développement interactif est la classe qui exige la latence la plus basse et
 
 ### 2.1. Un portail HPC ou un hub multi-utilisateur
 
-*Open OnDemand* se configure pour que des « interactive apps that run on compute nodes » soient lancées depuis un navigateur, par des adaptateurs vers Slurm, LSF, PBS Pro ou SGE ([documentation, version 4.2.0](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html)) : une session interactive y est donc un job de l'ordonnanceur. *JupyterHub*, de son côté, est « a multi-user Hub that spawns, manages, and proxies » des serveurs Jupyter mono-utilisateur, lancés par des *spawners* et déployables sur Kubernetes ([documentation](https://jupyterhub.readthedocs.io/en/stable/)).
+*Open OnDemand* se configure pour que des « interactive apps that run on compute nodes » soient lancées depuis un navigateur ([documentation, version 4.2.0](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html)), par des adaptateurs vers Slurm, LSF, PBS Professional, Grid Engine ou Kubernetes, entre autres ([liste des adaptateurs](https://osc.github.io/ood-documentation/latest/installation/resource-manager/slurm.html)) : une session interactive y est donc un job du gestionnaire de ressources. *JupyterHub*, de son côté, est « a multi-user Hub that spawns, manages, and proxies » des serveurs Jupyter mono-utilisateur, lancés par des *spawners* et déployables sur Kubernetes ([documentation](https://jupyterhub.readthedocs.io/en/stable/)).
 
-Le choix dépend de l'ordonnanceur de la plateforme : si les sessions doivent entrer dans les files de Slurm, un portail qui lance des jobs est naturel ; si la plateforme est sur Kubernetes, un hub qui lance des pods l'est. Dans les deux cas, la question importante est la même : **qui arrête la session ?**
+Le choix dépend de l'ordonnanceur de la plateforme : si les sessions doivent entrer dans les files de Slurm, un portail qui lance des jobs est naturel ; si la plateforme est sur Kubernetes, un hub qui lance des pods l'est. Comme Open OnDemand dispose aussi d'un adaptateur Kubernetes, ce n'est pas une impossibilité technique qui tranche, mais le coût d'exploitation d'un composant de plus. Dans les deux cas, la question importante est la même : **qui arrête la session ?**
 
 ### 2.2. Trois façons de partager un GPU
 
 Un GPU entier par session est simple et isolé, mais gaspille : une session de développement en occupe rarement la capacité. Deux mécanismes permettent de le partager.
 
-La *MIG* (*Multi-Instance GPU*) partitionne un GPU en « up to seven separate GPU Instances », avec « separate and isolated paths through the entire memory system » et une isolation des pannes ([guide MIG](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/introduction.html)). Le partage par tranches de temps (*time-slicing*) fait alterner les charges sur un GPU surbooké ; la documentation du GPU Operator précise que, contrairement à MIG, « there is no memory or fault-isolation between replicas » ([partage de GPU](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html)).
+La *MIG* (*Multi-Instance GPU*, à partir de l'architecture Ampere) partitionne un GPU en « up to seven separate GPU Instances », avec « separate and isolated paths through the entire memory system » et une isolation des pannes ([guide MIG](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/introduction.html)). Le partage par tranches de temps (*time-slicing*) fait alterner les charges sur un GPU surbooké ; la documentation du GPU Operator précise que, contrairement à MIG, « there is no memory or fault-isolation between replicas » ([partage de GPU](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html)).
 
 | Mode | Isolation mémoire et pannes | Souplesse | Convient à |
 |---|---|---|---|
@@ -176,7 +176,7 @@ Un GPU partagé est un matériel que des personnes qui ne se connaissent pas uti
 
 ### 3.1. Qui est un locataire
 
-La documentation de Kubernetes sur la multi-location le dit sans détour : « there is no single definition for a "tenant" ». Dans une plateforme de recherche, un locataire est typiquement une équipe, et parfois un utilisateur. Décidez-le **avant** de concevoir l'isolation : tout le reste (quotas, réseaux, secrets, audit) se rattache à cette unité.
+La documentation de Kubernetes sur la [multi-location](https://kubernetes.io/docs/concepts/security/multi-tenancy/) le dit sans détour : « there is no single definition for a "tenant" ». Dans une plateforme de recherche, un locataire est typiquement une équipe, et parfois un utilisateur. Décidez-le **avant** de concevoir l'isolation : tout le reste (quotas, réseaux, secrets, audit) se rattache à cette unité.
 
 ### 3.2. Identité et moindre privilège
 
@@ -233,15 +233,17 @@ Le SRE Book de Google définit le **budget d'erreur** à partir de l'objectif de
 
 ### 4.2. Une astreinte soutenable
 
-L'astreinte a une limite humaine que le SRE Book chiffre : investir « at least 50% of SRE time into engineering » et ne passer « no more than 25% » du reste en astreinte. Il en déduit que, pour une équipe sur un seul site assurant une rotation 24 heures sur 24 avec un titulaire et un second, « the minimum number of engineers needed for on-call duty from a single-site team is eight », et qu'une garde de 12 heures ne doit pas dépasser deux incidents ([Being On-Call](https://sre.google/sre-book/being-on-call/)).
+L'astreinte a une limite humaine que le SRE Book chiffre : investir « at least 50% of SRE time into engineering » et, sur le reste, ne pas passer plus de 25 % du temps total en astreinte (« no more than 25% can be spent on-call »), le dernier quart allant aux autres tâches d'exploitation.
+
+Il en déduit que, pour une équipe sur un seul site assurant une rotation 24 heures sur 24 avec un titulaire et un second, « the minimum number of engineers needed for on-call duty from a single-site team is eight », et qu'une garde de 12 heures ne doit pas dépasser deux incidents ([Being On-Call](https://sre.google/sre-book/being-on-call/)).
 
 ::: ex
-[Exemple 4.2 — Une équipe de trois ne tient pas une astreinte permanente]{.tag} Avec trois ingénieurs et une personne d'astreinte à la fois, en semaines alternées, chacun est d'astreinte un tiers du temps, soit **33,3 %**, au-dessus de la limite de 25 %. Pour qu'une seule personne d'astreinte à la fois reste sous 25 % du temps de chacun, il faut au moins 4 ingénieurs. C'est pourquoi la RFC de référence du projet 6 limite l'astreinte aux heures ouvrées et exige que chaque interruption soit absorbée **sans intervention humaine** : l'automatisation remplace des ingénieurs qu'on n'a pas.
+[Exemple 4.2 — Une équipe de trois ne tient pas une astreinte permanente]{.tag} Avec trois ingénieurs et une personne d'astreinte à la fois, en semaines alternées, chacun est d'astreinte un tiers du temps, soit **33,3 %**, au-dessus de la limite de 25 %. Pour qu'une seule personne d'astreinte à la fois ne dépasse pas 25 % du temps de chacun, il faut au moins 4 ingénieurs. C'est pourquoi la RFC de référence du projet 6 limite l'astreinte aux heures ouvrées et exige que chaque interruption soit absorbée **sans intervention humaine** : l'automatisation remplace des ingénieurs qu'on n'a pas.
 :::
 
 ### 4.3. Gérer un incident
 
-Un incident se gère avec des rôles et des jalons mesurés. Le lab 16.2 en donne la mécanique : un journal d'événements horodatés où l'on repère l'**anomalie** (début réel), la **détection** (premier signal humain ou automatique), l'**acquittement**, l'**atténuation** (le service repart) et la **résolution**. Les durées entre ces jalons sont les mesures à améliorer, dans cet ordre : détecter plus vite coûte presque toujours moins cher que réparer plus vite.
+Un incident se gère avec des rôles et des jalons mesurés. Le lab 16.2 en donne la mécanique : un journal d'événements horodatés où l'on repère l'**anomalie** (début réel), la **détection** (premier signal humain ou automatique), l'**acquittement**, l'**atténuation** (le service repart) et la **résolution**. Les durées entre ces jalons sont les mesures à améliorer, en commençant par la plus longue. Sur beaucoup d'incidents c'est la détection, et détecter plus vite coûte souvent moins cher que réparer plus vite (règle de pratique, non chiffrée ici).
 
 ::: ex
 [Exemple 4.3 — Lire les délais d'un incident synthétique]{.tag} Le journal inventé du lab 16.2 décrit un pré-entraînement de 128 GPU dont un rang s'arrête à 02:11. `timeline.py` donne :
@@ -260,9 +262,11 @@ Une fois l'incident détecté, tout va vite : 4 minutes pour acquitter, 18 pour 
 
 ### 4.4. Le post-mortem sans blâme
 
-Un post-mortem est le document qui transforme un incident en actions. Le SRE Book pose la règle : il doit « focus on identifying the contributing causes of the incident without indicting any individual or team ». Un post-mortem utile contient un résumé, l'impact chiffré, la chronologie, la cause racine, les facteurs contributifs, ce qui a bien et mal marché, et surtout des **actions** avec un propriétaire, une échéance et une vérification ([Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)).
+Un post-mortem est le document qui transforme un incident en actions. Le SRE Book pose la règle : il doit « focus on identifying the contributing causes of the incident without indicting any individual or team » ([Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)).
 
-Le lab 16.2 fournit un vérificateur qui contrôle cette structure et, plus important, que **les durées écrites dans le texte égalent celles du journal** : un post-mortem dont les chiffres ne tiennent pas est une opinion.
+Il le définit comme « a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring ». Ce parcours en tire un plan **recommandé** : résumé, impact chiffré, chronologie, cause racine, facteurs contributifs, ce qui a bien et mal marché, et surtout des **actions** avec un propriétaire, une échéance et une vérification.
+
+Le lab 16.2 fournit un vérificateur qui contrôle cette structure et, plus important, que **les durées écrites dans le texte égalent celles du journal** (détection, acquittement, atténuation, GPU-heures perdues ; pas chaque horodatage de la chronologie) : un post-mortem dont les chiffres ne tiennent pas est une opinion.
 
 ### 4.5. Écrire une décision : ADR et RFC
 
@@ -273,7 +277,7 @@ Une *ADR* (*architecture decision record*) est une décision d'une page : contex
 
 -   Le budget d'erreur est ce que l'objectif de service autorise de défaillance : 43,2 minutes par mois à 99,9 %.
 -   Limite humaine de l'astreinte (SRE Book) : au plus 25 % du temps, au moins huit ingénieurs pour une rotation 24/7 à deux ; une petite équipe automatise ou limite l'astreinte aux heures ouvrées.
--   Un incident se mesure par des jalons ; la détection est souvent la durée la plus longue et la plus rentable à réduire.
+-   Un incident se mesure par des jalons ; la détection est souvent la durée la plus longue, et l'on commence par la plus longue.
 -   Un post-mortem sans blâme cherche les causes du système et finit par des actions vérifiables ; ses chiffres doivent tenir.
 -   Une ADR écrit l'alternative écartée et le signal qui rouvrirait la décision.
 :::
@@ -302,7 +306,7 @@ Le point important est le deuxième palier : à 50 %, l'ancien système et le no
 
 La documentation de mise à jour de Slurm impose un ordre : sauvegardes, puis *slurmdbd* (la comptabilité), puis *slurmctld* (le contrôleur), puis *slurmd* (les démons des nœuds, de préférence avec le contrôleur), puis les nœuds de connexion et les commandes clientes ([guide de mise à jour](https://slurm.schedmd.com/upgrades.html)). Deux règles à retenir :
 
--   la mise à jour ne peut pas sauter de version : « Upgrades from incompatible versions will fail immediately upon startup », et il faut procéder par étapes entre versions compatibles ;
+-   la mise à jour n'est possible que depuis les versions de la fenêtre de compatibilité de la version cible (les deux versions majeures précédentes, puis trois depuis Slurm 24.11, d'après le guide lu le 2026-10-24) : « Upgrades from incompatible versions will fail immediately upon startup », et il faut procéder par étapes entre versions compatibles ;
 -   le retour arrière n'existe pas : « Reverting an upgrade (or downgrading) is not supported once any of the Slurm daemons have been started ».
 
 Le numéro de version se lit ainsi : dans 23.11.4, « 23.11 » est la version majeure (année et mois de publication) et « .4 » la version de maintenance.
@@ -433,7 +437,7 @@ Pour un modèle dense de $P$ paramètres entraîné sur $D$ jetons, le calcul d'
 
 $$ \text{jours} = \frac{6\,P\,D}{N \cdot F \cdot \text{MFU} \cdot 86400} $$
 
-où la MFU est la part de la puissance crête réellement obtenue. Pour un délai donné, on inverse la formule pour obtenir $N$, qu'on arrondit **au nœud entier** supérieur.
+où la MFU (*model FLOPs utilization*) est la part de la puissance crête réellement obtenue. Pour un délai donné, on inverse la formule pour obtenir $N$, qu'on arrondit **au nœud entier** supérieur.
 
 ::: ex
 [Exemple 8.1 — Dimensionner 70 milliards de paramètres sur 2 000 milliards de jetons]{.tag} Les hypothèses sont dites : puissance crête de 989 TFLOP/s par GPU, MFU de 0,40, 14 octets par paramètre pour un checkpoint (poids en bf16, copie maîtresse et deux moments d'Adam en fp32), écriture à 50 Go/s au total, 0,0002 panne par GPU-heure. `sizing.py` donne, pour 256 GPU :
@@ -455,6 +459,8 @@ Le délai de 100 jours est tenu avec 0,4 jour de marge : la conclusion honnête 
 
 Après le calcul de durée, trois chiffres montrent que vous pensez en production : le MTBF du job (ici 19,5 heures : un job de 256 GPU est interrompu en moyenne toutes les 19,5 heures), la taille et le temps d'écriture d'un checkpoint (980 Go en 20 secondes, ce qui suppose un stockage capable de 50 Go/s, à mesurer et non à supposer) et la période de checkpoint de Young et Daly, qui vaut ici 28 minutes. Nommez ensuite ce qui limiterait l'entraînement et comment vous le mesureriez *avant* de vous engager : réseau ([module 7](../networking/index.html)), stockage, fiabilité des nœuds.
 
+La période de Young et Daly vaut $T^{\ast} = \sqrt{2CM}$, avec $C$ le temps d'écriture d'un checkpoint et $M$ le temps moyen entre pannes du job ([module 10, chapitre 2](../fault-tolerance/index.html#ch2)). Ici $C = 19{,}6$ s et $M = 70\,300$ s, d'où $T^{\ast} \approx 1\,660$ s, soit 28 minutes.
+
 ::: recap
 [Points clés]{.tag}
 
@@ -467,12 +473,12 @@ Après le calcul de durée, trois chiffres montrent que vous pensez en productio
 
 ## Labs {#labs}
 
-Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU, sans cloud). Chacun a un `verify.sh` qui sort avec le code 0. **Aucun ne décrit un système ou une personne réels** : le journal d'incident, le cahier des charges et les réponses d'entretien sont inventés pour l'exercice.
+Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU, sans cloud, Python 3.13 et pytest 9.1, le 2026-10-24). Chacun a un `verify.sh` qui sort avec le code 0 ; lancez les commandes depuis le dossier du lab (`labs/platform-leadership/<lab>/`), après `pip install pytest` si besoin, et choisissez l'interpréteur avec `PYTHON=python3 bash verify.sh`. **Aucun ne décrit un système ou une personne réels** : le journal d'incident, le cahier des charges et les réponses d'entretien sont inventés pour l'exercice.
 
 ::: lab
 [Lab 16.1 — Écrire une décision d'architecture vérifiable]{.tag}
 
-**Objectif.** Écrire une ADR d'une page dont la structure est contrôlée mécaniquement : statut daté, contexte, décision, au moins deux alternatives écartées chacune avec une raison, conséquences positives **et** négatives, signal de révision. **Durée.** 3 h. **Prérequis matériels.** Un portable avec Python 3 ; aucun GPU.
+**Objectif.** Écrire une ADR d'une page dont la structure est contrôlée mécaniquement : statut daté, contexte, décision, au moins deux alternatives écartées chacune avec une raison, conséquences positives **et** négatives, signal de révision. **Durée.** 2 h. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU.
 
 1.  Lisez `labs/platform-leadership/rfc-template/example_adr.md`, qui reprend une décision de la RFC de référence du projet 6 (données fictives).
 2.  Lancez `python3 adr_lint.py adr_template.md` : le gabarit vierge est refusé, lisez les messages.
@@ -488,7 +494,7 @@ Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 
 ::: lab
 [Lab 16.2 — Post-mortem d'un incident simulé]{.tag}
 
-**Objectif.** Reconstituer la chronologie d'un incident à partir d'un journal **synthétique**, mesurer ses jalons, puis écrire un post-mortem sans blâme dont les durées égalent celles du journal. **Durée.** 4 h. **Prérequis matériels.** Un portable avec Python 3 ; aucun GPU.
+**Objectif.** Reconstituer la chronologie d'un incident à partir d'un journal **synthétique**, mesurer ses jalons, puis écrire un post-mortem sans blâme dont les durées égalent celles du journal. **Durée.** 3 h. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU.
 
 1.  Lisez `incident.log` **avant** `postmortem_example.md` : trouvez vous-même la cause (un rang silencieux sur un GPU tombé du bus) et les jalons.
 2.  Lancez `python3 timeline.py incident.log 128` et comparez avec votre lecture : détection, acquittement, atténuation, résolution.
@@ -496,7 +502,7 @@ Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 
 4.  Rédigez votre propre post-mortem avec résumé, impact chiffré, chronologie, cause racine, facteurs contributifs, ce qui a bien et mal marché, et des actions avec propriétaire, échéance et vérification.
 5.  Lancez `python3 postmortem_lint.py votre_fichier.md --log incident.log --gpus 128` jusqu'à « postmortem: ok », puis `bash verify.sh`.
 
-**Critère de réussite.** `bash verify.sh` affiche « 20 passed », les cinq durées de l'exemple 4.3 (détection 1 h 40, acquittement 4 min, atténuation 18 min), « GPU-hours without progress (128 GPUs): 251.7 », « postmortem: ok » et « OK incident-review ».
+**Critère de réussite.** `bash verify.sh` affiche « 20 passed », les cinq durées de l'exemple 4.3 (dont détection 1 h 40, acquittement 4 min, atténuation 18 min), « GPU-hours without progress (128 GPUs): 251.7 », « postmortem: ok » et « OK incident-review ».
 
 **Pour aller plus loin.** Ajoutez au journal un événement de fausse alerte et mesurez son effet sur le temps de détection ; écrivez l'alerte qui aurait réduit la détection (projet 5).
 :::
@@ -504,12 +510,12 @@ Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 
 ::: lab
 [Lab 16.3 — Exercice de conception : de 8 à 256 GPU]{.tag}
 
-**Objectif.** Dimensionner l'entraînement d'un modèle dense avec un calculateur dont chaque hypothèse est explicite, puis comparer trois réponses d'entretien (insuffisante, solide, excellente) à la grille d'évaluation. **Durée.** 3 h. **Prérequis matériels.** Un portable avec Python 3 ; aucun GPU.
+**Objectif.** Dimensionner l'entraînement d'un modèle dense avec un calculateur dont chaque hypothèse est explicite, puis comparer trois réponses d'entretien (insuffisante, solide, excellente) à la grille d'évaluation. **Durée.** 2 h. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU.
 
 1.  Lisez l'énoncé et la grille dans `labs/platform-leadership/design-interview/rubric.md`.
 2.  Répondez par écrit en trente minutes, **avant** de lire `answers/`.
-3.  Lancez `python3 sizing.py` avec les paramètres de l'exemple 8.1 et comparez sa sortie à vos chiffres.
-4.  Changez la MFU à 0,35, le débit d'écriture à 10 Go/s, le taux de panne à 0,001, et notez ce qui bascule.
+3.  Lancez `python3 sizing.py` avec les paramètres de l'exemple 8.1 (la commande complète est dans `README.md`) et comparez sa sortie à vos chiffres.
+4.  Changez la MFU à 0,35, le débit d'écriture à 10 Go/s, le taux de panne à 0,001, et notez ce qui bascule (avec les trois changements ensemble : 109,7 jours idéaux et 134,1 jours avec pannes).
 5.  Notez votre réponse avec la grille, puis lisez les trois réponses de `answers/` et dites ce qui sépare chaque niveau du suivant. Lancez `bash verify.sh`.
 
 **Critère de réussite.** `bash verify.sh` affiche « 8 passed » puis la sortie de l'exemple 8.1 (« duration with failures : 99.6 days ») et « OK design-interview ». Les tests vérifient que les chiffres des réponses « solide » et « excellente » sont ceux que reproduit le calculateur, et que la réponse « insuffisante » (« environ 25 jours ») est fausse selon lui (96,0 jours).
@@ -538,7 +544,7 @@ Un mois de 30 jours compte 43 200 minutes. (a) Budget = (1 − SLO) × 43 200 : 
 :::
 
 ::: exo
-[Exercice 3 · ★ — Combien de GPU pour le développement ?]{.tag} 800 sessions interactives de 1,5 heure arrivent chaque mois de 730 heures. L'objectif est une attente au 90e centile d'au plus 5 minutes. (a) Quelle est la charge moyenne, en sessions simultanées ? (b) Pour 3, 4 et 5 GPU, donnez l'utilisation, la probabilité d'attente et l'attente moyenne avec le modèle de file M/M/c. (c) Que choisissez-vous, et que se passe-t-il si la demande augmente de 5 % ?
+[Exercice 3 · ★★ — Combien de GPU pour le développement ?]{.tag} 800 sessions interactives de 1,5 heure arrivent chaque mois de 730 heures. L'objectif est une attente au 90e centile d'au plus 5 minutes. (a) Quelle est la charge moyenne, en sessions simultanées ? (b) Pour 3, 4 et 5 GPU, donnez l'utilisation, la probabilité d'attente et l'attente moyenne avec le modèle de file M/M/c (formule d'Erlang C : [module 15, chapitre 2](../finops-capacity/index.html#ch2), ou fonction `erlang_c` de `labs/projects/capstone-rfc/reference/capacity.py`). (c) Que choisissez-vous, et que se passe-t-il si la demande augmente de 5 % ?
 :::
 
 ::: sol
@@ -668,7 +674,7 @@ Nous déployons un JupyterHub qui lance un serveur mono-utilisateur par session 
 
 ## Alternatives écartées
 
-- **Portail de lancement de jobs de type Open OnDemand** : bonne intégration avec un ordonnanceur HPC et des applications interactives variées. Écartée parce que la plateforme retenue n'exécute pas les sessions sous Slurm et que l'équipe n'a pas de capacité pour maintenir un second ordonnanceur.
+- **Portail de lancement de jobs de type Open OnDemand** : bonne intégration avec un ordonnanceur HPC et des applications interactives variées. Écartée parce que la plateforme retenue n'exécute pas les sessions sous Slurm ; Open OnDemand dispose d'un adaptateur Kubernetes, mais son coût d'exploitation face à celui d'un hub n'a pas été comparé, ce qui est le point à mesurer si le signal de révision se déclenche.
 - **Accès SSH direct aux machines** : aucune infrastructure à écrire. Écartée parce qu'il n'y a ni isolation entre utilisateurs ni expiration automatique des sessions, donc des GPU réservés oubliés.
 
 ## Conséquences
@@ -717,23 +723,26 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Lectures et références {#refs}
 
+Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié en ligne par Google ; toutes les pages web ci-dessous ont été lues le 2026-10-24.
+
 -   Google. [*Site Reliability Engineering*, chap. *Embracing Risk*](https://sre.google/sre-book/embracing-risk/) : budget d'erreur et SLO (chapitre 4).
 -   Google. [*Site Reliability Engineering*, chap. *Being On-Call*](https://sre.google/sre-book/being-on-call/) : limites de l'astreinte et taille d'équipe (chapitres 4 et 6).
 -   Google. [*Site Reliability Engineering*, chap. *Postmortem Culture*](https://sre.google/sre-book/postmortem-culture/) : le post-mortem sans blâme (chapitre 4).
 -   Google. [*Site Reliability Engineering*, chap. *Eliminating Toil*](https://sre.google/sre-book/eliminating-toil/) : définition du toil (chapitre 6).
 -   SchedMD. [*Slurm Upgrade Guide*](https://slurm.schedmd.com/upgrades.html) : ordre des mises à jour, fenêtre de compatibilité, retour arrière (chapitre 5).
 -   JupyterHub. [*Documentation*](https://jupyterhub.readthedocs.io/en/stable/) : hub multi-utilisateur et *spawners* (chapitre 2).
--   Ohio Supercomputer Center. [*Open OnDemand — Setup Interactive Apps*](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html) : applications interactives sur les nœuds de calcul (chapitre 2).
+-   Ohio Supercomputer Center. [*Open OnDemand — Setup Interactive Apps*](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html) : applications interactives sur les nœuds de calcul ; la [liste des adaptateurs](https://osc.github.io/ood-documentation/latest/installation/resource-manager/slurm.html) (Slurm, Kubernetes…) se trouve dans la même documentation (chapitre 2).
 -   NVIDIA. [*MIG User Guide*](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/introduction.html) et [*GPU sharing, GPU Operator*](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html) : MIG et tranches de temps (chapitre 2).
 -   Kubernetes. [*Multi-tenancy*](https://kubernetes.io/docs/concepts/security/multi-tenancy/) et [*Pod Security Standards*](https://kubernetes.io/docs/concepts/security/pod-security-standards/) : locataires et profils de sécurité (chapitre 3).
 -   Kubernetes. [*Secrets*](https://kubernetes.io/docs/concepts/configuration/secret/), [*Images*](https://kubernetes.io/docs/concepts/containers/images/) et [*Auditing*](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/) : secrets, empreintes d'images, audit (chapitre 3).
+-   NVIDIA. [*XID Errors, Xid catalog*](https://docs.nvidia.com/deploy/xid-errors/analyzing-xid-catalog.html) : sens de l'Xid 79 (« GPU has fallen off the bus ») que montre le journal synthétique du lab 16.2 (chapitre 4).
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent.
+**Documenté.** Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par `tools/fetch_text.py`).
 
 **Recommandé.** Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes.
 
-**À vérifier.** Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
+**À vérifier.** Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
 
 **Hors périmètre.** La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand.

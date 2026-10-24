@@ -43,6 +43,7 @@ def test_both_kinds_of_consequences_and_a_revision_signal():
     assert any("Négatives" in e for e in errs("**Négatives**", "**Autres**"))
     assert any("Positives" in e for e in errs("**Positives**", "**Bien**"))
     assert any("Signal de révision" in e for e in errs("Signal de révision :", "Remarque :"))
+    assert any("Signal de révision" in e for e in errs("Signal de révision :", "Signal de révision seulement"))  # the colon is required
 
 
 def test_title_length_and_unfinished_markers():
@@ -50,9 +51,11 @@ def test_title_length_and_unfinished_markers():
     assert any("unfinished" in e for e in errs("## Décision\n", "## Décision\n\nTODO.\n"))
     assert any("words" in e for e in adr_lint.lint("# ADR-001 — x\n\n## Statut\n\nAccepté le 2026-01-01.\n"))
     assert any("words" in e for e in adr_lint.lint(GOOD + "\n" + "mot " * 800))
+    assert any("words" in e for e in adr_lint.lint(GOOD.split("## Décision")[0]))  # about 100 words: still too short
 
 
 def test_french_elision_counts_as_a_reason():
     assert adr_lint.BECAUSE.search("Écartée parce qu'un seul serveur")
     assert adr_lint.BECAUSE.search("Écartée parce qu\u2019elle change")
     assert not adr_lint.BECAUSE.search("Écartée car le coût")
+    assert not adr_lint.BECAUSE.search("Écartée parce quelque chose")

@@ -10,9 +10,13 @@ python3 pagecache.py            # tableau lisible
 python3 pagecache.py --json     # pour un script
 ```
 
-Pourquoi des compteurs et pas des débits ? Dans le bac à sable, le disque virtuel est mis en cache par l'hôte et des
-processus de la plateforme écrivent dans `drop_caches` : lecture « à froid » et « à chaud » vont à la même vitesse.
-Les compteurs, eux, disent la vérité sur ce que le noyau a fait.
+Pourquoi des compteurs et pas des débits ? Dans le bac à sable, une lecture « à froid » de 256 Mio n'est que 2,5 fois plus
+lente qu'une lecture « à chaud » (0,10 s contre 0,04 s) : le chronomètre ne dit pas si les octets viennent d'un disque
+rapide ou d'un cache de l'hôte (hypothèse non vérifiée), et des processus de la plateforme écrivent dans `drop_caches`.
+Les compteurs disent ce que le noyau a fait. Deux réserves : `Dirty` est le compteur de **toute la machine**, et les
+octets lus sont ceux de **tout le périphérique** ; sur une machine partagée, l'activité d'un autre processus, ou un
+`drop_caches` de la plateforme entre deux étapes, peut donc faire échouer `verify.sh` (raisonnement sur le code, non
+provoqué en pratique ; deux exécutions consécutives ont réussi).
 
 **Partie B — `littles_law.sh`** (nécessite `fio`). Lectures aléatoires de 4 Kio en `O_DIRECT`, profondeur de file 1
 puis 32 : le produit débit × latence moyenne doit valoir environ la profondeur de file.

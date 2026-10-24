@@ -4,7 +4,7 @@ import analysis
 
 
 def test_summarize():
-    s = analysis.summarize([1, 2, 3, 4, 5])
+    s = analysis.summarize([1, 2, 3, 4, 100])  # one outlier: the median and quartiles must not move (a mean would give 22)
     assert s == {"n": 5, "median": 3.0, "p25": 2.0, "p75": 4.0}
 
 
@@ -54,6 +54,10 @@ def test_analyze_computes_rows_from_points():
     assert s2["predicted_s"] == pytest.approx(
         analysis.predict_step(0.098 * k, 0.002 * k, 2, "strong", 4e6, 1e-5, 2e9), rel=1e-6)
     assert s2["utilization"] == pytest.approx(3.84e8 / (0.049 * k) / 1e11, rel=1e-6)
+    assert s2["step_s"] == pytest.approx(0.065 * k, rel=1e-6)
+    assert s2["step_iqr_s"] == pytest.approx(0.065 * 0.01, rel=1e-6)  # run medians 0.065 * (1, 1.01, 1.02): IQR = 0.01 * 0.065
+    pred = analysis.predict_step(0.098 * k, 0.002 * k, 2, "strong", 4e6, 1e-5, 2e9)
+    assert s2["pred_rel_error"] == pytest.approx(abs(pred - 0.065 * k) / (0.065 * k), rel=1e-6)  # relative to the MEASURED step
     w2 = rows[("weak", 2)]
     assert w2["efficiency"] == pytest.approx(0.100 / 0.125, rel=1e-6)
     assert "speedup" not in w2

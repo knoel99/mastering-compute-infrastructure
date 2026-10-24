@@ -24,7 +24,7 @@ def _labels(s):
 
 
 def render(samples):
-    """Exposition text for one scrape. Values use repr-like precision, one HELP/TYPE per metric."""
+    """Exposition text for one scrape: one HELP/TYPE per metric. Values are printed with %g (6 significant digits)."""
     out = []
     for name, typ, help_, field in METRICS:
         out += [f"# HELP {name} {help_}", f"# TYPE {name} {typ}"]

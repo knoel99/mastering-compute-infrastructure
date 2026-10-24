@@ -17,6 +17,8 @@ def bench(py, impl, tmp_path, world, **kw):
 def test_single_process_has_no_communication(py, impl, tmp_path):
     d = bench(py, impl, tmp_path, 1)
     assert statistics.median(d["comm_s"]) < 1e-4
+    # one rank: the step is exactly compute + communication + optimiser (the maximum over a single rank)
+    assert all(abs(s - (c + m + o)) < 1e-9 for s, c, m, o in zip(d["step_s"], d["compute_s"], d["comm_s"], d["opt_s"]))
 
 
 def test_two_processes_communicate_and_schema_is_stable(py, impl, tmp_path):
@@ -28,6 +30,8 @@ def test_two_processes_communicate_and_schema_is_stable(py, impl, tmp_path):
     assert d["grad_bytes"] == 4 * d["n_params"]
     assert d["flops_per_step_per_rank"] == 6 * d["n_params"] * 16
     assert all(s >= c for s, c in zip(d["step_s"], d["compute_s"]))
+    # gradients really are synchronised: both ranks end with the same weights although they saw different data
+    assert len(d["param_sum_by_rank"]) == 2 and d["param_sum_by_rank"][0] == pytest.approx(d["param_sum_by_rank"][1], abs=1e-9)
 
 
 def test_decompose_splits_communication(py, impl, tmp_path):

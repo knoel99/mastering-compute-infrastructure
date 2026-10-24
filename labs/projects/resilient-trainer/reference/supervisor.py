@@ -46,9 +46,14 @@ def supervise(cmd, workdir, max_restarts=5, stall_timeout=30.0, startup_grace=60
 
     attempt = 0
     while True:
+        if state["term"]:  # SIGTERM arrived during the back-off: do not start another attempt
+            log(events, event="terminated", rc=None)
+            return 143
         started = time.time()
         proc = subprocess.Popen(cmd, start_new_session=True)
         state["proc"] = proc
+        if state["term"]:  # SIGTERM arrived while the child was being spawned
+            kill_group(proc, signal.SIGTERM)
         log(events, event="launch", attempt=attempt, pid=proc.pid)
         last_beat = started
         progressed = False

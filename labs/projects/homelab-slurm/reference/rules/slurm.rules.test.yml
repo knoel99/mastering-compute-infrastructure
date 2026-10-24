@@ -12,6 +12,9 @@ tests:
       - alertname: SlurmExporterStale
         eval_time: 8m
         exp_alerts: []
+      - alertname: SlurmExporterStale   # scrape_ok has been 0 for 4m45s only: `for: 5m` is not over yet
+        eval_time: 15m
+        exp_alerts: []
       - alertname: SlurmExporterStale
         eval_time: 17m
         exp_alerts:
@@ -31,16 +34,17 @@ tests:
           - exp_labels: {severity: page}
             exp_annotations: {summary: "Slurm metrics are missing or stale"}
 
-  # A node drained for more than ten minutes; a short drain must stay quiet.
+  # A node drained for more than ten minutes fires; a short drain (vm2: three minutes, visible for eight with the
+  # five-minute lookback of Prometheus) must stay quiet.
   - interval: 15s
     input_series:
       - series: 'slurm_node_unhealthy{partition="debug",node="vm",reason="gpu_xid"}'
         values: '_x8 1x60'
       - series: 'slurm_node_unhealthy{partition="debug",node="vm2",reason="health"}'
-        values: '_x8 1x20 _x40'
+        values: '_x8 1x12 _x60'
     alert_rule_test:
-      - alertname: SlurmNodeUnhealthy
-        eval_time: 9m
+      - alertname: SlurmNodeUnhealthy   # vm has been drained for 9m: `for: 10m` is not over yet
+        eval_time: 11m
         exp_alerts: []
       - alertname: SlurmNodeUnhealthy
         eval_time: 14m
@@ -48,17 +52,18 @@ tests:
           - exp_labels: {severity: ticket, partition: debug, node: vm, reason: gpu_xid}
             exp_annotations: {summary: "node vm unhealthy: gpu_xid"}
 
-  # The oldest pending job crosses one hour and stays there.
+  # The oldest pending job has already waited 55 minutes, the age grows by 15 s per 15 s step and crosses one hour
+  # after 5 minutes (3300 + 315 s > 3600); the alert needs 10 more minutes above the threshold.
   - interval: 15s
     input_series:
       - series: 'slurm_job_max_pending_seconds{partition="debug"}'
-        values: '0+60x120'
+        values: '3300+15x120'
     alert_rule_test:
       - alertname: SlurmJobsPendingTooLong
-        eval_time: 20m
+        eval_time: 15m
         exp_alerts: []
       - alertname: SlurmJobsPendingTooLong
-        eval_time: 27m
+        eval_time: 16m
         exp_alerts:
           - exp_labels: {severity: ticket, partition: debug}
             exp_annotations: {summary: "jobs in partition debug have waited more than an hour"}
@@ -74,7 +79,7 @@ tests:
         values: '1x100'
     alert_rule_test:
       - alertname: SlurmSchedulerStuck
-        eval_time: 8m
+        eval_time: 9m
         exp_alerts: []
       - alertname: SlurmSchedulerStuck
         eval_time: 14m
@@ -89,6 +94,20 @@ tests:
         values: '1x100'
       - series: 'slurm_nodes{partition="debug",state="idle"}'
         values: '1x100'
+    alert_rule_test:
+      - alertname: SlurmSchedulerStuck
+        eval_time: 14m
+        exp_alerts: []
+
+  # Jobs pending, nothing running, but NO idle node (all drained): that is SlurmNodeUnhealthy's business, not this alert's.
+  - interval: 15s
+    input_series:
+      - series: 'slurm_jobs{partition="debug",state="PENDING"}'
+        values: '4x100'
+      - series: 'slurm_jobs{partition="debug",state="RUNNING"}'
+        values: '0x100'
+      - series: 'slurm_nodes{partition="debug",state="idle"}'
+        values: '0x100'
     alert_rule_test:
       - alertname: SlurmSchedulerStuck
         eval_time: 14m

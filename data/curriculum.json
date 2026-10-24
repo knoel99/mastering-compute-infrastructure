@@ -1028,7 +1028,7 @@
    ],
    "title": "Projet 2 — Étude de passage à l'échelle d'un entraînement",
    "summary": "Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.",
-   "idea": "Entraînement DDP/FSDP (gloo, CPU) à 1, 2, 4 processus ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif."
+   "idea": "Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif."
   },
   {
    "id": "resilient-trainer",
@@ -1040,7 +1040,7 @@
     "fault-tolerance"
    ],
    "title": "Projet 3 — Entraîneur tolérant aux pannes",
-   "summary": "Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.",
+   "summary": "Un entraînement qui survit à kill -9, aux blocages et aux checkpoints corrompus, avec preuves automatisées.",
    "idea": "Entraîneur PyTorch CPU avec checkpoint atomique complet, superviseur de relance, injection de pannes, tests qui prouvent la reprise exacte (perte continue, état RNG et données), rapport de coût de checkpoint et de goodput."
   },
   {
@@ -1088,8 +1088,8 @@
     "platform-leadership"
    ],
    "title": "Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU",
-   "summary": "Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.",
-   "idea": "RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité/coût testé, politique d'ordonnancement, plan de fiabilité et d'observabilité, plan de migration, runbooks, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types."
+   "summary": "Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.",
+   "idea": "RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité et de coût testé, choix du marché par classe de charge, plan de fiabilité et d'observabilité, plan de migration par phases, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types."
   }
  ]
 }

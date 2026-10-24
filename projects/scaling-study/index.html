@@ -54,7 +54,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </header>
 <h2 id="contexte">Contexte et objectif</h2>
 <p>Quand on double le nombre de processus d'un entraînement, va-t-il deux fois plus vite ? Presque jamais, et la bonne réponse d'un ingénieur d'infrastructure n'est pas « oui » ou « non » mais un <strong>chiffre accompagné de sa cause</strong> : de combien, pourquoi, et jusqu'où l'on peut extrapoler. Ce projet vous fait produire une telle réponse, avec des mesures que vous pouvez défendre en entretien.</p>
-<p>Vous allez concevoir un plan d'expériences, mesurer un entraînement data-parallel sur 1, 2 et 4 processus, ajuster le modèle α-β de l'all-reduce avec un intervalle de confiance, calculer accélération, efficacité et fraction sérielle de Karp-Flatt, <strong>prédire</strong> le temps d'un pas à partir d'une seule mesure, puis expliquer l'écart entre prédiction et mesure. Le tout tient dans un rapport qu'une seule commande régénère.</p>
+<p>Vous allez concevoir un plan d'expériences, mesurer un entraînement data-parallel sur 1, 2 et 4 processus, ajuster le modèle α-β de l'all-reduce avec un intervalle de confiance, calculer accélération, efficacité et fraction sérielle de Karp-Flatt (formules en fin de page), <strong>prédire</strong> le temps d'un pas à partir d'une seule mesure, puis expliquer l'écart entre prédiction et mesure. Le tout tient dans un rapport qu'une seule commande régénère.</p>
 <div class="key">
 <p><span class="tag">Objectif du projet</span> Un rapport honnête vaut mieux qu'un beau graphe. Un résultat négatif (« ça ne passe pas à l'échelle ») correctement mesuré, modélisé et expliqué est un excellent livrable ; une accélération flatteuse sans barre d'erreur, sans modèle et sans limites n'en est pas un.</p>
 </div>
@@ -107,7 +107,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="even">
 <td>R6</td>
 <td><strong>Utilisation</strong> (MFU de l'étude) avec un pic mesuré, jamais pris sur une fiche technique</td>
-<td><code>test_utilization</code>, <code>test_analyze_*</code></td>
+<td><code>test_utilization</code>, <code>test_analyze_*</code> (ils vérifient la formule ; l'origine du pic est à votre charge)</td>
 </tr>
 <tr class="odd">
 <td>R7</td>
@@ -181,7 +181,12 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">OMP_NUM_THREADS</span><span class="op">=</span>1 <span class="va">$PYTHON</span> starter/bench.py <span class="at">--world-size</span> 2 <span class="at">--batch-per-rank</span> 64 <span class="at">--out</span> /tmp/b2.json</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">IMPL</span><span class="op">=</span>starter <span class="va">$PYTHON</span> <span class="at">-m</span> pytest <span class="at">-q</span> tests           <span class="co"># 20 échecs sur 23 au départ</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                      <span class="co"># référence verte, départ rouge</span></span></code></pre></div>
-<p>Pour le balayage des tailles de message qui alimente l'ajustement, réutilisez <code>labs/perf-models/allreduce-model/bench_allreduce.py</code> du lab 2.2 (lancé avec <code>torch.distributed.run</code> sur 2 puis 4 processus).</p>
+<p>Pour le balayage des tailles de message qui alimente l'ajustement, réutilisez <code>labs/perf-models/allreduce-model/bench_allreduce.py</code> du lab 2.2, lancé avec <code>torchrun --nproc_per_node=2</code> puis <code>=4</code> (une sortie JSON par valeur de p ; <code>fit_model.load_rows</code> la relit).</p>
+<p>Les jalons 4 et 5 s'enchaînent ainsi. Les options de <code>report.py</code> ne sont pas imposées par les tests : ce sont celles de la référence. <code>fit.json</code> contient les deux clés <code>alpha_s</code> et <code>B_bytes_per_s</code>, que vous écrivez à partir du résultat de <code>fit_model.fit</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">$PYTHON</span> starter/run_study.py <span class="at">--out</span> results.json                   <span class="co"># 18 exécutions, quelques minutes</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">$PYTHON</span> starter/run_study.py <span class="at">--decompose</span> <span class="at">--out</span> results_dec.json   <span class="co"># même plan, avec décomposition</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">$PYTHON</span> <span class="at">-c</span> <span class="st">&quot;import json,sys; a,b=(json.load(open(f)) for f in sys.argv[1:3]); a[&#39;points&#39;]+=b[&#39;points&#39;]; json.dump(a,open(&#39;all.json&#39;,&#39;w&#39;))&quot;</span> results.json results_dec.json</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="va">$PYTHON</span> starter/report.py <span class="at">--results</span> all.json <span class="at">--fit</span> fit.json <span class="at">--out</span> report.md</span></code></pre></div>
 <h2 id="livrables">Livrables</h2>
 <p>Votre dépôt public contient :</p>
 <ul>
@@ -211,7 +216,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <h2 id="pistes">Pistes et indices</h2>
 <p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
-<p><strong>Mesurer.</strong> Écartez les premiers pas (caches, allocations, initialisation de <code>gloo</code>) : <code>bench.py</code> le fait déjà et le test vérifie que la série n'en contient pas. Fixez <code>OMP_NUM_THREADS=1</code> et <code>torch.set_num_threads(1)</code> : sans cela, chaque processus lance plusieurs fils et vous mesurez la contention entre processus, pas le passage à l'échelle. Sur une machine à quatre processeurs, quatre processus occupent tout : le système et le lanceur se disputent les mêmes cœurs.</p>
+<p><strong>Mesurer.</strong> Écartez les premiers pas (caches, allocations, initialisation de <code>gloo</code>) : <code>bench.py</code> le fait déjà et le test vérifie que la série n'en contient pas. Fixez <code>OMP_NUM_THREADS=1</code> et <code>torch.set_num_threads(1)</code> : sans cela, chaque processus lance plusieurs fils et vous mesurez la contention entre processus, pas le passage à l'échelle. Sur une machine à quatre processeurs, quatre processus occupent tout : le système et tout autre processus actif se disputent les mêmes cœurs.</p>
 <p><strong>Plan.</strong> Un enchaînement « toutes les mesures à p = 1, puis toutes à p = 2 » confond le facteur étudié avec la dérive de la machine (fréquence, voisins bruyants). Mélangez, avec une graine pour pouvoir rejouer. Trois répétitions sont un minimum : l'intervalle interquartile de trois valeurs est grossier, signalez-le.</p>
 <p><strong>Ajuster.</strong> Le modèle est linéaire en taille de message, mais ne l'est qu'au-delà d'une taille : les petits messages dépendent du pilote et de l'ordonnanceur. Ajustez sur l'erreur relative (divisez chaque équation par le temps mesuré) pour ne pas laisser les plus gros messages écraser les autres. Le bootstrap rééchantillonne les couples (taille, temps) ; avec une dizaine de points il est optimiste, comme le montre le test de couverture.</p>
 <p><strong>Prédire.</strong> Un modèle qui explique la <strong>collective</strong> n'explique pas pour autant le <strong>pas</strong> : relisez ce que <code>comm_s</code> contient. La communication mesurée inclut l'aplatissement des gradients, leur recopie, et l'attente du rang le plus lent. Séparez-les avec <code>--decompose</code> avant de blâmer le modèle.</p>
@@ -244,7 +249,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<p>La bande passante est stable, mais α <strong>n'est pas</strong> une constante de la machine : il est presque doublé à p = 4. Quand tous les cœurs sont occupés, l'ordonnanceur ajoute de la latence ; le modèle suppose un α fixe par saut.</p>
+<p>Les intervalles de B se recouvrent : rien ne dit que la bande passante change. En revanche les intervalles de α ne se recouvrent pas : α <strong>n'est pas</strong> une constante de la machine, il est nettement plus grand à p = 4 (×1,8 ici). Le modèle suppose un α fixe par saut. Une cause plausible, non testée ici, est que les quatre processus occupent les quatre processeurs et que l'ordonnanceur ajoute de la latence.</p>
+<p>Ces nombres ne se reproduisent pas à l'identique : un second balayage dans le même bac à sable a donné α = 250 puis 332 µs et B = 1,43 puis 1,21 Go/s (p = 2 puis 4). Seuls l'ordre de grandeur et le sens de l'écart de α sont stables ; c'est une raison de plus de publier les barres d'erreur.</p>
+<p>Le rapport de référence utilise un <strong>seul</strong> couple (α, B), celui de p = 4 (300 µs ; 1,05 Go/s), pour toutes les prédictions, y compris à p = 2. C'est une simplification, et donc une limite à nommer dans vos menaces à la validité.</p>
 <p><strong>Étude complète (jalon 4).</strong> Pas médian en millisecondes, accélération fort S, efficacité E, part de communication :</p>
 <div class="tbl-wrap">
 <table>
@@ -317,14 +324,16 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<p><strong>Lecture.</strong> Dans cette configuration, la parallélisation de données <strong>ne passe pas à l'échelle</strong> : à quatre processus, le pas du régime fort est plus lent qu'à un seul (accélération de 0,67). La cause est un rapport calcul sur communication défavorable : un pas de calcul de 64 exemples dure quelques millisecondes, alors que l'échange de 4,2 Mo de gradients à environ 1 Go/s en demande déjà quatre.</p>
-<p><strong>Décomposition (exécution avec <code>--decompose</code>).</strong> À p = 2, l'all-reduce mesuré dure 4,4 ms contre 4,6 ms prédites : le modèle est bon, à 4 % près. L'écart de 29 % sur le pas vient d'<strong>ailleurs</strong> : 2,8 ms d'aplatissement et de recopie des gradients, et 2,1 ms d'attente du rang le plus lent. À p = 4, l'all-reduce dure 11,4 ms pour 7,8 ms prédites (rapport de 1,46) : les quatre processus se disputent les quatre processeurs.</p>
+<p><strong>Lecture.</strong> Dans cette configuration, la parallélisation de données <strong>ne passe pas à l'échelle</strong> : à quatre processus, le pas du régime fort est plus lent qu'à un seul (accélération de 0,67).</p>
+<p>Rejouée une seconde fois, l'étude donne la même conclusion (accélération de 0,72 à p = 4) avec des nombres différents de quelques pour cent à plusieurs dizaines de pour cent : retenez les ordres de grandeur. La cause est un rapport calcul sur communication défavorable : un pas de calcul de 64 exemples dure quelques millisecondes, alors que l'échange de 4,2 Mo de gradients à environ 1 Go/s en demande déjà quatre (p = 2) à six (p = 4), sans compter la latence.</p>
+<p><strong>Décomposition (exécution avec <code>--decompose</code>).</strong> À p = 2, l'all-reduce mesuré dure 4,4 ms contre 4,6 ms prédites : le modèle est bon, à 4 % près. L'écart de 29 % sur le pas (5,8 ms) vient pour l'essentiel d'<strong>ailleurs</strong> : 2,8 ms d'aplatissement et de recopie des gradients, et 2,1 ms d'attente du rang le plus lent, soit 4,9 ms.</p>
+<p>Le reste tient notamment au calcul, qui ne diminue pas comme 1/p quand le lot par processus baisse : le pas à p = 1 dure 7,5 ms pour 64 exemples et 17,7 ms pour 256, un rapport de 2,4 et non de 4. À p = 4, l'all-reduce dure 11,4 ms pour 7,8 ms prédites (rapport de 1,46) : l'hypothèse la plus probable est que les quatre processus se disputent les quatre processeurs (non isolée ici : comparez avec trois processus).</p>
 </details>
 <h2 id="extensions">Extensions</h2>
 <ul>
 <li><strong>Seuil de rentabilité.</strong> Avec le modèle, prédisez le lot par processus à partir duquel le régime faible atteint une efficacité de 0,8, puis vérifiez par une mesure. L'écart entre prédiction et mesure vous dit ce que le modèle ignore.</li>
 <li><strong><code>DistributedDataParallel</code>.</strong> Remplacez l'entraîneur élémentaire par <code>torch.nn.parallel.DistributedDataParallel</code> et mesurez la part de communication cachée derrière la passe arrière. Prédisez-la avant de la mesurer.</li>
-<li><strong>Un pic mesuré.</strong> Utilisez le lab 2.1 (STREAM et GEMM) pour obtenir le pic d'un cœur, puis calculez l'utilisation (MFU) de chaque point. Discutez : une utilisation de 5 % est-elle un problème de calcul ou de communication ?</li>
+<li><strong>Un pic mesuré.</strong> Utilisez le lab 2.1 (STREAM et GEMM), lancé avec <code>OMP_NUM_THREADS=1</code> pour que le pic soit celui d'un seul cœur, puis calculez l'utilisation (MFU) de chaque point. Discutez : une utilisation de 5 % est-elle un problème de calcul ou de communication ?</li>
 <li><strong>Deux machines.</strong> Placez deux VM sur le même réseau et refaites le balayage avec <code>gloo</code> entre elles ; comparez α et B à ceux de la boucle locale.</li>
 <li><strong>Variante GPU.</strong> Même étude avec <code>nccl</code> sur un ou deux GPU, un modèle plus gros et un <code>peak</code> pris sur votre propre micro-benchmark GEMM. Le coût dépend du fournisseur : relevez-le le jour de l'essai.</li>
 </ul>
@@ -333,12 +342,12 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Ce qu'il faut montrer.</strong> Les données brutes, le rapport généré, l'ADR et les tests. Un recruteur regarde d'abord si vous donnez des barres d'erreur, si votre modèle est confronté à une mesure, et si vous reconnaissez ses limites.</p>
 <p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui ne confond pas la collective et le pas, qui sait qu'un modèle de performance se valide contre des mesures, et qui ose écrire « ça ne passe pas à l'échelle, voici pourquoi ».</p>
 <div class="note">
-<p><span class="tag">Mesurer la couverture d'un intervalle de confiance</span> Un intervalle à 95 % devrait contenir la vraie valeur dans 95 % des cas. Sur 40 jeux synthétiques de 11 points avec 3 % de bruit multiplicatif, l'intervalle bootstrap par percentiles de B contient la vraie valeur 34 fois sur 40 (85 %), et celui de α 36 fois sur 40 (90 %) : avec si peu de points, il est trop optimiste. Le test <code>test_bootstrap_coverage_is_close_to_but_below_nominal</code> l'inscrit ; retenez que « intervalle à 95 % » ne veut pas dire « 95 % de chances » sans vérification.</p>
+<p><span class="tag">Mesurer la couverture d'un intervalle de confiance</span> Un intervalle à 95 % devrait contenir la vraie valeur dans 95 % des cas. Sur 40 jeux synthétiques de 9 points (les tailles d'au moins 64 Kio parmi 15) avec 3 % de bruit multiplicatif, l'intervalle bootstrap par percentiles de B contient la vraie valeur 34 fois sur 40 (85 %), et celui de α 36 fois sur 40 (90 %) : avec si peu de points, il est trop optimiste. Le test <code>test_bootstrap_coverage_is_close_to_but_below_nominal</code> l'inscrit ; retenez que « intervalle à 95 % » ne veut pas dire « 95 % de chances » sans vérification.</p>
 </div>
 <p>Trois accroches <strong>honnêtes</strong>, à adapter à ce que vous avez réellement mesuré (ne reprenez pas ces chiffres s'ils ne sont pas les vôtres) :</p>
 <ol type="1">
 <li>« J'ai mesuré qu'un entraînement data-parallel d'un petit réseau ne passait pas à l'échelle sur quatre processeurs virtuels, et j'ai expliqué pourquoi avec un modèle α-β et une décomposition du temps de communication. »</li>
-<li>« J'ai validé un modèle d'all-reduce contre des mesures avec un intervalle de confiance, et montré qu'il prédit la collective à 4 % près mais pas le pas complet. »</li>
+<li>« J'ai validé un modèle d'all-reduce contre des mesures avec un intervalle de confiance, et montré qu'il prédit la collective à 4 % près à deux processus, observe un all-reduce 46 % plus lent que prévu à quatre, et ne prédit pas le pas complet. »</li>
 <li>« Je sais dire ce que cette étude ne permet pas de conclure : le comportement sur GPU, sur un vrai réseau, et à grande échelle. »</li>
 </ol>
 <h3 id="formules">Formules du projet</h3>

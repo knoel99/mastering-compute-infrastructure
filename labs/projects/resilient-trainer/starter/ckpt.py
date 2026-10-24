@@ -1,8 +1,9 @@
 """Checkpoints — NAIVE VERSION. It works on a good day and loses your run on a bad one.
 
-Your job (milestones 1 and 2 of the project): make it atomic, checksummed, rotating,
-with a fallback to the previous checkpoint. Keep these four function signatures,
-train.py and the tests depend on them.
+Your job (milestones 2 and 3 of the project): make it atomic, checksummed, rotating,
+with a fallback to the previous checkpoint and the full training state. Keep the
+signatures of save() and load_latest() (and list_ckpts()): train.py and the tests depend on
+them. Add pack() and unpack() yourself (serialise / validate one checkpoint).
 """
 from pathlib import Path
 

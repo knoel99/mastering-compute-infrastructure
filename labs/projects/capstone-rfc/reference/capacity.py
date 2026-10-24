@@ -2,7 +2,8 @@
 
 Each class is modelled as an M/M/c queue: Poisson arrivals, exponential service, c = pool GPUs // GPUs per job
 servers (gang scheduling: a job needs all its GPUs at once). The approximation ignores bursts, priorities and
-fragmentation across pools: treat the result as an OPTIMISTIC bound on waiting, never as a promise.
+fragmentation across pools. Waits grow with the variability of arrivals and of service times (Kingman), so the result is
+PROBABLY optimistic, but it is not a guaranteed bound (more regular service times would lower the waits): never a promise.
 """
 import math
 
@@ -50,8 +51,11 @@ def wait_stats(servers, arrival_per_h, mean_service_h):
 def young_daly_goodput(job_gpus, gpu_failure_rate, ckpt_min, restart_min, extra_rate_per_job_hour=0.0):
     """Fraction of time a job of `job_gpus` GPUs spends on useful work at the Young-Daly checkpoint period.
     Job failure rate = gpus x rate + extra (spot interruptions); M = 1 / rate hours; T* = sqrt(2 C M);
-    goodput = 1 - (C/T + (T/2 + R)/M), floored at 5 %."""
+    goodput = 1 - (C/T + (T/2 + R)/M), floored at 5 %. Without any failure (rate 0) there is nothing to checkpoint: 1.0.
+    First-order model: reliable while T*/M is small; pessimistic when failures are frequent (T*/M above about 0.3)."""
     rate_per_h = job_gpus * gpu_failure_rate + extra_rate_per_job_hour
+    if rate_per_h <= 0.0:
+        return 1.0
     mtbf_min = 60.0 / rate_per_h
     t = math.sqrt(2.0 * ckpt_min * mtbf_min)
     waste = ckpt_min / t + (t / 2.0 + restart_min) / mtbf_min

@@ -19,7 +19,20 @@ const SANDBOX = `SANDBOX FACTS (Linux 6.18 VM, 4 vCPU, 16 GB RAM, no GPU, root, 
 - IMPORTANT, shared machine: another writer may be running labs on the same 4 vCPUs at the same time. Never assert on wall-clock timing in verify.sh; assert on counters, ratios or structural properties with generous tolerances, and never saturate all CPUs for more than ~10 s. The page cache here is dropped periodically by the platform and the virtual disk is cached by the host: timing of cold vs warm reads is NOT reliable (see labs/linux-systems/pagecache for counter-based measurement).
 - Pandoc build: python3 tools/build.py courses/<id> ; gates: python3 tools/check_gates.py courses/<id> ; airiness: python3 tools/check_airiness.py courses/<id>.
 - Never leave daemons running when you finish (pkill -x what you started; never pkill -f). Put scratch files under ${SCR}/<module-id>/ , never in the repo.
-- Already published and linkable: modules ../perf-models/index.html, ../slurm/index.html; projects ../../projects/resilient-trainer/index.html (checkpoint, supervisor, Young-Daly), ../../projects/scaling-study/index.html (alpha-beta, Karp-Flatt), ../../projects/gpu-observability/index.html (dcgm-exporter format, promtool unit tests with mutation testing, detectors). Other modules/projects are planned (links to them are allowed by the gate). The project labs under ${REPO}/labs/projects/*/reference/ contain tested code you may reuse by reference instead of rewriting.`
+- Already published and linkable: modules ../linux-systems/index.html, ../perf-models/index.html, ../slurm/index.html, ../fault-tolerance/index.html, ../observability/index.html, ../kubernetes-gpu/index.html, ../finops-capacity/index.html, ../platform-leadership/index.html; projects ../../projects/<id>/index.html for resilient-trainer, scaling-study, gpu-observability, multi-provider-scheduler, capstone-rfc and homelab-slurm. Other modules are planned (links to them are allowed by the gate). Code under ${REPO}/labs/projects/*/reference/ and ${REPO}/labs/<module>/ is tested: reuse it by reference instead of rewriting.
+- Facts learned the hard way: the Slurm sandbox is a SINGLE instance (check pgrep -x slurmctld first; if it runs, someone else uses it: do not start or stop it); scancel has no --all option; a requeued job waits about 2 minutes (BeginTime) on a default 23.11.4 install; man7.org sometimes resets connections (retry later); EUR-Lex and several publishers answer 403 (say so in 'À vérifier' instead of citing unread text); tools/fetch_text.py caches under data/.cache (git-ignored). A real Kubernetes control plane without kubelet can run here (see ${REPO}/labs/kubernetes-gpu/mini-control-plane, about 350 MB of downloads).`
+
+const LESSONS = `LESSONS FROM THE INDEPENDENT REVIEWS OF EARLIER MODULES (each of these defects was found and fixed after the fact; do not reproduce them):
+1. Durations must agree everywhere: the lab durations in the Labs section add up to the labs share in the Fiche; reading + labs + exercises <= module.hours; every séance fits its chapters, lab and exercises in its own duration; an exercise is scheduled only after the séance that teaches what it needs.
+2. A lab's success criterion states a tolerance or a structural property ("about 0.20 within 25 %", "exit status 1 then 0"), never one run's measured value as a target.
+3. verify.sh: never write "cmd && cmd || echo skipped" or "|| true" around a linter or a test (it swallows failures): use if/else. Never pkill by name a process you did not start (kill your own background jobs by PID). Create temporary files with mktemp, never in the repository (Slurm jobs: use -o /dev/null). Shell scripts must pass shellcheck.
+4. A ::: war box is a DOCUMENTED incident or limit with a link; your own measurement is a ::: note, not a war box.
+5. Upper bounds are not facts ("at most", not "was"); a hypothesis is labelled as one on the page AND in the README; when a source is internally inconsistent, say so instead of quoting one figure silently.
+6. Every exercise must be solvable from the chapter: give the formula inline when it comes from another module, give units, and never ask for something the chapter does not teach.
+7. Every number on the page can be reproduced by a command the reader can run; randomized fixtures use seeds and tests use tolerances; pin exact values only for deterministic code. Counts stated on the page (tests, passes, failures) must be re-read from the real output after the last edit.
+8. All code shown on the page (including exercise snippets) exists under labs/<module>/; jargon is defined at first use; tool versions are dated.
+9. Do not state in the page what you did not run: a lab branch that needs a GPU, a cloud account or a cluster is a 'cluster' or 'gpu' lab, linted, with the badge 'unverified'.
+10. Inline SVG: keep text legible at 390 px width (viewBox about 560 px wide or text of at least 14 units), colours only through currentColor and the site CSS variables.`
 
 const WRITE = (id) => `You are writing ONE course module of the public French-language site "Mastering Compute Infrastructure" (repository ${REPO}). Audience: a senior AI/LLM engineer (strong Kubernetes, Prometheus/Grafana, Terraform, FinOps; no HPC schedulers, no InfiniBand/NCCL, no multi-node training operations) who wants to become a compute infrastructure engineer/lead for GPU training fleets.
 
@@ -32,6 +45,7 @@ STEP 0 — read, in this order (use sed -n ranges, do not dump whole files twice
  2. EXEMPLARS: ${REPO}/courses/perf-models/index.md and ${REPO}/courses/slurm/index.md: read the front matter + intro, one chapter, the labs section, three exercises with solutions, the exit/refs/sources sections. Imitate voice, density, box usage (def/thm/ex/note/key/war/recap), worked examples with REAL computed or captured outputs, honest "Documenté / Recommandé / À vérifier / Hors périmètre". Read their lab folders ${REPO}/labs/perf-models/*/ and ${REPO}/labs/slurm/*/ as the model for labs.
  3. ${REPO}/data/resources/learning.json (verified references: prefer them for the references section; check the 'topics' field).
 ${SANDBOX}
+${LESSONS}
 
 STEP 1 — facts first. For every external factual claim you intend to make (versions, numbers, defaults, flags, paper results, prices, limits), read the primary source with  python3 ${REPO}/tools/fetch_text.py "URL" --grep 'regex'  (official docs, arXiv/paper text, vendor datasheets). If you cannot confirm it, drop it or present it as an order of magnitude and list it under "À vérifier". Never quote prices or contract terms as real unless a page you read states them with a date (prefer giving the METHOD and telling the reader to read the price page the same day). Record each source you really used for the references section (title, authors/provider, year, URL). Quote a source verbatim only if the string appears in the fetched text.
 
@@ -54,7 +68,9 @@ Read ${REPO}/specs/module-contract.md first, then the page. Then:
 5. Rules: French prose + English code; no employer/client/person names; no invented statistics; badges honest (verified only if ALL labs are sandbox and passed; hand-made fixtures labelled).
 6. Finally run python3 tools/check_gates.py courses/${id} and python3 tools/build.py courses/${id}; both must pass.
 Budget: about 60-90 tool calls. Do not touch other modules or tools/. Return the schema.
-${SANDBOX}`
+${SANDBOX}
+Hunt specifically for these known defect classes:
+${LESSONS}`
 
 const W_SCHEMA = { type: 'object', properties: {
   module: { type: 'string' }, prose_words: { type: 'number' }, exercises: { type: 'number' }, labs: { type: 'number' },

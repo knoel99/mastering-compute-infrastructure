@@ -39,8 +39,9 @@ def device_of(path):
     return None
 
 
-def dirty_kib():
-    with open("/proc/meminfo") as f:
+def dirty_kib(meminfo="/proc/meminfo"):
+    """System-wide Dirty (KiB), not the dirty pages of one file: other writers on the machine move it too."""
+    with open(meminfo) as f:
         return next(int(line.split()[1]) for line in f if line.startswith("Dirty:"))
 
 

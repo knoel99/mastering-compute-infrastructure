@@ -45,7 +45,7 @@ def main():
     ap.add_argument("--jobs", type=int, default=30)
     a = ap.parse_args()
     results = {}
-    print(f"{'policy':<10} {'cost (u)':>22} {'deadline misses':>22} {'interruptions':>14} {'lost GPU-job-h':>15}")
+    print(f"{'policy':<10} {'cost (u)':>22} {'deadline misses':>22} {'interruptions':>14} {'lost job-h':>15}")
     for name in POLICIES:
         rows = run_policy(name, range(a.seeds), a.jobs)
         c, cl, ch = mean_ci([r["cost"] for r in rows])

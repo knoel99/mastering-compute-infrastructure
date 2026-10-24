@@ -35,12 +35,12 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 
 | Clé | Valeur |
 |---|---|
-| Volume | 24 h, dont environ 9 h de lecture, 10 h de labs et 5 h d'exercices |
+| Volume | 24 h, dont environ 9 h de lecture, 8 h de labs et 7 h d'exercices, de synthèse et de checkpoint |
 | Niveau d'entrée | 1 : à l'aise avec un terminal et capable de lire un script Python court |
 | Prérequis | aucun |
 | Statut pour le lecteur de référence | à survoler : un profil qui exploite déjà des conteneurs et du Kubernetes connaît l'essentiel ; lisez avec soin les chapitres 2 (cgroups), 3 (topologie) et 4 (méthode de mesure) |
 | Livrable | un rapport de triage reproductible de votre machine et un script d'exploitation idempotent avec tests |
-| Environnement | une machine Linux sans GPU suffit. Lab 1.4 : accès root. Labs 1.2 et 1.3 : `stress-ng` et `fio` pour le premier, rien de plus pour le second. Voir la page [environnement de travail](../../lab-setup/index.html) |
+| Environnement | une machine Linux sans GPU suffit. Lab 1.4 : accès root. Lab 1.2 : `stress-ng` et `fio`. Lab 1.3 : `fio` pour la partie B seulement. Lab 1.5 : `shellcheck` et `systemd-analyze`. Voir la page [environnement de travail](../../lab-setup/index.html) |
 | Projets qui s'appuient sur ce module | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
@@ -56,15 +56,15 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 
 | Séance | Durée | Niveau | Contenu | Pratique |
 |---|---|---|---|---|
-| 1 | 2.5 h | 1 | Chapitre 1 : processus, signaux, ordonnanceur, charge, mémoire virtuelle | exercices 1 et 2 |
+| 1 | 2.5 h | 1 | Chapitre 1 : processus, signaux, ordonnanceur, charge, mémoire virtuelle | exercice 1 |
 | 2 | 3 h | 1 | Chapitre 1 (cache de pages, OOM) puis chapitre 2 : cgroups et espaces de noms | lab 1.4, exercice 3 |
 | 3 | 2.5 h | 1 | Chapitre 3 : topologie matérielle et NUMA | lab 1.1, exercice 4 |
-| 4 | 3 h | 1 | Chapitre 4 : mesurer avant d'optimiser, méthode USE, pression PSI | lab 1.2, exercices 5 et 8 |
+| 4 | 3 h | 1 | Chapitre 4 : mesurer avant d'optimiser, méthode USE, pression PSI | lab 1.2, exercices 2 et 5 |
 | 5 | 2.5 h | 2 | Chapitre 5 : systemd, limites de ressources, pages énormes, paramètres noyau | exercice 9 |
 | 6 | 2.5 h | 2 | Chapitre 6 : réseau Linux, MTU, premiers pas RDMA | exercice 10 |
 | 7 | 3 h | 2 | Chapitre 7 : stockage, cache de pages, E/S directes, loi de Little | lab 1.3, exercice 6 |
-| 8 | 2.5 h | 2 | Chapitre 8 : pannes matérielles vues du système, scripts d'exploitation robustes | lab 1.5, exercice 11 |
-| 9 | 2.5 h | 3 | Synthèse : dimensionner, diagnostiquer un cas ouvert, checkpoint de sortie | exercice 7, checkpoint |
+| 8 | 2.5 h | 2 | Chapitre 8 : pannes matérielles vues du système, scripts d'exploitation robustes | lab 1.5 (qui inclut l'exercice 11) |
+| 9 | 2.5 h | 3 | Synthèse : dimensionner, diagnostiquer un cas ouvert, checkpoint de sortie | exercices 7 et 8, checkpoint |
 
 ## Avant de commencer {#avant}
 
@@ -92,7 +92,7 @@ Ce chapitre fixe quatre idées que tout le module réutilise : un processus a un
 
 Un *processus* est un programme en cours d'exécution, avec son espace d'adresses, ses descripteurs de fichiers et un identifiant (PID). À chaque instant, il est dans un état : `R` (exécutable), `S` (en sommeil, réveillable par un signal), `D` (sommeil ininterruptible, typiquement en attente d'une entrée-sortie), `T` (arrêté) ou `Z` (zombie : terminé, mais pas encore récolté par son parent).
 
-Les *signaux* sont les messages que le noyau ou un autre processus envoie. `SIGTERM` (15) demande l'arrêt et peut être intercepté. `SIGKILL` (9) et `SIGSTOP` ne le peuvent pas : la page [signal(7)](https://man7.org/linux/man-pages/man7/signal.7.html) le dit en une phrase, « The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored ». Un processus tué par un signal se termine avec le statut 128 plus le numéro du signal.
+Les *signaux* sont les messages que le noyau ou un autre processus envoie. `SIGTERM` (15) demande l'arrêt et peut être intercepté. `SIGKILL` (9) et `SIGSTOP` ne le peuvent pas : la page [signal(7)](https://man7.org/linux/man-pages/man7/signal.7.html) le dit en une phrase, « The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored ». Un processus tué par un signal est rapporté par le shell avec le statut 128 plus le numéro du signal (convention des shells : le parent lit dans le statut d'attente que le fils est mort d'un signal et affiche 128 + n).
 
 ::: ex
 [Exemple 1.1 — Les états d'un processus au fil des signaux]{.tag} Capturé dans le bac à sable (Linux 6.18). On lance `sleep 300`, puis on l'arrête, on le reprend, on le termine :
@@ -135,7 +135,7 @@ $$L_{k+1} = L_k\, e^{-\Delta/\tau} + n\,\bigl(1 - e^{-\Delta/\tau}\bigr)$$
 5.58 1.82 0.88 9/119 20326       # charge à 1, 5 et 15 minutes
 ~~~
 
-La valeur lue, 5,58, est un peu supérieure à la prédiction : d'autres tâches du système étaient exécutables en même temps, ce que le modèle ignore. L'ordre de grandeur est le bon, et la leçon aussi : **la charge ne dit pas combien de cœurs sont saturés**, seulement combien de tâches sont en file. Le chapitre 4 la remplace par une mesure directe de l'attente.
+La valeur lue, 5,58, est un peu supérieure à la prédiction : la charge de départ n'était pas nulle et d'autres tâches du système étaient exécutables en même temps, deux choses que le modèle ignore (on suppose $L_0 = 0$). L'ordre de grandeur est le bon, et la leçon aussi : **la charge ne dit pas combien de cœurs sont saturés**, seulement combien de tâches sont en file. Le chapitre 4 la remplace par une mesure directe de l'attente.
 :::
 
 ### 1.3. Mémoire virtuelle et allocation à la demande
@@ -207,10 +207,12 @@ En v2, `memory.max` est « the main mechanism to limit memory usage » : au-del�
 ~~~text
 allocated 90 MiB                           # dernier message affiché
 exit status: 137, oom_kill counter: 1      # tué par SIGKILL
-Memory cgroup out of memory: Killed process 20024 (python3) total-vm:116776kB, anon-rss:102016kB, file-rss:5724kB
+Memory cgroup out of memory: Killed process 28868 (python3) total-vm:116780kB, anon-rss:102016kB, file-rss:5836kB
 ~~~
 
-Lecture : la limite est de 102 400 kB ; la mémoire anonyme au moment de la mise à mort est de 102 016 kB, soit 99,6 % de la limite. Les 90 Mio touchés valent 92 160 kB ; il reste 9 856 kB, environ 9,6 Mio, pour l'interpréteur Python lui-même, ce qui est cohérent avec les 9 Mio de `VmRSS` d'un Python au repos mesurés à l'exemple 1.3. Le dixième bloc n'a jamais fini d'être touché : le noyau a tué avant que « allocated 100 MiB » s'affiche.
+Lecture : la limite est de 102 400 kB ; la mémoire anonyme au moment de la mise à mort est de 102 016 kB, soit 99,6 % de la limite. Les 90 Mio de blocs terminés valent 92 160 kB ; il reste 9 856 kB (environ 9,6 Mio).
+
+Ils se partagent entre l'interpréteur (un Python 3 au repos a environ 2,9 Mio de mémoire anonyme, `RssAnon` lu dans `/proc/self/status`) et la partie du dixième bloc déjà touchée quand le noyau a tué, soit environ 6,8 Mio par différence. Le dixième bloc n'a jamais fini d'être touché : « allocated 100 MiB » ne s'est jamais affiché.
 :::
 
 C'est la raison pour laquelle un job qui demande 100 Go dans Slurm ou Kubernetes **meurt** au lieu d'être ralenti quand il dépasse : la limite mémoire est dure. Pour un entraînement, prévoir de la marge dans la demande et un `memory.high` en dessous de `memory.max` transforme une mise à mort en ralentissement visible.
@@ -222,7 +224,7 @@ Une limite de processeur est un **quota par période** : en v2, `cpu.max` est de
 Un quota n'est pas une priorité : il plafonne même si la machine est vide. Pour répartir sans plafonner, on utilise des poids (`cpu.weight` en v2), qui n'agissent qu'en cas de concurrence.
 
 ::: ex
-[Exemple 2.3 — Un quota de 20 % mesuré]{.tag} Le lab 1.4 lance une boucle active pendant 4 secondes dans un groupe limité à 20 % d'un cœur et mesure le temps processeur obtenu sur le temps écoulé. Capturé : `share of one CPU obtained: 0.197`. C'est 98,5 % du quota (0,197 sur 0,20) ; le test accepte entre 0,10 et 0,35 pour tolérer le bruit d'une machine partagée.
+[Exemple 2.3 — Un quota de 20 % mesuré]{.tag} Le lab 1.4 lance une boucle active pendant 4 secondes dans un groupe limité à 20 % d'un cœur et mesure le temps processeur obtenu sur le temps écoulé. Capturé : `share of one CPU obtained: 0.197` (0,199 et 0,200 sur deux autres exécutions). C'est 98,5 % du quota (0,197 sur 0,20) ; le test accepte entre 0,10 et 0,35 pour tolérer le bruit d'une machine partagée.
 :::
 
 ### 2.4. La règle des processus internes (v2)
@@ -305,15 +307,17 @@ $ head -1 /proc/meminfo
 MemTotal:       16477348 kB          # soit 16 091 Mio
 ~~~
 
-`numactl` annonce 7 901 Mo pour l'unique nœud, `MemTotal` en annonce 16 091 : le nœud ne couvre que 49 % de la mémoire de la machine virtuelle. Sur une machine virtuelle, **ne supposez pas** que la somme des nœuds égale la mémoire totale. Sur une machine physique, un écart est un signal à expliquer (mémoire non attachée à un nœud, dispositif de mémoire particulier) avant de dimensionner quoi que ce soit.
+`numactl` annonce 7 901 Mo pour l'unique nœud, `MemTotal` en annonce 16 091 : le nœud ne couvre que 49 % de la mémoire de la machine virtuelle (la taille du nœud varie dans ce bac à sable : une relecture, plus tard, a donné 7 773 Mo). Sur une machine virtuelle, **ne supposez pas** que la somme des nœuds égale la mémoire totale. Sur une machine physique, un écart est un signal à expliquer (mémoire non attachée à un nœud, dispositif de mémoire particulier) avant de dimensionner quoi que ce soit.
 :::
 
 ### 3.3. Qui est branché où : GPU, carte réseau, disque NVMe
 
-Chaque périphérique PCI déclare dans `/sys/bus/pci/devices/<adresse>/numa_node` le nœud auquel il est rattaché, avec `-1` pour « aucune affinité déclarée ». Croiser cette information avec la classe du périphérique (3D controller pour un GPU, InfiniBand, NVMe) donne une **table de localité** : pour chaque nœud, les GPU, les cartes réseau et les disques qui y sont directement branchés. Le lab 1.1 la construit.
+Chaque périphérique PCI déclare dans `/sys/bus/pci/devices/<adresse>/numa_node` le nœud auquel il est rattaché, avec `-1` pour « aucune affinité déclarée ». Croiser cette information avec la classe du périphérique (3D controller pour un GPU, InfiniBand, NVMe ; le code de classe est lu dans `/sys/bus/pci/devices/<adresse>/class`) donne une **table de localité** : pour chaque nœud, les GPU, les cartes réseau et les disques qui y sont directement branchés. Le lab 1.1 la construit.
+
+Il classe une carte d'après ce code : une carte RDMA configurée en Ethernet (RoCE) peut y apparaître comme `ethernet` plutôt qu'`infiniband` ; ce point n'a pas été vérifié (voir « À vérifier »).
 
 ::: ex
-[Exemple 3.3 — Quelle carte réseau pour quel GPU ?]{.tag} Le lab 1.1 est exécuté sur un serveur à deux sockets et huit GPU **fabriqué à la main** (ce n'est pas la capture d'une machine réelle : il sert à tester la logique). La sortie `locality` est :
+[Exemple 3.3 — Quelle carte réseau pour quel GPU ?]{.tag} Le lab 1.1 est exécuté sur un serveur à deux sockets et quatre GPU **fabriqué à la main** (ce n'est pas la capture d'une machine réelle : il sert à tester la logique). La section `locality` du rapport JSON, remise en forme à la main, donne :
 
 ~~~text
 nœud  0 : GPU 0000:18:00.0, 0000:3b:00.0   InfiniBand 0000:5e:00.0   NVMe 0000:5f:00.0
@@ -411,17 +415,21 @@ Les outils de profilage d'échantillonnage, `perf` avec ses graphes de flammes e
 
 ### 4.4. Quatre charges, quatre lectures
 
-Le lab 1.2 fait tourner `triage.py` pendant quatre situations réelles et vérifie que chacune est reconnue. Résultats capturés (fractions du temps, sauf `aqu-sz`) :
+Le lab 1.2 fait tourner `triage.py` pendant quatre situations réelles et vérifie que chacune est reconnue. Résultats d'une exécution (fractions du temps, sauf `aqu-sz`, la taille moyenne de file du disque, au nom de la colonne de `iostat -x`) :
 
 | Situation | `cpu_util` | `cpu_psi` | `io_psi` | `disk_util` | `aqu-sz` | Conclusion de `classify` |
 |---|---|---|---|---|---|---|
 | machine au repos | 0,00 | 0,00 | 0,00 | 0,00 | 0,0 | rien ne ressort |
 | 8 boucles actives sur 4 cœurs | 1,00 | 0,98 | 0,00 | 0,00 | 0,0 | processeur saturé |
 | écritures synchrones avec `fsync` | 0,09 | 0,01 | 0,43 | 0,72 | 1,2 | tâches bloquées sur le disque |
-| lectures asynchrones profondes | 0,34 | 0,02 | 0,00 | 0,93 | 6,3 | disque occupé, aucune tâche bloquée |
+| écritures asynchrones profondes (4 Kio aléatoires, `O_DIRECT`) | 0,34 | 0,02 | 0,00 | 0,93 | 6,3 | disque occupé, aucune tâche bloquée |
+
+D'une exécution à l'autre, les chiffres bougent : deux autres exécutions ont donné, pour les écritures synchrones, `io_psi` de 0,19 et 0,28 et `disk_util` de 0,45 et 0,55. Seules les conclusions de `classify` et les ordres de grandeur sont reproductibles, et `verify.sh` ne vérifie que les conclusions.
 
 ::: war
-[L'angle mort de la pression PSI]{.tag} La dernière ligne est la leçon du chapitre. Avec des entrées-sorties asynchrones (`libaio` et une file de 32 requêtes), le disque est occupé à 93 % mais **aucune tâche n'est bloquée** : la pression PSI `io` reste à zéro. Un diagnostic qui ne lirait que PSI conclurait « le disque va bien ». Il faut lire en plus l'occupation du disque et la taille de sa file dans `/proc/diskstats`. Constaté sur ce disque virtuel, avec ce noyau ; reproduisez-le avec `verify.sh` avant de généraliser.
+[L'angle mort de la pression PSI]{.tag} La dernière ligne est la leçon du chapitre. Avec des entrées-sorties asynchrones (`libaio` et une file de 32 requêtes), le disque est occupé à 93 % mais **aucune tâche n'est bloquée** : la pression PSI `io` reste à zéro. Un diagnostic qui ne lirait que PSI conclurait « le disque va bien ». Il faut lire en plus l'occupation du disque et la taille de sa file dans `/proc/diskstats`.
+
+Constaté sur ce disque virtuel, avec ce noyau ; reproduisez-le avec `verify.sh` avant de généraliser. Source : mesure de ce module (lab 1.2) ; la définition de `some` est celle de la [documentation PSI](https://docs.kernel.org/accounting/psi.html), qui ne parle pas de ce cas.
 :::
 
 ::: recap
@@ -491,7 +499,7 @@ Les paramètres `vm.*` se lisent avec `sysctl`. Ceux qui reviennent le plus sur 
 
 | Paramètre | Valeur lue | Rôle |
 |---|---|---|
-| `vm.swappiness` | 60 | valeur entre 0 et 100 réglant la propension du noyau à écrire des pages en swap ; défaut 60 |
+| `vm.swappiness` | 60 | coût relatif estimé des E/S de swap par rapport aux E/S de fichiers, entre 0 et 200 ; à 100 le noyau les traite à égalité ; défaut 60 |
 | `vm.overcommit_memory` | 0 | mode heuristique de réservation (voir 1.3) |
 | `vm.dirty_ratio` | 20 | part de mémoire sale à partir de laquelle le processus qui écrit doit lui-même écrire des données sur disque |
 | `vm.dirty_background_ratio` | 10 | part de mémoire sale à partir de laquelle les fils de vidage du noyau commencent à écrire |
@@ -569,7 +577,7 @@ Le *bonding* regroupe plusieurs interfaces en une seule pour la redondance ou le
 
 ### 6.5. Premiers pas RDMA
 
-Dans une communication TCP, le noyau copie les données entre le programme et la carte. Avec le *RDMA* (*remote direct memory access*), la carte lit et écrit directement la mémoire du programme, sans passer par le noyau pour chaque transfert : c'est ce qui permet les latences basses et les débits élevés des réseaux de calcul (InfiniBand, RoCE). Le programme **enregistre** d'abord des zones mémoire auprès de la carte, ce qui explique les limites `memlock` du chapitre 5.
+Dans une communication TCP, le noyau copie les données entre le programme et la carte. Avec le *RDMA* (*remote direct memory access*), la carte lit et écrit directement la mémoire du programme, sans passer par le noyau pour chaque transfert : c'est ce qui permet les latences basses et les débits élevés des réseaux de calcul (InfiniBand, ou RoCE, c'est-à-dire du RDMA sur Ethernet). Le programme **enregistre** d'abord des zones mémoire auprès de la carte, ce qui explique les limites `memlock` du chapitre 5.
 
 Le module réseau du parcours détaille les protocoles, la topologie et la mesure. Retenez ici deux choses : le chemin des données change, donc les outils de diagnostic aussi, et un nœud dont la limite `memlock` est basse peut échouer à initialiser sa communication.
 
@@ -601,7 +609,7 @@ vda   disk  256G    1 /
 vdb   disk  9.6M    1 /opt/rclone
 ~~~
 
-Tous les disques virtio annoncent `ROTA=1`, comme s'ils étaient des disques durs mécaniques. Un disque virtuel transmet ce que son hôte lui dit, pas la nature du support. Un script qui choisirait un ordonnanceur d'E/S ou une stratégie de lecture d'après `ROTA` se tromperait ici : **vérifiez avec une mesure**, comme celle de la section suivante.
+Tous les disques virtio annoncent `ROTA=1`, comme s'ils étaient des disques durs mécaniques. Un disque virtuel ne connaît pas la nature du support qui se trouve derrière lui sur l'hôte : le drapeau n'est pas une mesure. Un script qui choisirait un ordonnanceur d'E/S ou une stratégie de lecture d'après `ROTA` se tromperait ici : **vérifiez avec une mesure**, comme celle de la section suivante.
 :::
 
 ### 7.2. Mesurer un disque avec `fio` : la loi de Little
@@ -628,7 +636,7 @@ Le produit vaut 0,98 pour une profondeur de 1 et 31,94 pour 32 : la loi tient à
 Une lecture normale passe par le cache de pages ; l'indicateur `O_DIRECT` de [open(2)](https://man7.org/linux/man-pages/man2/open.2.html) demande de « minimize cache effects of the I/O to and from this file » et exige des tampons alignés. `posix_fadvise` avec `POSIX_FADV_DONTNEED` « attempts to free cached pages » d'un fichier ([posix_fadvise(2)](https://man7.org/linux/man-pages/man2/posix_fadvise.2.html)), et [mincore(2)](https://man7.org/linux/man-pages/man2/mincore.2.html) permet de « determine whether pages are resident in memory ». Avec ces trois appels, le lab 1.3 raconte l'histoire du cache avec des compteurs.
 
 ::: ex
-[Exemple 7.3 — Ce que le noyau a fait de 256 Mio]{.tag} Résultat du lab 1.3, partie A (reproductible : trois exécutions donnent les mêmes valeurs à quelques kio près) :
+[Exemple 7.3 — Ce que le noyau a fait de 256 Mio]{.tag} Résultat du lab 1.3, partie A (les colonnes « résident » et « lu sur le périphérique » ont été identiques sur trois exécutions ; `dirty KiB` varie de quelques centaines de kio, car c'est le compteur `Dirty` de **toute la machine**, pas celui du fichier) :
 
 ~~~text
 stage                  dirty KiB  resident MiB  device read MiB
@@ -640,16 +648,20 @@ warm buffered read           408           256                0
 O_DIRECT read                408             0              256
 ~~~
 
-Lecture ligne à ligne : après `write()`, 262 540 kio de pages sont sales, c'est-à-dire pas encore sur le disque, mais les 256 Mio sont déjà **résidents**. `fsync()` ramène les pages sales à 404 kio sans les évincer. `DONTNEED` vide le cache du fichier. La lecture à froid lit 256 Mio **sur le périphérique** ; la lecture à chaud n'en lit aucun ; la lecture `O_DIRECT` lit 256 Mio sur le périphérique et **ne remplit pas** le cache.
+Lecture ligne à ligne : après `write()`, 262 540 kio de pages sont sales, c'est-à-dire pas encore sur le disque (256 Mio font 262 144 kio ; le reste est le bruit de fond de la machine), mais les 256 Mio sont déjà **résidents**. `fsync()` ramène les pages sales à 404 kio sans les évincer. `DONTNEED` vide le cache du fichier. La lecture à froid lit 256 Mio **sur le périphérique** ; la lecture à chaud n'en lit aucun ; la lecture `O_DIRECT` lit 256 Mio sur le périphérique et **ne remplit pas** le cache.
 :::
 
 ::: war
-[Pourquoi ce lab compte des octets et pas des secondes]{.tag} Dans le bac à sable, une lecture « à froid » après `drop_caches` va aussi vite qu'une lecture « à chaud » : le disque virtuel est mis en cache par l'hôte, et des processus de la plateforme écrivent eux-mêmes dans `drop_caches`, ce que le journal du noyau trahit (`dmesg` : « process_api (1): drop_caches: 10 », « tokio-rt-worker (77): drop_caches: 3 »). Un chronomètre ne distingue donc rien ici. Les compteurs d'octets lus sur le périphérique, eux, restent exacts. Même sur du matériel, préférez le compteur : il ne dépend pas de l'humeur de l'hôte.
+[Pourquoi ce lab compte des octets et pas des secondes]{.tag} Dans le bac à sable, une lecture « à froid » de 256 Mio ne prend que 0,10 s (2,6 Gio/s) contre 0,04 s à chaud, soit un rapport de 2,5 seulement (trois mesures le 2026-10-24). Le chronomètre ne dit pas si ces octets viennent d'un disque rapide ou d'un cache de l'hôte sous le disque virtuel (hypothèse, non vérifiée).
+
+Des processus de la plateforme écrivent aussi dans `drop_caches`, ce que le journal du noyau garde en mémoire au démarrage (`dmesg` : « process_api (1): drop_caches: 10 », « tokio-rt-worker (77): drop_caches: 3 »). Un chronomètre brouille donc la lecture.
+
+Les compteurs d'octets lus sur le périphérique, eux, restent exacts, à une réserve près : ils comptent tout le disque, donc la lecture d'un autre processus les fausse (raisonnement sur le code, non provoqué en pratique : cause possible d'un échec de `verify.sh` sur une machine partagée). Même sur du matériel, préférez le compteur. Source : mesures de ce module et journal du noyau du bac à sable.
 :::
 
 ### 7.4. Écrire un checkpoint
 
-Pour écrire un état de plusieurs gigaoctets, trois choix s'offrent. Écrire normalement et laisser le cache de pages absorber l'écriture est rapide, mais laisse jusqu'à la taille du fichier en mémoire sale puis résidente : sur un nœud où le jeu de données est lui aussi en cache, il le chasse. Appeler `fsync()` rend l'écriture **durable** avant de répondre. Écrire en `O_DIRECT` évite de polluer le cache, au prix d'alignements et de tailles de bloc à respecter.
+Pour écrire un état de plusieurs gigaoctets, trois choix s'offrent. Écrire normalement et laisser le cache de pages absorber l'écriture est rapide, mais laisse jusqu'à la taille du fichier en mémoire sale puis résidente : sur un nœud où le jeu de données est lui aussi en cache, elle peut le chasser. Appeler `fsync()` rend l'écriture **durable** avant de répondre. Écrire en `O_DIRECT` évite de polluer le cache, au prix d'alignements et de tailles de bloc à respecter.
 
 L'enseignement du lab 1.3 est que ces choix se **lisent** dans des compteurs. Le [projet 3](../../projects/resilient-trainer/index.html) en tire les conséquences pour un checkpoint atomique : écrire dans un fichier temporaire, `fsync`, renommer, puis synchroniser le dossier.
 
@@ -669,7 +681,7 @@ Sur une flotte de GPU, une partie des pannes vient du matériel. Ce chapitre app
 
 ### 8.1. Où le système voit une panne matérielle
 
-Le noyau journalise ce qu'il détecte : `dmesg` lit ce journal. Pour la mémoire, le sous-système **EDAC** expose par contrôleur des compteurs d'erreurs corrigées par le code correcteur (ECC) et non corrigées sous `/sys/devices/system/edac/mc/` ([documentation EDAC](https://docs.kernel.org/driver-api/edac.html)). Pour les disques, `smartctl` lit les attributs SMART. Pour le serveur lui-même, le contrôleur de gestion (BMC) tient un journal d'événements que `ipmitool sel` affiche ; une machine moderne l'expose aussi en réseau.
+Le noyau journalise ce qu'il détecte : `dmesg` lit ce journal. Pour la mémoire, le sous-système **EDAC** expose par contrôleur des compteurs d'erreurs corrigées par le code correcteur (ECC) et non corrigées sous `/sys/devices/system/edac/mc/` ([documentation EDAC](https://docs.kernel.org/driver-api/edac.html)). Pour les disques, `smartctl` lit les attributs SMART (l'auto-surveillance intégrée au disque). Pour le serveur lui-même, le contrôleur de gestion (BMC) tient un journal d'événements que `ipmitool sel` affiche ; une machine moderne l'expose aussi en réseau.
 
 ::: ex
 [Exemple 8.1 — Quand l'instrument est absent]{.tag} Dans le bac à sable (machine virtuelle), les trois sources de panne matérielle sont **absentes**. Capturé :
@@ -700,11 +712,11 @@ Un journal se lit champ par champ. Voici la mise à mort par manque de mémoire 
 [Exemple 8.2 — Les lignes du noyau après une mise à mort par manque de mémoire]{.tag} Extrait capturé de `dmesg` :
 
 ~~~text
-oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/mci-oom,task_memcg=/mci-oom,task=python3,pid=20024,uid=0
-Memory cgroup out of memory: Killed process 20024 (python3) total-vm:116776kB, anon-rss:102016kB, file-rss:5724kB, shmem-rss:0kB, UID:0 pgtables:268kB oom_score_adj:0
+oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/mci-lab-28861,task_memcg=/mci-lab-28861,task=python3,pid=28868,uid=0
+Memory cgroup out of memory: Killed process 28868 (python3) total-vm:116780kB, anon-rss:102016kB, file-rss:5836kB, shmem-rss:0kB, UID:0 pgtables:260kB oom_score_adj:0
 ~~~
 
-`constraint=CONSTRAINT_MEMCG` dit que la mise à mort est due à la **limite d'un cgroup** et non à la mémoire de la machine entière ; `oom_memcg=/mci-oom` nomme le groupe fautif. `anon-rss` est la mémoire anonyme (tas, piles) du processus tué : c'est elle qui a atteint la limite. Sans cette ligne, un job « disparu » sans message est un mystère ; avec elle, c'est un diagnostic.
+`constraint=CONSTRAINT_MEMCG` dit que la mise à mort est due à la **limite d'un cgroup** et non à la mémoire de la machine entière ; `oom_memcg=/mci-lab-28861` nomme le groupe fautif (le lab le nomme `mci-lab-` suivi du PID du script). `anon-rss` est la mémoire anonyme (tas, piles) du processus tué : c'est elle qui a atteint la limite. Sans cette ligne, un job « disparu » sans message est un mystère ; avec elle, c'est un diagnostic.
 :::
 
 ### 8.4. Écrire un script d'exploitation robuste
@@ -726,7 +738,7 @@ Un script d'exploitation tourne sans surveillance, souvent à un moment critique
 1) function called as an if condition:
   check_disk went on after a failure
   -> condition true
-2) the same function called alone:
+2) the same function in a subshell on the left of ||:
   check_disk went on after a failure
 3) pipeline without pipefail:
   status: 0
@@ -734,7 +746,7 @@ Un script d'exploitation tourne sans surveillance, souvent à un moment critique
   status: 1
 ~~~
 
-Dans une condition `if` ou une liste `||`, `set -e` est **neutralisé** : la fonction continue après `false` et la condition est vraie. Sans `set -o pipefail`, `false | cat` retourne 0 car seul le statut de la dernière commande compte. Un contrôle de santé écrit sans ces précautions peut donc déclarer sain un nœud qui ne l'est pas.
+Dans une condition `if` ou à gauche d'un `||` (cas 2, ici dans un sous-shell), `set -e` est **neutralisé** : la fonction continue après `false` ; dans le cas 1, la condition est vraie. Sans `set -o pipefail`, `false | cat` retourne 0 car seul le statut de la dernière commande compte. Un contrôle de santé écrit sans ces précautions peut donc déclarer sain un nœud qui ne l'est pas.
 :::
 
 ::: ex
@@ -762,12 +774,12 @@ unchanged: vm.max_map_count = 1048576
 
 ## Labs {#labs}
 
-Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). `verify.sh` de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Installation préalable des outils des labs 1.2, 1.3 et 1.5 : `sudo apt-get install -y stress-ng fio shellcheck`. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter.
+Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). `verify.sh` de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Installation préalable des outils des labs 1.2, 1.3 et 1.5 : `sudo apt-get install -y stress-ng fio shellcheck`. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter. Lancez chaque commande depuis le dossier du lab (`cd labs/linux-systems/<lab>`). Les durées de lab indiquées sont celles du travail guidé ; elles tiennent dans les séances du plan.
 
 ::: lab
 [Lab 1.1 — Cartographier une machine]{.tag}
 
-**Objectif.** Produire un rapport JSON de la machine (processeurs, NUMA, mémoire, PCI, interfaces, disques) et sa **table de localité** GPU, carte réseau et NVMe. **Durée.** 2 h. **Prérequis matériels.** Un portable Linux ; aucun GPU.
+**Objectif.** Produire un rapport JSON de la machine (processeurs, NUMA, mémoire, PCI, interfaces, disques) et sa **table de localité** GPU, carte réseau et NVMe. **Durée.** 1.5 h. **Prérequis matériels.** Un portable Linux ; aucun GPU.
 
 1.  Lisez `labs/linux-systems/machine-map/machine_map.py` : repérez comment `numa_node` et la classe PCI sont croisés.
 2.  Lancez `python3 machine_map.py` sur votre machine et repérez ce qui est vide (nœuds NUMA, PCI) et pourquoi.
@@ -775,7 +787,7 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 4.  Ajoutez au rapport la somme de la mémoire des nœuds et comparez-la à `MemTotal` (exemple 3.2).
 5.  Écrivez un test pour votre ajout et lancez `bash verify.sh`.
 
-**Critère de réussite.** `bash verify.sh` affiche « fixture: 2 NUMA nodes, 4 GPUs, 2 InfiniBand NICs », puis « live: 4 logical CPUs, 1 NUMA node(s), 15.7 GiB (MemTotal) » sur le bac à sable, puis « OK machine-map ». Huit tests unitaires passent.
+**Critère de réussite.** `bash verify.sh` affiche « fixture: 2 NUMA nodes, 4 GPUs, 2 InfiniBand NICs », puis « live: 4 logical CPUs, 1 NUMA node(s), 15.7 GiB (MemTotal) » sur le bac à sable, puis « OK machine-map ». Neuf tests unitaires passent.
 
 **Pour aller plus loin.** Sur une machine à GPU, comparez `locality` avec `nvidia-smi topo -m` et signalez toute divergence.
 :::
@@ -783,13 +795,13 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 ::: lab
 [Lab 1.2 — Triage avec la méthode USE et la pression PSI]{.tag}
 
-**Objectif.** Reconnaître, avec des compteurs du noyau, quatre situations réelles : repos, processeur saturé, tâches bloquées sur le disque, et l'angle mort de PSI. **Durée.** 3 h. **Prérequis matériels.** Linux avec PSI, `stress-ng` et `fio`.
+**Objectif.** Reconnaître, avec des compteurs du noyau, quatre situations réelles : repos, processeur saturé, tâches bloquées sur le disque, et l'angle mort de PSI. **Durée.** 1.5 h. **Prérequis matériels.** Linux avec PSI, `stress-ng` et `fio`.
 
 1.  Lisez `labs/linux-systems/psi-triage/triage.py` : `compute` transforme deux instantanés en fractions du temps, `classify` en conclusions.
 2.  Lancez `python3 triage.py --seconds 5` sur votre machine au repos.
 3.  Provoquez une charge de processeur avec `stress-ng --cpu 8 --timeout 10s` et relancez.
 4.  Provoquez des écritures synchrones puis asynchrones avec `fio` (voir les deux commandes de `verify.sh`) et comparez `io_psi` et `disk_util`.
-5.  Ajoutez un seuil pour la mémoire et écrivez son test.
+5.  Le seuil mémoire (`mem_psi`) et son test existent déjà : ajoutez à la place la détection d'une activité de swap (`pswpin` et `pswpout` de `/proc/vmstat`, lus deux fois) et écrivez son test.
 
 **Critère de réussite.** `bash verify.sh` affiche quatre lignes JSON dont les conclusions sont « cpu: saturated (busy and tasks waiting) », « io: tasks are stalled waiting for the disk » et « disk: busy, but no task stalls », puis « OK psi-triage ». Durée d'exécution : environ 30 secondes.
 
@@ -799,15 +811,15 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 ::: lab
 [Lab 1.3 — Page cache : mesurer ce qui touche le disque]{.tag}
 
-**Objectif.** Raconter, avec trois compteurs du noyau, ce que deviennent 256 Mio écrits puis relus, et vérifier la loi de Little. **Durée.** 3 h. **Prérequis matériels.** Linux avec un système de fichiers sur disque (pas `tmpfs`) ; `fio` pour la partie B.
+**Objectif.** Raconter, avec trois compteurs du noyau, ce que deviennent 256 Mio écrits puis relus, et vérifier la loi de Little. **Durée.** 1.5 h. **Prérequis matériels.** Linux avec un système de fichiers sur disque (pas `tmpfs`) ; `fio` pour la partie B.
 
 1.  Lisez `pagecache.py` : `resident_bytes` (mincore), `parse_diskstats`, `drop_file_cache` (fadvise).
 2.  Lancez `python3 pagecache.py` et expliquez chaque ligne avec le tableau de l'exemple 7.3.
 3.  Remplacez `os.fsync` par rien et observez ce qui change dans la colonne `dirty KiB`.
 4.  Lancez `bash littles_law.sh` et vérifiez le produit débit × latence pour deux profondeurs de file.
-5.  Sur un support de votre choix (disque USB, NFS si disponible), refaites la partie A et comparez.
+5.  Sur un autre disque local de votre choix (un disque USB par exemple, avec `--dir` et au besoin `--device`), refaites la partie A et comparez. Un partage NFS ne convient pas : ses lectures ne passent pas par un périphérique de bloc local et n'apparaissent pas dans `/proc/diskstats`.
 
-**Critère de réussite.** `bash verify.sh` affiche le tableau (lecture à froid : 256 Mio lus sur le périphérique ; à chaud : 0 ; `O_DIRECT` : 256 Mio et 0 Mio résidents), « OK pagecache », puis « iodepth=32 … iops x latency = 31.94 » et « OK littles-law ». Reproductible : exécuté trois fois.
+**Critère de réussite.** `bash verify.sh` affiche le tableau (lecture à froid : 256 Mio lus sur le périphérique ; à chaud : 0 ; `O_DIRECT` : 256 Mio et 0 Mio résidents), « OK pagecache », puis « iodepth=32 … iops x latency » proche de 32 (31,9 dans nos exécutions) et « OK littles-law ». Les colonnes de comptage ont été identiques sur trois exécutions ; `iodepth=32` doit rester à 25 % près de 32.
 
 **Pour aller plus loin.** Écrivez un checkpoint par blocs de 1 Gio avec `fsync` et `DONTNEED` après chaque bloc, et mesurez la mémoire résidente maximale.
 :::
@@ -815,7 +827,7 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 ::: lab
 [Lab 1.4 — cgroups : limite mémoire, mise à mort, quota de processeur]{.tag}
 
-**Objectif.** Mettre un programme dans un cgroup, constater sa mise à mort par manque de mémoire, mesurer un quota de processeur. **Durée.** 3 h. **Prérequis matériels.** Linux, **root**, une machine jetable. **Branche exécutée.** Le script détecte la version : la branche **cgroup v1** a été exécutée dans le bac à sable ; la branche **cgroup v2** suit la documentation du noyau et **n'a pas pu être exécutée** (le bac à sable est en v1, avec seulement `hugetlb` côté v2).
+**Objectif.** Mettre un programme dans un cgroup, constater sa mise à mort par manque de mémoire, mesurer un quota de processeur. **Durée.** 1.5 h. **Prérequis matériels.** Linux, **root**, une machine jetable. **Branche exécutée.** Le script détecte la version : la branche **cgroup v1** a été exécutée dans le bac à sable ; la branche **cgroup v2** suit la documentation du noyau et **n'a pas pu être exécutée** (le bac à sable est en v1, avec seulement `hugetlb` côté v2).
 
 1.  Lisez `labs/linux-systems/cgroup-limits/cgroup_lab.sh` : repérez la détection de version (`stat -fc %T`) et les deux branches.
 2.  Lancez `sudo bash verify.sh`. Le script alloue 300 Mio dans un cgroup limité à 100 Mio.
@@ -823,7 +835,7 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 4.  Changez la limite mémoire, relancez, et prédisez à quelle étape le programme est tué.
 5.  Sur une machine en cgroup v2, exécutez la branche v2 et **signalez tout écart** avec la page.
 
-**Critère de réussite.** `sudo bash verify.sh` affiche « exit status: 137, oom_kill counter: 1 », « share of one CPU obtained: 0.197 » (entre 0,10 et 0,35 pour un quota de 20 %) et « OK cgroup-limits (v1) ».
+**Critère de réussite.** `sudo bash verify.sh` affiche « exit status: 137, oom_kill counter: 1 », « share of one CPU obtained » proche de 0,20 (0,197 à 0,200 dans nos exécutions ; le script accepte de 0,10 à 0,35 pour un quota de 20 %, ce qui suppose une machine peu chargée) et « OK cgroup-limits (v1) ».
 
 **Pour aller plus loin.** Ajoutez `memory.high` en v2 et montrez que le groupe est ralenti sans être tué.
 :::
@@ -831,15 +843,15 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 ::: lab
 [Lab 1.5 — Un script d'exploitation idempotent]{.tag}
 
-**Objectif.** Écrire et tester un script qui fixe des paramètres noyau de façon idempotente, vérifier une unité systemd hors ligne, et constater les angles morts de `set -e`. **Durée.** 2.5 h. **Prérequis matériels.** Linux, `shellcheck` ; aucun accès root requis (le test `--apply` ne s'exécute qu'en root et sans effet).
+**Objectif.** Écrire et tester un script qui fixe des paramètres noyau de façon idempotente, vérifier une unité systemd hors ligne, et constater les angles morts de `set -e`. **Durée.** 2 h, exercice 11 compris. **Prérequis matériels.** Linux, `shellcheck` et `systemd-analyze` (paquet `systemd`) ; aucun accès root requis (le test `--apply` ne s'exécute qu'en root et sans effet).
 
 1.  Lisez `ensure_sysctl.sh` : cinq règles du chapitre 8, dont les codes de retour 0, 10, 2 et 1.
-2.  Exécutez-le deux fois de suite avec `--conf /tmp/90-mci.conf` et comparez les codes de retour.
+2.  Exécutez-le deux fois de suite, par exemple `./ensure_sysctl.sh --conf /tmp/90-mci.conf vm.swappiness=10`, et comparez les codes de retour (`echo $?`).
 3.  Lancez `bash test_ensure_sysctl.sh` ; cassez volontairement une ligne du script et vérifiez que le test échoue.
 4.  Lancez `./check_unit.sh units/bad.service` et expliquez pourquoi `systemd-analyze verify` seul ne suffit pas.
 5.  Écrivez `ensure_line.sh` (exercice 11) puis comparez avec `solutions/ensure_line.sh`.
 
-**Critère de réussite.** `bash verify.sh` affiche « ALL OK » pour les 19 contrôles de `ensure_sysctl.sh`, « ok: the broken unit is rejected although systemd-analyze itself exits 0 », les deux compteurs « check_disk went on after a failure », puis « OK ops-script ».
+**Critère de réussite.** `bash verify.sh` affiche « ALL OK » pour les contrôles de `ensure_sysctl.sh` (22 hors root, 24 en root), « ok: the broken unit is rejected although systemd-analyze itself exits 0 », les deux compteurs « check_disk went on after a failure », puis « OK ops-script ».
 
 **Pour aller plus loin.** Ajoutez un code de retour 3 « non observable » à un contrôle SMART qui échoue sur un disque virtuel.
 :::
@@ -875,11 +887,13 @@ Ensuite : la pression PSI `io` pour confirmer, `iostat -x` pour l'occupation et 
 :::
 
 ::: exo
-[Exercice 3 · ★★ — Lire une mise à mort et dimensionner la limite]{.tag} L'exemple 2.2 donne : limite de 100 Mio, dernier message « allocated 90 MiB », `anon-rss:102016kB`. (a) Quelle part de la limite représente `anon-rss` ? (b) Estimez la mémoire anonyme de base de l'interpréteur. (c) Quelle limite `memory.max` donneriez-vous à un programme qui a besoin de 90 Mio de données, avec 20 % de marge ?
+[Exercice 3 · ★★ — Lire une mise à mort et dimensionner la limite]{.tag} L'exemple 2.2 donne : limite de 100 Mio, dernier message « allocated 90 MiB », `anon-rss:102016kB`. (a) Quelle part de la limite représente `anon-rss` ? (b) Donnez un majorant de la mémoire anonyme de base de l'interpréteur. (c) Quelle limite `memory.max` donneriez-vous à un programme qui a besoin de 90 Mio de données, avec 20 % de marge ?
 :::
 
 ::: sol
-(a) 102 016 / 102 400 = **99,6 %** de la limite. (b) 90 Mio valent 92 160 kB ; 102 016 moins 92 160 donnent **9 856 kB, soit 9,6 Mio** de base (cohérent avec les 9 Mio de `VmRSS` d'un Python au repos de l'exemple 1.3). (c) Besoin total : 90 + 9,6 = 99,6 Mio ; avec 20 % de marge : 99,6 × 1,2 = 119,55, soit une limite d'environ **120 Mio**. Une limite à 100 Mio, juste au besoin, tue le programme à la moindre variation ; c'est exactement ce que le lab 1.4 provoque.
+(a) 102 016 / 102 400 = **99,6 %** de la limite. (b) 90 Mio valent 92 160 kB ; 102 016 moins 92 160 donnent **9 856 kB, soit 9,6 Mio**. C'est un **majorant** de la base, pas la base : le dixième bloc était déjà en partie touché quand le noyau a tué (un Python au repos n'a qu'environ 2,9 Mio de mémoire anonyme, `RssAnon`).
+
+(c) Par prudence, on prend le majorant : besoin total 90 + 9,6 = 99,6 Mio ; avec 20 % de marge : 99,6 × 1,2 ≈ 119,5, soit une limite d'environ **120 Mio**. Une limite à 100 Mio, juste au besoin, tue le programme à la moindre variation ; c'est exactement ce que le lab 1.4 provoque.
 :::
 
 ::: exo
@@ -899,11 +913,11 @@ Les deux GPU sont sur le **nœud 1** (`locality`), dont les cœurs sont **32 à 
 :::
 
 ::: exo
-[Exercice 6 · ★★ — Trois façons d'écrire un checkpoint]{.tag} Un nœud de 512 Gio de mémoire contient 300 Gio de jeu de données en cache de pages et 150 Gio occupés par les processus. Il doit écrire un checkpoint de 100 Gio. Option A : écriture normale puis `fsync`. Option B : écriture par blocs, avec `fsync` puis `DONTNEED` après chaque bloc. Option C : `O_DIRECT`. **Hypothèse de l'exercice** : le stockage relit à 2 Gio/s. Comparez la mémoire de cache évincée et le coût en relecture de A, puis dites laquelle vous choisissez et ce que vous mesureriez.
+[Exercice 6 · ★★ — Trois façons d'écrire un checkpoint]{.tag} Un nœud de 512 Gio de mémoire contient 300 Gio de jeu de données en cache de pages et 150 Gio occupés par les processus. Il doit écrire un checkpoint de 100 Gio. Option A : écriture normale puis `fsync` à la fin. Option B : écriture par blocs, avec `fsync` puis `DONTNEED` après chaque bloc. Option C : `O_DIRECT`. **Hypothèse de l'exercice** : le stockage relit à 2 Gio/s. Comparez la mémoire de cache évincée et le coût en relecture de A, puis dites laquelle vous choisissez et ce que vous mesureriez.
 :::
 
 ::: sol
-Mémoire libre : 512 − (300 + 150) = **62 Gio**. **A** : le checkpoint occupe 100 Gio de cache ; il en manque 38, le noyau évince **38 Gio du jeu de données**. Les relire à 2 Gio/s coûte 38 / 2 = **19 s** de relecture qui s'ajoutent à l'entraînement, sans compter l'effet sur l'écriture elle-même.
+Mémoire libre : 512 − (300 + 150) = **62 Gio**. **A** : le checkpoint occupe 100 Gio de cache ; il en manque 38, donc au pire le noyau évince **38 Gio du jeu de données**. Relus à 2 Gio/s, ils coûtent 38 / 2 = **19 s** qui s'ajoutent à l'entraînement, sans compter l'effet sur l'écriture elle-même. C'est une borne haute : le noyau peut aussi évincer les pages déjà écrites du checkpoint, qu'on ne relira pas, avant celles du jeu de données relues souvent ; seule la mesure tranche.
 
 **B** : l'empreinte du cache reste de l'ordre d'un bloc, aucune éviction notable. **C** : aucune empreinte, mais des tampons alignés et des tailles de bloc à respecter.
 
@@ -919,7 +933,7 @@ Mesure à faire : `resident MiB` et octets lus sur le périphérique avant et ap
 ::: sol
 Mémoire des jobs : 1 024 × 0,9 = 921,6 Gio, soit 115,2 Gio par job ; on arrondit **à la baisse** à **115 Gio** (8 × 115 = 920 Gio, sous la réserve). `memory.max = 123480309760` octets (115 × 2^30). `memory.high` plus bas, par exemple **108 Gio** = `115964116992` octets, pour que le groupe soit **ralenti** avant d'être tué.
 
-Processeurs : 128 / 8 = 16 par job, soit `cpu.max = 1600000 100000` (16 périodes de 100 000 µs de quota par période de 100 000 µs) ; un `cpuset` épinglé sur le nœud NUMA du GPU (exercice 4) serait préférable pour la localité.
+Processeurs : 128 / 8 = 16 par job, soit `cpu.max = 1600000 100000` (un quota de 1 600 000 µs par période de 100 000 µs, c'est-à-dire 16 cœurs) ; un `cpuset` épinglé sur le nœud NUMA du GPU (exercice 4) serait préférable pour la localité.
 
 Si la somme des `memory.max` dépasse la mémoire disponible, les limites ne protègent plus : le noyau peut manquer de mémoire **avant** qu'un groupe n'atteigne la sienne, et l'OOM killer global choisira une victime parmi tous. Une limite n'est une garantie que si la somme des limites tient dans la machine.
 
@@ -941,11 +955,17 @@ Aucune de ces trois lectures ne prouve à elle seule quel nœud est « le lent �
 :::
 
 ::: exo
-[Exercice 9 · ★ — Une unité qui passe l'outil et échoue en production]{.tag} L'unité suivante contient `Restart=sometimes`. (a) Que renvoie `systemd-analyze verify` ? (b) Quelle commande ou quel script mettez-vous en intégration continue pour la refuser ?
+[Exercice 9 · ★ — Une unité qui passe l'outil et échoue en production]{.tag} Le fichier `ex9.service` ci-dessous contient une valeur invalide pour `Restart=`. (a) Que renvoie `systemd-analyze verify ex9.service` ? (b) Quelle commande ou quel script mettez-vous en intégration continue pour la refuser ?
+
+~~~ini
+[Service]
+ExecStart=/usr/bin/python3 -m http.server 9400
+Restart=sometimes
+~~~
 :::
 
 ::: sol
-(a) Il affiche `units/bad.service:9: Failed to parse service restart specifier, ignoring: sometimes` et **retourne 0** : la valeur invalide est ignorée, le service serait lancé sans politique de redémarrage. (b) Le script `check_unit.sh` du lab 1.5 traite toute sortie comme un échec et retourne 1 ; équivalent en une ligne : `test -z "$(systemd-analyze verify unit.service 2>&1)"`. Le test du lab vérifie que `bad.service` est rejetée et `gpu-exporter.service` acceptée.
+(a) Il affiche `ex9.service:3: Failed to parse service restart specifier, ignoring: sometimes` et **retourne 0** (essayé avec systemd 255) : la valeur invalide est ignorée, le service serait lancé sans politique de redémarrage. (b) Le script `check_unit.sh` du lab 1.5 traite toute sortie comme un échec et retourne 1 ; équivalent en une ligne : `test -z "$(systemd-analyze verify unit.service 2>&1)"`. Le test du lab vérifie que `bad.service` est rejetée et `gpu-exporter.service` acceptée.
 :::
 
 ::: exo
@@ -1000,6 +1020,8 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Lectures et références {#refs}
 
+Les pages web ci-dessous ont été consultées le 2026-10-24 ; la documentation du noyau et les pages man7 sont mises à jour en continu et n'ont donc pas d'année de publication propre.
+
 -   Brendan Gregg. [*The USE Method*](https://www.brendangregg.com/usemethod.html) : la méthode du chapitre 4 ; du même auteur, *Systems Performance*, 2e édition, Addison-Wesley, 2020, ouvrage de référence sur le sujet.
 -   Noyau Linux. [*PSI — Pressure Stall Information*](https://docs.kernel.org/accounting/psi.html) : les lignes `some` et `full` (chapitre 4).
 -   Noyau Linux. [*Control Group v2*](https://docs.kernel.org/admin-guide/cgroup-v2.html) et [*Memory Resource Controller (v1)*](https://docs.kernel.org/admin-guide/cgroup-v1/memory.html) : limites, `memory.events`, `memory.oom_control` (chapitre 2).
@@ -1015,10 +1037,10 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les définitions de PSI, de la méthode USE, de `memory.max`, `memory.high` et `cpu.max`, des espaces de noms, de la charge moyenne, de `RLIMIT_MEMLOCK`, des paramètres `vm.*`, de `O_DIRECT`, `DONTNEED` et `mincore`, de la THP, du format des messages Xid et des options `cgroup.conf` de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18, Ubuntu 24.04, 4 processeurs) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.
+**Documenté.** Les définitions de PSI, de la méthode USE, de `memory.max`, `memory.high` et `cpu.max`, des espaces de noms, de la charge moyenne, de `RLIMIT_MEMLOCK`, des paramètres `vm.*`, de `O_DIRECT`, `DONTNEED` et `mincore`, de la THP, du format des messages Xid et des options `cgroup.conf` de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18.44, Ubuntu 24.04, 4 processeurs ; outils testés le 2026-10-24 : systemd 255, fio 3.36, stress-ng 0.17.06, iperf3 3.16, util-linux 2.39.3, procps-ng 4.0.4, ShellCheck 0.9.0) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.
 
 **Recommandé.** La table USE du chapitre 4, le code de retour 3 pour « non observable », les cinq règles du script d'exploitation, le choix de `memory.high` sous `memory.max` et l'ordre des chapitres sont des choix de cours, pas des normes.
 
-**À vérifier.** Le comportement de PSI `io` sous E/S asynchrones profondes a été constaté **sur ce disque virtuel et ce noyau** seulement. La branche cgroup v2 du lab 1.4 n'a pas été exécutée. Le serveur à deux sockets du lab 1.1 est fabriqué. Les extraits `vmstat` de l'exercice 2 et les valeurs de l'exercice 8 sont fabriqués. La mise à jour de EEVDF depuis le noyau 6.6 est celle que décrit la documentation du noyau : lisez-la pour votre version.
+**À vérifier.** Le comportement de PSI `io` sous E/S asynchrones profondes a été constaté **sur ce disque virtuel et ce noyau** seulement. La branche cgroup v2 du lab 1.4 n'a pas été exécutée. Le serveur à deux sockets du lab 1.1 est fabriqué. Les extraits `vmstat` de l'exercice 2 et les valeurs de l'exercice 8 sont fabriqués. La mise à jour de EEVDF depuis le noyau 6.6 est celle que décrit la documentation du noyau : lisez-la pour votre version. Que `systemd-analyze verify` retourne 0 sur un avertissement a été constaté avec systemd 255 seulement. L'écart de vitesse entre lecture à froid et à chaud du lab 1.3 (rapport 2,5) et son explication par un cache de l'hôte sont une hypothèse. Le code de classe PCI d'une carte RDMA configurée en Ethernet (RoCE), que le lab 1.1 classerait comme `ethernet`, n'a pas été vérifié. Les labs 1.2 et 1.3 lisent des compteurs de toute la machine ou de tout le disque : sur une machine partagée, une autre charge peut les faire échouer ; deux exécutions consécutives de chaque `verify.sh` ont réussi lors de la revue, ce qui ne prouve pas la robustesse.
 
 **Hors périmètre.** `perf`, les graphes de flammes et `bpftrace` (non installés dans le bac à sable, décrits sans sortie), `tc netem` (module absent de ce noyau), les lectures SMART, EDAC et BMC réelles (absentes en machine virtuelle), `nvidia-smi topo -m` et les messages Xid réels (aucun GPU), le réglage fin du noyau et l'administration d'un système de fichiers parallèle.

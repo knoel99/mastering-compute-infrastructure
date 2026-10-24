@@ -35,3 +35,5 @@ def test_panels_only_use_metrics_the_exporter_exposes():
     for title, expr in exprs():
         used = set(re.findall(r"\b(?:DCGM_[A-Z0-9_]+|slurm_[a-z_]+)\b", expr))
         assert used and used <= KNOWN, (title, used - KNOWN)
+        if "by (job)" in expr:  # a per-job panel needs the allocation join, as the alert rules do
+            assert "slurm_job_gpu_allocated" in expr, title

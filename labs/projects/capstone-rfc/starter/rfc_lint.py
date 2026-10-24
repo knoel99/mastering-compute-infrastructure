@@ -49,7 +49,7 @@ def number(s):
 
 
 def lint(text, req):
-    """TO WRITE (milestone 3). Return a list of problem strings (empty = the RFC passes). Check, in this spirit:
+    """TO WRITE (milestone 4). Return a list of problem strings (empty = the RFC passes). Check, in this spirit:
     * every title of SECTIONS exists as a '## Title' line  -> "missing section '## Title'"
     * 1500 to 8000 words, no TODO/TBD/XXX/à compléter marker
     * Options considérées: at least 3 '### Option X — title', each with the words Avantages and Inconvénients
@@ -58,7 +58,7 @@ def lint(text, req):
     * Risques: a table | Risque | Probabilité | Impact | Mitigation | with at least 5 rows, no empty mitigation,
       probability and impact in LEVELS
     * Capacité et coûts: a ```json design block that capacity.evaluate accepts, a line 'Coût mensuel total : N u'
-      within 0.5 % of the model, a design inside the budget and inside every SLO, and a 'Hypothèses et limites' part
+      within 0.5 % of the model, a design inside the budget and inside every SLO, and a '### Hypothèses et limites' sub-heading
     The error messages are matched loosely by tests/test_rfc_lint.py; read it to see the wording it expects."""
     raise NotImplementedError
 

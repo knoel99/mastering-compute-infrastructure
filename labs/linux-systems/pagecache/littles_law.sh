@@ -7,6 +7,7 @@ command -v fio >/dev/null || { echo "fio not installed: part B skipped (apt-get 
 PY="${PYTHON:-python3}"
 work="$(mktemp -d "${WORKDIR:-/tmp}/littles-law.XXXXXX")"
 trap 'rm -rf "$work"' EXIT
+[ "$(stat -f -c %T "$work")" != tmpfs ] || { echo "FAIL: $work is on tmpfs, which would measure RAM, not a disk: set WORKDIR to a directory on a disk" >&2; exit 1; }
 for qd in 1 32; do
   fio --name=ll --filename="$work/f.dat" --size=256M --rw=randread --bs=4k --direct=1 --ioengine=libaio \
       --iodepth="$qd" --runtime=3 --time_based --output-format=json > "$work/out$qd.json" 2>"$work/err$qd.log" \

@@ -9,8 +9,9 @@ command -v "${PROMTOOL:-promtool}" >/dev/null || { echo "FAIL: promtool not foun
 "$PY" -c "import pytest, yaml" 2>/dev/null || { echo "FAIL: PYTHON needs pytest and pyyaml" >&2; exit 2; }
 IMPL=reference "$PY" -m pytest -q -p no:cacheprovider tests
 echo "--- starter (failures expected) ---"
-if IMPL=starter "$PY" -m pytest -q -p no:cacheprovider tests > /tmp/go-starter.log 2>&1; then
+LOG="$(mktemp)"; trap 'rm -f "$LOG"' EXIT
+if IMPL=starter "$PY" -m pytest -q -p no:cacheprovider tests > "$LOG" 2>&1; then
   echo "starter passes all tests: the tests do not discriminate"; exit 1
 fi
-tail -1 /tmp/go-starter.log
+tail -1 "$LOG"
 echo "ok: reference passes, starter fails as intended"

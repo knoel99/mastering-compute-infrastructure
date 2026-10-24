@@ -40,3 +40,28 @@ def test_psi_blind_spot_is_called_out_when_the_disk_is_busy_without_stalls():
 def test_io_stall_takes_precedence_over_the_blind_spot_message():
     m = {"cpu_util": 0.1, "cpu_psi": 0, "mem_psi": 0, "io_psi": 0.25, "disk_util": 0.9, "disk_aqu_sz": 1}
     assert triage.classify(m) == ["io: tasks are stalled waiting for the disk"]
+
+
+def test_read_cpu_counts_iowait_as_idle_and_ignores_guest_time(tmp_path):
+    (tmp_path / "proc").mkdir()
+    #                       user nice system idle iowait irq softirq steal guest guest_nice
+    (tmp_path / "proc/stat").write_text("cpu  100 10 50 800 40 5 5 0 70 7\ncpu0 1 1 1 1 1 1 1 1 1 1\n")
+    assert triage.read_cpu(str(tmp_path)) == {"busy": 170, "total": 1010}
+
+
+def test_read_psi_returns_the_cumulative_microsecond_totals(tmp_path):
+    (tmp_path / "proc/pressure").mkdir(parents=True)
+    (tmp_path / "proc/pressure/cpu").write_text("some avg10=0.00 avg60=0.00 avg300=0.00 total=111\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n")
+    (tmp_path / "proc/pressure/memory").write_text("some avg10=0.00 avg60=0.00 avg300=0.00 total=222\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=22\n")
+    (tmp_path / "proc/pressure/io").write_text("some avg10=0.00 avg60=0.00 avg300=0.00 total=333\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=33\n")
+    psi = triage.read_psi(str(tmp_path))
+    assert (psi["cpu_some"], psi["memory_some"], psi["io_some"], psi["io_full"]) == (111, 222, 333, 33)
+
+
+def test_read_disk_picks_io_ticks_and_weighted_queue_time_by_device_name(tmp_path):
+    (tmp_path / "proc").mkdir()
+    # fields: major minor name, then 9 counters and in_flight, then io_ticks (ms) and time_in_queue (ms)
+    (tmp_path / "proc/diskstats").write_text(
+        " 254 0 vda 1 0 2 3 4 0 5 6 0 700 800 0 0 0 0\n 254 16 vdb 1 0 2 3 4 0 5 6 0 1 2 0 0 0 0\n")
+    assert triage.read_disk("vda", str(tmp_path)) == {"io_ticks_ms": 700, "queue_ms": 800}
+    assert triage.read_disk("vdb", str(tmp_path)) == {"io_ticks_ms": 1, "queue_ms": 2}

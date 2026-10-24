@@ -26,6 +26,8 @@ def test_gpus_for_deadline_rounds_up_to_whole_nodes():
     assert sizing.gpus_for_deadline(70e9, 2e12, 100, H100, 0.40) == 248  # exact 245.76
     assert sizing.gpus_for_deadline(70e9, 2e12, 96, H100, 0.40) == 256   # exact 255.99
     assert sizing.nodes(248) == 31 and sizing.nodes(249) == 32
+    assert sizing.gpus_for_deadline(7e9, 1e12, 30, H100, 0.40) == 48  # exact 40.96: rounding to the NEAREST node (40) would miss the deadline
+    assert sizing.gpus_for_deadline(7e9, 1e12, 30, H100, 0.30) == 56  # exact 54.6
 
 
 def test_checkpoint_size_and_time():
@@ -56,11 +58,18 @@ def claims(path):
 
 
 def test_solid_and_excellent_answers_quote_numbers_that_the_calculator_reproduces():
+    s = sizing.summary(70e9, 2e12, 256, H100, 0.40, 14, 50, 0.0002, 15)
+    fr = lambda x, nd: f"{x:.{nd}f}".replace(".", ",")  # French decimal comma
     for name in ("level2_solid.md", "level3_excellent.md"):
-        _, days = claims(name)
+        text, days = claims(name)
         assert 96 in days, name
-    _, days3 = claims("level3_excellent.md")
+        for needle in (f"{s['checkpoint_gb']:.0f} Go", fr(s["job_mtbf_h"], 1) + " h", f"{s['ckpt_period_min']:.0f} min",
+                       fr(s["days_with_failures"], 1) + " jours", f"{s['nodes']} nœuds"):
+            assert needle in text, (name, needle)
+    text3, days3 = claims("level3_excellent.md")
     assert 110 in days3  # the sensitivity to an MFU of 0.35
+    assert round(sizing.training_days(70e9, 2e12, 256, H100, 0.35)) == 110
+    assert f"{sizing.gpus_for_deadline(70e9, 2e12, 100, H100, 0.40)} GPU" in text3  # 248 GPUs on paper
 
 
 def test_the_insufficient_answer_is_wrong_by_the_calculator_and_says_so_nowhere():

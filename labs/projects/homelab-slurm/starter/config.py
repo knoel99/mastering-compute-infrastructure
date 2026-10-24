@@ -27,7 +27,7 @@ def validate(cfg):
     raise NotImplementedError
 
 
-def parse_state(assoc_text, qos_text, users_text=""):
+def parse_state(assoc_text, qos_text):
     """TO WRITE (milestone 1). Live state from the `-nP` output of
     `sacctmgr show assoc format=Cluster,Account,User,ParentName,Share,QOS` (fixtures/assoc.txt) and
     `show qos format=Name,Priority,Preempt` (fixtures/qos.txt). Return
@@ -60,3 +60,43 @@ def apply(commands, run):
     """TO WRITE. Run each argv with run(argv) -> (returncode, text); stop at the first non-zero status with a
     RuntimeError that names the command; return the number of commands run."""
     raise NotImplementedError
+
+
+# Provided (command line used by verify-live.sh): prints the plan, with --apply runs it. It calls the functions above.
+def _cli():
+    import argparse
+    import subprocess
+    import sys
+    ap = argparse.ArgumentParser(description="Print (default) or apply the sacctmgr commands that are missing.")
+    ap.add_argument("config")
+    ap.add_argument("--apply", action="store_true")
+    a = ap.parse_args()
+    cfg = load(a.config)
+    validate(cfg)
+
+    def run(argv):
+        r = subprocess.run(argv, capture_output=True, text=True)
+        return r.returncode, r.stdout + r.stderr
+
+    def read(argv):
+        rc, out = run(argv)
+        if rc != 0:
+            raise RuntimeError(f"{' '.join(argv)} failed: {out.strip()}")
+        return out
+
+    current = parse_state(read(["sacctmgr", "-nP", "show", "assoc", "format=Cluster,Account,User,ParentName,Share,QOS"]),
+                          read(["sacctmgr", "-nP", "show", "qos", "format=Name,Priority,Preempt"]))
+    cmds = plan(cfg, current)
+    for c in cmds:
+        print(" ".join(c))
+    d = drift(cfg, current)
+    if any(d.values()):
+        print(f"# drift (present, not in {a.config}, not removed): {d}", file=sys.stderr)
+    if a.apply:
+        print(f"# applied {apply(cmds, run)} command(s)", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(_cli())

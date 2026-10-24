@@ -615,9 +615,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="scaling-study">Projet 2 — Étude de passage à l'échelle d'un entraînement (20 h)</h3>
 <p>Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.</p>
 <p><strong>Modules mobilisés :</strong> 2, 3, 4, 7, 9.</p>
-<p><strong>Plan :</strong> Entraînement DDP/FSDP (gloo, CPU) à 1, 2, 4 processus ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif.</p>
+<p><strong>Plan :</strong> Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif.</p>
 <h3 id="resilient-trainer">Projet 3 — Entraîneur tolérant aux pannes (24 h)</h3>
-<p>Un entraînement qui survit à kill -9, aux nœuds lents et aux checkpoints corrompus, avec preuves automatisées.</p>
+<p>Un entraînement qui survit à kill -9, aux blocages et aux checkpoints corrompus, avec preuves automatisées.</p>
 <p><strong>Modules mobilisés :</strong> 8, 9, 10.</p>
 <p><strong>Plan :</strong> Entraîneur PyTorch CPU avec checkpoint atomique complet, superviseur de relance, injection de pannes, tests qui prouvent la reprise exacte (perte continue, état RNG et données), rapport de coût de checkpoint et de goodput.</p>
 <h3 id="multi-provider-scheduler">Projet 4 — Placement multi-fournisseurs sensible aux coûts (24 h)</h3>
@@ -629,9 +629,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Modules mobilisés :</strong> 14, 5, 10.</p>
 <p><strong>Plan :</strong> Exportateur de métriques au format dcgm-exporter alimenté par un simulateur de nœuds, règles Prometheus avec tests promtool, détecteur de job bloqué et de straggler avec taux de faux positifs mesurés, tableau de bord et runbook.</p>
 <h3 id="capstone-rfc">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU (40 h)</h3>
-<p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable, des runbooks et une démonstration.</p>
+<p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.</p>
 <p><strong>Modules mobilisés :</strong> 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16.</p>
-<p><strong>Plan :</strong> RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité/coût testé, politique d'ordonnancement, plan de fiabilité et d'observabilité, plan de migration, runbooks, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types.</p>
+<p><strong>Plan :</strong> RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité et de coût testé, choix du marché par classe de charge, plan de fiabilité et d'observabilité, plan de migration par phases, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../path/index.html"><span class="k">← Précédent</span>Feuille de route</a><a class="next" href="../lab-setup/index.html"><span class="k">Suivant →</span>Environnement de travail</a></nav>
 </main>
