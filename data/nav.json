@@ -41,6 +41,10 @@
    "label": "Module 05 — Slurm et exploitation d'un cluster HPC"
   },
   {
+   "href": "projects/resilient-trainer/index.html",
+   "label": "Projet 3 — Entraîneur tolérant aux pannes"
+  },
+  {
    "href": "resources/index.html",
    "label": "Ressources"
   }

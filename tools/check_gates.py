@@ -222,8 +222,9 @@ def check_project(path: Path):
     for a in PROJECT_SECTIONS:
         if a not in ids:
             errs.append(f"missing section {{#{a}}}")
+    planned_ids = {m["id"] for m in json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))["modules"]}
     for m in pr.get("modules", []) or []:
-        if not (ROOT / "courses" / m / "index.md").exists():
+        if m not in planned_ids:  # a module may be planned but not written yet
             errs.append(f"project.modules: unknown module {m}")
     jal = section_text(body, "jalons")
     if len(re.findall(r"^\d+\.\s|^\|\s*\d", jal, re.M)) < 3:
