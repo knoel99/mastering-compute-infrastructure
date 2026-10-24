@@ -49,6 +49,10 @@
    "label": "Projet 3 — Entraîneur tolérant aux pannes"
   },
   {
+   "href": "projects/gpu-observability/index.html",
+   "label": "Projet 5 — Observabilité GPU et détection de pannes silencieuses"
+  },
+  {
    "href": "resources/index.html",
    "label": "Ressources"
   }

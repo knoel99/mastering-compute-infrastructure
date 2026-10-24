@@ -1,0 +1,83 @@
+rule_files:
+  - gpu.rules.yml
+evaluation_interval: 15s
+
+tests:
+  # XID: the gauge holds the LAST xid code, so it stays non-zero until the GPU is reset.
+  - interval: 15s
+    input_series:
+      - series: 'DCGM_FI_DEV_XID_ERRORS{Hostname="n1",gpu="0"}'
+        values: '0x10 79x40'
+      - series: 'DCGM_FI_DEV_XID_ERRORS{Hostname="n1",gpu="1"}'
+        values: '0x50'
+    alert_rule_test:
+      - alertname: GPUXidError
+        eval_time: 2m
+        exp_alerts: []
+      - alertname: GPUXidError
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels: {severity: page, Hostname: n1, gpu: "0"}
+            exp_annotations: {summary: "XID 79 on n1 gpu 0"}
+
+  # Thermal: 85 C sustained for more than 2 minutes on one GPU; the other stays cool.
+  - interval: 15s
+    input_series:
+      - series: 'DCGM_FI_DEV_GPU_TEMP{Hostname="n1",gpu="0"}'
+        values: '60x10 85x50'
+      - series: 'DCGM_FI_DEV_GPU_TEMP{Hostname="n1",gpu="1"}'
+        values: '62x60'
+    alert_rule_test:
+      - alertname: GPUThermalThrottle
+        eval_time: 3m
+        exp_alerts: []
+      - alertname: GPUThermalThrottle
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels: {severity: ticket, Hostname: n1, gpu: "0"}
+            exp_annotations: {summary: "n1 gpu 0 at 85 C"}
+
+  # Hung collective: utilisation stays high, tensor pipe falls to zero. Only JobStalled may fire.
+  - interval: 15s
+    input_series:
+      - series: 'DCGM_FI_PROF_PIPE_TENSOR_ACTIVE{Hostname="n1",gpu="0"}'
+        values: '0.55x39 0.001x80'
+      - series: 'DCGM_FI_PROF_PIPE_TENSOR_ACTIVE{Hostname="n1",gpu="1"}'
+        values: '0.55x39 0.001x80'
+      - series: 'DCGM_FI_DEV_GPU_UTIL{Hostname="n1",gpu="0"}'
+        values: '96x120'
+      - series: 'DCGM_FI_DEV_GPU_UTIL{Hostname="n1",gpu="1"}'
+        values: '96x120'
+      - series: 'slurm_job_gpu_allocated{Hostname="n1",gpu="0",job="42"}'
+        values: '1x120'
+      - series: 'slurm_job_gpu_allocated{Hostname="n1",gpu="1",job="42"}'
+        values: '1x120'
+    alert_rule_test:
+      - alertname: JobStalled
+        eval_time: 14m
+        exp_alerts: []
+      - alertname: JobStalled
+        eval_time: 17m
+        exp_alerts:
+          - exp_labels: {severity: page, job: "42"}
+            exp_annotations: {summary: "job 42 stalled: tensor pipe idle"}
+      - alertname: GPUIdleAllocated
+        eval_time: 29m
+        exp_alerts: []
+
+  # Idle allocation: nothing runs, utilisation at zero for more than 15 minutes.
+  - interval: 15s
+    input_series:
+      - series: 'DCGM_FI_DEV_GPU_UTIL{Hostname="n2",gpu="0"}'
+        values: '0x150'
+      - series: 'slurm_job_gpu_allocated{Hostname="n2",gpu="0",job="7"}'
+        values: '1x150'
+    alert_rule_test:
+      - alertname: GPUIdleAllocated
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: GPUIdleAllocated
+        eval_time: 17m
+        exp_alerts:
+          - exp_labels: {severity: ticket, job: "7"}
+            exp_annotations: {summary: "job 7 holds idle GPUs"}

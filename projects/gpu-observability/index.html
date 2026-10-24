@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Projet 5 — Observabilité GPU et détection de pannes silencieuses — Mastering Compute Infrastructure</title>
+<meta name="description" content="Un exportateur au format dcgm-exporter, des règles d'alerte dont les tests résistent à la mutation, et des détecteurs de job bloqué et de traînard avec taux d'alarmes fausses et délai de détection mesurés.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#projets">Projets</a></p>
+<header id="title-block-header">
+<h1 class="title">Projet 5 — Observabilité GPU et détection de pannes silencieuses</h1>
+<p class="subtitle">Projet 5 · 20 h · modules : observability, slurm, fault-tolerance</p>
+<p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Code de départ et solution vérifiés (promtool 2.45)</span></p>
+</header>
+<h2 id="contexte">Contexte et objectif</h2>
+<p>Les pannes qui font du bruit sont les moins chères : un nœud qui tombe, un code d'erreur dans les journaux, un job qui s'arrête. Les pannes <strong>silencieuses</strong> coûtent le plus, parce que les GPU restent réservés et facturés pendant que rien d'utile ne se passe. Le rapport technique de Llama 3 en décrit une classe : « Sometimes, hardware issues may cause still-functioning but slow stragglers that are hard to detect. Even a single straggler can slow down thousands of other GPUs, often appearing as functioning but slow communications » (<a href="https://arxiv.org/abs/2407.21783">Llama Team, 2024</a>).</p>
+<p>Ce projet vous fait construire la chaîne qui rend ces pannes visibles : un exportateur de métriques, des règles d'alerte <strong>testées</strong>, des détecteurs dont vous <strong>mesurez</strong> la qualité, et un tableau de bord. Tout est alimenté par un simulateur de cluster, car la matière première d'une alerte, ce sont des séries temporelles de pannes, et on ne peut pas les provoquer à la demande sur du vrai matériel.</p>
+<div class="key">
+<p><span class="tag">Objectif du projet</span> Passer de « j'ai installé un exportateur et un tableau de bord » à « je sais dire en combien de temps mon dispositif détecte chaque panne, avec combien de fausses alertes, et j'ai prouvé que mes tests d'alertes les protègent contre une modification de la règle ».</p>
+</div>
+<p>Trois pannes sont simulées. Un <strong>job bloqué</strong> : une collective ne se termine plus, tous les GPU du job tournent dans des noyaux d'attente. Un <strong>traînard</strong> : un GPU ralenti par la chauffe freine tout le job. Un <strong>code XID</strong> : le pilote signale une erreur matérielle. Une quatrième situation, l'<strong>allocation inactive</strong>, ressemble à un blocage mais n'en est pas un : rien ne tourne, l'utilisation est vraiment nulle.</p>
+<div class="war">
+<p><span class="tag">Hypothèse du simulateur, à valider sur matériel</span> Le simulateur suppose qu'un job bloqué garde une utilisation GPU <strong>élevée</strong> (les noyaux d'attente tournent) alors que l'activité des unités tensorielles tombe à zéro et que la puissance baisse. Des rapports d'utilisateurs concordants décrivent ce profil (<a href="https://discuss.pytorch.org/t/distributed-data-parallel-freezes-without-error-message/8009?page=2">forum PyTorch</a>, <a href="https://docs.axolotl.ai/docs/nccl.html">dépannage NCCL de la documentation d'Axolotl</a>), mais je ne les ai pas vérifiés mot à mot et je n'ai pas pu le mesurer sur un GPU. Si vous avez un GPU, refaites l'expérience avant de faire confiance à la leçon de ce projet.</p>
+</div>
+<p>Les noms, types et textes d'aide des métriques sont ceux de la liste de compteurs par défaut de dcgm-exporter (<a href="https://github.com/NVIDIA/dcgm-exporter/blob/main/etc/default-counters.csv">etc/default-counters.csv</a>, lue à la rédaction). Notez le piège de <code>DCGM_FI_DEV_XID_ERRORS</code> : c'est une <strong>jauge</strong> qui porte « la valeur de la dernière erreur XID rencontrée », pas un compteur d'erreurs. Elle reste donc non nulle jusqu'à la réinitialisation du GPU, ce qui oriente la règle d'alerte.</p>
+<h3 id="pre">Prérequis de connaissances</h3>
+<p>Vous devez savoir lire une métrique Prometheus (jauge, étiquettes, requête <code>avg by</code>) et écrire un peu de Python. Le <a href="../../courses/slurm/index.html">module Slurm</a> donne le contexte d'exploitation, en particulier le chapitre sur la santé des nœuds. Le module « observabilité » du parcours approfondit Prometheus, Alertmanager et les tableaux de bord ; vous pouvez faire ce projet avant de le lire.</p>
+<p>Installation de l'outil de test, sous Debian ou Ubuntu : <code>sudo apt-get install prometheus</code> fournit <code>promtool</code>. Les tests ont été exécutés avec la version 2.45.3.</p>
+<h2 id="cahier">Cahier des charges</h2>
+<p>Le dossier <code>labs/projects/gpu-observability/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>tests/</code> (21 tests) et <code>verify.sh</code>. Le simulateur <code>sim.py</code> est fourni.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Exigence</th>
+<th>Test qui la vérifie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R1</td>
+<td><strong>Exportateur</strong> : texte au format d'exposition de Prometheus, six métriques aux noms de dcgm-exporter, une ligne par GPU, serveur HTTP <code>/metrics</code></td>
+<td><code>tests/test_exporter.py</code> (5 tests)</td>
+</tr>
+<tr class="even">
+<td>R2</td>
+<td><strong>Jointure d'allocation</strong> : métrique <code>slurm_job_gpu_allocated</code> pour relier un GPU à son job, car dcgm-exporter ne connaît pas Slurm</td>
+<td><code>test_labels_follow_dcgm_exporter_and_join_metric_*</code></td>
+</tr>
+<tr class="odd">
+<td>R3</td>
+<td><strong>Quatre alertes</strong> : <code>GPUXidError</code>, <code>GPUThermalThrottle</code>, <code>JobStalled</code>, <code>GPUIdleAllocated</code>, chacune avec une sévérité et un résumé</td>
+<td><code>test_required_alerts_exist_*</code>, <code>test_rules_are_syntactically_valid</code></td>
+</tr>
+<tr class="even">
+<td>R4</td>
+<td><strong>Tests d'alertes</strong> avec <code>promtool test rules</code> : pour chaque alerte, au moins un cas qui la déclenche et un cas où elle reste silencieuse</td>
+<td><code>test_rule_unit_tests_pass</code>, <code>test_every_required_alert_has_*</code></td>
+</tr>
+<tr class="odd">
+<td>R5</td>
+<td><strong>Tests qui résistent à la mutation</strong> : si l'on allonge la durée <code>for</code> d'une règle ou si l'on inverse sa comparaison, vos tests doivent échouer</td>
+<td><code>test_unit_tests_catch_mutated_rules</code></td>
+</tr>
+<tr class="even">
+<td>R6</td>
+<td><strong>Détecteur de job bloqué</strong> fondé sur l'activité tensorielle, qui ne se laisse pas tromper par une utilisation GPU élevée</td>
+<td><code>test_stalled_job_*</code>, <code>test_naive_utilisation_alert_is_blind_*</code></td>
+</tr>
+<tr class="odd">
+<td>R7</td>
+<td><strong>Détecteur de traînard</strong> robuste (médiane et MAD) et mesure du taux d'alarmes fausses et du délai de détection</td>
+<td><code>test_straggler_*</code>, <code>test_no_false_alarm_*</code>, <code>test_detectors_do_not_confuse_*</code></td>
+</tr>
+<tr class="even">
+<td>R8</td>
+<td><strong>Tableau de bord</strong> généré (JSON Grafana) dont chaque expression est du PromQL valide et n'utilise que des métriques exposées</td>
+<td><code>tests/test_dashboard.py</code> (3 tests)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le code de départ contient un squelette de <code>exporter.py</code> (liste des métriques donnée), les aides de <code>detectors.py</code> avec le détecteur naïf <strong>fondé sur l'utilisation GPU</strong>, laissé en place pour démontrer son aveuglement, une règle <code>GPUXidError</code> et son test. Les trois autres alertes, leurs tests, les deux détecteurs et le tableau de bord sont à écrire.</p>
+<h2 id="jalons">Jalons</h2>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>N°</th>
+<th>Jalon</th>
+<th>Durée</th>
+<th>Preuve</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Exportateur au format dcgm-exporter et serveur <code>/metrics</code></td>
+<td>4 h</td>
+<td>les 5 tests de <code>test_exporter.py</code> passent ; la sortie est lue par <code>promtool check metrics</code></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Règles d'alerte et tests <code>promtool</code></td>
+<td>5 h</td>
+<td><code>promtool check rules</code> et <code>promtool test rules</code> passent ; <code>test_rules.py</code> passe, mutants compris</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Détecteurs de job bloqué et de traînard, avec mesures</td>
+<td>5 h</td>
+<td>les 8 tests de <code>test_detectors.py</code> passent ; un tableau seuil, délai, alarmes fausses</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Tableau de bord généré</td>
+<td>3 h</td>
+<td>les 3 tests de <code>test_dashboard.py</code> passent ; un <code>dashboard.json</code> joint</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Mesures, runbook et ADR</td>
+<td>3 h</td>
+<td>une page de résultats, un runbook d'une page par panne, un ADR</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> labs/projects/gpu-observability</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> prometheus            <span class="co"># promtool</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span>/chemin/vers/python             <span class="co"># pytest et pyyaml suffisent</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">IMPL</span><span class="op">=</span>starter <span class="va">$PYTHON</span> <span class="at">-m</span> pytest <span class="at">-q</span> tests       <span class="co"># 19 échecs sur 21 au départ</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                  <span class="co"># référence verte, départ rouge</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> starter/rules <span class="kw">&amp;&amp;</span> <span class="ex">promtool</span> test rules gpu.rules.test.yml</span></code></pre></div>
+<p>Le test de mutation vaut le détour. Il copie vos règles, en modifie une (durée <code>for</code> portée à 90 minutes, ou comparaison inversée), relance <code>promtool test rules</code> et exige un échec. Une suite de tests qui passe encore sur une règle cassée ne protège de rien : écrire des cas qui franchissent le seuil <strong>et</strong> qui restent en deçà, avec des instants d'évaluation de part et d'autre de la durée <code>for</code>, est la seule façon de réussir.</p>
+<h2 id="livrables">Livrables</h2>
+<p>Votre dépôt public contient :</p>
+<ul>
+<li>le code complété, les règles, leurs tests <code>promtool</code> et la commande unique qui lance tout ;</li>
+<li><code>dashboard.json</code> généré ;</li>
+<li>une page de <strong>mesures</strong> : pour chaque détecteur, le délai de détection et le taux d'alarmes fausses, avec les valeurs de seuil essayées ;</li>
+<li>un <strong>runbook</strong> d'une page par panne (job bloqué, traînard, XID) : ce que l'alerte signifie, ce qu'il faut vérifier, dans quel ordre, quand vider le nœud ;</li>
+<li>un <strong>ADR</strong> d'une page.</li>
+</ul>
+<p>L'ADR tranche au moins quatre questions, en nommant l'alternative écartée :</p>
+<ol type="1">
+<li>Pourquoi détecter un job bloqué par l'activité tensorielle plutôt que par l'utilisation GPU, et quelle hypothèse cela suppose-t-il ?</li>
+<li>Où placer la jointure avec l'allocation (dans la règle, dans un exportateur, dans une règle d'enregistrement) et que se passe-t-il quand la métrique d'allocation est absente ?</li>
+<li>Comment avez-vous choisi les durées <code>for</code> et les seuils, et quel coût une alerte trop sensible fait-elle porter à la personne d'astreinte ?</li>
+<li>Que se passe-t-il quand l'exportateur lui-même tombe, et comment le saurez-vous ?</li>
+</ol>
+<h2 id="criteres">Critères de réussite</h2>
+<p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
+<ul>
+<li><strong>Format.</strong> La sortie de l'exportateur est acceptée par <code>promtool check metrics</code> ; le seul avertissement toléré est celui de la casse des étiquettes <code>UUID</code>, <code>modelName</code> et <code>Hostname</code>, qui sont celles de dcgm-exporter.</li>
+<li><strong>Règles.</strong> <code>promtool check rules gpu.rules.yml</code> réussit et <code>promtool test rules gpu.rules.test.yml</code> réussit pour les quatre alertes.</li>
+<li><strong>Mutation.</strong> Les huit mutants (quatre durées allongées, quatre comparaisons inversées) font tous échouer vos tests. Commande : <code>pytest tests/test_rules.py -k mutated</code>.</li>
+<li><strong>Blocage.</strong> Un job bloqué à t = 1 800 s est détecté en moins de 20 scrapes de 15 s plus un intervalle, alors que le détecteur naïf par utilisation GPU ne le détecte <strong>jamais</strong>. Commande : <code>pytest tests/test_detectors.py -k "stalled or naive"</code>.</li>
+<li><strong>Traînard.</strong> Un GPU ralenti est signalé en moins de huit scrapes plus un intervalle, <strong>lui seul</strong> est signalé, et aucun traînard n'est déclaré sur un job bloqué (ni l'inverse).</li>
+<li><strong>Alarmes fausses.</strong> Sur 1 024 GPU-heures sans panne, aucune alerte. Vous savez dire ce que cela prouve : le taux est inférieur à environ 3 divisés par 1 024, soit 0,3 %, avec 95 % de confiance, <strong>si</strong> les observations sont indépendantes, ce qu'elles ne sont pas tout à fait.</li>
+<li><strong>Tableau de bord.</strong> Chaque expression passe <code>promtool check rules</code> et n'utilise que des métriques de l'exportateur. Commande : <code>pytest tests/test_dashboard.py</code>.</li>
+</ul>
+<h2 id="pistes">Pistes et indices</h2>
+<p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
+<p><strong>Jointure.</strong> dcgm-exporter décrit des GPU, Slurm décrit des jobs. Pour agréger par job, multipliez la métrique du GPU par la métrique d'allocation, valeur 1, en associant sur <code>Hostname</code> et <code>gpu</code> et en ramenant l'étiquette du job avec <code>group_left</code>. Vérifiez ce qui arrive aux GPU sans allocation : la multiplication les fait disparaître, ce qui est voulu ici.</p>
+<p><strong>Durée <code>for</code>.</strong> Une alerte passe par l'état « en attente » avant de se déclencher. Pour la tester, évaluez avant et après la durée : l'état avant doit être silencieux, l'état après doit être actif. L'écriture <code>0.55x39</code> de <code>promtool</code> produit <strong>quarante</strong> échantillons, pas trente-neuf : la notation <code>axn</code> répète la valeur <code>n</code> fois après la première.</p>
+<p><strong>XID.</strong> Comme la jauge garde la dernière valeur, une règle <code>&gt; 0</code> reste active jusqu'à la remise à zéro. C'est voulu ; décidez en revanche si le message doit nommer le code (<code>{{ $value }}</code>), et lisez le catalogue d'erreurs XID de NVIDIA avant d'écrire un runbook.</p>
+<p><strong>Traînard.</strong> Une valeur aberrante gonfle l'écart type : utilisez la médiane et l'écart absolu médian (MAD), multiplié par 1,4826 pour l'ajuster à un écart type gaussien. Un plancher sur l'échelle évite de diviser par un nombre minuscule sur une flotte très régulière ; choisissez-le d'après la <strong>variabilité réelle</strong> d'une flotte saine.</p>
+<p><strong>Persistance.</strong> Exiger que la condition dure plusieurs scrapes consécutifs divise fortement les alarmes fausses, au prix d'un délai. Mesurez ce compromis plutôt que de le supposer : c'est le tableau demandé dans les livrables.</p>
+<p><strong>Mesurer sans se tromper.</strong> Un dispositif qui ne déclenche jamais n'a ni fausse alerte ni bonne détection. Reportez toujours les deux, sur des pannes simulées <strong>et</strong> sur des exécutions saines.</p>
+<h3 id="reference-results">Résultats de la solution de référence</h3>
+<p>À lire <strong>après</strong> votre propre travail. Le simulateur est déterministe, ces valeurs sont donc reproductibles ; elles dépendent de ses hypothèses, pas d'un matériel réel.</p>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Délais de détection</strong> (faute à t = 1 800 s, scrape de 15 s) :</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>détecteur</th>
+<th>panne</th>
+<th>délai</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>StalledJob</code> (20 scrapes)</td>
+<td>job bloqué</td>
+<td>285 s</td>
+</tr>
+<tr class="even">
+<td><code>NaiveUtilStall</code> (utilisation GPU)</td>
+<td>job bloqué</td>
+<td>jamais</td>
+</tr>
+<tr class="odd">
+<td><code>Straggler</code> (8 scrapes, z de 6)</td>
+<td>GPU ralenti</td>
+<td>105 s</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le délai est celui de la persistance : 19 intervalles de 15 s font 285 s, 7 intervalles font 105 s. Le détecteur naïf ne voit rien parce que, dans l'hypothèse du simulateur, l'utilisation reste à 98 % pendant le blocage.</p>
+<p><strong>Alarmes fausses du détecteur de traînard</strong>, sur 1 024 GPU-heures saines, <strong>sans persistance</strong> (un seul scrape suffit) :</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>seuil z</th>
+<th>alarmes par GPU-heure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td>8,41</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1,89</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0,40</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>0,016</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Avec la persistance de huit scrapes et z de 6, le nombre d'alarmes tombe à zéro. À z de 6 sans persistance il reste seize alarmes, bien plus que ne le prédit une loi gaussienne : le plancher d'échelle, de 5 MHz, est inférieur à la variabilité simulée de 10 MHz, donc le seuil effectif est proche de 3 écarts types. <strong>Le plancher doit refléter le bruit réel d'une flotte saine.</strong></p>
+<p><strong>Tests d'alertes.</strong> Les quatre alertes de référence passent <code>promtool test rules</code> avec quatre scénarios, et les huit mutants sont tous détectés.</p>
+<p><strong>Avertissement de format.</strong> <code>promtool check metrics</code> signale les étiquettes <code>UUID</code>, <code>modelName</code> et <code>Hostname</code> comme non conformes à la convention snake_case : ce sont celles de dcgm-exporter lui-même. La solution les conserve, parce que les règles et les tableaux de bord réels s'en servent ; c'est une décision à consigner dans l'ADR.</p>
+</details>
+<h2 id="extensions">Extensions</h2>
+<ul>
+<li><strong>Alerter sur l'absence.</strong> Ajoutez une alerte qui se déclenche quand l'exportateur ne répond plus, avec <code>up</code> ou <code>absent</code>, et testez-la avec <code>promtool</code>. Un exportateur mort ressemble à un cluster sain.</li>
+<li><strong>Vrai dcgm-exporter.</strong> Sur une machine à GPU, lancez dcgm-exporter, comparez ses séries à celles du simulateur, et <strong>mesurez</strong> le profil d'un blocage (utilisation, puissance, activité tensorielle) en tuant un rang d'un entraînement. C'est la validation qui manque à ce projet.</li>
+<li><strong>Alertmanager.</strong> Ajoutez regroupement, inhibition (un nœud en erreur XID masque les alertes de ses GPU) et silences, puis testez l'acheminement avec <code>amtool</code>.</li>
+<li><strong>Seuils appris.</strong> Remplacez le plancher fixe du traînard par une estimation sur une fenêtre glissante de données saines et mesurez de nouveau délai et alarmes fausses.</li>
+<li><strong>Intégration Slurm.</strong> Faites écrire la jointure d'allocation par un prolog et un épilog Slurm (module Slurm, chapitre sur la santé des nœuds) au lieu d'un fichier statique.</li>
+</ul>
+<h2 id="portfolio">Pour le portfolio</h2>
+<p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : les trois pannes, le schéma exportateur, règles, détecteurs et tableau de bord, la commande qui lance les 21 tests, le tableau des délais et des alarmes fausses, et un paragraphe « ce qui n'est pas validé sur matériel réel ».</p>
+<p><strong>Ce qu'il faut montrer.</strong> Les tests <code>promtool</code>, le test de mutation, le tableau seuil-délai-alarmes et le runbook. Le tableau de bord vient en dernier : il ne prouve rien tout seul.</p>
+<p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui sait que l'utilisation GPU ne dit pas si le job travaille, qui chiffre ses détecteurs au lieu de les affirmer, qui teste ses alertes comme du code, et qui dit ce qu'il n'a pas pu valider.</p>
+<div class="note">
+<p><span class="tag">Zéro événement observé n'est pas zéro risque</span> Voir aucune alarme fausse sur 1 024 GPU-heures permet seulement d'affirmer, avec 95 % de confiance, que le taux est inférieur à environ 3/1 024 par GPU-heure (règle des trois), si les observations sont indépendantes. Les GPU d'un même job ne le sont pas : l'incertitude réelle est plus grande. Écrivez la borne, pas « zéro ».</p>
+</div>
+<p>Trois accroches <strong>honnêtes</strong>, à adapter à ce que vous avez réellement fait :</p>
+<ol type="1">
+<li>« J'ai écrit des règles d'alerte GPU dont les tests <code>promtool</code> échouent quand on casse la règle (mutation de la durée et de la comparaison), et un détecteur de job bloqué qu'une alerte fondée sur l'utilisation GPU ne voit pas. »</li>
+<li>« J'ai mesuré délai de détection et alarmes fausses d'un détecteur de traînard pour plusieurs seuils sur un cluster simulé, et montré qu'un plancher d'échelle trop bas ramène le seuil réel à environ trois écarts types. »</li>
+<li>« Je sais dire ce que ce projet ne valide pas : le profil réel d'un blocage sur GPU, et le comportement à grande échelle. »</li>
+</ol>
+<h3 id="formules">Formules du projet</h3>
+<p>Le score robuste d'un GPU, avec x sa mesure, m la médiane de son job et MAD l'écart absolu médian :</p>
+<p><span class="math display">z = \frac{x - m}{\max\bigl(1{,}4826\,\mathrm{MAD},\; \text{plancher}\bigr)}</span></p>
+<p>Le délai de détection d'un détecteur à persistance k, avec un scrape toutes les Δ secondes, est de (k − 1)·Δ si la panne tombe sur un scrape, et d'au plus k·Δ sinon. La règle des trois borne le taux d'un événement non observé en n essais :</p>
+<p><span class="math display">p &lt; \frac{3}{n} \quad (95\ \%)</span></p>
+<h3 id="lectures">Pour aller plus loin</h3>
+<ul>
+<li>Llama Team, <em>The Llama 3 Herd of Models</em>, 2024 : section sur la fiabilité, le diagnostic des blocages et des traînards, <a href="https://arxiv.org/abs/2407.21783">arxiv.org/abs/2407.21783</a>.</li>
+<li>Documentation de Prometheus : tests unitaires de règles (<code>promtool test rules</code>) et règles d'alerte.</li>
+<li>Dépôt <a href="https://github.com/NVIDIA/dcgm-exporter">NVIDIA/dcgm-exporter</a> : liste de compteurs par défaut.</li>
+</ul>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../projects/resilient-trainer/index.html"><span class="k">← Précédent</span>Projet 3 — Entraîneur tolérant aux pannes</a><a class="next" href="../../resources/index.html"><span class="k">Suivant →</span>Ressources</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>
