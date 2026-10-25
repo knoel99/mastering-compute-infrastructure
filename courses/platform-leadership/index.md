@@ -34,7 +34,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 | Clé | Valeur |
 |---|---|
 | Volume | 28 h, dont environ 10 h de lecture, 7 h de labs et 11 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
-| Niveau d'entrée | 3 : vous avez déjà exploité un cluster ou une plateforme de calcul |
+| Niveau d'entrée | 3 : avoir suivi les phases 2 à 4 du parcours, ou avoir exploité un cluster ou une plateforme de calcul |
 | Prérequis | [Module 5 — Slurm](../slurm/index.html), module 12 — Kubernetes pour l'IA, module 14 — Observabilité |
 | Pour qui | Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage. |
 | Livrable | un ADR vérifié, un post-mortem cohérent avec son journal, un dimensionnement chiffré et défendu à l'oral |
