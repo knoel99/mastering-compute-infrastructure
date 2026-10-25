@@ -193,45 +193,45 @@ La profondeur est relevée module par module dans le texte des pages : **mention
 
 | Compétence | Offres qui la citent | dont exigée | Profondeur dans le parcours | Modules et projets |
 |---|---|---|---|---|
-| Python | 68 % | 59 % | pratiqué | [9](../courses/distributed-training/index.html), [10](../courses/fault-tolerance/index.html), [15](../courses/finops-capacity/index.html), [4](../courses/gpu-programming/index.html) |
+| Python | 68 % | 59 % | pratiqué | [1](../courses/linux-systems/index.html), [2](../courses/perf-models/index.html), [3](../courses/parallel-programming/index.html), [4](../courses/gpu-programming/index.html) |
 | Administration Linux | 56 % | 52 % | pratiqué | [1](../courses/linux-systems/index.html), [6](../courses/provisioning/index.html), [8](../courses/storage/index.html), [P3](../projects/resilient-trainer/index.html) |
-| Langage système (Go, Rust, C++) | 55 % | 50 % | enseigné | [4](../courses/gpu-programming/index.html), [3](../courses/parallel-programming/index.html) |
-| Astreinte, fiabilité (SRE) | 54 % | 51 % | pratiqué | [10](../courses/fault-tolerance/index.html), [1](../courses/linux-systems/index.html), [14](../courses/observability/index.html), [16](../courses/platform-leadership/index.html) |
-| Kubernetes | 52 % | 38 % | pratiqué | [12](../courses/kubernetes-gpu/index.html), [P4](../projects/multi-provider-scheduler/index.html), [10](../courses/fault-tolerance/index.html), [13](../courses/multi-cloud/index.html) |
+| Langage système (Go, Rust, C++) | 55 % | 50 % | enseigné | [3](../courses/parallel-programming/index.html), [4](../courses/gpu-programming/index.html) |
+| Astreinte, fiabilité (SRE) | 54 % | 51 % | pratiqué | [1](../courses/linux-systems/index.html), [5](../courses/slurm/index.html), [10](../courses/fault-tolerance/index.html), [14](../courses/observability/index.html) |
+| Kubernetes | 52 % | 38 % | pratiqué | [12](../courses/kubernetes-gpu/index.html), [P4](../projects/multi-provider-scheduler/index.html), [10](../courses/fault-tolerance/index.html), [11](../courses/ray-rl-infra/index.html) |
 | Expérience HPC | 51 % | 30 % | pratiqué | [3](../courses/parallel-programming/index.html), [5](../courses/slurm/index.html), [P1](../projects/homelab-slurm/index.html), [P2](../projects/scaling-study/index.html) |
-| Profilage, bancs d'essai | 51 % | 45 % | pratiqué | [9](../courses/distributed-training/index.html), [4](../courses/gpu-programming/index.html), [1](../courses/linux-systems/index.html), [3](../courses/parallel-programming/index.html) |
-| Expérience d'entraînement ML | 46 % | 28 % | pratiqué | [9](../courses/distributed-training/index.html), [10](../courses/fault-tolerance/index.html), [4](../courses/gpu-programming/index.html), [14](../courses/observability/index.html) |
-| Systèmes distribués | 45 % | 35 % | pratiqué | [10](../courses/fault-tolerance/index.html), [16](../courses/platform-leadership/index.html), [11](../courses/ray-rl-infra/index.html), [9](../courses/distributed-training/index.html) |
-| Réseau (général) | 44 % | 30 % | pratiqué | [1](../courses/linux-systems/index.html), [7](../courses/networking/index.html), [6](../courses/provisioning/index.html), [13](../courses/multi-cloud/index.html) |
+| Profilage, bancs d'essai | 51 % | 45 % | pratiqué | [1](../courses/linux-systems/index.html), [2](../courses/perf-models/index.html), [3](../courses/parallel-programming/index.html), [4](../courses/gpu-programming/index.html) |
+| Expérience d'entraînement ML | 46 % | 28 % | pratiqué | [9](../courses/distributed-training/index.html), [2](../courses/perf-models/index.html), [4](../courses/gpu-programming/index.html), [8](../courses/storage/index.html) |
+| Systèmes distribués | 45 % | 35 % | pratiqué | [10](../courses/fault-tolerance/index.html), [11](../courses/ray-rl-infra/index.html), [16](../courses/platform-leadership/index.html), [2](../courses/perf-models/index.html) |
+| Réseau (général) | 44 % | 30 % | pratiqué | [1](../courses/linux-systems/index.html), [6](../courses/provisioning/index.html), [7](../courses/networking/index.html), [2](../courses/perf-models/index.html) |
 | InfiniBand, RoCE | 43 % | 27 % | pratiqué | [7](../courses/networking/index.html) |
 | CUDA, programmation GPU | 38 % | 18 % | pratiqué | [4](../courses/gpu-programming/index.html), [2](../courses/perf-models/index.html), [6](../courses/provisioning/index.html) |
-| Santé matérielle (burn-in, diagnostics, RMA) | 38 % | 34 % | pratiqué | [10](../courses/fault-tolerance/index.html), [7](../courses/networking/index.html), [14](../courses/observability/index.html), [6](../courses/provisioning/index.html) |
+| Santé matérielle (burn-in, diagnostics, RMA) | 38 % | 34 % | pratiqué | [5](../courses/slurm/index.html), [6](../courses/provisioning/index.html), [7](../courses/networking/index.html), [10](../courses/fault-tolerance/index.html) |
 | Prometheus, Grafana | 36 % | 26 % | pratiqué | [14](../courses/observability/index.html), [P1](../projects/homelab-slurm/index.html), [P5](../projects/gpu-observability/index.html), [11](../courses/ray-rl-infra/index.html) |
 | Systèmes de fichiers parallèles | 30 % | 19 % | pratiqué | [8](../courses/storage/index.html), [10](../courses/fault-tolerance/index.html), [12](../courses/kubernetes-gpu/index.html) |
 | Provisioning bare-metal | 29 % | 21 % | pratiqué | [6](../courses/provisioning/index.html) |
-| Planification de capacité | 28 % | 23 % | pratiqué | [10](../courses/fault-tolerance/index.html), [15](../courses/finops-capacity/index.html), [13](../courses/multi-cloud/index.html), [16](../courses/platform-leadership/index.html) |
-| CI/CD, automatisation | 28 % | 20 % | enseigné | [1](../courses/linux-systems/index.html), [16](../courses/platform-leadership/index.html), [6](../courses/provisioning/index.html), [P5](../projects/gpu-observability/index.html) |
-| Conteneurs | 27 % | 18 % | enseigné | [12](../courses/kubernetes-gpu/index.html), [1](../courses/linux-systems/index.html), [16](../courses/platform-leadership/index.html), [6](../courses/provisioning/index.html) |
+| Planification de capacité | 28 % | 23 % | pratiqué | [6](../courses/provisioning/index.html), [8](../courses/storage/index.html), [10](../courses/fault-tolerance/index.html), [11](../courses/ray-rl-infra/index.html) |
+| CI/CD, automatisation | 28 % | 20 % | enseigné | [1](../courses/linux-systems/index.html), [6](../courses/provisioning/index.html), [16](../courses/platform-leadership/index.html), [P5](../projects/gpu-observability/index.html) |
+| Conteneurs | 27 % | 18 % | enseigné | [1](../courses/linux-systems/index.html), [5](../courses/slurm/index.html), [6](../courses/provisioning/index.html), [12](../courses/kubernetes-gpu/index.html) |
 | Cloud hyperscaler (AWS, GCP, Azure…) | 27 % | 19 % | pratiqué | [13](../courses/multi-cloud/index.html), [15](../courses/finops-capacity/index.html) |
 | Terraform, infrastructure as code | 26 % | 17 % | pratiqué | [6](../courses/provisioning/index.html), [13](../courses/multi-cloud/index.html), [P1](../projects/homelab-slurm/index.html) |
-| Collectives (NCCL, RCCL, HCCL) | 26 % | 16 % | pratiqué | [9](../courses/distributed-training/index.html), [7](../courses/networking/index.html), [2](../courses/perf-models/index.html), [10](../courses/fault-tolerance/index.html) |
-| Sécurité, conformité | 26 % | 23 % | pratiqué | [13](../courses/multi-cloud/index.html), [16](../courses/platform-leadership/index.html), [6](../courses/provisioning/index.html), [12](../courses/kubernetes-gpu/index.html) |
+| Collectives (NCCL, RCCL, HCCL) | 26 % | 16 % | pratiqué | [2](../courses/perf-models/index.html), [7](../courses/networking/index.html), [9](../courses/distributed-training/index.html), [3](../courses/parallel-programming/index.html) |
+| Sécurité, conformité | 26 % | 23 % | pratiqué | [6](../courses/provisioning/index.html), [13](../courses/multi-cloud/index.html), [16](../courses/platform-leadership/index.html), [12](../courses/kubernetes-gpu/index.html) |
 | Ansible, gestion de configuration | 24 % | 18 % | pratiqué | [6](../courses/provisioning/index.html) |
-| Journaux, traces | 23 % | 20 % | enseigné | [9](../courses/distributed-training/index.html), [1](../courses/linux-systems/index.html), [7](../courses/networking/index.html), [14](../courses/observability/index.html) |
+| Journaux, traces | 23 % | 20 % | enseigné | [1](../courses/linux-systems/index.html), [7](../courses/networking/index.html), [9](../courses/distributed-training/index.html), [14](../courses/observability/index.html) |
 | Leadership, management | 23 % | 19 % | pratiqué | [16](../courses/platform-leadership/index.html), [P6](../projects/capstone-rfc/index.html), [15](../courses/finops-capacity/index.html) |
-| Slurm | 22 % | 12 % | pratiqué | [15](../courses/finops-capacity/index.html), [14](../courses/observability/index.html), [3](../courses/parallel-programming/index.html), [5](../courses/slurm/index.html) |
-| Entraînement distribué (PyTorch, Megatron, DeepSpeed…) | 20 % | 15 % | pratiqué | [9](../courses/distributed-training/index.html), [12](../courses/kubernetes-gpu/index.html), [P2](../projects/scaling-study/index.html), [10](../courses/fault-tolerance/index.html) |
-| Checkpoint, tolérance aux pannes | 20 % | 16 % | pratiqué | [10](../courses/fault-tolerance/index.html), [12](../courses/kubernetes-gpu/index.html), [13](../courses/multi-cloud/index.html), [16](../courses/platform-leadership/index.html) |
-| Conception d'ordonnanceur | 20 % | 17 % | pratiqué | [12](../courses/kubernetes-gpu/index.html), [13](../courses/multi-cloud/index.html), [5](../courses/slurm/index.html), [P4](../projects/multi-provider-scheduler/index.html) |
+| Slurm | 22 % | 12 % | pratiqué | [3](../courses/parallel-programming/index.html), [5](../courses/slurm/index.html), [14](../courses/observability/index.html), [15](../courses/finops-capacity/index.html) |
+| Entraînement distribué (PyTorch, Megatron, DeepSpeed…) | 20 % | 15 % | pratiqué | [9](../courses/distributed-training/index.html), [12](../courses/kubernetes-gpu/index.html), [P2](../projects/scaling-study/index.html), [2](../courses/perf-models/index.html) |
+| Checkpoint, tolérance aux pannes | 20 % | 16 % | pratiqué | [5](../courses/slurm/index.html), [8](../courses/storage/index.html), [10](../courses/fault-tolerance/index.html), [11](../courses/ray-rl-infra/index.html) |
+| Conception d'ordonnanceur | 20 % | 17 % | pratiqué | [5](../courses/slurm/index.html), [12](../courses/kubernetes-gpu/index.html), [13](../courses/multi-cloud/index.html), [P4](../projects/multi-provider-scheduler/index.html) |
 | Accélérateurs non NVIDIA (TPU, ROCm, Ascend…) | 18 % | 14 % | pratiqué | [4](../courses/gpu-programming/index.html) |
 | Virtualisation (KVM, MIG, vGPU) | 18 % | 10 % | pratiqué | [6](../courses/provisioning/index.html), [1](../courses/linux-systems/index.html) |
-| Service d'inférence | 17 % | 12 % | pratiqué | [11](../courses/ray-rl-infra/index.html), [4](../courses/gpu-programming/index.html), [2](../courses/perf-models/index.html) |
-| FinOps, coûts | 15 % | 14 % | pratiqué | [15](../courses/finops-capacity/index.html), [13](../courses/multi-cloud/index.html), [11](../courses/ray-rl-infra/index.html), [8](../courses/storage/index.html) |
-| Supervision GPU (DCGM) | 14 % | 12 % | pratiqué | [14](../courses/observability/index.html), [6](../courses/provisioning/index.html), [P5](../projects/gpu-observability/index.html) |
-| Chaînes de données | 14 % | 9 % | pratiqué | [11](../courses/ray-rl-infra/index.html), [8](../courses/storage/index.html) |
+| Service d'inférence | 17 % | 12 % | pratiqué | [11](../courses/ray-rl-infra/index.html), [2](../courses/perf-models/index.html), [4](../courses/gpu-programming/index.html) |
+| FinOps, coûts | 15 % | 14 % | pratiqué | [8](../courses/storage/index.html), [11](../courses/ray-rl-infra/index.html), [13](../courses/multi-cloud/index.html), [15](../courses/finops-capacity/index.html) |
+| Supervision GPU (DCGM) | 14 % | 12 % | pratiqué | [6](../courses/provisioning/index.html), [14](../courses/observability/index.html), [P5](../projects/gpu-observability/index.html) |
+| Chaînes de données | 14 % | 9 % | pratiqué | [8](../courses/storage/index.html), [11](../courses/ray-rl-infra/index.html) |
 | Centre de données (énergie, refroidissement) | 14 % | 7 % | pratiqué | [15](../courses/finops-capacity/index.html) |
-| Achats, relation fournisseurs | 12 % | 12 % | pratiqué | [15](../courses/finops-capacity/index.html), [13](../courses/multi-cloud/index.html), [2](../courses/perf-models/index.html), [6](../courses/provisioning/index.html) |
-| Stockage objet | 8 % | 7 % | pratiqué | [13](../courses/multi-cloud/index.html), [8](../courses/storage/index.html) |
+| Achats, relation fournisseurs | 12 % | 12 % | pratiqué | [15](../courses/finops-capacity/index.html), [2](../courses/perf-models/index.html), [6](../courses/provisioning/index.html), [8](../courses/storage/index.html) |
+| Stockage objet | 8 % | 7 % | pratiqué | [8](../courses/storage/index.html), [13](../courses/multi-cloud/index.html) |
 | Multi-cloud (SkyPilot…) | 7 % | 6 % | pratiqué | [13](../courses/multi-cloud/index.html), [P4](../projects/multi-provider-scheduler/index.html) |
 | Clouds GPU spécialisés | 7 % | 6 % | pratiqué | [15](../courses/finops-capacity/index.html), [13](../courses/multi-cloud/index.html) |
 | Infrastructure de RL | 6 % | 6 % | pratiqué | [11](../courses/ray-rl-infra/index.html) |

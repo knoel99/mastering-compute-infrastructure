@@ -115,7 +115,9 @@ def coverage():
                 best = max(best, d)
                 if d >= 2:
                     owners.append({"page": pid, "kind": kind[:-1], "depth": d})
-        owners.sort(key=lambda o: -o["depth"])
+        cur = json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8"))
+        num = {m["id"]: m["number"] for m in cur["modules"]} | {p["id"]: 100 + p["number"] for p in cur["projects"]}
+        owners.sort(key=lambda o: (-o["depth"], num.get(o["page"], 999)))   # deepest first, then in course order
         out[s] = {"max_depth": best, "owners": owners, "practised": any(o["depth"] == 3 for o in owners)}
     return out
 
