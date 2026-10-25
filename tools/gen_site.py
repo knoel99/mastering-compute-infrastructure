@@ -182,7 +182,7 @@ Volume total : **{hfmt(mh)} h de modules et {hfmt(ph)} h de projets**, soit envi
 
 ## Cours {{#cours}}
 
-Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge **Cœur** signale un module indispensable à tous ; **Fondation** un module de base que vous pouvez survoler si vous le pratiquez déjà. La section « Comment travailler ce module » de chaque cours donne la priorité selon votre profil d'entrée.
+Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, bilan de sortie et références. Le badge **Cœur** signale un module indispensable à tous ; **Fondation** un module de base que vous pouvez survoler si vous le pratiquez déjà. La section « Comment travailler ce module » de chaque cours donne la priorité selon votre profil d'entrée.
 
 {phase_blocks(card_course)}
 
@@ -332,7 +332,7 @@ Le [point de départ](../profile/index.html) décrit cinq profils d'entrée et l
 
 ## Suivre sa progression {{#suivi}}
 
--   Après chaque module : cochez son checkpoint de sortie, produit pour chaque capacité la preuve demandée.
+-   Après chaque module : cochez son bilan de sortie, produit pour chaque capacité la preuve demandée.
 -   Après chaque phase : publiez le livrable du jalon dans un dépôt, avec un fichier `README.md` et une décision d'architecture d'une page.
 -   Tous les deux mois : relisez l'enquête sur les masters et les offres d'emploi, et notez ce qui a changé.
 """

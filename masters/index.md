@@ -15,7 +15,7 @@ numbered: true
 
 ## Méthode et limites {#methode}
 
-L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; **un contrôle mécanique a vérifié mot pour mot 1437 citations sur 1438** (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier `data/` du dépôt.
+L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; **un contrôle mécanique a vérifié mot pour mot 1448 citations sur 1449** (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier `data/` du dépôt.
 
 Cinq limites à garder en tête.
 

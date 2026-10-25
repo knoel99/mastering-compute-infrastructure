@@ -78,7 +78,7 @@ Onze séances, soit 28 h : trois de 3 h, six de 2,5 h et deux de 2 h. Le niveau 
 | 8 | 3 h | 2 | Lab 7.2 en entier | Lab 7.2 (3 h) |
 | 9 | 2.5 h | 3 | ch. 8 Mesure et diagnostic (1 h) | Ex. 8 (1,5 h) |
 | 10 | 3 h | 3 | ch. 8 en pratique : recette `nccl-tests`, partie A | Lab 7.3 partie A (1,5 h) ; Ex. 9 (1,5 h) |
-| 11 | 2 h | 3 | ch. 8 en pratique : recette sur cluster, partie B | Lab 7.3 partie B (1,5 h) ; Checkpoint de sortie (0,5 h) ; le rapport de recette du lab 7.3 sert aux extensions « Deux machines » et « Variante GPU » du Projet 2 |
+| 11 | 2 h | 3 | ch. 8 en pratique : recette sur cluster, partie B | Lab 7.3 partie B (1,5 h) ; Bilan de sortie (0,5 h) ; le rapport de recette du lab 7.3 sert aux extensions « Deux machines » et « Variante GPU » du Projet 2 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -95,7 +95,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le diagnostic NCCL et le modèle de coût des collectives sont ce qui manque le plus souvent, quel que soit le profil d'entrée.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1038,7 +1038,7 @@ Pour les séparer : `NCCL_TESTS_SPLIT="MOD 8"` avec `-a 3` confirme qu'un rail e
 (d) Les versions de NCCL et du pilote, les variables posées, la commande exacte, le plateau attendu et sa source, la table par rail, la liste des nœuds exclus, la cause trouvée, la correction et la table de contrôle après correction. Mention explicite : les chiffres de cet exercice sont synthétiques.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

@@ -147,7 +147,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-4-4">Lab 4.4 — Lire une trace de profil</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -325,7 +325,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>2.5 h</td>
 <td>3</td>
 <td>ch. 9 Au-delà de NVIDIA (1,25 h)</td>
-<td>Ex. 11 et Ex. 12 (1,25 h) ; checkpoint de sortie</td>
+<td>Ex. 11 et Ex. 12 (1,25 h) ; bilan de sortie</td>
 </tr>
 </tbody>
 </table>
@@ -377,7 +377,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Le profilage et la lecture de traces servent à tous les profils, y compris si vous n'écrirez jamais de noyau.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si les trois vous paraissent routinières, lisez les exercices ★★★ et le chapitre 7, puis passez au module suivant.</p>
@@ -1543,7 +1543,7 @@ VERDICT: LAUNCH-BOUND: many short kernels and an idle device (fuse, CUDA graphs,
 <li><p>La liste de contrôle du § 9.6 (image reproductible, <em>device plugin</em> ou DRA, collectives testées, santé branchée sur l'observabilité, aucune hypothèse de <code>warpSize</code> ou d'API CUDA), plus une validation numérique (précision, TF32) et un profil mesuré sur le nouveau matériel avant la mise en production.</p></li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux calculer l'occupation d'un noyau et nommer sa ressource limitante.</strong> Preuve : l'exercice 1 refait avec les sorties <code>ptxas</code> d'un noyau de votre choix.</li>

@@ -34,9 +34,9 @@ Ce module donne un vocabulaire (données, tenseur, pipeline, experts, séquence)
 
 | Clé | Valeur |
 |---|---|
-| Volume | 36 h, dont environ 14 h de lecture (chapitres, questions de positionnement, checkpoint de sortie), 13 h de labs et 9 h d'exercices |
+| Volume | 36 h, dont environ 14 h de lecture (chapitres, questions de positionnement, bilan de sortie), 13 h de labs et 9 h d'exercices |
 | Niveau d'entrée | 3 : vous savez écrire une boucle d'entraînement PyTorch, lire un MFU et un modèle α-β (module 2), et vous connaissez le rôle de NCCL (module 7) |
-| Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [Module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [Module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html) |
+| Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [Module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle](../parallel-programming/index.html), [Module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [Module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html) |
 | Pour qui | Cœur : DDP, FSDP, parallélisme tensoriel et pipeline ; survol possible si vous entraînez déjà sur plusieurs nœuds, en gardant les chapitres de diagnostic et de mémoire. |
 | Livrable | un planificateur de parallélisme testé, un DDP prouvé équivalent à un entraînement mono-processus, une mesure de mémoire FSDP comparée à sa prédiction, une procédure d'enquête sur un hang |
 | Environnement | un portable CPU avec PyTorch suffit : les quatre labs tournent sur 4 processus `gloo`, sans GPU. Ce que seuls des GPU permettraient (NCCL, recouvrement réel, MFU mesuré) est décrit et sourcé, jamais présenté comme exécuté |
@@ -57,7 +57,7 @@ Ce module donne un vocabulaire (données, tenseur, pipeline, experts, séquence)
 ### Place dans le parcours {#place}
 
 -   **Phase 3 — Systèmes d'entraînement distribué** (semaines 21-32) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
--   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html).
+-   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle](../parallel-programming/index.html), [module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html).
 -   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](../ray-rl-infra/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html), [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Expérience d'entraînement ML, Profilage, bancs d'essai, Journaux, traces, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
@@ -80,7 +80,7 @@ Douze séances de 3 h, soit 36 h. Le niveau 1 correspond aux fondations, le nive
 | 9 | 3 h | 3 | ch. 6 (45 min) ; ch. 7 §7.1 (25 min) | Ex. 10 (55 min), Ex. 11 (55 min) |
 | 10 | 3 h | 3 | ch. 7 (50 min) ; ch. 8 §8.1 à §8.3 (75 min) | Ex. 12 (55 min) |
 | 11 | 3 h | 3 | ch. 8 fin (15 min) ; ch. 9 §9.1 et §9.2 (40 min) | Lab 9.3 partie A (90 min) ; Ex. 9 (35 min) |
-| 12 | 3 h | 3 | ch. 9 fin (20 min) ; checkpoint de sortie (15 min) | Lab 9.3 partie B (90 min) ; Ex. 14 (55 min) ; démarrage du Projet 2 |
+| 12 | 3 h | 3 | ch. 9 fin (20 min) ; bilan de sortie (15 min) | Lab 9.3 partie B (90 min) ; Ex. 14 (55 min) ; démarrage du Projet 2 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -97,7 +97,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le calcul de la mémoire et du trafic par stratégie de parallélisme sert ensuite au dimensionnement (modules 7, 13 et 15).
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1435,7 +1435,7 @@ Avec un recouvrement parfait, les deux sont cachées (1,63 s = 47 % du calcul). 
 (d) Une troisième lecture, **non confirmée** dans les sources lues : les couches d'experts utiliseraient un autre découpage que l'attention (par exemple un TP d'experts de 1), de sorte que $1024 / 16 = 64$ rangs forment l'EP. Avant de dimensionner un MoE, recalculez le produit sur chaque exemple publié et lisez le code de construction des groupes de votre version ; ne prenez pas un tableau de documentation pour une spécification.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

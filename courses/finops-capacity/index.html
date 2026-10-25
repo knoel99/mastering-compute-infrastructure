@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-15-4">Lab 15.4 — Revue d'un contrat de capacité fictif</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>9</td>
 <td>2.5 h</td>
 <td>3</td>
-<td>ch. 8 Matrices de décision, appel d'offres, pilotage ; checkpoint de sortie</td>
+<td>ch. 8 Matrices de décision, appel d'offres, pilotage ; bilan de sortie</td>
 <td>Ex. 13 ; lecture du cahier des charges du Projet 6 (phase 5, avec le module 16)</td>
 </tr>
 </tbody>
@@ -352,7 +352,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> La prévision de demande et le coût par GPU-heure productive sont demandés par les offres de capacité et de direction.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Les prix sont fictifs, en unités arbitraires (u). Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au chapitre 5.</p>
@@ -386,7 +386,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Avec <span class="math inline">c_{\text{dispo}}</span> le coût plein d'une heure disponible, <span class="math inline">a</span> la part des heures allouées (l'allocation) et <span class="math inline">g</span> le goodput des heures allouées, le coût d'une heure utile est :</p>
 <p><span class="math display">c_{\text{utile}} = \frac{c_{\text{dispo}}}{a \times g}</span></p>
 <p>C'est la formule de la question 1 de « Avant de commencer » : avec <span class="math inline">a = 0{,}55</span> et <span class="math inline">g = 0{,}9</span>, un coût de 2,08 u devient 4,20 u. Les régimes à la demande se paient seulement quand on alloue : leur coût par heure utile vaut <span class="math inline">c/g</span>, indépendamment de <span class="math inline">a</span> (chapitre 4).</p>
-<p>Les rapports d'ordonnanceur, les labs (<code>utilization</code>) et la prose de ce module appellent aussi <span class="math inline">a</span> « utilisation ». Ce n'est pas l'activité des GPU alloués que mesure DCGM, notée <span class="math inline">u</span> au <a href="../kubernetes-gpu/index.html#ch8">module 12</a> : celle-ci n'est qu'un indice, alors que <span class="math inline">g</span> compte le progrès conservé. Le « u » des montants, lui, est l'unité monétaire fictive.</p>
+<p>Les rapports d'ordonnanceur, les labs (<code>utilization</code>) et la prose de ce module appellent aussi <span class="math inline">a</span> « utilisation ». Ce n'est pas l'activité des GPU alloués que mesure DCGM, notée <span class="math inline">u</span> au <a href="../kubernetes-gpu/index.html#les-coûts">module 12, §8.4</a> : celle-ci n'est qu'un indice, alors que <span class="math inline">g</span> compte le progrès conservé. Le « u » des montants, lui, est l'unité monétaire fictive.</p>
 <p>Les équipes ne raisonnent pas en GPU-heures mais en unités métier. La Fondation propose, dans son document sur l'IA, des indicateurs comme le coût par inférence, le coût par token (<span class="math inline">\text{coût total} / \text{tokens}</span>) et l'efficacité d'utilisation des ressources (utilisation réelle sur capacité provisionnée). Pour l'entraînement, le chapitre 7 du module 2 donne le pont : <span class="math inline">6N</span> FLOP par token pour un modèle de <span class="math inline">N</span> paramètres, soit <span class="math inline">6ND</span> pour <span class="math inline">D</span> tokens.</p>
 <div class="ex">
 <p><span class="tag">Exemple 1.1 — Coût d'un entraînement, par token</span> Entraîner un modèle de <span class="math inline">N = 7 \cdot 10^9</span> paramètres sur <span class="math inline">D = 10^{12}</span> tokens demande <span class="math inline">6ND = 4{,}2 \cdot 10^{22}</span> FLOP. À un MFU de 40 % sur des GPU de 989 TFLOP/s dense (H100 SXM en BF16, module 2), un GPU délivre <span class="math inline">0{,}4 \times 989 \cdot 10^{12} = 3{,}96 \cdot 10^{14}</span> FLOP/s utiles.</p>
@@ -450,7 +450,7 @@ Chaîne de rendements d'une flotte (valeurs de l'exemple 2.1, hypothèses d'exem
 <p>L'ETTR joue le rôle d'un goodput par job (notre <span class="math inline">g</span> l'égale quand l'attente est nulle) ; l'article réserve le mot « goodput » à la production de travail utile de l'ensemble du cluster.</p>
 <p>L'article de Llama 3 rapporte, lui, plus de 90 % de « temps d'entraînement effectif » pendant l'entraînement du modèle de 405 milliards de paramètres, tout en acceptant une maintenance automatisée du cluster. Sur 54 jours, l'équipe a compté 466 interruptions de jobs, dont 419 inattendues (Dubey et al., 2024).</p>
 <div class="war">
-<p><span class="tag">419 interruptions imprévues en 54 jours</span> Selon le tableau 5 de <a href="https://arxiv.org/abs/2407.21783">l'article de Llama 3</a>, environ 78 % des interruptions inattendues sont attribuées à des problèmes matériels confirmés ou suspectés, sur une période de pré-entraînement du modèle de 405 milliards de paramètres. Le goodput est donc un chiffre d'exploitation, pas une propriété du code : il dépend de la fiabilité du matériel, de l'automatisation des reprises et du coût des checkpoints (<a href="../fault-tolerance/index.html#ch2">module 10</a> et projet <a href="../../projects/resilient-trainer/index.html">Entraîneur tolérant aux pannes</a>).</p>
+<p><span class="tag">419 interruptions imprévues en 54 jours</span> Selon le tableau 5 de <a href="https://arxiv.org/abs/2407.21783">l'article de Llama 3</a>, environ 78 % des interruptions inattendues sont attribuées à des problèmes matériels confirmés ou suspectés, sur une période de pré-entraînement du modèle de 405 milliards de paramètres. Le goodput est donc un chiffre d'exploitation, pas une propriété du code : il dépend de la fiabilité du matériel, de l'automatisation des reprises et du coût des checkpoints (<a href="../fault-tolerance/index.html#ch2">module 10, chapitre 2</a>, appliqué au <a href="../../projects/resilient-trainer/index.html">projet 3</a>).</p>
 </div>
 <p>D'autres pertes sont moins spectaculaires. Hu et al. (2024) ont analysé les traces d'un centre de données qui développe des grands modèles de langage. Pour un job d'évaluation sur le jeu HumanEval, ils mesurent que 29,5 % du temps passent à charger le modèle et à préparer les données, et 19,0 % de plus à exécuter des tests de correction de programmes : environ la moitié du temps seulement est consacrée à l'inférence sur GPU.</p>
 <p>Ces trois chiffres ne se comparent pas : ils portent sur des objets différents (cluster, job d'entraînement, job d'évaluation) et des définitions différentes. Retenez la leçon de méthode : avant de comparer deux utilisations, demandez ce qui est au numérateur et au dénominateur.</p>
@@ -820,7 +820,7 @@ Courbe de durée des 2 000 scénarios synthétiques du lab 15.2 (prix fictifs r 
 </tbody>
 </table>
 </div>
-<p>Pour le spot, <span class="math inline">W</span> est la part de temps perdue à cause des interruptions. Au premier ordre et avec le meilleur intervalle de checkpoint, le modèle de Young et Daly (<a href="../fault-tolerance/index.html#ch2">module 10, chapitre 2</a>, appliqué au projet 3) donne :</p>
+<p>Pour le spot, <span class="math inline">W</span> est la part de temps perdue à cause des interruptions. Au premier ordre et avec le meilleur intervalle de checkpoint, le modèle de Young et Daly (<a href="../fault-tolerance/index.html#ch2">module 10, chapitre 2</a>, appliqué au <a href="../../projects/resilient-trainer/index.html">projet 3</a>) donne :</p>
 <p><span class="math display">W = \sqrt{\frac{2C}{M}} + \frac{R}{M}</span></p>
 <p>avec <span class="math inline">C</span> le coût bloquant d'un checkpoint (le <span class="math inline">\delta</span> du module 10), <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le coût d'un redémarrage.</p>
 <p>Pour un checkpoint de 3 minutes et un redémarrage de 10 minutes, la perte vaut 7,9 % si une interruption survient en moyenne toutes les 20 heures. Elle monte à 30,7 % pour une interruption toutes les 2 heures et tombe à 2,3 % pour une toutes les 200 heures.</p>
@@ -882,7 +882,7 @@ Courbe de durée des 2 000 scénarios synthétiques du lab 15.2 (prix fictifs r 
 </tbody>
 </table>
 </div>
-<p>Le parc possédé bat la demande à partir d'une allocation <span class="math inline">a^{*} = 0{,}516</span> (indépendante de <span class="math inline">g</span> : il se simplifie ; le lab l'affiche <code>u*</code>). La location à 2,6 u bat la demande à 4,0 u à partir de <span class="math inline">r/o = 0{,}65</span>, et la réservation à 3,2 u à partir de 0,80. À 30 % d'allocation, le parc possédé coûte 1,7 fois la demande ; à 90 %, il coûte 42 % de moins.</p>
+<p>Le parc possédé bat la demande à partir d'une allocation <span class="math inline">a^{*} = 0{,}516</span> (indépendante de <span class="math inline">g</span>, qui se simplifie). La location à 2,6 u bat la demande à 4,0 u à partir de <span class="math inline">r/o = 0{,}65</span>, et la réservation à 3,2 u à partir de 0,80. À 30 % d'allocation, le parc possédé coûte 1,7 fois la demande ; à 90 %, il coûte 42 % de moins.</p>
 </div>
 <figure class="fig">
 <svg viewBox="0 0 640 290" role="img" aria-labelledby="tco-t tco-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
@@ -1663,7 +1663,7 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <li>Remplacez trois valeurs de <code>assumptions.yaml</code> par des devis datés et sourcés, relancez, et notez le déplacement du point mort.</li>
 <li>Exécutez l'exemple de <code>decision_matrix.py</code> du chapitre 8 avec vos propres notes.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>breakeven owned vs on_demand   : u* = 0.516</code> et « ok: tco-model reference passes, starter fails as intended ».</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>breakeven owned vs on_demand   : a* = 0.516</code> et « ok: tco-model reference passes, starter fails as intended ».</p>
 <p><strong>Statut de vérification.</strong> Deux exécutions réussies de <code>verify.sh</code> (24 tests verts pour la référence, 18 rouges au départ). Les prix sont fictifs ; le modèle ignore taxes, inflation, remises de volume, limites de capacité et délais.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez une capacité maximale au spot, un délai de livraison par option, ou un scénario où la revente est nulle.</p>
 </div>
@@ -1843,7 +1843,7 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <p>Totaux : achat 4,67 ; location 5,83 ; réservé 6,25 ; demande et spot 6,33. La demande et le spot sont premiers, d'un cheveu devant le réservé. Sur 5 000 tirages : demande et spot 57,2 %, réservé 38,3 %, location 4,5 %, achat 0 %. Multiplier le poids du coût ou de l'approvisionnement par 1,17, ou celui du délai par 1,25, renverse le classement.</p>
 <p>Conclusion : l'écart de 0,08 point ne fait pas une décision. Remplacez les notes subjectives par des mesures, ou retenez un mélange (socle réservé, pointes à la demande) au lieu d'un gagnant.</p>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux exprimer le coût d'un cluster en GPU-heure utile.</strong> Preuve : l'exercice 2 refait avec vos propres mesures de disponibilité, d'allocation, de goodput et de MFU.</li>

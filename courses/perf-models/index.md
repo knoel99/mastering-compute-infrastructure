@@ -75,7 +75,7 @@ Huit séances de 3 h, soit 24 h. Le niveau 1 correspond aux fondations, le nivea
 | 5 | 3 h | 2 | ch. 5 Amdahl, Gustafson, efficacité | Ex. 6 ; lab 2.2 (étapes 1 et 2 : lecture du code, mesures) |
 | 6 | 3 h | 2 | ch. 6 Le modèle α-β et les collectives | Ex. 7, 8 ; lab 2.2 (étapes 3 à 5 : ajustement, analyse) |
 | 7 | 3 h | 2 | ch. 7 FLOP, MFU et mémoire d'un entraînement | Ex. 9, 10 ; lab 2.3 (étapes 1 à 3) |
-| 8 | 3 h | 3 | ch. 8 Études de passage à l'échelle ; checkpoint de sortie | Ex. 11 ; lab 2.3 (étapes 4 et 5) ; lecture du cahier des charges du Projet 2 (il se fait en phase 3) |
+| 8 | 3 h | 3 | ch. 8 Études de passage à l'échelle ; bilan de sortie | Ex. 11 ; lab 2.3 (étapes 4 et 5) ; lecture du cahier des charges du Projet 2 (il se fait en phase 3) |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -92,7 +92,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le roofline, le modèle α-β et le MFU reviennent dans les modules 3, 4, 7, 9 et 15 : ne les survolez pas, même si les formules vous sont familières.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -935,7 +935,7 @@ Sans recouvrement, la communication s'ajoute au calcul. Avec recouvrement, elle 
 Limite importante : en entraînement complet, ce modèle occupe 112 Go d'états (chapitre 7). Il ne tient donc pas sur un GPU de 80 Go en DDP pur. L'exercice isole la communication ; le choix réel du parallélisme est l'objet du module 9. Les bandes passantes sont des hypothèses : il faut les mesurer.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

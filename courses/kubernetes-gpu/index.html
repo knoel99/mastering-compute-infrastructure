@@ -143,7 +143,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-12-4">Lab 12.4 — Un plan de contrôle Kubernetes 1.37 sans kubelet</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -320,7 +320,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>11</td>
 <td>2 h</td>
 <td>3</td>
-<td>Checkpoint de sortie, ouverture du Projet 4</td>
+<td>Bilan de sortie, ouverture du Projet 4</td>
 <td></td>
 </tr>
 </tbody>
@@ -373,7 +373,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Les files d'attente (Kueue), le gang scheduling et le partage des GPU sont ce qui distingue Kubernetes pour l'IA de Kubernetes pour des services.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, lisez le chapitre 3 et le chapitre 7, puis passez aux exercices ★★★.</p>
@@ -1302,7 +1302,7 @@ PodGroup message: minCount (8) cannot be satisfied: 6 scheduled, 1 remaining, po
 <p><strong>Plan C (en place par 8).</strong> Chaque vague retire 8 nœuds au job, qui ne tourne pas à moins de 64 nœuds et doit donc s'arrêter, puis redémarrer : 8 vagues <span class="math inline">\times</span> 1 300 s <span class="math inline">\times</span> 512 GPU / 3600 <span class="math inline">\approx</span> 1 479 GPU·h, soit huit fois le plan A.</p>
 <p><strong>Recommandation.</strong> Plan B : environ 31 % du coût du plan A (56,9 contre 184,9 GPU·h), au prix de 64 nœuds de réserve libérés pendant environ 2 h (évaluations préemptées ou reportées) et de 4 h de calendrier. Il suppose que les 64 nœuds libres ont la même topologie que ceux du job (chapitre 5).</p>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux dire ce que garantit chaque moyen de partager un GPU.</strong> Preuve : l'exercice 3 refait pour votre propre flotte, avec le décompte des GPU et ce que chaque stratégie interdit.</li>

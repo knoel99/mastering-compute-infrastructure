@@ -199,11 +199,11 @@ Trois accroches **honnêtes**, à adapter à ce que vous avez réellement fait :
 
 ### Formules du projet {#formules}
 
-Avec C le coût d'un checkpoint, M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le temps facturé sans progrès à chaque reprise (démarrage de l'offre plus rechargement de l'état, ce dernier de 10 min) et T le temps de calcul entre deux checkpoints, la fraction de gaspillage au premier ordre est :
+Avec C le coût d'un checkpoint (le $\delta$ du module 10), M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le temps facturé sans progrès à chaque reprise (démarrage de l'offre plus rechargement de l'état, ce dernier de 10 min) et T le temps de calcul entre deux checkpoints (le $\tau$ du module 10), la fraction de gaspillage au premier ordre est :
 
 $$W(T) = \frac{C}{T} + \frac{T/2 + R}{M}, \qquad T^{*} = \sqrt{2\,C\,M}$$
 
-Le [module 10](../../courses/fault-tolerance/index.html#ch2), qui dérive ces formules, note $\delta$ ce que l'on note ici C, et $\tau$ ce que l'on note T.
+Le [module 10, chapitre 2](../../courses/fault-tolerance/index.html#ch2) dérive ces formules.
 
 Le coût attendu par heure productive d'une offre de prix $p$ est alors :
 

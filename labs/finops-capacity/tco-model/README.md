@@ -23,8 +23,8 @@ PYTHON=$PYTHON bash verify.sh             # reference green (24), starter red (1
 $PYTHON reference/tco.py assumptions.yaml --breakeven --sensitivity
 ```
 
-Model in one line: a fixed-cost option (owned, committed) costs `yearly / (8760 * u * g)` per useful GPU-hour, where
-`u` (`utilization` in the code, written `a` on the module page) is the fraction of hours allocated and `g` the goodput
+Model in one line: a fixed-cost option (owned, committed) costs `yearly / (8760 * a * g)` per useful GPU-hour, where
+`a` (`utilization` in the code; `u` is only the fictional money unit) is the fraction of hours allocated and `g` the goodput
 of allocated hours; on-demand costs `rate / g`; spot costs `rate / (g * (1 - W))` with `W = sqrt(2C/M) + R/M`, where
 `C` is the blocking cost of a checkpoint (the `δ` of module 10), `M` the mean time between interruptions and `R` the
 restart cost (Young-Daly first order, module 10 chapter 2, applied in the `resilient-trainer` project).

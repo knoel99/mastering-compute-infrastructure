@@ -135,7 +135,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-1-5">Lab 1.5 — Un script d'exploitation idempotent</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -295,7 +295,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>9</td>
 <td>2.5 h</td>
 <td>3</td>
-<td>Synthèse : dimensionner, diagnostiquer un cas ouvert, checkpoint de sortie</td>
+<td>Synthèse : dimensionner, diagnostiquer un cas ouvert, bilan de sortie</td>
 <td>exercices 7 et 8, checkpoint</td>
 </tr>
 </tbody>
@@ -348,7 +348,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Même en survol, lisez les chapitres sur les cgroups, la topologie (NUMA, PCIe) et la méthode de mesure : tout le parcours s'appuie dessus.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Trois questions pour situer votre niveau. Répondez sans chercher, puis ouvrez les réponses.</p>
@@ -1153,8 +1153,8 @@ unchanged: vm.max_map_count = 1048576</code></pre>
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span> 10</span></code></pre></div>
 <p><code>grep -x</code> impose la correspondance de ligne entière et <code>-F</code> désactive les expressions régulières ; <code>tail -c1 | wc -l</code> vaut 0 quand le dernier octet n'est pas un retour à la ligne. Le test <code>solutions/test_ensure_line.sh</code> couvre : fichier absent, second appel sans effet, ligne différente, une ligne par entrée, dernière ligne sans retour, ligne plus longue qui contient le texte, usage invalide : huit contrôles, tous « ok ».</p>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
-<p>Ce checkpoint-là est un bilan du module, pas la sauvegarde d'état d'un entraînement des chapitres 1 et 7. Ce n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<h2 id="exit">Bilan de sortie</h2>
+<p>Ce bilan n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux cartographier une machine.</strong> Preuve : le rapport du lab 1.1 sur votre machine, avec la table de localité commentée.</li>
 <li><strong>Je peux provoquer et lire une mise à mort par manque de mémoire.</strong> Preuve : le lab 1.4 et l'explication de chaque champ de la ligne <code>oom-kill</code> (exemple 8.2).</li>

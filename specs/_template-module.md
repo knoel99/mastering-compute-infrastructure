@@ -101,7 +101,7 @@ Points clés — chapitre 1
 Corrigé.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 -   **Je peux…** — preuve attendue : …
 

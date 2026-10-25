@@ -81,7 +81,7 @@ def travailler(m):
     rows += ["", f"**À ne pas survoler.** {m['focus']}", "",
              "**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, "
              "en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices "
-             "dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe."]
+             "dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe."]
     return "\n".join(rows)
 
 

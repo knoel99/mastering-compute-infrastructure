@@ -143,7 +143,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-9-4">Lab 9.4 — Un planificateur de parallélisme testé</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -176,7 +176,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Volume</td>
-<td>36 h, dont environ 14 h de lecture (chapitres, questions de positionnement, checkpoint de sortie), 13 h de labs et 9 h d'exercices</td>
+<td>36 h, dont environ 14 h de lecture (chapitres, questions de positionnement, bilan de sortie), 13 h de labs et 9 h d'exercices</td>
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
@@ -184,7 +184,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Prérequis</td>
-<td><a href="../perf-models/index.html">Module 2 — Architecture matérielle et modèles de performance</a>, <a href="../gpu-programming/index.html">Module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">Module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a></td>
+<td><a href="../perf-models/index.html">Module 2 — Architecture matérielle et modèles de performance</a>, <a href="../parallel-programming/index.html">Module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>, <a href="../gpu-programming/index.html">Module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">Module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a></td>
 </tr>
 <tr class="even">
 <td>Pour qui</td>
@@ -220,7 +220,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="place">Place dans le parcours</h3>
 <ul>
 <li><strong>Phase 3 — Systèmes d'entraînement distribué</strong> (semaines 21-32) : faire tourner un entraînement multi-nœuds qui survit aux pannes.</li>
-<li><strong>S'appuie sur</strong> : <a href="../perf-models/index.html">module 2 — Architecture matérielle et modèles de performance</a>, <a href="../gpu-programming/index.html">module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a>.</li>
+<li><strong>S'appuie sur</strong> : <a href="../perf-models/index.html">module 2 — Architecture matérielle et modèles de performance</a>, <a href="../parallel-programming/index.html">module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>, <a href="../gpu-programming/index.html">module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a>.</li>
 <li><strong>Prépare</strong> : <a href="../fault-tolerance/index.html">module 10 — Pannes, checkpointing et reprise automatique</a>, <a href="../ray-rl-infra/index.html">module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a>, <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>.</li>
 <li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>, <a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>.</li>
 <li><strong>Compétences demandées dans les offres d'emploi et travaillées ici</strong> : Python, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Expérience d'entraînement ML, Profilage, bancs d'essai, Journaux, traces, Systèmes distribués (voir <a href="../../market/index.html#couverture">l'analyse du marché</a>). <!-- /gen:place --></li>
@@ -327,7 +327,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>12</td>
 <td>3 h</td>
 <td>3</td>
-<td>ch. 9 fin (20 min) ; checkpoint de sortie (15 min)</td>
+<td>ch. 9 fin (20 min) ; bilan de sortie (15 min)</td>
 <td>Lab 9.3 partie B (90 min) ; Ex. 14 (55 min) ; démarrage du Projet 2</td>
 </tr>
 </tbody>
@@ -380,7 +380,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Le calcul de la mémoire et du trafic par stratégie de parallélisme sert ensuite au dimensionnement (modules 7, 13 et 15).</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, lisez les chapitres 5 et 8, faites les exercices ★★★ et passez au module 10.</p>
@@ -1901,7 +1901,7 @@ findings:
 <li><p>Une troisième lecture, <strong>non confirmée</strong> dans les sources lues : les couches d'experts utiliseraient un autre découpage que l'attention (par exemple un TP d'experts de 1), de sorte que <span class="math inline">1024 / 16 = 64</span> rangs forment l'EP. Avant de dimensionner un MoE, recalculez le produit sur chaque exemple publié et lisez le code de construction des groupes de votre version ; ne prenez pas un tableau de documentation pour une spécification.</p></li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux décoder une configuration de parallélisme.</strong> Preuve : l'exercice 1 refait sur une configuration publiée de votre choix, avec <code>mesh.py</code>.</li>

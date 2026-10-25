@@ -52,6 +52,6 @@ Le [point de départ](../profile/index.html) décrit cinq profils d'entrée et l
 
 ## Suivre sa progression {#suivi}
 
--   Après chaque module : cochez son checkpoint de sortie, produit pour chaque capacité la preuve demandée.
+-   Après chaque module : cochez son bilan de sortie, produit pour chaque capacité la preuve demandée.
 -   Après chaque phase : publiez le livrable du jalon dans un dépôt, avec un fichier `README.md` et une décision d'architecture d'une page.
 -   Tous les deux mois : relisez l'enquête sur les masters et les offres d'emploi, et notez ce qui a changé.

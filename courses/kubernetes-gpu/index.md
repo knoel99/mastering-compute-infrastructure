@@ -79,7 +79,7 @@ Onze séances, soit 28 h : cinq de 3 h, deux de 2,5 h et quatre de 2 h. Le nivea
 | 8 | 2 h | 2 | ch. 6 Stockage et données | Ex. 9 |
 | 9 | 3 h | 3 | ch. 7 Slurm ou Kubernetes ? | Lab 12.3 ; Ex. 10 |
 | 10 | 2.5 h | 3 | ch. 8 Exploitation : mises à jour, sécurité, multi-tenance, coûts | Lab 12.4 partie C (validation par un serveur d'API) ; Ex. 11, 13 |
-| 11 | 2 h | 3 | Checkpoint de sortie, ouverture du Projet 4 | |
+| 11 | 2 h | 3 | Bilan de sortie, ouverture du Projet 4 | |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -96,7 +96,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Les files d'attente (Kueue), le gang scheduling et le partage des GPU sont ce qui distingue Kubernetes pour l'IA de Kubernetes pour des services.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1199,7 +1199,7 @@ Au départ, eval emprunte 32 GPU. Pretrain arrive : son usage dans le pool serai
 **Recommandation.** Plan B : environ 31 % du coût du plan A (56,9 contre 184,9 GPU·h), au prix de 64 nœuds de réserve libérés pendant environ 2 h (évaluations préemptées ou reportées) et de 4 h de calendrier. Il suppose que les 64 nœuds libres ont la même topologie que ceux du job (chapitre 5).
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

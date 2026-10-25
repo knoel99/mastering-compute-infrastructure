@@ -76,7 +76,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 | 8 | 3 h | 3 | Chapitre 7 : contribuer et se rendre visible, puis chapitre 8 (début) | exercice 10 |
 | 9 | 2 h | 3 | Chapitre 8 : exercice de conception | lab 16.3 (étapes 1 à 3) |
 | 10 | 2.5 h | 3 | Chapitre 9 : plan de contrôle, consensus, haute disponibilité et livraison continue | lab 16.4, exercices 12 et 13 |
-| 11 | 2 h | 3 | Synthèse et checkpoint de sortie | lab 16.3 (étapes 4 et 5), exercice 9, checkpoint |
+| 11 | 2 h | 3 | Synthèse et bilan de sortie | lab 16.3 (étapes 4 et 5), exercice 9, checkpoint |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -93,7 +93,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le RFC et la revue d'incident servent au projet 6, quel que soit votre profil.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1009,7 +1009,7 @@ L'arbitrage oppose la charge d'un dump sur la base à la valeur de la comptabili
 (d) Presque rien : 37 ko, un seul membre, une machine locale, aucun réseau. La mesure valide la **procédure**, pas sa durée. Le RTO réel comprend la détection, la décision, l'arrêt des serveurs d'API, la copie du snapshot, la restauration de chaque membre à la taille réelle de la base, le redémarrage et la vérification. Mesurez-le sur un environnement jetable de taille réaliste, étape par étape, comme les jalons d'un incident du chapitre 4.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

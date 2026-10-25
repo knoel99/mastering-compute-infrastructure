@@ -78,7 +78,7 @@ Dix séances, soit 24 h. Le niveau ne diminue jamais d'une séance à la suivant
 | 7 | 3 h | 3 | ch. 7 Pannes silencieuses | Lab 14.2 mutation ; Ex. 7, 8 |
 | 8 | 3 h | 3 | Lab 14.3 parties A et B | Ex. 9 |
 | 9 | 2 h | 3 | ch. 8 Suivi d'expériences et reproductibilité | Lab 14.3 partie C ; Ex. 10 |
-| 10 | 2 h | 3 | Checkpoint de sortie, démarrage du Projet 5 | Reprise de l'exercice 9 |
+| 10 | 2 h | 3 | Bilan de sortie, démarrage du Projet 5 | Reprise de l'exercice 9 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -95,7 +95,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Les pannes silencieuses des GPU et les SLO de calcul sont nouveaux même pour une équipe d'observabilité expérimentée.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1166,7 +1166,7 @@ Pour `j1`, la moyenne vaut $(0 + 0{,}02)/2 = 0{,}01 < 0{,}05$ : l'alerte se déc
 La règle ne couvre pas les GPU Radeon, où la métrique n'est pas exportée : la série manque, et une série absente ne déclenche rien (§ 3.4). Il leur faut une autre alerte, sur `gpu_gfx_activity` par exemple. Corrigé vérifié par `promtool test rules` sur des séries synthétiques, avec et sans la division : `labs/observability/alert-rules/exercises/`, que lance le `verify.sh` du lab 14.2.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

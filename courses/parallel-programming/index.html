@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-3-3">Lab 3.3 — Jacobi 2D : décomposition de domaine et étude de passage à l'échelle</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Volume</td>
-<td>30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h), 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) et 30 min de checkpoint de sortie</td>
+<td>30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h), 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) et 30 min de bilan de sortie</td>
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
@@ -219,6 +219,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <ul>
 <li><strong>Phase 1 — Calcul parallèle et GPU</strong> (semaines 5-9) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.</li>
 <li><strong>S'appuie sur</strong> : <a href="../perf-models/index.html">module 2 — Architecture matérielle et modèles de performance</a>.</li>
+<li><strong>Prépare</strong> : <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</li>
 <li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>.</li>
 <li><strong>Compétences demandées dans les offres d'emploi et travaillées ici</strong> : Python, Slurm, Expérience HPC, Profilage, bancs d'essai, Langage système (Go, Rust, C++), Collectives (NCCL, RCCL, HCCL), Réseau (général), Systèmes distribués (voir <a href="../../market/index.html#couverture">l'analyse du marché</a>). <!-- /gen:place --></li>
 </ul>
@@ -317,7 +318,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>11</td>
 <td>2 h</td>
 <td>3</td>
-<td>checkpoint de sortie</td>
+<td>bilan de sortie</td>
 <td>Ex. 7, 12</td>
 </tr>
 </tbody>
@@ -370,7 +371,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Si vous survolez, gardez l'étude de passage à l'échelle et la lecture des courbes : le projet 2 la reprend.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si les trois vous paraissent routinières, parcourez les exercices ★★★ et passez au module suivant.</p>
@@ -2160,7 +2161,7 @@ MCW rank 1 bound to socket 0[core 1[hwt 0]]: [./B/./.]</code></pre>
 <li><p><span class="math inline">E \ge 0{,}7</span> : <span class="math inline">p = 8</span> (<span class="math inline">E = 0{,}81</span>) ; <span class="math inline">p = 16</span> (<span class="math inline">E = 0{,}62</span>) est en dessous du seuil. Ce choix est un compromis (seuil arbitraire) qu'il faut écrire dans le rapport.</p></li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux paralléliser une boucle avec OpenMP et justifier chaque clause.</strong> Preuve : le tableau de la partie A du lab 3.1, avec la ligne de base séquentielle correcte.</li>

@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-7-3">Lab 7.3 — nccl-tests sur un vrai cluster</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -315,7 +315,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>2 h</td>
 <td>3</td>
 <td>ch. 8 en pratique : recette sur cluster, partie B</td>
-<td>Lab 7.3 partie B (1,5 h) ; Checkpoint de sortie (0,5 h) ; le rapport de recette du lab 7.3 sert aux extensions « Deux machines » et « Variante GPU » du Projet 2</td>
+<td>Lab 7.3 partie B (1,5 h) ; Bilan de sortie (0,5 h) ; le rapport de recette du lab 7.3 sert aux extensions « Deux machines » et « Variante GPU » du Projet 2</td>
 </tr>
 </tbody>
 </table>
@@ -367,7 +367,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Le diagnostic NCCL et le modèle de coût des collectives sont ce qui manque le plus souvent, quel que soit le profil d'entrée.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez directement au module suivant.</p>
@@ -1383,7 +1383,7 @@ degraded_rail.log:  HCAs per host {&#39;node-01&#39;: 8, &#39;node-02&#39;: 7}
 <li><p>Les versions de NCCL et du pilote, les variables posées, la commande exacte, le plateau attendu et sa source, la table par rail, la liste des nœuds exclus, la cause trouvée, la correction et la table de contrôle après correction. Mention explicite : les chiffres de cet exercice sont synthétiques.</p></li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux convertir un débit de fiche en débit attendu.</strong> Preuve : l'exercice 1 refait pour votre carte et votre MTU, avec le débit utile en Go/s.</li>

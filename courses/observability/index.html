@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-14-3">Lab 14.3 — Détecteur de job bloqué</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -303,7 +303,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>10</td>
 <td>2 h</td>
 <td>3</td>
-<td>Checkpoint de sortie, démarrage du Projet 5</td>
+<td>Bilan de sortie, démarrage du Projet 5</td>
 <td>Reprise de l'exercice 9</td>
 </tr>
 </tbody>
@@ -356,7 +356,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Les pannes silencieuses des GPU et les SLO de calcul sont nouveaux même pour une équipe d'observabilité expérimentée.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module 15.</p>
@@ -1356,7 +1356,7 @@ rank 2 innermost frame: train.py:212 in next_batch   -&gt; batch = next(data_ite
 <p>Pour <code>j1</code>, la moyenne vaut <span class="math inline">(0 + 0{,}02)/2 = 0{,}01 &lt; 0{,}05</span> : l'alerte se déclenche après sa durée <code>for</code>. Sans la division par 100, le GPU AMD compterait pour 2, la moyenne vaudrait <span class="math inline">(0 + 2)/2 = 1</span> et le job bloqué passerait inaperçu.</p>
 <p>La règle ne couvre pas les GPU Radeon, où la métrique n'est pas exportée : la série manque, et une série absente ne déclenche rien (§ 3.4). Il leur faut une autre alerte, sur <code>gpu_gfx_activity</code> par exemple. Corrigé vérifié par <code>promtool test rules</code> sur des séries synthétiques, avec et sans la division : <code>labs/observability/alert-rules/exercises/</code>, que lance le <code>verify.sh</code> du lab 14.2.</p>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux dire ce qu'une métrique GPU mesure et ce qu'elle ne mesure pas.</strong> Preuve : un tableau commenté de six métriques DCGM avec leur définition citée et, pour chacune, un cas où elle induit en erreur.</li>

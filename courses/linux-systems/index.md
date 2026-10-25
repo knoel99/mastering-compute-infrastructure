@@ -74,7 +74,7 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 | 6 | 2.5 h | 2 | Chapitre 6 : réseau Linux, MTU, premiers pas RDMA | exercice 10 |
 | 7 | 3 h | 2 | Chapitre 7 : stockage, cache de pages, E/S directes, loi de Little | lab 1.3, exercice 6 |
 | 8 | 2.5 h | 2 | Chapitre 8 : pannes matérielles vues du système, scripts d'exploitation robustes | lab 1.5 (qui inclut l'exercice 11) |
-| 9 | 2.5 h | 3 | Synthèse : dimensionner, diagnostiquer un cas ouvert, checkpoint de sortie | exercices 7 et 8, checkpoint |
+| 9 | 2.5 h | 3 | Synthèse : dimensionner, diagnostiquer un cas ouvert, bilan de sortie | exercices 7 et 8, checkpoint |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -91,7 +91,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Même en survol, lisez les chapitres sur les cgroups, la topologie (NUMA, PCIe) et la méthode de mesure : tout le parcours s'appuie dessus.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1063,9 +1063,9 @@ exit 10
 `grep -x` impose la correspondance de ligne entière et `-F` désactive les expressions régulières ; `tail -c1 | wc -l` vaut 0 quand le dernier octet n'est pas un retour à la ligne. Le test `solutions/test_ensure_line.sh` couvre : fichier absent, second appel sans effet, ligne différente, une ligne par entrée, dernière ligne sans retour, ligne plus longue qui contient le texte, usage invalide : huit contrôles, tous « ok ».
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
-Ce checkpoint-là est un bilan du module, pas la sauvegarde d'état d'un entraînement des chapitres 1 et 7. Ce n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
+Ce bilan n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 
 -   **Je peux cartographier une machine.** Preuve : le rapport du lab 1.1 sur votre machine, avec la table de localité commentée.
 -   **Je peux provoquer et lire une mise à mort par manque de mémoire.** Preuve : le lab 1.4 et l'explication de chaque champ de la ligne `oom-kill` (exemple 8.2).

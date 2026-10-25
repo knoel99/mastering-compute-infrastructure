@@ -393,9 +393,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>« Je sais dire ce que ma simulation ne dit pas : les prix et les taux d'interruption y sont inventés, et mes manifestes ne sont validés que structurellement. »</li>
 </ol>
 <h3 id="formules">8.1. Formules du projet</h3>
-<p>Avec C le coût d'un checkpoint, M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le temps facturé sans progrès à chaque reprise (démarrage de l'offre plus rechargement de l'état, ce dernier de 10 min) et T le temps de calcul entre deux checkpoints, la fraction de gaspillage au premier ordre est :</p>
+<p>Avec C le coût d'un checkpoint (le <span class="math inline">\delta</span> du module 10), M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le temps facturé sans progrès à chaque reprise (démarrage de l'offre plus rechargement de l'état, ce dernier de 10 min) et T le temps de calcul entre deux checkpoints (le <span class="math inline">\tau</span> du module 10), la fraction de gaspillage au premier ordre est :</p>
 <p><span class="math display">W(T) = \frac{C}{T} + \frac{T/2 + R}{M}, \qquad T^{*} = \sqrt{2\,C\,M}</span></p>
-<p>Le <a href="../../courses/fault-tolerance/index.html#ch2">module 10</a>, qui dérive ces formules, note <span class="math inline">\delta</span> ce que l'on note ici C, et <span class="math inline">\tau</span> ce que l'on note T.</p>
+<p>Le <a href="../../courses/fault-tolerance/index.html#ch2">module 10, chapitre 2</a> dérive ces formules.</p>
 <p>Le coût attendu par heure productive d'une offre de prix <span class="math inline">p</span> est alors :</p>
 <p><span class="math display">\text{coût attendu} = \frac{p}{1 - W(T^{*})}</span></p>
 <p>Pour une offre à la demande, <span class="math inline">W</span> vaut zéro et le coût attendu égale le prix.</p>

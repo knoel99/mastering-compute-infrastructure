@@ -35,7 +35,7 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 
 | Clé | Valeur |
 |---|---|
-| Volume | 30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h), 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) et 30 min de checkpoint de sortie |
+| Volume | 30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h), 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) et 30 min de bilan de sortie |
 | Niveau d'entrée | 2 : lecture de C et de Python, ligne de commande Linux, modèles du module précédent |
 | Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html) |
 | Pour qui | Cœur : rang, communicateur, collective et liaison aux cœurs reviennent dans NCCL, dans PyTorch distribué et dans les journaux de Slurm ; survol possible si vous pratiquez déjà MPI. |
@@ -59,6 +59,7 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 
 -   **Phase 1 — Calcul parallèle et GPU** (semaines 5-9) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
+-   **Prépare** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Slurm, Expérience HPC, Profilage, bancs d'essai, Langage système (Go, Rust, C++), Collectives (NCCL, RCCL, HCCL), Réseau (général), Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
@@ -79,7 +80,7 @@ Onze séances, soit 30 h : sept de 3 h, deux de 2,5 h et deux de 2 h. Le contenu
 | 8 | 2.5 h | 3 | ch. 7 Hybride, placement et lancement sous Slurm | Lab 3.3 partie A |
 | 9 | 3 h | 3 | ch. 8 Étudier le passage à l'échelle | Lab 3.3 partie B |
 | 10 | 2 h | 3 | pratique | Lab 3.3 partie C (la partie D, facultative, est reportée après le module 5) ; Ex. 10, 11 |
-| 11 | 2 h | 3 | checkpoint de sortie | Ex. 7, 12 |
+| 11 | 2 h | 3 | bilan de sortie | Ex. 7, 12 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -96,7 +97,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Si vous survolez, gardez l'étude de passage à l'échelle et la lecture des courbes : le projet 2 la reprend.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1469,7 +1470,7 @@ $8 \times 8 = 64$ cœurs par nœud, et 4 rangs par domaine de 32 cœurs.
 (d) $E \ge 0{,}7$ : $p = 8$ ($E = 0{,}81$) ; $p = 16$ ($E = 0{,}62$) est en dessous du seuil. Ce choix est un compromis (seuil arbitraire) qu'il faut écrire dans le rapport.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

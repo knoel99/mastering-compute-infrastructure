@@ -38,8 +38,8 @@ Les offres se rangent en quelques familles, que l'[analyse du marché](../market
 
 Les compétences de fond sont les mêmes partout, mais leur poids varie. L'[analyse du marché](../market/index.html#regions) le détaille ; retenez-en trois tendances pour orienter votre travail.
 
--   **États-Unis** : flottes géantes, santé matérielle et automatisation de la réparation, réseaux RoCE à grande échelle, accélérateurs de plusieurs fabricants.
--   **Europe** : centres HPC et clouds souverains, Linux et exploitation bare-metal, conformité et sécurité, virtualisation.
+-   **États-Unis** : flottes géantes, santé matérielle et automatisation de la réparation, Slurm et expérience HPC (laboratoires nationaux), observabilité avec Prometheus, cloud hyperscaler.
+-   **Europe** : Kubernetes, sécurité et conformité (clouds souverains, centres publics), automatisation (CI/CD, Terraform), stockage parallèle et virtualisation chez les clouds et les centres HPC.
 -   **Chine** : savoir-faire d'entraînement de grands modèles demandé jusque dans les postes d'exploitation, collectives et RDMA, accélérateurs chinois (Ascend, GPU nationaux), ordonnancement sur Kubernetes plutôt que Slurm.
 
 ## Cinq profils d'entrée {#profils}
@@ -151,7 +151,7 @@ Le niveau visé est celui d'un ingénieur confirmé d'infrastructure de calcul. 
 
 -   **Écart de 2 ou plus** : travaillez le module à fond, avec tous ses labs. C'est là que le parcours vous apporte le plus.
 -   **Écart de 1** : parcours normal, en vous appuyant sur l'existant ; les exemples chiffrés et les labs comblent l'écart.
--   **Écart nul** : survol guidé par les questions de positionnement ; gardez le checkpoint de sortie comme preuve.
+-   **Écart nul** : survol guidé par les questions de positionnement ; gardez le bilan de sortie comme preuve.
 
 Refaites la grille à la fin de chaque phase. L'écart doit diminuer là où vous avez travaillé ; sinon, refaites les labs.
 

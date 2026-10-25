@@ -144,7 +144,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-16-4">Lab 16.4 — Quorum d'un cluster de consensus et exercice de restauration</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -319,7 +319,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>11</td>
 <td>2 h</td>
 <td>3</td>
-<td>Synthèse et checkpoint de sortie</td>
+<td>Synthèse et bilan de sortie</td>
 <td>lab 16.3 (étapes 4 et 5), exercice 9, checkpoint</td>
 </tr>
 </tbody>
@@ -372,7 +372,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Le RFC et la revue d'incident servent au projet 6, quel que soit votre profil.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Trois questions pour situer votre niveau. Répondez sans chercher, puis ouvrez les réponses.</p>
@@ -1211,7 +1211,7 @@ RESTORE DRILL OK</code></pre>
 <li>Presque rien : 37 ko, un seul membre, une machine locale, aucun réseau. La mesure valide la <strong>procédure</strong>, pas sa durée. Le RTO réel comprend la détection, la décision, l'arrêt des serveurs d'API, la copie du snapshot, la restauration de chaque membre à la taille réelle de la base, le redémarrage et la vérification. Mesurez-le sur un environnement jetable de taille réaliste, étape par étape, comme les jalons d'un incident du chapitre 4.</li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux mesurer l'adoption d'une plateforme.</strong> Preuve : les quatre mesures du chapitre 1 calculées sur des données (même synthétiques), avec la loi de Little appliquée à une classe de charge.</li>

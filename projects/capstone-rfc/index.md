@@ -224,6 +224,8 @@ Une file M/M/c reçoit des arrivées de Poisson, sert chaque client en une duré
 
 $$P_{\text{attente}} = \frac{\dfrac{a^{c}}{c!}\cdot\dfrac{c}{c-a}}{\displaystyle\sum_{k=0}^{c-1}\frac{a^{k}}{k!} + \dfrac{a^{c}}{c!}\cdot\dfrac{c}{c-a}}$$
 
+Le [module 15, § 2.4](../../courses/finops-capacity/index.html#ch2) écrit la même formule avec $a = c\rho$, où $\rho = \lambda/(c\mu)$ est la charge par serveur : le facteur $c/(c-a)$ y devient $1/(1-\rho)$.
+
 La queue de l'attente est exponentielle, d'où l'attente moyenne et le 90e centile :
 
 $$W_q = \frac{P_{\text{attente}}}{c\mu - \lambda}, \qquad t_{90} = \frac{\ln\bigl(P_{\text{attente}}/0{,}1\bigr)}{c\mu - \lambda} \ \text{si } P_{\text{attente}} > 0{,}1, \text{ sinon } 0$$

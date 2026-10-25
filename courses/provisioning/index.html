@@ -145,7 +145,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-6-4">Lab 6.4 — Supervision hors bande avec Redfish</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -369,7 +369,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> La recette des nœuds et les contrôles de santé matérielle sont demandés par la plupart des offres de flotte GPU : faites-en les labs même en survol.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et le chapitre 6.</p>
@@ -1523,7 +1523,7 @@ verdict            : 1 of 4 group(s) ready for VFIO</code></pre>
 <li><p>Le tableau du §9.6 sur une VM de chaque unité, avec, pour les unités avec carte, <code>GDRDMA</code> dans le journal NCCL et un <code>ib_write_bw --use_cuda</code> comparable au chemin par la mémoire de l'hôte. Rien de cela n'est exécuté dans le bac à sable : la sortie vient de la section A de <code>virt-checks/verify.sh</code>.</p></li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux décrire la chaîne de démarrage d'un nœud et la dépanner.</strong> Preuve : le schéma du chapitre 2 refait de mémoire, avec la panne probable à chaque étape, et l'exercice 2.</li>

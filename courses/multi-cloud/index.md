@@ -76,7 +76,7 @@ Dix séances, soit 28 h : sept de 3 h, deux de 2,5 h et une de 2 h. Le niveau 2 
 | 7 | 3 h | 3 | Séance de lab | Lab 13.1 partie B : politiques, balayage, critère (3 h) |
 | 8 | 3 h | 3 | ch. 7 Centres publics (1,5 h) | Ex. 6, 9, 10, 5 (1,5 h) |
 | 9 | 3 h | 3 | ch. 8 Gouvernance (1 h) | Lab 13.2 partie B : résidence et jobs étendus (1 h) ; Ex. 11 (1 h) |
-| 10 | 2.5 h | 3 | Synthèse et checkpoint de sortie | Ex. 8, 12, 2 (2,5 h) |
+| 10 | 2.5 h | 3 | Synthèse et bilan de sortie | Ex. 8, 12, 2 (2,5 h) |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -93,7 +93,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** La comparaison chiffrée d'offres de capacité et la reprise d'un job d'un fournisseur à l'autre servent au projet 4.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1119,7 +1119,7 @@ Pour la bascule, les candidats restent trois, mais la liste est plus étroite : 
 Architecture : réplication continue du jeu de données vers un stockage neutre à sortie gratuite, ce qui amène le cas (c) ; ordre de reprise par priorité pour étaler les 1,24 h de copie ; plafond du nombre de transferts simultanés ; vérification que les images sont publiées chez le fournisseur B ; et un exercice de bascule régulier, comme un jeu de chaos. La liaison partagée est le goulot : la quarantième reprise attend la fin des 39 autres copies si on les sérialise.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

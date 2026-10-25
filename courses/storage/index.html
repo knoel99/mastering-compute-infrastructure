@@ -149,7 +149,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-8-4">Lab 8.4 — Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>8</td>
 <td>3 h</td>
 <td>3</td>
-<td>ch. 8 Capacité, durée de vie, coût ; checkpoint de sortie</td>
+<td>ch. 8 Capacité, durée de vie, coût ; bilan de sortie</td>
 <td>Ex. 10, 11, 12</td>
 </tr>
 </tbody>
@@ -359,7 +359,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Le dimensionnement des E/S de checkpoint relie ce module aux modules 9 et 10 : ne le sautez pas.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.</p>
@@ -1500,7 +1500,7 @@ Taux de succès selon la taille relative du cache pour des époques en ordre al�
 <li><p>Tout au prix chaud <span class="math inline">p</span>, y compris le niveau durable des checkpoints (une simplification) : <span class="math inline">22{,}54 + 20 + 2 + 60 = 104{,}54</span> To × <span class="math inline">p</span>. Avec le brut au quart du prix : <span class="math inline">44{,}54 + 15 = 59{,}54</span> To × <span class="math inline">p</span>, soit 43 % de moins. Le quart est une hypothèse. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e12.*</code>).</p></li>
 </ol>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux estimer le débit de lecture et le débit de checkpoint d'un entraînement.</strong> Preuve : les exercices 1 et 2 refaits avec les chiffres de votre cluster, via <code>iosizing.py</code>.</li>

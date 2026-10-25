@@ -77,7 +77,7 @@ Dix séances, soit 28 h : six de 3 h et quatre de 2,5 h. Le niveau ne diminue ja
 | 7 | 2.5 h | 3 | ch. 5 Détection | Ex. 7 |
 | 8 | 3 h | 3 | ch. 6 Reprise et élasticité | Lab 10.3 ; Ex. 5, 10 |
 | 9 | 3 h | 3 | ch. 7 Erreurs GPU courantes | Ex. 8, 9 |
-| 10 | 2.5 h | 3 | ch. 8 Chaos et procédures, synthèse | Ex. 11 ; checkpoint de sortie ; démarrage du Projet 3 |
+| 10 | 2.5 h | 3 | ch. 8 Chaos et procédures, synthèse | Ex. 11 ; bilan de sortie ; démarrage du Projet 3 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -94,7 +94,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le modèle de Young et Daly et la détection des blocages reviennent dans les projets 3, 4 et 5.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1244,7 +1244,7 @@ def save_atomic(state, path):
 Cette version corrige (1) et (3). Il reste (2) et (4), et la complétude (5) : passez à un répertoire par pas avec manifeste d'empreintes et rotation, comme `ckpt.py` du lab 10.2.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

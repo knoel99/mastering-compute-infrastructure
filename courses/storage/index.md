@@ -78,7 +78,7 @@ Huit séances de 3 h, soit 24 h. Chaque séance contient ses chapitres, son lab 
 | 5 | 3 h | 2 | révision des chapitres 4 et 5 | Lab 8.1 ; Ex. 8 |
 | 6 | 3 h | 2 | ch. 6 E/S de checkpoint | Lab 8.3 parties A, B et D ; Ex. 9 |
 | 7 | 3 h | 3 | ch. 7 Mise en cache | Lab 8.3 partie C ; Lab 8.4 partie B |
-| 8 | 3 h | 3 | ch. 8 Capacité, durée de vie, coût ; checkpoint de sortie | Ex. 10, 11, 12 |
+| 8 | 3 h | 3 | ch. 8 Capacité, durée de vie, coût ; bilan de sortie | Ex. 10, 11, 12 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -95,7 +95,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le dimensionnement des E/S de checkpoint relie ce module aux modules 9 et 10 : ne le sautez pas.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1387,7 +1387,7 @@ Avec `loader_lab.diagnose(stall, util, workers, cores=32)` : 0 worker, chargemen
 (e) Tout au prix chaud $p$, y compris le niveau durable des checkpoints (une simplification) : $22{,}54 + 20 + 2 + 60 = 104{,}54$ To × $p$. Avec le brut au quart du prix : $44{,}54 + 15 = 59{,}54$ To × $p$, soit 43 % de moins. Le quart est une hypothèse. Commande : `python3 iosizing.py exercises` (valeurs `e12.*`).
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

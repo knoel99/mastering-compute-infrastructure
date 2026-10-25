@@ -80,7 +80,7 @@ Onze séances, soit 30,5 h : sept de 3 h, trois de 2,5 h et une de 2 h. Chaque s
 | 8 | 3 h | 3 | ch. 7 Hétérogénéité (0,75 h) | Lab 11.2 partie A, fin (0,5 h), puis partie B, acteurs Ray réels (1,75 h) |
 | 9 | 3 h | 3 | ch. 8 Kubernetes, Slurm, observabilité, alternatives (0,75 h) | Lab 11.2 partie B, suite (2,25 h) |
 | 10 | 2.5 h | 3 | ch. 9 Inférence : moteurs, cache KV, batching continu (1,25 h) | Lab 11.4, batching simulé (0,5 h) ; Ex. 13, 14 (0,75 h) |
-| 11 | 2.5 h | 3 | Checkpoint de sortie (0,5 h) | Ex. 9, 10 (1 h) ; Ex. 11, 12 (1 h) |
+| 11 | 2.5 h | 3 | Bilan de sortie (0,5 h) | Ex. 9, 10 (1 h) ; Ex. 11, 12 (1 h) |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -97,7 +97,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Les boucles acteur-apprenant et leur dimensionnement sont nouveaux pour presque tous les profils.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1269,7 +1269,7 @@ Augmenter `--max-num-seqs` n'aide pas : la limite est le cache, pas le nombre de
 Mettez le moteur de rollouts en veille de niveau 1 plutôt que de le détruire. À son retour, il recopie ses poids depuis la mémoire CPU, 0,66 s à 25 Go/s (hypothèse), au lieu des 68 s d'un démarrage à froid. Toutes les valeurs de trafic et de durée sont des hypothèses d'exemple.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

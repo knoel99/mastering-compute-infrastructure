@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-2-3">Lab 2.3 — Un calculateur de MFU testé</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -287,7 +287,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>8</td>
 <td>3 h</td>
 <td>3</td>
-<td>ch. 8 Études de passage à l'échelle ; checkpoint de sortie</td>
+<td>ch. 8 Études de passage à l'échelle ; bilan de sortie</td>
 <td>Ex. 11 ; lab 2.3 (étapes 4 et 5) ; lecture du cahier des charges du Projet 2 (il se fait en phase 3)</td>
 </tr>
 </tbody>
@@ -340,7 +340,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> Le roofline, le modèle α-β et le MFU reviennent dans les modules 3, 4, 7, 9 et 15 : ne les survolez pas, même si les formules vous sont familières.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si les trois vous paraissent routinières, parcourez les exercices ★★★ et passez directement au module suivant.</p>
@@ -1073,7 +1073,7 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <p>Sans recouvrement, la communication s'ajoute au calcul. Avec recouvrement, elle disparaît tant qu'elle reste plus courte que la passe arrière, environ deux tiers du calcul, soit 4,7 s. À 40 Go/s elle est cachée avec de la marge. À 12,5 Go/s elle l'est encore sur le papier, mais avec peu de marge si le recouvrement est imparfait.</p>
 <p>Limite importante : en entraînement complet, ce modèle occupe 112 Go d'états (chapitre 7). Il ne tient donc pas sur un GPU de 80 Go en DDP pur. L'exercice isole la communication ; le choix réel du parallélisme est l'objet du module 9. Les bandes passantes sont des hypothèses : il faut les mesurer.</p>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux situer un noyau sur un roofline.</strong> Preuve : le roofline de votre machine (lab 2.1) et l'intensité de trois noyaux placés dessus.</li>

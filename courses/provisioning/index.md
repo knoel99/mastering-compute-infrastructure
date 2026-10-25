@@ -97,7 +97,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** La recette des nœuds et les contrôles de santé matérielle sont demandés par la plupart des offres de flotte GPU : faites-en les labs même en survol.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1369,7 +1369,7 @@ Activer l'ACS, si le matériel le permet (contrôle : `lspci -vvv | grep ACSCtl`
 (d) Le tableau du §9.6 sur une VM de chaque unité, avec, pour les unités avec carte, `GDRDMA` dans le journal NCCL et un `ib_write_bw --use_cuda` comparable au chemin par la mémoire de l'hôte. Rien de cela n'est exécuté dans le bac à sable : la sortie vient de la section A de `virt-checks/verify.sh`.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

@@ -144,7 +144,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#lab-13-3">Lab 13.3 — Coût réel d'un déménagement de données</a></li>
 </ul></li>
 <li><a href="#ex">Exercices</a></li>
-<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#exit">Bilan de sortie</a></li>
 <li><a href="#refs">Lectures et références</a></li>
 <li><a href="#sources">Sources et portée</a>
 <ul>
@@ -314,7 +314,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>10</td>
 <td>2.5 h</td>
 <td>3</td>
-<td>Synthèse et checkpoint de sortie</td>
+<td>Synthèse et bilan de sortie</td>
 <td>Ex. 8, 12, 2 (2,5 h)</td>
 </tr>
 </tbody>
@@ -367,7 +367,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>À ne pas survoler.</strong> La comparaison chiffrée d'offres de capacité et la reprise d'un job d'un fournisseur à l'autre servent au projet 4.</p>
-<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
 <h2 id="avant">0. Avant de commencer</h2>
 <h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.</p>
@@ -1426,7 +1426,7 @@ job-eu.yaml: 0 error(s), 1 warning(s)</code></pre>
 </ol>
 <p>Architecture : réplication continue du jeu de données vers un stockage neutre à sortie gratuite, ce qui amène le cas (c) ; ordre de reprise par priorité pour étaler les 1,24 h de copie ; plafond du nombre de transferts simultanés ; vérification que les images sont publiées chez le fournisseur B ; et un exercice de bascule régulier, comme un jeu de chaos. La liaison partagée est le goulot : la quarantième reprise attend la fin des 39 autres copies si on les sérialise.</p>
 </details>
-<h2 id="exit">Checkpoint de sortie</h2>
+<h2 id="exit">Bilan de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux classer une offre de calcul et la comparer à une autre.</strong> Preuve : deux fiches de douze lignes (section 1.5), datées et sourcées, pour deux fournisseurs de votre choix.</li>

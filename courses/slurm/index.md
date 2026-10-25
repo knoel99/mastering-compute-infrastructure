@@ -78,7 +78,7 @@ Douze séances, soit 32 h : huit de 3 h et quatre de 2 h. Le niveau ne diminue j
 | 9 | 3 h | 3 | ch. 7 Santé des nœuds | Lab 5.3 partie A |
 | 10 | 3 h | 3 | ch. 7 suite, ch. 8 Conteneurs | Lab 5.3 partie B ; Ex. 10 |
 | 11 | 3 h | 3 | ch. 8 Slurm sur Kubernetes, synthèse | Ex. 11 |
-| 12 | 2 h | 3 | Checkpoint de sortie, démarrage du Projet 1 | |
+| 12 | 2 h | 3 | Bilan de sortie, démarrage du Projet 1 | |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -95,7 +95,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** La politique d'équité, la préemption et la santé des nœuds sont ce que les offres d'exploitation demandent au-delà de l'usage de sbatch.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1063,7 +1063,7 @@ Il n'y a pas de réponse unique ; voici une réponse défendable.
 Une bonne réponse nomme le coût caché de chaque choix.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

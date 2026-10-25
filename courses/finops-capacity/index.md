@@ -41,6 +41,7 @@ Ce module est le volet technique de l'achat de calcul. Il part de l'utilisation 
 | Livrable | un modèle de coût total testé, un plan de capacité chiffré avec ses risques et une revue de contrat appliquée à un contrat fictif |
 | Environnement | un portable CPU suffit ; aucun GPU ni compte cloud. Un Slurm réel est optionnel (lab 15.1, branche « live ») |
 | Projets liés | [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
+
 ### Ce que vous saurez vérifier {#acquis}
 
 -   Exprimer un coût en GPU-heure disponible, allouée et utile, et le convertir en coût par token ou par expérience (chapitres 1 et 2).
@@ -75,7 +76,7 @@ Neuf séances, soit 24 h : six de 2,5 h et trois de 3 h. Le niveau 1 correspond 
 | 6 | 2.5 h | 2 | ch. 5 Énergie et datacenter | Ex. 8, 9 |
 | 7 | 2.5 h | 2 | ch. 6 Lire un contrat de capacité | Lab 15.4 ; Ex. 10 |
 | 8 | 3 h | 3 | ch. 7 Négocier | Ex. 11, 12 |
-| 9 | 2.5 h | 3 | ch. 8 Matrices de décision, appel d'offres, pilotage ; checkpoint de sortie | Ex. 13 ; lecture du cahier des charges du Projet 6 (phase 5, avec le module 16) |
+| 9 | 2.5 h | 3 | ch. 8 Matrices de décision, appel d'offres, pilotage ; bilan de sortie | Ex. 13 ; lecture du cahier des charges du Projet 6 (phase 5, avec le module 16) |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -92,7 +93,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** La prévision de demande et le coût par GPU-heure productive sont demandés par les offres de capacité et de direction.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -149,7 +150,7 @@ $$c_{\text{utile}} = \frac{c_{\text{dispo}}}{a \times g}$$
 
 C'est la formule de la question 1 de « Avant de commencer » : avec $a = 0{,}55$ et $g = 0{,}9$, un coût de 2,08 u devient 4,20 u. Les régimes à la demande se paient seulement quand on alloue : leur coût par heure utile vaut $c/g$, indépendamment de $a$ (chapitre 4).
 
-Les rapports d'ordonnanceur, les labs (`utilization`) et la prose de ce module appellent aussi $a$ « utilisation ». Ce n'est pas l'activité des GPU alloués que mesure DCGM, notée $u$ au [module 12](../kubernetes-gpu/index.html#ch8) : celle-ci n'est qu'un indice, alors que $g$ compte le progrès conservé. Le « u » des montants, lui, est l'unité monétaire fictive.
+Les rapports d'ordonnanceur, les labs (`utilization`) et la prose de ce module appellent aussi $a$ « utilisation ». Ce n'est pas l'activité des GPU alloués que mesure DCGM, notée $u$ au [module 12, §8.4](../kubernetes-gpu/index.html#les-coûts) : celle-ci n'est qu'un indice, alors que $g$ compte le progrès conservé. Le « u » des montants, lui, est l'unité monétaire fictive.
 
 Les équipes ne raisonnent pas en GPU-heures mais en unités métier. La Fondation propose, dans son document sur l'IA, des indicateurs comme le coût par inférence, le coût par token ($\text{coût total} / \text{tokens}$) et l'efficacité d'utilisation des ressources (utilisation réelle sur capacité provisionnée). Pour l'entraînement, le chapitre 7 du module 2 donne le pont : $6N$ FLOP par token pour un modèle de $N$ paramètres, soit $6ND$ pour $D$ tokens.
 
@@ -247,7 +248,7 @@ L'ETTR joue le rôle d'un goodput par job (notre $g$ l'égale quand l'attente es
 L'article de Llama 3 rapporte, lui, plus de 90 % de « temps d'entraînement effectif » pendant l'entraînement du modèle de 405 milliards de paramètres, tout en acceptant une maintenance automatisée du cluster. Sur 54 jours, l'équipe a compté 466 interruptions de jobs, dont 419 inattendues (Dubey et al., 2024).
 
 ::: war
-[419 interruptions imprévues en 54 jours]{.tag} Selon le tableau 5 de [l'article de Llama 3](https://arxiv.org/abs/2407.21783), environ 78 % des interruptions inattendues sont attribuées à des problèmes matériels confirmés ou suspectés, sur une période de pré-entraînement du modèle de 405 milliards de paramètres. Le goodput est donc un chiffre d'exploitation, pas une propriété du code : il dépend de la fiabilité du matériel, de l'automatisation des reprises et du coût des checkpoints ([module 10](../fault-tolerance/index.html#ch2) et projet [Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html)).
+[419 interruptions imprévues en 54 jours]{.tag} Selon le tableau 5 de [l'article de Llama 3](https://arxiv.org/abs/2407.21783), environ 78 % des interruptions inattendues sont attribuées à des problèmes matériels confirmés ou suspectés, sur une période de pré-entraînement du modèle de 405 milliards de paramètres. Le goodput est donc un chiffre d'exploitation, pas une propriété du code : il dépend de la fiabilité du matériel, de l'automatisation des reprises et du coût des checkpoints ([module 10, chapitre 2](../fault-tolerance/index.html#ch2), appliqué au [projet 3](../../projects/resilient-trainer/index.html)).
 :::
 
 D'autres pertes sont moins spectaculaires. Hu et al. (2024) ont analysé les traces d'un centre de données qui développe des grands modèles de langage. Pour un job d'évaluation sur le jeu HumanEval, ils mesurent que 29,5 % du temps passent à charger le modèle et à préparer les données, et 19,0 % de plus à exécuter des tests de correction de programmes : environ la moitié du temps seulement est consacrée à l'inférence sur GPU.
@@ -499,7 +500,7 @@ Chaque régime se ramène au coût par heure utile, avec $a$ l'allocation et $g$
 | À la demande | tarif / $g$ |
 | Spot | tarif / $\bigl(g \cdot (1 - W)\bigr)$ |
 
-Pour le spot, $W$ est la part de temps perdue à cause des interruptions. Au premier ordre et avec le meilleur intervalle de checkpoint, le modèle de Young et Daly ([module 10, chapitre 2](../fault-tolerance/index.html#ch2), appliqué au projet 3) donne :
+Pour le spot, $W$ est la part de temps perdue à cause des interruptions. Au premier ordre et avec le meilleur intervalle de checkpoint, le modèle de Young et Daly ([module 10, chapitre 2](../fault-tolerance/index.html#ch2), appliqué au [projet 3](../../projects/resilient-trainer/index.html)) donne :
 
 $$W = \sqrt{\frac{2C}{M}} + \frac{R}{M}$$
 
@@ -517,7 +518,7 @@ Pour un checkpoint de 3 minutes et un redémarrage de 10 minutes, la perte vaut 
 | 0,7 | 3,31 | 4,13 | 5,08 | 4,44 | 1,93 |
 | 0,9 | 2,59 | 3,21 | 3,95 | 4,44 | 1,93 |
 
-Le parc possédé bat la demande à partir d'une allocation $a^{*} = 0{,}516$ (indépendante de $g$ : il se simplifie ; le lab l'affiche `u*`). La location à 2,6 u bat la demande à 4,0 u à partir de $r/o = 0{,}65$, et la réservation à 3,2 u à partir de 0,80. À 30 % d'allocation, le parc possédé coûte 1,7 fois la demande ; à 90 %, il coûte 42 % de moins.
+Le parc possédé bat la demande à partir d'une allocation $a^{*} = 0{,}516$ (indépendante de $g$, qui se simplifie). La location à 2,6 u bat la demande à 4,0 u à partir de $r/o = 0{,}65$, et la réservation à 3,2 u à partir de 0,80. À 30 % d'allocation, le parc possédé coûte 1,7 fois la demande ; à 90 %, il coûte 42 % de moins.
 :::
 
 <figure class="fig">
@@ -1036,7 +1037,7 @@ export PYTHON="$(command -v python)"
 5.  Remplacez trois valeurs de `assumptions.yaml` par des devis datés et sourcés, relancez, et notez le déplacement du point mort.
 6.  Exécutez l'exemple de `decision_matrix.py` du chapitre 8 avec vos propres notes.
 
-**Critère de réussite.** `bash verify.sh` affiche `breakeven owned vs on_demand   : u* = 0.516` et « ok: tco-model reference passes, starter fails as intended ».
+**Critère de réussite.** `bash verify.sh` affiche `breakeven owned vs on_demand   : a* = 0.516` et « ok: tco-model reference passes, starter fails as intended ».
 
 **Statut de vérification.** Deux exécutions réussies de `verify.sh` (24 tests verts pour la référence, 18 rouges au départ). Les prix sont fictifs ; le modèle ignore taxes, inflation, remises de volume, limites de capacité et délais.
 
@@ -1280,7 +1281,7 @@ Totaux : achat 4,67 ; location 5,83 ; réservé 6,25 ; demande et spot 6,33. La 
 Conclusion : l'écart de 0,08 point ne fait pas une décision. Remplacez les notes subjectives par des mesures, ou retenez un mélange (socle réservé, pointes à la demande) au lieu d'un gagnant.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

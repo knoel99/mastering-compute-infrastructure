@@ -118,7 +118,7 @@ def main(argv=None):
         # a break-even exists against pay-per-use options only: two fixed-cost options keep the same ranking at any utilization
         out["breakeven"] = {v: breakeven_utilization(a, "owned", v, args.goodput) for v in PAY_PER_USE}
         mid = args.utilization[len(args.utilization) // 2]
-        out["yearly_per_gpu"] = {"owned (u=%.2f)" % mid: sum(owned_components(a, mid).values())}
+        out["yearly_per_gpu"] = {"owned (a=%.2f)" % mid: sum(owned_components(a, mid).values())}
         out["yearly_per_gpu"].update({k: v["u_per_gpu_hour"] * HOURS for k, v in a["committed"].items()})
     if args.sensitivity:
         out["sensitivity"] = sensitivity(a, args.utilization[len(args.utilization) // 2], args.goodput)
@@ -133,11 +133,11 @@ def main(argv=None):
         print("%6.2f " % r["utilization"] + " ".join("%12.2f" % r["costs"][n] for n in names) + "  " + r["best"])
     if args.breakeven:
         for v, u in out["breakeven"].items():
-            print("breakeven owned vs %-12s: %s" % (v, "never" if u is None else "u* = %.3f" % u))
+            print("breakeven owned vs %-12s: %s" % (v, "never" if u is None else "a* = %.3f" % u))
         for k, v in out["yearly_per_gpu"].items():
             print("yearly cost per GPU, %-18s: %9.0f" % (k, v))
     if args.sensitivity:
-        print("sensitivity of the owned cost (+/-20%%) at u=%.2f" % args.utilization[len(args.utilization) // 2])
+        print("sensitivity of the owned cost (+/-20%%) at a=%.2f" % args.utilization[len(args.utilization) // 2])
         for r in out["sensitivity"]:
             print("  %-40s %8.2f .. %8.2f  swing %.2f" % (r["param"], r["low"], r["high"], r["swing"]))
     return 0

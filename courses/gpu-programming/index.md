@@ -80,7 +80,7 @@ Onze séances, 32,5 h au total. Le niveau 1 correspond aux fondations, le niveau
 | 8 | 3 h | 3 | ch. 7 Profiler (1,5 h) | Lab 4.4 partie A : profil CPU (1,5 h) |
 | 9 | 3 h | 3 | consolidation du chapitre 7 (pas de nouvelle lecture) | Lab 4.4 partie B : traces de type GPU (1,5 h) ; Ex. 8 (0,75 h) et Ex. 6 (0,75 h) |
 | 10 | 3 h | 3 | ch. 8 Techniques d'accélération (1 h) | Ex. 9 et Ex. 10 (1 h chacun) |
-| 11 | 2.5 h | 3 | ch. 9 Au-delà de NVIDIA (1,25 h) | Ex. 11 et Ex. 12 (1,25 h) ; checkpoint de sortie |
+| 11 | 2.5 h | 3 | ch. 9 Au-delà de NVIDIA (1,25 h) | Ex. 11 et Ex. 12 (1,25 h) ; bilan de sortie |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -97,7 +97,7 @@ Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de
 
 **À ne pas survoler.** Le profilage et la lecture de traces servent à tous les profils, y compris si vous n'écrirez jamais de noyau.
 
-**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le bilan de sortie : une capacité compte quand sa preuve existe.
 <!-- /gen:travailler -->
 
 ## 0. Avant de commencer {#avant}
@@ -1437,7 +1437,7 @@ $$2 \times 8192 \times 4096 \times 2 = 134\,217\,728 \text{ octets} = 134{,}2 \t
 (d) La liste de contrôle du § 9.6 (image reproductible, *device plugin* ou DRA, collectives testées, santé branchée sur l'observabilité, aucune hypothèse de `warpSize` ou d'API CUDA), plus une validation numérique (précision, TF32) et un profil mesuré sur le nouveau matériel avant la mise en production.
 :::
 
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 

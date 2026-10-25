@@ -50,7 +50,7 @@ labs:
 ## Labs {#labs}
 ### Lab N.1 — Titre {#lab-N-1}           (puis le bloc ::: lab, sans titre dans le bloc)
 ## Exercices {#ex}
-## Checkpoint de sortie {#exit}
+## Bilan de sortie {#exit}
 ## Lectures et références {#refs}
 ## Sources et portée {#sources}
 ### Documenté {#documente} · ### Recommandé {#recommande} · ### À vérifier {#a-verifier} · ### Hors périmètre {#hors-perimetre}
@@ -96,7 +96,7 @@ La structure suit celle des pages de cours de `polytechnique-llga` et de `master
 - Variété obligatoire : calcul chiffré, lecture de log ou de sortie de commande, diagnostic de panne, conception/dimensionnement, comparaison d'options avec arbitrage chiffré.
 - Chaque corrigé est **vérifié** (le calcul a été refait en Python ou à la main, la commande a été exécutée ou lue dans la documentation officielle).
 
-## 7. Checkpoint de sortie
+## 7. Bilan de sortie
 
 5 à 8 capacités formulées « Je peux… » avec la **preuve attendue** (un artefact à produire ou une explication à fournir) et 3 questions d'entretien de type « compute infrastructure engineer » avec une réponse-type.
 
