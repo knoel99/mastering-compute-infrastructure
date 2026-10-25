@@ -3,37 +3,37 @@
   {
    "n": 0,
    "title": "Fondations : machines et performance",
-   "weeks_hint": "semaines 1-5",
+   "weeks_hint": "semaines 1-4",
    "goal": "Lire une machine et prédire sa performance avant de la mesurer."
   },
   {
    "n": 1,
    "title": "Calcul parallèle et GPU",
-   "weeks_hint": "semaines 6-11",
+   "weeks_hint": "semaines 5-9",
    "goal": "Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU."
   },
   {
    "n": 2,
    "title": "Exploiter un cluster",
-   "weeks_hint": "semaines 12-22",
+   "weeks_hint": "semaines 10-20",
    "goal": "Provisionner, ordonnancer, relier et alimenter en données un cluster GPU."
   },
   {
    "n": 3,
    "title": "Systèmes d'entraînement distribué",
-   "weeks_hint": "semaines 23-31",
+   "weeks_hint": "semaines 21-32",
    "goal": "Faire tourner un entraînement multi-nœuds qui survit aux pannes."
   },
   {
    "n": 4,
    "title": "Plateforme cloud-native et multi-fournisseurs",
-   "weeks_hint": "semaines 32-41",
+   "weeks_hint": "semaines 33-44",
    "goal": "Placer, observer et facturer des charges sur plusieurs fournisseurs."
   },
   {
    "n": 5,
    "title": "Production et leadership",
-   "weeks_hint": "semaines 42-48",
+   "weeks_hint": "semaines 45-50",
    "goal": "Opérer en production, décider, négocier, diriger et passer l'entretien."
   }
  ],
@@ -75,25 +75,25 @@
      "id": "psi-triage",
      "title": "Triage avec la méthode USE et la pression PSI",
      "kind": "sandbox",
-     "idea": "Triage avec la méthode USE et la pression PSI"
+     "idea": "Deux instantanés du noyau à quelques secondes d'écart : utilisation et saturation du processeur, de la mémoire et du disque (/proc/stat, PSI, diskstats), et un verdict de triage selon la méthode USE."
     },
     {
      "id": "pagecache",
      "title": "Page cache : mesurer ce qui touche le disque",
      "kind": "sandbox",
-     "idea": "Page cache : mesurer ce qui touche le disque"
+     "idea": "Écrire puis relire un fichier à froid, à chaud et en O_DIRECT, en suivant trois compteurs du noyau (pages sales, pages résidentes, octets lus sur le périphérique)."
     },
     {
      "id": "cgroup-limits",
      "title": "cgroups : limite mémoire, mise à mort, quota de processeur",
      "kind": "sandbox",
-     "idea": "Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire."
+     "idea": "Créer un cgroup jetable, provoquer une mise à mort par dépassement de mémoire (statut 137, compteur oom_kill) et mesurer la part de processeur sous un quota ; le script détecte cgroups v1 ou v2 et dit quelle branche a tourné."
     },
     {
      "id": "ops-script",
      "title": "Un script d'exploitation idempotent",
      "kind": "sandbox",
-     "idea": "Un script d'exploitation idempotent"
+     "idea": "Un script qui règle un paramètre du noyau sans le dupliquer, avec réécriture atomique, mode simulation et codes de retour exploitables par un appelant."
     }
    ],
    "facts": [
@@ -137,7 +137,7 @@
     "Le modèle roofline : intensité arithmétique, bornes mémoire et calcul, lecture de profils",
     "Passage à l'échelle : loi d'Amdahl, loi de Gustafson, scalabilité forte et faible, efficacité parallèle",
     "Le modèle de communication α-β (Hockney) et les collectives : arbre, anneau, bande passante optimale",
-    "FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres/optimiseur/activations",
+    "FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres et de l'optimiseur",
     "Études de passage à l'échelle reproductibles : plan d'expérience, tracé, rapport honnête"
    ],
    "labs": [
@@ -151,7 +151,7 @@
      "id": "allreduce-model",
      "title": "α-β : prédire puis mesurer",
      "kind": "sandbox",
-     "idea": "Avec torch.distributed gloo sur 4 processus : mesurer des all-reduce de tailles variées, ajuster α et β par régression, comparer la prédiction du modèle en anneau."
+     "idea": "Avec torch.distributed gloo sur 4 processus : mesurer des all-reduce de tailles variées, ajuster α et B par régression, comparer la prédiction du modèle en anneau."
     },
     {
      "id": "mfu-calculator",
@@ -281,7 +281,7 @@
      "id": "warp-memory-model",
      "title": "Le warp et la mémoire, en modèle",
      "kind": "sandbox",
-     "idea": "Le warp et la mémoire, en modèle"
+     "idea": "Modéliser en Python la coalescence, les conflits de bancs et la divergence d'un warp à partir de la documentation NVIDIA, puis réécrire le modèle et le valider par des tests ; aucun GPU requis."
     },
     {
      "id": "numba-cuda-sim",
@@ -354,7 +354,7 @@
      "id": "slurm-sandbox",
      "title": "Un Slurm réel dans le bac à sable",
      "kind": "sandbox",
-     "idea": "Installer munge, MariaDB, slurmdbd et slurmctld/slurmd sur une seule machine (apt, Slurm 23.11), créer comptes et QOS, soumettre des jobs. Constat de départ : sans base de comptabilité, les jobs restent en InvalidAccount ; documenter la solution (slurmdbd) et fournir un script d'installation reproductible."
+     "idea": "Installer munge, MariaDB, slurmdbd et slurmctld/slurmd sur une seule machine (apt, Slurm 23.11), créer comptes et QOS, soumettre des jobs. Constat de départ : avec AccountingStorageEnforce et sans association, sbatch refuse le job ; script d'installation reproductible fourni."
     },
     {
      "id": "fairshare-qos",
@@ -398,7 +398,8 @@
    "title": "Provisioning, images et santé des nœuds GPU",
    "summary": "Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette, supervision matérielle et virtualisation multi-locataire.",
    "prerequisites": [
-    "linux-systems"
+    "linux-systems",
+    "slurm"
    ],
    "outcomes": [
     "Décrire la chaîne PXE → image → configuration → enregistrement dans l'ordonnanceur",
@@ -441,7 +442,7 @@
      "id": "redfish-oob",
      "title": "Supervision hors bande avec Redfish",
      "kind": "sandbox",
-     "idea": "Supervision hors bande avec Redfish"
+     "idea": "Un client Redfish contre un contrôleur de carte mère simulé : lire l'état de santé, décider (surveiller, drainer) et demander un redémarrage dans les limites annoncées par le contrôleur."
     }
    ],
    "facts": [
@@ -474,7 +475,8 @@
    "summary": "Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.",
    "prerequisites": [
     "linux-systems",
-    "perf-models"
+    "perf-models",
+    "slurm"
    ],
    "outcomes": [
     "Comparer InfiniBand et RoCE (contrôle de congestion, perte, configuration) et choisir selon le besoin",
@@ -541,7 +543,8 @@
    "title": "Stockage et E/S pour l'entraînement",
    "summary": "Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.",
    "prerequisites": [
-    "linux-systems"
+    "linux-systems",
+    "perf-models"
    ],
    "outcomes": [
     "Choisir entre système de fichiers parallèle, NFS et stockage objet pour un usage donné",
@@ -582,7 +585,7 @@
      "id": "io-sizing",
      "title": "Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité",
      "kind": "sandbox",
-     "idea": "Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité"
+     "idea": "Les formules du module sous forme de fonctions testées : débit de lecture, checkpoint, striping, requêtes, cache et capacité, à refaire avec vos propres chiffres."
     }
    ],
    "facts": [
@@ -602,7 +605,8 @@
     "ml": "B",
     "logiciel": "A",
     "etudiant": "A"
-   }
+   },
+   "prerequisites_note": "en particulier le chapitre 7 du module 1 (cache de pages et `fio`)"
   },
   {
    "id": "distributed-training",
@@ -658,7 +662,7 @@
      "id": "parallelism-planner",
      "title": "Un planificateur de parallélisme testé",
      "kind": "sandbox",
-     "idea": "Un planificateur de parallélisme testé"
+     "idea": "Un calculateur de mémoire et de communication pour choisir le parallélisme tensoriel, pipeline et de données et l'étape ZeRO, chaque formule citant sa source ; c'est un modèle, pas une mesure."
     }
    ],
    "facts": [
@@ -694,7 +698,8 @@
    "summary": "À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.",
    "prerequisites": [
     "distributed-training",
-    "storage"
+    "storage",
+    "slurm"
    ],
    "outcomes": [
     "Modéliser la fiabilité d'un job (MTBF d'un cluster, temps perdu, intervalle de checkpoint optimal)",
@@ -769,7 +774,8 @@
     "Concevoir une architecture acteur-apprenant avec synchronisation de politique et tampon de rejeu",
     "Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)",
     "Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte",
-    "Dimensionner le cache KV d'un moteur d'inférence à partir du `config.json` d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement"
+    "Dimensionner le cache KV d'un moteur d'inférence à partir du `config.json` d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement",
+    "Déployer un cluster Ray sur Kubernetes avec KubeRay"
    ],
    "chapters": [
     "Pourquoi un framework distribué général : tâches, acteurs, ressources, ordonnancement dans Ray",
@@ -838,12 +844,13 @@
    "summary": "Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.",
    "prerequisites": [
     "linux-systems",
-    "slurm"
+    "slurm",
+    "distributed-training"
    ],
    "outcomes": [
     "Exposer des GPU à des pods (device plugin, GPU Operator, MIG, time-slicing) et en comprendre les limites",
     "Mettre en place files d'attente et gang scheduling (Kueue ou Volcano) avec quotas et préemption",
-    "Lancer un entraînement multi-nœuds avec JobSet/Kubeflow Trainer et un cluster Ray avec KubeRay",
+    "Lancer un entraînement multi-nœuds avec un Job indexé, JobSet ou Kubeflow Trainer",
     "Choisir Slurm, Kubernetes ou les deux (Slurm sur Kubernetes) selon l'équipe et la charge"
    ],
    "chapters": [
@@ -879,7 +886,7 @@
      "id": "mini-control-plane",
      "title": "Un plan de contrôle Kubernetes 1.37 sans kubelet",
      "kind": "sandbox",
-     "idea": "Un plan de contrôle Kubernetes 1.37 sans kubelet"
+     "idea": "Démarrer un vrai plan de contrôle Kubernetes (etcd, apiserver, contrôleurs, ordonnanceur) sans kubelet, avec des nœuds déclarés à 8 GPU, pour observer l'ordonnancement de groupe et la fragmentation."
     }
    ],
    "facts": [
@@ -1048,7 +1055,8 @@
    "title": "FinOps, capacité, énergie et achats de calcul",
    "summary": "Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.",
    "prerequisites": [
-    "perf-models"
+    "perf-models",
+    "slurm"
    ],
    "outcomes": [
     "Construire un modèle de coût total (TCO) comparant achat, colocation, réservation et à la demande",
@@ -1071,7 +1079,7 @@
      "id": "usage-showback",
      "title": "Du sacct au rapport de showback",
      "kind": "sandbox",
-     "idea": "Du sacct au rapport de showback"
+     "idea": "Transformer l'export de comptabilité d'un ordonnanceur (sacct) en rapport de refacturation : GPU-heures par équipe, utilisation, heures perdues, attente, et coût complet de la flotte réparti entre les équipes."
     },
     {
      "id": "demand-forecast",
@@ -1123,7 +1131,9 @@
    "prerequisites": [
     "slurm",
     "kubernetes-gpu",
-    "observability"
+    "observability",
+    "finops-capacity",
+    "fault-tolerance"
    ],
    "outcomes": [
     "Concevoir une plateforme de calcul self-service (sessions interactives, files, quotas, modèles de jobs)",
@@ -1134,7 +1144,7 @@
    ],
    "chapters": [
     "La plateforme comme produit : utilisateurs, besoins, adoption, mesure de la vélocité des chercheurs",
-    "Sessions interactives et environnements de développement : VM/conteneurs GPU, notebooks, partage de matériel",
+    "Sessions interactives et environnements de développement : conteneurs GPU, notebooks, partage de matériel",
     "Sécurité d'une plateforme GPU partagée : identité, isolation, secrets, réseau, chaîne d'approvisionnement logicielle, audit",
     "Fiabilité de production : SLO, astreinte, gestion d'incident, post-mortems, revues de conception (RFC/ADR)",
     "Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs",
@@ -1200,8 +1210,8 @@
     "observability"
    ],
    "title": "Projet 1 — Mini-cluster Slurm instrumenté",
-   "summary": "Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.",
-   "idea": "Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana en JSON. Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension."
+   "summary": "La comptabilité d'un cluster Slurm décrite en code et appliquée par différence, un exportateur de métriques et des alertes testées par promtool, vérifiés sur un vrai Slurm ; tableau de bord Grafana en extension.",
+   "idea": "Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana (extension). Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension."
   },
   {
    "id": "scaling-study",
@@ -1216,7 +1226,7 @@
    ],
    "title": "Projet 2 — Étude de passage à l'échelle d'un entraînement",
    "summary": "Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.",
-   "idea": "Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif."
+   "idea": "Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec matériel à prévoir."
   },
   {
    "id": "resilient-trainer",

@@ -35,7 +35,7 @@ badges:
 
 ## Règles
 
-- Réalisable **sans GPU** dans sa version de base (laptop ou bac à sable) ; la variante GPU est une extension avec coût indicatif.
+- Réalisable **sans GPU** dans sa version de base (laptop ou bac à sable) ; la variante GPU est une extension : sa page donne le matériel (nombre et type de GPU) et renvoie à la méthode de chiffrage de la page Environnement de travail (§ Budget), sans prix.
 - Un **code de départ** vérifié existe dans `labs/projects/<id>/` (tests fournis, `verify.sh` passe sur le code de référence), et le dossier contient une **solution de référence** dans `labs/projects/<id>/reference/` que le cours présente comme « à consulter après votre propre tentative ».
 - Les critères de réussite sont **mesurables** (ex. « le job reprend après un `kill -9` et la loss continue sans saut > 1 % », « le rapport donne le MFU avec sa formule »).
 - Le projet nomme les **décisions de conception** à documenter (un ADR d'une page) : un recruteur lit cela avant le code.

@@ -1,19 +1,19 @@
 ---
 title: "Plans détaillés des modules"
 subtitle: "Acquis visés, chapitres, labs et sources à lire pour chacun des modules du parcours"
-description: "Plan de chacun des 16 modules : ce qui est rédigé est signalé, le reste est un plan prêt à être rédigé."
+description: "Plan de chacun des modules : acquis, chapitres, labs et sources."
 ---
 
 ## Comment lire cette page {#lecture}
 
-Cette page donne le plan de **chaque module du parcours**, qu'il soit déjà rédigé ou non. Un module rédigé a sa page complète (fiche, plan de séances, chapitres, labs vérifiés, exercices corrigés) ; un module marqué « plan » n'a pas encore son cours : ses chapitres, ses labs prévus et ses sources à lire sont donnés pour que vous puissiez commencer à travailler dessus avec les références officielles en attendant.
+Cette page résume chaque module du parcours : acquis, chapitres, labs et sources. La page complète de chaque module (fiche, plan de séances, chapitres, labs, exercices corrigés) est liée depuis son résumé. Le statut de vérification d'un module est celui de son badge : « labs vérifiés » quand tous ses labs ont tourné, « non vérifié » quand une partie demande un GPU, un cluster ou un cloud.
 
-Les sources citées dans les rubriques « Sources à lire et faits à vérifier » ne sont **pas** des faits établis : ce sont les références sur lesquelles le futur cours devra s'appuyer, et les affirmations chiffrées qu'il faudra relire à la source avant de les écrire.
+Les rubriques « Sources à lire » donnent les références sur lesquelles s'appuie chaque module ; les chiffres qu'elles mentionnent sont à relire à la source, comme dans les pages des modules.
 
 
 ## Phase 0 — Fondations : machines et performance {#phase0}
 
-### Module 01 — Linux, systèmes et diagnostic de performance (rédigé, 24 h) {#linux-systems}
+### Module 01 — Linux, systèmes et diagnostic de performance (labs vérifiés, 24 h) {#linux-systems}
 
 Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.
 
@@ -40,12 +40,12 @@ Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, system
 **Labs :**
 
 -   **Cartographier une machine** (bac à sable, sans GPU) : Script qui produit un rapport JSON (CPU, NUMA, mémoire, disques, interfaces) à partir de lscpu/numactl/sysfs ; tests sur la sortie.
--   **Triage avec la méthode USE et la pression PSI** (bac à sable, sans GPU) : Triage avec la méthode USE et la pression PSI
--   **Page cache : mesurer ce qui touche le disque** (bac à sable, sans GPU) : Page cache : mesurer ce qui touche le disque
--   **cgroups : limite mémoire, mise à mort, quota de processeur** (bac à sable, sans GPU) : Créer un cgroup, limiter mémoire/CPU, provoquer un OOM contrôlé. Si le bac à sable ne permet pas l'écriture cgroup, basculer le lab en 'cluster' et le dire.
--   **Un script d'exploitation idempotent** (bac à sable, sans GPU) : Un script d'exploitation idempotent
+-   **Triage avec la méthode USE et la pression PSI** (bac à sable, sans GPU) : Deux instantanés du noyau à quelques secondes d'écart : utilisation et saturation du processeur, de la mémoire et du disque (/proc/stat, PSI, diskstats), et un verdict de triage selon la méthode USE.
+-   **Page cache : mesurer ce qui touche le disque** (bac à sable, sans GPU) : Écrire puis relire un fichier à froid, à chaud et en O_DIRECT, en suivant trois compteurs du noyau (pages sales, pages résidentes, octets lus sur le périphérique).
+-   **cgroups : limite mémoire, mise à mort, quota de processeur** (bac à sable, sans GPU) : Créer un cgroup jetable, provoquer une mise à mort par dépassement de mémoire (statut 137, compteur oom_kill) et mesurer la part de processeur sous un quota ; le script détecte cgroups v1 ou v2 et dit quelle branche a tourné.
+-   **Un script d'exploitation idempotent** (bac à sable, sans GPU) : Un script qui règle un paramètre du noyau sans le dupliquer, avec réécriture atomique, mode simulation et codes de retour exploitables par un appelant.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Brendan Gregg, méthode USE et Systems Performance (2e éd., 2020)
 -   Documentation noyau cgroup v2 (kernel.org)
@@ -53,7 +53,7 @@ Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, system
 
 **Projets qui s'appuient sur ce module :** Projet 1.
 
-### Module 02 — Architecture matérielle et modèles de performance (rédigé, 24 h) {#perf-models}
+### Module 02 — Architecture matérielle et modèles de performance (labs vérifiés, 24 h) {#perf-models}
 
 Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.
 
@@ -74,16 +74,16 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 4.  Le modèle roofline : intensité arithmétique, bornes mémoire et calcul, lecture de profils
 5.  Passage à l'échelle : loi d'Amdahl, loi de Gustafson, scalabilité forte et faible, efficacité parallèle
 6.  Le modèle de communication α-β (Hockney) et les collectives : arbre, anneau, bande passante optimale
-7.  FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres/optimiseur/activations
+7.  FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres et de l'optimiseur
 8.  Études de passage à l'échelle reproductibles : plan d'expérience, tracé, rapport honnête
 
 **Labs :**
 
 -   **STREAM et GEMM : bandes passantes et pic** (bac à sable, sans GPU) : Mesurer la bande passante mémoire et le débit GEMM de la machine (NumPy), tracer son roofline, comparer au pic théorique du CPU.
--   **α-β : prédire puis mesurer** (bac à sable, sans GPU) : Avec torch.distributed gloo sur 4 processus : mesurer des all-reduce de tailles variées, ajuster α et β par régression, comparer la prédiction du modèle en anneau.
+-   **α-β : prédire puis mesurer** (bac à sable, sans GPU) : Avec torch.distributed gloo sur 4 processus : mesurer des all-reduce de tailles variées, ajuster α et B par régression, comparer la prédiction du modèle en anneau.
 -   **Calculateur de MFU** (bac à sable, sans GPU) : Outil Python testé qui calcule FLOP/pas d'un transformeur donné et MFU à partir d'un temps mesuré ; cas de test tirés de valeurs publiées et citées.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Williams, Waterman, Patterson (2009), roofline, CACM
 -   Hockney (1994) et Thakur et al. (2005) pour les collectives
@@ -95,7 +95,7 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 
 ## Phase 1 — Calcul parallèle et GPU {#phase1}
 
-### Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (rédigé, 30 h) {#parallel-programming}
+### Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (labs vérifiés, 30 h) {#parallel-programming}
 
 Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.
 
@@ -127,7 +127,7 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 -   **MPI : anneau, halo et all-reduce** (bac à sable, sans GPU) : Implémenter un all-reduce en anneau à la main avec MPI (OpenMPI/mpi4py dans le bac à sable, 4 rangs locaux), comparer à MPI_Allreduce.
 -   **Jacobi 2D : étude de scalabilité** (bac à sable, sans GPU) : Solveur Jacobi avec décomposition de domaine ; scalabilité forte/faible sur les cœurs disponibles ; tracé et analyse.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Norme MPI (mpi-forum.org), spécification OpenMP (openmp.org)
 -   Patarasuk & Yuan (2009), all-reduce optimal en bande passante
@@ -135,7 +135,7 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 
 **Projets qui s'appuient sur ce module :** Projet 2.
 
-### Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 32,5 h) {#gpu-programming}
+### Module 04 — Programmation GPU : CUDA, Triton et profilage (labs vérifiés, 32,5 h) {#gpu-programming}
 
 Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, Nsight et les accélérateurs d'autres fabricants (AMD, TPU, Trainium, Ascend).
 
@@ -165,12 +165,12 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 
 **Labs :**
 
--   **Le warp et la mémoire, en modèle** (bac à sable, sans GPU) : Le warp et la mémoire, en modèle
+-   **Le warp et la mémoire, en modèle** (bac à sable, sans GPU) : Modéliser en Python la coalescence, les conflits de bancs et la divergence d'un warp à partir de la documentation NVIDIA, puis réécrire le modèle et le valider par des tests ; aucun GPU requis.
 -   **Noyaux CUDA dans le simulateur Numba** (bac à sable, sans GPU) : Noyaux Numba (réduction, matmul par tuiles) exécutés avec NUMBA_ENABLE_CUDASIM=1 ; tests de justesse ; version GPU réelle documentée mais non exécutée.
 -   **Triton en mode interpréteur** (bac à sable, sans GPU) : Noyau Triton d'addition fusionnée et softmax exécutés avec TRITON_INTERPRET=1 si l'installation CPU est possible ; sinon lab 'gpu' documenté et linté.
 -   **Lire une trace de profil** (bac à sable, sans GPU) : Profil PyTorch Profiler sur CPU d'un petit transformeur ; exporter la trace Chrome, identifier les opérateurs dominants ; transposition au profil GPU expliquée.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation CUDA C++ Programming Guide (NVIDIA)
 -   Dao et al. (2022) FlashAttention
@@ -182,7 +182,7 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 
 ## Phase 2 — Exploiter un cluster {#phase2}
 
-### Module 05 — Slurm et exploitation d'un cluster HPC (rédigé, 32 h) {#slurm}
+### Module 05 — Slurm et exploitation d'un cluster HPC (labs vérifiés, 32 h) {#slurm}
 
 L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.
 
@@ -210,11 +210,11 @@ L'ordonnanceur de référence du calcul scientifique et de l'entraînement : par
 
 **Labs :**
 
--   **Un Slurm réel dans le bac à sable** (bac à sable, sans GPU) : Installer munge, MariaDB, slurmdbd et slurmctld/slurmd sur une seule machine (apt, Slurm 23.11), créer comptes et QOS, soumettre des jobs. Constat de départ : sans base de comptabilité, les jobs restent en InvalidAccount ; documenter la solution (slurmdbd) et fournir un script d'installation reproductible.
+-   **Un Slurm réel dans le bac à sable** (bac à sable, sans GPU) : Installer munge, MariaDB, slurmdbd et slurmctld/slurmd sur une seule machine (apt, Slurm 23.11), créer comptes et QOS, soumettre des jobs. Constat de départ : avec AccountingStorageEnforce et sans association, sbatch refuse le job ; script d'installation reproductible fourni.
 -   **Fairshare, QOS et préemption** (bac à sable, sans GPU) : Deux comptes concurrents, un QOS préemptif ; observer sshare/sprio/squeue ; critères chiffrés.
 -   **Drain, prolog et vérification de santé** (bac à sable, sans GPU) : Script de vérification de nœud appelé en prolog/epilog ; drainer automatiquement sur échec ; tests.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation officielle Slurm (slurm.schedmd.com) : slurm.conf, gres.conf, cgroup.conf, sacctmgr, priority multifactor
 -   Yoo, Jette, Grondona (2003)
@@ -222,11 +222,11 @@ L'ordonnanceur de référence du calcul scientifique et de l'entraînement : par
 
 **Projets qui s'appuient sur ce module :** Projet 1, Projet 6.
 
-### Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 26,5 h) {#provisioning}
+### Module 06 — Provisioning, images et santé des nœuds GPU (non vérifié, 26,5 h) {#provisioning}
 
 Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette, supervision matérielle et virtualisation multi-locataire.
 
-**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
+**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).
 
 **Cours complet :** [Provisioning, images et santé des nœuds GPU](../courses/provisioning/index.html).
 
@@ -255,9 +255,9 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 -   **Un rôle Ansible de nœud de calcul** (bac à sable, sans GPU) : Rôle Ansible (muni de molecule ou ansible-playbook --check) qui configure limites, sysctl, services ; tests d'idempotence en local connection.
 -   **Terraform : une flotte décrite en code** (bac à sable, sans GPU) : Module Terraform avec provider local/null et sorties ; terraform validate/plan en local ; gestion de la dérive expliquée.
 -   **Recette d'un nœud GPU** (GPU requis) : Script de recette qui enchaîne nvidia-smi, DCGM diag, gpu-burn, nccl-tests ; lint et simulation des sorties pour le test ; exécution réelle documentée (GPU requis).
--   **Supervision hors bande avec Redfish** (bac à sable, sans GPU) : Supervision hors bande avec Redfish
+-   **Supervision hors bande avec Redfish** (bac à sable, sans GPU) : Un client Redfish contre un contrôleur de carte mère simulé : lire l'état de santé, décider (surveiller, drainer) et demander un redémarrage dans les limites annoncées par le contrôleur.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation NVIDIA DCGM (dcgmi diag) et Fabric Manager
 -   Documentation Ansible et Terraform
@@ -265,11 +265,11 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 
 **Projets qui s'appuient sur ce module :** Projet 1, Projet 6.
 
-### Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (rédigé, 28 h) {#networking}
+### Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (non vérifié, 28 h) {#networking}
 
 Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.
 
-**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance).
+**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance), module 5 (Slurm et exploitation d'un cluster HPC).
 
 **Cours complet :** [Réseaux haute performance : InfiniBand, RoCE et NCCL](../courses/networking/index.html).
 
@@ -297,7 +297,7 @@ Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, 
 -   **Lire un journal NCCL** (bac à sable, sans GPU) : Analyseur de logs NCCL_DEBUG (jeux de logs d'exemple fournis et étiquetés comme synthétiques ou publics) qui extrait topologie, algorithme, interfaces ; tests.
 -   **nccl-tests sur un vrai cluster** (GPU requis) : Procédure et script pour exécuter nccl-tests (all_reduce_perf) sous Slurm et interpréter busbw ; lint ; exécution réelle documentée.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation NCCL (docs.nvidia.com/deeplearning/nccl) et dépôt nccl-tests
 -   Guides InfiniBand/RoCE de NVIDIA (Mellanox) ; DCQCN (Zhu et al. 2015)
@@ -305,11 +305,11 @@ Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, 
 
 **Projets qui s'appuient sur ce module :** Projet 2, Projet 6.
 
-### Module 08 — Stockage et E/S pour l'entraînement (rédigé, 24 h) {#storage}
+### Module 08 — Stockage et E/S pour l'entraînement (labs vérifiés, 24 h) {#storage}
 
 Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.
 
-**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
+**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance).
 
 **Cours complet :** [Stockage et E/S pour l'entraînement](../courses/storage/index.html).
 
@@ -336,9 +336,9 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 -   **Démasquer un chargeur de données lent** (bac à sable, sans GPU) : Boucle PyTorch avec Dataset synthétique ; varier workers/prefetch ; mesurer débit et temps d'attente GPU simulé ; tableau de décision.
 -   **Shards et lecture séquentielle** (bac à sable, sans GPU) : Convertir un jeu en shards tar/Parquet ; comparer lecture aléatoire et séquentielle avec fio/Python ; chiffrer l'écart.
 -   **Coût d'un checkpoint** (bac à sable, sans GPU) : Écrire des checkpoints de tailles variées (sync/async/fsync) et modéliser débit et temps de blocage.
--   **Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité** (bac à sable, sans GPU) : Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité
+-   **Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité** (bac à sable, sans GPU) : Les formules du module sous forme de fonctions testées : débit de lecture, checkpoint, striping, requêtes, cache et capacité, à refaire avec vos propres chiffres.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation Lustre (lustre.org), BeeGFS, GPFS ; Mohan et al. (CheckFreq, FAST 2021)
 -   Chiffres de débit par fournisseur : à citer ou ordre de grandeur
@@ -349,7 +349,7 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 
 ## Phase 3 — Systèmes d'entraînement distribué {#phase3}
 
-### Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (rédigé, 36 h) {#distributed-training}
+### Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (labs vérifiés, 36 h) {#distributed-training}
 
 Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.
 
@@ -381,9 +381,9 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 -   **DDP à quatre processus sur CPU** (bac à sable, sans GPU) : Entraînement DDP avec torchrun --nproc_per_node=4 backend gloo ; vérifier l'équivalence avec un run mono-processus à la tolérance près ; mesurer le coût de communication.
 -   **FSDP : mesurer la mémoire par rang** (bac à sable, sans GPU) : FSDP2/fully_shard sur CPU gloo ; comparer à DDP ; calculer la mémoire attendue et la comparer à la mesure (par tailles de tenseurs).
 -   **Reproduire et diagnostiquer un hang** (bac à sable, sans GPU) : Script où un rang saute une collective ; utiliser le watchdog/timeout et les traces pour localiser ; procédure d'enquête reproductible.
--   **Un planificateur de parallélisme testé** (bac à sable, sans GPU) : Un planificateur de parallélisme testé
+-   **Un planificateur de parallélisme testé** (bac à sable, sans GPU) : Un calculateur de mémoire et de communication pour choisir le parallélisme tensoriel, pipeline et de données et l'étape ZeRO, chaque formule citant sa source ; c'est un modèle, pas une mesure.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Narayanan et al. (2021) Megatron-LM
 -   Rajbhandari et al. (2020) ZeRO ; Zhao et al. (2023) PyTorch FSDP
@@ -393,11 +393,11 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Projets qui s'appuient sur ce module :** Projet 2, Projet 3, Projet 6.
 
-### Module 10 — Pannes, checkpointing et reprise automatique (rédigé, 28 h) {#fault-tolerance}
+### Module 10 — Pannes, checkpointing et reprise automatique (labs vérifiés, 28 h) {#fault-tolerance}
 
 À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.
 
-**Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement).
+**Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement), module 5 (Slurm et exploitation d'un cluster HPC).
 
 **Cours complet :** [Pannes, checkpointing et reprise automatique](../courses/fault-tolerance/index.html).
 
@@ -425,7 +425,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 -   **Checkpoint atomique et reprise exacte** (bac à sable, sans GPU) : Entraîneur PyTorch CPU avec checkpoint complet (modèle, optimiseur, RNG, itérateur de données) ; kill -9 aléatoire ; vérifier que la perte reprend sans saut et que le résultat final est identique.
 -   **Superviseur de relance** (bac à sable, sans GPU) : Superviseur qui détecte un hang par heartbeat, tue et relance depuis le dernier checkpoint valide, avec limite de relances ; tests.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Llama 3 (Dubey et al. 2024) : interruptions sur 54 jours, répartition des causes ; citer chiffres exacts depuis le papier
 -   Kokolis et al. (2024) fiabilité des clusters de recherche ML de Meta ; Hu et al. (NSDI 2024)
@@ -434,7 +434,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Projets qui s'appuient sur ce module :** Projet 3, Projet 6.
 
-### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 30,5 h) {#ray-rl-infra}
+### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (labs vérifiés, 30,5 h) {#ray-rl-infra}
 
 Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré, et l'inférence qui produit les rollouts (moteurs, cache KV, batching continu).
 
@@ -449,6 +449,7 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 -   Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)
 -   Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte
 -   Dimensionner le cache KV d'un moteur d'inférence à partir du `config.json` d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement
+-   Déployer un cluster Ray sur Kubernetes avec KubeRay
 
 **Chapitres :**
 
@@ -469,7 +470,7 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 -   **Modèle de débit d'une boucle en ligne** (bac à sable, sans GPU) : Modèle analytique + simulation événementielle : combien d'acteurs pour saturer un apprenant ; tests de cohérence modèle/simulation.
 -   **Batching statique, batching continu et cache KV paginé** (bac à sable, sans GPU) : Simulateur déterministe en Python standard : comparer batching statique et continu, et la réservation du cache KV à son allocation par pages ; tests sur des propriétés structurelles.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Moritz et al. (2018) Ray (OSDI) ; documentation Ray 2.x
 -   Documentation KubeRay
@@ -481,11 +482,11 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 
 ## Phase 4 — Plateforme cloud-native et multi-fournisseurs {#phase4}
 
-### Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (rédigé, 28 h) {#kubernetes-gpu}
+### Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (non vérifié, 28 h) {#kubernetes-gpu}
 
 Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.
 
-**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).
+**Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC), module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).
 
 **Cours complet :** [Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../courses/kubernetes-gpu/index.html).
 
@@ -493,7 +494,7 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 
 -   Exposer des GPU à des pods (device plugin, GPU Operator, MIG, time-slicing) et en comprendre les limites
 -   Mettre en place files d'attente et gang scheduling (Kueue ou Volcano) avec quotas et préemption
--   Lancer un entraînement multi-nœuds avec JobSet/Kubeflow Trainer et un cluster Ray avec KubeRay
+-   Lancer un entraînement multi-nœuds avec un Job indexé, JobSet ou Kubeflow Trainer
 -   Choisir Slurm, Kubernetes ou les deux (Slurm sur Kubernetes) selon l'équipe et la charge
 
 **Chapitres :**
@@ -512,9 +513,9 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 -   **Kueue : files, quotas, préemption** (bac à sable, sans GPU) : Manifestes ClusterQueue/LocalQueue/WorkloadPriorityClass validés hors ligne (kubernetes-validate/kubeconform si installable) et simulation de la logique d'admission en Python testée ; exécution sur cluster documentée.
 -   **JobSet : un entraînement multi-nœuds** (cluster) : Manifestes JobSet/Trainer pour torchrun multi-nœuds ; validation de schéma ; exécution réelle documentée.
 -   **Matrice de décision Slurm / Kubernetes** (bac à sable, sans GPU) : Grille de critères pondérée avec scénarios d'équipes ; script de calcul de score testé ; justification écrite.
--   **Un plan de contrôle Kubernetes 1.37 sans kubelet** (bac à sable, sans GPU) : Un plan de contrôle Kubernetes 1.37 sans kubelet
+-   **Un plan de contrôle Kubernetes 1.37 sans kubelet** (bac à sable, sans GPU) : Démarrer un vrai plan de contrôle Kubernetes (etcd, apiserver, contrôleurs, ordonnanceur) sans kubelet, avec des nœuds déclarés à 8 GPU, pour observer l'ordonnancement de groupe et la fragmentation.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation Kubernetes (device plugins, DRA), NVIDIA GPU Operator, Kueue (kueue.sigs.k8s.io), Volcano, JobSet, KubeRay
 -   Retours publics sur Slurm sur Kubernetes (Slinky/SchedMD, CoreWeave SUNK) : vérifier les pages officielles
@@ -522,7 +523,7 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 
 **Projets qui s'appuient sur ce module :** Projet 6.
 
-### Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (rédigé, 28 h) {#multi-cloud}
+### Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (non vérifié, 28 h) {#multi-cloud}
 
 Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.
 
@@ -554,7 +555,7 @@ Placer, déborder et basculer des charges entre fournisseurs sans réécrire les
 -   **Un job SkyPilot indépendant du fournisseur** (cluster) : YAML SkyPilot avec ressources, file_mounts, setup/run, restart on preemption ; validation de schéma/linter ; exécution réelle documentée (compte cloud requis).
 -   **Coût réel d'un déménagement de données** (bac à sable, sans GPU) : Calculateur (avec barèmes cités et datés) de sortie de données, stockage et temps de transfert ; scénarios ; tests.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Yang et al. (2023) SkyPilot (NSDI) ; documentation SkyPilot
 -   Pages tarifaires officielles : toujours citer la source et la date, ne jamais figer un prix sans lien
@@ -563,7 +564,7 @@ Placer, déborder et basculer des charges entre fournisseurs sans réécrire les
 
 **Projets qui s'appuient sur ce module :** Projet 4, Projet 6.
 
-### Module 14 — Observabilité et fiabilité d'une flotte GPU (rédigé, 24 h) {#observability}
+### Module 14 — Observabilité et fiabilité d'une flotte GPU (labs vérifiés, 24 h) {#observability}
 
 Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.
 
@@ -595,7 +596,7 @@ Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée
 -   **Règles d'alerte testées avec promtool** (bac à sable, sans GPU) : Règles Prometheus (job bloqué, nœud lent, GPU chaud) testées avec promtool test rules (paquet apt prometheus si disponible).
 -   **Détecteur de job bloqué** (bac à sable, sans GPU) : Détecteur par stagnation de métriques + heartbeat ; faux positifs et faux négatifs chiffrés sur séries simulées.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Documentation NVIDIA DCGM et dcgm-exporter
 -   Documentation Prometheus (règles, promtool), Grafana, Loki, MLflow
@@ -603,11 +604,11 @@ Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée
 
 **Projets qui s'appuient sur ce module :** Projet 5, Projet 1, Projet 6.
 
-### Module 15 — FinOps, capacité, énergie et achats de calcul (rédigé, 24 h) {#finops-capacity}
+### Module 15 — FinOps, capacité, énergie et achats de calcul (labs vérifiés, 24 h) {#finops-capacity}
 
 Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.
 
-**Prérequis :** module 2 (Architecture matérielle et modèles de performance).
+**Prérequis :** module 2 (Architecture matérielle et modèles de performance), module 5 (Slurm et exploitation d'un cluster HPC).
 
 **Cours complet :** [FinOps, capacité, énergie et achats de calcul](../courses/finops-capacity/index.html).
 
@@ -631,12 +632,12 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 
 **Labs :**
 
--   **Du sacct au rapport de showback** (bac à sable, sans GPU) : Du sacct au rapport de showback
+-   **Du sacct au rapport de showback** (bac à sable, sans GPU) : Transformer l'export de comptabilité d'un ordonnanceur (sacct) en rapport de refacturation : GPU-heures par équipe, utilisation, heures perdues, attente, et coût complet de la flotte réparti entre les équipes.
 -   **Prévision de la demande et capacité à engager** (bac à sable, sans GPU) : Génération de scénarios de demande, calcul de capacité à engager et du risque de pénurie/gaspillage ; tests.
 -   **Modèle de coût total paramétrable** (bac à sable, sans GPU) : Outil Python testé : achat/colocation/réservé/à la demande/spot ; sensibilité aux hypothèses ; hypothèses étiquetées et sourcées ou 'exemple'.
 -   **Revue d'un contrat de capacité fictif** (bac à sable, sans GPU) : Grille d'analyse de clauses appliquée à un contrat fictif fourni (clairement fictif) ; script qui note les clauses ; corrigé détaillé.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   FinOps Foundation Framework et 'FinOps for AI' (pages officielles)
 -   Chiffres de puissance par GPU/rack : fiches constructeur datées ; ordres de grandeur sinon
@@ -647,11 +648,11 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 
 ## Phase 5 — Production et leadership {#phase5}
 
-### Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 30,5 h) {#platform-leadership}
+### Module 16 — Plateforme interne, sécurité, production et leadership (labs vérifiés, 30,5 h) {#platform-leadership}
 
 Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, plan de contrôle à haute disponibilité, livraison continue, fiabilité de production, direction d'équipe et entretien.
 
-**Prérequis :** module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).
+**Prérequis :** module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU), module 15 (FinOps, capacité, énergie et achats de calcul), module 10 (Pannes, checkpointing et reprise automatique).
 
 **Cours complet :** [Plateforme interne, sécurité, production et leadership](../courses/platform-leadership/index.html).
 
@@ -666,7 +667,7 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 **Chapitres :**
 
 1.  La plateforme comme produit : utilisateurs, besoins, adoption, mesure de la vélocité des chercheurs
-2.  Sessions interactives et environnements de développement : VM/conteneurs GPU, notebooks, partage de matériel
+2.  Sessions interactives et environnements de développement : conteneurs GPU, notebooks, partage de matériel
 3.  Sécurité d'une plateforme GPU partagée : identité, isolation, secrets, réseau, chaîne d'approvisionnement logicielle, audit
 4.  Fiabilité de production : SLO, astreinte, gestion d'incident, post-mortems, revues de conception (RFC/ADR)
 5.  Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs
@@ -682,7 +683,7 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 -   **Exercice de conception : de 8 à 256 GPU** (bac à sable, sans GPU) : Énoncé d'entretien de conception avec grille d'évaluation et réponses de niveaux différents ; calculateur de dimensionnement testé.
 -   **Quorum d'un cluster de consensus et exercice de restauration** (bac à sable, sans GPU) : Probabilité de garder le quorum (formule binomiale contre Monte-Carlo à graine fixe) et exercice de sauvegarde et restauration d'etcd avec etcdctl et etcdutl.
 
-**Sources à lire et faits à vérifier :**
+**Sources à lire :**
 
 -   Google SRE Book / SRE Workbook (accès libre)
 -   Documentation Open OnDemand, JupyterHub, Slurm ; modèles de menaces pour GPU partagés (documentation NVIDIA, CNCF)
@@ -695,11 +696,11 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 
 ### Projet 1 — Mini-cluster Slurm instrumenté (24 h) {#homelab-slurm}
 
-Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.
+La comptabilité d'un cluster Slurm décrite en code et appliquée par différence, un exportateur de métriques et des alertes testées par promtool, vérifiés sur un vrai Slurm ; tableau de bord Grafana en extension.
 
 **Modules mobilisés :** 1, 6, 5, 14.
 
-**Plan :** Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana en JSON. Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension.
+**Plan :** Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana (extension). Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension.
 
 ### Projet 2 — Étude de passage à l'échelle d'un entraînement (20 h) {#scaling-study}
 
@@ -707,7 +708,7 @@ Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'
 
 **Modules mobilisés :** 2, 3, 4, 7, 9.
 
-**Plan :** Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec coût indicatif.
+**Plan :** Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec matériel à prévoir.
 
 ### Projet 3 — Entraîneur tolérant aux pannes (24 h) {#resilient-trainer}
 

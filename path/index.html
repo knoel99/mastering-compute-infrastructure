@@ -48,7 +48,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 </section>
 <h2 id="lecture">1. Comment lire cette feuille de route</h2>
-<p>Le volume total est de <strong>450 h de modules et 152 h de projets</strong>, soit <strong>602 h</strong>. À titre de repère, 12 h par semaine donnent environ 50 semaines ; 25 h par semaine, environ 24 semaines ; un temps plein de 35 h, environ 17 semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.</p>
+<p>Le volume total est de <strong>450 h de modules et 152 h de projets</strong>, soit <strong>602 h</strong>. À titre de repère, 12 h par semaine donnent environ 50 semaines (les numéros de semaine des pages de module supposent ce rythme) ; 25 h par semaine, environ 24 semaines ; un temps plein de 35 h, environ 17 semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.</p>
 <p>Un rythme hebdomadaire type de 12 h : deux séances de lecture de 3 h, une séance de lab de 3 h, et 3 h d'exercices et de relecture. Tenez un journal d'apprentissage dans un dépôt public : c'est aussi une pièce de portfolio.</p>
 <h2 id="phases">2. Les six phases</h2>
 <div class="tbl-wrap">
@@ -94,7 +94,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>110,5 h</td>
 <td>1 (24 h)</td>
 <td>11 sem.</td>
-<td>Projet 1 : un mini-cluster Slurm reproductible, instrumenté, avec politique d'équité.</td>
+<td>Projet 1, exigences R1 à R4 : la comptabilité Slurm décrite en code, appliquée par différence, convergente. R5 à R7 (exportateur, alertes, vérification en direct) se terminent en phase 4, après le module 14.</td>
 </tr>
 <tr class="even">
 <td>3 — Systèmes d'entraînement distribué</td>
@@ -134,6 +134,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <h2 id="court">4. Parcours court : l'essentiel en 192 h</h2>
 <p>Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : Architecture matérielle et modèles de performance, Slurm et exploitation d'un cluster HPC, Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline, Pannes, checkpointing et reprise automatique, Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC, plus les projets Projet 2, Projet 3. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.</p>
+<p>Ces modules supposent des bases à survoler : module 1, chapitres 1 et 5, pour Slurm ; module 4, chapitres 1, 2 et 7, et module 7, chapitres 1 et 7, pour l'entraînement distribué ; module 8, chapitre 6 (E/S de checkpoint), pour les pannes et le projet 3 ; module 12, chapitre 3 (Kueue), pour le multi-fournisseurs.</p>
 <h2 id="profils">5. Parcours selon votre profil d'entrée</h2>
 <p>Le <a href="../profile/index.html">point de départ</a> décrit cinq profils d'entrée et leurs priorités module par module. Le tableau en déduit un volume d'étude indicatif : les modules à fond et normaux comptent pour leur volume, les modules survolés pour un quart, les projets pour leur volume. C'est un ordre de grandeur, à corriger avec les questions de positionnement.</p>
 <div class="tbl-wrap">

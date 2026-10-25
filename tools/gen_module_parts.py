@@ -2,7 +2,8 @@
 """Generate the shared parts of every course page from data/curriculum.json (idempotent).
 
 In courses/<id>/index.md this script:
-  * writes the "Pour qui" row of the module fiche (generic, by entry profile, never about one person);
+  * writes the "Pour qui", "Prérequis" and "Projets liés" rows of the module fiche from the curriculum
+    (generic, by entry profile, never about one person; prerequisites and projects never drift);
   * writes two sub-sections of the introduction between markers, regenerated on every run:
       ### Place dans le parcours {#place}        phase, prerequisites, what the module prepares, projects,
                                                 market skills it covers (data/coverage.json, if present)
@@ -120,10 +121,18 @@ def restructure(text):
 
 
 def fiche(text, m):
+    """Rows of the module fiche that must agree with data/curriculum.json: who it is for, prerequisites, projects."""
     row = f"| Pour qui | {m['audience']} |"
-    text, n = re.subn(r"^\| Statut pour le lecteur de référence \|.*\|\s*$", row, text, flags=re.M)
+    text, n = re.subn(r"^\| Statut pour le lecteur de référence \|.*\|\s*$", lambda _: row, text, flags=re.M)
     if not n:
-        text = re.sub(r"^\| Pour qui \|.*\|\s*$", row, text, flags=re.M)
+        text = re.sub(r"^\| Pour qui \|.*\|\s*$", lambda _: row, text, flags=re.M)
+    pre = ", ".join(f"[Module {MODS[i]['number']} — {MODS[i]['title']}](../{i}/index.html)" for i in m["prerequisites"]) or "aucun"
+    if m.get("prerequisites_note"):
+        pre += f", {m['prerequisites_note']}"
+    text = re.sub(r"^\| Prérequis \|.*\|\s*$", lambda _: f"| Prérequis | {pre} |", text, flags=re.M)
+    projects = [p for p in C["projects"] if m["id"] in p["modules"]]
+    proj = ", ".join(f"[{p['title']}](../../projects/{p['id']}/index.html)" for p in projects) or "aucun"
+    text = re.sub(r"^\| (Projets liés|Projets qui s'appuient sur ce module) \|.*\|\s*$", lambda _: f"| Projets liés | {proj} |", text, flags=re.M)
     return text
 
 

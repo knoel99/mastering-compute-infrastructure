@@ -111,7 +111,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base.
 
 <div class="cards">
-<a class="card" href="projects/homelab-slurm/index.html"><h4>Mini-cluster Slurm instrumenté</h4><p class="meta">Projet 1 · 24 h</p><p>Un cluster Slurm de test reproductible par script, avec comptabilité, politique d'équité et tableau de bord de supervision.</p></a>
+<a class="card" href="projects/homelab-slurm/index.html"><h4>Mini-cluster Slurm instrumenté</h4><p class="meta">Projet 1 · 24 h</p><p>La comptabilité d'un cluster Slurm décrite en code et appliquée par différence, un exportateur de métriques et des alertes testées par promtool, vérifiés sur un vrai Slurm ; tableau de bord Grafana en extension.</p></a>
 <a class="card" href="projects/scaling-study/index.html"><h4>Étude de passage à l'échelle d'un entraînement</h4><p class="meta">Projet 2 · 20 h</p><p>Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.</p></a>
 <a class="card" href="projects/resilient-trainer/index.html"><h4>Entraîneur tolérant aux pannes</h4><p class="meta">Projet 3 · 24 h</p><p>Un entraînement qui survit à kill -9, aux blocages et aux checkpoints corrompus, avec preuves automatisées.</p></a>
 <a class="card" href="projects/multi-provider-scheduler/index.html"><h4>Placement multi-fournisseurs sensible aux coûts</h4><p class="meta">Projet 4 · 24 h</p><p>Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.</p></a>

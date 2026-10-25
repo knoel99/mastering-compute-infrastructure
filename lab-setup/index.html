@@ -49,8 +49,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#verifier">3.1. Vérifier l'installation</a></li>
 </ul></li>
 <li><a href="#exigences">4. Ce que chaque élément exige</a></li>
-<li><a href="#budget">5. Budget</a></li>
-<li><a href="#problemes">6. Problèmes fréquents</a></li>
+<li><a href="#adr-runbook">5. Écrire un ADR et un runbook</a></li>
+<li><a href="#budget">6. Budget</a></li>
+<li><a href="#problemes">7. Problèmes fréquents</a></li>
 </ul>
 </section>
 <h2 id="principe">1. Principe : commencer sans GPU</h2>
@@ -78,14 +79,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td><strong>A</strong></td>
-<td>Ordinateur personnel, 4 cœurs, 8 Go de mémoire conseillés, sans droits administrateur</td>
+<td>Machine Linux (portable, VM ou WSL 2), 4 cœurs, 8 Go de mémoire conseillés ; droit d'installer des paquets (apt) une fois, aucun droit root pour exécuter les labs</td>
 <td>Les labs de presque tous les modules et les projets 2, 3, 4 et 6 ; tous les tests Python. Chaque module liste ses outils en plus dans le tableau « Ce que chaque élément exige »</td>
 <td>Aucun</td>
 </tr>
 <tr class="even">
 <td><strong>B</strong></td>
 <td>Machine ou conteneur <strong>Linux jetable</strong> avec accès root, 4 cœurs, 8 Go</td>
-<td>Tout le niveau A, plus les labs Slurm (module 5, projet 1), <code>promtool</code> (projet 5), le lab cgroups du module 1 et les branches « Slurm en direct » facultatives</td>
+<td>Tout le niveau A, plus les labs Slurm (module 5, projet 1), <code>promtool</code> (module 14, projets 1 et 5), le lab cgroups du module 1 et les branches « Slurm en direct » facultatives</td>
 <td>Aucun en local ; quelques heures de VM en nuage sinon</td>
 </tr>
 <tr class="odd">
@@ -97,6 +98,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
+<p>Sous macOS ou sous Windows sans WSL, travaillez dans une VM Linux : les labs des modules 1 et 8 lisent des compteurs du noyau Linux. Les labs 6.2 et 12.4 et les installations par <code>pip</code> demandent un accès réseau sortant.</p>
 <p>Le niveau B est un choix de sécurité autant que de commodité : les scripts de Slurm écrivent dans <code>/etc/slurm</code>, créent des utilisateurs et démarrent des démons en <code>root</code>. <strong>Ne les lancez jamais</strong> sur une machine de travail ou de production. Le script <code>labs/slurm/slurm-sandbox/teardown.sh</code> défait l'installation (l'option <code>--purge-db</code> efface aussi la comptabilité) ; les deux autres labs Slurm s'appuient sur la même installation.</p>
 <h2 id="testee">2. Configuration testée</h2>
 <p>Les « labs vérifiés » de ce site ont été exécutés dans la configuration suivante. Elle n'a rien d'exigeant : si la vôtre est comparable, vous devriez obtenir des résultats comparables, pas identiques.</p>
@@ -131,9 +133,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Prometheus</td>
-<td>2.45.3 (paquet Ubuntu : fournit <code>promtool</code>)</td>
+<td>2.45.3 (paquet Ubuntu : fournit <code>promtool</code>) ; la documentation citée par les modules est celle de la branche 3.x : vérifiez vos règles avec le <code>promtool</code> de la version de votre serveur</td>
 </tr>
 <tr class="even">
+<td>CUDA</td>
+<td><code>nvcc</code> 12.0.140 (paquet Ubuntu 24.04), compilation seule, sans GPU ; documentation lue : CUDA 13.x ; sur un GPU loué, prenez la version qu'impose le pilote (module 6)</td>
+</tr>
+<tr class="odd">
 <td>Pandoc</td>
 <td>3.1.3, seulement pour régénérer ce site</td>
 </tr>
@@ -204,7 +210,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="even">
 <td>Module 6, provisioning</td>
 <td>A</td>
-<td><code>ansible-core</code>, <code>ansible-lint</code>, <code>dnsmasq-base</code>, Terraform 1.6 ou plus, <code>shellcheck</code></td>
+<td><code>ansible-core</code>, <code>ansible-lint</code>, <code>dnsmasq-base</code>, Terraform 1.6 ou plus (accès au registre Terraform au premier lancement du lab 6.2), <code>shellcheck</code></td>
 </tr>
 <tr class="odd">
 <td>Module 7, réseaux</td>
@@ -234,7 +240,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="even">
 <td>Module 12, Kubernetes pour l'IA</td>
 <td>A</td>
-<td><code>jsonschema</code>, <code>kubernetes-validate</code> ; le lab 12.4 télécharge environ 350 Mo ; le lab 12.2 exige un cluster GPU</td>
+<td><code>jsonschema</code>, <code>kubernetes-validate</code> ; le lab 12.4 (Linux x86_64, <code>curl</code>, <code>openssl</code>, HTTPS sortant vers dl.k8s.io, registry.k8s.io et raw.githubusercontent.com, environ 350 Mo) arrête à la fin tout processus de l'utilisateur nommé <code>etcd</code> ou <code>kube-*</code> : ne le lancez pas sur une machine qui fait tourner un autre plan de contrôle ; le lab 12.2 exige un cluster GPU</td>
 </tr>
 <tr class="odd">
 <td>Module 13, multi-fournisseurs</td>
@@ -243,7 +249,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="even">
 <td>Module 14, observabilité</td>
-<td>A et <code>promtool</code></td>
+<td>A, plus <code>promtool</code> (paquet <code>prometheus</code>, à installer une fois avec sudo)</td>
 <td><code>prometheus_client</code> ; <code>mlflow-skinny</code>, <code>sqlalchemy</code>, <code>alembic</code> pour la partie C du lab 14.3</td>
 </tr>
 <tr class="odd">
@@ -254,7 +260,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="even">
 <td>Module 16, plateforme et leadership</td>
 <td>A</td>
-<td>rien d'autre</td>
+<td><code>pytest</code> ; la partie facultative du lab 16.4 demande les binaires <code>etcd</code>, <code>etcdctl</code> et <code>etcdutl</code> (variable <code>ETCD_BIN</code>)</td>
 </tr>
 <tr class="odd">
 <td>Projet 1, Slurm de laboratoire</td>
@@ -262,28 +268,44 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>Slurm et <code>promtool</code></td>
 </tr>
 <tr class="even">
-<td>Projets 2, 3, 4 et 6</td>
+<td>Projets 2 et 3</td>
+<td>A</td>
+<td>PyTorch CPU</td>
+</tr>
+<tr class="odd">
+<td>Projet 4, placement multi-fournisseurs</td>
+<td>A</td>
+<td><code>yamllint</code> (<code>pip install yamllint</code>)</td>
+</tr>
+<tr class="even">
+<td>Projet 6, RFC de plateforme</td>
 <td>A</td>
 <td>rien d'autre</td>
 </tr>
 <tr class="odd">
 <td>Projet 5, observabilité GPU</td>
-<td>A et <code>promtool</code></td>
-<td><code>promtool</code> s'installe avec <code>sudo apt-get install prometheus</code></td>
+<td>A, plus <code>promtool</code> (paquet <code>prometheus</code>, à installer une fois avec sudo)</td>
+<td>rien d'autre</td>
 </tr>
 </tbody>
 </table>
 </div>
-<h2 id="budget">5. Budget</h2>
+<h2 id="adr-runbook">5. Écrire un ADR et un runbook</h2>
+<p>Les projets 1 à 5 demandent un ADR (<em>Architecture Decision Record</em>) et un runbook d'une page. Le gabarit et son vérificateur sont dans le lab 16.1 ; vous pouvez vous en servir dès le premier projet, sans attendre le module 16.</p>
+<ul>
+<li><strong>ADR</strong> : cinq sections, dans cet ordre, Statut daté, Contexte, Décision, Alternatives écartées, Conséquences. Partez de <code>labs/platform-leadership/rfc-template/adr_template.md</code> et vérifiez votre fichier avec <code>python3 labs/platform-leadership/rfc-template/adr_lint.py mon_adr.md</code>.</li>
+<li><strong>Runbook</strong> : une page par panne, avec le symptôme observé, les vérifications dans l'ordre, l'action, et la manière de revenir en arrière si l'action aggrave la situation.</li>
+</ul>
+<h2 id="budget">6. Budget</h2>
 <p>Cette page <strong>ne donne aucun prix</strong> : les tarifs des fournisseurs changent, varient selon la région et la disponibilité, et un chiffre recopié ici serait faux au moment où vous le lisez. La méthode, elle, ne change pas.</p>
 <p>Le coût d'une extension est le produit de trois quantités : la durée pendant laquelle la machine est allumée, le tarif horaire relevé <strong>le jour même</strong> sur la page de prix du fournisseur, et le nombre de machines. Ajoutez le stockage conservé après l'arrêt, souvent facturé séparément, et la sortie de données si vous en copiez. Pour borner la durée, partez des durées mesurées ci-dessus et multipliez par trois : vous perdrez du temps en configuration, pas en calcul.</p>
 <div class="war">
 <p><span class="tag">Trois protections avant la première machine louée</span> Premièrement, une alerte de budget chez le fournisseur, créée <strong>avant</strong> la première machine. Deuxièmement, un arrêt automatique ou un délai d'expiration sur chaque machine. Troisièmement, une étiquette commune sur tout ce que vous créez, pour tout retrouver et tout supprimer à la fin, volumes et adresses IP compris.</p>
 </div>
 <p>Les machines préemptibles ou « spot » coûtent moins cher en échange du droit pour le fournisseur de les reprendre à tout moment. C'est un excellent terrain d'entraînement pour le <a href="../projects/resilient-trainer/index.html">projet 3</a>, dont l'entraîneur reprend après une interruption brutale ; ce n'est pas un bon choix pour un lab que vous ne savez pas encore reprendre.</p>
-<h2 id="problemes">6. Problèmes fréquents</h2>
+<h2 id="problemes">7. Problèmes fréquents</h2>
 <ul>
-<li><strong>Un lab Slurm bloque sur « InvalidAccount ».</strong> La comptabilité n'est pas démarrée : <code>slurmdbd</code> ou MariaDB est arrêté. Relancez <code>setup.sh</code>, qui est idempotent.</li>
+<li><strong><code>sbatch</code> refuse le job (« Invalid account or account/partition combination specified »).</strong> L'utilisateur n'a pas d'association : la comptabilité n'a pas été initialisée (<code>slurmdbd</code> ou MariaDB arrêtés pendant <code>setup.sh</code>) ou le compte manque. Relancez <code>setup.sh</code>, qui est idempotent, puis vérifiez avec <code>sacctmgr show assoc</code>.</li>
 <li><strong>Un lab Slurm échoue après un arrêt brutal de la machine.</strong> L'état de la base peut être incohérent : lancez <code>teardown.sh --purge-db</code> puis <code>setup.sh</code>.</li>
 <li><strong>Les mesures du projet 2 varient beaucoup d'un essai à l'autre.</strong> Fermez les autres programmes, vérifiez <code>OMP_NUM_THREADS=1</code>, et rappelez-vous que quatre processus sur quatre cœurs laissent le système sans marge.</li>
 <li><strong><code>pytest</code> ne trouve pas <code>torch</code>.</strong> Le <code>python</code> qui lance <code>pytest</code> n'est pas celui de l'environnement virtuel : exportez <code>PYTHON</code> vers <code>~/mci-venv/bin/python</code>, comme le demandent les scripts <code>verify.sh</code>.</li>

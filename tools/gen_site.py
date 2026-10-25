@@ -15,6 +15,22 @@ MODS = {m["id"]: m for m in C["modules"]}
 PROJ = {p["id"]: p for p in C["projects"]}
 PHASES = {p["n"]: p for p in C["phases"]}
 HPW = 12  # reference pace: hours per week
+PROJ_BY_PHASE = {0: [], 1: [], 2: ["homelab-slurm"], 3: ["scaling-study", "resilient-trainer"], 4: ["multi-provider-scheduler", "gpu-observability"], 5: ["capstone-rfc"]}
+
+
+def phase_weeks():
+    """Week ranges of the phases at HPW hours a week, written back to data/curriculum.json (weeks_hint), so that the
+    module pages (generated 'Place dans le parcours') and the roadmap give the same weeks."""
+    start, changed = 1, False
+    for n in sorted(PHASES):
+        h = sum(m["hours"] for m in C["modules"] if m["phase"] == n) + sum(PROJ[i]["hours"] for i in PROJ_BY_PHASE[n])
+        w = max(1, round(h / HPW))
+        hint = f"semaines {start}-{start + w - 1}"
+        if PHASES[n].get("weeks_hint") != hint:
+            PHASES[n]["weeks_hint"], changed = hint, True
+        start += w
+    if changed:
+        (ROOT / "data" / "curriculum.json").write_text(json.dumps(C, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def hfmt(x):
@@ -29,6 +45,15 @@ def has_course(i):
 
 def has_project(i):
     return (ROOT / "projects" / i / "index.md").exists()
+
+
+def verification_label(i):
+    """'labs vérifiés' or 'non vérifié', read from the badges of the course page."""
+    import yaml
+    text = (ROOT / "courses" / i / "index.md").read_text(encoding="utf-8")
+    meta = yaml.safe_load(text.split("\n---\n", 1)[0].lstrip("-\n")) or {}
+    classes = {b.get("class") for b in meta.get("badges", [])}
+    return "non vérifié" if "unverified" in classes else "labs vérifiés" if "verified" in classes else "rédigé"
 
 
 def has_page(rel):
@@ -195,11 +220,11 @@ def roadmap():
     rows, tot = [], 0
     jal = {0: "Rapport de mesure reproductible (roofline, α-β) et calculateur de MFU testé.",
            1: "Étude de scalabilité d'un solveur MPI et noyaux GPU validés par leurs tests.",
-           2: "Projet 1 : un mini-cluster Slurm reproductible, instrumenté, avec politique d'équité.",
+           2: "Projet 1, exigences R1 à R4 : la comptabilité Slurm décrite en code, appliquée par différence, convergente. R5 à R7 (exportateur, alertes, vérification en direct) se terminent en phase 4, après le module 14.",
            3: "Projets 2 et 3 : étude de passage à l'échelle et entraîneur tolérant aux pannes.",
            4: "Projets 4 et 5 : placement multi-fournisseurs et observabilité GPU.",
            5: "Projet 6 : RFC de plateforme de 8 à 256 GPU et soutenance de 20 minutes."}
-    proj_by_phase = {0: [], 1: [], 2: ["homelab-slurm"], 3: ["scaling-study", "resilient-trainer"], 4: ["multi-provider-scheduler", "gpu-observability"], 5: ["capstone-rfc"]}
+    proj_by_phase = PROJ_BY_PHASE
     for n in sorted(PHASES):
         ms = [m for m in C["modules"] if m["phase"] == n]
         hm = sum(m["hours"] for m in ms)
@@ -218,7 +243,7 @@ numbered: true
 
 ## Comment lire cette feuille de route {{#lecture}}
 
-Le volume total est de **{hfmt(mh)} h de modules et {hfmt(ph)} h de projets**, soit **{hfmt(tot)} h**. À titre de repère, {HPW} h par semaine donnent environ {round(tot / HPW)} semaines ; 25 h par semaine, environ {round(tot / 25)} semaines ; un temps plein de 35 h, environ {round(tot / 35)} semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.
+Le volume total est de **{hfmt(mh)} h de modules et {hfmt(ph)} h de projets**, soit **{hfmt(tot)} h**. À titre de repère, {HPW} h par semaine donnent environ {round(tot / HPW)} semaines (les numéros de semaine des pages de module supposent ce rythme) ; 25 h par semaine, environ {round(tot / 25)} semaines ; un temps plein de 35 h, environ {round(tot / 35)} semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.
 
 Un rythme hebdomadaire type de {HPW} h : deux séances de lecture de 3 h, une séance de lab de 3 h, et 3 h d'exercices et de relecture. Tenez un journal d'apprentissage dans un dépôt public : c'est aussi une pièce de portfolio.
 
@@ -242,6 +267,8 @@ Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que
 
 Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : {', '.join(f"{MODS[i]['title']}" for i in short)}, plus les projets {', '.join(PROJ[i]['title'].split(' — ')[0] for i in short_p)}. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.
 
+Ces modules supposent des bases à survoler : module 1, chapitres 1 et 5, pour Slurm ; module 4, chapitres 1, 2 et 7, et module 7, chapitres 1 et 7, pour l'entraînement distribué ; module 8, chapitre 6 (E/S de checkpoint), pour les pannes et le projet 3 ; module 12, chapitre 3 (Kueue), pour le multi-fournisseurs.
+
 ## Parcours selon votre profil d'entrée {{#profils}}
 
 Le [point de départ](../profile/index.html) décrit cinq profils d'entrée et leurs priorités module par module. Le tableau en déduit un volume d'étude indicatif : les modules à fond et normaux comptent pour leur volume, les modules survolés pour un quart, les projets pour leur volume. C'est un ordre de grandeur, à corriger avec les questions de positionnement.
@@ -261,20 +288,20 @@ def syllabus():
     out = ["""---
 title: "Plans détaillés des modules"
 subtitle: "Acquis visés, chapitres, labs et sources à lire pour chacun des modules du parcours"
-description: "Plan de chacun des 16 modules : ce qui est rédigé est signalé, le reste est un plan prêt à être rédigé."
+description: "Plan de chacun des modules : acquis, chapitres, labs et sources."
 ---
 
 ## Comment lire cette page {#lecture}
 
-Cette page donne le plan de **chaque module du parcours**, qu'il soit déjà rédigé ou non. Un module rédigé a sa page complète (fiche, plan de séances, chapitres, labs vérifiés, exercices corrigés) ; un module marqué « plan » n'a pas encore son cours : ses chapitres, ses labs prévus et ses sources à lire sont donnés pour que vous puissiez commencer à travailler dessus avec les références officielles en attendant.
+Cette page résume chaque module du parcours : acquis, chapitres, labs et sources. La page complète de chaque module (fiche, plan de séances, chapitres, labs, exercices corrigés) est liée depuis son résumé. Le statut de vérification d'un module est celui de son badge : « labs vérifiés » quand tous ses labs ont tourné, « non vérifié » quand une partie demande un GPU, un cluster ou un cloud.
 
-Les sources citées dans les rubriques « Sources à lire et faits à vérifier » ne sont **pas** des faits établis : ce sont les références sur lesquelles le futur cours devra s'appuyer, et les affirmations chiffrées qu'il faudra relire à la source avant de les écrire.
+Les rubriques « Sources à lire » donnent les références sur lesquelles s'appuie chaque module ; les chiffres qu'elles mentionnent sont à relire à la source, comme dans les pages des modules.
 """]
     for ph in sorted(PHASES):
         out.append(f"\n## Phase {ph} — {PHASES[ph]['title']} {{#phase{ph}}}\n")
         for m in [m for m in C["modules"] if m["phase"] == ph]:
             done = has_course(m["id"])
-            tag = "rédigé" if done else "plan"
+            tag = verification_label(m["id"]) if done else "plan"
             title = f"[{m['title']}](../courses/{m['id']}/index.html)" if done else m["title"]   # the syllabus lives in syllabus/
             out.append(f"### Module {m['number']:02d} — {m['title']} ({tag}, {hfmt(m['hours'])} h) {{#{m['id']}}}\n")
             out.append(f"{m['summary']}\n")
@@ -288,7 +315,7 @@ Les sources citées dans les rubriques « Sources à lire et faits à vérifier 
             out += [f"{i}.  {c}" for i, c in enumerate(m["chapters"], 1)]
             out.append("\n**Labs :**\n")
             out += [f"-   **{l['title']}** ({'bac à sable, sans GPU' if l['kind'] == 'sandbox' else 'cluster' if l['kind'] == 'cluster' else 'GPU requis'}) : {l['idea']}" for l in m["labs"]]
-            out.append("\n**Sources à lire et faits à vérifier :**\n")
+            out.append("\n**Sources à lire :**\n")
             out += [f"-   {f}" for f in m["facts"]]
             feeds = [PROJ[i] for i in m.get("feeds", []) if i in PROJ]
             if feeds:
@@ -326,6 +353,7 @@ def nav():
 
 
 if __name__ == "__main__":
+    phase_weeks()
     nav()
     home()
     roadmap()
