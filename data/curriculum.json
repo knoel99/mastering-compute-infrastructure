@@ -249,6 +249,12 @@
    ],
    "labs": [
     {
+     "id": "warp-memory-model",
+     "title": "Le warp et la mémoire, en modèle",
+     "kind": "sandbox",
+     "idea": "Le warp et la mémoire, en modèle"
+    },
+    {
      "id": "numba-cuda-sim",
      "title": "Noyaux CUDA dans le simulateur Numba",
      "kind": "sandbox",
@@ -571,6 +577,12 @@
      "title": "Reproduire et diagnostiquer un hang",
      "kind": "sandbox",
      "idea": "Script où un rang saute une collective ; utiliser le watchdog/timeout et les traces pour localiser ; procédure d'enquête reproductible."
+    },
+    {
+     "id": "parallelism-planner",
+     "title": "Un planificateur de parallélisme testé",
+     "kind": "sandbox",
+     "idea": "Un planificateur de parallélisme testé"
     }
    ],
    "facts": [

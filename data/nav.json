@@ -45,6 +45,14 @@
    "label": "Module 02 — Architecture matérielle et modèles de performance"
   },
   {
+   "href": "courses/parallel-programming/index.html",
+   "label": "Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle"
+  },
+  {
+   "href": "courses/gpu-programming/index.html",
+   "label": "Module 04 — Programmation GPU : CUDA, Triton et profilage"
+  },
+  {
    "href": "courses/slurm/index.html",
    "label": "Module 05 — Slurm et exploitation d'un cluster HPC"
   },
@@ -61,8 +69,16 @@
    "label": "Module 08 — Stockage et E/S pour l'entraînement"
   },
   {
+   "href": "courses/distributed-training/index.html",
+   "label": "Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline"
+  },
+  {
    "href": "courses/fault-tolerance/index.html",
    "label": "Module 10 — Pannes, checkpointing et reprise automatique"
+  },
+  {
+   "href": "courses/ray-rl-infra/index.html",
+   "label": "Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne"
   },
   {
    "href": "courses/kubernetes-gpu/index.html",

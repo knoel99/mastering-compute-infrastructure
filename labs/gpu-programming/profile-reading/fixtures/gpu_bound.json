@@ -1,0 +1,342 @@
+{
+"displayTimeUnit": "ms",
+"otherData": {
+"note": "hand-made by make_fixture.py, NOT captured from a GPU",
+"synthetic": true
+},
+"traceEvents": [
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 0.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3.0
+},
+{
+"cat": "kernel",
+"dur": 945.603,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 0.0
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 20.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 23.0
+},
+{
+"cat": "kernel",
+"dur": 944.783,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 947.603
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 40.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 43.0
+},
+{
+"cat": "kernel",
+"dur": 855.655,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1894.386
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 60.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 63.0
+},
+{
+"cat": "kernel",
+"dur": 858.487,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2752.041
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 80.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 83.0
+},
+{
+"cat": "kernel",
+"dur": 933.55,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3612.529
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 100.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 103.0
+},
+{
+"cat": "kernel",
+"dur": 923.597,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 4548.078
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 120.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 123.0
+},
+{
+"cat": "kernel",
+"dur": 916.973,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 5473.675
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 140.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 143.0
+},
+{
+"cat": "kernel",
+"dur": 880.814,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 6392.648
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 160.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 163.0
+},
+{
+"cat": "kernel",
+"dur": 910.594,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 7275.462
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 180.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 183.0
+},
+{
+"cat": "kernel",
+"dur": 910.68,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 8188.057
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 200.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 203.0
+},
+{
+"cat": "kernel",
+"dur": 908.12,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 9100.737
+},
+{
+"cat": "cpu_op",
+"dur": 12.0,
+"name": "aten::mm",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 220.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 6.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 223.0
+},
+{
+"cat": "kernel",
+"dur": 865.838,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 10010.857
+},
+{
+"cat": "cuda_runtime",
+"dur": 10638.695,
+"name": "cudaStreamSynchronize",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 240.0
+}
+]
+}

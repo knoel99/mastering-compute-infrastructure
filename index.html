@@ -42,7 +42,7 @@ Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesque
 <p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a> <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a></p>
 </div>
 <h2 id="etat">État du chantier</h2>
-<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>12 module(s) sur 16 et 6 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
+<p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>16 module(s) sur 16 et 6 projet(s) sur 6 sont publiés</strong> ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.</p>
 <ul>
 <li><strong>Documenté</strong> : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.</li>
 <li><strong>Vérifié</strong> : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (<code>verify.sh</code>), les pages passent des contrôles mécaniques (<code>tools/check_gates.py</code>).</li>
@@ -136,28 +136,27 @@ Phase 1 — Calcul parallèle et GPU
 Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
 </p>
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed">
+<a class="card" href="courses/parallel-programming/index.html">
 <h4>
 Programmation parallèle : OpenMP, MPI et études de passage à l'échelle
 </h4>
 <p class="meta">
-Module 03 · 30 h · Cœur · en préparation
+Module 03 · 30 h · Cœur
 </p>
 <p>
 Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.
 </p>
-</div>
-<div class="card" style="opacity:.78;border-style:dashed">
+</a> <a class="card" href="courses/gpu-programming/index.html">
 <h4>
 Programmation GPU : CUDA, Triton et profilage
 </h4>
 <p class="meta">
-Module 04 · 30 h · Cœur · en préparation
+Module 04 · 30 h · Cœur
 </p>
 <p>
 Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.
 </p>
-</div>
+<p></a></p>
 </div>
 <h3 class="phase" id="phase2">
 Phase 2 — Exploiter un cluster
@@ -215,18 +214,17 @@ Phase 3 — Systèmes d'entraînement distribué
 Faire tourner un entraînement multi-nœuds qui survit aux pannes.
 </p>
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed">
+<a class="card" href="courses/distributed-training/index.html">
 <h4>
 Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline
 </h4>
 <p class="meta">
-Module 09 · 36 h · Cœur · en préparation
+Module 09 · 36 h · Cœur
 </p>
 <p>
 Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.
 </p>
-</div>
-<a class="card" href="courses/fault-tolerance/index.html">
+</a> <a class="card" href="courses/fault-tolerance/index.html">
 <h4>
 Pannes, checkpointing et reprise automatique
 </h4>
@@ -236,18 +234,17 @@ Module 10 · 28 h · Cœur
 <p>
 À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.
 </p>
-</a>
-<div class="card" style="opacity:.78;border-style:dashed">
+</a> <a class="card" href="courses/ray-rl-infra/index.html">
 <h4>
 Ray, infrastructure d'apprentissage par renforcement et boucles en ligne
 </h4>
 <p class="meta">
-Module 11 · 28 h · Cœur · en préparation
+Module 11 · 28 h · Cœur
 </p>
 <p>
 Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.
 </p>
-</div>
+<p></a></p>
 </div>
 <h3 class="phase" id="phase4">
 Phase 4 — Plateforme cloud-native et multi-fournisseurs

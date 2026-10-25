@@ -1,0 +1,279 @@
+{
+"displayTimeUnit": "ms",
+"otherData": {
+"note": "hand-made by make_fixture.py, NOT captured from a GPU",
+"synthetic": true
+},
+"traceEvents": [
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 0.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 20.0
+},
+{
+"cat": "kernel",
+"dur": 304.759,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 4020.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 4350.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 4370.0
+},
+{
+"cat": "kernel",
+"dur": 310.885,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 8370.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 8700.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 8720.0
+},
+{
+"cat": "kernel",
+"dur": 307.399,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 12720.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 13050.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 13070.0
+},
+{
+"cat": "kernel",
+"dur": 312.078,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 17070.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 17400.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 17420.0
+},
+{
+"cat": "kernel",
+"dur": 312.514,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 21420.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 21750.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 21770.0
+},
+{
+"cat": "kernel",
+"dur": 301.311,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 25770.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 26100.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 26120.0
+},
+{
+"cat": "kernel",
+"dur": 300.263,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 30120.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 30450.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 30470.0
+},
+{
+"cat": "kernel",
+"dur": 316.749,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 34470.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 34800.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 34820.0
+},
+{
+"cat": "kernel",
+"dur": 305.187,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 38820.0
+},
+{
+"cat": "cpu_op",
+"dur": 20.0,
+"name": "aten::to",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 39150.0
+},
+{
+"cat": "gpu_memcpy",
+"dur": 4000.0,
+"name": "Memcpy HtoD (Pageable -> Device)",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 39170.0
+},
+{
+"cat": "kernel",
+"dur": 304.687,
+"name": "gemm_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 43170.0
+}
+]
+}

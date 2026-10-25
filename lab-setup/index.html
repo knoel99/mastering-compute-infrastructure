@@ -62,13 +62,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="odd">
 <td><strong>A</strong></td>
 <td>Ordinateur personnel, 4 cœurs, 8 Go de mémoire conseillés, sans droits administrateur</td>
-<td>Modules 2 et 3, projets 2, 3, 4 et 6, tous les tests Python</td>
+<td>Les labs de presque tous les modules et les projets 2, 3, 4 et 6 ; tous les tests Python. Chaque module liste ses outils en plus dans le tableau « Ce que chaque élément exige »</td>
 <td>Aucun</td>
 </tr>
 <tr class="even">
 <td><strong>B</strong></td>
 <td>Machine ou conteneur <strong>Linux jetable</strong> avec accès root, 4 cœurs, 8 Go</td>
-<td>Tout le niveau A, plus les labs Slurm (module 5), <code>promtool</code> (projet 5) et les labs système du module 1</td>
+<td>Tout le niveau A, plus les labs Slurm (module 5, projet 1), <code>promtool</code> (projet 5), le lab cgroups du module 1 et les branches « Slurm en direct » facultatives</td>
 <td>Aucun en local ; quelques heures de VM en nuage sinon</td>
 </tr>
 <tr class="odd">
@@ -132,6 +132,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install numpy scipy pytest pyyaml</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch <span class="at">--index-url</span> https://download.pytorch.org/whl/cpu   <span class="co"># version pour CPU</span></span></code></pre></div>
 <p>L'environnement Python complet occupe environ <strong>1,1 Go</strong> sur disque, presque tout pour PyTorch.</p>
+<p>Chaque module ajoute quelques outils, listés dans le tableau « Ce que chaque élément exige » plus bas et au début de la section « Labs » du module. Installez-les au moment d'attaquer le module, pas avant. Sous Ubuntu 24.04, <code>pip</code> refuse les installations à l'échelle du système : travaillez toujours dans un environnement virtuel.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Niveau B : Slurm avec comptabilité, et promtool (machine JETABLE, root)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> DEBIAN_FRONTEND=noninteractive apt-get install <span class="at">-y</span> munge slurm-wlm slurmdbd mariadb-server</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> prometheus     <span class="co"># fournit promtool ; arrêtez le démon s&#39;il démarre</span></span></code></pre></div>
@@ -142,6 +143,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span>~/mci-venv/bin/python <span class="fu">bash</span> labs/check_env.sh</span></code></pre></div>
 <p>Sur la configuration testée, il affiche pour le niveau A les versions de Python, de <code>torch</code>, <code>numpy</code>, <code>scipy</code>, <code>pytest</code> et <code>yaml</code>, puis pour le niveau B la présence de <code>sinfo</code>, <code>sbatch</code>, <code>sacctmgr</code>, <code>munge</code>, <code>mariadbd</code> et <code>promtool</code>. Sans GPU il écrit « none detected (fine: nothing is required) ».</p>
 <h2 id="exigences">Ce que chaque élément exige</h2>
+<p>Tous les labs « vérifiés » tournent sans GPU. Le tableau liste, <strong>en plus</strong> de Python, NumPy, pytest et PyYAML, ce que demande chaque module ; la section « Labs » de chaque page donne les commandes exactes et les versions testées.</p>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -153,39 +155,104 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="header">
 <th>Élément</th>
 <th>Niveau</th>
-<th>Remarque</th>
+<th>En plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td>Module 1, Linux et diagnostic</td>
+<td>A ; B pour le lab 1.4</td>
+<td><code>stress-ng</code>, <code>fio</code>, <code>shellcheck</code>, <code>systemd-analyze</code> ; le lab 1.4 écrit dans un cgroup (root)</td>
+</tr>
+<tr class="even">
 <td>Module 2, modèles de performance</td>
 <td>A</td>
-<td>PyTorch CPU pour le lab de l'all-reduce ; mesures plus stables avec 4 cœurs</td>
+<td>PyTorch CPU</td>
+</tr>
+<tr class="odd">
+<td>Module 3, programmation parallèle</td>
+<td>A ; B pour la branche Slurm facultative</td>
+<td><code>gcc</code>, <code>openmpi-bin</code>, <code>libopenmpi-dev</code>, <code>mpi4py</code></td>
 </tr>
 <tr class="even">
+<td>Module 4, programmation GPU</td>
+<td>A</td>
+<td><code>numba</code> et <code>triton</code> (simulateurs CPU) ; <code>nvcc</code> facultatif, sans exécution</td>
+</tr>
+<tr class="odd">
 <td>Module 5, Slurm</td>
 <td>B</td>
-<td>Labs sur un vrai Slurm 23.11 ; durée de chaque vérification : moins de trois minutes</td>
-</tr>
-<tr class="odd">
-<td>Projet 2, passage à l'échelle</td>
-<td>A</td>
-<td>4 cœurs recommandés : avec moins, les « rangs » se disputent les processeurs</td>
+<td><code>munge</code>, <code>slurm-wlm</code>, <code>slurmdbd</code>, <code>mariadb-server</code></td>
 </tr>
 <tr class="even">
-<td>Projet 3, entraîneur tolérant aux pannes</td>
+<td>Module 6, provisioning</td>
 <td>A</td>
-<td>Aucune dépendance système</td>
+<td><code>ansible-core</code>, <code>ansible-lint</code>, <code>dnsmasq-base</code>, Terraform 1.6 ou plus, <code>shellcheck</code></td>
 </tr>
 <tr class="odd">
-<td>Projet 5, observabilité</td>
+<td>Module 7, réseaux</td>
+<td>A</td>
+<td><code>ibsim-utils</code>, <code>opensm</code>, <code>infiniband-diags</code> pour la partie B du lab 7.1 ; le lab 7.3 exige deux nœuds GPU</td>
+</tr>
+<tr class="even">
+<td>Module 8, stockage</td>
+<td>A</td>
+<td><code>fio</code> ; <code>pyarrow</code> et <code>webdataset</code> en option</td>
+</tr>
+<tr class="odd">
+<td>Module 9, entraînement distribué</td>
+<td>A</td>
+<td>PyTorch CPU</td>
+</tr>
+<tr class="even">
+<td>Module 10, pannes et checkpointing</td>
+<td>A ; B pour la démo Slurm</td>
+<td><code>safetensors</code>, SciPy</td>
+</tr>
+<tr class="odd">
+<td>Module 11, Ray et RL</td>
+<td>A</td>
+<td><code>ray[data,train]</code></td>
+</tr>
+<tr class="even">
+<td>Module 12, Kubernetes pour l'IA</td>
+<td>A</td>
+<td><code>jsonschema</code>, <code>kubernetes-validate</code> ; le lab 12.4 télécharge environ 350 Mo ; le lab 12.2 exige un cluster GPU</td>
+</tr>
+<tr class="odd">
+<td>Module 13, multi-fournisseurs</td>
+<td>A</td>
+<td><code>yamllint</code>, <code>shellcheck</code> ; <code>skypilot</code> dans un environnement à part pour la branche d'analyse ; la branche cloud exige un compte</td>
+</tr>
+<tr class="even">
+<td>Module 14, observabilité</td>
 <td>A et <code>promtool</code></td>
-<td><code>promtool</code> s'installe avec <code>sudo apt-get install prometheus</code>, ou depuis les binaires du projet Prometheus</td>
+<td><code>prometheus_client</code> ; <code>mlflow-skinny</code>, <code>sqlalchemy</code>, <code>alembic</code> pour la partie C du lab 14.3</td>
+</tr>
+<tr class="odd">
+<td>Module 15, FinOps et capacité</td>
+<td>A</td>
+<td>rien d'autre ; un Slurm réel est facultatif</td>
 </tr>
 <tr class="even">
-<td>Modules et projets pas encore publiés</td>
-<td>selon plan</td>
-<td>Le niveau est donné dans leur plan, voir la page des plans détaillés</td>
+<td>Module 16, plateforme et leadership</td>
+<td>A</td>
+<td>rien d'autre</td>
+</tr>
+<tr class="odd">
+<td>Projet 1, Slurm de laboratoire</td>
+<td>B</td>
+<td>Slurm et <code>promtool</code></td>
+</tr>
+<tr class="even">
+<td>Projets 2, 3, 4 et 6</td>
+<td>A</td>
+<td>rien d'autre</td>
+</tr>
+<tr class="odd">
+<td>Projet 5, observabilité GPU</td>
+<td>A et <code>promtool</code></td>
+<td><code>promtool</code> s'installe avec <code>sudo apt-get install prometheus</code></td>
 </tr>
 </tbody>
 </table>

@@ -1,0 +1,5409 @@
+{
+"displayTimeUnit": "ms",
+"otherData": {
+"note": "hand-made by make_fixture.py, NOT captured from a GPU",
+"synthetic": true
+},
+"traceEvents": [
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 0.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2.0
+},
+{
+"cat": "kernel",
+"dur": 4.269,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 7.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 18.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 20.0
+},
+{
+"cat": "kernel",
+"dur": 5.695,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 25.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 36.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 38.0
+},
+{
+"cat": "kernel",
+"dur": 5.528,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 43.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 54.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 56.0
+},
+{
+"cat": "kernel",
+"dur": 4.51,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 61.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 72.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 74.0
+},
+{
+"cat": "kernel",
+"dur": 4.991,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 79.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 90.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 92.0
+},
+{
+"cat": "kernel",
+"dur": 4.899,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 97.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 108.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 110.0
+},
+{
+"cat": "kernel",
+"dur": 5.303,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 115.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 126.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 128.0
+},
+{
+"cat": "kernel",
+"dur": 5.577,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 133.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 144.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 146.0
+},
+{
+"cat": "kernel",
+"dur": 4.188,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 151.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 162.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 164.0
+},
+{
+"cat": "kernel",
+"dur": 4.057,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 169.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 180.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 182.0
+},
+{
+"cat": "kernel",
+"dur": 5.672,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 187.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 198.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 200.0
+},
+{
+"cat": "kernel",
+"dur": 4.866,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 205.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 216.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 218.0
+},
+{
+"cat": "kernel",
+"dur": 5.525,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 223.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 234.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 236.0
+},
+{
+"cat": "kernel",
+"dur": 4.004,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 241.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 252.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 254.0
+},
+{
+"cat": "kernel",
+"dur": 4.891,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 259.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 270.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 272.0
+},
+{
+"cat": "kernel",
+"dur": 5.443,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 277.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 288.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 290.0
+},
+{
+"cat": "kernel",
+"dur": 4.458,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 295.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 306.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 308.0
+},
+{
+"cat": "kernel",
+"dur": 5.891,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 313.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 324.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 326.0
+},
+{
+"cat": "kernel",
+"dur": 5.803,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 331.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 342.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 344.0
+},
+{
+"cat": "kernel",
+"dur": 4.061,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 349.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 360.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 362.0
+},
+{
+"cat": "kernel",
+"dur": 4.051,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 367.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 378.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 380.0
+},
+{
+"cat": "kernel",
+"dur": 5.083,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 385.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 396.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 398.0
+},
+{
+"cat": "kernel",
+"dur": 5.878,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 403.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 414.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 416.0
+},
+{
+"cat": "kernel",
+"dur": 4.762,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 421.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 432.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 434.0
+},
+{
+"cat": "kernel",
+"dur": 4.433,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 439.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 450.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 452.0
+},
+{
+"cat": "kernel",
+"dur": 4.844,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 457.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 468.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 470.0
+},
+{
+"cat": "kernel",
+"dur": 4.058,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 475.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 486.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 488.0
+},
+{
+"cat": "kernel",
+"dur": 4.443,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 493.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 504.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 506.0
+},
+{
+"cat": "kernel",
+"dur": 4.876,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 511.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 522.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 524.0
+},
+{
+"cat": "kernel",
+"dur": 4.992,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 529.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 540.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 542.0
+},
+{
+"cat": "kernel",
+"dur": 4.466,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 547.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 558.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 560.0
+},
+{
+"cat": "kernel",
+"dur": 4.462,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 565.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 576.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 578.0
+},
+{
+"cat": "kernel",
+"dur": 4.438,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 583.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 594.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 596.0
+},
+{
+"cat": "kernel",
+"dur": 4.919,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 601.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 612.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 614.0
+},
+{
+"cat": "kernel",
+"dur": 4.58,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 619.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 630.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 632.0
+},
+{
+"cat": "kernel",
+"dur": 4.043,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 637.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 648.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 650.0
+},
+{
+"cat": "kernel",
+"dur": 5.675,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 655.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 666.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 668.0
+},
+{
+"cat": "kernel",
+"dur": 5.113,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 673.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 684.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 686.0
+},
+{
+"cat": "kernel",
+"dur": 5.285,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 691.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 702.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 704.0
+},
+{
+"cat": "kernel",
+"dur": 4.372,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 709.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 720.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 722.0
+},
+{
+"cat": "kernel",
+"dur": 5.985,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 727.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 738.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 740.0
+},
+{
+"cat": "kernel",
+"dur": 5.72,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 745.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 756.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 758.0
+},
+{
+"cat": "kernel",
+"dur": 4.242,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 763.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 774.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 776.0
+},
+{
+"cat": "kernel",
+"dur": 4.665,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 781.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 792.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 794.0
+},
+{
+"cat": "kernel",
+"dur": 5.443,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 799.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 810.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 812.0
+},
+{
+"cat": "kernel",
+"dur": 5.422,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 817.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 828.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 830.0
+},
+{
+"cat": "kernel",
+"dur": 5.873,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 835.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 846.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 848.0
+},
+{
+"cat": "kernel",
+"dur": 4.844,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 853.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 864.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 866.0
+},
+{
+"cat": "kernel",
+"dur": 5.66,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 871.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 882.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 884.0
+},
+{
+"cat": "kernel",
+"dur": 5.341,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 889.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 900.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 902.0
+},
+{
+"cat": "kernel",
+"dur": 4.607,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 907.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 918.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 920.0
+},
+{
+"cat": "kernel",
+"dur": 5.175,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 925.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 936.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 938.0
+},
+{
+"cat": "kernel",
+"dur": 5.765,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 943.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 954.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 956.0
+},
+{
+"cat": "kernel",
+"dur": 5.692,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 961.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 972.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 974.0
+},
+{
+"cat": "kernel",
+"dur": 5.011,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 979.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 990.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 992.0
+},
+{
+"cat": "kernel",
+"dur": 5.178,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 997.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1008.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1010.0
+},
+{
+"cat": "kernel",
+"dur": 4.069,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1015.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1026.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1028.0
+},
+{
+"cat": "kernel",
+"dur": 4.485,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1033.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1044.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1046.0
+},
+{
+"cat": "kernel",
+"dur": 5.595,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1051.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1062.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1064.0
+},
+{
+"cat": "kernel",
+"dur": 4.829,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1069.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1080.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1082.0
+},
+{
+"cat": "kernel",
+"dur": 4.346,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1087.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1098.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1100.0
+},
+{
+"cat": "kernel",
+"dur": 5.098,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1105.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1116.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1118.0
+},
+{
+"cat": "kernel",
+"dur": 5.406,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1123.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1134.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1136.0
+},
+{
+"cat": "kernel",
+"dur": 5.349,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1141.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1152.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1154.0
+},
+{
+"cat": "kernel",
+"dur": 4.749,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1159.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1170.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1172.0
+},
+{
+"cat": "kernel",
+"dur": 4.878,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1177.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1188.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1190.0
+},
+{
+"cat": "kernel",
+"dur": 5.017,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1195.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1206.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1208.0
+},
+{
+"cat": "kernel",
+"dur": 5.557,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1213.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1224.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1226.0
+},
+{
+"cat": "kernel",
+"dur": 5.042,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1231.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1242.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1244.0
+},
+{
+"cat": "kernel",
+"dur": 4.787,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1249.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1260.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1262.0
+},
+{
+"cat": "kernel",
+"dur": 4.979,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1267.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1278.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1280.0
+},
+{
+"cat": "kernel",
+"dur": 4.059,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1285.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1296.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1298.0
+},
+{
+"cat": "kernel",
+"dur": 4.087,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1303.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1314.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1316.0
+},
+{
+"cat": "kernel",
+"dur": 5.407,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1321.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1332.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1334.0
+},
+{
+"cat": "kernel",
+"dur": 5.966,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1339.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1350.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1352.0
+},
+{
+"cat": "kernel",
+"dur": 5.186,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1357.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1368.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1370.0
+},
+{
+"cat": "kernel",
+"dur": 4.787,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1375.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1386.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1388.0
+},
+{
+"cat": "kernel",
+"dur": 4.341,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1393.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1404.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1406.0
+},
+{
+"cat": "kernel",
+"dur": 5.004,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1411.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1422.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1424.0
+},
+{
+"cat": "kernel",
+"dur": 5.964,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1429.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1440.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1442.0
+},
+{
+"cat": "kernel",
+"dur": 5.541,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1447.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1458.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1460.0
+},
+{
+"cat": "kernel",
+"dur": 5.079,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1465.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1476.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1478.0
+},
+{
+"cat": "kernel",
+"dur": 5.721,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1483.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1494.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1496.0
+},
+{
+"cat": "kernel",
+"dur": 4.464,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1501.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1512.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1514.0
+},
+{
+"cat": "kernel",
+"dur": 5.028,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1519.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1530.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1532.0
+},
+{
+"cat": "kernel",
+"dur": 5.905,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1537.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1548.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1550.0
+},
+{
+"cat": "kernel",
+"dur": 5.156,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1555.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1566.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1568.0
+},
+{
+"cat": "kernel",
+"dur": 4.918,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1573.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1584.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1586.0
+},
+{
+"cat": "kernel",
+"dur": 4.539,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1591.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1602.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1604.0
+},
+{
+"cat": "kernel",
+"dur": 5.096,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1609.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1620.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1622.0
+},
+{
+"cat": "kernel",
+"dur": 5.914,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1627.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1638.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1640.0
+},
+{
+"cat": "kernel",
+"dur": 4.011,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1645.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1656.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1658.0
+},
+{
+"cat": "kernel",
+"dur": 5.567,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1663.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1674.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1676.0
+},
+{
+"cat": "kernel",
+"dur": 5.641,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1681.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1692.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1694.0
+},
+{
+"cat": "kernel",
+"dur": 5.772,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1699.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1710.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1712.0
+},
+{
+"cat": "kernel",
+"dur": 5.481,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1717.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1728.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1730.0
+},
+{
+"cat": "kernel",
+"dur": 5.618,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1735.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1746.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1748.0
+},
+{
+"cat": "kernel",
+"dur": 5.037,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1753.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1764.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1766.0
+},
+{
+"cat": "kernel",
+"dur": 5.123,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1771.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1782.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1784.0
+},
+{
+"cat": "kernel",
+"dur": 4.852,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1789.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1800.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1802.0
+},
+{
+"cat": "kernel",
+"dur": 4.112,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1807.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1818.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1820.0
+},
+{
+"cat": "kernel",
+"dur": 5.74,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1825.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1836.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1838.0
+},
+{
+"cat": "kernel",
+"dur": 5.14,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1843.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1854.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1856.0
+},
+{
+"cat": "kernel",
+"dur": 4.4,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1861.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1872.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1874.0
+},
+{
+"cat": "kernel",
+"dur": 5.009,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1879.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1890.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1892.0
+},
+{
+"cat": "kernel",
+"dur": 4.97,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1897.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1908.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1910.0
+},
+{
+"cat": "kernel",
+"dur": 4.714,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1915.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1926.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1928.0
+},
+{
+"cat": "kernel",
+"dur": 4.692,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1933.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1944.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1946.0
+},
+{
+"cat": "kernel",
+"dur": 5.077,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1951.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1962.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1964.0
+},
+{
+"cat": "kernel",
+"dur": 5.247,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1969.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1980.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1982.0
+},
+{
+"cat": "kernel",
+"dur": 5.225,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 1987.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 1998.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2000.0
+},
+{
+"cat": "kernel",
+"dur": 4.916,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2005.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2016.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2018.0
+},
+{
+"cat": "kernel",
+"dur": 4.056,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2023.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2034.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2036.0
+},
+{
+"cat": "kernel",
+"dur": 4.459,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2041.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2052.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2054.0
+},
+{
+"cat": "kernel",
+"dur": 4.354,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2059.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2070.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2072.0
+},
+{
+"cat": "kernel",
+"dur": 5.169,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2077.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2088.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2090.0
+},
+{
+"cat": "kernel",
+"dur": 5.722,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2095.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2106.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2108.0
+},
+{
+"cat": "kernel",
+"dur": 5.597,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2113.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2124.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2126.0
+},
+{
+"cat": "kernel",
+"dur": 5.594,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2131.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2142.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2144.0
+},
+{
+"cat": "kernel",
+"dur": 5.633,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2149.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2160.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2162.0
+},
+{
+"cat": "kernel",
+"dur": 4.511,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2167.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2178.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2180.0
+},
+{
+"cat": "kernel",
+"dur": 5.683,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2185.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2196.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2198.0
+},
+{
+"cat": "kernel",
+"dur": 5.346,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2203.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2214.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2216.0
+},
+{
+"cat": "kernel",
+"dur": 4.166,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2221.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2232.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2234.0
+},
+{
+"cat": "kernel",
+"dur": 4.033,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2239.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2250.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2252.0
+},
+{
+"cat": "kernel",
+"dur": 4.029,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2257.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2268.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2270.0
+},
+{
+"cat": "kernel",
+"dur": 5.511,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2275.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2286.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2288.0
+},
+{
+"cat": "kernel",
+"dur": 4.499,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2293.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2304.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2306.0
+},
+{
+"cat": "kernel",
+"dur": 4.219,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2311.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2322.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2324.0
+},
+{
+"cat": "kernel",
+"dur": 5.25,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2329.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2340.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2342.0
+},
+{
+"cat": "kernel",
+"dur": 4.689,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2347.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2358.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2360.0
+},
+{
+"cat": "kernel",
+"dur": 4.139,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2365.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2376.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2378.0
+},
+{
+"cat": "kernel",
+"dur": 4.319,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2383.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2394.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2396.0
+},
+{
+"cat": "kernel",
+"dur": 5.055,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2401.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2412.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2414.0
+},
+{
+"cat": "kernel",
+"dur": 4.336,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2419.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2430.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2432.0
+},
+{
+"cat": "kernel",
+"dur": 4.546,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2437.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2448.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2450.0
+},
+{
+"cat": "kernel",
+"dur": 5.423,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2455.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2466.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2468.0
+},
+{
+"cat": "kernel",
+"dur": 4.909,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2473.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2484.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2486.0
+},
+{
+"cat": "kernel",
+"dur": 4.644,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2491.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2502.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2504.0
+},
+{
+"cat": "kernel",
+"dur": 4.948,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2509.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2520.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2522.0
+},
+{
+"cat": "kernel",
+"dur": 4.047,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2527.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2538.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2540.0
+},
+{
+"cat": "kernel",
+"dur": 4.773,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2545.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2556.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2558.0
+},
+{
+"cat": "kernel",
+"dur": 4.842,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2563.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2574.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2576.0
+},
+{
+"cat": "kernel",
+"dur": 4.376,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2581.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2592.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2594.0
+},
+{
+"cat": "kernel",
+"dur": 4.218,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2599.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2610.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2612.0
+},
+{
+"cat": "kernel",
+"dur": 5.8,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2617.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2628.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2630.0
+},
+{
+"cat": "kernel",
+"dur": 5.02,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2635.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2646.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2648.0
+},
+{
+"cat": "kernel",
+"dur": 4.418,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2653.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2664.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2666.0
+},
+{
+"cat": "kernel",
+"dur": 5.211,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2671.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2682.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2684.0
+},
+{
+"cat": "kernel",
+"dur": 5.634,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2689.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2700.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2702.0
+},
+{
+"cat": "kernel",
+"dur": 4.042,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2707.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2718.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2720.0
+},
+{
+"cat": "kernel",
+"dur": 4.036,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2725.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2736.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2738.0
+},
+{
+"cat": "kernel",
+"dur": 4.293,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2743.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2754.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2756.0
+},
+{
+"cat": "kernel",
+"dur": 5.438,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2761.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2772.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2774.0
+},
+{
+"cat": "kernel",
+"dur": 4.32,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2779.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2790.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2792.0
+},
+{
+"cat": "kernel",
+"dur": 5.409,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2797.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2808.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2810.0
+},
+{
+"cat": "kernel",
+"dur": 5.356,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2815.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2826.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2828.0
+},
+{
+"cat": "kernel",
+"dur": 5.089,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2833.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2844.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2846.0
+},
+{
+"cat": "kernel",
+"dur": 4.441,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2851.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2862.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2864.0
+},
+{
+"cat": "kernel",
+"dur": 5.951,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2869.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2880.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2882.0
+},
+{
+"cat": "kernel",
+"dur": 5.596,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2887.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2898.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2900.0
+},
+{
+"cat": "kernel",
+"dur": 5.033,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2905.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2916.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2918.0
+},
+{
+"cat": "kernel",
+"dur": 4.446,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2923.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2934.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2936.0
+},
+{
+"cat": "kernel",
+"dur": 5.297,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2941.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2952.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2954.0
+},
+{
+"cat": "kernel",
+"dur": 4.79,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2959.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2970.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2972.0
+},
+{
+"cat": "kernel",
+"dur": 5.152,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2977.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2988.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 2990.0
+},
+{
+"cat": "kernel",
+"dur": 4.642,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 2995.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3006.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3008.0
+},
+{
+"cat": "kernel",
+"dur": 5.262,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3013.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3024.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3026.0
+},
+{
+"cat": "kernel",
+"dur": 4.118,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3031.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3042.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3044.0
+},
+{
+"cat": "kernel",
+"dur": 4.597,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3049.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3060.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3062.0
+},
+{
+"cat": "kernel",
+"dur": 5.936,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3067.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3078.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3080.0
+},
+{
+"cat": "kernel",
+"dur": 5.751,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3085.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3096.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3098.0
+},
+{
+"cat": "kernel",
+"dur": 4.613,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3103.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3114.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3116.0
+},
+{
+"cat": "kernel",
+"dur": 5.717,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3121.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3132.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3134.0
+},
+{
+"cat": "kernel",
+"dur": 4.621,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3139.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3150.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3152.0
+},
+{
+"cat": "kernel",
+"dur": 5.879,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3157.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3168.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3170.0
+},
+{
+"cat": "kernel",
+"dur": 5.488,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3175.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3186.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3188.0
+},
+{
+"cat": "kernel",
+"dur": 4.832,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3193.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3204.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3206.0
+},
+{
+"cat": "kernel",
+"dur": 4.505,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3211.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3222.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3224.0
+},
+{
+"cat": "kernel",
+"dur": 4.017,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3229.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3240.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3242.0
+},
+{
+"cat": "kernel",
+"dur": 5.757,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3247.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3258.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3260.0
+},
+{
+"cat": "kernel",
+"dur": 4.076,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3265.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3276.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3278.0
+},
+{
+"cat": "kernel",
+"dur": 5.639,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3283.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3294.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3296.0
+},
+{
+"cat": "kernel",
+"dur": 5.924,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3301.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3312.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3314.0
+},
+{
+"cat": "kernel",
+"dur": 5.141,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3319.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3330.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3332.0
+},
+{
+"cat": "kernel",
+"dur": 4.343,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3337.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3348.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3350.0
+},
+{
+"cat": "kernel",
+"dur": 5.736,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3355.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3366.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3368.0
+},
+{
+"cat": "kernel",
+"dur": 5.948,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3373.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3384.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3386.0
+},
+{
+"cat": "kernel",
+"dur": 5.408,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3391.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3402.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3404.0
+},
+{
+"cat": "kernel",
+"dur": 5.018,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3409.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3420.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3422.0
+},
+{
+"cat": "kernel",
+"dur": 4.756,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3427.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3438.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3440.0
+},
+{
+"cat": "kernel",
+"dur": 4.694,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3445.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3456.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3458.0
+},
+{
+"cat": "kernel",
+"dur": 4.412,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3463.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3474.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3476.0
+},
+{
+"cat": "kernel",
+"dur": 5.348,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3481.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3492.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3494.0
+},
+{
+"cat": "kernel",
+"dur": 4.866,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3499.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3510.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3512.0
+},
+{
+"cat": "kernel",
+"dur": 4.388,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3517.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3528.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3530.0
+},
+{
+"cat": "kernel",
+"dur": 4.209,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3535.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3546.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3548.0
+},
+{
+"cat": "kernel",
+"dur": 5.332,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3553.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3564.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3566.0
+},
+{
+"cat": "kernel",
+"dur": 4.592,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3571.0
+},
+{
+"cat": "cpu_op",
+"dur": 7.0,
+"name": "aten::mul",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3582.0
+},
+{
+"cat": "cuda_runtime",
+"dur": 5.0,
+"name": "cudaLaunchKernel",
+"ph": "X",
+"pid": 1000,
+"tid": 1,
+"ts": 3584.0
+},
+{
+"cat": "kernel",
+"dur": 5.0,
+"name": "elementwise_kernel",
+"ph": "X",
+"pid": 0,
+"tid": 7,
+"ts": 3589.0
+}
+]
+}

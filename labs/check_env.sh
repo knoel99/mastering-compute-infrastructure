@@ -2,6 +2,7 @@
 # Reports what this machine can run. Informational: it never installs anything.
 #   PYTHON=/path/to/python bash labs/check_env.sh        (default: python3)
 #   --strict  exit 1 when level A is not fully available
+# shellcheck disable=SC2015  # "a && b || c" is intended here: ok() and no() always succeed
 set -u
 PY="${PYTHON:-python3}"
 strict=0; [ "${1:-}" = "--strict" ] && strict=1
@@ -28,6 +29,14 @@ has pandoc && ok "pandoc (only to rebuild the site)" "$(pandoc --version | head 
 echo "level B: disposable Linux machine with root (Slurm labs, project 5 promtool)"
 for t in sinfo sbatch sacctmgr munge mariadbd promtool; do
   has "$t" && ok "$t" || no "$t" "see lab-setup page"
+done
+
+echo "extras by module (informational; each module page lists its own commands)"
+for t in gcc mpirun fio stress-ng shellcheck dnsmasq terraform ansible-playbook; do
+  has "$t" && ok "$t" || echo "  $(printf '%-34s' "$t")absent"
+done
+for mod in mpi4py numba triton safetensors ray jsonschema kubernetes_validate prometheus_client yamllint pyarrow; do
+  if "$PY" -c "import $mod" >/dev/null 2>&1; then ok "python module $mod"; else echo "  $(printf '%-34s' "python module $mod")absent"; fi
 done
 
 echo "level C: GPU (optional extensions only)"

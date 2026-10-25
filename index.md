@@ -16,7 +16,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **12 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **16 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
@@ -53,8 +53,8 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.</p>
 
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</h4><p class="meta">Module 03 · 30 h · Cœur · en préparation</p><p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p></div>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Programmation GPU : CUDA, Triton et profilage</h4><p class="meta">Module 04 · 30 h · Cœur · en préparation</p><p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p></div>
+<a class="card" href="courses/parallel-programming/index.html"><h4>Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</h4><p class="meta">Module 03 · 30 h · Cœur</p><p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p></a>
+<a class="card" href="courses/gpu-programming/index.html"><h4>Programmation GPU : CUDA, Triton et profilage</h4><p class="meta">Module 04 · 30 h · Cœur</p><p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p></a>
 </div>
 
 <h3 class="phase" id="phase2">Phase 2 — Exploiter un cluster</h3>
@@ -73,9 +73,9 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Faire tourner un entraînement multi-nœuds qui survit aux pannes.</p>
 
 <div class="cards">
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</h4><p class="meta">Module 09 · 36 h · Cœur · en préparation</p><p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p></div>
+<a class="card" href="courses/distributed-training/index.html"><h4>Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</h4><p class="meta">Module 09 · 36 h · Cœur</p><p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p></a>
 <a class="card" href="courses/fault-tolerance/index.html"><h4>Pannes, checkpointing et reprise automatique</h4><p class="meta">Module 10 · 28 h · Cœur</p><p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p></a>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</h4><p class="meta">Module 11 · 28 h · Cœur · en préparation</p><p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p></div>
+<a class="card" href="courses/ray-rl-infra/index.html"><h4>Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</h4><p class="meta">Module 11 · 28 h · Cœur</p><p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p></a>
 </div>
 
 <h3 class="phase" id="phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</h3>

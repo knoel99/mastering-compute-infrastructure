@@ -112,9 +112,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2, Projet 6.</p>
 <h2 id="phase1">Phase 1 — Calcul parallèle et GPU</h2>
-<h3 id="parallel-programming">Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (plan, 30 h)</h3>
+<h3 id="parallel-programming">Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (rédigé, 30 h)</h3>
 <p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Cours complet :</strong> <a href="courses/parallel-programming/index.html">Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Paralléliser une boucle avec OpenMP en justifiant partage, réduction et ordonnancement</li>
@@ -146,9 +147,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Cours de référence cités par les masters (EPCC, Berkeley CS267)</li>
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2.</p>
-<h3 id="gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (plan, 30 h)</h3>
+<h3 id="gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h)</h3>
 <p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
+<p><strong>Cours complet :</strong> <a href="courses/gpu-programming/index.html">Programmation GPU : CUDA, Triton et profilage</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Écrire un noyau CUDA (Numba) avec mémoire partagée et le comparer à une version vectorisée</li>
@@ -169,6 +171,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ol>
 <p><strong>Labs :</strong></p>
 <ul>
+<li><strong>Le warp et la mémoire, en modèle</strong> (bac à sable, sans GPU) : Le warp et la mémoire, en modèle</li>
 <li><strong>Noyaux CUDA dans le simulateur Numba</strong> (bac à sable, sans GPU) : Noyaux Numba (réduction, matmul par tuiles) exécutés avec NUMBA_ENABLE_CUDASIM=1 ; tests de justesse ; version GPU réelle documentée mais non exécutée.</li>
 <li><strong>Triton en mode interpréteur</strong> (bac à sable, sans GPU) : Noyau Triton d'addition fusionnée et softmax exécutés avec TRITON_INTERPRET=1 si l'installation CPU est possible ; sinon lab 'gpu' documenté et linté.</li>
 <li><strong>Lire une trace de profil</strong> (bac à sable, sans GPU) : Profil PyTorch Profiler sur CPU d'un petit transformeur ; exporter la trace Chrome, identifier les opérateurs dominants ; transposition au profil GPU expliquée.</li>
@@ -325,9 +328,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 3, Projet 6.</p>
 <h2 id="phase3">Phase 3 — Systèmes d'entraînement distribué</h2>
-<h3 id="distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (plan, 36 h)</h3>
+<h3 id="distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (rédigé, 36 h)</h3>
 <p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).</p>
+<p><strong>Cours complet :</strong> <a href="courses/distributed-training/index.html">Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Choisir DDP, FSDP, tensor, pipeline ou expert parallelism pour un modèle et un cluster donnés, chiffres à l'appui</li>
@@ -352,6 +356,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>DDP à quatre processus sur CPU</strong> (bac à sable, sans GPU) : Entraînement DDP avec torchrun --nproc_per_node=4 backend gloo ; vérifier l'équivalence avec un run mono-processus à la tolérance près ; mesurer le coût de communication.</li>
 <li><strong>FSDP : mesurer la mémoire par rang</strong> (bac à sable, sans GPU) : FSDP2/fully_shard sur CPU gloo ; comparer à DDP ; calculer la mémoire attendue et la comparer à la mesure (par tailles de tenseurs).</li>
 <li><strong>Reproduire et diagnostiquer un hang</strong> (bac à sable, sans GPU) : Script où un rang saute une collective ; utiliser le watchdog/timeout et les traces pour localiser ; procédure d'enquête reproductible.</li>
+<li><strong>Un planificateur de parallélisme testé</strong> (bac à sable, sans GPU) : Un planificateur de parallélisme testé</li>
 </ul>
 <p><strong>Sources à lire et faits à vérifier :</strong></p>
 <ul>
@@ -398,9 +403,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Documentation NVIDIA sur les codes Xid</li>
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 3, Projet 6.</p>
-<h3 id="ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (plan, 28 h)</h3>
+<h3 id="ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h)</h3>
 <p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p>
 <p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).</p>
+<p><strong>Cours complet :</strong> <a href="courses/ray-rl-infra/index.html">Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Expliquer le modèle de Ray (tâches, acteurs, objets) et choisir quand l'utiliser</li>

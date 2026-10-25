@@ -95,11 +95,13 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 
 ## Phase 1 — Calcul parallèle et GPU {#phase1}
 
-### Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (plan, 30 h) {#parallel-programming}
+### Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (rédigé, 30 h) {#parallel-programming}
 
 Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
+
+**Cours complet :** [Programmation parallèle : OpenMP, MPI et études de passage à l'échelle](courses/parallel-programming/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -133,11 +135,13 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 
 **Projets qui s'appuient sur ce module :** Projet 2.
 
-### Module 04 — Programmation GPU : CUDA, Triton et profilage (plan, 30 h) {#gpu-programming}
+### Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h) {#gpu-programming}
 
 Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
+
+**Cours complet :** [Programmation GPU : CUDA, Triton et profilage](courses/gpu-programming/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -159,6 +163,7 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 
 **Labs :**
 
+-   **Le warp et la mémoire, en modèle** (bac à sable, sans GPU) : Le warp et la mémoire, en modèle
 -   **Noyaux CUDA dans le simulateur Numba** (bac à sable, sans GPU) : Noyaux Numba (réduction, matmul par tuiles) exécutés avec NUMBA_ENABLE_CUDASIM=1 ; tests de justesse ; version GPU réelle documentée mais non exécutée.
 -   **Triton en mode interpréteur** (bac à sable, sans GPU) : Noyau Triton d'addition fusionnée et softmax exécutés avec TRITON_INTERPRET=1 si l'installation CPU est possible ; sinon lab 'gpu' documenté et linté.
 -   **Lire une trace de profil** (bac à sable, sans GPU) : Profil PyTorch Profiler sur CPU d'un petit transformeur ; exporter la trace Chrome, identifier les opérateurs dominants ; transposition au profil GPU expliquée.
@@ -340,11 +345,13 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 
 ## Phase 3 — Systèmes d'entraînement distribué {#phase3}
 
-### Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (plan, 36 h) {#distributed-training}
+### Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (rédigé, 36 h) {#distributed-training}
 
 Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).
+
+**Cours complet :** [Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](courses/distributed-training/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -370,6 +377,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 -   **DDP à quatre processus sur CPU** (bac à sable, sans GPU) : Entraînement DDP avec torchrun --nproc_per_node=4 backend gloo ; vérifier l'équivalence avec un run mono-processus à la tolérance près ; mesurer le coût de communication.
 -   **FSDP : mesurer la mémoire par rang** (bac à sable, sans GPU) : FSDP2/fully_shard sur CPU gloo ; comparer à DDP ; calculer la mémoire attendue et la comparer à la mesure (par tailles de tenseurs).
 -   **Reproduire et diagnostiquer un hang** (bac à sable, sans GPU) : Script où un rang saute une collective ; utiliser le watchdog/timeout et les traces pour localiser ; procédure d'enquête reproductible.
+-   **Un planificateur de parallélisme testé** (bac à sable, sans GPU) : Un planificateur de parallélisme testé
 
 **Sources à lire et faits à vérifier :**
 
@@ -422,11 +430,13 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Projets qui s'appuient sur ce module :** Projet 3, Projet 6.
 
-### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (plan, 28 h) {#ray-rl-infra}
+### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h) {#ray-rl-infra}
 
 Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.
 
 **Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).
+
+**Cours complet :** [Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](courses/ray-rl-infra/index.html).
 
 **Ce que vous saurez vérifier :**
 

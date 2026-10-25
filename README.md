@@ -15,8 +15,7 @@ Le contenu est un ensemble de pages HTML statiques (style dérivé de [`polytech
 
 | Élément | Statut |
 |---|---|
-| Modules rédigés (page, labs, exercices corrigés) | 8 sur 16 : 1 Linux et diagnostic, 2 modèles de performance, 5 Slurm, 10 pannes et checkpointing, 12 Kubernetes pour l'IA, 14 observabilité, 15 FinOps et capacité, 16 plateforme et leadership |
-| Modules planifiés (plan, chapitres et sources dans `syllabus/`) | 3 programmation parallèle, 4 programmation GPU, 6 provisioning, 7 réseaux, 8 stockage, 9 entraînement distribué, 11 Ray et RL, 13 multi-cloud |
+| Modules rédigés (page, labs, exercices corrigés) | 16 sur 16, voir la feuille de route : la plupart ont un lab exécuté sans GPU ; les modules 6, 7, 12 et 13 ont une partie GPU ou cloud seulement vérifiée statiquement, et le disent dans leur badge `unverified` |
 | Projets de portfolio | 6 sur 6 : entraînement résilient, étude de passage à l'échelle, observabilité GPU, ordonnanceur multi-fournisseurs, RFC de capacité, Slurm de laboratoire |
 | Enquête sur les masters et offres d'emploi | faite, avec citations vérifiées mécaniquement (`tools/verify_quotes.py`) |
 

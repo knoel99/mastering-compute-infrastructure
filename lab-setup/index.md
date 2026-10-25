@@ -16,8 +16,8 @@ Ce parcours se suit **sans GPU** pour tout ce qui est noté « vérifié » : le
 
 | Niveau | Machine | Ce qu'elle permet | Coût |
 |---|---|---|---|
-| **A** | Ordinateur personnel, 4 cœurs, 8 Go de mémoire conseillés, sans droits administrateur | Modules 2 et 3, projets 2, 3, 4 et 6, tous les tests Python | Aucun |
-| **B** | Machine ou conteneur **Linux jetable** avec accès root, 4 cœurs, 8 Go | Tout le niveau A, plus les labs Slurm (module 5), `promtool` (projet 5) et les labs système du module 1 | Aucun en local ; quelques heures de VM en nuage sinon |
+| **A** | Ordinateur personnel, 4 cœurs, 8 Go de mémoire conseillés, sans droits administrateur | Les labs de presque tous les modules et les projets 2, 3, 4 et 6 ; tous les tests Python. Chaque module liste ses outils en plus dans le tableau « Ce que chaque élément exige » | Aucun |
+| **B** | Machine ou conteneur **Linux jetable** avec accès root, 4 cœurs, 8 Go | Tout le niveau A, plus les labs Slurm (module 5, projet 1), `promtool` (projet 5), le lab cgroups du module 1 et les branches « Slurm en direct » facultatives | Aucun en local ; quelques heures de VM en nuage sinon |
 | **C** | Machine avec un ou plusieurs GPU, louée à l'heure | Extensions GPU : noyaux, NCCL, variantes de projets | Voir « Budget » |
 
 Le niveau B est un choix de sécurité autant que de commodité : les scripts de Slurm écrivent dans `/etc/slurm`, créent des utilisateurs et démarrent des démons en `root`. **Ne les lancez jamais** sur une machine de travail ou de production. Le script `labs/slurm/slurm-sandbox/teardown.sh` défait l'installation (l'option `--purge-db` efface aussi la comptabilité) ; les deux autres labs Slurm s'appuient sur la même installation.
@@ -51,6 +51,8 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu   # version p
 
 L'environnement Python complet occupe environ **1,1 Go** sur disque, presque tout pour PyTorch.
 
+Chaque module ajoute quelques outils, listés dans le tableau « Ce que chaque élément exige » plus bas et au début de la section « Labs » du module. Installez-les au moment d'attaquer le module, pas avant. Sous Ubuntu 24.04, `pip` refuse les installations à l'échelle du système : travaillez toujours dans un environnement virtuel.
+
 ~~~bash
 # Niveau B : Slurm avec comptabilité, et promtool (machine JETABLE, root)
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y munge slurm-wlm slurmdbd mariadb-server
@@ -73,14 +75,29 @@ Sur la configuration testée, il affiche pour le niveau A les versions de Python
 
 ## Ce que chaque élément exige {#exigences}
 
-| Élément | Niveau | Remarque |
+Tous les labs « vérifiés » tournent sans GPU. Le tableau liste, **en plus** de Python, NumPy, pytest et PyYAML, ce que demande chaque module ; la section « Labs » de chaque page donne les commandes exactes et les versions testées.
+
+| Élément | Niveau | En plus |
 |---|---|---|
-| Module 2, modèles de performance | A | PyTorch CPU pour le lab de l'all-reduce ; mesures plus stables avec 4 cœurs |
-| Module 5, Slurm | B | Labs sur un vrai Slurm 23.11 ; durée de chaque vérification : moins de trois minutes |
-| Projet 2, passage à l'échelle | A | 4 cœurs recommandés : avec moins, les « rangs » se disputent les processeurs |
-| Projet 3, entraîneur tolérant aux pannes | A | Aucune dépendance système |
-| Projet 5, observabilité | A et `promtool` | `promtool` s'installe avec `sudo apt-get install prometheus`, ou depuis les binaires du projet Prometheus |
-| Modules et projets pas encore publiés | selon plan | Le niveau est donné dans leur plan, voir la page des plans détaillés |
+| Module 1, Linux et diagnostic | A ; B pour le lab 1.4 | `stress-ng`, `fio`, `shellcheck`, `systemd-analyze` ; le lab 1.4 écrit dans un cgroup (root) |
+| Module 2, modèles de performance | A | PyTorch CPU |
+| Module 3, programmation parallèle | A ; B pour la branche Slurm facultative | `gcc`, `openmpi-bin`, `libopenmpi-dev`, `mpi4py` |
+| Module 4, programmation GPU | A | `numba` et `triton` (simulateurs CPU) ; `nvcc` facultatif, sans exécution |
+| Module 5, Slurm | B | `munge`, `slurm-wlm`, `slurmdbd`, `mariadb-server` |
+| Module 6, provisioning | A | `ansible-core`, `ansible-lint`, `dnsmasq-base`, Terraform 1.6 ou plus, `shellcheck` |
+| Module 7, réseaux | A | `ibsim-utils`, `opensm`, `infiniband-diags` pour la partie B du lab 7.1 ; le lab 7.3 exige deux nœuds GPU |
+| Module 8, stockage | A | `fio` ; `pyarrow` et `webdataset` en option |
+| Module 9, entraînement distribué | A | PyTorch CPU |
+| Module 10, pannes et checkpointing | A ; B pour la démo Slurm | `safetensors`, SciPy |
+| Module 11, Ray et RL | A | `ray[data,train]` |
+| Module 12, Kubernetes pour l'IA | A | `jsonschema`, `kubernetes-validate` ; le lab 12.4 télécharge environ 350 Mo ; le lab 12.2 exige un cluster GPU |
+| Module 13, multi-fournisseurs | A | `yamllint`, `shellcheck` ; `skypilot` dans un environnement à part pour la branche d'analyse ; la branche cloud exige un compte |
+| Module 14, observabilité | A et `promtool` | `prometheus_client` ; `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3 |
+| Module 15, FinOps et capacité | A | rien d'autre ; un Slurm réel est facultatif |
+| Module 16, plateforme et leadership | A | rien d'autre |
+| Projet 1, Slurm de laboratoire | B | Slurm et `promtool` |
+| Projets 2, 3, 4 et 6 | A | rien d'autre |
+| Projet 5, observabilité GPU | A et `promtool` | `promtool` s'installe avec `sudo apt-get install prometheus` |
 
 ## Budget {#budget}
 

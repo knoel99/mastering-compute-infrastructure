@@ -1,0 +1,54 @@
+# Indicative KubeRay RayCluster with autoscaling and two worker groups
+# (CPU rollout, GPU learner).
+# LINTED (yamllint, YAML parse), NOT APPLIED to a cluster and NOT validated
+# against the CRD schema: check every field against the KubeRay version you
+# install.
+---
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: rl-loop
+spec:
+  rayVersion: "2.59.0"
+  enableInTreeAutoscaling: true
+  autoscalerOptions:
+    upscalingMode: Default
+    idleTimeoutSeconds: 60
+  headGroupSpec:
+    rayStartParams:
+      num-cpus: "0"          # keep user tasks and actors off the head Pod
+    template:
+      spec:
+        containers:
+          - name: ray-head
+            image: REPLACE_WITH_YOUR_RAY_IMAGE
+            resources:
+              requests: {cpu: "4", memory: 16Gi}
+              limits: {cpu: "4", memory: 16Gi}
+  workerGroupSpecs:
+    - groupName: rollout-cpu
+      replicas: 2
+      minReplicas: 0
+      maxReplicas: 32
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: REPLACE_WITH_YOUR_RAY_IMAGE
+              resources:
+                requests: {cpu: "16", memory: 64Gi}
+                limits: {cpu: "16", memory: 64Gi}
+    - groupName: learner-gpu
+      replicas: 1
+      minReplicas: 1
+      maxReplicas: 1
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: REPLACE_WITH_YOUR_RAY_IMAGE
+              resources:
+                requests: {cpu: "32", memory: 256Gi, nvidia.com/gpu: "8"}
+                limits: {cpu: "32", memory: 256Gi, nvidia.com/gpu: "8"}
