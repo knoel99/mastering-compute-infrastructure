@@ -99,7 +99,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#la-loi-damdahl">5.1. La loi d'Amdahl</a></li>
 <li><a href="#la-loi-de-gustafson">5.2. La loi de Gustafson</a></li>
 <li><a href="#au-delà-de-la-fraction-séquentielle">5.3. Au-delà de la fraction séquentielle</a></li>
-<li><a href="#les-retardataires">5.4. Les retardataires</a></li>
+<li><a href="#les-traînards">5.4. Les traînards</a></li>
 </ul></li>
 <li><a href="#ch6">6. Le modèle α-β et les communications collectives</a>
 <ul>
@@ -190,7 +190,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Projets liés</td>
-<td><a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+<td><a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a></td>
 </tr>
 </tbody>
 </table>
@@ -207,10 +207,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <!-- gen:place -->
 <h3 id="place">Place dans le parcours</h3>
 <ul>
-<li><strong>Phase 0 — Fondations : machines et performance</strong> (semaines 1-5) : lire une machine et prédire sa performance avant de la mesurer.</li>
+<li><strong>Phase 0 — Fondations : machines et performance</strong> (semaines 1-4) : lire une machine et prédire sa performance avant de la mesurer.</li>
 <li><strong>S'appuie sur</strong> : aucun module ; c'est un point d'entrée.</li>
-<li><strong>Prépare</strong> : <a href="../parallel-programming/index.html">module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>, <a href="../gpu-programming/index.html">module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a>, <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>, <a href="../finops-capacity/index.html">module 15 — FinOps, capacité, énergie et achats de calcul</a>.</li>
-<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>.</li>
+<li><strong>Prépare</strong> : <a href="../parallel-programming/index.html">module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>, <a href="../gpu-programming/index.html">module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a>, <a href="../storage/index.html">module 8 — Stockage et E/S pour l'entraînement</a>, <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>, <a href="../finops-capacity/index.html">module 15 — FinOps, capacité, énergie et achats de calcul</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>.</li>
 <li><strong>Compétences demandées dans les offres d'emploi et travaillées ici</strong> : Python, Collectives (NCCL, RCCL, HCCL), Profilage, bancs d'essai, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), CUDA, programmation GPU, Achats, relation fournisseurs, Planification de capacité, Expérience HPC, Expérience d'entraînement ML, Réseau (général), Service d'inférence, Systèmes distribués (voir <a href="../../market/index.html#couverture">l'analyse du marché</a>). <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
@@ -288,7 +288,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>3 h</td>
 <td>3</td>
 <td>ch. 8 Études de passage à l'échelle ; checkpoint de sortie</td>
-<td>Ex. 11 ; lab 2.3 (étapes 4 et 5) ; démarrage du Projet 2</td>
+<td>Ex. 11 ; lab 2.3 (étapes 4 et 5) ; lecture du cahier des charges du Projet 2 (il se fait en phase 3)</td>
 </tr>
 </tbody>
 </table>
@@ -479,7 +479,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Bande passante NVLink</td>
-<td>900 Go/s</td>
+<td>900 Go/s au total (450 Go/s par sens)</td>
 </tr>
 <tr class="even">
 <td>TF32, cœurs tensoriels</td>
@@ -500,6 +500,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
+<p>La page produit ne dit pas dans quel sens se comptent les 900 Go/s de NVLink. Le <a href="https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/">blog Hopper</a> précise qu'il s'agit d'une bande passante totale : 18 liens de 25 Go/s par sens, soit 450 Go/s dans chaque sens.</p>
 <div class="war">
 <p><span class="tag">Le piège du chiffre « avec sparsité »</span> Les trois lignes de cœurs tensoriels portent la note « <em>with sparsity</em> » sur la <a href="https://www.nvidia.com/en-us/data-center/h100/">page produit</a>. Elles supposent l'activation de la sparsité structurée des cœurs tensoriels, qui double leur débit annoncé mais qu'un calcul dense standard n'utilise pas. Le pic <strong>dense</strong> est la moitié, soit environ 989 TFLOPS en BF16.</p>
 <p>Le <a href="https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/">blog Hopper</a> de NVIDIA présente d'ailleurs, sur des spécifications préliminaires, 1 000 TFLOPS en dense et 2 000 avec sparsité. Les 430 TFLOPs par GPU du tableau 4 de l'<a href="https://arxiv.org/abs/2407.21783">article Llama 3</a> correspondent à 43 % du pic dense, ce qui est cohérent. Diviser une mesure par le chiffre « avec sparsité » fait paraître le matériel deux fois moins bien utilisé qu'il ne l'est.</p>
@@ -569,7 +570,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Cinq règles évitent la majorité des erreurs.</p>
 <ol type="1">
 <li><strong>Chauffer avant de mesurer.</strong> Les premières exécutions paient le chargement des caches, la compilation à la volée et la montée en fréquence. Jetez-les.</li>
-<li><strong>Répéter.</strong> Une mesure isolée n'a pas de sens ; sept à vingt répétitions donnent une distribution.</li>
+<li><strong>Répéter.</strong> Une mesure isolée n'a pas de sens ; au moins dix répétitions, davantage si la dispersion est forte, donnent une distribution.</li>
 <li><strong>Choisir son estimateur.</strong> Le <em>minimum</em> estime ce dont la machine est capable, car le bruit ne peut que ralentir ; la <em>médiane</em> estime ce qu'un utilisateur obtient typiquement. Annoncez lequel vous utilisez.</li>
 <li><strong>Contrôler l'environnement.</strong> Nombre de threads, affinité, fréquence du processeur, autres charges sur la machine : notez-les, ou fixez-les.</li>
 <li><strong>Mesurer ce qu'on croit mesurer.</strong> Sur un GPU, les appels sont asynchrones : sans synchronisation avant l'arrêt du chronomètre, vous mesurez le temps de lancement, pas d'exécution.</li>
@@ -581,7 +582,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><span class="tag">Exemple 3.1 — Compter honnêtement les octets de STREAM</span> Pour l'addition <span class="math inline">a = b + c</span> en double précision, chaque élément implique deux lectures de 8 octets et une écriture de 8 octets : <strong>24 octets par élément</strong>. Pour la copie, 16 octets. Le lab 2.1 applique exactement ces comptes. Une bande passante calculée avec un mauvais compte d'octets est fausse d'un facteur 1,5.</p>
 </div>
 <h3 id="rapporter-honnêtement">3.3. Rapporter honnêtement</h3>
-<p>Hoefler et Belli ont examiné 120 articles de trois grandes conférences de calcul haute performance et ont trouvé des pratiques de mesure insuffisantes, ce qui rend parfois impossible de savoir si un gain annoncé est réel. Ils en tirent des règles que nous reprendrons au chapitre 8 : intervalles de confiance, conditions expérimentales publiées, pas de moyenne arithmétique des rapports.</p>
+<p><a href="https://doi.org/10.1145/2807591.2807644">Hoefler et Belli</a> ont examiné 120 articles de trois grandes conférences de calcul haute performance et ont trouvé des pratiques de mesure insuffisantes, ce qui rend parfois impossible de savoir si un gain annoncé est réel. Ils en tirent des règles que nous reprendrons au chapitre 8 : intervalles de confiance, conditions expérimentales publiées, pas de moyenne arithmétique des rapports.</p>
 <p>Pour l'instant, retenez une habitude : toute mesure que vous rapportez s'accompagne de la machine, des versions logicielles, du nombre de répétitions et de l'estimateur choisi.</p>
 <div class="recap">
 <p>Points clés — chapitre 3</p>
@@ -607,10 +608,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <title id="rf-t">
 Roofline d'un GPU H100 SXM
 </title>
-<desc id="rf-d">Graphe log-log : la performance atteignable est bornée par la bande passante mémoire à gauche du point de rupture, puis par le pic de calcul à droite. Trois noyaux sont placés.</desc> <line x1="70.0" y1="20" x2="70.0" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="70.0" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">-1</tspan></text> <line x1="192.7" y1="20" x2="192.7" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="192.7" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">0</tspan></text> <line x1="315.5" y1="20" x2="315.5" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="315.5" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">1</tspan></text> <line x1="438.2" y1="20" x2="438.2" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="438.2" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">2</tspan></text> <line x1="560.9" y1="20" x2="560.9" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="560.9" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">3</tspan></text> <line x1="70" y1="300.0" x2="610" y2="300.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="304.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">11</tspan></text> <line x1="70" y1="230.0" x2="610" y2="230.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="234.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">12</tspan></text> <line x1="70" y1="160.0" x2="610" y2="160.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="164.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">13</tspan></text> <line x1="70" y1="90.0" x2="610" y2="90.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="94.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">14</tspan></text> <line x1="70" y1="20.0" x2="610" y2="20.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="24.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">15</tspan></text> <rect x="70" y="20" width="540" height="280" fill="none" stroke="currentColor" stroke-width="1.5"/> <polyline points="70.0,263.2 495.9,20.3 610.0,20.3" fill="none" stroke="var(--accent)" stroke-width="3.5"/> <line x1="495.9" y1="20.3" x2="495.9" y2="300" stroke="var(--accent)" stroke-dasharray="5 4" stroke-width="1.5"/> <text x="489.9" y="292" text-anchor="end" font-size="12" fill="currentColor">point de rupture ≈ 295 FLOP/octet</text> <text x="78.0" y="233.2" font-size="12" fill="currentColor" transform="rotate(-27 78.0 233.2)">limite mémoire : 3,35 To/s</text> <text x="487.9" y="12.3" text-anchor="end" font-size="12" fill="currentColor">limite calcul : 989 TFLOP/s (BF16 dense)</text> <circle cx="60.3" cy="268.8" r="5.5" fill="var(--key-bar)" stroke="currentColor" stroke-width="1"/> <text x="70.3" y="286.8" text-anchor="start" font-size="12" font-weight="700" fill="currentColor">addition de vecteurs</text> <circle cx="429.7" cy="58.1" r="5.5" fill="var(--key-bar)" stroke="currentColor" stroke-width="1"/> <text x="419.7" y="78.1" text-anchor="end" font-size="12" font-weight="700" fill="currentColor">GEMM n=256</text> <circle cx="577.5" cy="20.3" r="5.5" fill="var(--key-bar)" stroke="currentColor" stroke-width="1"/> <text x="567.5" y="42.3" text-anchor="end" font-size="12" font-weight="700" fill="currentColor">GEMM n=4096</text> <text x="340.0" y="352" text-anchor="middle" font-size="13" fill="currentColor">intensité arithmétique (FLOP par octet de trafic mémoire)</text> <text x="14" y="160.0" text-anchor="middle" font-size="13" fill="currentColor" transform="rotate(-90 14 160.0)">performance (FLOP/s)</text>
+<desc id="rf-d">Graphe log-log : la performance atteignable est bornée par la bande passante mémoire à gauche du point de rupture, puis par le pic de calcul à droite. Trois noyaux sont placés.</desc> <line x1="124.0" y1="20" x2="124.0" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="124.0" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">-1</tspan></text> <line x1="232.0" y1="20" x2="232.0" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="232.0" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">0</tspan></text> <line x1="340.0" y1="20" x2="340.0" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="340.0" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">1</tspan></text> <line x1="448.0" y1="20" x2="448.0" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="448.0" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">2</tspan></text> <line x1="556.0" y1="20" x2="556.0" y2="300" stroke="currentColor" stroke-opacity=".18"/> <text x="556.0" y="318" text-anchor="middle" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">3</tspan></text> <line x1="70" y1="300.0" x2="610" y2="300.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="304.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">11</tspan></text> <line x1="70" y1="230.0" x2="610" y2="230.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="234.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">12</tspan></text> <line x1="70" y1="160.0" x2="610" y2="160.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="164.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">13</tspan></text> <line x1="70" y1="90.0" x2="610" y2="90.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="94.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">14</tspan></text> <line x1="70" y1="20.0" x2="610" y2="20.0" stroke="currentColor" stroke-opacity=".18"/> <text x="62" y="24.0" text-anchor="end" font-size="12" fill="currentColor">10<tspan font-size="9" dy="-5">15</tspan></text> <rect x="70" y="20" width="540" height="280" fill="none" stroke="currentColor" stroke-width="1.5"/> <polyline points="70.0,298.2 498.8,20.3 610.0,20.3" fill="none" stroke="var(--accent)" stroke-width="3.5"/> <line x1="498.8" y1="20.3" x2="498.8" y2="300" stroke="var(--accent)" stroke-dasharray="5 4" stroke-width="1.5"/> <text x="492.8" y="292" text-anchor="end" font-size="12" fill="currentColor">point de rupture ≈ 295 FLOP/octet</text> <text x="78.0" y="268.1" font-size="12" fill="currentColor" transform="rotate(-33 78.0 268.1)">limite mémoire : 3,35 To/s</text> <text x="490.8" y="12.3" text-anchor="end" font-size="12" fill="currentColor">limite calcul : 989 TFLOP/s (BF16 dense)</text> <circle cx="115.4" cy="268.8" r="5.5" fill="var(--key-bar)" stroke="currentColor" stroke-width="1"/> <text x="125.4" y="286.8" text-anchor="start" font-size="12" font-weight="700" fill="currentColor">addition de vecteurs</text> <circle cx="440.6" cy="58.1" r="5.5" fill="var(--key-bar)" stroke="currentColor" stroke-width="1"/> <text x="430.6" y="48.1" text-anchor="end" font-size="12" font-weight="700" fill="currentColor">GEMM n=256</text> <circle cx="570.6" cy="20.3" r="5.5" fill="var(--key-bar)" stroke="currentColor" stroke-width="1"/> <text x="566.6" y="44.3" text-anchor="end" font-size="12" font-weight="700" fill="currentColor">GEMM n=4096</text> <text x="340.0" y="352" text-anchor="middle" font-size="13" fill="currentColor">intensité arithmétique (FLOP par octet de trafic mémoire)</text> <text x="14" y="160.0" text-anchor="middle" font-size="13" fill="currentColor" transform="rotate(-90 14 160.0)">performance (FLOP/s)</text>
 </svg>
 <figcaption>
-Roofline d'un H100 SXM construit avec les valeurs de la page produit NVIDIA (pic dense BF16 de 989 TFLOP/s, bande passante de 3,35 To/s). Les trois points sont les noyaux des exemples 4.1 à 4.3.
+Roofline d'un H100 SXM construit avec les valeurs de la page produit NVIDIA (pic dense BF16 de 989 TFLOP/s, bande passante de 3,35 To/s). Les trois points sont les noyaux des exemples 4.1 à 4.3 ; l'addition de vecteurs, en FP32, est placée sous le toit BF16 pour comparaison (voir l'exemple 4.1).
 </figcaption>
 </figure>
 <h3 id="quatre-exemples-sur-le-h100">4.3. Quatre exemples sur le H100</h3>
@@ -709,9 +710,12 @@ Roofline d'un H100 SXM construit avec les valeurs de la page produit NVIDIA (pic
 <p>Pour distinguer une vraie part séquentielle d'un coût qui croît avec <span class="math inline">p</span>, la <strong>métrique de Karp et Flatt</strong> calcule, à partir d'un gain mesuré <span class="math inline">S</span> sur <span class="math inline">p</span> processeurs, une fraction séquentielle expérimentale :</p>
 <p><span class="math display">e(p) = \frac{1/S - 1/p}{1 - 1/p}</span></p>
 <p>Si <span class="math inline">e</span> reste constant quand <span class="math inline">p</span> augmente, le goulot est une vraie part séquentielle. Si <span class="math inline">e</span> croît, un coût de parallélisme (communication, synchronisation, déséquilibre) augmente avec <span class="math inline">p</span>.</p>
-<h3 id="les-retardataires">5.4. Les retardataires</h3>
+<h3 id="les-traînards">5.4. Les traînards</h3>
 <p>Dans un entraînement synchrone, chaque étape attend le rang le plus lent. Si les temps de calcul des rangs sont des variables aléatoires de moyenne <span class="math inline">\mu</span> et d'écart-type <span class="math inline">\sigma</span>, l'espérance du maximum de <span class="math inline">p</span> gaussiennes est bornée par <span class="math inline">\mu + \sigma\sqrt{2\ln p}</span>.</p>
-<p>Pour <span class="math inline">p = 1024</span>, le facteur <span class="math inline">\sqrt{2\ln p}</span> vaut 3,72 : avec un écart-type de 2 % de la moyenne, l'étape dure en moyenne jusqu'à 7,4 % de plus que la moyenne des rangs. Un seul GPU légèrement dégradé, un <em>straggler</em>, suffit à ralentir tout le job. C'est la raison d'être de la supervision fine du module 14.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — Le prix de la dispersion à 1 024 rangs</span> Pour <span class="math inline">p = 1024</span>, le facteur <span class="math inline">\sqrt{2\ln p}</span> vaut 3,72. Avec un écart-type de 2 % de la moyenne, l'étape dure en moyenne jusqu'à <span class="math inline">3{,}72 \times 2 \approx 7{,}4</span> % de plus que la moyenne des rangs, sans qu'aucun rang ne soit en panne.</p>
+</div>
+<p>Un seul GPU légèrement dégradé, un <strong>traînard</strong> (<em>straggler</em>), suffit à ralentir tout le job. C'est la raison d'être de la supervision fine du module 14.</p>
 <div class="recap">
 <p>Points clés — chapitre 5</p>
 <ul>
@@ -728,6 +732,7 @@ Roofline d'un H100 SXM construit avec les valeurs de la page produit NVIDIA (pic
 <p>Roger Hockney a proposé de modéliser le temps d'un message de <span class="math inline">n</span> octets par une fonction affine :</p>
 <p><span class="math display">T(n) = \alpha + \frac{n}{B}</span></p>
 <p>Le terme <span class="math inline">\alpha</span> est la <strong>latence</strong> : ce que coûte un message, même vide. Le terme <span class="math inline">n/B</span> est le <strong>temps de transfert</strong>. Un petit message est dominé par <span class="math inline">\alpha</span>, un gros par <span class="math inline">n/B</span>. La taille qui sépare les deux régimes, atteinte quand le temps de transfert égale la latence, est <span class="math inline">n_{1/2} = \alpha B</span>.</p>
+<p>Le modèle s'appelle α-β parce que la littérature écrit souvent <span class="math inline">T(n) = \alpha + n\beta</span>, avec <span class="math inline">\beta = 1/B</span> le temps par octet ; Patarasuk et Yuan notent ainsi <span class="math inline">\beta m</span> le temps de transfert d'un message de <span class="math inline">m</span> octets. Ce parcours écrit <span class="math inline">n/B</span>, plus facile à comparer à une fiche technique.</p>
 <div class="ex">
 <p><span class="tag">Exemple 6.1 — La taille de demi-performance</span> Avec une latence <span class="math inline">\alpha = 5\ \mu</span>s et une bande passante <span class="math inline">B = 25</span> Go/s, on obtient <span class="math inline">n_{1/2} = 5 \cdot 10^{-6} \times 25 \cdot 10^9 = 125</span> ko. En dessous de 125 ko, le débit effectif est inférieur à la moitié de la bande passante nominale. C'est pourquoi les bibliothèques regroupent les petits messages en gros.</p>
 </div>
@@ -761,21 +766,21 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <p>Pour les mêmes paramètres, l'arbre naïf prend 257,7 ms pour 1 Gio (3,4 fois plus) mais 30 µs pour 1 Kio (2,3 fois moins). Le point d'égalité se situe vers 235 ko.</p>
 </div>
 <h3 id="débit-algorithmique-et-débit-de-bus">6.5. Débit algorithmique et débit de bus</h3>
-<p>Les outils de mesure comme <code>nccl-tests</code> rapportent deux débits. Le <strong>débit algorithmique</strong> (<em>algbw</em>) est la taille des données divisée par le temps, <span class="math inline">S/t</span>. Le <strong>débit de bus</strong> (<em>busbw</em>) le multiplie par un facteur qui dépend de l'opération, pour obtenir un chiffre comparable à la bande passante matérielle quel que soit le nombre de rangs. Pour un all-reduce, la documentation de <code>nccl-tests</code> donne le facteur <span class="math inline">2(p-1)/p</span>.</p>
+<p>Les outils de mesure comme <code>nccl-tests</code> rapportent deux débits. Le <strong>débit algorithmique</strong> (<em>algbw</em>) est la taille des données divisée par le temps, <span class="math inline">n/t</span> (la documentation de <code>nccl-tests</code> note <span class="math inline">S</span> cette taille, que ce module réserve au gain). Le <strong>débit de bus</strong> (<em>busbw</em>) le multiplie par un facteur qui dépend de l'opération, pour obtenir un chiffre comparable à la bande passante matérielle quel que soit le nombre de rangs. Pour un all-reduce, la documentation de <code>nccl-tests</code> donne le facteur <span class="math inline">2(p-1)/p</span>.</p>
 <p>Dans l'exemple 6.2, le débit algorithmique vaut <span class="math inline">2^{30}/0{,}0752 \approx 14{,}3</span> Go/s ; le débit de bus vaut <span class="math inline">14{,}3 \times 1{,}75 \approx 25</span> Go/s, c'est-à-dire, à 0,1 % près, la bande passante <span class="math inline">B</span> du lien (la latence explique l'écart). Un débit de bus proche de la bande passante nominale signifie que le réseau est saturé : on ne peut plus rien gagner de ce côté.</p>
 <h3 id="recouvrir-calcul-et-communication">6.6. Recouvrir calcul et communication</h3>
 <p>Si les gradients d'une couche peuvent être envoyés pendant que la couche précédente calcule encore sa rétropropagation, la communication est cachée derrière le calcul. Au mieux, le temps d'étape vaut le maximum des deux, et non leur somme :</p>
 <p><span class="math display">T_{\text{étape}} \approx \max\bigl(T_{\text{calcul}},\; T_{\text{comm}}\bigr)</span></p>
 <p>Au pire, sans recouvrement, c'est la somme. Les implémentations réelles tombent entre les deux ; mesurer où elles se situent est l'objet du module 9. Le modèle α-β donne seulement la valeur de <span class="math inline">T_{\text{comm}}</span> à mettre en regard du temps de calcul.</p>
 <div class="note">
-<p><span class="tag">Un modèle à deux niveaux</span> Dans un nœud, les GPU communiquent par NVLink (900 Go/s sur H100 SXM d'après la page produit), bien plus vite qu'entre nœuds par le réseau. Un seul couple <span class="math inline">(\alpha, B)</span> ne suffit alors plus : on utilise un modèle hiérarchique, avec un all-reduce interne puis un all-reduce entre nœuds. Le module 7 détaille cette hiérarchie et ses effets de topologie.</p>
+<p><span class="tag">Un modèle à deux niveaux</span> Dans un nœud, les GPU communiquent par NVLink (900 Go/s au total, 450 Go/s par sens, sur H100 SXM d'après la page produit et le blog Hopper), bien plus vite qu'entre nœuds par le réseau. Un seul couple <span class="math inline">(\alpha, B)</span> ne suffit alors plus : on utilise un modèle hiérarchique, avec un all-reduce interne puis un all-reduce entre nœuds. Le module 7 détaille cette hiérarchie et ses effets de topologie.</p>
 </div>
 <div class="recap">
 <p>Points clés — chapitre 6</p>
 <ul>
 <li><span class="math inline">T(n) = \alpha + n/B</span> : latence par message, transfert par octet ; la taille de demi-performance est <span class="math inline">\alpha B</span>.</li>
 <li>Un all-reduce exige que les rangs émettent au moins <span class="math inline">2n(p-1)</span> octets en tout, soit <span class="math inline">2n(p-1)/p</span> par rang en moyenne, presque indépendamment de <span class="math inline">p</span>.</li>
-<li>L'anneau est optimal en bande passante mais coûte <span class="math inline">2(p-1)</span> latences ; l'arbre fait l'inverse.</li>
+<li>L'anneau est optimal en bande passante mais coûte <span class="math inline">2(p-1)</span> latences ; l'arbre naïf fait l'inverse.</li>
 <li>Le débit de bus de <code>nccl-tests</code> multiplie le débit algorithmique par <span class="math inline">2(p-1)/p</span> pour un all-reduce.</li>
 <li>Le recouvrement fait passer le temps d'étape de la somme au maximum du calcul et de la communication.</li>
 </ul>
@@ -783,9 +788,10 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <h2 id="ch7">7. FLOP d'un transformeur, MFU et mémoire d'un entraînement</h2>
 <p>Le roofline et le modèle α-β décrivent la machine. Il reste à décrire la charge : combien de calcul demande un entraînement de modèle de langage, et quelle part du pic de la machine en fait-il un usage utile ?</p>
 <h3 id="combien-de-flop-par-token">7.1. Combien de FLOP par token</h3>
-<p>Pour un transformeur <em>decoder-only</em> de <span class="math inline">N</span> paramètres, l'entraînement d'un token demande environ <span class="math inline">6N</span> FLOP de produits de matrices : <span class="math inline">2N</span> pour la passe avant, <span class="math inline">4N</span> pour la passe arrière. Le calcul de l'attention ajoute un terme qui dépend de la longueur de séquence. L'annexe B de l'article PaLM donne le total par token :</p>
+<p>Pour un transformeur <em>decoder-only</em> de <span class="math inline">N</span> paramètres, l'entraînement d'un token demande environ <span class="math inline">6N</span> FLOP de produits de matrices : <span class="math inline">2N</span> pour la passe avant, <span class="math inline">4N</span> pour la passe arrière. Pour <span class="math inline">D</span> tokens d'entraînement, le calcul total vaut donc environ <span class="math inline">6ND</span> FLOP.</p>
+<p>Le calcul de l'attention ajoute un terme qui dépend de la longueur de séquence. L'annexe B de l'<a href="https://arxiv.org/abs/2204.02311">article PaLM</a> donne le total par token :</p>
 <p><span class="math display">F_{\text{token}} = 6N + 12\,L\,H\,Q\,T</span></p>
-<p>avec <span class="math inline">L</span> le nombre de couches, <span class="math inline">H</span> le nombre de têtes d'attention, <span class="math inline">Q</span> la dimension d'une tête et <span class="math inline">T</span> la longueur de séquence.</p>
+<p>avec <span class="math inline">L</span> le nombre de couches, <span class="math inline">H</span> le nombre de têtes d'attention, <span class="math inline">Q</span> la dimension d'une tête et <span class="math inline">T</span> la longueur de séquence (notation de PaLM ; ailleurs dans le module, <span class="math inline">T</span> désigne un temps).</p>
 <div class="ex">
 <p><span class="tag">Exemple 7.1 — Le terme d'attention pèse 15 % à 4 096 tokens</span> Prenons un modèle de 7 milliards de paramètres avec <span class="math inline">L = 32</span>, <span class="math inline">H = 32</span>, <span class="math inline">Q = 128</span> et <span class="math inline">T = 4096</span>. Le terme principal vaut <span class="math inline">6N = 4{,}2 \cdot 10^{10}</span> FLOP par token.</p>
 <p>Le terme d'attention vaut :</p>
@@ -793,7 +799,7 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <p>Il ajoute donc 15,3 % aux FLOP. Il croît avec <span class="math inline">T</span> : à longue séquence il devient dominant, et l'ignorer sous-estime le travail réel.</p>
 </div>
 <h3 id="mfu-et-hfu">7.2. MFU et HFU</h3>
-<p>L'article PaLM définit le <strong>MFU</strong> (<em>model FLOPs utilization</em>) comme le rapport entre le débit observé, en tokens par seconde, et le débit théorique maximal d'une machine qui fonctionnerait au pic. Le dénominateur ne compte que les opérations <em>nécessaires</em> à la passe avant et arrière, pas celles qu'ajoute la recomputation des activations. Cela rend le MFU indépendant de l'implémentation :</p>
+<p>L'<a href="https://arxiv.org/abs/2204.02311">article PaLM</a> définit le <strong>MFU</strong> (<em>model FLOPs utilization</em>) comme le rapport entre le débit observé, en tokens par seconde, et le débit théorique maximal d'une machine qui fonctionnerait au pic. Ce débit théorique ne compte que les opérations <em>nécessaires</em> à la passe avant et arrière, pas celles qu'ajoute la recomputation des activations. Cela rend le MFU indépendant de l'implémentation :</p>
 <p><span class="math display">\text{MFU} = \frac{\text{tokens/s} \times F_{\text{token}}}{n_{\text{GPU}} \times P_{\text{pic}}}</span></p>
 <p>Le <strong>HFU</strong> (<em>hardware FLOPs utilization</em>) compte au contraire les FLOP réellement exécutés, recomputation comprise. Les auteurs de PaLM le jugent peu fiable pour comparer des systèmes : il dépend de choix d'implémentation et de la méthode de comptage. Pour PaLM 540B sur 6 144 puces TPU v4, ils rapportent un MFU de 46,2 % et un HFU de 57,8 %.</p>
 <p>Le pic <span class="math inline">P_{\text{pic}}</span> doit être le pic <strong>dense</strong> de la précision utilisée pour l'entraînement : 989 TFLOP/s en BF16 sur H100 SXM, comme au chapitre 2.</p>
@@ -805,21 +811,22 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <div class="ex">
 <p><span class="tag">Exemple 7.3 — Retrouver un ordre de grandeur de durée d'étape</span> Le tableau 4 de Llama 3 indique 16 M tokens par lot, soit environ <span class="math inline">16 \times 2^{20}</span>. Pour <span class="math inline">N = 405 \cdot 10^{9}</span>, <span class="math inline">6N \times 1{,}68 \cdot 10^{7} \approx 4{,}08 \cdot 10^{19}</span> FLOP par étape. À 400 TFLOPs par GPU sur 16 384 GPU, la machine délivre <span class="math inline">6{,}55 \cdot 10^{18}</span> FLOP/s : une étape dure de l'ordre de 6 secondes. C'est une estimation de l'auteur de ce module : l'article ne publie pas la durée d'étape.</p>
 </div>
-<p>Le MFU est un rapport de débit. Il ne dit rien du temps perdu quand le job est arrêté, ce qui nous amène à la notion de <strong>goodput</strong> (débit utile) : ici, le MFU multiplié par la fraction du temps où le job progresse réellement.</p>
+<p>Le MFU est un rapport de débit. Il ne dit rien du temps perdu quand le job est arrêté. La part du temps d'horloge consacrée à du calcul qui sera conservé s'appelle le <strong>goodput</strong> (<a href="../fault-tolerance/index.html#ch2">module 10</a>). Le produit MFU × goodput, que ce parcours appelle <strong>usage utile du pic</strong>, donne la part du pic réellement convertie en progrès de l'entraînement.</p>
 <div class="war">
-<p><span class="tag">À 16 000 GPU, on s'arrête tous les jours</span> Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 466 interruptions de job, dont 47 planifiées et 419 imprévues. Environ 78 % des interruptions imprévues ont été attribuées à des problèmes matériels confirmés ou suspectés, les GPU représentant à eux seuls 58,7 % des causes. L'équipe a pourtant atteint plus de 90 % de temps d'entraînement effectif, grâce à l'automatisation : une intervention manuelle significative n'a été nécessaire que trois fois. Source : <a href="https://arxiv.org/abs/2407.21783">article Llama 3</a>, section 3.3.4.</p>
-<p>Un MFU de 40 % associé à 90 % de temps effectif donne un usage utile de l'ordre de 36 % du pic (<span class="math inline">0{,}9 \times 0{,}40</span>), un ordre de grandeur de calcul à retenir. Le module 10 traite cette perte.</p>
+<p><span class="tag">À 16 000 GPU, on s'arrête tous les jours</span> Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 466 interruptions de job, dont 47 planifiées et 419 imprévues. Environ 78 % des interruptions imprévues ont été attribuées à des problèmes matériels confirmés ou suspectés. Les GPU représentent 268 des 419 interruptions imprévues : 64 % recalculé à partir des comptes du tableau 5, alors que le texte de l'article dit 58,7 % (voir le <a href="../fault-tolerance/index.html#ch1">module 10, § 1.3</a>).</p>
+<p>L'équipe a pourtant atteint plus de 90 % de temps d'entraînement effectif, grâce à l'automatisation : une intervention manuelle significative n'a été nécessaire que trois fois. Source : <a href="https://arxiv.org/abs/2407.21783">article Llama 3</a>, section 3.3.4.</p>
+<p>Un MFU de 40 % associé à 90 % de temps effectif donne un usage utile de l'ordre de 36 % du pic (<span class="math inline">0{,}9 \times 0{,}40</span>, goodput × MFU), un ordre de grandeur de calcul à retenir. Le module 10 traite cette perte.</p>
 </div>
 <h3 id="la-mémoire-dun-entraînement">7.4. La mémoire d'un entraînement</h3>
 <p>Un entraînement en précision mixte avec l'optimiseur Adam stocke, par paramètre : 2 octets de poids en BF16, 2 octets de gradient, et 12 octets d'état d'optimiseur (copie des poids en FP32, moment, variance). L'article ZeRO l'écrit <span class="math inline">2\Psi + 2\Psi + K\Psi = 16\Psi</span> octets avec <span class="math inline">K = 12</span>.</p>
-<p>Pour 7 milliards de paramètres, cela représente <span class="math inline">16 \times 7 \cdot 10^9 = 112</span> Go, hors activations. C'est plus que les 80 Go d'un H100 : un modèle de 7 milliards de paramètres <strong>ne tient pas</strong> sur un GPU en entraînement complet. Il faut répartir ces états entre GPU, ce que font ZeRO et FSDP au module 9.</p>
+<p>Pour 7 milliards de paramètres, cela représente <span class="math inline">16 \times 7 \cdot 10^9 = 112</span> Go, hors activations (la mémoire des activations est chiffrée au <a href="../distributed-training/index.html#ch3">module 9, chapitre 3</a>). C'est plus que les 80 Go d'un H100 : un modèle de 7 milliards de paramètres <strong>ne tient pas</strong> sur un GPU en entraînement complet. Il faut répartir ces états entre GPU, ce que font ZeRO et FSDP au module 9.</p>
 <div class="recap">
 <p>Points clés — chapitre 7</p>
 <ul>
-<li>Un token coûte environ <span class="math inline">6N + 12LHQT</span> FLOP à l'entraînement (PaLM, annexe B).</li>
+<li>Un token coûte environ <span class="math inline">6N + 12LHQT</span> FLOP à l'entraînement (PaLM, annexe B) ; <span class="math inline">D</span> tokens coûtent donc environ <span class="math inline">6ND</span> FLOP.</li>
 <li>MFU : tokens/s × FLOP par token divisés par le pic dense agrégé ; HFU compte la recomputation.</li>
 <li>De 38 à 46 % de MFU est la fourchette publiée à grande échelle (PaLM, Llama 3).</li>
-<li>Le goodput est le MFU multiplié par la part de temps où le job tourne vraiment.</li>
+<li>Le goodput est la part du temps où le job produit du calcul conservé ; MFU × goodput est l'usage utile du pic.</li>
 <li>Adam en précision mixte coûte 16 octets par paramètre : 112 Go pour 7 milliards de paramètres.</li>
 </ul>
 </div>
@@ -888,7 +895,7 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 </tbody>
 </table>
 </div>
-<p>La fraction séquentielle de Karp-Flatt vaut, pour <span class="math inline">p = 8</span>, <span class="math inline">e = (1/6{,}06 - 1/8)/(1 - 1/8) \approx 0{,}046</span>. Si ce coût était une vraie part séquentielle, Amdahl prédirait pour <span class="math inline">p = 64</span> un gain de <span class="math inline">1/(0{,}046 + 0{,}954/64) \approx 16{,}5</span>, soit une efficacité de 26 %. La <strong>prédiction</strong> peut ensuite être comparée à une mesure : un écart important signale un coût qui croît avec <span class="math inline">p</span>.</p>
+<p>La fraction séquentielle de Karp-Flatt vaut, pour <span class="math inline">p = 8</span>, <span class="math inline">e = (1/6{,}06 - 1/8)/(1 - 1/8) \approx 0{,}046</span>. Si ce coût était une vraie part séquentielle, Amdahl prédirait pour <span class="math inline">p = 64</span> un gain de <span class="math inline">1/(0{,}046 + 0{,}954/64) \approx 16{,}4</span>, soit une efficacité de 26 %. La <strong>prédiction</strong> peut ensuite être comparée à une mesure : un écart important signale un coût qui croît avec <span class="math inline">p</span>.</p>
 </div>
 <h3 id="les-pièges-classiques">8.4. Les pièges classiques</h3>
 <ul>
@@ -912,20 +919,20 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <h2 id="labs">Labs</h2>
 <h3 id="lab-2-1">Lab 2.1 — STREAM et GEMM : votre roofline</h3>
 <div class="lab">
-<p><strong>Objectif.</strong> Mesurer la bande passante mémoire et le débit de produit matriciel de votre machine, puis construire son roofline. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable CPU avec Python 3 et NumPy ; aucun GPU.</p>
+<p><strong>Objectif.</strong> Mesurer la bande passante mémoire et le débit de produit matriciel de votre machine, puis construire son roofline. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable CPU avec Python 3 et NumPy (testé avec Python 3.13 et NumPy 2.5 le 2026-10-25) ; aucun GPU.</p>
 <ol type="1">
 <li>Ouvrez <code>labs/perf-models/stream-gemm/</code> et lisez <code>stream_gemm.py</code> : repérez le compte d'octets de la copie (16 par élément) et de l'addition (24).</li>
 <li>Lancez <code>python3 stream_gemm.py</code> pour la mesure complète, puis <code>./verify.sh</code> pour le contrôle de cohérence rapide.</li>
 <li>Relevez dans <code>results.json</code> la bande passante <code>stream.add_gbs</code>, le débit <code>peak_gemm_gflops</code> et le point de rupture <code>ridge_flop_per_byte</code>.</li>
-<li>Pour chaque taille de GEMM, comparez le débit mesuré à la valeur du roofline (champ <code>measured_over_roofline</code>, affiché <code>ratio=</code>). Expliquez en cinq lignes pourquoi les petites tailles restent sous le toit.</li>
+<li>Pour chaque taille de GEMM, comparez le débit mesuré à la valeur du roofline (champ <code>measured_over_roofline</code>, affiché <code>ratio=</code>). Le GEMM du lab est en <code>float32</code> : 4 octets par élément, donc <span class="math inline">I = n/6</span> et non <span class="math inline">n/3</span> comme en BF16 (exemple 4.2). Expliquez en cinq lignes pourquoi les petites tailles restent sous le toit.</li>
 <li>Relancez <code>python3 stream_gemm.py --quick</code> avec <code>OMP_NUM_THREADS</code> à 1, 2, puis au nombre de cœurs. Le débit du GEMM augmente avec les threads, mais la bande passante <code>add_gbs</code> ne bouge pas : les opérations élémentaires de NumPy sont mono-thread. Que devient le point de rupture, et pourquoi faut-il le lire avec prudence ?</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK roofline coherent » et vous pouvez donner, avec leurs unités, votre bande passante, votre pic GEMM et votre point de rupture. Sur la VM de test à 4 vCPU (relevé du 2026-10-25, une dizaine d'exécutions rapides), l'addition donne de 8 à 11 Go/s, le GEMM de 250 à 470 GFLOP/s et le point de rupture de 25 à 52 FLOP par octet ; la dispersion vient d'une machine partagée, et le GEMM peut tomber dix fois plus bas quand d'autres charges l'occupent. Vos valeurs seront différentes, c'est normal.</p>
+<p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK roofline coherent » et vous pouvez donner, avec leurs unités, votre bande passante, votre pic GEMM et votre point de rupture. Sur la VM de test à 4 vCPU (relevés du 2026-10-25, une douzaine d'exécutions rapides), l'addition donne de 7 à 11 Go/s, le GEMM d'environ 250 à 470 GFLOP/s et le point de rupture de 25 à 52 FLOP par octet ; la dispersion vient d'une machine partagée, et le GEMM peut tomber dix fois plus bas quand d'autres charges l'occupent. Vos valeurs seront différentes, c'est normal.</p>
 <p><strong>Pour aller plus loin.</strong> Sur un GPU, remplacez NumPy par PyTorch : mesurez l'addition de vecteurs sur le GPU, un GEMM en BF16, et comparez au pic <strong>dense</strong> de la fiche technique. Vous retrouverez qu'un petit GEMM est loin du pic (exemple 4.3).</p>
 </div>
 <h3 id="lab-2-2">Lab 2.2 — α-β : prédire puis mesurer un all-reduce</h3>
 <div class="lab">
-<p><strong>Objectif.</strong> Ajuster le modèle de l'anneau sur des mesures d'all-reduce et juger de sa qualité. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3 et PyTorch (version CPU suffisante) ; 4 cœurs recommandés.</p>
+<p><strong>Objectif.</strong> Ajuster le modèle de l'anneau sur des mesures d'all-reduce et juger de sa qualité. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3 et PyTorch (version CPU suffisante ; testé avec Python 3.13 et PyTorch 2.14.1 pour CPU le 2026-10-25, la <a href="../../lab-setup/index.html#testee">configuration de référence</a>) ; 4 cœurs recommandés.</p>
 <ol type="1">
 <li>Lisez <code>labs/perf-models/allreduce-model/bench_allreduce.py</code> : repérez la chauffe, la barrière avant chaque mesure et le maximum entre rangs.</li>
 <li>Lancez <code>OMP_NUM_THREADS=1 torchrun --nproc_per_node=4 bench_allreduce.py --out allreduce.json</code>.</li>
@@ -933,12 +940,12 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <li>Comparez les temps mesurés et prédits pour chaque taille. Où le modèle se trompe-t-il le plus ? Reliez la réponse à la taille de demi-performance.</li>
 <li>Calculez le débit algorithmique et le débit de bus pour la plus grande taille, avec le facteur <span class="math inline">2(p-1)/p</span>.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK alpha-beta fit usable » avec une erreur relative médiane inférieure à 60 % sur la plage ajustée. Sur la VM de test (relevé du 2026-10-25, treize exécutions), l'ajustement donne <span class="math inline">\alpha</span> de 250 à 910 <span class="math inline">\mu</span>s (les valeurs hautes quand la machine est chargée) et <span class="math inline">B</span> de 0,7 à 1,9 Go/s, avec une erreur médiane de 6 à 23 % : les processus <code>gloo</code> partagent les mêmes cœurs, ce n'est donc pas un réseau. Le but est la méthode, pas ces chiffres.</p>
-<p><strong>Pour aller plus loin.</strong> Sur un nœud multi-GPU, remplacez le backend par <code>nccl</code> et placez le tenseur sur GPU, puis comparez le débit de bus mesuré à la bande passante NVLink de la fiche technique.</p>
+<p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK alpha-beta fit usable » avec une erreur relative médiane inférieure à 60 % sur la plage ajustée. Sur la VM de test (relevés du 2026-10-25, quinze exécutions), l'ajustement donne <span class="math inline">\alpha</span> de 250 à 910 <span class="math inline">\mu</span>s (les valeurs hautes quand la machine est chargée) et <span class="math inline">B</span> de 0,7 à 1,9 Go/s, avec une erreur médiane de 1 à 23 % : les processus <code>gloo</code> partagent les mêmes cœurs, ce n'est donc pas un réseau. Le but est la méthode, pas ces chiffres.</p>
+<p><strong>Pour aller plus loin.</strong> Sur un nœud multi-GPU, remplacez le backend par <code>nccl</code> et placez le tenseur sur GPU, puis comparez le débit de bus mesuré à 450 Go/s, la bande passante NVLink <strong>par sens</strong> (chapitre 2). Le débit de bus d'un all-reduce vaut les octets qu'un rang émet, <span class="math inline">2n(p-1)/p</span>, divisés par le temps : il se compare à un seul sens du lien, pas aux 900 Go/s du total.</p>
 </div>
 <h3 id="lab-2-3">Lab 2.3 — Un calculateur de MFU testé</h3>
 <div class="lab">
-<p><strong>Objectif.</strong> Maîtriser le calcul du MFU en le programmant avec ses cas limites. <strong>Durée.</strong> 2 h. <strong>Prérequis matériels.</strong> Portable, Python 3 et <code>pytest</code>.</p>
+<p><strong>Objectif.</strong> Maîtriser le calcul du MFU en le programmant avec ses cas limites. <strong>Durée.</strong> 2 h. <strong>Prérequis matériels.</strong> Portable, Python 3 et <code>pytest</code> (testé avec Python 3.13 et pytest 9.1 le 2026-10-25).</p>
 <ol type="1">
 <li>Lisez <code>labs/perf-models/mfu-calculator/mfu.py</code> : repérez la formule de PaLM (annexe B) et l'absence de comptage de la recomputation.</li>
 <li>Lancez <code>./verify.sh</code> : les seize tests doivent passer, puis la commande de l'étape 4 s'affiche.</li>
@@ -1071,7 +1078,7 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <ul>
 <li><strong>Je peux situer un noyau sur un roofline.</strong> Preuve : le roofline de votre machine (lab 2.1) et l'intensité de trois noyaux placés dessus.</li>
 <li><strong>Je peux lire une fiche technique sans me tromper de pic.</strong> Preuve : l'exercice 2 refait sur une fiche de votre choix.</li>
-<li><strong>Je peux prédire un gain et son plafond.</strong> Preuve : l'exercice 6 refait sur vos propres mesures de scalabilité.</li>
+<li><strong>Je peux prédire un gain et son plafond.</strong> Preuve : l'exercice 6 refait sur le pic GEMM du lab 2.1 mesuré avec <code>OMP_NUM_THREADS</code> à 1, 2 et 4 (étape 5, en mesure complète sans <code>--quick</code>), le gain étant le rapport des débits.</li>
 <li><strong>Je peux prédire le temps d'un all-reduce.</strong> Preuve : l'ajustement α-β du lab 2.2 et son erreur relative.</li>
 <li><strong>Je peux calculer un MFU et en contester un.</strong> Preuve : le calculateur testé du lab 2.3 et l'exercice 10.</li>
 <li><strong>Je peux écrire un plan d'étude de passage à l'échelle.</strong> Preuve : une page avec question, prédiction, protocole et menaces.</li>
@@ -1098,6 +1105,7 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <h2 id="sources">Sources et portée</h2>
 <h3 id="documente">Documenté</h3>
 <p>Les chiffres du H100 (page produit NVIDIA et blog Hopper), la définition et les valeurs de MFU de PaLM, le tableau 4 et la section 3.3.4 de Llama 3, la règle des 16 octets par paramètre de ZeRO, les définitions de débit algorithmique et de bus de <code>nccl-tests</code>, la borne inférieure de Patarasuk et Yuan, et l'étude de Hoefler et Belli ont été relus à la source le 22 octobre 2026, puis recontrôlés lors d'une relecture indépendante le 25 octobre 2026. Tous les calculs des exemples et des corrigés ont été refaits en Python. Les comptes d'octets de STREAM viennent du code source <code>stream.c</code>.</p>
+<p>Ont aussi été relus à la source le 25 octobre 2026 : les comptes du tableau 5 de Llama 3 (268 interruptions liées aux GPU sur 419 imprévues), le comptage de NVLink dans le blog Hopper (18 liens de 25 Go/s par sens, 900 Go/s au total), la notation <span class="math inline">\beta m</span> de Patarasuk et Yuan, la définition du MFU de PaLM et l'échantillon de 120 articles de Hoefler et Belli.</p>
 <h3 id="recommande">Recommandé</h3>
 <p>L'ordre des chapitres, le choix de l'anneau et de l'arbre naïf comme modèles pédagogiques, le protocole en sept étapes et la discipline de prédire avant de mesurer sont des choix de ce parcours, pas des normes.</p>
 <h3 id="a-verifier">À vérifier</h3>

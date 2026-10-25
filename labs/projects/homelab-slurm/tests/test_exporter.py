@@ -81,19 +81,19 @@ def test_idle_cluster_still_emits_zero_valued_job_series():
     assert metric(m, "slurm_jobs", partition="debug", state="PENDING") == 0  # "nothing runs" alerts need a 0, not an absence
 
 
-def test_a_failing_command_gives_scrape_ok_zero_and_nothing_else():
+def test_a_failing_command_gives_scrape_success_zero_and_nothing_else():
     def broken(argv):
         raise RuntimeError("slurmctld unreachable")
     out = exporter.collect(broken, now=T0)
-    assert "slurm_scrape_ok 0" in out and "slurm_jobs" not in out and "slurm_nodes" not in out
+    assert "slurm_scrape_success 0" in out and "slurm_jobs" not in out and "slurm_nodes" not in out
     garbled = {"sinfo": "", "squeue": "1|debug|u|a|PENDING|Priority|not-a-date\n", "sshare": ""}  # unparsable output is a failed scrape too
-    assert "slurm_scrape_ok 0" in exporter.collect(lambda argv: garbled[argv[0]], now=T0)
+    assert "slurm_scrape_success 0" in exporter.collect(lambda argv: garbled[argv[0]], now=T0)
 
 
 def test_collect_with_working_commands_reports_ok():
     outputs = {"sinfo": fx("sinfo_mix.txt"), "squeue": fx("squeue_mixed.txt"), "sshare": fx("sshare.txt")}
     out = exporter.collect(lambda argv: outputs[argv[0]], now=T0 + 5)
-    assert "slurm_scrape_ok 1" in out and 'slurm_jobs{partition="debug",state="PENDING"} 4' in out
+    assert "slurm_scrape_success 1" in out and 'slurm_jobs{partition="debug",state="PENDING"} 4' in out
 
 
 def test_exposition_passes_promtool_check_metrics():

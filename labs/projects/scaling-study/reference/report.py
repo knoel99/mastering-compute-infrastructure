@@ -58,7 +58,8 @@ def build(results, fitres, peak_gflops=None):
     out += ["", "## Definitions", "",
             "- speedup `S = t1 / tp` (strong scaling), efficiency `E = t1 / (p tp)` (strong) or `t1 / tp` (weak).",
             "- Karp-Flatt `e = (1/S - 1/p) / (1 - 1/p)`: if e grows with p, the loss is not a fixed serial part.",
-            "- utilisation (MFU of this study) = `6 * params * batch_per_rank / compute_time / peak`; "
+            "- utilisation of the measured peak `U_c = 6 * params * batch_per_rank / compute_time / peak` "
+            "(compute phase only: not the MFU of module 2, which uses the full step time and the datasheet peak); "
             "`peak` must be measured (GEMM micro-benchmark), here: "
             + (f"{peak_gflops} GFLOP/s." if peak_gflops else "not provided, column left empty."),
             "", "## Threats to validity", "", THREATS.format(reps=reps, cpus=pts[0]['cpu_count'])]

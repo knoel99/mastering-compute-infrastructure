@@ -68,7 +68,7 @@ HELP = {
 
 
 def render(m, ok=True):
-    """TO WRITE. Prometheus text: always `slurm_scrape_ok 1|0` with HELP and TYPE gauge; only when ok, every metric of m
+    """TO WRITE. Prometheus text: always `slurm_scrape_success 1|0` with HELP and TYPE gauge; only when ok, every metric of m
     with HELP, TYPE gauge, and one line per sample: name{k="v",...} value (format %g)."""
     raise NotImplementedError
 

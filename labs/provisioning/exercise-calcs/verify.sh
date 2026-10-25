@@ -10,14 +10,11 @@ expect() { local out="$1" pattern="$2"; if ! grep -qF -- "$pattern" <<<"$out"; t
 out="$(run llama)"; echo "$out"
 expect "$out" 'sum of counts      : 419'
 expect "$out" 'Faulty GPU: 148/419 = 35.3 % but the table prints 30.1 %'
-out="$(run mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9)"; echo "$out"
+out="$(run mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9 --rate-per-1000-node-days 6.5)"; echo "$out"
 expect "$out" '1/N prediction     : 1024 GPUs -> 8.94 h'
+expect "$out" '1 node: 153.8 days, 128 nodes: 28.8 h (3.65 x the measured value)'
 out="$(run rolling --nodes 64 --batch 8 --walltime-h 24 --reboot-h 0.25)"; echo "$out"
 expect "$out" 'worst case total   : 194.00 h = 8.08 days'
-out="$(run dcgm --nodes 32 --minutes 35 --parallel 32)"; echo "$out"
-expect "$out" 'at most 35.0 min'
-out="$(run dcgm --nodes 32 --minutes 35 --parallel 1)"; echo "$out"
-expect "$out" 'at most 1120.0 min = 18.67 h'
 out="$(run busbw --ranks 8 --size-gib 4 --ms 36 --baseline 200)"; echo "$out"
 expect "$out" 'factor 2(n-1)/n    : n=8 -> 1.750'
 out="$(run spares --nodes 256 --rate-per-1000-node-days 2.5 --repair-days 10 --quantile 0.95)"; echo "$out"

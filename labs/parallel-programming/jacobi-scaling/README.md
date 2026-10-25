@@ -1,7 +1,7 @@
 # Lab 3.3 — Jacobi 2D : décomposition de domaine et étude de passage à l'échelle
 
 Un solveur de Laplace par itération de Jacobi, en C avec MPI (décomposition 1D ou 2D, échange de halos par `Isend`/`Irecv`,
-recouvrement optionnel) et OpenMP (hybride), puis une étude de scalabilité forte et faible avec intervalles de confiance.
+recouvrement optionnel) et OpenMP (hybride), puis une étude de passage à l'échelle, fort et faible, avec intervalles de confiance.
 Testé avec Open MPI 4.1.6 et GCC 13.3 le 2026-10-25, sur une VM Linux à 4 vCPU (Intel Xeon à 2,8 GHz, un seul domaine NUMA).
 
 ```bash
@@ -19,7 +19,8 @@ python3 hybrid_compare.py --jacobi ./jacobi --reps 9 --misbound     # rangs x th
 |---|---|
 | `jacobi.c` | le solveur ; sortie sur une ligne `clé=valeur` : temps (max sur les rangs), compteurs de messages et d'octets, empreinte du champ, résidus |
 | `check_jacobi.py` | assertions structurelles de `verify.sh` |
-| `run_study.py`, `analyze_study.py` | plan d'expérience (ordre aléatoire à graine fixe, répétitions), médiane + intervalle bootstrap, gain, efficacité, Karp-Flatt (fonctions du projet `scaling-study`), décomposition du temps, tracé SVG |
+| `run_study.py`, `analyze_study.py` | plan d'expérience (ordre aléatoire à graine fixe, répétitions), médiane + intervalle bootstrap, gain, efficacité, Karp-Flatt (fonctions de `scaling_math.py` ; le projet 2 vous les fera réécrire), décomposition du temps, tracé SVG |
+| `scaling_math.py`, `test_scaling_math.py` | `summarize`, `speedup`, `efficiency`, `karp_flatt` et leurs tests (lancés par `verify.sh`, sans pytest) |
 | `hybrid_compare.py` | mêmes cœurs, répartitions rangs × threads, avec ou sans liaison correcte |
 | `compare_variants.py` | plain, recouvrement, 2D, 2D+recouvrement, résidu à chaque balayage : médiane et minimum, ordre aléatoire ; vérifie que le champ ne change pas |
 | `repro_sum.py`, `mpiio_demo.py` | sommes non associatives (naïve contre à ordre fixe) et écriture MPI-IO collective indépendante du nombre de rangs |

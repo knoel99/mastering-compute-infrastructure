@@ -30,7 +30,7 @@ blocker=$(sbatch --parsable -A teamb --cpus-per-task=4 --time=2 --wrap='sleep 25
 ja=$(sbatch --parsable -A teama --cpus-per-task=2 --wrap='sleep 2' -o /dev/null)
 jb=$(sbatch --parsable -A teamb --cpus-per-task=2 --wrap='sleep 2' -o /dev/null)
 sleep 2
-sprio -o "%i %a %Y %f" -j "$ja,$jb"
+sprio -o "%i %o %Y %f" -j "$ja,$jb"   # %o = account (%a would be the normalized age factor)
 fa=$(sprio -h -o "%f" -j "$ja"); fb=$(sprio -h -o "%f" -j "$jb")
 awk -v a="$fa" -v b="$fb" 'BEGIN{exit !(b>a)}' || { echo "FAIL: fairshare factor of teamb ($fb) should exceed teama ($fa)"; exit 1; }
 # shellcheck disable=SC2016  # the condition is evaluated later by wait_until, on purpose

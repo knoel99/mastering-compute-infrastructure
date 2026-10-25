@@ -18,7 +18,7 @@ COPY_BYTES_PER_ELEM = 16  # float64: 8 B read + 8 B written
 ADD_BYTES_PER_ELEM = 24   # float64: 16 B read + 8 B written (STREAM counts nominal traffic, not write-allocate)
 
 
-def timeit(fn, repeat=7, warmup=2):
+def timeit(fn, repeat=10, warmup=2):
     """Return (min, median) wall time in seconds. The minimum is the least noisy estimate of capability."""
     for _ in range(warmup):
         fn()
@@ -70,7 +70,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--array-mib", type=int, default=128, help="size of each STREAM array (must exceed the last-level cache)")
     ap.add_argument("--sizes", type=int, nargs="+", default=[64, 128, 256, 512, 1024, 2048])
-    ap.add_argument("--repeat", type=int, default=7)
+    ap.add_argument("--repeat", type=int, default=10, help="timed runs per kernel (the course asks for at least ten)")
     ap.add_argument("--quick", action="store_true", help="small sizes, for tests")
     ap.add_argument("--out", default="results.json")
     args = ap.parse_args()

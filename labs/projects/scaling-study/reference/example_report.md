@@ -35,7 +35,7 @@ The extra barrier of `--decompose` perturbs the step time: use these runs to exp
 
 - speedup `S = t1 / tp` (strong scaling), efficiency `E = t1 / (p tp)` (strong) or `t1 / tp` (weak).
 - Karp-Flatt `e = (1/S - 1/p) / (1 - 1/p)`: if e grows with p, the loss is not a fixed serial part.
-- utilisation (MFU of this study) = `6 * params * batch_per_rank / compute_time / peak`; `peak` must be measured (GEMM micro-benchmark), here: not provided, column left empty.
+- utilisation of the measured peak `U_c = 6 * params * batch_per_rank / compute_time / peak` (compute phase only: not the MFU of module 2, which uses the full step time and the datasheet peak); `peak` must be measured (GEMM micro-benchmark), here: not provided, column left empty.
 
 ## Threats to validity
 

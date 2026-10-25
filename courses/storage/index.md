@@ -8,7 +8,7 @@ module:
   phase: 2
   hours: 24
   level: 2
-prerequisites: [linux-systems]
+prerequisites: [linux-systems, perf-models]
 status: core
 badges:
   - {label: "Cœur du parcours", class: core}
@@ -36,13 +36,13 @@ Ce module ne remplace pas le module 10 sur les pannes : le protocole d'un checkp
 
 | Clé | Valeur |
 |---|---|
-| Volume | 24 h : environ 9,5 h de lecture, 9,25 h de labs, 3,5 h d'exercices et 0,5 h de bilan de sortie, soit 22,75 h, plus une marge d'environ 1 h répartie sur les séances |
-| Niveau d'entrée | 2 : à l'aise avec Linux en ligne de commande (module 1) et avec PyTorch |
-| Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), en particulier le chapitre 7 sur le cache de pages et `fio` |
+| Volume | 24 h : environ 9,5 h de lecture, 9,25 h de labs, 3,5 h d'exercices et 0,5 h de bilan de sortie, soit 22,75 h, plus une marge d'environ 1,25 h répartie sur les séances |
+| Niveau d'entrée | 2 : à l'aise avec Linux en ligne de commande (module 1), avec le modèle α-β (module 2) et avec PyTorch |
+| Prérequis | [Module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), en particulier le chapitre 7 du module 1 (cache de pages et `fio`) |
 | Pour qui | Cœur : systèmes de fichiers parallèles, chargement des données et E/S des checkpoints à grande échelle. |
 | Livrable | un rapport de dimensionnement E/S d'un entraînement (lecture, checkpoint, cache, capacité) et la table de décision du chargeur appliquée à une mesure |
 | Environnement | un portable ou une VM Linux sans GPU ; `fio`, PyTorch CPU et `pytest` ; `pyarrow` et `webdataset` en option. Les parties qui demandent un GPU (`pin_memory`, GPUDirect Storage) ou un vrai système de fichiers parallèle sont décrites, **pas exécutées** |
-| Projets liés | [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
+| Projets liés | [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -58,8 +58,8 @@ Ce module ne remplace pas le module 10 sur les pannes : le protocole d'un checkp
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 2 — Exploiter un cluster** (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
--   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
+-   **Phase 2 — Exploiter un cluster** (semaines 10-20) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
+-   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
 -   **Projets qui s'en servent** : [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Administration Linux, Systèmes de fichiers parallèles, Stockage objet, Checkpoint, tolérance aux pannes, FinOps, coûts, Planification de capacité, Chaînes de données, Profilage, bancs d'essai, Achats, relation fournisseurs, Expérience HPC, Expérience d'entraînement ML, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
@@ -169,7 +169,7 @@ Le débit moyen ne dit rien du nombre de fichiers : 3 000 images par seconde sur
 
 ### 1.4. Dimensionner le checkpoint
 
-Pour un modèle de $\Psi$ paramètres entraîné avec Adam en précision mixte, le [papier ZeRO](https://arxiv.org/abs/1910.02054) compte 2 octets par paramètre pour les poids en demi-précision, 2 pour les gradients et 12 pour l'état de l'optimiseur. Un checkpoint n'a pas besoin des gradients : on retient ici $14\Psi$ octets, comme au [chapitre 2 du module 10](../fault-tolerance/index.html#ch2).
+Pour un modèle de $\Psi$ paramètres entraîné avec Adam en précision mixte, le [papier ZeRO](https://arxiv.org/abs/1910.02054) compte 2 octets par paramètre pour les poids en demi-précision, 2 pour les gradients et 12 pour l'état de l'optimiseur. Un checkpoint n'a pas besoin des gradients : on retient ici $14\Psi$ octets, chiffre que le [module 10](../fault-tolerance/index.html#ch2) réutilise dans son modèle de coût (chapitre 2).
 
 Si l'écriture doit tenir dans une fraction $f$ de la période $\tau$ entre deux checkpoints, le débit d'écriture agrégé requis est
 
@@ -270,7 +270,7 @@ Le [manuel de Lustre](https://doc.lustre.org/lustre_manual.xhtml) décrit la mê
 
 ### 2.2. Le striping
 
-Le **striping** découpe un fichier en blocs de taille fixe répartis en tourniquet sur plusieurs cibles. Deux paramètres le règlent : le nombre de cibles (*stripe count*) et la taille d'un bloc (*stripe size*). Le manuel de Lustre indique que les valeurs par défaut du système sont de **1** cible et de **1 Mo**, modifiables par répertoire ou par fichier avec `lfs setstripe -c`.
+Le **striping** découpe un fichier en blocs de taille fixe répartis en tourniquet sur plusieurs cibles. Deux paramètres le règlent : le nombre de cibles (*stripe count*) et la taille d'un bloc (*stripe size*). Le manuel de Lustre indique que les valeurs par défaut du système sont de **1** cible et de **1 Mio** (le manuel écrit « 1 MB », et ses exemples de `lfs getstripe` affichent `lmm_stripe_size: 1048576`), modifiables par répertoire ou par fichier avec `lfs setstripe -c`.
 
 La documentation de BeeGFS donne un exemple de répertoire configuré en `RAID0` avec 4 cibles et des blocs de 1 Mio, modifiable avec `beegfs entry set --num-targets=… --chunk-size=…` ; ces réglages s'appliquent aux **nouveaux** fichiers du répertoire, pas à ceux qui existent déjà.
 
@@ -311,7 +311,7 @@ Ce tableau ne contient que ce que ce module a **lu à la source** le 24 octobre 
 
 | Système | Ce que la documentation lue établit | Réglage de répartition |
 |---|---|---|
-| Lustre | clients, serveurs de métadonnées (MDS, MDT) et de stockage (OSS, OST) ; Data on MDT depuis 2.11 ; quotas utilisateur, groupe et projet | nombre et taille de blocs, par répertoire ou par fichier ; défaut 1 cible et 1 Mo |
+| Lustre | clients, serveurs de métadonnées (MDS, MDT) et de stockage (OSS, OST) ; Data on MDT depuis 2.11 ; quotas utilisateur, groupe et projet | nombre et taille de blocs, par répertoire ou par fichier ; défaut 1 cible et 1 Mio |
 | BeeGFS | services client, métadonnées, stockage et gestion ; clients en contact direct avec le stockage ; métadonnées répartissables ; module noyau côté client | nombre de cibles et taille de bloc par répertoire |
 | GPFS / IBM Storage Scale | **non relu** : la documentation d'IBM a répondu HTTP 403 depuis le bac à sable | à vérifier à la source |
 | WEKA | système de fichiers parallèle distribué (la page lue nomme le produit « NeuralMesh by WEKA »), exécuté dans l'espace utilisateur en conteneurs Linux, cohérence forte et compatibilité POSIX complète annoncées ; quotas, instantanés et hiérarchisation vers un stockage objet | non relu en détail |
@@ -396,7 +396,7 @@ Le tableau compare des **garanties**, pas des vitesses. Les vitesses se mesurent
 La méthode est la même pour tout stockage : mesurer $\alpha$, $B$ et la taille de demi-performance avec des requêtes de taille croissante. Le lab 8.2 (partie B) le fait avec `fio` sur un fichier de 512 Mio en `O_DIRECT`, profondeur de file 1, et ajuste $T = \alpha + n/B$. Pour un autre système, lancez `python3 fio_gap.py --dir <point de montage>` ; un montage NFS n'a **pas** été testé ici.
 
 ::: ex
-[Exemple 3.2 — Les trois nombres du disque du bac à sable]{.tag} Capturé sur la VM de test (4 vCPU, disque virtuel `virtio`, 2026-10-24), `fio_gap.py`, lectures aléatoires en `O_DIRECT` à profondeur de file 1 :
+[Exemple 3.2 — Les trois nombres du disque du bac à sable]{.tag} Capturé sur la VM de test (4 vCPU, disque virtuel `virtio`, 2026-10-24), `fio_gap.py`, lectures en `O_DIRECT` à profondeur de file 1 (une ligne séquentielle, quatre aléatoires) :
 
 ~~~text
 pattern      bs      IOPS       MiB/s  mean lat us
@@ -508,7 +508,7 @@ Ligne par ligne :
 
 Le format [WebDataset](https://raw.githubusercontent.com/webdataset/webdataset/main/README.md) est un ensemble de fichiers tar avec deux conventions : les fichiers qui forment un échantillon partagent le même nom de base, et les shards sont numérotés `quelquechose-000000.tar`, souvent écrits en notation à accolades. Le README affirme qu'il permet des « purely sequential I/O pipelines » et chiffre le gain à « 3x-10x for local drives compared to random access » : c'est une **affirmation du projet, non reproduite ici**.
 
-Notre mesure dit autre chose, et c'est utile : elle ne montre pas de gain de débit à chaud (le jeu tient en mémoire), mais elle chiffre ce qui change à froid : 8 ouvertures contre 4 096, des requêtes séquentielles, et 10 % de surcoût d'octets. Les shards du lab sont lisibles par la vraie bibliothèque `webdataset` (test du lab).
+Notre mesure dit autre chose, et c'est utile : elle ne montre pas de gain de débit à chaud (le jeu tient en mémoire), mais elle chiffre ce qui change à froid : 8 ouvertures contre 4 096, des requêtes séquentielles, et 10 % d'octets lus en plus sur le périphérique (`device/pay` = 1,10 ; 9 % au niveau des appels `read`). Les shards du lab sont lisibles par la vraie bibliothèque `webdataset` (test du lab).
 
 Le prix des shards est le mélange. Un tirage aléatoire global sur un jeu en shards redevient un accès aléatoire. La pratique est de mélanger l'ordre des shards puis de mélanger dans un tampon en mémoire, ce qui donne un ordre moins aléatoire qu'un tirage global. Le README note aussi la limite : équilibrer exactement le nombre d'échantillons entre nœuds sur une époque est délicat, d'où le ré-échantillonnage des shards en multi-nœuds.
 
@@ -596,18 +596,20 @@ Le papier sur les *data stalls* (Mohan et coauteurs, VLDB 2021) distingue les **
 
 ### 5.3. Un modèle du premier ordre
 
-Un échantillon coûte $c$ secondes à un worker : une attente d'E/S $t_{\text{io}}$ et un calcul $t_{\text{cpu}}$. Un batch de $B$ échantillons coûte donc $Bc$ à un worker.
+Un échantillon coûte $c$ secondes à un worker : une attente d'E/S $t_{\text{io}}$ et un calcul $t_{\text{cpu}}$. Un batch de $n_{\text{batch}}$ échantillons coûte donc $n_{\text{batch}}\,c$ à un worker ($B$ reste réservé au débit du chapitre 1).
 
-Avec $W$ workers, le chargeur produit $W/(Bc)$ batchs par seconde.
+Avec $W$ workers, le chargeur produit $W/(n_{\text{batch}}\,c)$ batchs par seconde.
 
-Les cœurs plafonnent ce débit : avec $C$ cœurs, il ne dépasse pas $C/(B\,t_{\text{cpu}})$. Le pas GPU dure $t_{\text{pas}}$ ; la boucle attend dès que le chargeur produit moins vite qu'elle ne consomme.
+Les cœurs plafonnent ce débit : avec $C$ cœurs, il ne dépasse pas $C/(n_{\text{batch}}\,t_{\text{cpu}})$. Le pas GPU dure $t_{\text{pas}}$ ; la boucle attend dès que le chargeur produit moins vite qu'elle ne consomme.
 
-$$\text{stall} = \max\Bigl(0,\; 1 - t_{\text{pas}} \cdot \min\bigl(\tfrac{W}{B c},\; \tfrac{C}{B\,t_{\text{cpu}}}\bigr)\Bigr)$$
+$$\text{stall} = \max\Bigl(0,\; 1 - t_{\text{pas}} \cdot \min\bigl(\tfrac{W}{n_{\text{batch}}\,c},\; \tfrac{C}{n_{\text{batch}}\,t_{\text{cpu}}}\bigr)\Bigr)$$
 
-Sans worker, le chargement et le pas s'enchaînent : le *stall* vaut $Bc/(Bc + t_{\text{pas}})$.
+Sans worker, le chargement et le pas s'enchaînent : le *stall* vaut
+
+$$\text{stall}_0 = \frac{n_{\text{batch}}\,c}{n_{\text{batch}}\,c + t_{\text{pas}}}$$
 
 ::: ex
-[Exemple 5.1 — Combien de workers pour un pas de 12 ms ?]{.tag} Jeu **simulé** : lecture distante de 6 ms par échantillon dont 5 % dix fois plus lentes (donc $t_{\text{io}}$ moyen de $6 \times (1 + 0{,}05 \times 9) = 8{,}7$ ms), décodage de 1 ms, batch de 8, pas GPU de 12 ms (le GPU consommerait 83 batchs par seconde). Donc $c = 9{,}7$ ms et $Bc = 77{,}6$ ms. Capturé sur la VM de test à 4 vCPU (2026-10-24), `run_lab.py`, `DataLoader` réel :
+[Exemple 5.1 — Combien de workers pour un pas de 12 ms ?]{.tag} Jeu **simulé** : lecture distante de 6 ms par échantillon dont 5 % dix fois plus lentes (donc $t_{\text{io}}$ moyen de $6 \times (1 + 0{,}05 \times 9) = 8{,}7$ ms), décodage de 1 ms, $n_{\text{batch}} = 8$, pas GPU de 12 ms (le GPU consommerait 83 batchs par seconde). Donc $c = 9{,}7$ ms et $n_{\text{batch}}\,c = 77{,}6$ ms. Capturé sur la VM de test à 4 vCPU (2026-10-24), `run_lab.py`, `DataLoader` réel, 40 batchs par mesure (valeur par défaut de `--batches`) :
 
 ~~~text
 workers prefetch  batch/s     stall     model cpu/wkr
@@ -667,7 +669,7 @@ L'exemple porte aussi sur `prefetch_factor`. Avec 8 workers, passer de 1 à 2 ba
 Si le prétraitement coûte du CPU (décodage d'images, tokenisation, augmentation), ajouter des workers cesse d'aider dès que les cœurs sont saturés. Le papier sur les *data stalls* conclut dans son tableau 1 que les réseaux étudiés ont besoin « anywhere between 3 – 24 CPU cores per GPU » pour le prétraitement et passent jusqu'à 65 % du temps d'époque dans le prétraitement des données.
 
 ::: ex
-[Exemple 5.2 — Un chargeur CPU sature à 4 cœurs]{.tag} Jeu **simulé** : 8 ms de CPU par échantillon (du vrai CPU), aucune attente d'E/S. Capturé sur la même VM, `run_lab.py`. Le modèle utilise le CPU **mesuré** par échantillon (lu dans `/proc/<pid>/stat` des workers), calibré sur la ligne à 2 workers, pas les 8 ms nominaux.
+[Exemple 5.2 — Un chargeur CPU sature à 4 cœurs]{.tag} Jeu **simulé** : 8 ms de CPU par échantillon (du vrai CPU), aucune attente d'E/S ; batch de 8 et pas de 12 ms, comme à l'exemple 5.1. Capturé sur la même VM, `run_lab.py`. Le modèle utilise le CPU **mesuré** par échantillon (lu dans `/proc/<pid>/stat` des workers), calibré sur la ligne à 2 workers, pas les 8 ms nominaux.
 
 ~~~text
 workers prefetch  batch/s     stall     model cpu/wkr    cpu/sample
@@ -780,18 +782,24 @@ fit T = alpha + S/B on fsync: alpha = 0.0 ms, B = 518 MiB/s, median error 13 %, 
 
 À 128 Mio, l'écriture ordinaire prend 102 ms (1,2 Gio/s) mais n'est pas durable. Le protocole avec `fsync` en prend 283 (452 Mio/s), soit 2,8 fois plus : c'est le prix de la durabilité. `O_DIRECT` en prend 356. L'ajustement $T = \alpha + S/B$ donne $B = 518$ Mio/s avec 13 % d'erreur médiane. Sur nos exécutions, $B$ a varié de 499 à 590 Mio/s et l'erreur médiane de 2 % à 13 % : rapportez des médianes et dites la dispersion.
 
-Avec trois tailles seulement, l'ajustement avait donné un $\alpha$ négatif (−3,5 ms), ramené à 0 par le code, alors que d'autres exécutions ont donné +3,6 et +4,0 ms : $\alpha$ n'est pas identifiable ici, seul $B$ se lit.
+Avec trois tailles seulement, l'ajustement de cette exécution a donné un $\alpha$ négatif (−3,5 ms), affiché 0,0 car le code le ramène à 0, alors que d'autres exécutions ont donné +3,6 et +4,0 ms : $\alpha$ n'est pas identifiable ici, seul $B$ se lit.
 :::
 
 La colonne `snapshot` est la copie de l'état dans un tampon de l'hôte, **simulation** de la copie GPU vers hôte (il n'y a pas de GPU ici) : 12 ms pour 128 Mio, soit environ 10 Gio/s. Elle est près de vingt-quatre fois plus courte que l'écriture durable. C'est cet écart que le checkpoint asynchrone exploite.
 
 ### 6.3. Temps bloquant et temps de persistance
 
-Soit $T_p$ la durée de la persistance, $s$ celle du snapshot et $I$ l'intervalle entre deux checkpoints. Un checkpoint synchrone bloque pendant $T_p$ ; un checkpoint asynchrone bloque pendant $s$, plus ce qui reste de l'écriture précédente si elle dépasse l'intervalle :
+Soit $T_p$ la durée de la persistance, $s$ celle du snapshot et $\tau$ l'intervalle entre deux checkpoints (la période de la section 1.4, notée de même au module 10). Un checkpoint synchrone bloque pendant $T_p$ ; un checkpoint asynchrone bloque pendant $s$, plus ce qui reste de l'écriture précédente si elle dépasse l'intervalle :
 
-$$\text{sync} = \frac{T_p}{I} \qquad \text{async} = \frac{s + \max(0,\, T_p - I)}{I}$$
+$$\text{sync} = \frac{T_p}{\tau} \qquad \text{async} = \frac{s + \max(0,\, T_p - \tau)}{\tau}$$
 
-Le temps qui entre dans la formule de Young du module 10 est le temps **bloquant**, pas la durée totale. Mais si $T_p$ dépasse $I$, l'écriture ne tient plus dans l'intervalle et son reliquat bloque à son tour : l'asynchrone ne vaut plus rien.
+Le temps qui compte pour choisir l'intervalle entre checkpoints est le temps **bloquant**, pas la durée totale. La formule de Young, établie au [chapitre 2 du module 10](../fault-tolerance/index.html#ch2), donne l'intervalle optimal
+
+$$\tau^{\ast} = \sqrt{2\,\delta\,M}$$
+
+où $\delta$ est ce temps bloquant et $M$ le temps moyen entre pannes ; en asynchrone, $\delta$ vaut $s$ tant que l'écriture tient dans l'intervalle.
+
+Si $T_p$ dépasse $\tau$, l'écriture ne tient plus dans l'intervalle et son reliquat bloque à son tour : l'asynchrone ne vaut plus rien.
 
 ::: ex
 [Exemple 6.2 — Synchrone contre asynchrone, mesuré contre modèle]{.tag} Partie B du lab : un pas d'entraînement **simulé** de 20 ms, un stockage **simulé** à 200 Mio/s (l'écrivain se bride lui-même), un état de 32 Mio. Persistance mesurée : 206 ms ; snapshot : 3 ms. Capturé sur la VM de test.
@@ -805,7 +813,7 @@ every N steps   sync meas.   sync model  async meas.  async model
 Tous les 10 pas (200 ms), l'intervalle vaut presque la durée d'écriture : le synchrone double le temps (96,9 %), l'asynchrone coûte 8,9 %. Tous les 40 pas (800 ms), le synchrone coûte 28,3 % et l'asynchrone 1,4 %. Le modèle suit à quelques points près ; l'asynchrone est un peu plus coûteux que prévu (8,9 % contre 4,3 %), écart que nous n'avons pas cherché à expliquer. Le lab accepte 10 points d'écart.
 :::
 
-La figure applique les deux formules à l'exemple d'un état dont la persistance dure 240 s (exercice 9) avec un snapshot de 3 s. Le surcoût synchrone suit $240/I$ ; l'asynchrone reste de l'ordre du pour cent tant que $I > 240$ s, puis s'effondre. **Le coude se trouve à $I = T_p$.**
+La figure applique les deux formules à l'exemple d'un état dont la persistance dure 240 s (exercice 9) avec un snapshot de 3 s. Le surcoût synchrone suit $240/\tau$ ; l'asynchrone reste de l'ordre du pour cent tant que $\tau > 240$ s, puis s'effondre. **Le coude se trouve à $\tau = T_p$.**
 
 <figure class="fig">
 <svg viewBox="0 0 560 330" role="img" aria-labelledby="ovh-t ovh-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
@@ -851,10 +859,10 @@ Part D - informational: snapshot copy of 256 MiB, first into a new buffer, then 
    first copy   1417 ms   second copy     25 ms   ratio 56.3
 ~~~
 
-La première copie coûte cinquante fois la seconde. L'écart dépend de l'état de la mémoire de la machine (fautes de page ; sur une VM, peut-être l'attribution tardive de la mémoire par l'hôte, hypothèse non vérifiée) et varie d'une exécution à l'autre. Il justifie la règle d'ingénierie : allouer et toucher le tampon une fois (c'est le rôle de la mémoire épinglée réutilisée dans les vrais entraîneurs), puis le réutiliser.
+La première copie coûte plus de cinquante fois la seconde. L'écart dépend de l'état de la mémoire de la machine (défauts de page ; sur une VM, peut-être l'attribution tardive de la mémoire par l'hôte, hypothèse non vérifiée) et varie d'une exécution à l'autre. Il justifie la règle d'ingénierie : allouer et toucher le tampon une fois (c'est le rôle de la mémoire épinglée réutilisée dans les vrais entraîneurs), puis le réutiliser.
 :::
 
-Cette réutilisation impose la règle du module 10 : **une seule persistance en vol**. Tant que l'écriture précédente lit le tampon, le snapshot suivant doit attendre. C'est ce que fait `AsyncCheckpointer.save`, et c'est là que se mesure le temps d'attente de l'exemple 6.2.
+Cette réutilisation impose une règle que le module 10 reprend : **une seule persistance en vol**. Tant que l'écriture précédente lit le tampon, le snapshot suivant doit attendre. C'est ce que fait `AsyncCheckpointer.save`, et c'est là que se mesure le temps d'attente de l'exemple 6.2.
 
 ~~~python
         if self._stage is None or len(self._stage) != len(state):
@@ -902,7 +910,7 @@ Un fournisseur de stockage ou de cloud donne un débit maximal ; ce qui vous imp
 2.  **Rafale de lecture :** les mêmes clients relisent, caches froids ; critère : $S/R$.
 3.  **Lecture séquentielle agrégée :** $N$ clients lisent de gros fichiers ; critère : le débit de lecture du chapitre 1.
 4.  **Lecture aléatoire :** à la taille d'un échantillon ; critère : $\eta(n)$ du chapitre 4 sur $\alpha$ et $B$ mesurés.
-5.  **Métadonnées :** créations et lectures d'attributs par seconde ; critère : les opérations par époque de l'exemple 2.1 divisées par la durée que vous acceptez.
+5.  **Métadonnées :** créations et lectures d'attributs par seconde ; critère : les opérations par époque de la section 2.4 (et de l'exercice 11) divisées par la durée que vous acceptez.
 
 `bench_ckpt.py --dir <point de montage>` et `fio_gap.py --dir <point de montage>` couvrent les essais 1 et 4 sur un seul client ; le test multi-clients et le test de métadonnées sont à écrire pour votre système et n'ont **pas** été exécutés ici.
 
@@ -914,7 +922,7 @@ Un fournisseur de stockage ou de cloud donne un débit maximal ; ce qui vous imp
 Points clés — chapitre 6
 
 -   Écriture ordinaire (non durable), protocole `fsync` + renommage et `O_DIRECT` n'ont pas le même coût : 102, 283 et 356 ms pour 128 Mio sur le disque du bac à sable.
--   Synchrone : $T_p/I$ ; asynchrone : $(s + \max(0, T_p - I))/I$ ; le coude est à $I = T_p$.
+-   Synchrone : $T_p/\tau$ ; asynchrone : $(s + \max(0, T_p - \tau))/\tau$ ; le coude est à $\tau = T_p$. Le $\delta$ de la formule de Young est le temps bloquant.
 -   Allouer le tampon de snapshot une fois : sur la VM de test, la première copie de 256 Mio dans un tampon neuf a coûté 1 417 ms, la suivante 25 ms.
 -   Plusieurs écrivains sur un seul disque ne passent pas à l'échelle ; sur un système parallèle, l'agrégat suit $\min(\text{clients},\text{serveurs})$.
 -   Un checkpoint contient l'état du chargeur ; une recette de stockage teste vos motifs avec des critères chiffrés.
@@ -942,7 +950,7 @@ $$B_{\text{eff}} = \frac{1}{h/B_{\text{cache}} + (1-h)/B_{\text{stockage}}}$$
 
 Le cache de pages du noyau évince en gros les pages les moins récemment utilisées (LRU). Or un entraînement relit tout le jeu à chaque époque, dans un ordre aléatoire différent. Si le jeu est plus grand que le cache, ce motif est le pire cas pour le LRU : ce qu'on vient de lire est évincé avant d'être relu.
 
-Le papier sur les *data stalls* le constate (tableau 1) : « OS Page Cache is inefficient for DNN training due to thrashing ». Ses auteurs proposent un cache logiciel, MinIO, spécialisé pour l'entraînement : les éléments, une fois en cache, ne sont **jamais remplacés**. Quand le cache est plein, les autres requêtes vont au stockage. Avec $x = C/D$, le rapport de la taille du cache à celle du jeu, un tel cache a un taux de succès de $x$.
+Le papier sur les *data stalls* le constate (tableau 1) : « OS Page Cache is inefficient for DNN training due to thrashing ». Ses auteurs proposent un cache logiciel, MinIO (sans rapport avec le magasin d'objets compatible S3 du même nom), spécialisé pour l'entraînement : les éléments, une fois en cache, ne sont **jamais remplacés**. Quand le cache est plein, les autres requêtes vont au stockage. Avec $x = C/D$, le rapport de la taille du cache à celle du jeu, un tel cache a un taux de succès de $x$.
 
 Pour le LRU, la dérivation de ce parcours (champ moyen, détaillée dans la docstring de `lru_epoch_hit_ratio`) donne
 
@@ -1022,7 +1030,7 @@ Quant à l'**invalidation**, la parade la plus sûre est de l'éviter : traitez 
 
 ### 7.5. GPUDirect Storage
 
-Le guide de [GPUDirect Storage](https://docs.nvidia.com/gpudirect-storage/overview-guide/index.html) (GDS) le décrit comme un chemin direct pour des transferts par accès direct à la mémoire entre la mémoire du GPU et le stockage, ce qui « avoids a bounce buffer through the CPU » et peut soulager la bande passante du système et la charge du CPU.
+Le guide de [GPUDirect Storage](https://docs.nvidia.com/gpudirect-storage/overview-guide/index.html) (GDS ; principe au [module 7, section 2.5](../networking/index.html#gpudirect-storage)) le décrit comme un chemin direct pour des transferts par accès direct à la mémoire entre la mémoire du GPU et le stockage, ce qui « avoids a bounce buffer through the CPU » et peut soulager la bande passante du système et la charge du CPU.
 
 Il convient surtout aux gros transferts qui ne passent pas par le CPU : lecture et écriture d'un checkpoint depuis la mémoire GPU, ou lots déjà prêts. Il apporte peu si le CPU doit de toute façon décoder les données (inférence de ce parcours, pas une phrase du guide).
 
@@ -1064,13 +1072,13 @@ Le NERSC décrit le système de fichiers de travail de Perlmutter comme un stock
 
 ### 8.2. La vie d'un checkpoint
 
-Sans politique, les checkpoints s'accumulent. La rotation du module 10 garde les $K$ derniers et un checkpoint ancien « de sécurité » tous les $L$ checkpoints. Le stockage retenu en fin de campagne est donc $(K + \lfloor n/L \rfloor) \times S$ pour $n$ checkpoints écrits.
+Sans politique, les checkpoints s'accumulent. Une rotation courante, que le [module 10](../fault-tolerance/index.html#ch4) reprend (section 4.5), garde les $K$ derniers et un checkpoint ancien « de sécurité » tous les $L$ checkpoints. Le stockage retenu en fin de campagne est donc $(K + \lfloor n/L \rfloor) \times S$ pour $n$ checkpoints écrits.
 
 ::: ex
-[Exemple 8.1 — Rotation d'un modèle de 70 milliards de paramètres]{.tag} $S = 980$ Go ; 100 000 pas, un checkpoint tous les 500 pas, soit $n = 200$ ; $K = 3$ et $L = 10$. On retient $3 + 20 = 23$ checkpoints, soit **22,5 To**, contre 196 To sans rotation : 173,5 To économisés. Pendant la rotation, le nouveau checkpoint est écrit et validé **avant** que le plus ancien soit supprimé : le pic est de $(K+1) \times S = 3{,}92$ To. Calculé avec `iosizing.py demo`.
+[Exemple 8.1 — Rotation d'un modèle de 70 milliards de paramètres]{.tag} $S = 980$ Go ; 100 000 pas, un checkpoint tous les 500 pas, soit $n = 200$ ; $K = 3$ et $L = 10$. On retient $3 + 20 = 23$ checkpoints, soit **22,5 To**, contre 196 To sans rotation : 173,5 To économisés. Pendant la rotation, le nouveau checkpoint est écrit et validé **avant** que le plus ancien des trois derniers soit supprimé : le pic de ces checkpoints tournants est de $(K+1) \times S = 3{,}92$ To. Calculé avec `iosizing.py demo`.
 :::
 
-Deux conséquences. D'abord, le quota doit couvrir le **pic**, pas le régime établi : un checkpoint qui échoue par manque de place au moment de la rotation est un échec de plus à gérer. Ensuite, les checkpoints de sécurité à long terme n'ont pas leur place sur un stockage purgé ; ils vont sur un niveau durable (section 8.1).
+Deux conséquences. D'abord, les checkpoints de sécurité à long terme (ici 20, soit 19,6 To) n'ont pas leur place sur un stockage purgé : ils vont sur un niveau durable (section 8.1), et seuls les $K$ derniers restent sur le système de travail. Ensuite, le quota de ce système doit couvrir leur **pic**, pas le régime établi : un checkpoint qui échoue par manque de place au moment de la rotation est un échec de plus à gérer.
 
 ### 8.3. Les jeux de données et leurs copies
 
@@ -1090,14 +1098,14 @@ Pour un entraînement, cela signifie qu'un checkpoint peut échouer **parce qu'u
 
 ### 8.6. Le coût au To
 
-Le coût mensuel d'un programme est la somme, sur les niveaux, de la capacité multipliée par le nombre de copies et par le prix du To-mois du niveau, plus les requêtes et les sorties de données :
+Le coût mensuel de capacité d'un programme est la somme, sur les niveaux, de la capacité multipliée par le nombre de copies et par le prix du To-mois du niveau :
 
 $$C = \sum_{\text{niveaux}} T_i \times m_i \times p_i$$
 
-La fonction `monthly_cost` du lab prend le prix en argument : **aucun prix n'est donné** dans ce module. Lisez la page de prix de votre fournisseur le jour de votre calcul, avec ses unités (To ou Tio, mois de 30 jours ou non) et ses lignes annexes.
+Les requêtes et les sorties de données s'y ajoutent (section 3.6) ; la formule et le lab ne les comptent pas. La fonction `monthly_cost` du lab prend le prix en argument : **aucun prix n'est donné** dans ce module. Lisez la page de prix de votre fournisseur le jour de votre calcul, avec ses unités (To ou Tio, mois de 30 jours ou non) et ses lignes annexes.
 
 ::: ex
-[Exemple 8.2 — Ce que change le niveau de stockage]{.tag} Même programme que l'exemple 8.1 : 22,5 To de checkpoints, 20 To de jeu tokenisé, 2 To de journaux et artefacts (le « chaud », 44,5 To), plus 60 To de données brutes. Si tout est au prix $p$ du niveau chaud : 104,5 To × $p$. Si les 60 To bruts sont dans un niveau **supposé** à un quart du prix : $(44{,}5 + 60/4) \times p = 59{,}5\ p$, soit 43 % de moins. Le quart est une hypothèse pour l'illustration, pas un prix. Calculé avec `iosizing.py exercises`.
+[Exemple 8.2 — Ce que change le niveau de stockage]{.tag} Même programme que l'exemple 8.1 : 22,5 To de checkpoints, 20 To de jeu tokenisé et 2 To de journaux et artefacts, soit 44,5 To au prix $p$ du niveau chaud (les checkpoints de sécurité, rangés sur un niveau durable, y sont supposés au même prix), plus 60 To de données brutes. Si tout est au prix $p$ : 104,5 To × $p$. Si les 60 To bruts sont dans un niveau **supposé** à un quart du prix : $(44{,}5 + 60/4) \times p = 59{,}5\ p$, soit 43 % de moins. Le quart est une hypothèse pour l'illustration, pas un prix. Calculé avec `iosizing.py exercises`.
 :::
 
 ### 8.7. Observer le stockage
@@ -1108,7 +1116,7 @@ Quatre familles de métriques suffisent à un tableau de bord de stockage : l'es
 Points clés — chapitre 8
 
 -   Quatre classes : éphémère, travail en cours, durable, archive ; une purge efface ce qui n'a pas été lu (huit semaines au NERSC).
--   Rotation : $(K + \lfloor n/L \rfloor) \times S$ retenus ; le quota doit couvrir le pic $(K+1) \times S$.
+-   Rotation : $(K + \lfloor n/L \rfloor) \times S$ retenus ; les checkpoints de sécurité vont sur un niveau durable, et le quota du système de travail doit couvrir le pic $(K+1) \times S$ des $K$ derniers.
 -   Chaque transformation d'un jeu de données crée une copie : prévoir la somme, garder un manifeste.
 -   Une sauvegarde se juge à sa restauration ; un quota atteint fait échouer une écriture sans que le disque soit plein.
 -   Le coût est $\sum T_i m_i p_i$ ; lisez le prix le jour même, ne figez aucun chiffre.
@@ -1175,7 +1183,7 @@ Sur la VM de test (2026-10-24) : `OK loader-bottleneck: stall 0/1/2/4/8 workers 
 1.  Lisez `labs/storage/checkpoint-io/ckpt_io.py` : les trois écritures, `AsyncCheckpointer`, la boucle simulée.
 2.  Partie A : lancez `python3 bench_ckpt.py`, relevez le rapport `fsync` sur écriture ordinaire, l'ajustement et son erreur médiane ; relancez trois fois et notez la dispersion.
 3.  Partie B : calculez à la main le surcoût synchrone et asynchrone pour un checkpoint tous les 40 pas, puis comparez au tableau.
-4.  Changez `--throttle-mbps` (50, puis 800) : prédisez où se trouve le coude ($I = T_p$), puis mesurez.
+4.  Changez `--throttle-mbps` (50, puis 800) : prédisez où se trouve le coude ($\tau = T_p$), puis mesurez.
 5.  Partie C : relevez le gain agrégé de 1 à 4 écrivains et expliquez pourquoi il est faible sur un seul disque.
 6.  Partie D : relevez le rapport entre la première et la seconde copie dans un tampon.
 
@@ -1198,7 +1206,7 @@ Sur la VM de test (2026-10-24) : `OK loader-bottleneck: stall 0/1/2/4/8 workers 
 4.  Appelez `epoch_times` avec votre nombre de nœuds et vos débits, en affectation `sticky` puis `random`, et tracez la différence.
 5.  Calculez la rétention et le pic de votre campagne avec `retained_checkpoint_bytes` et `peak_checkpoint_bytes` (en séance 8, après le chapitre 8).
 
-**Critère de réussite.** `bash verify.sh` affiche `OK io-sizing` (16 tests fournis) : la simulation du LRU est à 3 points de la formule, le cache sans éviction à 3 points de $x$, et votre test passe. Sur la VM de test : `OK io-sizing: 70B checkpoint = 980 GB, LRU 15 % vs pinned 50 % hits at cache = 50 % of data`.
+**Critère de réussite.** `bash verify.sh` affiche `OK io-sizing` (16 tests fournis) : la simulation du LRU est à 3 points de la formule, le cache sans éviction à 3 points de $x$, et votre test passe. Sur la VM de test : `OK io-sizing: 70B checkpoint = 980 GB, LRU 15 % vs pinned 50 % hits at cache = 50 % of data`. Dans le code, `pinned` désigne le cache sans éviction, sans rapport avec la mémoire épinglée du chapitre 5.
 
 **Pour aller plus loin.** Ajoutez un modèle de coût avec le prix lu le jour même sur la page de votre fournisseur (`monthly_cost` le prend en argument).
 :::
@@ -1328,7 +1336,7 @@ Avec `loader_lab.diagnose(stall, util, workers, cores=32)` : 0 worker, chargemen
 
 (d) Pour que l'écriture tienne dans 180 s : $1{,}2 \cdot 10^{12}/180 = 6{,}7$ Go/s (sans marge).
 
-(e) L'asynchrone permet de passer de 30 à 5 minutes pour 1 % de surcoût, mais il ne sert plus dès que $T_p > I$ : à 3 minutes, le surcoût remonte à 35 %. Descendre plus bas exige de réduire $T_p$ (plus de débit, un état plus petit, un niveau en mémoire du module 10), pas de rendre l'écriture « plus asynchrone ». Commande : `python3 iosizing.py exercises` (valeurs `e9.*`).
+(e) L'asynchrone permet de passer de 30 à 5 minutes pour 1 % de surcoût, mais il ne sert plus dès que $T_p > \tau$ : à 3 minutes, le surcoût remonte à 35 %. Descendre plus bas exige de réduire $T_p$ (plus de débit, un état plus petit, un niveau en mémoire du module 10), pas de rendre l'écriture « plus asynchrone ». Commande : `python3 iosizing.py exercises` (valeurs `e9.*`).
 :::
 
 ::: exo
@@ -1370,9 +1378,13 @@ Avec `loader_lab.diagnose(stall, util, workers, cores=32)` : 0 worker, chargemen
 ::: sol
 (a) $n = 100\,000/500 = 200$ checkpoints écrits ; retenus : $3 + 20 = 23$, soit $23 \times 0{,}98 = 22{,}5$ To ; pic de la rotation : $4 \times 0{,}98 = 3{,}92$ To. Sans rotation : 196 To.
 
-(b) Le chaud vaut $22{,}54 + 20 + 2 = 44{,}54$ To ; en ajoutant un checkpoint pour le pic, $(44{,}54 + 0{,}98) \times 1{,}15 = 52{,}3$ To. (c) Le brut (60 To, relu rarement) va en archive ou sur un niveau froid. Les shards tokenisés sont relus à chaque époque, donc leur date d'accès se renouvelle, mais gardez une copie sur un niveau durable. Les 20 checkpoints « un sur dix » vont sur un niveau durable **sans purge** : écrits puis jamais relus, ils seraient purgés au bout de 8 semaines. Les 3 derniers restent sur le système de travail. (d) $1\,024 \times 23 = 23\,552$ fichiers, à ajouter au quota de fichiers.
+(b) Le système de travail ne garde que les 3 derniers checkpoints, les shards et les journaux, car les checkpoints de sécurité le quittent (question c) : $3 \times 0{,}98 + 20 + 2 = 24{,}94$ To. En ajoutant un checkpoint pour le pic, $(24{,}94 + 0{,}98) \times 1{,}15 = 29{,}8$ To.
 
-(e) Tout au prix chaud $p$ : $22{,}54 + 20 + 2 + 60 = 104{,}54$ To × $p$. Avec le brut au quart du prix : $44{,}54 + 15 = 59{,}54$ To × $p$, soit 43 % de moins. Le quart est une hypothèse. Commande : `python3 iosizing.py exercises` (valeurs `e12.*`).
+(c) Le brut (60 To, relu rarement) va en archive ou sur un niveau froid. Les shards tokenisés sont relus à chaque époque, donc leur date d'accès se renouvelle, mais gardez une copie sur un niveau durable. Les 20 checkpoints « un sur dix » (19,6 To) vont sur un niveau durable **sans purge** : écrits puis jamais relus, ils seraient purgés au bout de 8 semaines. Les 3 derniers restent sur le système de travail.
+
+(d) $1\,024 \times 23 = 23\,552$ fichiers au total. Le système de travail en porte 3 072, et 4 096 au pic : c'est ce qui compte pour son quota de fichiers ; les 20 480 autres comptent sur le niveau durable.
+
+(e) Tout au prix chaud $p$, y compris le niveau durable des checkpoints (une simplification) : $22{,}54 + 20 + 2 + 60 = 104{,}54$ To × $p$. Avec le brut au quart du prix : $44{,}54 + 15 = 59{,}54$ To × $p$, soit 43 % de moins. Le quart est une hypothèse. Commande : `python3 iosizing.py exercises` (valeurs `e12.*`).
 :::
 
 ## Checkpoint de sortie {#exit}
@@ -1416,7 +1428,7 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ### Documenté {#documente}
 
-Les faits attribués à une source dans le texte ont été relus à la source le 24 octobre 2026 : les composants, les valeurs par défaut et les limites de striping, Data on MDT, la règle « as few objects… » et les quotas de Lustre ; l'architecture et le striping de BeeGFS ; la description générale de WEKA ; les chiffres du système de travail de Perlmutter, sa politique de purge et le matériel de Jean Zay ; la cohérence à la fermeture, `nconnect` et les compteurs de `/proc/<pid>/io` ; la cohérence et les débits par préfixe de S3 ; la sémantique de Mountpoint ; le format WebDataset ; la définition de Parquet, le cache mémoire projeté de Hugging Face Datasets et le `train.bin` de nanoGPT ; la docstring de `DataLoader` ; les résultats et le cache MinIO de l'étude sur les *data stalls* ; le résumé de CheckFreq ; le paragraphe sur le stockage de Llama 3 ; le chargeur unique par machine de MegaScale ; le guide de GPUDirect Storage et la configuration NVMe du DGX H100. Tous les chiffres des exemples et des corrigés viennent de `iosizing.py` (commandes `demo` et `exercises`) ou des sorties des labs, exécutés dans le bac à sable le 24 octobre 2026 (noyau Linux 6.18, 4 vCPU, PyTorch 2.14.1 CPU, `fio` 3.36, `pyarrow` 26.0.0, `webdataset` 1.0.2).
+Les faits attribués à une source dans le texte ont été relus à la source le 24 octobre 2026 : les composants, les valeurs par défaut et les limites de striping, Data on MDT, la règle « as few objects… » et les quotas de Lustre ; l'architecture et le striping de BeeGFS ; la description générale de WEKA ; les chiffres du système de travail de Perlmutter, sa politique de purge et le matériel de Jean Zay ; la cohérence à la fermeture, `nconnect` et les compteurs de `/proc/<pid>/io` ; la cohérence et les débits par préfixe de S3 ; la sémantique de Mountpoint ; le format WebDataset ; la définition de Parquet, le cache mémoire projeté de Hugging Face Datasets et le `train.bin` de nanoGPT ; la docstring de `DataLoader` ; les résultats et le cache MinIO de l'étude sur les *data stalls* ; le résumé de CheckFreq ; le paragraphe sur le stockage de Llama 3 ; le chargeur unique par machine de MegaScale ; le guide de GPUDirect Storage et la configuration NVMe du DGX H100. Tous les chiffres des exemples et des corrigés viennent de `iosizing.py` (commandes `demo` et `exercises`) ou des sorties des labs, exécutés dans le bac à sable les 24 et 25 octobre 2026 (la mesure avec `in_order=False` date du 25 ; noyau Linux 6.18, 4 vCPU, PyTorch 2.14.1 CPU, `fio` 3.36, `pyarrow` 26.0.0, `webdataset` 1.0.2).
 
 ### Recommandé {#recommande}
 
@@ -1424,8 +1436,8 @@ L'ordre des chapitres ; les quatre flux d'E/S ; les seuils de la table de décis
 
 ### À vérifier {#a-verifier}
 
-(1) La documentation de GPFS / IBM Storage Scale a répondu HTTP 403 : aucun fait sur ce système n'est avancé, et celle de WEKA n'a été lue que dans sa page de présentation. (2) La formule du taux de succès d'un LRU en époques aléatoires est une **dérivation de ce parcours** (champ moyen), vérifiée par simulation à 3 points près ; ce n'est pas un résultat publié. Le modèle d'affectation collante ou aléatoire est une simplification (cache sans éviction, parts égales). (3) L'écart entre le modèle du chargeur et la mesure à 8 workers n'est pas expliqué : la livraison dans l'ordre a été testée (`in_order=False`) et écartée. Plusieurs autres explications sont des **hypothèses non testées** : l'amplification de 3,4 de `mmap` (lecture autour de la faute de page), le 1,30 de la lecture aléatoire de shards (échantillons à cheval sur cinq pages), l'écart de l'asynchrone mesuré (8,9 %) et prédit (4,3 %), le coût de la première copie dans un tampon neuf (attribution tardive de la mémoire par l'hôte) et l'effet de l'option `discard` sur les écritures parallèles. (4) Les entrées des exemples (3 000 images par seconde, 110 ou 120 ko par image, 8 000 jetons par seconde, latences de 20 ms, 40 Go/s de débit partagé, 50 000 opérations de métadonnées par seconde, quart de prix) sont des **valeurs d'exemple**, pas des mesures de produits. (5) L'affirmation de WebDataset sur un gain de 3 à 10 fois n'a pas été reproduite. (6) Le manuel de Lustre lu est celui du site officiel ; vérifiez la version de votre déploiement pour les fonctions citées avec un numéro (2.11, 2.13). (7) `pin_memory` et GPUDirect Storage n'ont pas été exécutés (pas de GPU) ; `fio_gap.py` et `bench_ckpt.py` n'ont pas été lancés sur NFS, ni sur un système parallèle, ni sur un stockage objet monté. (8) La page de documentation HTML de `DataLoader` n'a pas livré de texte : les paramètres viennent de la docstring du code source (branche `main`, lue le 24 octobre 2026) ; relisez la documentation de votre version. (9) Aucun prix n'est cité.
+(1) La documentation de GPFS / IBM Storage Scale a répondu HTTP 403 : aucun fait sur ce système n'est avancé, et celle de WEKA n'a été lue que dans sa page de présentation. (2) La formule du taux de succès d'un LRU en époques aléatoires est une **dérivation de ce parcours** (champ moyen), vérifiée par simulation à 3 points près ; ce n'est pas un résultat publié. Le modèle d'affectation collante ou aléatoire est une simplification (cache sans éviction, parts égales). (3) L'écart entre le modèle du chargeur et la mesure à 8 workers n'est pas expliqué : la livraison dans l'ordre a été testée (`in_order=False`) et écartée. Plusieurs autres explications sont des **hypothèses non testées** : l'amplification de 3,4 de `mmap` (lecture autour du défaut de page), le 1,30 de la lecture aléatoire de shards (échantillons à cheval sur cinq pages), l'écart de l'asynchrone mesuré (8,9 %) et prédit (4,3 %), le coût de la première copie dans un tampon neuf (attribution tardive de la mémoire par l'hôte) et l'effet de l'option `discard` sur les écritures parallèles. (4) Les entrées des exemples (3 000 images par seconde, 110 ou 120 ko par image, 8 000 jetons par seconde, latences de 20 ms, 40 Go/s de débit partagé, 50 000 opérations de métadonnées par seconde, quart de prix) sont des **valeurs d'exemple**, pas des mesures de produits. (5) L'affirmation de WebDataset sur un gain de 3 à 10 fois n'a pas été reproduite. (6) Le manuel de Lustre lu est celui du site officiel ; vérifiez la version de votre déploiement pour les fonctions citées avec un numéro (2.11, 2.13). (7) `pin_memory` et GPUDirect Storage n'ont pas été exécutés (pas de GPU) ; `fio_gap.py` et `bench_ckpt.py` n'ont pas été lancés sur NFS, ni sur un système parallèle, ni sur un stockage objet monté. (8) La page de documentation HTML de `DataLoader` n'a pas livré de texte : les paramètres viennent de la docstring du code source (branche `main`, lue le 24 octobre 2026) ; relisez la documentation de votre version. (9) Aucun prix n'est cité.
 
 ### Hors périmètre {#hors-perimetre}
 
-La conception d'un système de fichiers parallèle ou d'un stockage Ceph ; les réseaux de stockage (RDMA, NVMe sur fabric : module 7) ; le protocole et le format d'un checkpoint (atomicité, sommes de contrôle, reprise : module 10) ; les volumes Kubernetes et leurs pilotes CSI (module 12) ; le chiffrement au repos et le contrôle d'accès (module 16) ; le décodage d'images sur GPU (DALI) ; les tarifs des fournisseurs ; l'exécution de GPUDirect Storage.
+La conception d'un système de fichiers parallèle ou d'un stockage Ceph ; les réseaux de stockage (RDMA : module 7 ; NVMe sur fabric : hors parcours) ; le protocole et le format d'un checkpoint (atomicité, sommes de contrôle, reprise : module 10) ; les volumes Kubernetes et leurs pilotes CSI (module 12) ; le chiffrement au repos des jeux de données (hors parcours) et le contrôle d'accès (identité et moindre privilège : module 16, chapitre 3) ; le décodage d'images sur GPU (DALI) ; les tarifs des fournisseurs ; l'exécution de GPUDirect Storage.

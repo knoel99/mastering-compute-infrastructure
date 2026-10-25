@@ -350,14 +350,19 @@ def exercises(out=sys.stdout) -> dict[str, float]:
     s70 = checkpoint_state_bytes(70e9)
     keep = retained_checkpoint_bytes(s70, 100_000, 500, 3, 10)
     p("e12.ckpt_TB", keep / TB, "TB retained")
-    p("e12.hot_TB", keep / TB + 20 + 2, "TB hot (checkpoints + tokenised 20 + logs 2)")
+    p("e12.hot_TB", keep / TB + 20 + 2, "TB priced as hot (all checkpoints + tokenised 20 + logs 2)")
+    p("e12.durable_ckpt_TB", (keep - 3 * s70) / TB, "TB of long-term safety checkpoints, on a durable tier with no purge")
+    p("e12.work_TB", 3 * s70 / TB + 20 + 2, "TB on the purged work file system (3 latest + tokenised 20 + logs 2)")
     p("e12.cold_TB", 60.0, "TB raw (cold)")
     p("e12.cost_units_all_hot", (keep / TB + 20 + 2 + 60), "TB x price per TB-month if everything were hot")
     p("e12.cost_units_tiered", (keep / TB + 20 + 2) + 60 * 0.25, "TB-equivalents if raw sits at a quarter of the price")
     p("e12.rotation_saving_TB", (200 * s70 - keep) / TB, "TB saved by the rotation")
     p("e12.peak_TB", peak_checkpoint_bytes(s70, 3) / TB, "TB peak of the checkpoints during rotation")
-    p("e12.quota_TB", (keep / TB + 20 + 2 + s70 / TB) * 1.15, "TB quota: (hot + one extra checkpoint) x 1.15")
+    p("e12.quota_TB", (3 * s70 / TB + 20 + 2 + s70 / TB) * 1.15, "TB work quota: (work + one extra checkpoint) x 1.15")
     p("e12.files_ckpt", 1024 * (3 + 200 // 10), "files held by 1024 ranks x 23 checkpoints")
+    p("e12.files_work", 1024 * 3, "files on the work file system (3 latest)")
+    p("e12.files_work_peak", 1024 * 4, "files on the work file system during rotation")
+    p("e12.files_durable", 1024 * (200 // 10), "files on the durable tier (20 safety checkpoints)")
     return r
 
 

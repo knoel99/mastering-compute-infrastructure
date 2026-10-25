@@ -37,6 +37,7 @@ for spec in "1 1d" "5 1d" "8 1d" "4 2d" "6 2d" "9 2d"; do
 done
 "$PY" check_jacobi.py "$tmp/runs.txt"
 echo "--- C. a miniature scaling study, end to end (2 repetitions, 384 x 384 grid)"
+"$PY" test_scaling_math.py
 "$PY" run_study.py --jacobi "$tmp/jacobi" --out "$tmp/study.json" --quick
 "$PY" analyze_study.py "$tmp/study.json" --svg "$tmp/speedup.svg" | cut -c1-150
 "$PY" - "$tmp/study.json" "$tmp/speedup.svg" <<'PYEOF'

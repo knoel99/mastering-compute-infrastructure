@@ -5,9 +5,8 @@ Every subcommand prints its inputs and its result; nothing here is measured, the
 from a source cited on the page.
 
   calc.py llama                                  # consistency check of Table 5 of the Llama 3 paper
-  calc.py mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9
+  calc.py mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9 --rate-per-1000-node-days 6.5
   calc.py rolling --nodes 64 --batch 8 --walltime-h 24 --reboot-h 0.25
-  calc.py dcgm --nodes 32 --minutes 35 --parallel 32
   calc.py busbw --ranks 8 --size-gib 4 --ms 36 --baseline 400
   calc.py spares --nodes 256 --rate-per-1000-node-days 2.5 --repair-days 10 --quantile 0.95
   calc.py compat --driver 570 --cuda 13.0
@@ -54,6 +53,13 @@ def mttf(a):
     print(f"1/N prediction     : {a.gpus} GPUs -> {predicted:.2f} h")
     print(f"measured           : {a.measured_hours} h  (ratio measured/predicted = {a.measured_hours / predicted:.2f})")
     print(f"GPU ratio / MTTF ratio : {a.gpus / a.ref_gpus:.0f} / {ref_hours / a.measured_hours:.0f}")
+    if a.rate_per_1000_node_days is not None:
+        # projection of Kokolis et al.: MTTF = (N_nodes * r_f)^-1, r_f in failures per node-day
+        rate = a.rate_per_1000_node_days / 1000
+        nodes = a.gpus / a.gpus_per_node
+        projected_h = 24 / (nodes * rate)
+        print(f"rate projection    : r_f = {a.rate_per_1000_node_days}/1000 node-days -> 1 node: {1 / rate:.1f} days,"
+              f" {nodes:.0f} nodes: {projected_h:.1f} h ({projected_h / a.measured_hours:.2f} x the measured value)")
     return 0
 
 
@@ -64,12 +70,6 @@ def rolling(a):
     print(f"worst case per wave: wait for the longest job ({a.walltime_h} h) + reboot and validation ({a.reboot_h} h) = {per_wave} h")
     print(f"worst case total   : {waves * per_wave:.2f} h = {waves * per_wave / 24:.2f} days")
     print(f"capacity offline   : at most {a.batch}/{a.nodes} = {100 * a.batch / a.nodes:.1f} % of the nodes at any time")
-    return 0
-
-
-def dcgm(a):
-    waves = math.ceil(a.nodes / a.parallel)
-    print(f"{a.nodes} nodes, {a.minutes} min each (upper bound), {a.parallel} in parallel -> {waves} wave(s), at most {waves * a.minutes} min = {waves * a.minutes / 60:.2f} h")
     return 0
 
 
@@ -203,12 +203,10 @@ def main():
     p = sub.add_parser("mttf"); p.set_defaults(fn=mttf)
     p.add_argument("--ref-gpus", type=int, required=True); p.add_argument("--ref-days", type=float, required=True)
     p.add_argument("--gpus", type=int, required=True); p.add_argument("--measured-hours", type=float, required=True)
+    p.add_argument("--rate-per-1000-node-days", type=float); p.add_argument("--gpus-per-node", type=int, default=8)
     p = sub.add_parser("rolling"); p.set_defaults(fn=rolling)
     p.add_argument("--nodes", type=int, required=True); p.add_argument("--batch", type=int, required=True)
     p.add_argument("--walltime-h", type=float, required=True); p.add_argument("--reboot-h", type=float, required=True)
-    p = sub.add_parser("dcgm"); p.set_defaults(fn=dcgm)
-    p.add_argument("--nodes", type=int, required=True); p.add_argument("--minutes", type=float, required=True)
-    p.add_argument("--parallel", type=int, required=True)
     p = sub.add_parser("busbw"); p.set_defaults(fn=busbw)
     p.add_argument("--ranks", type=int, required=True); p.add_argument("--size-gib", type=float, required=True)
     p.add_argument("--ms", type=float, required=True); p.add_argument("--baseline", type=float, required=True)

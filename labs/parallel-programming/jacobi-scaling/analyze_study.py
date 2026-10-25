@@ -7,19 +7,17 @@ efficiency E = S/p (strong) or T1/Tp (weak), Karp-Flatt serial fraction e(p), an
 time of the slowest rank into compute / halo wait / residual all-reduce ("imb" = slowest / fastest rank compute time). "comm only" is the time of the
 same exchanges without arithmetic (--skip-sweep): what is above it in the halo column is waiting
 (load imbalance, jitter, interference), not data transfer.
-Speedup, efficiency and Karp-Flatt come from the tested reference of the scaling-study project.
+Speedup, efficiency and Karp-Flatt come from scaling_math.py, next to this file (tested by test_scaling_math.py).
 """
 import argparse
-import importlib.util
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
 
-REF = Path(__file__).resolve().parents[2] / "projects" / "scaling-study" / "reference" / "analysis.py"
-spec = importlib.util.spec_from_file_location("scaling_analysis", REF)
-analysis = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(analysis)
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import scaling_math as analysis  # noqa: E402  (the lab directory must be on the path first)
 
 
 def median_ci(xs, n_boot=2000, seed=0):

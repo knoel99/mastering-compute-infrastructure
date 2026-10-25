@@ -1,6 +1,6 @@
 ---
 title: "Programmation GPU : CUDA, Triton et profilage"
-subtitle: "Module 04 · Phase 1 · 32.5 h"
+subtitle: "Module 04 · Phase 1 · 32,5 h"
 description: "Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, précision numérique et Nsight."
 module:
   id: gpu-programming
@@ -40,28 +40,27 @@ Aucun GPU n'a servi à rédiger ce module : tout ce qui est calculé ou capturé
 | Niveau d'entrée | 2 : Python solide, notions de roofline et de MFU (module 2) |
 | Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html) |
 | Pour qui | Cœur : la grammaire des échanges entre l'infrastructure et la recherche sur la performance ; survol possible si vous écrivez déjà des noyaux CUDA ou Triton. |
-| Livrable | quatre labs testés (modèle de warp, noyaux Numba, noyaux Triton, lecteur de trace) et une grille de diagnostic écrite par vous |
-| Environnement | un portable CPU suffit pour tous les labs ; `nvcc` 12.0 est optionnel (compilation sans exécution). Un GPU est utile pour les branches « Pour aller plus loin », décrites mais non exécutées ici ; leur coût de location n'est pas chiffré ici faute de tarif relu (voir le [module FinOps et capacité](../finops-capacity/index.html)) |
-| Projets liés | [Projet 2 — Étude de passage à l'échelle](../../projects/scaling-study/index.html) |
+| Livrable | quatre labs testés (modèle de warp, noyaux Numba, noyaux Triton, lecteur de trace) et une fiche de diagnostic écrite par vous : le plafond de gain et la première action pour chaque trace (étape 6 du lab 4.4) |
+| Environnement | un portable CPU suffit pour tous les labs ; `nvcc` 12.0 est optionnel (compilation sans exécution) ; le guide cité est celui de CUDA 13.4.2 : vérifiez qu'une option existe dans votre `nvcc` (`nvcc --help`). Un GPU est utile pour les branches « Pour aller plus loin », décrites mais non exécutées ici ; leur coût de location n'est pas chiffré ici faute de tarif relu (voir le [module FinOps et capacité](../finops-capacity/index.html)) |
+| Projets liés | aucun |
 
 ### Ce que vous saurez vérifier {#acquis}
 
--   Écrire un noyau CUDA avec Numba, utiliser la mémoire partagée et le comparer à une version vectorisée (chapitres 1 et 3, labs 4.1 et 4.2).
+-   Écrire un noyau CUDA avec Numba, utiliser la mémoire partagée et le comparer à une version vectorisée (chapitres 1 et 3, lab 4.2).
 -   Expliquer la coalescence, l'occupation et la divergence de warps sur un exemple chiffré (chapitres 1 et 2, lab 4.1).
 -   Calculer le gain d'un recouvrement entre transferts et calcul avec des flux (chapitre 4).
 -   Lire un noyau Triton, dire ce qu'il fusionne et pourquoi le trafic mémoire baisse (chapitre 5, lab 4.3).
 -   Choisir un format numérique pour un calcul et prévoir ses pièges : accumulation, sous-dépassement, ordre des sommes (chapitre 6).
--   Lire une trace de profil et nommer le goulot : calcul, mémoire, lancement ou transferts (chapitre 7, lab 4.4).
+-   Lire une trace de profil et nommer le goulot : transferts, lancement, GPU saturé ou attente du CPU, puis dire quel outil départage le calcul et la mémoire (chapitre 7, lab 4.4).
 -   Dire ce qu'apportent la fusion, FlashAttention, `torch.compile` et les CUDA graphs, et quand ils ne paient pas (chapitre 8).
 -   Transposer le vocabulaire GPU vers AMD/ROCm, les TPU, Trainium et Ascend, et dresser une liste de contrôle de portabilité (chapitre 9).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 1 — Calcul parallèle et GPU** (semaines 6-11) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
+-   **Phase 1 — Calcul parallèle et GPU** (semaines 5-9) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Prépare** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
--   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, CUDA, programmation GPU, Accélérateurs non NVIDIA (TPU, ROCm, Ascend…), Profilage, bancs d'essai, Langage système (Go, Rust, C++), Expérience d'entraînement ML, Service d'inférence (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
@@ -274,7 +273,7 @@ Le tableau résume les niveaux visibles du programmeur. Les capacités viennent 
 
 | Niveau | Portée | Capacité | Ce qu'il faut en retenir |
 |---|---|---|---|
-| Registres | un thread | 64 K registres de 32 bits par SM, au plus 255 par thread | le plus rapide ; les débordements (*spills*) vont en mémoire locale |
+| Registres | un thread | 64 K registres de 32 bits par SM, au plus 255 par thread | le plus rapide ; les déversements (*spills*) vont en mémoire locale |
 | Mémoire locale | un thread | jusqu'à 512 Kio par thread | physiquement en mémoire globale : lente |
 | Mémoire partagée | un bloc | jusqu'à 164 Kio par SM (capacité 8.0), 228 Kio (capacité 9.0) | programmable, sur puce, organisée en 32 bancs |
 | Cache L1 | un SM | partage sa mémoire sur puce (SRAM, *static RAM*) avec la mémoire partagée (256 Kio combinés sur H100) | géré par le matériel |
@@ -421,7 +420,7 @@ AoS, field x of a 16-byte struct                16       25.0%
 Trois enseignements. Un décalage de 4 octets coûte un secteur de plus (80 %). Le rendement tombe à 1/pas jusqu'au pas 8, puis plafonne à 12,5 %. Un accès aléatoire est au pire des cas.
 
 ::: ex
-[Exemple 2.1 — Tableau de structures contre structure de tableaux]{.tag} Des particules sont stockées dans un tableau de structures de 16 octets (x, y, z, w en `float`). Un noyau qui lit seulement `x` fait lire à chaque thread un octet sur seize : le warp touche 16 secteurs au lieu de 4 pour un tableau de `x` contigus (rendement de 25 %).
+[Exemple 2.1 — Tableau de structures contre structure de tableaux]{.tag} Des particules sont stockées dans un tableau de structures de 16 octets (x, y, z, w en `float`). Un noyau qui lit seulement `x` fait lire à chaque thread quatre octets sur seize : le warp touche 16 secteurs au lieu de 4 pour un tableau de `x` contigus (rendement de 25 %).
 
 Pour $2^{24}$ particules, le noyau transfère 268 Mo au lieu de 67 Mo. À 3,35 To/s (bande passante de la fiche du H100 SXM, voir le module 2), cela donne au mieux 80 µs au lieu de 20 µs : un facteur 4 sur un noyau limité par la mémoire. Les caches peuvent récupérer une partie des octets perdus si le noyau relit ensuite `y`, `z` et `w` ; c'est une borne, pas une prédiction.
 :::
@@ -451,14 +450,14 @@ all lanes read the same word (broadcast)                 1
 ::: ex
 [Exemple 2.2 — La transposition et sa colonne de remplissage]{.tag} Le fichier `labs/gpu-programming/warp-memory-model/cuda/transpose.cu` contient trois noyaux : naïf (lectures coalescées, écritures avec un pas de $n$ éléments, donc 32 secteurs par requête d'écriture), par tuile `tile[32][32]` et par tuile `tile[32][33]`. Les deux versions à tuile lisent et écrivent la mémoire globale en accès coalescés ; la première lit pourtant la tuile par colonnes avec un pas de 32 mots, donc un conflit d'ordre 32, alors que la seconde a un pas de 33 mots, premier avec 32, donc aucun conflit (modèle ci-dessus).
 
-Compilation seule, `nvcc` 12.0.140, `sm_80`, 25 octobre 2026 : 20 registres pour le noyau naïf, 24 registres et 4096 octets de mémoire partagée pour la tuile simple, 24 registres et 4224 octets pour la tuile avec remplissage ; aucun débordement (*0 bytes spill stores*). Le coût du remplissage est de 128 octets par bloc. Le gain réel se mesure sur un GPU avec le programme du lab (non exécuté ici).
+Compilation seule, `nvcc` 12.0.140, `sm_80`, 25 octobre 2026 : 20 registres pour le noyau naïf, 24 registres et 4096 octets de mémoire partagée pour la tuile simple, 24 registres et 4224 octets pour la tuile avec remplissage ; aucun déversement (*0 bytes spill stores*). Le coût du remplissage est de 128 octets par bloc. Le gain réel se mesure sur un GPU avec le programme du lab (non exécuté ici).
 :::
 
-Le remplissage fonctionne parce que 33 est premier avec 32 : pour un pas $p \le 32$, le degré de conflit vaut $\gcd(p, 32)$ (vérifié par le modèle du lab 4.1 pour $p$ de 1 à 128 ; voir l'exercice 9). Un pas impair ne produit jamais de conflit.
+Le remplissage fonctionne parce que 33 est premier avec 32 : pour un pas de $p$ mots, le degré de conflit vaut $\gcd(p, 32)$ (vérifié par le modèle du lab 4.1 pour $p$ de 1 à 128 ; voir l'exercice 9). Un pas impair ne produit jamais de conflit.
 
-### 2.4. Registres et débordements
+### 2.4. Registres et déversements
 
-Un thread qui a besoin de plus de registres que le compilateur ne lui en accorde les **déverse** en mémoire locale, c'est-à-dire en mémoire globale cachée. `-Xptxas -v` l'indique par « spill stores » et « spill loads » ; l'option `-maxrregcount` de `nvcc` plafonne les registres pour augmenter l'occupation, au risque de créer ces débordements. Un noyau dont l'occupation est limitée par les registres demande donc un arbitrage chiffré, pas une consigne générale.
+Un thread qui a besoin de plus de registres que le compilateur ne lui en accorde les **déverse** en mémoire locale, c'est-à-dire en mémoire globale cachée. `-Xptxas -v` l'indique par « spill stores » et « spill loads » ; l'option `-maxrregcount` de `nvcc` plafonne les registres pour augmenter l'occupation, au risque de créer ces déversements. Un noyau dont l'occupation est limitée par les registres demande donc un arbitrage chiffré, pas une consigne générale.
 
 ::: recap
 Points clés — chapitre 2
@@ -548,7 +547,7 @@ def matmul_tiled(A, B, C, loads):
         C[row, col] = acc
 ~~~
 
-Le même schéma de fabrique fixe la taille de tuile `tile` ; `count=True` ajoute un compteur atomique de lectures.
+Le même schéma de fabrique fixe la taille de tuile `tile`.
 
 Le lab ajoute un compteur atomique de lectures globales (`count=True`) : on ne mesure pas un temps, on **compte** les accès, ce qui est déterministe et indépendant de la machine. Sortie capturée (`python3 demo.py loads`, Numba 0.68.0, simulateur) :
 
@@ -622,6 +621,8 @@ Un GPU exécute des noyaux et des copies. Enchaînés l'un après l'autre, le GP
 
 Le guide de programmation CUDA décrit l'interface comme asynchrone : un appel qui lance un noyau ou une copie retourne aussitôt, souvent avant que l'opération ait commencé. Le CPU peut alors préparer la suite pendant que le GPU travaille. La documentation de PyTorch en tire la conséquence pour le chronométrage : les mesures de temps sans synchronisation ne sont pas exactes ; il faut appeler `torch.cuda.synchronize()` avant de mesurer, ou utiliser des `torch.cuda.Event`.
 
+La même documentation ([notes CUDA de PyTorch 2.14](https://docs.pytorch.org/docs/2.14/notes/cuda.html)) en tire une autre conséquence : une erreur sur le GPU n'est signalée qu'après l'exécution réelle de l'opération, si bien que la pile d'appels ne montre pas où elle a été demandée. `CUDA_LAUNCH_BLOCKING=1` force l'exécution synchrone pour déboguer.
+
 Un **flux** (*stream*) est une file d'attente d'opérations exécutées dans l'ordre. Deux opérations de flux différents peuvent s'exécuter en même temps si les ressources le permettent ; une opération lancée sans flux explicite va dans le flux par défaut. Un **événement** est un repère inséré dans un flux : on l'utilise pour chronométrer sur le GPU (`cudaEventElapsedTime`) et pour faire attendre un flux sur un autre.
 
 ### 4.2. La mémoire épinglée
@@ -636,7 +637,7 @@ Le guide des bonnes pratiques ajoute deux avertissements. Les copies depuis la m
 
 ### 4.3. Recouvrir transferts et calcul
 
-Cas typique : traiter un grand tampon en trois étapes, copie vers le GPU, noyau, copie retour. On le découpe en $c$ morceaux, chacun dans son flux. Le noyau du morceau 1 s'exécute pendant la copie du morceau 2. Voici la boucle du fichier `cuda/streams_overlap.cu` (lab 4.2, non exécuté ici faute de GPU).
+Cas typique : traiter un grand tampon en trois étapes, copie vers le GPU, noyau, copie retour. On le découpe en $c$ morceaux, répartis à tour de rôle sur quelques flux (`c % streams` dans le code). Le noyau du morceau 1 s'exécute pendant la copie du morceau 2. Voici la boucle du fichier `cuda/streams_overlap.cu` (lab 4.2, non exécuté ici faute de GPU).
 
 ~~~cuda
 for (int c = 0; c < chunks; ++c) {
@@ -704,7 +705,7 @@ Quand $c$ croît, $T$ tend vers le maximum des trois durées : le recouvrement m
 ::: ex
 [Exemple 4.1 — Quatre morceaux au lieu d'un]{.tag} Avec des étapes de 40, 30 et 40 ms (valeurs choisies pour l'exemple), un seul morceau prend 110 ms. Avec quatre morceaux : $110/4 + 3 \times 40/4 = 57{,}5$ ms, soit un gain de 1,91.
 
-Pour 1, 2, 4, 8 et 16 morceaux, la formule donne 110, 75, 57,5, 48,75 et 44,4 ms ; la borne est 40 ms. La figure ci-dessus trace les deux premiers cas.
+Pour 1, 2, 4, 8 et 16 morceaux, la formule donne 110, 75, 57,5, 48,75 et 44,4 ms ; la borne est 40 ms. La figure ci-dessus trace les cas à 1 et à 4 morceaux.
 :::
 
 Le modèle suppose des copies et un noyau indépendants, des morceaux assez grands pour que chaque noyau occupe le GPU, et ignore le coût fixe de chaque lancement. Il faut aussi que les copies partent de mémoire épinglée. Il ne dit pas si votre GPU a un moteur de copie par direction : cela se vérifie dans la documentation du modèle et par la mesure.
@@ -765,7 +766,7 @@ def softmax_kernel(x_ptr, out_ptr, n_cols, row_stride, BLOCK_SIZE: tl.constexpr)
     tl.store(out_ptr + row * row_stride + cols, num / den, mask=mask)
 ~~~
 
-Le lab 4.3 ne recopie pas la formule du tutoriel : le registre `traffic.py` exécute les cinq opérations et additionne les éléments des tenseurs d'entrée et de sortie de chacune (comptage idéalisé : chaque opération relit tous ses opérandes en DRAM, sans cache). Sortie capturée (`python3 traffic.py 4096 2048`, PyTorch 2.14.1 CPU, 25 octobre 2026) :
+Le lab 4.3 ne recopie pas la formule du tutoriel : le script `traffic.py` exécute les cinq opérations et additionne les éléments des tenseurs d'entrée et de sortie de chacune (comptage idéalisé : chaque opération relit tous ses opérandes en DRAM, sans cache). Sortie capturée (`python3 traffic.py 4096 2048`, PyTorch 2.14.1 CPU, 25 octobre 2026) :
 
 ~~~text
 softmax of a 4096 x 2048 float32 matrix as 5 separate operations:
@@ -887,11 +888,11 @@ bfloat16 (7 bits)                   2.36e-03
 2 mantissa bits (e5m2 precision)    7.50e-02
 ~~~
 
-L'erreur relative suit la précision du format : environ $10^{-4}$ pour 10 bits, $2 \cdot 10^{-3}$ pour 7 bits, $7 \cdot 10^{-2}$ pour 2 bits. Elle ne dit rien de la qualité d'un entraînement, qui dépend aussi des accumulations et des normalisations : c'est la raison pour laquelle on valide un changement de précision par une courbe de perte, pas par cette erreur.
+L'erreur relative suit la précision du format : environ $3 \cdot 10^{-4}$ pour 10 bits, $2 \cdot 10^{-3}$ pour 7 bits, $7 \cdot 10^{-2}$ pour 2 bits. Elle ne dit rien de la qualité d'un entraînement, qui dépend aussi des accumulations et des normalisations : c'est la raison pour laquelle on valide un changement de précision par une courbe de perte, pas par cette erreur.
 
 ### 6.5. L'ordre des sommes et le déterminisme
 
-L'addition flottante n'est pas associative : $(a + b) + c$ peut différer de $a + (b + c)$. Une réduction parallèle dont l'ordre varie d'une exécution à l'autre (par exemple des additions atomiques) donne donc des résultats qui varient aussi.
+L'addition flottante n'est pas associative : $(a + b) + c$ peut différer de $a + (b + c)$ (le [module 3, § 6.1](../parallel-programming/index.html#laddition-nest-pas-associative), en donne la version CPU et MPI). Une réduction parallèle dont l'ordre varie d'une exécution à l'autre (par exemple des additions atomiques) donne donc des résultats qui varient aussi.
 
 ::: ex
 [Exemple 6.2 — Vingt ordres, dix-sept résultats]{.tag} Sortie capturée (`precision.py`) : les mêmes 4096 nombres `float32`, sommés dans 20 ordres aléatoires (graine fixée), donnent **17 résultats distincts**, étalés sur 0,047 pour une somme voisine de 6534,17 ; le pire écart à la somme en `float64` est 0,033. Sur 16 384 nombres voisins de 1, la somme séquentielle en `float32` s'écarte de $3{,}1 \cdot 10^{-3}$ de la somme exacte, la somme en arbre (celle du chapitre 3) de $7{,}8 \cdot 10^{-4}$ : dans cet essai l'arbre est environ quatre fois plus précis.
@@ -940,7 +941,7 @@ On y lit deux voies. La voie CPU montre ce que fait le programme : opérateurs, 
 
 ### 7.3. Quatre verdicts
 
-Le script `trace_report.py` du lab calcule, pour une trace avec activité GPU : l'utilisation du GPU (durée de l'union des intervalles occupés sur la durée totale), la durée médiane des noyaux et la part des copies. Il en tire un verdict selon des seuils qui sont des **heuristiques de ce cours**.
+Le script `trace_report.py` du lab calcule, pour une trace avec activité GPU : l'utilisation du GPU (durée de l'union des intervalles occupés sur la durée totale), la durée médiane des noyaux et la part des copies. Il en tire un verdict selon des seuils qui sont des **heuristiques de ce cours**. Les règles s'appliquent dans l'ordre du tableau et la première vérifiée l'emporte : une trace dominée par les copies est classée « transferts » même si son utilisation dépasse 85 %.
 
 | Signal | Verdict | Premières actions |
 |---|---|---|
@@ -1033,12 +1034,12 @@ Son analyse donne, pour une SRAM de taille $M$ avec $d \le M \le Nd$, un nombre 
 ::: ex
 [Exemple 8.1 — Combien de HBM pour la matrice d'attention ?]{.tag} Prenons $N = 4096$, 32 têtes, `bfloat16` (2 octets), une couche, une séquence. La matrice $S$ pèse $4096^2 \times 32 \times 2 = 1{,}07 \cdot 10^9$ octets, soit 1 Gio. Écrite puis relue pour le softmax, puis la matrice $P$ écrite et relue pour le produit : au moins 4 passes, soit 4 Gio de trafic HBM pour la seule passe avant d'une couche. À 3,35 To/s, cela représente au moins 1,28 ms par couche, borne idéalisée.
 
-Avec $d = 64$ et une SRAM de $M = 98\,304$ éléments (les 192 Kio par SM de l'A100 cités par l'article, comptés en nombres de 2 octets), le rapport des ordres de grandeur $(Nd + N^2) / (N^2 d^2 / M)$ vaut environ 24 ; il reste compris entre 24 et 26 pour $N$ de 1024 à 16 384.
+Avec $d = 64$ et une SRAM de $M = 98\,304$ éléments (les 192 Kio de SRAM par SM de l'A100 cités par l'article, comptés en nombres de 2 octets ; c'est la capacité combinée du cache L1 et de la mémoire partagée, dont le programmeur n'adresse que 164 Kio au plus, § 2.1), le rapport des ordres de grandeur $(Nd + N^2) / (N^2 d^2 / M)$ vaut environ 24 ; il reste compris entre 24 et 26 pour $N$ de 1024 à 16 384.
 
 Le $\Theta$ cache des constantes : lisez ce 24 comme un ordre de grandeur, pas comme une prédiction. L'article lui-même annonce, pour des valeurs typiques de $d$ et $M$, jusqu'à 9 fois moins d'accès à la HBM (sa figure 2), soit un facteur très inférieur à 24.
 :::
 
-Dans PyTorch, `scaled_dot_product_attention` est l'opérateur qui permet de choisir une implémentation fusionnée selon la plateforme. Le lab 4.4 montre ce que la substitution change dans un profil : avec l'attention explicite, le profil contient les appels `aten::softmax` et plus de `aten::bmm` ; avec l'opérateur fusionné, l'appel `aten::softmax` disparaît (testé sur CPU). Sur GPU, le noyau choisi dépend de votre version et de votre matériel : vérifiez-le dans votre propre trace.
+Dans PyTorch, `scaled_dot_product_attention` est l'opérateur qui permet de choisir une implémentation fusionnée selon la plateforme. Le lab 4.4 montre ce que la substitution change dans un profil : avec l'attention explicite, le profil contient les appels `aten::softmax` (qui délègue le calcul à `aten::_softmax`, la ligne visible au § 7.4) et plus de `aten::bmm` ; avec l'opérateur fusionné, l'appel `aten::softmax` disparaît (testé sur CPU). Sur GPU, le noyau choisi dépend de votre version et de votre matériel : vérifiez-le dans votre propre trace.
 
 ### 8.4. `torch.compile`
 
@@ -1185,7 +1186,7 @@ python3 -m pip install numpy torch numba triton pytest
 
 **Critère de réussite.** `./verify.sh` affiche `19 passed`, puis les compteurs exacts `tile  8: 8192 loads`, `tile 16: 4096 loads` et `naive  : 65536 loads`, puis `OK numba-cuda-sim: kernels correct in the simulator, tiled loads = naive / tile`. Les compteurs sont déterministes ; le test des barrières manquantes accorde 6 essais et exige au moins un résultat faux (nous avons observé 5 sur 5). Durée : environ 30 secondes sur 4 vCPU.
 
-**Pour aller plus loin.** Sur un GPU NVIDIA, lancez `NUMBA_ENABLE_CUDASIM=0 python3 bench_gpu.py` et placez les trois points (naïf, tuilé, `torch.matmul`) sur le roofline du module 2. Compilez et lancez `cuda/streams_overlap.cu` et comparez les quatre configurations à l'exemple 4.1. Ces deux programmes n'ont pas été exécutés pour ce cours.
+**Pour aller plus loin.** Sur un GPU NVIDIA, lancez `NUMBA_ENABLE_CUDASIM=0 python3 bench_gpu.py` et placez les trois points (naïf, tuilé, `torch.matmul`) sur le roofline du module 2. Compilez et lancez `cuda/streams_overlap.cu` : il garde 16 morceaux et fait varier la mémoire (paginable ou épinglée) et le nombre de flux (1, 2 ou 4). Comparez le flux unique, qui ne recouvre rien, aux configurations à plusieurs flux, dont le modèle de l'exemple 4.1 donne la durée idéale $T(16)$. Ces deux programmes n'ont pas été exécutés pour ce cours.
 :::
 
 ### Lab 4.3 — Triton en mode interpréteur {#lab-4-3}
@@ -1201,7 +1202,7 @@ python3 -m pip install numpy torch numba triton pytest
 5.  Lancez `python3 traffic.py 4096 2048` et retrouvez $5MN + 2M$ et $3MN + 2M$ ; lancez-le pour $M = N = 1024$.
 6.  Décorez `add_kernel` avec `@triton.autotune` et notez l'erreur. Lancez ensuite `python3 probe_observations.py` : il refait les observations sur `bfloat16`, l'auto-réglage et le masque absent, sans rien affirmer.
 
-**Critère de réussite.** `./verify.sh` affiche `13 passed`, puis `reads 41951232 elements` et `writes 25174016 elements` (déterministes), un rapport de trafic compris entre 3,9 et 4,1 (la sortie du bac à sable : `x4.001`), puis `OK triton-interpret: kernels correct under TRITON_INTERPRET=1, unfused/fused traffic ratio = 4.00`. Durée : environ 10 secondes.
+**Critère de réussite.** `./verify.sh` affiche `13 passed`, puis `reads 41951232 elements` et `writes 25174016 elements` (déterministes), le rapport de trafic `x4.001`, lui aussi déterministe ($4 + 2/N$ pour $N = 2048$ colonnes), puis `OK triton-interpret: kernels correct under TRITON_INTERPRET=1, unfused/fused traffic ratio = 4.00`. Durée : environ 10 secondes.
 
 **Pour aller plus loin.** Sur un GPU, lancez `bench_gpu.py` : si le softmax est limité par la bande passante, le rapport des temps du noyau fusionné et des cinq opérations devrait s'approcher du rapport de trafic (environ 4), moins le coût fixe des lancements : c'est l'hypothèse du modèle, à confronter à la mesure. Ce programme n'a pas été exécuté pour ce cours.
 :::

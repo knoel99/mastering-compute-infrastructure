@@ -58,7 +58,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.</p>
 
 <div class="cards">
-<a class="card" href="courses/parallel-programming/index.html"><h4>Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</h4><p class="meta">Module 03 · 30 h · Cœur</p><p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p></a>
+<a class="card" href="courses/parallel-programming/index.html"><h4>Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</h4><p class="meta">Module 03 · 30 h · Cœur</p><p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de passage à l'échelle.</p></a>
 <a class="card" href="courses/gpu-programming/index.html"><h4>Programmation GPU : CUDA, Triton et profilage</h4><p class="meta">Module 04 · 32,5 h · Cœur</p><p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, Nsight et les accélérateurs d'autres fabricants (AMD, TPU, Trainium, Ascend).</p></a>
 </div>
 
@@ -108,7 +108,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 ## Projets de portfolio {#projets}
 
-Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base.
+Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base. Le module 4 n'est exercé que par ses labs.
 
 <div class="cards">
 <a class="card" href="projects/homelab-slurm/index.html"><h4>Mini-cluster Slurm instrumenté</h4><p class="meta">Projet 1 · 24 h</p><p>La comptabilité d'un cluster Slurm décrite en code et appliquée par différence, un exportateur de métriques et des alertes testées par promtool, vérifiés sur un vrai Slurm ; tableau de bord Grafana en extension.</p></a>

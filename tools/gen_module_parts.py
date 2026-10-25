@@ -123,17 +123,17 @@ def restructure(text):
 def fiche(text, m):
     """Rows of the module fiche that must agree with data/curriculum.json: who it is for, prerequisites, projects."""
     row = f"| Pour qui | {m['audience']} |"
-    text, n = re.subn(r"^\| Statut pour le lecteur de référence \|.*\|\s*$", lambda _: row, text, flags=re.M)
+    text, n = re.subn(r"^\| Statut pour le lecteur de référence \|.*\|[ \t]*$", lambda _: row, text, flags=re.M)
     if not n:
-        text = re.sub(r"^\| Pour qui \|.*\|\s*$", lambda _: row, text, flags=re.M)
+        text = re.sub(r"^\| Pour qui \|.*\|[ \t]*$", lambda _: row, text, flags=re.M)
     pre = ", ".join(f"[Module {MODS[i]['number']} — {MODS[i]['title']}](../{i}/index.html)" for i in m["prerequisites"]) or "aucun"
     if m.get("prerequisites_note"):
         pre += f", {m['prerequisites_note']}"
-    text = re.sub(r"^\| Prérequis \|.*\|\s*$", lambda _: f"| Prérequis | {pre} |", text, flags=re.M)
+    text = re.sub(r"^\| Prérequis \|.*\|[ \t]*$", lambda _: f"| Prérequis | {pre} |", text, flags=re.M)
     projects = [p for p in C["projects"] if m["id"] in p["modules"]]
     proj = ", ".join(f"[{p['title']}](../../projects/{p['id']}/index.html)" for p in projects) or "aucun"
-    text = re.sub(r"^\| (Projets liés|Projets qui s'appuient sur ce module) \|.*\|\s*$", lambda _: f"| Projets liés | {proj} |", text, flags=re.M)
-    return text
+    text = re.sub(r"^\| (Projets liés|Projets qui s'appuient sur ce module) \|.*\|[ \t]*$", lambda _: f"| Projets liés | {proj} |", text, flags=re.M)
+    return re.sub(r"^(\|.*\|)\n(#{2,3} )", r"\1\n\n\2", text, flags=re.M)   # a table is followed by a blank line
 
 
 def main(argv):

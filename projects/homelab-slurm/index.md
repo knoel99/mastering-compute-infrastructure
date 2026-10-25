@@ -25,13 +25,19 @@ Le point de départ est un constat fait en écrivant le [module Slurm](../../cou
 
 Le projet se vérifie de deux façons. Hors ligne, avec des sorties **réelles** de Slurm 23.11.4 enregistrées dans `fixtures/` : aucun Slurm n'est nécessaire pour faire passer les tests. En direct, avec `verify-live.sh`, qui monte le Slurm du bac à sable du module 5, applique votre configuration deux fois et lit de vraies métriques.
 
-**État de la vérification en direct.** Le 2026-10-24, `verify-live.sh` a été exécuté avec succès de bout en bout plusieurs fois sur le code de référence (dont deux fois sur la version finale), avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes `sacctmgr`, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par `promtool`) et voit un nœud drainé devenir `slurm_node_unhealthy{reason="gpu_xid"} 1`.
+**État de la vérification en direct.** `verify-live.sh` a été exécuté avec succès de bout en bout plusieurs fois le 2026-10-24 sur le code de référence, puis deux fois le 2026-10-25 sur la version finale, avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes `sacctmgr`, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par `promtool`) et voit un nœud drainé devenir `slurm_node_unhealthy{reason="gpu_xid"} 1`.
 
 Limites : le drainage est provoqué à la main avec `scontrol update … reason=gpu_xid:79`, sans panne de GPU réelle, et les jobs sont des `sleep` sur processeur. L'exportateur lit `sshare` sans `-a` : il ne voit que les associations de l'utilisateur qui le lance (ici `root`), pas celles des autres utilisateurs.
 
 ### Prérequis de connaissances {#pre}
 
-Le [module Slurm](../../courses/slurm/index.html) (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; le chapitre sur la comptabilité explique ce que vous allez décrire en code. Les règles d'alerte et leurs tests reprennent la méthode du [projet 5](../gpu-observability/index.html), appliquée ici aux métriques d'un ordonnanceur et non d'un GPU. Ce projet vous fournit le test de mutation déjà écrit ; le projet 5 l'explique en détail.
+Le [module Slurm](../../courses/slurm/index.html) (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; son [chapitre 3](../../courses/slurm/index.html#ch3) (associations, QOS, Fair Tree) explique ce que vous allez décrire en code.
+
+Deux autres modules donnent la méthode. Le [chapitre 8 du module 1](../../courses/linux-systems/index.html#ch8) demande à un script d'exploitation des codes de retour explicites, ce que `|| true` efface. Le [module 6](../../courses/provisioning/index.html#ch3) prouve l'idempotence par un second passage (chapitre 3, Ansible) et traite du plan, de la dérive et de ce qui ne doit jamais se détruire (chapitre 4, Terraform).
+
+Les exigences R5 et R6 (exportateur, alertes testées par `promtool` et par mutation) s'appuient sur le [module 14](../../courses/observability/index.html), chapitres [3](../../courses/observability/index.html#ch3) et [5](../../courses/observability/index.html#ch5) et labs [14.1](../../courses/observability/index.html#lab-14-1) et [14.2](../../courses/observability/index.html#lab-14-2), qui viennent en phase 4. Si vous suivez l'ordre du parcours et que Prometheus est nouveau pour vous, faites R1 à R4 en phase 2 et R5 à R7 après le module 14, ou lisez d'abord ces chapitres.
+
+Le test de mutation est fourni. Il produit des copies du fichier de règles où une règle est cassée (durée `for` portée à 90 minutes, ou première comparaison inversée), relance `promtool test rules` sur chacune et exige un échec : une suite qui passe encore sur une règle cassée ne protège rien. Le [projet 5](../gpu-observability/index.html) reprendra cette méthode à l'échelle d'une flotte GPU.
 
 ## Cahier des charges {#cahier}
 
@@ -43,11 +49,15 @@ Le dossier `labs/projects/homelab-slurm/` contient `starter/` (à compléter), `
 | R2 | **Lecture de l'état réel** à partir des sorties `-nP` de `sacctmgr show assoc` et `show qos` | `test_parse_state_reads_the_real_sacctmgr_output` |
 | R3 | **Plan par différence**, dans l'ordre (QOS, comptes parents d'abord, utilisateurs), avec la syntaxe vérifiée sur Slurm ; jamais destructif ; l'état réel capturé est déjà convergé | `test_plan_*`, `test_the_real_captured_state_is_already_converged` |
 | R4 | **Convergence** : appliquer le plan puis recalculer donne un plan vide ; l'application s'arrête à la première erreur et la nomme | `test_applying_the_plan_converges_*`, `test_apply_stops_*` |
-| R5 | **Exportateur** : métriques sur nœuds, jobs, raisons d'attente, âge du plus vieux job en attente, parts d'équité ; étiquettes **bornées** ; séries à zéro ; `slurm_scrape_ok` | `tests/test_exporter.py` (9 tests) |
+| R5 | **Exportateur** : métriques sur nœuds, jobs, raisons d'attente, âge du plus vieux job en attente, parts d'équité ; étiquettes **bornées** ; séries à zéro ; `slurm_scrape_success` | `tests/test_exporter.py` (9 tests) |
 | R6 | **Quatre alertes** avec tests `promtool`, chacune avec un cas qui se déclenche et un cas silencieux, et des tests qui détectent une règle mutée | `tests/test_rules.py` (5 tests) |
 | R7 | **Vérification en direct** : le second passage ne change rien, les métriques lues sur un vrai Slurm sont acceptées par `promtool`, un nœud drainé devient « mal portant » | `verify-live.sh` |
 
-Les quatre alertes sont `SlurmExporterStale` (métriques absentes ou périmées), `SlurmNodeUnhealthy` (nœud drainé ou en panne), `SlurmJobsPendingTooLong` (le plus vieux job attend depuis plus d'une heure) et `SlurmSchedulerStuck` (des jobs attendent, aucun ne tourne et des nœuds sont libres). La dernière est la panne classique du module 5 : un job qui attend à jamais avec la raison `InvalidAccount` alors que le nœud est libre.
+Les quatre alertes sont `SlurmExporterStale` (métriques absentes ou périmées), `SlurmNodeUnhealthy` (nœud drainé ou en panne), `SlurmJobsPendingTooLong` (le plus vieux job attend depuis plus d'une heure) et `SlurmSchedulerStuck` (des jobs attendent, aucun ne tourne et des nœuds sont libres).
+
+La dernière couvre un ordonnanceur qui ne place rien alors que des nœuds sont libres. La documentation de `squeue` cite par exemple la raison d'attente `InvalidAccount` (le compte du job est invalide). Le [module 5](../../courses/slurm/index.html#ch1) ne l'a pas reproduite sur Slurm 23.11.4 : sur son bac à sable, un compte invalide est refusé dès `sbatch`. Cette alerte n'est donc vérifiée que par les tests `promtool`, sur des séries synthétiques.
+
+La santé de la collecte porte le même nom qu'au [lab 14.1](../../courses/observability/index.html#lab-14-1) : `slurm_scrape_success`. Deux métriques ont volontairement un autre nom, car ce sont d'autres séries : `slurm_job_max_pending_seconds` est par partition, alors que `slurm_pending_oldest_age_seconds` est par classe de raison ; `slurm_node_unhealthy` couvre aussi les états `fail` et `maint`, alors que `slurm_node_drain_info` ne retient que les nœuds drainés, en drainage ou `down`. Même `slurm_jobs`, de même nom, n'a pas les mêmes étiquettes (`state="PENDING"` ici, `state="pending"` au lab 14.1) : relisez une règle avant de la transposer.
 
 ## Jalons {#jalons}
 
@@ -76,8 +86,8 @@ Votre dépôt public contient :
 
 - `cluster.yml`, `config.py` et `exporter.py` complétés, les règles et leurs tests, avec la commande unique qui lance tout ;
 - la sortie de `verify-live.sh` sur votre machine, ou la mention honnête qu'elle n'a pas pu être exécutée ;
-- un **runbook** d'une page : « des jobs attendent, des nœuds sont libres, que vérifier et dans quel ordre » ;
-- un **ADR** d'une page.
+- un **runbook** d'une page : « des jobs attendent, des nœuds sont libres, que vérifier et dans quel ordre », avec la structure donnée dans [Écrire un ADR et un runbook](../../lab-setup/index.html#adr-runbook) ;
+- un **ADR** d'une page au format de `adr_template.md`, vérifié par `adr_lint.py` (même section).
 
 L'ADR tranche au moins quatre questions, en nommant l'alternative écartée :
 
@@ -93,7 +103,7 @@ Chaque critère est mesurable ; la commande qui le montre est indiquée.
 - **État réel converge.** Pour `cluster.yml` et les sorties capturées dans `fixtures/`, `plan` renvoie une liste vide et `drift` ne signale rien. Commande : `pytest -k real_captured_state`.
 - **Syntaxe vérifiée.** Sur un cluster vierge, le plan est exactement : une QOS, deux comptes, deux utilisateurs et un `modify user … qos+=urgent`, dans l'ordre du test. Commande : `pytest -k plan_from_an_empty`.
 - **Idempotence.** Après application, un second plan est vide, avec un faux `sacctmgr` qui répond 1 sur un objet existant ; et en direct, le second passage de `config.py` n'affiche aucune commande. Commandes : `pytest -k converges` et `verify-live.sh`.
-- **Jamais destructif.** Aucune commande du plan ne contient `delete`, `remove` ni `-=`, et les objets en trop sont rapportés par `drift`.
+- **Jamais destructif.** Aucune commande du plan ne contient `delete`, `remove` ni `-=`, et les objets en trop sont rapportés par `drift`. Commande : `pytest -k never_destructive`. Exception connue, non testée : `Preempt=` remplace toute la liste (voir les résultats de la référence).
 - **Exportateur.** Les sorties réelles donnent 4 jobs en attente dont 3 `Priority` et 1 `Resources`, et un nœud `drng` avec la raison bornée `gpu_xid`. L'exposition passe `promtool check metrics`.
 - **Série à zéro.** Un cluster au repos expose `slurm_jobs{state="RUNNING"} 0` et `PENDING 0`. Commande : `pytest -k zero_valued`.
 - **Alertes.** Chacune des six mutations (durée `for` portée à 90 minutes, comparaison inversée) fait échouer vos tests. Commande : `pytest tests/test_rules.py -k mutated`.
@@ -149,8 +159,10 @@ Les deux commandes se terminent avec le code 1, comme n'importe quelle erreur : 
 - **Plusieurs nœuds.** Étendez le cluster à plusieurs `slurmd` et vérifiez que les métriques par nœud et les alertes se comportent de même.
 - **API plutôt que lignes de commande.** Remplacez les appels à `sinfo` et `squeue` par l'API REST `slurmrestd` et comparez la robustesse de l'analyse.
 - **Tableau de bord.** Générez un tableau de bord Grafana comme au projet 5, avec les quatre alertes en annotations.
+- **Intégration continue.** Faites lancer vos tests et `promtool test rules` par un workflow d'intégration continue à chaque poussée sur votre dépôt (GitHub Actions, par exemple), avec `promtool` installé dans le workflow. La preuve : un commit qui casse une règle fait échouer le workflow, et le badge de statut figure dans le `README.md`.
+- **Variante GPU.** Sur une machine Linux avec un GPU NVIDIA (un seul suffit), déclarez le GPU à Slurm comme ressource générique (GRES, [§ 5.1 du module 5](../../courses/slurm/index.html#ch5)) et faites lire au contrôle de santé du lab 5.3 une vraie sortie de `nvidia-smi` au lieu du fichier simulé. La preuve : un drainage par ce contrôle apparaît dans `slurm_node_unhealthy` avec la raison `health`. Chiffrez la location avec la méthode de la page [Environnement de travail](../../lab-setup/index.html#budget).
 - **Dérive.** Faites supprimer, avec confirmation explicite, un objet signalé par `drift` ; décidez qui a le droit de lancer cette commande et comment le tracer.
-- **Exportateur en Go.** Réécrivez `exporter.py` en Go avec [client_golang](https://pkg.go.dev/github.com/prometheus/client_golang/prometheus), sur un registre `prometheus.NewRegistry()` : celui par défaut ajoute des séries du *runtime* Go et du processus. Commandes lues, noms de métriques, étiquettes bornées et `slurm_scrape_ok` ne changent pas, donc les règles et leurs tests `promtool` non plus. La preuve : `go test` sur les mêmes `fixtures/` retrouve 4 jobs en attente (3 `Priority`, 1 `Resources`) et le nœud `drng` de raison `gpu_xid` ; `promtool check metrics` accepte la sortie de `--once` ; à instant fixé, les deux expositions ont les mêmes séries et valeurs, à l'arrondi d'affichage près.
+- **Exportateur en Go.** Réécrivez `exporter.py` en Go avec [client_golang](https://pkg.go.dev/github.com/prometheus/client_golang/prometheus), sur un registre `prometheus.NewRegistry()` : celui par défaut ajoute des séries du *runtime* Go et du processus. Commandes lues, noms de métriques, étiquettes bornées et `slurm_scrape_success` ne changent pas, donc les règles et leurs tests `promtool` non plus. La preuve : `go test` sur les mêmes `fixtures/` retrouve 4 jobs en attente (3 `Priority`, 1 `Resources`) et le nœud `drng` de raison `gpu_xid` ; `promtool check metrics` accepte la sortie de `--once` ; à instant fixé, les deux expositions ont les mêmes séries et valeurs, à l'arrondi d'affichage près.
 
 ## Pour le portfolio {#portfolio}
 
@@ -179,4 +191,4 @@ $$\text{âge}_{\max} = t_{\text{lecture}} - \min_{j \in \text{PENDING}} t_{\text
 ### Pour aller plus loin {#lectures}
 
 - SchedMD, documentation de [`sacctmgr`](https://slurm.schedmd.com/sacctmgr.html), [`sinfo`](https://slurm.schedmd.com/sinfo.html), [`squeue`](https://slurm.schedmd.com/squeue.html) et [`sshare`](https://slurm.schedmd.com/sshare.html).
-- Le [projet 5](../gpu-observability/index.html) pour la méthode des règles testées par mutation.
+- Le [lab 14.2](../../courses/observability/index.html#lab-14-2) et le [projet 5](../gpu-observability/index.html) pour la méthode des règles testées par mutation.

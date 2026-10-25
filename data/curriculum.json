@@ -134,7 +134,7 @@
     "Du transistor au nœud : cœurs, SIMD, hiérarchie mémoire, bande passante, latence",
     "Le GPU vu comme machine à débit : SM, warps, HBM, tenseurs ; comparaison CPU/GPU",
     "Mesurer proprement : benchmarks, variance, warm-up, minimum vs médiane, STREAM, GEMM",
-    "Le modèle roofline : intensité arithmétique, bornes mémoire et calcul, lecture de profils",
+    "Le modèle roofline : intensité arithmétique, bornes mémoire et calcul",
     "Passage à l'échelle : loi d'Amdahl, loi de Gustafson, scalabilité forte et faible, efficacité parallèle",
     "Le modèle de communication α-β (Hockney) et les collectives : arbre, anneau, bande passante optimale",
     "FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres et de l'optimiseur",
@@ -162,9 +162,8 @@
    ],
    "facts": [
     "Williams, Waterman, Patterson (2009), roofline, CACM",
-    "Hockney (1994) et Thakur et al. (2005) pour les collectives",
-    "Chowdhery et al. (PaLM, 2022) pour la définition du MFU",
-    "FLOP de l'attention : formules de Kaplan et al. 2020 / Megatron-LM"
+    "Hockney (1994) pour le modèle α-β ; Patarasuk et Yuan (2009) pour le coût du all-reduce en anneau",
+    "Chowdhery et al. (PaLM, 2022) pour la définition du MFU et les FLOP par token (annexe B)"
    ],
    "feeds": [
     "scaling-study",
@@ -188,14 +187,14 @@
    "level": 2,
    "status": "core",
    "title": "Programmation parallèle : OpenMP, MPI et études de passage à l'échelle",
-   "summary": "Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.",
+   "summary": "Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de passage à l'échelle.",
    "prerequisites": [
     "perf-models"
    ],
    "outcomes": [
     "Paralléliser une boucle avec OpenMP en justifiant partage, réduction et ordonnancement",
     "Écrire un programme MPI avec communications point-à-point et collectives, sans interblocage",
-    "Mener une étude de scalabilité forte et faible et expliquer l'écart au modèle",
+    "Mener une étude de passage à l'échelle, fort et faible, et expliquer l'écart au modèle",
     "Relier les collectives MPI à ce que NCCL fait pour l'entraînement"
    ],
    "chapters": [
@@ -206,7 +205,7 @@
     "Décomposition de domaine, halos et recouvrement calcul/communication",
     "E/S parallèles et reproductibilité numérique : MPI-IO, sommes non associatives, graines",
     "Hybride MPI+OpenMP, placement et binding ; lancement sous Slurm",
-    "Étudier la scalabilité : plan d'expérience, efficacité, goulots, rapport"
+    "Étudier le passage à l'échelle : plan d'expérience, efficacité, goulots, rapport"
    ],
    "labs": [
     {
@@ -219,11 +218,11 @@
      "id": "mpi-ring",
      "title": "MPI : anneau, halo et all-reduce",
      "kind": "sandbox",
-     "idea": "Implémenter un all-reduce en anneau à la main avec MPI (OpenMPI/mpi4py dans le bac à sable, 4 rangs locaux), comparer à MPI_Allreduce."
+     "idea": "Lire un all-reduce en anneau écrit à la main avec Sendrecv (Open MPI et mpi4py, 4 rangs locaux), en réécrire la phase reduce-scatter, et le comparer à MPI_Allreduce par comptage des messages et des octets."
     },
     {
      "id": "jacobi-scaling",
-     "title": "Jacobi 2D : étude de scalabilité",
+     "title": "Jacobi 2D : étude de passage à l'échelle",
      "kind": "sandbox",
      "idea": "Solveur Jacobi avec décomposition de domaine ; scalabilité forte/faible sur les cœurs disponibles ; tracé et analyse."
     }
@@ -308,9 +307,7 @@
     "Tillet et al. (2019) Triton",
     "Documentation Numba CUDA simulator et Triton interpreter : vérifier la disponibilité sur CPU"
    ],
-   "feeds": [
-    "scaling-study"
-   ],
+   "feeds": [],
    "audience": "Cœur : la grammaire des échanges entre l'infrastructure et la recherche sur la performance ; survol possible si vous écrivez déjà des noyaux CUDA ou Triton.",
    "focus": "Le profilage et la lecture de traces servent à tous les profils, y compris si vous n'écrirez jamais de noyau.",
    "study": {
@@ -376,6 +373,7 @@
    ],
    "feeds": [
     "homelab-slurm",
+    "gpu-observability",
     "capstone-rfc"
    ],
    "audience": "Cœur pour tous, sauf si vous administrez déjà Slurm en production : survolez alors les premiers chapitres et faites les labs de politique d'équité et de santé des nœuds.",
@@ -520,7 +518,6 @@
     "Chiffres de bande passante par génération (NVLink, NDR) : citer les fiches constructeur"
    ],
    "feeds": [
-    "scaling-study",
     "capstone-rfc"
    ],
    "audience": "Cœur pour tous : InfiniBand, RoCE et NCCL ; un administrateur HPC qui connaît InfiniBand y trouvera NCCL et le dimensionnement pour l'entraînement.",
@@ -745,6 +742,8 @@
    ],
    "feeds": [
     "resilient-trainer",
+    "multi-provider-scheduler",
+    "gpu-observability",
     "capstone-rfc"
    ],
    "audience": "Cœur : reprise après panne à grande échelle, coût des checkpoints et procédures d'exploitation.",
@@ -895,6 +894,7 @@
     "Vérifier l'état de DRA et des versions de Kubernetes à la date du jour"
    ],
    "feeds": [
+    "multi-provider-scheduler",
     "capstone-rfc"
    ],
    "audience": "Cœur : la couche GPU de Kubernetes, la mise en file et le placement des entraînements ; si vous exploitez déjà Kubernetes, survolez les rappels et travaillez les chapitres sur les GPU, les files d'attente et le gang scheduling.",
@@ -1031,8 +1031,8 @@
     "Pièges d'interprétation de DCGM_FI_DEV_GPU_UTIL : citer la documentation"
    ],
    "feeds": [
-    "gpu-observability",
     "homelab-slurm",
+    "gpu-observability",
     "capstone-rfc"
    ],
    "audience": "Cœur : sémantique des métriques GPU, détection des blocages et objectifs de service (SLO) du calcul ; si vous maîtrisez déjà Prometheus, concentrez-vous sur ces trois points.",
@@ -1211,7 +1211,7 @@
    ],
    "title": "Projet 1 — Mini-cluster Slurm instrumenté",
    "summary": "La comptabilité d'un cluster Slurm décrite en code et appliquée par différence, un exportateur de métriques et des alertes testées par promtool, vérifiés sur un vrai Slurm ; tableau de bord Grafana en extension.",
-   "idea": "Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana (extension). Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension."
+   "idea": "Comptabilité (comptes, QOS, parts d'équité) décrite dans cluster.yml et appliquée par différence sur le Slurm du bac à sable du module 5, exportateur de métriques Slurm, règles d'alerte testées avec promtool et par mutation, tableau de bord Grafana (extension). Vérifié dans le bac à sable avec Slurm 23.11.4."
   },
   {
    "id": "scaling-study",
@@ -1220,13 +1220,11 @@
    "modules": [
     "perf-models",
     "parallel-programming",
-    "gpu-programming",
-    "networking",
     "distributed-training"
    ],
    "title": "Projet 2 — Étude de passage à l'échelle d'un entraînement",
    "summary": "Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.",
-   "idea": "Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec matériel à prévoir."
+   "idea": "Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul du gain, de l'efficacité et de l'utilisation du pic mesuré, rapport reproductible (commande unique, tableaux, ADR). Variante GPU en extension avec matériel à prévoir."
   },
   {
    "id": "resilient-trainer",
@@ -1248,7 +1246,8 @@
    "modules": [
     "multi-cloud",
     "finops-capacity",
-    "kubernetes-gpu"
+    "kubernetes-gpu",
+    "fault-tolerance"
    ],
    "title": "Projet 4 — Placement multi-fournisseurs sensible aux coûts",
    "summary": "Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.",
@@ -1272,6 +1271,7 @@
    "number": 6,
    "hours": 40,
    "modules": [
+    "perf-models",
     "slurm",
     "provisioning",
     "networking",

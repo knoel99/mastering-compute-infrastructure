@@ -1,7 +1,7 @@
 ---
 title: "Programmation parallèle : OpenMP, MPI et études de passage à l'échelle"
 subtitle: "Module 03 · Phase 1 · 30 h"
-description: "Mémoire partagée avec OpenMP, passage de messages avec MPI, collectives, halos, reproductibilité numérique et une étude de scalabilité mesurée sur un vrai Open MPI."
+description: "Mémoire partagée avec OpenMP, passage de messages avec MPI, collectives, halos, reproductibilité numérique et une étude de passage à l'échelle mesurée sur un vrai Open MPI."
 module:
   id: parallel-programming
   number: 3
@@ -23,7 +23,7 @@ labs:
 
 **La question à laquelle ce module répond :** quand un calcul tient sur un cœur, il est simple ; comment le répartir sur quatre cœurs, puis sur quatre machines, sans changer son résultat et en sachant dire pourquoi il n'ira pas quatre fois plus vite ? C'est le noyau commun des formations en calcul haute performance, et c'est aussi le vocabulaire sur lequel se calquent NCCL et les frameworks d'entraînement distribué.
 
-Vous allez écrire et mesurer de petits programmes OpenMP (mémoire partagée) et MPI (passage de messages), puis les assembler dans un solveur de Jacobi dont vous étudierez la scalabilité. Les sorties et les chiffres de ce module viennent d'exécutions réelles sur une VM de 4 cœurs virtuels, avec Open MPI 4.1.6 et GCC 13.3, le 25 octobre 2026 ; les données fictives (exercices 1 et 12) et les paramètres d'exemple sont signalés comme tels. Les chiffres de votre machine seront différents ; la méthode, non.
+Vous allez écrire et mesurer de petits programmes OpenMP (mémoire partagée) et MPI (passage de messages), puis les assembler dans un solveur de Jacobi dont vous étudierez le passage à l'échelle. Les sorties et les chiffres de ce module viennent d'exécutions réelles sur une VM de 4 cœurs virtuels, avec Open MPI 4.1.6 et GCC 13.3, le 25 octobre 2026 ; les données fictives (exercices 1 et 12) et les paramètres d'exemple sont signalés comme tels. Les chiffres de votre machine seront différents ; la méthode, non.
 
 Le module [Architecture matérielle et modèles de performance](../perf-models/index.html) vous a donné les modèles : Amdahl, Gustafson, α-β, roofline. Ici, vous les confrontez à des mesures et vous apprenez à expliquer l'écart. Le module [Slurm](../slurm/index.html) servira de lanceur pour la dernière partie.
 
@@ -35,13 +35,13 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 
 | Clé | Valeur |
 |---|---|
-| Volume | 30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h) et 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) |
+| Volume | 30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h), 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) et 30 min de checkpoint de sortie |
 | Niveau d'entrée | 2 : lecture de C et de Python, ligne de commande Linux, modèles du module précédent |
 | Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html) |
 | Pour qui | Cœur : rang, communicateur, collective et liaison aux cœurs reviennent dans NCCL, dans PyTorch distribué et dans les journaux de Slurm ; survol possible si vous pratiquez déjà MPI. |
-| Livrable | une étude de scalabilité reproductible d'un solveur MPI+OpenMP (lab 3.3), un all-reduce en anneau testé (lab 3.2) et un rapport d'une page |
+| Livrable | une étude de passage à l'échelle reproductible d'un solveur MPI+OpenMP (lab 3.3), un all-reduce en anneau testé (lab 3.2) et un rapport d'une page |
 | Environnement | un portable CPU de 4 cœurs ou plus, Linux, GCC, Open MPI et mpi4py ; aucun GPU. La partie facultative sous Slurm demande en plus un conteneur jetable avec accès root |
-| Projets liés | [Projet 2 — Étude de passage à l'échelle](../../projects/scaling-study/index.html) (la méthode du chapitre 8 en est le fondement), [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html) (le lancement hybride du chapitre 7) |
+| Projets liés | [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -52,12 +52,12 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 -   Décomposer un domaine, compter les octets de halo et décider si un recouvrement vaut la peine (chapitre 5).
 -   Dire quand un résultat doit être identique bit à bit, et comment l'obtenir malgré une addition non associative (chapitre 6).
 -   Lancer un job hybride MPI+OpenMP avec le bon placement, avec `mpirun` et sous Slurm (chapitre 7).
--   Mener une étude de scalabilité forte et faible, avec intervalles de confiance, et expliquer l'écart au modèle (chapitre 8).
+-   Mener une étude de passage à l'échelle, fort et faible, avec intervalles de confiance, et expliquer l'écart au modèle (chapitre 8).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 1 — Calcul parallèle et GPU** (semaines 6-11) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
+-   **Phase 1 — Calcul parallèle et GPU** (semaines 5-9) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Slurm, Expérience HPC, Profilage, bancs d'essai, Langage système (Go, Rust, C++), Collectives (NCCL, RCCL, HCCL), Réseau (général), Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
@@ -77,8 +77,8 @@ Onze séances, soit 30 h : sept de 3 h, deux de 2,5 h et deux de 2 h. Le contenu
 | 6 | 3 h | 2 | ch. 5 Décomposition de domaine et halos | Lab 3.2 parties C et D |
 | 7 | 3 h | 2 | ch. 6 E/S parallèles et reproductibilité numérique | Ex. 6, 8, 9 |
 | 8 | 2.5 h | 3 | ch. 7 Hybride, placement et lancement sous Slurm | Lab 3.3 partie A |
-| 9 | 3 h | 3 | ch. 8 Étudier la scalabilité | Lab 3.3 partie B |
-| 10 | 2 h | 3 | pratique | Lab 3.3 partie C ; Ex. 10, 11 |
+| 9 | 3 h | 3 | ch. 8 Étudier le passage à l'échelle | Lab 3.3 partie B |
+| 10 | 2 h | 3 | pratique | Lab 3.3 partie C (la partie D, facultative, est reportée après le module 5) ; Ex. 10, 11 |
 | 11 | 2 h | 3 | checkpoint de sortie | Ex. 7, 12 |
 
 <!-- gen:travailler -->
@@ -143,14 +143,14 @@ Ce rapprochement avec l'entraînement est une analogie pédagogique, pas une éq
 
 ### 1.2. Travail, profondeur et bornes
 
-Deux grandeurs décrivent un calcul indépendamment de la machine. Le **travail** $W$ est le nombre total d'opérations. La **profondeur** $S$ (en anglais *span*) est la longueur de la plus longue chaîne d'opérations dépendantes entre elles : même avec autant de processeurs qu'on veut, on ne peut pas faire mieux.
+Deux grandeurs décrivent un calcul indépendamment de la machine. Le **travail** $W$ est le nombre total d'opérations. La **profondeur** $T_\infty$ (en anglais *span*) est la longueur de la plus longue chaîne d'opérations dépendantes entre elles : même avec autant de processeurs qu'on veut, on ne peut pas faire mieux, d'où la notation.
 
-Sur $p$ processeurs, le temps est donc au moins $\max(W/p,\ S)$ en unités d'opération. Un ordonnanceur glouton, qui ne laisse jamais un processeur inactif tant qu'il reste du travail prêt, atteint $W/p + S$ au plus : cet encadrement de facteur deux suffit pour raisonner.
+Sur $p$ processeurs, le temps est donc au moins $\max(W/p,\ T_\infty)$ en unités d'opération. Un ordonnanceur glouton, qui ne laisse jamais un processeur inactif tant qu'il reste du travail prêt, atteint $W/p + T_\infty$ au plus : cet encadrement de facteur deux suffit pour raisonner.
 
 ::: ex
-[Exemple 1.1 — Travail et profondeur d'une somme]{.tag} Sommer $n = 2^{25} = 33\,554\,432$ nombres demande $W = n - 1 = 33\,554\,431$ additions. En les regroupant deux par deux, puis les résultats deux par deux, on obtient un arbre de $\log_2 n = 25$ niveaux : la profondeur vaut $S = 25$ additions.
+[Exemple 1.1 — Travail et profondeur d'une somme]{.tag} Sommer $n = 2^{25} = 33\,554\,432$ nombres demande $W = n - 1 = 33\,554\,431$ additions. En les regroupant deux par deux, puis les résultats deux par deux, on obtient un arbre de $\log_2 n = 25$ niveaux : la profondeur vaut $T_\infty = 25$ additions.
 
-Le parallélisme disponible, $W/S \approx 1{,}34$ million, dépasse de loin les 4 cœurs de la machine d'essai : la somme n'est pas limitée par sa structure, mais par la mémoire et par la façon de l'écrire (chapitre 2). À l'inverse, une boucle `s += a[i]` écrite telle quelle a une profondeur de $n-1$ : c'est la structure des dépendances, pas le nombre de cœurs, qui interdit de la paralléliser sans la réécrire en arbre.
+Le parallélisme disponible, $W/T_\infty \approx 1{,}34$ million, dépasse de loin les 4 cœurs de la machine d'essai : la somme n'est pas limitée par sa structure, mais par la mémoire et par la façon de l'écrire (chapitre 2). À l'inverse, une boucle `s += a[i]` écrite telle quelle a une profondeur de $n-1$ : c'est la structure des dépendances, pas le nombre de cœurs, qui interdit de la paralléliser sans la réécrire en arbre.
 :::
 
 ### 1.3. Mémoire partagée contre mémoire distribuée
@@ -235,7 +235,7 @@ La machine n'est pas dédiée : d'autres charges peuvent tourner sur les mêmes 
 Points clés — chapitre 1
 
 -   Données, tâches et pipeline sont trois façons de répartir un travail ; elles se combinent.
--   Le travail $W$ et la profondeur $S$ donnent le temps minimal $\max(W/p,\ S)$ sur $p$ processeurs.
+-   Le travail $W$ et la profondeur $T_\infty$ donnent le temps minimal $\max(W/p,\ T_\infty)$ sur $p$ processeurs.
 -   Mémoire partagée : des threads, des courses de données. Mémoire distribuée : des rangs, des interblocages.
 -   Les spécifications (OpenMP 6.0, MPI 5.0) sont plus récentes que les bibliothèques que vous utilisez (OpenMP 4.5 pour GCC 13.3, MPI 3.1 pour Open MPI 4.1.6).
 -   Lisez la machine (`lscpu`, `getconf`) avant de choisir un schéma : caches privés ou partagés, nombre de domaines NUMA.
@@ -321,7 +321,7 @@ $$T_{\text{boucle}} \approx t_{\text{unité}} \times \max_t \text{charge}_t \qqu
 | `dynamic,16` | 125 | 1,017 | 74,2 | 75,7 | 3,85 |
 | `guided` | 23 | 1,003 | 73,1 | 73,8 | 3,95 |
 
-Le déséquilibre de `static` est exact et déterministe : le dernier thread reçoit les itérations 1501 à 2000, soit 875 250 unités sur une moyenne de 500 250, donc 1,750. Les prédictions tombent à 7 % des mesures pour `static` et à 13 % pour `static,16`, le plus mauvais cas. Le modèle ne contient ni le coût d'obtention d'un paquet ni les effets de cache ; ce qu'il ne dit pas est la partie de l'écart que vous devez chercher.
+Le déséquilibre de `static` est exact et déterministe : le dernier thread reçoit les itérations 1500 à 1999, de coûts 1 501 à 2 000, soit 875 250 unités sur une moyenne de 500 250, donc 1,750. Les prédictions tombent à 7 % des mesures pour `static` et à 13 % pour `static,16`, le plus mauvais cas. Le modèle ne contient ni le coût d'obtention d'un paquet ni les effets de cache ; ce qu'il ne dit pas est la partie de l'écart que vous devez chercher.
 :::
 
 Sur une boucle uniforme, `static` suffit et coûte le moins. Dès que le coût dépend de l'indice ou des données, essayez `static` avec un petit paquet, puis `dynamic` ou `guided`, et mesurez avec `schedule(runtime)` et `OMP_SCHEDULE` sans recompiler.
@@ -332,7 +332,7 @@ Un cœur ne lit pas la mémoire octet par octet mais par **lignes de cache** de 
 
 <figure class="fig">
 <svg viewBox="0 0 560 250" role="img" aria-labelledby="fs-t fs-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
-<title id="fs-t">Faux partage : huit cases de 56 octets contre des cases alignées sur 64 octets</title>
+<title id="fs-t">Faux partage : quatre cases de 56 octets contre quatre cases alignées sur 64 octets</title>
 <desc id="fs-d">En haut, quatre threads ont chacun une case de 56 octets rangées côte à côte sur quatre lignes de cache de 64 octets : les cases des threads 0 et 1, 1 et 2, 2 et 3 partagent une ligne. En bas, chaque case commence au début d'une ligne : aucune ligne n'est partagée.</desc>
 <g fill="none" stroke="currentColor" stroke-width="2">
 <rect x="20" y="50" width="520" height="40"/><line x1="150" y1="50" x2="150" y2="90"/><line x1="280" y1="50" x2="280" y2="90"/><line x1="410" y1="50" x2="410" y2="90"/>
@@ -356,7 +356,7 @@ Un cœur ne lit pas la mémoire octet par octet mais par **lignes de cache** de 
 Le lab construit un cas réaliste : un histogramme par thread, où l'indice du compteur incrémenté dépend de la donnée. Trois dispositions, mêmes résultats :
 
 -   `packed` : chaque thread a 7 compteurs de 8 octets (56 octets), rangés bout à bout ;
--   `padded` : chaque thread a sa case alignée sur 64 octets ;
+-   `padded` : chaque thread a sa case alignée sur 64 octets, complétée par du remplissage (*padding*) ;
 -   `private` : chaque thread compte dans un tableau local, fusionné une fois à la fin.
 
 ::: ex
@@ -376,7 +376,7 @@ Avec quatre threads, `packed` est 3,3 fois plus lent que `padded` et 1,6 fois pl
 
 Un essai de relecture à $10^8$ incréments a donné un facteur proche de 10 : l'ordre de grandeur est robuste, le facteur ne l'est pas.
 
-Nous n'avons pas d'explication vérifiée à l'absence d'effet dans le premier cas (on peut supposer que le tampon d'écriture du cœur absorbe des écritures simples, hypothèse non testée). Retenez que le faux partage n'est pas une constante de la nature : mesurez-le sur votre matériel avant de padder partout.
+Nous n'avons pas d'explication vérifiée à l'absence d'effet dans le premier cas (on peut supposer que le tampon d'écriture du cœur absorbe des écritures simples, hypothèse non testée). Retenez que le faux partage n'est pas une constante de la nature : mesurez-le sur votre matériel avant d'ajouter du remplissage partout.
 :::
 
 ### 2.6. Les tâches
@@ -530,7 +530,7 @@ alltoall       r0:[0, 10, 20, 30] r1:[1, 11, 21, 31] r2:[2, 12, 22, 32] r3:[3, 1
 -   `Allgather` concatène les contributions de tous les rangs, dans l'ordre des rangs, chez tous.
 -   `Alltoall` transpose : le bloc $j$ du rang $i$ devient le bloc $i$ du rang $j$.
 
-Deux identités sont vérifiées par le script. `Allreduce` égale `Reduce_scatter_block` suivi d'`Allgather` ; `Alltoall` est la transposée de la matrice des blocs. La première est la clé des algorithmes de la section 4.3 et de NCCL (section 4.6).
+Deux identités sont vérifiées par le script. `Allreduce` égale `Reduce_scatter_block` suivi d'`Allgather` ; `Alltoall` est la transposée de la matrice des blocs. La première est la clé des algorithmes de la section 4.3 et de NCCL (section 4.7).
 
 ### 4.2. Tous ou personne
 
@@ -680,7 +680,7 @@ Côté PyTorch, `torch.distributed` propose les backends `gloo`, `mpi`, `nccl` e
 Points clés — chapitre 4
 
 -   Une collective est appelée par tous les rangs, dans le même ordre ; sinon, blocage.
--   `Allreduce` = `Reduce_scatter` + `Allgather` : c'est la structure de l'anneau et de NCCL.
+-   `Allreduce` = `Reduce_scatter_block` + `Allgather` : c'est la structure de l'anneau et de NCCL.
 -   Anneau : $2(p-1)$ messages, $2(p-1)/p\cdot n$ octets. Doublement récursif : $\log_2 p$ messages, $\log_2 p \cdot n$ octets. Seuil de croisement $n^{*}$ au-dessus duquel l'anneau gagne.
 -   Les compteurs de messages et d'octets se vérifient exactement ; les durées, jamais sans dispersion.
 -   Calibrez le modèle sur la primitive que vous utilisez, et mesurez le coût de votre propre code.
@@ -794,10 +794,10 @@ Le « déséquilibre » est le rapport entre le temps de calcul du rang le plus 
 Nous n'avons pas isolé la cause de cette différence entre rangs (mémoire partagée, ordonnancement du système, voisins sur l'hôte de la VM) : c'est une hypothèse, que le chapitre 8 range parmi les menaces à la validité.
 :::
 
-Une conséquence vérifiée par une autre expérience : demander la norme du résidu après **chaque** balayage (`--check-every 1`) ajoute un `MPI_Allreduce` de deux nombres par balayage.
+Une conséquence vérifiée par une autre expérience : demander la norme du résidu après **chaque** balayage (`--check-every 1`) ajoute deux `MPI_Allreduce` d'un nombre de 8 octets par balayage : un maximum et une somme, un par norme du résidu.
 
 ::: ex
-[Exemple 5.3 — Un all-reduce de 8 octets qui coûte 0,6 ms]{.tag} `compare_variants.py` lance les variantes dans un ordre aléatoire, 15 répétitions, 4 rangs, grille $1536 \times 1536$, 30 balayages ; la machine était au repos au départ. Médianes :
+[Exemple 5.3 — Deux all-reduce de 8 octets qui coûtent 0,6 ms par balayage]{.tag} `compare_variants.py` lance les variantes dans un ordre aléatoire, 15 répétitions, 4 rangs, grille $1536 \times 1536$, 30 balayages ; la machine était au repos au départ. Médianes :
 
 | Variante | Temps (ms) | Minimum (ms) | Halo (ms) | All-reduce (ms) |
 |---|---|---|---|---|
@@ -809,7 +809,7 @@ Une conséquence vérifiée par une autre expérience : demander la norme du ré
 
 Les quatre premières lignes ne se distinguent pas de façon fiable : 31,7 contre 30,4 ms n'est pas une différence, et le classement des médianes (30,4 à 37,3 ms) n'est pas celui des minimums (22,2 à 28,1 ms). Le recouvrement ne pouvait d'ailleurs pas aider, puisque le transfert est plus de soixante-dix fois plus court que le balayage.
 
-En revanche, le résidu à chaque balayage ajoute 68 % au temps total : 17,7 ms d'all-reduce pour 30 appels, soit 0,59 ms chacun, alors qu'un all-reduce de 16 octets entre processus d'une même machine coûte quelques microsecondes. Ce temps est encore de l'attente : l'all-reduce est un point de rendez-vous où le retard du plus lent est payé par tous. Un test de convergence tous les 10 ou 100 balayages suffit presque toujours.
+En revanche, le résidu à chaque balayage ajoute 68 % au temps total : 17,7 ms d'all-reduce pour 30 balayages, soit 0,59 ms par balayage et 0,30 ms pour chacun des 60 appels, alors qu'un all-reduce de 8 octets entre processus d'une même machine coûte quelques microsecondes (exemple 4.3). Ce temps est encore de l'attente : l'all-reduce est un point de rendez-vous où le retard du plus lent est payé par tous. Un test de convergence tous les 10 ou 100 balayages suffit presque toujours.
 :::
 
 ::: recap
@@ -923,7 +923,7 @@ MPI doit savoir que des threads existent. La norme définit quatre niveaux (sect
 
 ### 7.2. Qui est où ?
 
-Un processus ou un thread non lié peut être déplacé par le système d'un cœur à l'autre, ce qui vide ses caches et le met en concurrence avec les autres. La **liaison** (*binding*) fixe un processus ou un thread sur un ensemble de cœurs. Trois niveaux la décident : le lanceur (Slurm ou `mpirun`) pour les rangs, la bibliothèque OpenMP pour les threads à l'intérieur de chaque rang.
+Un processus ou un thread non lié peut être déplacé par le système d'un cœur à l'autre, ce qui vide ses caches et le met en concurrence avec les autres. La **liaison** (*binding*) fixe un processus ou un thread sur un ensemble de cœurs. Deux niveaux la décident : le lanceur (Slurm ou `mpirun`) pour les rangs, la bibliothèque OpenMP pour les threads à l'intérieur de chaque rang.
 
 Open MPI montre ce qu'il a fait avec `--report-bindings`. Voici trois cas sur la VM de 4 cœurs, en sortie réelle (abrégée) :
 
@@ -954,7 +954,7 @@ level 1 thread 0x… affinity 0-3
 ~~~
 
 ::: ex
-[Exemple 7.1 — Même cœurs, trois répartitions, une erreur de liaison]{.tag} `hybrid_compare.py --misbound` lance, dans un ordre aléatoire, 9 répétitions de chaque répartition de 4 cœurs sur la grille $1536 \times 1536$ (30 balayages). Les trois premières lignes sont correctement liées (`--map-by slot:PE=T --bind-to core`) ; les deux dernières mettent les $T$ threads de chaque rang sur un seul cœur (`--bind-to core` sans `PE`).
+[Exemple 7.1 — Mêmes cœurs, trois répartitions, une erreur de liaison]{.tag} `hybrid_compare.py --misbound` lance, dans un ordre aléatoire, 9 répétitions de chaque répartition de 4 cœurs sur la grille $1536 \times 1536$ (30 balayages). Les trois premières lignes sont correctement liées (`--map-by slot:PE=T --bind-to core`) ; les deux dernières mettent les $T$ threads de chaque rang sur un seul cœur (`--bind-to core` sans `PE`).
 
 | Rangs × threads | Liaison | Médiane (ms) | Minimum (ms) | Octets de halo |
 |---|---|---|---|---|
@@ -985,7 +985,7 @@ Le guide MPI de Slurm distingue trois façons de lancer un programme parallèle 
 [Le troisième mode contourne Slurm]{.tag} Documenté dans le guide MPI de Slurm : dans le troisième cas, Slurm ne lance pas directement l'application, ce qui peut empêcher la liaison des tâches aux cœurs et la comptabilité, et le guide indique que ce n'est pas une méthode recommandée. Il recommande aussi `pam_slurm_adopt` pour que les processus lancés ainsi soient rattachés au job. Source : <https://slurm.schedmd.com/mpi_guide.html>.
 :::
 
-Le lab 3.3 (partie D, facultative) exécute les deux premiers modes sur le Slurm mono-nœud du module 5, version 23.11.4. Le script `slurm_hybrid.sbatch` demande 2 tâches de 2 cœurs, fixe le nombre de threads d'après ce que Slurm a alloué, et lance `mpirun` dans l'allocation.
+Le lab 3.3 (partie D, facultative) exécute les deux premiers modes sur le Slurm mono-nœud du module 5, version 23.11.4. Elle se fait après le lab 5.1, qui installe ce bac à sable : revenez-y pendant la phase 2. Le script `slurm_hybrid.sbatch` demande 2 tâches de 2 cœurs, fixe le nombre de threads d'après ce que Slurm a alloué, et lance `mpirun` dans l'allocation.
 
 ~~~bash
 #!/usr/bin/env bash
@@ -1037,7 +1037,7 @@ Points clés — chapitre 7
 -   La VM n'a qu'un domaine NUMA : le placement mémoire n'est ni mesuré ni démontré ici.
 :::
 
-## 8. Étudier la scalabilité : plan d'expérience, efficacité, goulots, rapport {#ch8}
+## 8. Étudier le passage à l'échelle : plan d'expérience, efficacité, goulots, rapport {#ch8}
 
 Le module 2 a posé le protocole en sept étapes, les statistiques minimales et les pièges classiques. Ce chapitre les applique à un vrai solveur, du plan à l'interprétation, en rapportant aussi ce qui ne marche pas bien. Il suit la partie B du lab 3.3 et prépare le [Projet 2](../../projects/scaling-study/index.html). Le protocole est dans le [module 2, chapitre 8](../perf-models/index.html#ch8) : nous ne le répétons pas.
 
@@ -1056,7 +1056,7 @@ Ce modèle oublie la mémoire. Le noyau fait 4 opérations flottantes par cellul
 ### 8.2. Le plan
 
 -   Facteurs : $p \in \{1, 2, 4\}$ ; découpe 1D, et 2D pour $p=4$ ; fort et faible ; échange seul pour chaque $p$.
--   Neuf répétitions de chaque configuration, dans un ordre aléatoire à graine fixe (0), avec un seul `mpirun` par mesure.
+-   Neuf répétitions de chaque configuration, une de moins que la règle du module 2 (au moins dix) : c'est une menace à la validité (section 8.5). Ordre aléatoire à graine fixe (0), un seul `mpirun` par mesure.
 -   Environnement fixé : Open MPI 4.1.6, GCC 13.3, `--bind-to core`, `OMP_NUM_THREADS=1`, 4 cœurs virtuels d'un Xeon à 2,8 GHz. La charge moyenne à 1 minute valait 1,04 au début, tâches précédentes de l'auteur incluses.
 -   Estimateur : médiane, avec un intervalle de confiance à 95 % obtenu par rééchantillonnage ; gain $S = T_1/T_p$, efficacité $E = S/p$ et fraction de Karp-Flatt $e(p) = (1/S - 1/p)/(1 - 1/p)$ calculés sur les médianes.
 -   Vérification préalable : le champ final doit avoir la même empreinte pour tous les $p$ (chapitre 6). Sinon on ne compare pas la même chose.
@@ -1139,7 +1139,7 @@ La seconde valeur tombe pourtant dans l'intervalle de confiance de la première 
 Un rapport d'une page suffit : la question, la prédiction (avant la mesure), le protocole, le graphique avec intervalles, l'analyse de l'écart, les menaces. Voici les menaces de cette étude.
 
 -   **Machine partagée.** Des charges étrangères ont pu tourner pendant les mesures ; l'écart entre séances ci-dessus en est peut-être un signe.
--   **Peu de répétitions.** Neuf mesures par point donnent des intervalles larges, surtout à $p=4$.
+-   **Peu de répétitions.** Neuf mesures par point, une de moins que la règle du module 2, donnent des intervalles larges, surtout à $p=4$.
 -   **Un seul nœud.** Les rangs se partagent un bus mémoire : aucune conclusion sur un réseau, la latence ou la topologie.
 -   **Un seul problème.** Une grille de $1536^2$ et 30 balayages : les effets de cache seraient différents pour une autre taille.
 -   **Cause non isolée.** Le déséquilibre entre rangs est mesuré, pas expliqué.
@@ -1192,7 +1192,7 @@ Chaque `verify.sh` sort avec le code 0 quand ses vérifications passent. Il affi
 
 ::: lab
 
-**Objectif.** Écrire un all-reduce en anneau avec `Sendrecv`, prouver qu'il est juste et que ses compteurs suivent les formules, déclencher puis corriger des interblocages, échanger un halo et confronter le modèle α-β à la mesure. **Durée.** 4,5 h : partie A 1 h 30, B 1 h, C 1 h, D 1 h. **Prérequis matériels.** Un portable CPU de 4 cœurs, Open MPI, mpi4py, numpy ; aucun GPU, aucun coût.
+**Objectif.** Lire un all-reduce en anneau écrit avec `Sendrecv` et en réécrire vous-même la phase *reduce-scatter*, prouver que l'anneau est juste et que ses compteurs suivent les formules, déclencher puis corriger des interblocages, échanger un halo et confronter le modèle α-β à la mesure. **Durée.** 4,5 h : partie A 1 h 30, B 1 h, C 1 h, D 1 h. **Prérequis matériels.** Un portable CPU de 4 cœurs, Open MPI, mpi4py, numpy ; aucun GPU, aucun coût.
 
 1.  Partie A. Lancez `collectives_tour.py` sur 4 rangs et retrouvez la sortie du chapitre 4. Lisez `ringlib.py`, puis lancez `check_allreduce.py 1200` pour $p = 2, 3, 4, 5, 8$. Écrivez une variante qui fait seulement le *reduce-scatter* et vérifiez-la contre `Reduce_scatter_block`.
 2.  Partie B. Lancez `deadlock_demo.py` pour les sept cas de l'exemple 3.1, sous `timeout` (5 s pour les cas bloquants). Puis relevez la limite eager avec `--mca btl_vader_eager_limit 65536` et notez les tailles qui passent.
@@ -1209,9 +1209,9 @@ Chaque `verify.sh` sort avec le code 0 quand ses vérifications passent. Il affi
 
 ::: lab
 
-**Objectif.** Prouver qu'un solveur MPI+OpenMP donne le même champ pour toute décomposition, puis mener et rapporter une étude de scalabilité forte et faible avec intervalles de confiance, en séparant calcul, transfert et attente. **Durée.** 3,5 h : partie A 1 h, B 1 h 30, C 1 h. **Prérequis matériels.** Un portable CPU de 4 cœurs, Open MPI, GCC, mpi4py, numpy ; aucun GPU, aucun coût. La partie D facultative demande en plus un conteneur jetable avec accès root et le Slurm du module 5.
+**Objectif.** Prouver qu'un solveur MPI+OpenMP donne le même champ pour toute décomposition, puis mener et rapporter une étude de passage à l'échelle, fort et faible, avec intervalles de confiance, en séparant calcul, transfert et attente. **Durée.** 3,5 h : partie A 1 h, B 1 h 30, C 1 h. **Prérequis matériels.** Un portable CPU de 4 cœurs, Open MPI, GCC, mpi4py, numpy ; aucun GPU, aucun coût. La partie D facultative demande en plus un conteneur jetable avec accès root et le Slurm du module 5 : faites-la après le lab 5.1.
 
-1.  Partie A. Compilez `jacobi.c` (`mpicc -O2 -fopenmp`), lancez-le sur 1 à 4 rangs, en 1D et 2D, avec et sans `--overlap`, et comparez les empreintes. Lancez `repro_sum.py` pour $p = 1, 2, 3, 4, 5, 8` et `mpiio_demo.py` pour $p = 1$ à 5. Lisez `check_jacobi.py`.
+1.  Partie A. Compilez `jacobi.c` (`mpicc -O2 -fopenmp`), lancez-le sur 1 à 4 rangs, en 1D et 2D, avec et sans `--overlap`, et comparez les empreintes. Lancez `repro_sum.py` pour $p = 1, 2, 3, 4, 5, 8$ et `mpiio_demo.py` pour $p = 1$ à 5. Lisez `check_jacobi.py`.
 2.  Partie B. **Écrivez d'abord votre prédiction** (une page : $T_1$ mesuré, modèle, gains attendus à 2 et 4 rangs). Lancez `run_study.py --reps 9`, puis `analyze_study.py --svg speedup.svg`. Décomposez l'écart à la prédiction en transfert, attente et calcul, et rédigez la page de rapport avec ses menaces.
 3.  Partie C. Lancez `hybrid_compare.py --misbound`, et `compare_variants.py`. Lisez `mpirun --report-bindings` et `OMP_DISPLAY_AFFINITY=TRUE` pour chaque répartition.
 4.  Lancez `bash verify.sh` (environ 1 min). Facultatif : `RUN_SLURM=1 bash verify.sh` pour la partie D (lancement sous un vrai Slurm).
@@ -1273,7 +1273,7 @@ D  03120312013201320132013201320132
 :::
 
 ::: exo
-[Exercice 3 · ★★ — Rembourrer ou non]{.tag} Chaque thread possède 7 compteurs de 8 octets (56 octets), rangés bout à bout dans un tableau aligné sur 64 octets. (a) Combien de lignes de cache sont partagées avec 8 threads ? avec 16 ? (b) Quel est le surcoût mémoire d'un rembourrage à 64 octets par thread, pour 64 threads ? (c) Si chaque thread avait 12 compteurs (96 octets), combien de lignes seraient partagées avec 4 threads, et quel rembourrage faudrait-il ? (d) Pourquoi la variante `private` du lab n'a-t-elle besoin d'aucun rembourrage ?
+[Exercice 3 · ★★ — Ajouter du remplissage ou non]{.tag} Chaque thread possède 7 compteurs de 8 octets (56 octets), rangés bout à bout dans un tableau aligné sur 64 octets. (a) Combien de lignes de cache sont partagées avec 8 threads ? avec 16 ? (b) Quel est le surcoût mémoire d'un remplissage (*padding*) à 64 octets par thread, pour 64 threads ? (c) Si chaque thread avait 12 compteurs (96 octets), combien de lignes seraient partagées avec 4 threads, et quel remplissage faudrait-il ? (d) Pourquoi la variante `private` du lab n'a-t-elle besoin d'aucun remplissage ?
 :::
 
 ::: sol
@@ -1281,7 +1281,7 @@ D  03120312013201320132013201320132
 
 (b) 64 octets au lieu de 56 : $+8$ octets par thread, soit $8/56 = 14{,}3\ \%$ ; pour 64 threads, $64 \times 64 = 4\,096$ octets au lieu de $3\,584$, soit 512 octets de plus. Le prix est négligeable devant le facteur 3,3 mesuré à l'exemple 2.4.
 
-(c) 96 octets : 2 lignes partagées avec 4 threads, et un rembourrage à 128 octets (deux lignes par thread), soit $+33{,}3\ \%$ (`line_sharing.py 4 96`).
+(c) 96 octets : 2 lignes partagées avec 4 threads, et un remplissage à 128 octets (deux lignes par thread), soit $+33{,}3\ \%$ (`line_sharing.py 4 96`).
 
 (d) Chaque thread écrit dans un tableau local, sur sa propre pile, pendant la boucle ; la zone commune n'est écrite qu'une fois par thread à la fin, sous `critical`. Il n'y a pas d'écritures concurrentes sur une même ligne pendant le calcul.
 :::
@@ -1447,7 +1447,7 @@ $8 \times 8 = 64$ cœurs par nœud, et 4 rangs par domaine de 32 cœurs.
 :::
 
 ::: exo
-[Exercice 12 · ★★★ — Combien de rangs pour ce job ?]{.tag} Une étude de scalabilité **fictive** d'un solveur donne, pour $p = 1, 2, 4, 8, 16, 32, 64$ : 100, 51, 27, 15,5, 10,1, 7,9 et 7,5 s. Le coût est proportionnel à $p \times T$ (en cœurs-secondes, sans prix). (a) Calculez gain, efficacité et $e(p)$. (b) Que conclure sur la nature de la perte ? Proposez deux expériences pour la caractériser. (c) Un résultat est attendu en 12 s au plus : quel $p$ choisissez-vous, et à quel coût relatif ? (d) Sans échéance, quel $p$ choisissez-vous si vous exigez $E \ge 0{,}7$ ?
+[Exercice 12 · ★★★ — Combien de rangs pour ce job ?]{.tag} Une étude de passage à l'échelle **fictive** d'un solveur donne, pour $p = 1, 2, 4, 8, 16, 32, 64$ : 100, 51, 27, 15,5, 10,1, 7,9 et 7,5 s. Le coût est proportionnel à $p \times T$ (en cœurs-secondes, sans prix). (a) Calculez gain, efficacité et $e(p)$. (b) Que conclure sur la nature de la perte ? Proposez deux expériences pour la caractériser. (c) Un résultat est attendu en 12 s au plus : quel $p$ choisissez-vous, et à quel coût relatif ? (d) Sans échéance, quel $p$ choisissez-vous si vous exigez $E \ge 0{,}7$ ?
 :::
 
 ::: sol
@@ -1480,7 +1480,7 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 -   **Je peux décomposer un domaine et compter son halo.** Preuve : l'exercice 8 et la vérification des compteurs de `jacobi.c`.
 -   **Je peux dire ce qu'est un résultat reproductible et en fixer la tolérance.** Preuve : l'exercice 9 et le tableau de l'exemple 6.1 refait.
 -   **Je peux lancer un job hybride bien placé, sous `mpirun` et sous Slurm.** Preuve : `--report-bindings` d'un job correct et l'exercice 10.
--   **Je peux mener et rapporter une étude de scalabilité.** Preuve : la page de rapport du lab 3.3 partie B avec prédiction, intervalles et menaces.
+-   **Je peux mener et rapporter une étude de passage à l'échelle.** Preuve : la page de rapport du lab 3.3 partie B avec prédiction, intervalles et menaces.
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
@@ -1516,7 +1516,7 @@ L'ordre des chapitres, les analogies avec l'entraînement (chapitre 1), le « te
 
 ### À vérifier {#a-verifier}
 
-(1) L'article de Thakur, Rabenseifner et Gropp (2005) sur les algorithmes de collectives de MPICH est cité de mémoire : l'éditeur et l'hébergeur ont répondu 403, il n'a pas été rouvert. Les algorithmes d'Open MPI ne sont donc que nommés d'après `ompi_info` (dont Rabenseifner), jamais décrits. (2) La borne $\max(W/p, S)$ et l'encadrement $W/p + S$ de l'ordonnancement glouton sont des résultats classiques non rouverts pour ce module. (3) Les explications suivantes sont des hypothèses non testées : le mécanisme exact de la course de données (registre du compilateur), l'absence de faux partage mesurable avec des écritures `volatile`, la cause du déséquilibre de 1,31 entre rangs, le facteur de 7,4 du doublement récursif sur 2 Mio, le facteur 1,6 d'une mauvaise liaison. (4) La règle de liaison par défaut d'Open MPI (liés à un cœur avec 2 rangs, non liés avec 4) est observée, non lue dans la documentation. (5) Le seuil eager de 4 096 octets et le blocage des envois croisés sont propres à Open MPI 4.1.6 et à son transport mémoire partagée. (6) Le modèle à deux niveaux est dérivé, ses paramètres sont des exemples. (7) Le placement NUMA et le *first touch* ne sont pas démontrés : la VM n'a qu'un domaine. (8) L'écart de 29 % entre deux médianes de la même configuration, mesurées à quelques dizaines de minutes d'intervalle, n'est pas expliqué (dérive de la machine ou bruit d'échantillonnage : les deux intervalles se recouvrent). (9) Les versions changent : relisez les pages des normes et des bibliothèques à la date de votre lecture.
+(1) L'article de Thakur, Rabenseifner et Gropp (2005) sur les algorithmes de collectives de MPICH est cité de mémoire : l'éditeur et l'hébergeur ont répondu 403, il n'a pas été rouvert. Les algorithmes d'Open MPI ne sont donc que nommés d'après `ompi_info` (dont Rabenseifner), jamais décrits. (2) La borne $\max(W/p, T_\infty)$ et l'encadrement $W/p + T_\infty$ de l'ordonnancement glouton sont des résultats classiques non rouverts pour ce module. (3) Les explications suivantes sont des hypothèses non testées : le mécanisme exact de la course de données (registre du compilateur), l'absence de faux partage mesurable avec des écritures `volatile`, la cause du déséquilibre de 1,31 entre rangs, le facteur de 7,4 du doublement récursif sur 2 Mio, le facteur 1,6 d'une mauvaise liaison. (4) La règle de liaison par défaut d'Open MPI (liés à un cœur avec 2 rangs, non liés avec 4) est observée, non lue dans la documentation. (5) Le seuil eager de 4 096 octets et le blocage des envois croisés sont propres à Open MPI 4.1.6 et à son transport mémoire partagée. (6) Le modèle à deux niveaux est dérivé, ses paramètres sont des exemples. (7) Le placement NUMA et le *first touch* ne sont pas démontrés : la VM n'a qu'un domaine. (8) L'écart de 29 % entre deux médianes de la même configuration, mesurées à quelques dizaines de minutes d'intervalle, n'est pas expliqué (dérive de la machine ou bruit d'échantillonnage : les deux intervalles se recouvrent). (9) Les versions changent : relisez les pages des normes et des bibliothèques à la date de votre lecture.
 
 ### Hors périmètre {#hors-perimetre}
 

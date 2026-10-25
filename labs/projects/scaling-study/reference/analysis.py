@@ -41,7 +41,10 @@ def predict_step(compute_1, opt_1, p, mode, n_bytes, alpha, bandwidth):
 
 
 def utilization(flops_per_rank_step, compute_seconds, peak_flops):
-    """Achieved FLOP/s of one rank during forward+backward, over its peak: the MFU of this study."""
+    """Achieved FLOP/s of one rank during forward+backward, over its MEASURED peak: U_c of this study.
+
+    Not the MFU of module 2, which uses the full step time and the datasheet dense peak.
+    """
     return flops_per_rank_step / compute_seconds / peak_flops
 
 

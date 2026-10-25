@@ -8,7 +8,7 @@ module:
   phase: 2
   hours: 26.5
   level: 2
-prerequisites: [linux-systems]
+prerequisites: [linux-systems, slurm]
 status: core
 badges:
   - {label: "Cœur du parcours", class: core}
@@ -37,12 +37,12 @@ Les labs s'exécutent sans GPU, par simulation. Chaque simulation est étiqueté
 | Clé | Valeur |
 |---|---|
 | Volume | 26,5 h, dont 9,5 h de lecture, 10,5 h de labs et 6,5 h d'exercices |
-| Niveau d'entrée | 2 : à l'aise avec Linux, systemd et le réseau (module 1) |
-| Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html) |
+| Niveau d'entrée | 2 : à l'aise avec Linux, systemd et le réseau (module 1), et avec le drain d'un nœud Slurm (module 5) |
+| Prérequis | [Module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [Module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html) |
 | Pour qui | Cœur : démarrage réseau, images, recette des nœuds GPU et contrôleurs de carte mère (BMC) ; survol possible si vous déployez déjà des nœuds bare-metal. |
 | Livrable | un rôle Ansible testé, un module Terraform qui dérive tout de la carte des nœuds, un script de recette dont la logique de décision est testée, un client Redfish testé |
 | Environnement | un portable ou une VM Linux, sans GPU ; Terraform, ansible-core et dnsmasq pour les labs. La recette réelle demande un nœud GPU avec DCGM (optionnel ; coût non chiffré ici, à demander à votre fournisseur) |
-| Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
+| Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -58,8 +58,8 @@ Les labs s'exécutent sans GPU, par simulation. Chaque simulation est étiqueté
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 2 — Exploiter un cluster** (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
--   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
+-   **Phase 2 — Exploiter un cluster** (semaines 10-20) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
+-   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Administration Linux, Terraform, infrastructure as code, Ansible, gestion de configuration, Supervision GPU (DCGM), Planification de capacité, Sécurité, conformité, Réseau (général), Provisioning bare-metal, Virtualisation (KVM, MIG, vGPU), Santé matérielle (burn-in, diagnostics, RMA), Slurm, Conteneurs, Collectives (NCCL, RCCL, HCCL), CUDA, programmation GPU, Checkpoint, tolérance aux pannes, Achats, relation fournisseurs, Astreinte, fiabilité (SRE), Expérience HPC, CI/CD, automatisation (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
@@ -73,7 +73,7 @@ Dix séances, soit 26,5 h. Chaque séance contient ses chapitres, sa part de lab
 | 1 | 2 h | 1 | ch. 1 Cycle de vie d'un nœud (45 min) ; questions de positionnement (15 min) ; ch. 2 §2.1 La chaîne de démarrage (30 min) | Ex. 1 |
 | 2 | 2 h | 1 | ch. 2 §2.2 à §2.5 Démarrage réseau et images | Ex. 2, 3 |
 | 3 | 3 h | 2 | ch. 3 Gestion de configuration avec Ansible | Lab 6.1 partie A ; Ex. 4 |
-| 4 | 3 h | 2 | ch. 4 Terraform pour la flotte | Lab 6.1 partie B ; Ex. 5 |
+| 4 | 3 h | 2 | ch. 4 Terraform pour la flotte | Lab 6.1 partie B (lots et secrets, §3.5 et §3.6) ; Ex. 5 |
 | 5 | 3 h | 2 | Synthèse des chapitres 2 à 4 par le lab | Lab 6.2 |
 | 6 | 2.5 h | 2 | ch. 5 Pile GPU, ch. 6 §6.1 à §6.3 Tests, outils et remappage | Ex. 6, 8 |
 | 7 | 2.5 h | 2 | ch. 6 §6.4 et §6.5 Recette : règles de décision | Lab 6.3 partie A ; Ex. 7 |
@@ -181,9 +181,11 @@ Dans Slurm (module 5), un nœud en recette est drainé avec une raison explicite
 Deux publications de Meta donnent des ordres de grandeur sur de très grands clusters d'entraînement. Elles décrivent leur flotte, pas la vôtre : lisez-les comme des échelles, pas comme des cibles.
 
 ::: war
-[Ce que mesurent deux grands clusters]{.tag} Sur 54 jours d'entraînement de Llama 3 405B, [Dubey et al. (2024)](https://arxiv.org/abs/2407.21783) comptent 466 interruptions de job, dont 47 planifiées (firmware, configuration) et 419 inattendues. Environ 78 % des interruptions inattendues sont attribuées à du matériel confirmé ou suspecté. Le temps d'entraînement effectif dépasse 90 %, avec une maintenance automatisée qui provoque au moins une interruption par jour.
+[Ce que mesurent deux grands clusters]{.tag} Sur 54 jours d'entraînement de Llama 3 405B, [Dubey et al. (2024)](https://arxiv.org/abs/2407.21783) comptent 466 interruptions de job, dont 47 planifiées (firmware, configuration) et 419 inattendues. Environ 78 % des interruptions inattendues sont attribuées à du matériel confirmé ou suspecté. Le temps d'entraînement effectif dépasse 90 %, avec une maintenance automatisée qui, selon l'article, a provoqué « au moins une interruption par jour » : la formule est difficile à concilier avec 47 interruptions planifiées en 54 jours, soit 0,87 par jour.
 
-[Kokolis et al. (2024)](https://arxiv.org/abs/2410.21680) mesurent sur deux clusters de recherche des taux moyens de 6,50 (RSC-1) et 2,34 (RSC-2) pannes pour 1 000 nœuds-jours, qui varient dans le temps (de l'ordre de 2,5 à 17,5 sur RSC-1). Le MTTF (*mean time to failure*, temps moyen avant panne) est de 7,9 h pour les jobs de 1 024 GPU contre 47,7 jours pour ceux de 8 GPU.
+[Kokolis et al. (2024)](https://arxiv.org/abs/2410.21680) mesurent sur deux clusters de recherche, à partir des jobs de plus de 128 GPU, des taux de 6,50 (RSC-1) et 2,34 (RSC-2) pannes pour 1 000 nœuds-jours, qui varient dans le temps (de l'ordre de 2,5 à 17,5 sur RSC-1). Le MTTF observé (*mean time to failure*, temps mesuré divisé par le nombre d'échecs ; pour un job qu'on relance, c'est le MTBF du module 10) est de 7,9 h pour les jobs de 1 024 GPU contre 47,7 jours pour ceux de 8 GPU.
+
+Ces deux familles de chiffres ne se déduisent pas simplement l'une de l'autre. La formule de projection de l'article, $(N_{\text{nœuds}}\,r_f)^{-1}$, avec le taux $r_f$ de RSC-1, donne 154 jours pour un nœud et 28,8 h pour les 128 nœuds d'un job de 1 024 GPU, 3,7 fois le MTTF observé ; l'article juge pourtant cette projection proche des mesures au-delà de 32 GPU. Il rappelle aussi que les échecs de job viennent du programme utilisateur, du logiciel système et du matériel. Le [module 10](../fault-tolerance/index.html#ch1) refait ce calcul : retenez des ordres de grandeur.
 
 Ils décrivent aussi des « nœuds citrons » (*lemon nodes*) : 40 nœuds identifiés, dont l'éviction fait passer les échecs de gros jobs (512 GPU et plus) de 14 % à 4 %. Les mêmes auteurs signalent jusqu'à 50-75 % de perte de bande passante réseau pendant la mise en service de l'un des clusters.
 :::
@@ -210,13 +212,13 @@ Tout le reste du module suppose qu'un nœud a une identité stable et lisible pa
 
 Le point de départ de ce module est une **carte des nœuds**, un fichier déclaratif de votre dépôt. Le lab 6.2 en dérive l'inventaire Ansible, la configuration DHCP, le script de démarrage et les lignes `NodeName=` de Slurm. Écrire une information à un seul endroit est la seule façon pour que quatre outils ne divergent jamais.
 
-La recette a besoin d'une référence. Plutôt qu'une valeur lue sur une fiche technique, comparez chaque nœud à un nœud « doré » (*golden node*) que vous avez qualifié à la main, et à la médiane de la flotte. Le seuil d'acceptation de la bande passante, au chapitre 6, est un paramètre de site mesuré ainsi.
+La recette a besoin d'une référence. Plutôt qu'une valeur lue sur une fiche technique, comparez chaque nœud à un nœud « doré » (*golden node*) que vous avez qualifié à la main, et à la médiane de la flotte. Le seuil d'acceptation du débit de bus, au chapitre 6, est un paramètre de site mesuré ainsi.
 
 ::: recap
 Points clés — chapitre 1
 
 -   Un nœud traverse sept états ; chaque porte d'entrée est une preuve, pas une impression.
--   Sur de grands clusters publiés, une part majoritaire des interruptions inattendues vient du matériel ; un job de 1 024 GPU a un MTTF de quelques heures (7,9 h chez Kokolis et al.).
+-   Sur de grands clusters publiés, une part majoritaire des interruptions inattendues vient du matériel ; un job de 1 024 GPU a un MTTF observé de quelques heures (7,9 h chez Kokolis et al.), qui ne se déduit pas simplement de leur taux de pannes par nœud.
 -   Un tableau publié se recoupe avant d'être cité : celui de Llama 3 est incohérent sur un pourcentage.
 -   L'identité d'un nœud vit dans un fichier déclaratif unique, dont les autres outils sont dérivés.
 :::
@@ -289,7 +291,9 @@ $ dnsmasq --test -C prod-dnsmasq.conf
 dnsmasq: syntax check OK.
 ~~~
 
-Lecture : `static` ne distribue d'adresse qu'aux machines listées par une ligne `dhcp-host` (une machine inconnue ne reçoit rien). Le firmware, sans l'option 175, reçoit un binaire iPXE choisi selon son architecture annoncée dans l'option 93 (le [RFC 4578](https://www.rfc-editor.org/rfc/rfc4578.txt) attribue 9 à EFI x86-64 et 7 à EFI Byte Code ; des firmwares UEFI x86-64 annoncent l'un ou l'autre selon les constructeurs : le gabarit couvre les deux, à confirmer par une capture sur votre matériel). iPXE, lui, reçoit l'URL d'un script.
+Lecture : `static` ne distribue d'adresse qu'aux machines listées par une ligne `dhcp-host` (une machine inconnue ne reçoit rien). Le firmware, sans l'option 175, reçoit un binaire iPXE choisi selon son architecture annoncée dans l'option 93. iPXE, lui, reçoit l'URL d'un script.
+
+Le texte du [RFC 4578](https://www.rfc-editor.org/rfc/rfc4578.txt) attribue 9 à EFI x86-64 et 7 à EFI Byte Code, mais son [erratum 4624](https://www.rfc-editor.org/errata/eid4624), vérifié en 2016, inverse les deux : les implémentations UEFI annoncent 7 pour x86-64, comme le [registre de l'IANA](https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xhtml#processor-architecture). Le gabarit accepte aussi 9, la valeur du texte original ; une capture sur votre matériel dit laquelle il envoie.
 
 **Ce que cela ne prouve pas.** `--test` ne vérifie que la syntaxe. Aucune machine, réelle ou virtuelle, n'a démarré sur cette configuration dans le bac à sable : le chemin PXE de bout en bout est **non testé** ici.
 :::
@@ -626,11 +630,11 @@ La documentation précise aussi ce que DCGM Diagnostics n'est pas : un outil de 
 -   **`nvidia-smi -q -d PERFORMANCE`** : affiche l'état de performance et les « Clocks Event Reasons » (plafond de puissance logiciel, ralentissement thermique…), qui expliquent un GPU plus lent que ses voisins.
 -   **Le journal du noyau** : les erreurs `NVRM: Xid` pendant la recette (codes d'erreur que le pilote NVIDIA écrit dans le journal du noyau). Le catalogue NVIDIA décrit le code 79 comme « GPU has fallen off the bus ».
 
-La bande passante de bus est la grandeur de comparaison de nccl-tests, car l'algorithme de bande passante $S/t$ dépend du nombre de rangs. Pour un all-reduce sur $n$ rangs, la documentation de nccl-tests donne :
+Un all-reduce combine, le plus souvent par une somme, les tampons de tous les rangs (les participants, en général un par GPU) et rend le résultat à chacun. Le **débit de bus** (*busbw*) est la grandeur de comparaison de nccl-tests, car le **débit algorithmique** (*algbw*) $S/t$ dépend du nombre de rangs ([module 2, §6.5](../perf-models/index.html#débit-algorithmique-et-débit-de-bus)). Pour un all-reduce sur $p$ rangs (nccl-tests écrit $n$), la documentation de nccl-tests donne :
 
-$$\text{busbw} = \text{algbw} \times \frac{2(n-1)}{n}, \qquad \text{algbw} = \frac{S}{t}$$
+$$\text{busbw} = \text{algbw} \times \frac{2(p-1)}{p}, \qquad \text{algbw} = \frac{S}{t}$$
 
-Pour $n = 8$, le facteur vaut $1{,}75$. Le programme peut aussi juger lui-même : si la variable d'environnement `NCCL_TESTS_MIN_BW` est fixée, il marque la moyenne de bande passante de bus comme échouée quand elle tombe sous 0,9 fois cette valeur (lu dans le code source, branche principale, le 24 octobre 2026).
+Pour $p = 8$, le facteur vaut $1{,}75$. Le programme peut aussi juger lui-même : si la variable d'environnement `NCCL_TESTS_MIN_BW` est fixée, il marque la moyenne du débit de bus comme échouée quand elle tombe sous 0,9 fois cette valeur (lu dans le code source, branche principale, le 24 octobre 2026).
 
 ### 6.3. Mémoire du GPU, remappage de lignes et RMA
 
@@ -649,7 +653,7 @@ Le script `acceptance.sh` range les preuves dans un répertoire : `smi.csv`, `dc
 | pile | pilote trop ancien pour CUDA, FM inactif ou de version différente, `nouveau` chargé | version de CUDA inconnue |
 | `nvidia-smi` | nombre de GPU inattendu, drapeau *failure*, erreur ECC (correction d'erreurs de la mémoire) non corrigible, lien PCIe dégradé | drapeau *pending* |
 | DCGM | test en échec, sortie 226 ou 205 | outil en erreur, test requis absent |
-| nccl-tests | valeurs fausses, bande passante sous 90 % de la référence | entre 90 % et 95 %, ou non lancé en recette complète |
+| nccl-tests | valeurs fausses, débit de bus sous 90 % de la référence | entre 90 % et 95 %, ou non lancé en recette complète |
 | gpu_burn | un GPU `FAULTY` | non lancé en recette complète |
 | journal | toute erreur Xid pendant la recette | |
 
@@ -691,7 +695,7 @@ Le script lit ces deux dernières dans des variables d'environnement faute de mi
 Points clés — chapitre 6
 
 -   DCGM propose quatre profondeurs de test ; leurs durées sont des bornes constructeur à remesurer, et l'outil ne remplace ni le diagnostic de terrain ni le processus de RMA.
--   nccl-tests donne un débit de bus comparable entre nombres de rangs ($\text{algbw}\times 2(n-1)/n$ pour un all-reduce) et vérifie les valeurs.
+-   nccl-tests donne un débit de bus comparable entre nombres de rangs ($\text{algbw}\times 2(p-1)/p$ pour un all-reduce sur $p$ rangs) et vérifie les valeurs.
 -   Le drapeau de remappage *pending* appelle une réinitialisation, le drapeau *failure* appelle un dossier ; les seuils de RMA sont ceux de NVIDIA.
 -   Le verdict à trois issues est le pire des constats ; les seuils sont des paramètres de site.
 -   La collecte réelle reste à valider sur votre matériel.
@@ -732,7 +736,7 @@ C'est un **majorant** : en pratique, les jobs ne durent pas tous 24 h et les lot
 
 ### 7.2. Firmware : le plus risqué des changements
 
-Un nœud GPU porte plusieurs firmwares : BIOS, BMC, cartes réseau, GPU, NVSwitch. L'article Llama 3 cite les mises à jour de firmware et de noyau parmi les opérations d'une maintenance automatisée, qui provoque, dans leur exploitation, au moins une interruption d'entraînement par jour. Le coût d'une mise à jour se compte donc aussi en jobs interrompus.
+Un nœud GPU porte plusieurs firmwares : BIOS, BMC, cartes réseau, GPU, NVSwitch. L'article Llama 3 cite les mises à jour de firmware et de noyau parmi les opérations d'une maintenance automatisée qui a provoqué, selon l'article, « au moins une » interruption d'entraînement par jour (voir la réserve du §1.2). Le coût d'une mise à jour se compte donc aussi en jobs interrompus.
 
 Trois règles de ce parcours, à valider avec vos constructeurs : relever les versions de firmware dans l'inventaire (elles font partie de l'identité d'un nœud) ; ne jamais mettre à jour un firmware sans matrice de compatibilité du constructeur avec le pilote et le BMC ; mettre à jour d'abord le canari, puis rejouer la recette complète, pas seulement la recette rapide. Les outils de mise à jour de firmware ne sont pas couverts ici (voir la section « Sources et portée »).
 
@@ -746,7 +750,7 @@ La traçabilité sert une seconde fin : repérer les nœuds « citrons » dont l
 
 ### 7.4. Dimensionner un volant de nœuds de rechange
 
-Combien de nœuds de réserve garder pour absorber les pannes pendant qu'on réparait ? Si les nœuds tombent au taux $\lambda$ par nœud et par jour et restent en réparation $T$ jours, la loi de Little donne le nombre moyen de nœuds hors service dans une flotte de $N$ nœuds :
+Combien de nœuds de réserve garder pour absorber les pannes pendant les réparations ? Si les nœuds tombent au taux $\lambda$ par nœud et par jour et restent en réparation $T$ jours, la loi de Little ([module 1, §7.2](../linux-systems/index.html#mesurer-un-disque-avec-fio-la-loi-de-little) : taux d'arrivée multiplié par durée de séjour) donne le nombre moyen de nœuds hors service dans une flotte de $N$ nœuds :
 
 $$\bar{R} = N \cdot \lambda \cdot T$$
 
@@ -903,7 +907,7 @@ Lecture. `/sys/kernel/iommu_groups` est vide : VFIO n'a rien à confier. Les onz
 
 ### 9.3. Partager un GPU : MIG, time-slicing, MPS et vGPU
 
-Si vous avez lu le module 12, vous connaissez MIG (§2.4) et le time-slicing (§2.5) côté Kubernetes. Ici, un fournisseur vend des fractions de GPU et doit dire quelle garantie il vend.
+Cette section est la référence du parcours sur les garanties d'un GPU partagé, par MIG, par partage par tranches de temps (*time-slicing*), par MPS ou par vGPU. Le [module 5](../slurm/index.html#partager-un-gpu) (§5.3) en donne la déclaration dans Slurm, le [module 12](../kubernetes-gpu/index.html#mig-des-partitions-matérielles) (§2.4 et §2.5) la configuration dans Kubernetes. Ici, un fournisseur vend des fractions de GPU et doit dire quelle garantie il vend.
 
 Le [guide MIG](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/introduction.html) donne à chaque instance des chemins séparés dans tout le système mémoire (*crossbar*, banques de cache L2, contrôleurs et bus de la DRAM), une qualité de service définie et une isolation des fautes entre VM, conteneurs ou processus. D'après la page [*Virtualization*](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/virtualization.html), un invité Linux qui reçoit un GPU MIG en passthrough utilise les mêmes outils et profils qu'un hôte nu.
 
@@ -1008,7 +1012,7 @@ Points clés — chapitre 9
 
 ## Labs {#labs}
 
-Les quatre labs tournent sur un portable ou une VM Linux **sans GPU**, n'exigent pas les droits root (seule l'installation des paquets en a besoin) et ne touchent jamais la configuration de la machine : chaque nœud est un répertoire temporaire. Les outils utilisés ont été testés le 24 octobre 2026 avec Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7 (fournisseur `hashicorp/local` 2.9.1), dnsmasq 2.91 et shellcheck. Installation préalable :
+Les quatre labs, comme les scripts d'exercice `exercise-calcs` et `virt-checks` (chapitre 9, exercices 12 et 13), tournent sur un portable ou une VM Linux **sans GPU**, n'exigent pas les droits root (seule l'installation des paquets en a besoin) et ne touchent jamais la configuration de la machine : chaque nœud est un répertoire temporaire. Les outils utilisés ont été testés le 24 octobre 2026 avec Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7 (fournisseur `hashicorp/local` 2.9.1), dnsmasq 2.91 et shellcheck. Installation préalable :
 
 ~~~bash
 python3 -m venv .venv && . .venv/bin/activate
@@ -1069,7 +1073,7 @@ Chaque lab se lance avec `PYTHON=$(which python) bash verify.sh` depuis son doss
 5.  Ajoutez un scénario à `make_fixtures.py` (par exemple des erreurs ECC corrigibles seulement) et le test qui l'accompagne.
 6.  Facultatif, sur matériel : lancez `./acceptance.sh --level quick`, comparez le verdict à votre attente et corrigez les écarts de format (champs de `nvidia-smi`, enveloppe JSON de DCGM).
 
-**Critère de réussite.** `bash verify.sh` sort avec le code 0, affiche `30 passed` pour la solution de référence, une ligne `starter (failures expected): ... failed ...` pour le squelette, les verdicts `good -> exit 0`, `remap_failure -> exit 1` et `nccl_marginal -> exit 3`, puis `OK node-acceptance (replay branch): decision rules proven on synthetic evidence`. **Le lab porte le type `gpu` et le badge « non vérifié » :** la branche de rejeu est vérifiée, la collecte réelle ne l'est pas, et le script le rappelle en dernière ligne (`NOT EXECUTED: live branch on real GPUs`).
+**Critère de réussite.** `bash verify.sh` sort avec le code 0, affiche `30 passed` pour la solution de référence, une ligne `starter (failures expected): ... failed ...` pour le squelette, les verdicts `good -> exit 0`, `remap_failure -> exit 1` et `nccl_marginal -> exit 3`, puis `OK node-acceptance (replay branch): decision rules proven on synthetic evidence`. **Le lab porte le type `gpu` et le badge « non vérifié » :** la branche de rejeu est vérifiée, la collecte réelle ne l'est pas, et le script le rappelle juste avant sa ligne finale (`NOT EXECUTED: live branch on real GPUs`).
 
 **Pour aller plus loin.** Ajoutez un compteur de rejeux par nœud (au troisième *retest*, rejeter), puis branchez le verdict sur `scontrol update state=drain` (module 5).
 :::
@@ -1096,7 +1100,7 @@ Chaque lab se lance avec `PYTHON=$(which python) bash verify.sh` depuis son doss
 Les chiffres des énoncés marqués « fictifs » sont inventés pour l'exercice. Les calculs des corrigés sont refaits par `bash labs/provisioning/exercise-calcs/verify.sh`, la sortie de l'exercice 13 par `labs/provisioning/virt-checks/verify.sh`.
 
 ::: exo
-[Exercice 1 · ★★ — Le MTTF d'un gros job]{.tag} Kokolis et al. rapportent, sur leurs deux clusters de recherche, un MTTF de 47,7 jours pour les jobs de 8 GPU et de 7,9 h pour les jobs de 1 024 GPU. Si les pannes étaient indépendantes et de même taux par GPU, le MTTF d'un job de $N$ GPU vaudrait $\text{MTTF}(8)\times 8/N$.
+[Exercice 1 · ★★ — Le MTTF d'un gros job]{.tag} Kokolis et al. rapportent, sur leurs deux clusters de recherche, un MTTF observé de 47,7 jours pour les jobs de 8 GPU et de 7,9 h pour les jobs de 1 024 GPU (des valeurs qui ne se déduisent pas simplement de leur taux de pannes par nœud, voir le §1.2). Si les pannes étaient indépendantes et de même taux par GPU, le MTTF d'un job de $G$ GPU vaudrait $\text{MTTF}(8)\times 8/G$.
 
 (a) Calculez la prédiction pour 1 024 GPU. (b) Comparez-la à la mesure. (c) En supposant des pannes sans mémoire à la cadence de 7,9 h, combien d'interruptions attendez-vous pendant un job de 1 024 GPU de 72 h ? (d) Qu'en déduisez-vous pour la valeur d'une recette ?
 :::
@@ -1104,11 +1108,13 @@ Les chiffres des énoncés marqués « fictifs » sont inventés pour l'exercice
 ::: sol
 (a) 47,7 jours valent $47{,}7\times 24 = 1\,144{,}8$ h, donc la prédiction est $1\,144{,}8\times 8/1024 = 8{,}94$ h.
 
-(b) La mesure, 7,9 h, vaut 0,88 fois la prédiction : les pannes sont un peu plus fréquentes que ne le prévoit l'indépendance. Le rapport du nombre de GPU est 128, celui des MTTF 145 : même ordre de grandeur, donc le modèle en $1/N$ est une bonne approximation de premier ordre. Que l'écart vienne de pannes corrélées ou de composants partagés est une hypothèse que ces deux chiffres ne permettent pas de trancher.
+(b) La mesure, 7,9 h, vaut 0,88 fois la prédiction : les pannes sont un peu plus fréquentes que ne le prévoit l'indépendance. Le rapport du nombre de GPU est 128, celui des MTTF 145 : même ordre de grandeur.
+
+N'en concluez pas trop vite que le modèle en $1/G$ est validé. L'article observe des MTTF peu prévisibles pour les petits jobs (usages expérimentaux, `NODE_FAIL` corrélés), et sa propre projection par le taux de pannes donne 28,8 h à 1 024 GPU (§1.2). Que l'écart vienne de pannes corrélées, de composants partagés ou d'échecs logiciels, ces deux chiffres ne permettent pas de le trancher.
 
 (c) $72/7{,}9 = 9{,}1$ interruptions attendues en trois jours.
 
-(d) À ce rythme, chaque nœud à défaut latent qu'on écarte avant le premier job supprime des interruptions, et chacune coûte la reprise depuis le dernier point de sauvegarde sur 1 024 GPU. Les points (a) et (b) se refont avec `calc.py mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9`.
+(d) À ce rythme, chaque nœud à défaut latent qu'on écarte avant le premier job supprime des interruptions, et chacune coûte la reprise depuis le dernier *checkpoint* (point de reprise : l'état de l'entraînement sauvegardé) sur 1 024 GPU. Les points (a) et (b), et la projection à 28,8 h, se refont avec `calc.py mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9 --rate-per-1000-node-days 6.5`.
 :::
 
 ::: exo
@@ -1219,7 +1225,7 @@ Pour CUDA 13.0 sur le pilote 570 : (1) mettre le pilote à 580 ou plus, par une 
   "verdict": "reject" }
 ~~~
 
-(a) Pourquoi le verdict est-il *reject* alors que deux constats sont des *retest* ? (b) Dans quel ordre traitez-vous les trois constats ? (c) Peut-on conclure que le lien PCIe dégradé explique la bande passante ?
+(a) Pourquoi le verdict est-il *reject* alors que deux constats sont des *retest* ? (b) Dans quel ordre traitez-vous les trois constats ? (c) Peut-on conclure que le lien PCIe dégradé explique le débit de bus ?
 :::
 
 ::: sol
@@ -1227,35 +1233,37 @@ Pour CUDA 13.0 sur le pilote 570 : (1) mettre le pilote à 580 ou plus, par une 
 
 (b) D'abord le rejet : un lien PCIe négocié en x8 au lieu de x16 est une cause physique ou de configuration (carte mal enfichée, riser, réglage du BIOS) qu'une réinitialisation ne corrige pas ; vérifiez l'état du lien avec `lspci -vv`. Ensuite seulement, la réinitialisation du GPU 5 pour que le remappage en attente prenne effet, puis la **recette complète rejouée**, car le défaut corrigé peut avoir modifié les autres résultats.
 
-(c) Non. Rien dans ces preuves ne l'établit : une collective NCCL entre GPU reliés en NVLink ne traverse pas le lien PCIe de la même façon. C'est une hypothèse à tester en rejouant : si la bande passante reste marginale après correction du lien, c'est une autre cause.
+(c) Non. Rien dans ces preuves ne l'établit : une collective NCCL entre GPU reliés en NVLink ne traverse pas le lien PCIe de la même façon. C'est une hypothèse à tester en rejouant : si le débit de bus reste marginal après correction du lien, c'est une autre cause.
 :::
 
 ::: exo
-[Exercice 8 · ★★ — Bande passante de bus]{.tag} Rappel : pour un all-reduce sur $n$ rangs de $S$ octets en un temps $t$,
+[Exercice 8 · ★★ — Débit de bus]{.tag} Rappel : pour un all-reduce sur $p$ rangs de $S$ octets en un temps $t$,
 
-$$\text{algbw} = \frac{S}{t}, \qquad \text{busbw} = \text{algbw}\times\frac{2(n-1)}{n}$$
+$$\text{algbw} = \frac{S}{t}, \qquad \text{busbw} = \text{algbw}\times\frac{2(p-1)}{p}$$
 
-avec 1 GiB = $2^{30}$ octets et 1 GB = $10^{9}$ octets. La référence du site (nœud doré, valeur **fictive**) est de 200 GB/s de bande passante de bus. La politique du lab : accepter à 95 % ou plus, rejouer entre 90 % et 95 %, rejeter sous 90 %.
+avec 1 Gio = $2^{30}$ octets et 1 Go = $10^{9}$ octets. La référence du site (nœud doré, valeur **fictive**) est un débit de bus de 200 Go/s. La politique du lab : accepter à 95 % ou plus, rejouer entre 90 % et 95 %, rejeter sous 90 %.
 
-Un all-reduce de 4 GiB sur 8 GPU prend 36 ms sur un nœud et 41 ms sur un autre. Calculez algbw, busbw, le pourcentage de la référence et le verdict de chacun. Quel serait le facteur sur 16 rangs, et pourquoi compare-t-on le busbw plutôt que l'algbw ?
+Un all-reduce de 4 Gio sur 8 GPU prend 36 ms sur un nœud et 41 ms sur un autre. Calculez algbw, busbw, le pourcentage de la référence et le verdict de chacun. Quel serait le facteur sur 16 rangs, et pourquoi compare-t-on le busbw plutôt que l'algbw ?
 :::
 
 ::: sol
-Pour 36 ms : $S = 4\times 2^{30} = 4{,}295\times 10^{9}$ octets, algbw $= 4{,}295\times 10^{9}/0{,}036 = 119{,}3$ GB/s. Le facteur vaut $2\times 7/8 = 1{,}75$, donc busbw $= 208{,}8$ GB/s, soit 104 % de la référence : *accept*.
+Pour 36 ms : $S = 4\times 2^{30} = 4{,}295\times 10^{9}$ octets, algbw $= 4{,}295\times 10^{9}/0{,}036 = 119{,}3$ Go/s. Le facteur vaut $2\times 7/8 = 1{,}75$, donc busbw $= 208{,}8$ Go/s, soit 104 % de la référence : *accept*.
 
-Pour 41 ms : algbw $= 104{,}8$ GB/s, busbw $= 183{,}3$ GB/s, soit 92 % : entre 90 % et 95 %, donc *retest*.
+Pour 41 ms : algbw $= 104{,}8$ Go/s, busbw $= 183{,}3$ Go/s, soit 92 % : entre 90 % et 95 %, donc *retest*.
 
-Sur 16 rangs le facteur est $2\times 15/16 = 1{,}875$. On compare le busbw parce que l'algbw dépend du nombre de rangs : à matériel identique, il diminue quand $n$ augmente, alors que le busbw reflète l'usage des liens indépendamment de $n$ (documentation de nccl-tests). Les valeurs sortent de `calc.py busbw --ranks 8 --size-gib 4 --ms 36 --baseline 200` (et `--ms 41`).
+Sur 16 rangs le facteur est $2\times 15/16 = 1{,}875$. On compare le busbw parce que l'algbw dépend du nombre de rangs : à matériel identique, il diminue quand $p$ augmente, alors que le busbw reflète l'usage des liens indépendamment de $p$ (documentation de nccl-tests). Les valeurs sortent de `calc.py busbw --ranks 8 --size-gib 4 --ms 36 --baseline 200` (et `--ms 41`).
 :::
 
 ::: exo
-[Exercice 9 · ★★★ — Un nœud intermittent]{.tag} Un nœud passe la recette cinq fois de suite avec ces bandes passantes de bus, en pourcentage de la référence : 98, 97, 91, 96, 89. Les autres nœuds de la flotte donnent 98 avec un écart-type d'environ 1 point (valeurs **fictives**). Le diagnostic DCGM de niveau 3 est propre et aucun Xid n'est apparu.
+[Exercice 9 · ★★★ — Un nœud intermittent]{.tag} Un nœud subit cinq recettes de suite, avec ces débits de bus en pourcentage de la référence : 98, 97, 91, 96, 89. Les autres nœuds de la flotte donnent 98 avec un écart-type d'environ 1 point (valeurs **fictives**). Le diagnostic DCGM de niveau 3 est propre et aucun Xid n'est apparu.
 
 Qualifiez la situation, listez des hypothèses ordonnées, proposez pour chacune un test discriminant, et fixez une règle de décision. Précisez ce que cinq mesures ne permettent pas de conclure.
 :::
 
 ::: sol
 **Situation.** En écarts à 98 : 0, −1, −7, −2, −9 points, soit 0, 1, 7, 2 et 9 écarts-types de la flotte. Deux mesures sur cinq sont très loin du bruit habituel : ce n'est pas du bruit de mesure, et ce nœud n'est pas comme les autres. Cinq mesures ne suffisent pas pour estimer une fréquence de panne ni pour distinguer deux causes ; elles justifient seulement de ne pas accepter le nœud.
+
+Recette par recette, la politique du lab (exercice 8) donne *accept*, *accept*, *retest*, *accept*, puis *reject*. Le dernier verdict suffit à garder le nœud dehors, mais un verdict par recette ne voit pas l'instabilité : c'est la série qu'il faut juger.
 
 **Hypothèses (non démontrées), avec le test qui les départage.**
 
@@ -1270,7 +1278,7 @@ Qualifiez la situation, listez des hypothèses ordonnées, proposez pour chacune
 ::: exo
 [Exercice 10 · ★★ — Dimensionner une mise à jour progressive]{.tag} Une flotte de 120 nœuds, des jobs de 48 h au plus, un redémarrage plus validation de 20 minutes (0,333 h) : valeurs **fictives**. Vous ne pouvez pas retirer plus de 10 % des nœuds à la fois. Formule du pire cas, avec $N$ nœuds et des lots de $b$ nœuds :
 
-$$T = \left\lceil \frac{N}{b} \right\rceil \times \left( T_{\text{job}} + T_{\text{reboot}} \right)$$
+$$T_{\text{pire}} = \left\lceil \frac{N}{b} \right\rceil \times \left( T_{\text{job}} + T_{\text{reboot}} \right)$$
 
 (a) Calculez la taille de lot et la durée de pire cas. (b) Combien gagne-t-on en doublant le lot, et à quel prix ? (c) Proposez une manière de réduire le pire cas sans retirer plus de capacité.
 :::
@@ -1292,7 +1300,7 @@ Dimensionnez ensuite le volant de nœuds de rechange pour un taux de 2,5 pannes 
 ::: sol
 **Procédure.**
 
-1.  Drainer le nœud avec une raison lisible (`scontrol update … state=drain reason=…`) ; les jobs en cours finissent ou sont repris depuis leur point de sauvegarde. Responsable : l'automatisation, sur le signal du client Redfish et du journal Xid.
+1.  Drainer le nœud avec une raison lisible (`scontrol update … state=drain reason=…`) ; les jobs en cours finissent ou sont repris depuis leur checkpoint. Responsable : l'automatisation, sur le signal du client Redfish et du journal Xid.
 2.  Geler les preuves : rapport DCGM, journal Xid, valeur des drapeaux de remappage, numéros de série et identifiants des GPU, historique des drains du nœud.
 3.  Substituer un nœud de rechange recetté, en l'ajoutant à la carte des nœuds (relue, plan lu), pour que Slurm voie la capacité revenir.
 4.  Réinitialiser le GPU si le diagnostic l'autorise, puis recette complète. Si elle échoue ou si le défaut revient, ouvrir le dossier de remplacement avec les preuves de l'étape 2.
@@ -1393,7 +1401,7 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 -   Projet iPXE. [*Chainloading iPXE*](https://ipxe.org/howto/chainloading) et [*Scripting*](https://ipxe.org/scripting) : boucle d'amorçage et scripts (chapitre 2).
 -   Warewulf. [*The Provisioning Process*](https://warewulf.org/docs/main/getting-started/provisioning.html) et Canonical, [*MAAS : commissioning et déploiement*](https://canonical.com/maas/docs/stable/explanation/deploying-machines/) : deux chaînes de provisionnement documentées (chapitre 2).
 -   DMTF. [*Redfish Specification DSP0266 1.22.0*](https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.22.0.pdf), 2025 : racine, authentification, hypermédia (chapitre 8).
--   SchedMD. [*scontrol*](https://slurm.schedmd.com/scontrol.html) : `reboot`, `ASAP`, `nextstate` (chapitre 7).
+-   SchedMD. [*scontrol*](https://slurm.schedmd.com/scontrol.html) : `reboot`, son option `ASAP` et la raison « reboot timed out » (chapitre 7).
 -   Noyau Linux. [*VFIO*](https://docs.kernel.org/driver-api/vfio.html), et KubeVirt, [*Host Devices Assignment*](https://kubevirt.io/user-guide/compute/host-devices/) : groupes IOMMU, liaison à `vfio-pci`, GPU dans une VM Kubernetes (chapitre 9).
 -   NVIDIA. [*Multi-Instance GPU User Guide*](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/index.html) : isolation, profils, placements et persistance des instances (chapitre 9).
 
@@ -1401,7 +1409,7 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ### Documenté {#documente}
 
-Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de `dcgmi diag`, option `-j`, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable `NCCL_TESTS_MIN_BW` ; sémantique de `scontrol reboot` ; racine `/redfish/v1/`, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, codes de sortie de `terraform plan`, limite de `prevent_destroy`. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, `hashicorp/local` 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale). Chapitre 9, pages lues le 25 octobre 2026 : groupes IOMMU et liaison à `vfio-pci`, paramètres IOMMU du noyau, isolation, persistance et placements de MIG, confinement des erreurs de MPS, licence et ordonnanceurs de vGPU, prérequis et limites de KubeVirt, étiquette de l'opérateur GPU, ACS et ATS dans une VM, `nvidia-smi -r`, VM confidentielles ; sorties de `virt-checks` et de `calc.py mig`.
+Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de `dcgmi diag`, option `-j`, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable `NCCL_TESTS_MIN_BW` ; sémantique de `scontrol reboot` ; racine `/redfish/v1/`, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, valeurs de l'option DHCP 93 (erratum 4624 du RFC 4578 et registre de l'IANA, lus le 25 octobre 2026), codes de sortie de `terraform plan`, limite de `prevent_destroy`. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, `hashicorp/local` 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale). Chapitre 9, pages lues le 25 octobre 2026 : groupes IOMMU et liaison à `vfio-pci`, paramètres IOMMU du noyau, isolation, persistance et placements de MIG, confinement des erreurs de MPS, licence et ordonnanceurs de vGPU, prérequis et limites de KubeVirt, étiquette de l'opérateur GPU, ACS et ATS dans une VM, `nvidia-smi -r`, VM confidentielles ; sorties de `virt-checks` et de `calc.py mig`.
 
 ### Recommandé {#recommande}
 
@@ -1409,7 +1417,7 @@ Les sept états du cycle de vie ; la recette en trois issues et ses seuils (90 %
 
 ### À vérifier {#a-verifier}
 
-(1) La liste des champs de `nvidia-smi --query-gpu` et l'enveloppe du JSON de `dcgmi diag` : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) Les valeurs de l'option DHCP 93 annoncées par vos firmwares UEFI (7 ou 9). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt `ansible-documentation`. (11) Le comportement de `hashicorp/local` face à un fichier modifié est une observation sur la version 2.9.1. (12) Rien du chapitre 9 n'a tourné sur un hyperviseur : la machine de rédaction n'a ni groupe IOMMU ni `/dev/kvm`. (13) NVIDIA et KubeVirt demandent `amd_iommu=on`, valeur absente de la documentation du noyau. (14) Le modèle de placement MIG vient d'une sortie d'exemple sur A100 40 Go. (15) Aucune page lue ne garantit l'effacement des données d'un locataire par une réinitialisation, ni l'isolation des fautes d'un vGPU partagé dans le temps.
+(1) La liste des champs de `nvidia-smi --query-gpu` et l'enveloppe du JSON de `dcgmi diag` : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) La valeur de l'option DHCP 93 annoncée par vos firmwares UEFI x86-64 (7 d'après l'erratum 4624 du RFC 4578 et le registre de l'IANA, 9 dans le texte original du RFC). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt `ansible-documentation`. (11) Le comportement de `hashicorp/local` face à un fichier modifié est une observation sur la version 2.9.1. (12) Rien du chapitre 9 n'a tourné sur un hyperviseur : la machine de rédaction n'a ni groupe IOMMU ni `/dev/kvm`. (13) NVIDIA et KubeVirt demandent `amd_iommu=on`, valeur absente de la documentation du noyau. (14) Le modèle de placement MIG vient d'une sortie d'exemple sur A100 40 Go. (15) Aucune page lue ne garantit l'effacement des données d'un locataire par une réinitialisation, ni l'isolation des fautes d'un vGPU partagé dans le temps.
 
 ### Hors périmètre {#hors-perimetre}
 

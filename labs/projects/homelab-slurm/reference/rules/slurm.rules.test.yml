@@ -3,16 +3,16 @@ rule_files:
 evaluation_interval: 15s
 
 tests:
-  # Exporter stale: scrape_ok drops to 0, and separately the series disappears altogether.
+  # Exporter stale: scrape_success drops to 0, and separately the series disappears altogether.
   - interval: 15s
     input_series:
-      - series: 'slurm_scrape_ok{instance="a"}'
+      - series: 'slurm_scrape_success{instance="a"}'
         values: '1x40 0x80'
     alert_rule_test:
       - alertname: SlurmExporterStale
         eval_time: 8m
         exp_alerts: []
-      - alertname: SlurmExporterStale   # scrape_ok has been 0 for 4m45s only: `for: 5m` is not over yet
+      - alertname: SlurmExporterStale   # scrape_success has been 0 for 4m45s only: `for: 5m` is not over yet
         eval_time: 15m
         exp_alerts: []
       - alertname: SlurmExporterStale
@@ -22,7 +22,7 @@ tests:
             exp_annotations: {summary: "Slurm metrics are missing or stale"}
   - interval: 15s
     input_series:
-      - series: 'slurm_scrape_ok{instance="a"}'
+      - series: 'slurm_scrape_success{instance="a"}'
         values: '1x10 _x100'
     alert_rule_test:
       - alertname: SlurmExporterStale
@@ -68,7 +68,8 @@ tests:
           - exp_labels: {severity: ticket, partition: debug}
             exp_annotations: {summary: "jobs in partition debug have waited more than an hour"}
 
-  # The classic failure of the Slurm module: jobs pending with idle nodes and nothing running (InvalidAccount).
+  # A classic blocking pattern: jobs pending with idle nodes and nothing running (e.g. InvalidAccount, documented by
+  # squeue; not reproduced on the Slurm module's sandbox, where sbatch rejects an invalid account at submission).
   - interval: 15s
     input_series:
       - series: 'slurm_jobs{partition="debug",state="PENDING"}'

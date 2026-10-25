@@ -112,8 +112,8 @@ HELP = {
 
 
 def render(m, ok=True):
-    lines = ["# HELP slurm_scrape_ok 1 when the last collection from sinfo, squeue and sshare succeeded.",
-             "# TYPE slurm_scrape_ok gauge", f"slurm_scrape_ok {1 if ok else 0}"]
+    lines = ["# HELP slurm_scrape_success 1 when the last collection from sinfo, squeue and sshare succeeded.",
+             "# TYPE slurm_scrape_success gauge", f"slurm_scrape_success {1 if ok else 0}"]
     if ok:
         for name, rows in m.items():
             lines += [f"# HELP {name} {HELP[name]}", f"# TYPE {name} gauge"]
@@ -133,7 +133,7 @@ def run_cmd(argv):
 
 
 def collect(run=run_cmd, now=None):
-    """Exposition text for one scrape. Any failing command gives slurm_scrape_ok 0 and nothing else:
+    """Exposition text for one scrape. Any failing command gives slurm_scrape_success 0 and nothing else:
     stale numbers must not look fresh."""
     now = int(time.time()) if now is None else now
     try:

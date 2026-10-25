@@ -71,7 +71,7 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 1.  Du transistor au nœud : cœurs, SIMD, hiérarchie mémoire, bande passante, latence
 2.  Le GPU vu comme machine à débit : SM, warps, HBM, tenseurs ; comparaison CPU/GPU
 3.  Mesurer proprement : benchmarks, variance, warm-up, minimum vs médiane, STREAM, GEMM
-4.  Le modèle roofline : intensité arithmétique, bornes mémoire et calcul, lecture de profils
+4.  Le modèle roofline : intensité arithmétique, bornes mémoire et calcul
 5.  Passage à l'échelle : loi d'Amdahl, loi de Gustafson, scalabilité forte et faible, efficacité parallèle
 6.  Le modèle de communication α-β (Hockney) et les collectives : arbre, anneau, bande passante optimale
 7.  FLOP d'un transformeur, MFU et HFU : 6ND, attention, coût mémoire des paramètres et de l'optimiseur
@@ -86,9 +86,8 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 **Sources à lire :**
 
 -   Williams, Waterman, Patterson (2009), roofline, CACM
--   Hockney (1994) et Thakur et al. (2005) pour les collectives
--   Chowdhery et al. (PaLM, 2022) pour la définition du MFU
--   FLOP de l'attention : formules de Kaplan et al. 2020 / Megatron-LM
+-   Hockney (1994) pour le modèle α-β ; Patarasuk et Yuan (2009) pour le coût du all-reduce en anneau
+-   Chowdhery et al. (PaLM, 2022) pour la définition du MFU et les FLOP par token (annexe B)
 
 **Projets qui s'appuient sur ce module :** Projet 2, Projet 6.
 
@@ -97,7 +96,7 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 
 ### Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (labs vérifiés, 30 h) {#parallel-programming}
 
-Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.
+Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de passage à l'échelle.
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
 
@@ -107,7 +106,7 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 
 -   Paralléliser une boucle avec OpenMP en justifiant partage, réduction et ordonnancement
 -   Écrire un programme MPI avec communications point-à-point et collectives, sans interblocage
--   Mener une étude de scalabilité forte et faible et expliquer l'écart au modèle
+-   Mener une étude de passage à l'échelle, fort et faible, et expliquer l'écart au modèle
 -   Relier les collectives MPI à ce que NCCL fait pour l'entraînement
 
 **Chapitres :**
@@ -119,13 +118,13 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 5.  Décomposition de domaine, halos et recouvrement calcul/communication
 6.  E/S parallèles et reproductibilité numérique : MPI-IO, sommes non associatives, graines
 7.  Hybride MPI+OpenMP, placement et binding ; lancement sous Slurm
-8.  Étudier la scalabilité : plan d'expérience, efficacité, goulots, rapport
+8.  Étudier le passage à l'échelle : plan d'expérience, efficacité, goulots, rapport
 
 **Labs :**
 
 -   **OpenMP : réduction et faux partage** (bac à sable, sans GPU) : Programme C avec OpenMP : somme, faux partage, effet du schedule ; mesures et comparaison au modèle.
--   **MPI : anneau, halo et all-reduce** (bac à sable, sans GPU) : Implémenter un all-reduce en anneau à la main avec MPI (OpenMPI/mpi4py dans le bac à sable, 4 rangs locaux), comparer à MPI_Allreduce.
--   **Jacobi 2D : étude de scalabilité** (bac à sable, sans GPU) : Solveur Jacobi avec décomposition de domaine ; scalabilité forte/faible sur les cœurs disponibles ; tracé et analyse.
+-   **MPI : anneau, halo et all-reduce** (bac à sable, sans GPU) : Lire un all-reduce en anneau écrit à la main avec Sendrecv (Open MPI et mpi4py, 4 rangs locaux), en réécrire la phase reduce-scatter, et le comparer à MPI_Allreduce par comptage des messages et des octets.
+-   **Jacobi 2D : étude de passage à l'échelle** (bac à sable, sans GPU) : Solveur Jacobi avec décomposition de domaine ; scalabilité forte/faible sur les cœurs disponibles ; tracé et analyse.
 
 **Sources à lire :**
 
@@ -177,9 +176,6 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 -   Tillet et al. (2019) Triton
 -   Documentation Numba CUDA simulator et Triton interpreter : vérifier la disponibilité sur CPU
 
-**Projets qui s'appuient sur ce module :** Projet 2.
-
-
 ## Phase 2 — Exploiter un cluster {#phase2}
 
 ### Module 05 — Slurm et exploitation d'un cluster HPC (labs vérifiés, 32 h) {#slurm}
@@ -220,7 +216,7 @@ L'ordonnanceur de référence du calcul scientifique et de l'entraînement : par
 -   Yoo, Jette, Grondona (2003)
 -   Version testée et date à indiquer ; ne pas écrire 'dernière version' sans lecture de la source officielle
 
-**Projets qui s'appuient sur ce module :** Projet 1, Projet 6.
+**Projets qui s'appuient sur ce module :** Projet 1, Projet 5, Projet 6.
 
 ### Module 06 — Provisioning, images et santé des nœuds GPU (non vérifié, 26,5 h) {#provisioning}
 
@@ -303,7 +299,7 @@ Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, 
 -   Guides InfiniBand/RoCE de NVIDIA (Mellanox) ; DCQCN (Zhu et al. 2015)
 -   Chiffres de bande passante par génération (NVLink, NDR) : citer les fiches constructeur
 
-**Projets qui s'appuient sur ce module :** Projet 2, Projet 6.
+**Projets qui s'appuient sur ce module :** Projet 6.
 
 ### Module 08 — Stockage et E/S pour l'entraînement (labs vérifiés, 24 h) {#storage}
 
@@ -432,7 +428,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 -   Young (1974), Daly (2006) ; Mohan et al. CheckFreq ; Wang et al. Gemini (SOSP 2023) ; documentation PyTorch DCP et torch.distributed.elastic
 -   Documentation NVIDIA sur les codes Xid
 
-**Projets qui s'appuient sur ce module :** Projet 3, Projet 6.
+**Projets qui s'appuient sur ce module :** Projet 3, Projet 4, Projet 5, Projet 6.
 
 ### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (labs vérifiés, 30,5 h) {#ray-rl-infra}
 
@@ -521,7 +517,7 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 -   Retours publics sur Slurm sur Kubernetes (Slinky/SchedMD, CoreWeave SUNK) : vérifier les pages officielles
 -   Vérifier l'état de DRA et des versions de Kubernetes à la date du jour
 
-**Projets qui s'appuient sur ce module :** Projet 6.
+**Projets qui s'appuient sur ce module :** Projet 4, Projet 6.
 
 ### Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (non vérifié, 28 h) {#multi-cloud}
 
@@ -602,7 +598,7 @@ Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée
 -   Documentation Prometheus (règles, promtool), Grafana, Loki, MLflow
 -   Pièges d'interprétation de DCGM_FI_DEV_GPU_UTIL : citer la documentation
 
-**Projets qui s'appuient sur ce module :** Projet 5, Projet 1, Projet 6.
+**Projets qui s'appuient sur ce module :** Projet 1, Projet 5, Projet 6.
 
 ### Module 15 — FinOps, capacité, énergie et achats de calcul (labs vérifiés, 24 h) {#finops-capacity}
 
@@ -700,15 +696,15 @@ La comptabilité d'un cluster Slurm décrite en code et appliquée par différen
 
 **Modules mobilisés :** 1, 6, 5, 14.
 
-**Plan :** Script d'installation reproductible (munge, MariaDB, slurmdbd, slurmctld/slurmd), configuration de comptes/QOS/fairshare, exportateur de métriques Slurm, règles d'alerte testées avec promtool, tableau de bord Grafana (extension). Vérifié dans le bac à sable avec Slurm 23.11 ; version multi-nœuds avec conteneurs en extension.
+**Plan :** Comptabilité (comptes, QOS, parts d'équité) décrite dans cluster.yml et appliquée par différence sur le Slurm du bac à sable du module 5, exportateur de métriques Slurm, règles d'alerte testées avec promtool et par mutation, tableau de bord Grafana (extension). Vérifié dans le bac à sable avec Slurm 23.11.4.
 
 ### Projet 2 — Étude de passage à l'échelle d'un entraînement (20 h) {#scaling-study}
 
 Mesurer, modéliser et expliquer comment un entraînement distribué passe à l'échelle, avec un rapport honnête.
 
-**Modules mobilisés :** 2, 3, 4, 7, 9.
+**Modules mobilisés :** 2, 3, 9.
 
-**Plan :** Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP/FSDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul de MFU/efficacité, rapport reproductible (script unique, graphes, ADR). Variante GPU en extension avec matériel à prévoir.
+**Plan :** Entraînement CPU (gloo) avec all-reduce de gradients naïf à 1, 2, 4 processus (DDP en extension) ; plan d'expérience, mesure du temps par pas et de la communication, ajustement du modèle α-β, calcul du gain, de l'efficacité et de l'utilisation du pic mesuré, rapport reproductible (commande unique, tableaux, ADR). Variante GPU en extension avec matériel à prévoir.
 
 ### Projet 3 — Entraîneur tolérant aux pannes (24 h) {#resilient-trainer}
 
@@ -722,7 +718,7 @@ Un entraînement qui survit à kill -9, aux blocages et aux checkpoints corrompu
 
 Un simulateur et une politique de placement/bascule, avec les manifestes qui la matérialiseraient sur de vrais fournisseurs.
 
-**Modules mobilisés :** 13, 15, 12.
+**Modules mobilisés :** 13, 15, 12, 10.
 
 **Plan :** Simulateur Python d'offres (données synthétiques étiquetées comme telles), politiques de placement et de bascule comparées par différences appariées sur les mêmes graines, tâches SkyPilot et manifestes Kueue générés puis validés hors ligne de façon structurelle, ADR sur les compromis coût, fiabilité et latence. Un module Terraform validé avec terraform validate est proposé en extension.
 
@@ -738,7 +734,7 @@ Exportateurs, règles d'alerte testées et détecteurs qui trouvent un job bloqu
 
 Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.
 
-**Modules mobilisés :** 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16.
+**Modules mobilisés :** 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16.
 
 **Plan :** RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité et de coût testé, choix du marché par classe de charge, plan de fiabilité et d'observabilité, plan de migration par phases, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types.
 

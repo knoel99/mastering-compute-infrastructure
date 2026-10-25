@@ -18,6 +18,27 @@ HPW = 12  # reference pace: hours per week
 PROJ_BY_PHASE = {0: [], 1: [], 2: ["homelab-slurm"], 3: ["scaling-study", "resilient-trainer"], 4: ["multi-provider-scheduler", "gpu-observability"], 5: ["capstone-rfc"]}
 
 
+def sync_projects():
+    """projects[].modules follows the front matter of each project page (the page is the authority), and
+    modules[].feeds is derived from it, so that the syllabus, the module fiches and the projects agree."""
+    import yaml
+    changed = False
+    for p in C["projects"]:
+        f = ROOT / "projects" / p["id"] / "index.md"
+        if not f.exists():
+            continue
+        meta = yaml.safe_load(f.read_text(encoding="utf-8").split("\n---\n", 1)[0].lstrip("-\n")) or {}
+        mods = (meta.get("project") or {}).get("modules")
+        if mods and mods != p["modules"]:
+            p["modules"], changed = mods, True
+    for m in C["modules"]:
+        feeds = [p["id"] for p in C["projects"] if m["id"] in p["modules"]]
+        if feeds != m.get("feeds"):
+            m["feeds"], changed = feeds, True
+    if changed:
+        (ROOT / "data" / "curriculum.json").write_text(json.dumps(C, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def phase_weeks():
     """Week ranges of the phases at HPW hours a week, written back to data/curriculum.json (weeks_hint), so that the
     module pages (generated 'Place dans le parcours') and the roadmap give the same weeks."""
@@ -92,6 +113,16 @@ def phase_blocks(card_fn):
     return "\n\n".join(out)
 
 
+def lab_only_note():
+    alone = [m for m in C["modules"] if not any(m["id"] in p["modules"] for p in C["projects"])]
+    if not alone:
+        return ""
+    names = ", ".join(str(m["number"]) for m in alone)
+    if len(alone) == 1:
+        return f" Le module {names} n'est exercé que par ses labs."
+    return f" Les modules {names} ne sont exercés que par leurs labs."
+
+
 def total_hours():
     mh = sum(m["hours"] for m in C["modules"])
     ph = sum(p["hours"] for p in C["projects"])
@@ -156,7 +187,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 ## Projets de portfolio {{#projets}}
 
-Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base.
+Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base.{lab_only_note()}
 
 <div class="cards">
 """ + "\n".join(card_project(p) for p in C["projects"]) + f"""
@@ -353,6 +384,7 @@ def nav():
 
 
 if __name__ == "__main__":
+    sync_projects()
     phase_weeks()
     nav()
     home()

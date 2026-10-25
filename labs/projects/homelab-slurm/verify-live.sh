@@ -38,8 +38,8 @@ cpus="$(sinfo -h -N -o %c | head -1)"   # each job takes the whole node, whateve
 for i in 1 2 3 4; do sbatch -J lv$i -o /dev/null -A teama -N1 -n"$cpus" --wrap 'sleep 300' >/dev/null; done
 for _ in $(seq 1 30); do squeue -h -t R | grep -q . && break; sleep 1; done
 metrics="$("$PY" "$IMPL/exporter.py" --once)"
-echo "$metrics" | grep -E '^slurm_(scrape_ok|jobs)\{?' | head -8
-grep -qx 'slurm_scrape_ok 1' <<<"$metrics" || { echo "FAIL: scrape not ok" >&2; exit 1; }
+echo "$metrics" | grep -E '^slurm_(scrape_success|jobs)\{?' | head -8
+grep -qx 'slurm_scrape_success 1' <<<"$metrics" || { echo "FAIL: scrape not ok" >&2; exit 1; }
 running="$(sed -n 's/^slurm_jobs{partition="[^"]*",state="RUNNING"} //p' <<<"$metrics" | head -1)"
 pending="$(sed -n 's/^slurm_jobs{partition="[^"]*",state="PENDING"} //p' <<<"$metrics" | head -1)"
 if [ "${running:-0}" -lt 1 ] || [ "${pending:-0}" -lt 2 ]; then echo "FAIL: RUNNING=$running PENDING=$pending" >&2; exit 1; fi

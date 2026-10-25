@@ -9,7 +9,7 @@ tests/        19 tests, partagés ; IMPL=<dossier> choisit le code testé (start
 verify.sh     prouve : référence verte, départ rouge
 ```
 
-Prérequis : un Python avec PyTorch CPU (`pip install torch --index-url https://download.pytorch.org/whl/cpu`) et `pytest`.
+Prérequis : un Python avec PyTorch CPU (`pip install "torch==2.14.1" --index-url https://download.pytorch.org/whl/cpu`) et `pytest`. Version vérifiée : Python 3.13, PyTorch 2.14.1 pour CPU, pytest 9.1.
 
 ```bash
 export PYTHON=/chemin/vers/python

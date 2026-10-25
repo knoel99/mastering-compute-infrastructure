@@ -33,7 +33,7 @@ done
 
 echo "extras by module (informational; each module page lists its own commands)"
 # tool:who-needs-it pairs; a missing extra is reported, never fatal
-for pair in "stress-ng:lab 1.2" "fio:labs 1.2, 8.x" "systemd-analyze:lab 1.5" "shellcheck:modules 1, 6, 13" \
+for pair in "stress-ng:lab 1.2" "fio:labs 1.2, 1.3 (part B), 8.x" "systemd-analyze:lab 1.5" "shellcheck:modules 1, 6, 13" \
             "gcc:module 3" "mpicc:module 3" "mpirun:module 3" "dnsmasq:module 6" "terraform:lab 6.2" "ansible-playbook:module 6" \
             "curl:labs 12.4, 14.1" "openssl:labs 12.4, 14.1" "etcd:lab 16.4 (optional part)"; do
   t="${pair%%:*}"; who="${pair#*:}"

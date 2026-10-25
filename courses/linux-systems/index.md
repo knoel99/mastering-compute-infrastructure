@@ -41,7 +41,7 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 | Pour qui | Fondation pour tous ; survol possible si vous administrez déjà des serveurs Linux en production. |
 | Livrable | un rapport de triage reproductible de votre machine et un script d'exploitation idempotent avec tests |
 | Environnement | une machine Linux sans GPU suffit. Lab 1.4 : accès root. Lab 1.2 : `stress-ng` et `fio`. Lab 1.3 : `fio` pour la partie B seulement. Lab 1.5 : `shellcheck` et `systemd-analyze`. Voir la page [environnement de travail](../../lab-setup/index.html) |
-| Projets qui s'appuient sur ce module | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html) |
+| Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -55,7 +55,7 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 0 — Fondations : machines et performance** (semaines 1-5) : lire une machine et prédire sa performance avant de la mesurer.
+-   **Phase 0 — Fondations : machines et performance** (semaines 1-4) : lire une machine et prédire sa performance avant de la mesurer.
 -   **S'appuie sur** : aucun module ; c'est un point d'entrée.
 -   **Prépare** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 6 — Provisioning, images et santé des nœuds GPU](../provisioning/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html), [module 8 — Stockage et E/S pour l'entraînement](../storage/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html).
@@ -242,10 +242,10 @@ Memory cgroup out of memory: Killed process 28868 (python3) total-vm:116780kB, a
 
 Lecture : la limite est de 102 400 kB ; la mémoire anonyme au moment de la mise à mort est de 102 016 kB, soit 99,6 % de la limite. Les 90 Mio de blocs terminés valent 92 160 kB ; il reste 9 856 kB (environ 9,6 Mio).
 
-Ils se partagent entre l'interpréteur (un Python 3 au repos a environ 2,9 Mio de mémoire anonyme, `RssAnon` lu dans `/proc/self/status`) et la partie du dixième bloc déjà touchée quand le noyau a tué, soit environ 6,8 Mio par différence. Le dixième bloc n'a jamais fini d'être touché : « allocated 100 MiB » ne s'est jamais affiché.
+Ils se partagent entre l'interpréteur (un Python 3.13 au repos a environ 2 880 kB, soit 2,8 Mio, de mémoire anonyme, `RssAnon` lu dans `/proc/self/status`) et la partie du dixième bloc déjà touchée quand le noyau a tué, soit environ 6 976 kB (6,8 Mio) par différence. Le dixième bloc n'a jamais fini d'être touché : « allocated 100 MiB » ne s'est jamais affiché.
 :::
 
-C'est la raison pour laquelle un job qui demande 100 Go dans Slurm ou Kubernetes **meurt** au lieu d'être ralenti quand il dépasse : la limite mémoire est dure. Pour un entraînement, prévoir de la marge dans la demande et un `memory.high` en dessous de `memory.max` transforme une mise à mort en ralentissement visible.
+C'est la raison pour laquelle un job limité à 100 Go **meurt** au lieu d'être ralenti quand il dépasse : la limite mémoire est dure. Sous Slurm, cette limite est la mémoire demandée quand `ConstrainRAMSpace=yes` (section 2.6). Sous Kubernetes, c'est la limite (`limits.memory`) ; la requête sert surtout au placement ([Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)). Pour un entraînement, prévoir de la marge dans la limite et un `memory.high` en dessous de `memory.max` transforme une mise à mort en ralentissement visible.
 
 ### 2.3. Limiter le processeur
 
@@ -337,7 +337,9 @@ $ head -1 /proc/meminfo
 MemTotal:       16477348 kB          # soit 16 091 Mio
 ~~~
 
-`numactl` annonce 7 901 Mo pour l'unique nœud, `MemTotal` en annonce 16 091 : le nœud ne couvre que 49 % de la mémoire de la machine virtuelle (la taille du nœud varie dans ce bac à sable : une relecture, plus tard, a donné 7 773 Mo). Sur une machine virtuelle, **ne supposez pas** que la somme des nœuds égale la mémoire totale. Sur une machine physique, un écart est un signal à expliquer (mémoire non attachée à un nœud, dispositif de mémoire particulier) avant de dimensionner quoi que ce soit.
+`numactl` annonce 7 901 « MB » pour l'unique nœud, qui sont des Mio (comparez avec le `MemTotal` en kB de `/sys/devices/system/node/node0/meminfo`, divisé par 1 024), et `MemTotal` en annonce 16 091 : le nœud ne couvre que 49 % de la mémoire de la machine virtuelle (la taille du nœud varie dans ce bac à sable : une relecture, plus tard, a donné 7 773 Mio).
+
+Sur une machine virtuelle, **ne supposez pas** que la somme des nœuds égale la mémoire totale. Sur une machine physique, un écart est un signal à expliquer (mémoire non attachée à un nœud, dispositif de mémoire particulier) avant de dimensionner quoi que ce soit.
 :::
 
 ### 3.3. Qui est branché où : GPU, carte réseau, disque NVMe
@@ -358,11 +360,28 @@ nœud -1 : Ethernet 0000:00:1f.6                                       # aucune 
 Un processus qui pilote le GPU `0000:86:00.0` doit être épinglé sur les cœurs du nœud 1 et utiliser la carte `0000:c1:00.0`. S'il utilise celle du nœud 0, chaque transfert réseau traverse la liaison entre sockets. Le rapport garde le nœud `-1` visible plutôt que de l'omettre : une information manquante est un fait, pas un détail.
 :::
 
+La bibliothèque *hwloc* (*Portable Hardware Locality*) donne la même information sous forme d'arbre, des cœurs aux périphériques : son [site](https://www.open-mpi.org/projects/hwloc/) indique qu'elle « can detect the locality PCI devices ». `lstopo-no-graphics --of console` en affiche un résumé texte. Extrait capturé dans le bac à sable le 2026-10-25 (hwloc 2.10.0) :
+
+~~~text
+Machine (6110MB total)
+  Package L#0
+    NUMANode L#0 (P#0 6110MB)
+    L3 L#0 (33MB)
+      L2 L#0 (1024KB) + L1d L#0 (32KB) + L1i L#0 (32KB) + Core L#0 + PU L#0 (P#0)
+  HostBridge
+    PCI 00:02.0 (Storage)
+      Block "vda"
+    PCI 00:08.0 (Ethernet)
+      Net "eth0"
+~~~
+
+(les trois autres cœurs et cinq autres disques virtio sont omis.) Les caches confirment `lscpu` : 1 Mio de L2 par cœur, soit les 4 Mio des quatre instances. Le total de la machine est celui du nœud NUMA, comme chez `numactl`, et non `MemTotal` : l'écart de l'exemple 3.2 se retrouve ici. Un pont PCI (`HostBridge`) y est rattaché « below a normal object (usually the entire machine or a NUMA node) » ([hwloc, I/O Devices](https://www.open-mpi.org/projects/hwloc/doc/v2.10.0/a00339.php)) : sur un serveur à plusieurs sockets, l'arbre recoupe donc la table de localité du lab 1.1.
+
 Sur une machine réelle à GPU, recoupez toujours ce rapport avec la matrice que produit `nvidia-smi topo -m`, qui décrit aussi les liens entre GPU (NVLink ou PCIe). Aucun GPU n'est disponible dans le bac à sable : ce recoupement n'a pas pu être fait ici.
 
 ### 3.4. Épingler un processus
 
-`taskset` restreint les cœurs autorisés d'un processus ; `numactl --cpunodebind=N --membind=N` restreint aussi l'allocation mémoire au nœud N. Slurm et Kubernetes font la même chose avec des cpusets (chapitre 2).
+`taskset` restreint les cœurs autorisés d'un processus ; `numactl --cpunodebind=N --membind=N` restreint aussi l'allocation mémoire au nœud N. Slurm fait la même chose avec le contrôleur `cpuset` quand `ConstrainCores=yes` (section 2.6). Kubernetes le fait avec la politique `static` de son gestionnaire de processeurs (*CPU Manager*), qui réserve des cœurs exclusifs aux conteneurs des pods *Guaranteed* demandant un nombre entier de processeurs ([CPU Management Policies](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/)).
 
 ::: ex
 [Exemple 3.4 — Affinité de processeur]{.tag} Capturé :
@@ -441,6 +460,8 @@ procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu----
 La première ligne de `vmstat` (non reproduite) est une moyenne depuis le démarrage : ignorez-la. Ici `id` vaut 100 : rien ne travaille. Dans `strace -c`, la colonne `errors` compte les appels qui ont échoué : 28 `newfstatat` et 7 `openat` en erreur sont normaux au démarrage de Python (recherche de modules) ; un grand nombre d'erreurs sur un programme de calcul serait un indice.
 :::
 
+`sar`, du même paquet sysstat que `iostat` et `pidstat`, affiche ces compteurs à intervalle fixe : `sar -u 1 3` pour le processeur, `sar -d 1 3` pour chaque disque. Il relit aussi les fichiers d'activité quotidiens qu'enregistre son collecteur `sadc` ([sar(1)](https://man7.org/linux/man-pages/man1/sar.1.html)) : c'est l'outil qui répond à « que s'est-il passé cette nuit ? ». Encore faut-il que la collecte tourne. Dans le bac à sable (sysstat 12.6.1, lu le 2026-10-25), `/etc/default/sysstat` contient `ENABLED="false"` et le dossier d'historique est vide : `sar` n'y a pas de passé à montrer.
+
 Les outils de profilage d'échantillonnage, `perf` avec ses graphes de flammes et `bpftrace` pour tracer le noyau, complètent cette liste. Ils ne sont pas installés dans le bac à sable : ce cours les décrit sans en montrer de sortie. Pour les utiliser, partez d'une hypothèse issue de la table USE, pas de l'envie d'essayer.
 
 ### 4.4. Quatre charges, quatre lectures
@@ -505,6 +526,8 @@ rc=0
 
 L'outil signale la valeur, l'ignore, **et retourne quand même 0**. Une intégration continue qui ne regarde que le code de retour accepte l'unité cassée. `check_unit.sh` (lab 1.5) traite toute sortie comme un échec, et son test vérifie qu'il rejette `bad.service`. Documentation : [systemd-analyze](https://www.freedesktop.org/software/systemd/man/latest/systemd-analyze.html).
 :::
+
+Les messages des services et du noyau sont rassemblés par *journald*, le journal de systemd. `journalctl -u slurmd` lit ceux d'une unité ; `journalctl -k` lit les messages du noyau du démarrage en cours (l'option « implies --boot=0 », selon [journalctl(1)](https://www.freedesktop.org/software/systemd/man/latest/journalctl.html)), c'est-à-dire ce que `dmesg` montre au chapitre 8, avec des dates et des filtres. Dans le bac à sable, où systemd n'est pas le processus 1, les deux commandes affichent « No journal files were found. » et retournent 0 : comme à l'exemple 8.1, un outil muet n'est pas un nœud sain.
 
 ### 5.2. Limites de processus
 
@@ -609,7 +632,7 @@ Le *bonding* regroupe plusieurs interfaces en une seule pour la redondance ou le
 
 Dans une communication TCP, le noyau copie les données entre le programme et la carte. Avec le *RDMA* (*remote direct memory access*), la carte lit et écrit directement la mémoire du programme, sans passer par le noyau pour chaque transfert : c'est ce qui permet les latences basses et les débits élevés des réseaux de calcul (InfiniBand, ou RoCE, c'est-à-dire du RDMA sur Ethernet). Le programme **enregistre** d'abord des zones mémoire auprès de la carte, ce qui explique les limites `memlock` du chapitre 5.
 
-Le module réseau du parcours détaille les protocoles, la topologie et la mesure. Retenez ici deux choses : le chemin des données change, donc les outils de diagnostic aussi, et un nœud dont la limite `memlock` est basse peut échouer à initialiser sa communication.
+Le [module 7 — Réseaux haute performance](../networking/index.html) détaille les protocoles (chapitres 2 à 4), la topologie (chapitre 5) et la mesure (chapitre 8). Retenez ici deux choses : le chemin des données change, donc les outils de diagnostic aussi, et un nœud dont la limite `memlock` est basse peut échouer à initialiser sa communication.
 
 ::: recap
 [Points clés]{.tag}
@@ -628,6 +651,8 @@ Un entraînement lit son jeu de données et écrit ses checkpoints : le stockage
 ### 7.1. Périphériques de bloc et systèmes de fichiers
 
 `lsblk` liste les disques et leurs partitions ; la colonne `ROTA` indique si le noyau croit le disque rotatif. Le système de fichiers de la machine de test est de l'ext4 sur `/dev/vda` (`findmnt`).
+
+Le noyau documente plusieurs systèmes de fichiers locaux, dont ext4, « an advanced level of the ext3 filesystem » ([ext4](https://docs.kernel.org/admin-guide/ext4.html)), et XFS, « a high performance journaling filesystem » prévu pour les gros fichiers et les grands volumes ([XFS](https://docs.kernel.org/admin-guide/xfs.html)). `findmnt` dit lequel est monté ; les compteurs et la loi de Little de ce chapitre s'appliquent aux deux. XFS n'est pas outillé dans le bac à sable (ni `mkfs.xfs` ni `xfs_info`) : ce chapitre n'en montre pas de sortie.
 
 ::: ex
 [Exemple 7.1 — Quand `ROTA` ment]{.tag} Capturé :
@@ -651,7 +676,7 @@ $$N = \lambda \, W$$
 Avec une file de profondeur $N$ (le nombre de requêtes que `fio` garde en vol), un débit $\lambda$ en requêtes par seconde et une latence moyenne $W$, le produit doit valoir $N$. C'est un contrôle de cohérence de toute mesure d'E/S : un résultat qui s'en écarte est suspect.
 
 ::: ex
-[Exemple 7.2 — Little vérifiée sur un vrai disque]{.tag} Le lab 1.3 (partie B) lance des lectures aléatoires de 4 Kio en `O_DIRECT` à profondeur de file 1 puis 32. Capturé :
+[Exemple 7.2 — Little vérifiée sur le disque virtuel du bac à sable]{.tag} Le lab 1.3 (partie B) lance des lectures aléatoires de 4 Kio en `O_DIRECT` à profondeur de file 1 puis 32. Capturé :
 
 ~~~text
 iodepth=1   iops=   16992  mean latency=   57.8 us  iops x latency =  0.98
@@ -682,7 +707,7 @@ Lecture ligne à ligne : après `write()`, 262 540 kio de pages sont sales, c'es
 :::
 
 ::: war
-[Pourquoi ce lab compte des octets et pas des secondes]{.tag} Dans le bac à sable, une lecture « à froid » de 256 Mio ne prend que 0,10 s (2,6 Gio/s) contre 0,04 s à chaud, soit un rapport de 2,5 seulement (trois mesures le 2026-10-24). Le chronomètre ne dit pas si ces octets viennent d'un disque rapide ou d'un cache de l'hôte sous le disque virtuel (hypothèse, non vérifiée).
+[Pourquoi ce lab compte des octets et pas des secondes]{.tag} Dans le bac à sable, une lecture « à froid » de 256 Mio ne prend que 0,10 s (2,5 Gio/s) contre 0,04 s à chaud, soit un rapport de 2,5 seulement (trois mesures le 2026-10-24). Le chronomètre ne dit pas si ces octets viennent d'un disque rapide ou d'un cache de l'hôte sous le disque virtuel (hypothèse, non vérifiée).
 
 Des processus de la plateforme écrivent aussi dans `drop_caches`, ce que le journal du noyau garde en mémoire au démarrage (`dmesg` : « process_api (1): drop_caches: 10 », « tokio-rt-worker (77): drop_caches: 3 »). Un chronomètre brouille donc la lecture.
 
@@ -711,7 +736,7 @@ Sur une flotte de GPU, une partie des pannes vient du matériel. Ce chapitre app
 
 ### 8.1. Où le système voit une panne matérielle
 
-Le noyau journalise ce qu'il détecte : `dmesg` lit ce journal. Pour la mémoire, le sous-système **EDAC** expose par contrôleur des compteurs d'erreurs corrigées par le code correcteur (ECC) et non corrigées sous `/sys/devices/system/edac/mc/` ([documentation EDAC](https://docs.kernel.org/driver-api/edac.html)). Pour les disques, `smartctl` lit les attributs SMART (l'auto-surveillance intégrée au disque). Pour le serveur lui-même, le contrôleur de gestion (BMC) tient un journal d'événements que `ipmitool sel` affiche ; une machine moderne l'expose aussi en réseau.
+Le noyau journalise ce qu'il détecte : `dmesg` lit ce journal. Pour la mémoire, le sous-système **EDAC** expose par contrôleur des compteurs d'erreurs corrigées par le code correcteur (ECC) et non corrigées sous `/sys/devices/system/edac/mc/` ([documentation EDAC](https://docs.kernel.org/driver-api/edac.html)). Pour les disques, `smartctl` lit les attributs SMART (l'auto-surveillance intégrée au disque). Pour le serveur lui-même, le contrôleur de gestion (BMC) tient un journal d'événements que `ipmitool sel` affiche ; il répond aussi en réseau, par IPMI ou par l'API REST Redfish ([module 6, chapitre 8](../provisioning/index.html#ch8), et le [lab 6.4](../provisioning/index.html#lab-6-4)).
 
 ::: ex
 [Exemple 8.1 — Quand l'instrument est absent]{.tag} Dans le bac à sable (machine virtuelle), les trois sources de panne matérielle sont **absentes**. Capturé :
@@ -759,7 +784,7 @@ Un script d'exploitation tourne sans surveillance, souvent à un moment critique
 4.  **Écriture atomique** : fichier temporaire puis renommage, pour ne jamais laisser un fichier à moitié écrit.
 5.  **Journal sur la sortie d'erreur**, daté, d'une ligne par décision.
 
-`ensure_sysctl.sh` du lab 1.5 applique ces cinq règles. Le comportement de `set -e`, souvent invoqué comme garantie, a des angles morts qu'une exécution montre mieux qu'une description.
+`ensure_sysctl.sh` du lab 1.5 applique ces cinq règles, avec les codes 0, 10, 2 et 1 : le code 3 sert aux contrôles d'un matériel (exemple 8.1), et le « Pour aller plus loin » du lab l'ajoute à un contrôle SMART. Le comportement de `set -e`, souvent invoqué comme garantie, a des angles morts qu'une exécution montre mieux qu'une description.
 
 ::: ex
 [Exemple 8.3 — Ce que `set -e` ne rattrape pas]{.tag} Le script `errexit_demo.sh` du lab 1.5, capturé :
@@ -804,7 +829,9 @@ unchanged: vm.max_map_count = 1048576
 
 ## Labs {#labs}
 
-Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). `verify.sh` de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Installation préalable des outils des labs 1.2, 1.3 et 1.5 : `sudo apt-get install -y stress-ng fio shellcheck`. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter. Lancez chaque commande depuis le dossier du lab (`cd labs/linux-systems/<lab>`). Les durées de lab indiquées sont celles du travail guidé ; elles tiennent dans les séances du plan.
+Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU), le lab 1.4 dans sa branche cgroup v1 seulement. `verify.sh` de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter. Lancez chaque commande depuis le dossier du lab (`cd labs/linux-systems/<lab>`). Les durées de lab indiquées sont celles du travail guidé ; elles tiennent dans les séances du plan.
+
+Installation préalable des outils des labs 1.2, 1.3 et 1.5 : `sudo apt-get install -y stress-ng fio shellcheck systemd` (le paquet `systemd` fournit `systemd-analyze` ; l'image de conteneur Ubuntu 24.04 ne contient que `libsystemd0`, selon son [manifeste](https://partner-images.canonical.com/oci/noble/current/ubuntu-noble-oci-amd64-root.manifest) lu le 2026-10-25).
 
 ### Lab 1.1 — Cartographier une machine {#lab-1-1}
 
@@ -926,13 +953,13 @@ Ensuite : la pression PSI `io` pour confirmer, `iostat -x` pour l'occupation et 
 :::
 
 ::: sol
-(a) 102 016 / 102 400 = **99,6 %** de la limite. (b) 90 Mio valent 92 160 kB ; 102 016 moins 92 160 donnent **9 856 kB, soit 9,6 Mio**. C'est un **majorant** de la base, pas la base : le dixième bloc était déjà en partie touché quand le noyau a tué (un Python au repos n'a qu'environ 2,9 Mio de mémoire anonyme, `RssAnon`).
+(a) 102 016 / 102 400 = **99,6 %** de la limite. (b) 90 Mio valent 92 160 kB ; 102 016 moins 92 160 donnent **9 856 kB, soit 9,6 Mio**. C'est un **majorant** de la base, pas la base : le dixième bloc était déjà en partie touché quand le noyau a tué (un Python au repos n'a qu'environ 2,8 Mio de mémoire anonyme, `RssAnon`).
 
 (c) Par prudence, on prend le majorant : besoin total 90 + 9,6 = 99,6 Mio ; avec 20 % de marge : 99,6 × 1,2 ≈ 119,5, soit une limite d'environ **120 Mio**. Une limite à 100 Mio, juste au besoin, tue le programme à la moindre variation ; c'est exactement ce que le lab 1.4 provoque.
 :::
 
 ::: exo
-[Exercice 4 · ★★ — Épingler un job sur GPU]{.tag} Avec le serveur à deux sockets fabriqué du lab 1.1, un job utilise les GPU `0000:86:00.0` et `0000:af:00.0`. Sur quels cœurs doit-il être épinglé, quelle carte InfiniBand doit-il utiliser, et quelle commande l'épingle ? Que se passe-t-il s'il utilise la carte `0000:5e:00.0` ?
+[Exercice 4 · ★★ — Épingler un job sur GPU]{.tag} Avec le serveur à deux sockets fabriqué du lab 1.1, un job utilise les GPU `0000:86:00.0` et `0000:af:00.0`. Les fichiers `cpulist` de ce serveur donnent `0-31,64-95` pour le nœud 0 et `32-63,96-127` pour le nœud 1. Sur quels cœurs doit-il être épinglé, quelle carte InfiniBand doit-il utiliser, et quelle commande l'épingle ? Que se passe-t-il s'il utilise la carte `0000:5e:00.0` ?
 :::
 
 ::: sol
@@ -1038,7 +1065,7 @@ exit 10
 
 ## Checkpoint de sortie {#exit}
 
-Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
+Ce checkpoint-là est un bilan du module, pas la sauvegarde d'état d'un entraînement des chapitres 1 et 7. Ce n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
 
 -   **Je peux cartographier une machine.** Preuve : le rapport du lab 1.1 sur votre machine, avec la table de localité commentée.
 -   **Je peux provoquer et lire une mise à mort par manque de mémoire.** Preuve : le lab 1.4 et l'explication de chaque champ de la ligne `oom-kill` (exemple 8.2).
@@ -1074,7 +1101,7 @@ Les pages web ci-dessous ont été consultées le 2026-10-24 ; la documentation 
 
 ### Documenté {#documente}
 
-Les définitions de PSI, de la méthode USE, de `memory.max`, `memory.high` et `cpu.max`, des espaces de noms, de la charge moyenne, de `RLIMIT_MEMLOCK`, des paramètres `vm.*`, de `O_DIRECT`, `DONTNEED` et `mincore`, de la THP, du format des messages Xid et des options `cgroup.conf` de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18.44, Ubuntu 24.04, 4 processeurs ; outils testés le 2026-10-24 : systemd 255, fio 3.36, stress-ng 0.17.06, iperf3 3.16, util-linux 2.39.3, procps-ng 4.0.4, ShellCheck 0.9.0) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.
+Les définitions de PSI, de la méthode USE, de `memory.max`, `memory.high` et `cpu.max`, des espaces de noms, de la charge moyenne, de `RLIMIT_MEMLOCK`, des paramètres `vm.*`, de `O_DIRECT`, `DONTNEED` et `mincore`, de la THP, du format des messages Xid, des options `cgroup.conf` de Slurm, des limites mémoire et du gestionnaire de processeurs de Kubernetes, de `journalctl -k`, de `sar`, des ponts PCI de hwloc, d'ext4 et de XFS viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18.44, Ubuntu 24.04, 4 processeurs ; outils testés le 2026-10-24 : systemd 255, fio 3.36, stress-ng 0.17.06, iperf3 3.16, util-linux 2.39.3, procps-ng 4.0.4, ShellCheck 0.9.0 ; le 2026-10-25 : hwloc 2.10.0, sysstat 12.6.1, Python 3.13) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.
 
 ### Recommandé {#recommande}
 
@@ -1086,4 +1113,4 @@ Le comportement de PSI `io` sous E/S asynchrones profondes a été constaté **s
 
 ### Hors périmètre {#hors-perimetre}
 
-`perf`, les graphes de flammes et `bpftrace` (non installés dans le bac à sable, décrits sans sortie), `tc netem` (module absent de ce noyau), les lectures SMART, EDAC et BMC réelles (absentes en machine virtuelle), `nvidia-smi topo -m` et les messages Xid réels (aucun GPU), le réglage fin du noyau et l'administration d'un système de fichiers parallèle.
+`perf`, les graphes de flammes et `bpftrace` (non installés dans le bac à sable, décrits sans sortie), XFS (non outillé, décrit sans sortie), l'historique de `sar` et le contenu du journal de systemd (collecte absente dans le bac à sable), `tc netem` (module absent de ce noyau), les lectures SMART, EDAC et BMC réelles (absentes en machine virtuelle), `nvidia-smi topo -m` et les messages Xid réels (aucun GPU), le réglage fin du noyau et l'administration d'un système de fichiers parallèle.

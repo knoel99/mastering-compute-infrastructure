@@ -57,5 +57,8 @@ j3=$(cd "$out" && sbatch --parsable -o "$out/run3.out" "$here/examples/checkpoin
 for _ in $(seq 1 30); do sacct -X -n -j "$j3" --format=State | grep -qE 'COMPLETED|FAILED' && break; sleep 1; done
 sacct -X -j "$j3" --format=JobID,State%10,ExitCode
 sacct -X -n -j "$j3" --format=State | grep -q FAILED || { echo "FAIL: a trainer that cannot start must end the job as FAILED"; exit 1; }
-echo "OK failure propagation: a crashing trainer ends the job as FAILED"
+# ExitCode is code:signal; the job must carry python3's own status (2), not a signal
+rc3=$(sacct -X -n -P -j "$j3" --format=ExitCode)
+[ "$rc3" = "2:0" ] || { echo "FAIL: expected ExitCode 2:0 (python3 could not open trainer.py), got $rc3"; exit 1; }
+echo "OK failure propagation: a crashing trainer ends the job as FAILED with ExitCode $rc3"
 echo "OK slurm-sandbox: parts A and B"

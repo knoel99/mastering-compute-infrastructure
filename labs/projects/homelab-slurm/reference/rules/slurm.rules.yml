@@ -4,7 +4,7 @@ groups:
     interval: 15s
     rules:
       - alert: SlurmExporterStale
-        expr: slurm_scrape_ok == 0 or absent(slurm_scrape_ok)
+        expr: slurm_scrape_success == 0 or absent(slurm_scrape_success)
         for: 5m
         labels:
           severity: page

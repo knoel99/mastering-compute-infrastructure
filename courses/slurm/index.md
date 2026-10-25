@@ -23,7 +23,7 @@ labs:
 
 **La question à laquelle ce module répond :** comment partager équitablement et efficacement quelques centaines de GPU entre des équipes qui ne s'entendent pas toujours, sans qu'un job oublié ne bloque un entraînement de deux semaines ? Slurm est la réponse la plus répandue dans les centres de calcul et chez de nombreux fournisseurs de GPU.
 
-Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, comptabilité), à **écrire** des jobs corrects, à **configurer** une politique (partitions, équité, préemption) et à **exploiter** les nœuds (GPU, santé, conteneurs). Tout est vérifié sur un vrai Slurm 23.11 lancé dans un bac à sable, pas sur des exemples écrits de mémoire.
+Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, comptabilité), à **écrire** des jobs corrects, à **configurer** une politique (partitions, équité, préemption) et à **exploiter** les nœuds (GPU, santé, conteneurs). Les labs, les comportements dits « observés » et les sorties citées viennent d'un vrai Slurm 23.11 lancé dans un bac à sable, pas d'exemples écrits de mémoire. Les exemples qui demandent des GPU sont relus sur la documentation et signalés comme non exécutés.
 
 ::: key
 [Règle de ce module]{.tag} Un ordonnanceur est un contrat social écrit en configuration. Chaque paramètre répond à la question « qui passe en premier quand tout le monde veut la même chose ? ». Si vous ne savez pas formuler la réponse en une phrase, ne touchez pas au paramètre.
@@ -35,11 +35,11 @@ Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, 
 |---|---|
 | Volume | 32 h, dont environ 12 h de lecture, 10 h de labs et 10 h d'exercices, de synthèse et de checkpoint |
 | Niveau d'entrée | 2 : à l'aise avec Linux en ligne de commande (module 1) |
-| Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html) |
+| Prérequis | [Module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html) |
 | Pour qui | Cœur pour tous, sauf si vous administrez déjà Slurm en production : survolez alors les premiers chapitres et faites les labs de politique d'équité et de santé des nœuds. |
 | Livrable | un Slurm de test reproductible par script, avec comptes, QOS, préemption et vérification de santé |
 | Environnement | une VM ou un conteneur Linux jetable avec accès root ; aucun GPU |
-| Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
+| Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -47,16 +47,16 @@ Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, 
 -   Lire une file d'attente et expliquer pourquoi un job attend (chapitres 1 et 3).
 -   Configurer partitions, comptes, QOS, équité et préemption pour une politique donnée (chapitres 3 et 4).
 -   Décrire la configuration d'un nœud GPU et une topologie réseau pour le placement (chapitre 5).
--   Mesurer l'utilisation d'un cluster avec `sacct` et `sreport` (chapitre 6), et lire l'équité avec `sshare` (chapitre 3).
+-   Mesurer l'allocation, l'attente et le gaspillage d'un cluster avec `sacct` et `sreport` (chapitre 6), et lire l'équité avec `sshare` (chapitre 3).
 -   Diagnostiquer et mettre en quarantaine un nœud défaillant, automatiquement (chapitre 7).
 -   Situer Slurm face aux conteneurs et à Kubernetes (chapitre 8).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 2 — Exploiter un cluster** (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
+-   **Phase 2 — Exploiter un cluster** (semaines 10-20) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
--   **Prépare** : [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
+-   **Prépare** : [module 6 — Provisioning, images et santé des nœuds GPU](../provisioning/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html), [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Slurm, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Astreinte, fiabilité (SRE), Expérience HPC, Santé matérielle (burn-in, diagnostics, RMA), Administration Linux, Conteneurs, Planification de capacité, Réseau (général) (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
@@ -73,11 +73,11 @@ Douze séances, soit 32 h : huit de 3 h et quatre de 2 h. Le niveau ne diminue j
 | 4 | 3 h | 2 | ch. 3 Partitions, associations, QOS, priorité | Ex. 4 |
 | 5 | 3 h | 2 | ch. 3 Équité (Fair Tree) et backfill | Lab 5.2 partie A ; Ex. 5, 6 |
 | 6 | 2 h | 2 | ch. 4 Préemption, réservations, limites | Lab 5.2 partie B |
-| 7 | 3 h | 2 | ch. 5 GPU et topologie | Ex. 7 |
-| 8 | 2 h | 2 | ch. 6 Comptabilité et reporting | Ex. 8 |
+| 7 | 3 h | 2 | ch. 5 GPU et topologie ; retour sur la politique du ch. 4 | Ex. 7, 8 |
+| 8 | 2 h | 2 | ch. 6 Comptabilité et reporting | Ex. 9 |
 | 9 | 3 h | 3 | ch. 7 Santé des nœuds | Lab 5.3 partie A |
-| 10 | 3 h | 3 | ch. 7 suite, ch. 8 Conteneurs | Lab 5.3 partie B ; Ex. 9 |
-| 11 | 3 h | 3 | ch. 8 Slurm sur Kubernetes, synthèse | Ex. 10 |
+| 10 | 3 h | 3 | ch. 7 suite, ch. 8 Conteneurs | Lab 5.3 partie B ; Ex. 10 |
+| 11 | 3 h | 3 | ch. 8 Slurm sur Kubernetes, synthèse | Ex. 11 |
 | 12 | 2 h | 3 | Checkpoint de sortie, démarrage du Projet 1 | |
 
 <!-- gen:travailler -->
@@ -244,13 +244,26 @@ Pour un entraînement distribué, la règle est de **demander des nœuds entiers
 set -euo pipefail
 head_node="$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)"
 export OMP_NUM_THREADS=8
+trap 'scontrol requeue "$SLURM_JOB_ID"' USR1
+# srun runs in the background: bash only runs a trap once the foreground command has returned.
 srun --kill-on-bad-exit=1 \
   torchrun --nnodes="$SLURM_NNODES" --nproc_per_node=8 \
            --rdzv_backend=c10d --rdzv_endpoint="${head_node}:29500" --rdzv_id="$SLURM_JOB_ID" \
-           train.py --config config.yaml --resume-latest
+           train.py --config config.yaml --resume-latest &
+pid=$!
+rc=0
+while :; do
+  wait "$pid" && rc=0 || rc=$?
+  kill -0 "$pid" 2>/dev/null || break
+done
+exit "$rc"
 ~~~
 
 Ce script a passé `shellcheck` mais n'a **pas** été exécuté ici : il demande des GPU. Les valeurs (96 processeurs par tâche, huit threads OpenMP, port 29500) sont des exemples à adapter. L'option `--kill-on-bad-exit=1` fait arrêter tout le job quand un rang tombe, plutôt que de laisser les autres bloqués dans une collective.
+
+La reprise tient au `trap`. Sans lui, `SIGUSR1` tue le shell du script (c'est l'action par défaut de ce signal), et le job avec lui. Dans le bac à sable, un job de test sans `trap` qui reçoit ce signal finit en `FAILED` avec `ExitCode 0:10` (signal 10, `SIGUSR1`) et `Restarts=0`. Avec le `trap`, le même job, soumis par un utilisateur sans privilège, repasse en `PENDING` avec `Restarts=1` (essais CPU du 25 octobre 2026).
+
+Slurm relance alors le script, et `train.py --resume-latest` repart de son dernier *checkpoint* (point de reprise : l'état sauvegardé de l'entraînement). Le programme doit donc en écrire régulièrement : le travail fait depuis le dernier est perdu. La boucle sur `wait` est expliquée à l'exemple 2.2.
 :::
 
 ### 2.3. Tableaux et dépendances
@@ -264,8 +277,8 @@ Les **dépendances** chaînent des jobs : `--dependency=afterok:ID` attend que l
 Slurm arrête les jobs : dépassement de durée, préemption, panne de nœud, annulation. Un script robuste prévoit ces cas.
 
 1.  **Mettez `set -euo pipefail`** en tête : une erreur silencieuse en milieu de script ne doit pas produire un succès apparent.
-2.  **Demandez un signal avant la fin.** `--signal=B:USR1@300` envoie `SIGUSR1` au shell du script environ 300 secondes avant la limite de durée (`B:` limite l'envoi au shell du script ; la documentation précise que le signal peut partir jusqu'à 60 secondes plus tôt). Le script le transmet au programme, qui sauvegarde son état.
-3.  **Autorisez la remise en file** avec `--requeue` : Slurm relance alors le job depuis le début de son script, et c'est votre programme qui doit reprendre à son dernier point de sauvegarde.
+2.  **Demandez un signal avant la fin.** `--signal=B:USR1@300` envoie `SIGUSR1` au shell du script environ 300 secondes avant la limite de durée (`B:` limite l'envoi au shell du script ; la documentation précise que le signal peut partir jusqu'à 60 secondes plus tôt). Le script l'intercepte avec `trap`, faute de quoi le signal tue le shell et le job avec lui (exemple 2.1). Il le transmet ensuite au programme, qui sauvegarde son état, ou remet le job en file.
+3.  **Autorisez la remise en file** avec `--requeue` : Slurm relance alors le job depuis le début de son script, et c'est votre programme qui doit reprendre à son dernier checkpoint.
 4.  **Écrivez de façon atomique.** Un checkpoint écrit dans un fichier temporaire puis renommé ne laisse jamais un fichier à moitié écrit.
 
 ::: ex
@@ -350,8 +363,8 @@ Chaque poids $W$ se règle par un paramètre `PriorityWeight…` de `slurm.conf`
 ~~~text
 $ sprio -o "%i %o %Y %f" -j 10,11
 JOBID ACCOUNT PRIORITY FAIRSHARE
-10    teama   2500     0.2500000
-11    teamb   7500     0.7500000
+10 teama 2500 0.2500000
+11 teamb 7500 0.7500000
 ~~~
 
 Quand un nœud se libère, c'est le job 11, de priorité 7 500, qui démarre en premier, bien qu'il ait été soumis après le job 10.
@@ -417,6 +430,10 @@ La **préemption** libère des ressources en interrompant un job moins prioritai
 | `REQUEUE` | il est remis en file s'il est « requeueable », annulé sinon |
 | `CANCEL` | il est annulé |
 | `SUSPEND,GANG` | il est suspendu puis repris, en partageant les ressources par tranches de temps |
+
+Le mot *gang* prête à confusion. Dans Slurm, le *gang scheduling* (option `GANG` de `PreemptMode`) est un partage par tranches de temps (*time slicing*) : des jobs placés sur les mêmes ressources sont suspendus et repris à tour de rôle. Kubernetes emploie le même mot pour le démarrage tout ou rien d'un groupe de pods (§ 8.4 et [module 12, chapitre 3](../kubernetes-gpu/index.html#ch3)).
+
+Ce démarrage groupé, Slurm l'assure sans option : d'après la documentation de `sbatch`, `--nodes=N` demande qu'au moins N nœuds soient alloués au job, qui ne démarre qu'avec son allocation complète.
 
 Avec `preempt/qos`, `PreemptMode` peut aussi se fixer par QOS. Le paramètre `GraceTime` d'une QOS ou d'une partition donne au job préempté un délai pour finir proprement : c'est le moment de sauvegarder (voir le chapitre 2). Retenez la règle de fond : **la préemption n'a de sens que si les jobs préemptibles savent reprendre**. Un entraînement qui ne sait pas reprendre depuis un checkpoint perd tout son travail à chaque préemption.
 
@@ -548,7 +565,9 @@ Sans `--gpu-bind=closest`, la répartition peut envoyer une tâche vers un GPU r
 
 ### 5.3. Partager un GPU
 
-Un GPU entier pour une petite expérience est du gaspillage. NVIDIA propose le partitionnement matériel **MIG** (*Multi-Instance GPU*) sur certains modèles ; la page « GRES » de la documentation de Slurm contient une section « MIG Management ». Elle précise qu'avec la détection `nvidia`, Slurm ne détecte pas les instances MIG ni les liens NVLink, et que NVML ne fournit pas de métriques d'utilisation pour les instances MIG : la comptabilité de la mémoire et de l'utilisation GPU n'existe donc pas pour elles.
+Un GPU entier pour une petite expérience est du gaspillage. NVIDIA propose le partitionnement matériel **MIG** (*Multi-Instance GPU*) sur certains modèles ; la page « GRES » de la documentation de Slurm contient une section « MIG Management ». La même page distingue deux détections des GPU NVIDIA : `AutoDetect=nvml`, qui passe par la bibliothèque NVML (paragraphe 5.1), et `AutoDetect=nvidia`, ajoutée dans Slurm 24.11 et donc absente de la version 23.11 testée ici, qui se passe de NVML mais ne détecte ni les instances MIG ni les liens NVLink.
+
+Elle précise aussi que NVML ne fournit pas de métriques d'utilisation pour les instances MIG : la comptabilité de la mémoire et de l'utilisation GPU n'existe donc pas pour elles.
 
 Avec `AutoDetect=nvml`, en revanche, Slurm traite chaque instance MIG comme un GPU distinct. La conséquence pour l'exploitation : MIG convient aux petites charges d'inférence ou de développement, pas à l'entraînement multi-GPU. Le partage par tranches de temps (*time-slicing*) relève plutôt de Kubernetes (module 12).
 
@@ -570,15 +589,15 @@ Les commutateurs de feuille (`s0` à `s3`) listent leurs nœuds, ceux des niveau
 
 L'option `--switches=N@durée` d'un job fixe le nombre maximal de commutateurs de feuille souhaité et la durée d'attente maximale pour l'obtenir. La durée suit les formats de `--time` (`minutes`, `minutes:secondes`, `heures:minutes:secondes`) : `01:00` vaut donc **une minute**, pas une heure.
 
-Un job qui préfère attendre une heure plutôt que de s'étaler sur deux commutateurs écrit `--switches=1@01:00:00`. L'administrateur peut plafonner cette attente avec le paramètre `max_switch_wait` de `SchedulerParameters` (300 secondes par défaut d'après le guide de configuration de l'ordonnancement).
+Un job qui préfère attendre une heure plutôt que de s'étaler sur deux commutateurs écrit `--switches=1@01:00:00`. Cette attente est toutefois plafonnée par le paramètre `max_switch_wait` de `SchedulerParameters`, qui vaut 300 secondes par défaut d'après la page `slurm.conf`. Tant que l'administrateur ne le relève pas, ce job n'attend donc que cinq minutes, pas une heure.
 
 ::: ex
 [Exemple 5.2 — Choisir entre attendre et s'étaler]{.tag} Sur les huit nœuds de la topologie ci-dessus, un job demande quatre nœuds. Seuls `tux0` (sous `s0`), `tux2` (sous `s1`), `tux4` et `tux5` (sous `s2`) sont libres. Quatre nœuds libres existent donc, mais sur trois commutateurs de feuille.
 
-Avec `--switches=2@30` (30 minutes), Slurm attendra jusqu'à 30 minutes, sous réserve du plafond `max_switch_wait`, une allocation sur au plus deux commutateurs de feuille avant de céder et d'accepter ce qu'il trouve. Le compromis est classique : attendre améliore la communication mais retarde le démarrage ; pour un job de plusieurs jours, 30 minutes d'attente sont négligeables, pour un job d'une heure elles sont prohibitives.
+Avec `--switches=2@30` (30 minutes) et un `max_switch_wait` relevé à au moins 1 800 secondes, Slurm attendra jusqu'à 30 minutes une allocation sur au plus deux commutateurs de feuille avant de céder et d'accepter ce qu'il trouve. Avec la valeur par défaut, il cède au bout de cinq minutes. Le compromis est classique : attendre améliore la communication mais retarde le démarrage ; pour un job de plusieurs jours, 30 minutes d'attente sont négligeables, pour un job d'une heure elles sont prohibitives.
 :::
 
-Les versions récentes de la documentation décrivent aussi un plugin `topology/block`, qui impose une structure hiérarchique de blocs pour que les jobs restent dans un bloc : il cherche à limiter la fragmentation de la grappe, là où `topology/tree` place d'abord le job sur les premières ressources disponibles. Ses détails et sa disponibilité dépendent de votre version : voir la page « Topology » de la documentation de la version installée.
+Les versions récentes de la documentation décrivent aussi un plugin `topology/block`, qui impose une structure hiérarchique de blocs pour que les jobs restent dans un bloc : il cherche à limiter la fragmentation de la grappe, là où `topology/tree`, dit la même page, cherche surtout à loger chaque job dans les ressources libres au moment de la décision. Ses détails et sa disponibilité dépendent de votre version : voir la page « Topology » de la documentation de la version installée.
 
 ::: recap
 Points clés — chapitre 5
@@ -586,12 +605,12 @@ Points clés — chapitre 5
 -   Un nœud GPU se déclare dans `slurm.conf` (`Gres=`), `gres.conf` (`AutoDetect=nvml`) et `cgroup.conf` (`ConstrainDevices=yes`).
 -   `--gpus-per-node`, `--gres-flags=enforce-binding` et `--gpu-bind=closest` décrivent la demande et la liaison CPU-GPU.
 -   MIG partage un GPU sans comptabilité d'utilisation GPU : réservez-le aux petites charges.
--   `topology/tree` et `--switches=N@durée` (attention : `01:00` vaut une minute) arbitrent entre attente et étalement sur le réseau.
+-   `topology/tree` et `--switches=N@durée` (attention : `01:00` vaut une minute, et `max_switch_wait` plafonne l'attente à 300 secondes par défaut) arbitrent entre attente et étalement sur le réseau.
 :::
 
 ## 6. Comptabilité et reporting {#ch6}
 
-Ce qui ne se mesure pas ne se pilote pas : l'utilisation d'un cluster, le temps d'attente des utilisateurs et la part de calcul perdue se lisent dans la comptabilité. Ce chapitre apprend à les extraire sans se tromper de commande.
+Ce qui ne se mesure pas ne se pilote pas : l'allocation d'un cluster, le temps d'attente des utilisateurs et la part de calcul perdue se lisent dans la comptabilité. Ce chapitre apprend à les extraire sans se tromper de commande.
 
 ### 6.1. Ce que la comptabilité enregistre
 
@@ -633,11 +652,11 @@ sreport -t hours cluster AccountUtilizationByUser start=2026-10-01 -T gres/gpu
 
 Trois grandeurs répondent à trois questions différentes. Ne les mélangez pas.
 
-1.  **L'utilisation** répond à « les machines sont-elles occupées ? ». Elle se calcule sur une période :
+1.  **L'allocation** (que les rapports Slurm appellent souvent « utilisation ») répond à « les machines sont-elles occupées ? ». Elle se calcule sur une période :
 
-$$U = \frac{\text{GPU-heures allouées}}{\text{GPU-heures totales}}$$
+$$a = \frac{\text{GPU-heures allouées}}{\text{GPU-heures totales}}$$
 
-Variante utile : rapporter l'allocation à la capacité *disponible*, c'est-à-dire sans les nœuds drainés. Le calcul est celui de l'exercice 8.
+Les modules 12 et 15 notent $a$ cette même fraction. L'activité des GPU alloués, que mesure DCGM et que les modules 12 et 14 appellent « utilisation », est une autre grandeur : un GPU alloué peut rester inactif. Variante utile : rapporter l'allocation à la capacité *disponible*, c'est-à-dire sans les nœuds drainés. Le calcul est celui de l'exercice 9.
 
 2.  **L'attente** répond à « les utilisateurs sont-ils servis rapidement ? ». Pour chaque job, c'est l'écart entre sa soumission et son démarrage ; on suit la médiane et un percentile élevé par QOS, car une moyenne cache les jobs qui attendent des jours.
 
@@ -673,7 +692,7 @@ Avec quatre jobs, le p90 n'a aucune valeur statistique : l'exemple ne montre que
 
 ### 6.4. Du rapport au pilotage
 
-Une revue hebdomadaire d'un cluster tient en quatre chiffres : utilisation brute, utilisation rapportée à la capacité disponible, médiane et percentile 90 de l'attente par QOS, part de GPU-heures perdues. Comparer deux semaines vaut mieux que lire une semaine seule. Le module 14 branche ces mêmes grandeurs sur Prometheus et Grafana ; le module 15 les convertit en coûts.
+Une revue hebdomadaire d'un cluster tient en quatre chiffres : allocation brute, allocation rapportée à la capacité disponible, médiane et percentile 90 de l'attente par QOS, part de GPU-heures perdues. Comparer deux semaines vaut mieux que lire une semaine seule. Le module 14 branche ces mêmes grandeurs sur Prometheus et Grafana ; le module 15 les convertit en coûts.
 
 ::: recap
 Points clés — chapitre 6
@@ -681,12 +700,14 @@ Points clés — chapitre 6
 -   `sacct` lit les jobs enregistrés ; `sreport` lit des cumuls horaires, quotidiens et mensuels : un cluster neuf ou l'heure en cours y est absent.
 -   `ExitCode` s'écrit `code:signal` ; `CPUTimeRAW` est le produit processeurs par durée en secondes.
 -   Pour compter des GPU, `AccountingStorageTRES=gres/gpu` est indispensable.
--   Trois indicateurs distincts : utilisation, attente, gaspillage.
+-   Trois indicateurs distincts : allocation (l'« utilisation » des rapports Slurm), attente, gaspillage.
 :::
 
 ## 7. Santé des nœuds {#ch7}
 
-Sur un cluster de plusieurs centaines de GPU, des nœuds tombent tous les jours. La question n'est pas d'éviter les pannes mais de **ne pas y envoyer de jobs** : un job lancé sur un nœud défaillant coûte des heures de GPU puis une enquête.
+Sur un cluster de 256 à 512 GPU (32 à 64 nœuds de huit GPU), un nœud tombe en moyenne tous les deux à cinq jours au taux de 6,5 pannes pour mille nœuds-jours mesuré par [Kokolis et al. (2024)](https://arxiv.org/abs/2410.21680) et repris au [module 10](../fault-tolerance/index.html#ch1). Dans leurs périodes de pointe, vers 17,5 pour mille, c'est tous les un à deux jours ; sur plusieurs milliers de GPU, c'est tous les jours.
+
+La question n'est pas d'éviter les pannes mais de **ne pas y envoyer de jobs** : un job lancé sur un nœud défaillant coûte des heures de GPU puis une enquête.
 
 ### 7.1. Les états d'un nœud
 
@@ -747,7 +768,8 @@ Le préfixe `health:` de la raison est la signature du script : lui seul peut re
 Un **prolog** est un script exécuté sur le nœud avant un job, un **epilog** après. La page « Prolog and Epilog Guide » de la documentation précise deux points qui surprennent.
 
 -   Par défaut, le prolog ne s'exécute sur un nœud que lorsqu'il voit **la première étape d'une nouvelle allocation**. Un job qui n'a lancé aucune étape ne déclenche jamais le prolog, sauf si `PrologFlags=Alloc` force l'exécution dès l'allocation. L'epilog, lui, s'exécute toujours.
--   Si le **prolog échoue** (code de sortie non nul), le nœud passe en état `DRAIN` et le job est remis en file ; si l'**epilog échoue**, le nœud passe aussi en `DRAIN`. D'après la documentation, le job est alors retenu (*held*), sauf si `nohold_on_prolog_fail` figure dans `SchedulerParameters`.
+-   Si le **prolog échoue** (code de sortie non nul), le nœud passe en état `DRAIN` et le job est remis en file. D'après la documentation, ce job est en outre retenu (*held*), sauf si `nohold_on_prolog_fail` figure dans `SchedulerParameters` : l'exemple 7.2 le montre.
+-   Si l'**epilog échoue**, le nœud passe aussi en `DRAIN`. Ce cas est documenté mais le lab 5.3 ne le reproduit pas.
 
 Un prolog est donc une barrière : un job ne démarre pas sur un nœud qui échoue au contrôle.
 
@@ -778,15 +800,15 @@ Une procédure écrite évite les remises en service précipitées.
 Un nœud qui est drainé plusieurs fois en peu de temps est un nœud à retirer pour réparation plutôt qu'à remettre en service : fixez une règle, par exemple trois drains en sept jours. C'est un choix de politique de ce parcours, pas une règle de Slurm.
 
 ::: war
-[À grande échelle, la santé des nœuds est un travail d'automatisation]{.tag} Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 419 interruptions imprévues de job, attribuées à environ 78 % à des problèmes matériels confirmés ou suspectés ; les GPU représentaient 58,7 % de toutes les causes imprévues. L'équipe n'a eu besoin d'une intervention manuelle significative que trois fois : le reste a été traité par l'automatisation. Source : [article Llama 3, section 3.3.4](https://arxiv.org/abs/2407.21783).
+[À grande échelle, la santé des nœuds est un travail d'automatisation]{.tag} Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 419 interruptions imprévues de job, attribuées à environ 78 % à des problèmes matériels confirmés ou suspectés ; les GPU en représentaient 268 (64 % recalculé à partir des comptes du tableau 5 ; le texte de l'article dit 58,7 %, voir le [module 10, § 1.3](../fault-tolerance/index.html#ch1)). L'équipe n'a eu besoin d'une intervention manuelle significative que trois fois : le reste a été traité par l'automatisation. Source : [article Llama 3, section 3.3.4](https://arxiv.org/abs/2407.21783).
 :::
 
 ::: recap
 Points clés — chapitre 7
 
--   Drainer avec une raison : le nœud reçoit plus de jobs, les jobs en cours finissent.
+-   Drainer avec une raison : le nœud ne reçoit plus de nouveaux jobs, les jobs en cours finissent.
 -   `HealthCheckProgram` exécute un contrôle périodique ; NHC (LBNL) en est une implémentation ouverte.
--   Un bon contrôle est rapide, idempotent, drainé avec raison, et ne remet en service que ses propres drains.
+-   Un bon contrôle est rapide, idempotent, draine avec une raison, et ne remet en service que ses propres drains.
 -   Un prolog en échec draine le nœud et retient le job : il faut le libérer.
 -   La remise en service suit une procédure écrite ; un nœud qui flotte doit sortir de la production.
 :::
@@ -810,6 +832,10 @@ srun --container-image=almalinux:9 --container-mounts=/etc/os-release:/host/os-r
 
 Une contrainte d'exploitation à retenir : depuis Slurm 21.08, Pyxis doit être **compilé contre la version de Slurm déployée** sur le cluster, sinon Slurm refuse de le charger avec l'erreur `Incompatible plugin version`. Chaque mise à jour de Slurm entraîne donc une recompilation de Pyxis : c'est une ligne de votre procédure de mise à jour.
 
+**Apptainer** est l'autre conteneur courant des centres de calcul. C'est le projet Singularity, [renommé](https://apptainer.org/docs/user/latest/singularity_compatibility.html) lors de son entrée dans la Linux Foundation, et sa [documentation](https://apptainer.org/docs/user/latest/introduction.html) dit qu'il a été créé pour exécuter des applications sur des grappes HPC de façon portable et reproductible. Il travaille sur des images au format SIF, qu'on tire d'un registre Docker avec `apptainer pull`.
+
+Apptainer n'est pas un plugin de Slurm : `srun` le lance comme n'importe quel programme, par exemple `srun apptainer exec --nv image.sif python train.py`, sans recompilation à chaque mise à jour de Slurm. D'après sa documentation, `--nv` rend visibles dans le conteneur les GPU NVIDIA et les bibliothèques CUDA de base. Cette commande n'a pas été exécutée ici : le bac à sable n'a ni GPU ni Apptainer.
+
 ### 8.3. Slurm sur Kubernetes
 
 Beaucoup d'organisations ont des années d'investissement dans des scripts Slurm et veulent pourtant la gestion d'infrastructure de Kubernetes. **Slinky** est un projet ouvert développé par SchedMD (désormais rattaché à NVIDIA) qui permet d'exécuter et de gérer des clusters Slurm à l'intérieur de Kubernetes. Il comprend notamment un opérateur (`slurm-operator`) qui déploie les démons Slurm comme des ressources Kubernetes. Le module 12 reprend cette comparaison.
@@ -820,7 +846,7 @@ Beaucoup d'organisations ont des années d'investissement dans des scripts Slurm
 |---|---|---|---|
 | Modèle de charge | jobs finis, gros jobs parallèles | services et jobs | jobs finis dans une plateforme de services |
 | File d'attente, équité, préemption | natifs et matures | à ajouter (Kueue, Volcano) | natifs de Slurm |
-| *Gang scheduling* (tous les processus d'un job démarrent ensemble, ou aucun) | natif | à ajouter | natif de Slurm |
+| *Gang scheduling* au sens de Kubernetes (tous les processus d'un job démarrent ensemble, ou aucun ; voir § 4.1) | natif | à ajouter | natif de Slurm |
 | Outillage des utilisateurs | scripts `sbatch`, familiers aux chercheurs | manifestes et images | scripts `sbatch` conservés |
 | Exploitation de l'infrastructure | spécialisée HPC | commune avec les services | double compétence |
 
@@ -830,6 +856,7 @@ Ce tableau est un jugement de ce parcours, pas une mesure. Le bon choix dépend 
 Points clés — chapitre 8
 
 -   Pyxis et Enroot lancent des conteneurs avec `srun --container-image` ; Pyxis doit être compilé contre la version de Slurm déployée.
+-   Apptainer, qui n'est pas un plugin, se lance par `srun apptainer exec`, avec `--nv` pour les GPU NVIDIA.
 -   Environment Modules, Lmod et Spack gèrent les piles logicielles des centres de calcul.
 -   Slinky exécute des clusters Slurm dans Kubernetes pour concilier habitudes HPC et exploitation cloud-native.
 -   Le choix Slurm, Kubernetes ou hybride dépend de l'équipe d'exploitation et des utilisateurs avant la technique.
@@ -858,6 +885,8 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y munge slurm-wlm slurmdbd 
 **Critère de réussite.** `sudo bash verify.sh` affiche « OK part A », la ligne `start at step N` de la reprise (où `N` est l'étape sauvegardée), « OK failure propagation » puis « OK slurm-sandbox: parts A and B ». Temps d'exécution : de 40 à 50 secondes mesurées.
 
 **Pour aller plus loin.** Supprimez l'association de `root` (`sacctmgr -i remove user root`) et constatez le refus de `sbatch` du chapitre 1, puis essayez `AccountingStorageType=accounting_storage/none` sans `AccountingStorageEnforce` pour voir un job s'exécuter sans comptabilité. Ajouter un deuxième nœud simulé (plusieurs `slurmd` sur une machine) n'a pas été essayé ici.
+
+Étape facultative, **non vérifiée** (le bac à sable n'installe ni Enroot ni Pyxis) : sur une machine qui les a, importez une image avec `enroot import -o almalinux9.sqsh docker://almalinux:9`, puis lancez `srun --container-image="$PWD/almalinux9.sqsh" grep PRETTY /etc/os-release`. Pyxis accepte en effet le chemin d'un fichier squashfs à la place d'une image de registre (chapitre 8).
 :::
 
 ### Lab 5.2 — Fairshare, QOS et préemption {#lab-5-2}
@@ -918,11 +947,11 @@ JOBID PARTITION NAME  USER  ST TIME NODES NODELIST(REASON)
 :::
 
 ::: sol
-Les options clés sont `--nodes=4`, `--gpus-per-node=8`, `--exclusive`, `--time=6-00:00:00`, `--signal=B:USR1@600` et `--requeue`. Le lancement reprend la structure de l'exemple 2.1, avec le nombre de nœuds alloués passé à `torchrun`. L'erreur de chemin est celle du lab 5.1 : Slurm exécute une **copie** du script depuis son répertoire d'attente, de sorte que `${BASH_SOURCE[0]}` ne désigne plus votre dépôt. Utilisez `SLURM_SUBMIT_DIR` (le répertoire d'où `sbatch` a été lancé) ou un chemin absolu, et lancez `sbatch` depuis le répertoire du projet.
+Les options clés sont `--nodes=4`, `--gpus-per-node=8`, `--exclusive`, `--time=6-00:00:00`, `--signal=B:USR1@600` et `--requeue`. Le lancement reprend la structure de l'exemple 2.1, avec le nombre de nœuds alloués passé à `torchrun` et le `trap` qui remet le job en file : sans lui, le signal tuerait le job dix minutes avant la fin. L'erreur de chemin est celle du lab 5.1 : Slurm exécute une **copie** du script depuis son répertoire d'attente, de sorte que `${BASH_SOURCE[0]}` ne désigne plus votre dépôt. Utilisez `SLURM_SUBMIT_DIR` (le répertoire d'où `sbatch` a été lancé) ou un chemin absolu, et lancez `sbatch` depuis le répertoire du projet.
 :::
 
 ::: exo
-[Exercice 3 · ★ — Un tableau avec limite de concurrence]{.tag} Vous devez évaluer 100 points de contrôle. Chaque évaluation dure 12 minutes sur un GPU et vous n'avez le droit d'en occuper que 10 à la fois. Écrivez l'option de tableau et calculez le temps total en supposant que la file ne vous retarde pas.
+[Exercice 3 · ★ — Un tableau avec limite de concurrence]{.tag} Vous devez évaluer 100 checkpoints. Chaque évaluation dure 12 minutes sur un GPU et vous n'avez le droit d'en occuper que 10 à la fois. Écrivez l'option de tableau et calculez le temps total en supposant que la file ne vous retarde pas.
 :::
 
 ::: sol
@@ -962,7 +991,7 @@ Seul (a) peut démarrer : il termine en 50 min, avant l'heure de début prévue 
 :::
 
 ::: exo
-[Exercice 7 · ★★★ — Traduire une politique en commandes]{.tag} Traduisez la table du paragraphe 4.5 en commandes `sacctmgr` : trois comptes de parts 5, 3 et 2 sous un compte parent, une QOS `interactive` (priorité 2000, 4 h au plus, 2 GPU par utilisateur au plus), une QOS `scavenger` (priorité 10) que la QOS `normal` peut préempter, et un quota total de 64 GPU pour le compte de la recherche. Précisez deux paramètres de `slurm.conf` indispensables à son application, puis dites comment vous vérifieriez chaque règle.
+[Exercice 7 · ★★★ — Traduire une politique en commandes]{.tag} Traduisez la table du paragraphe 4.5 en commandes `sacctmgr` : trois comptes de parts 5, 3 et 2 sous un compte parent, une QOS `interactive` (priorité 2000, 4 h au plus, 2 GPU par utilisateur au plus), une QOS `large` (priorité 500, 7 jours au plus), une QOS `scavenger` (priorité 10, remise en file quand elle est préemptée) que la QOS `normal` peut préempter, et un quota total de 64 GPU pour le compte de la recherche. Précisez deux paramètres de `slurm.conf` indispensables à son application, puis dites comment vous vérifieriez chaque règle.
 :::
 
 ::: sol
@@ -973,24 +1002,41 @@ sacctmgr -i add account recherche parent=research fairshare=5
 sacctmgr -i add account applis parent=research fairshare=3
 sacctmgr -i add account dev parent=research fairshare=2
 sacctmgr -i add qos interactive Priority=2000 MaxWall=04:00:00 MaxTRESPerUser=gres/gpu=2
-sacctmgr -i add qos scavenger Priority=10
+sacctmgr -i add qos large Priority=500 MaxWall=7-00:00:00
+sacctmgr -i add qos scavenger Priority=10 PreemptMode=requeue
 sacctmgr -i modify qos normal set Preempt+=scavenger
 sacctmgr -i modify account recherche set GrpTRES=gres/gpu=64
 ~~~
 
-Deux paramètres sont indispensables : `AccountingStorageEnforce=associations,limits,qos` (sans lui les limites ne sont pas appliquées) et `AccountingStorageTRES=gres/gpu` (pour que les GPU soient suivis). La préemption exige aussi `PreemptType=preempt/qos` et un `PreemptMode`. On vérifie : les parts avec `sshare`, la QOS interactive en soumettant trois GPU pour un utilisateur (le job doit être retenu par une raison de limite ; avec des processeurs au lieu de GPU, le bac à sable a donné `QOSMaxCpuPerUserLimit`), le quota en soumettant au-delà de 64 GPU (`AssocGrpCpuLimit` avec des processeurs), et la préemption comme au lab 5.2.
+Deux paramètres sont indispensables : `AccountingStorageEnforce=associations,limits,qos` (sans lui les limites ne sont pas appliquées) et `AccountingStorageTRES=gres/gpu` (pour que les GPU soient suivis). La préemption exige aussi `PreemptType=preempt/qos` et un `PreemptMode` global : la page `slurm.conf` impose une valeur par défaut pour tout le cluster dès que la préemption est active, et le `PreemptMode=requeue` de `scavenger` s'y ajoute (`sacctmgr show qos format=Name,Preempt,PreemptMode` l'affiche).
+
+On vérifie : les parts avec `sshare`, la QOS interactive en soumettant trois GPU pour un utilisateur (le job doit être retenu par une raison de limite ; avec des processeurs au lieu de GPU, le bac à sable a donné `QOSMaxCpuPerUserLimit`), le quota en soumettant au-delà de 64 GPU (`AssocGrpCpuLimit` avec des processeurs), et la préemption comme au lab 5.2.
 :::
 
 ::: exo
-[Exercice 8 · ★★ — Mesurer l'utilisation d'un cluster]{.tag} Un cluster compte 16 nœuds de 8 GPU. Sur une semaine, `sreport` donne 11 200 GPU-heures allouées. Cinq nœuds ont été drainés pendant 12 heures chacun. Calculez l'utilisation brute, l'utilisation rapportée à la capacité disponible, et le temps de GPU réellement productif si 20 % des GPU-heures allouées ont été perdues en redémarrages.
+[Exercice 8 · ★★ — Attendre un commutateur]{.tag} Dans la topologie du paragraphe 5.4, un job demande quatre nœuds avec `--switches=1@01:00`. Les nœuds libres sont `tux0`, `tux1`, `tux4`, `tux6` et `tux7`, et `max_switch_wait` garde sa valeur par défaut. (a) Sur combien de commutateurs de feuille au minimum quatre nœuds peuvent-ils tenir, dans cette topologie et avec ces nœuds libres ? (b) Combien de temps le job attend-il, et qu'y gagne-t-il ? (c) Qu'écrire pour accepter jusqu'à une heure d'attente afin de tenir sur deux commutateurs, et que faut-il demander à l'administrateur ?
 :::
 
 ::: sol
-Capacité totale : $16 \times 8 \times 168 = 21\,504$ GPU-heures. Utilisation brute : $11\,200/21\,504 \approx 52{,}1$ %. Capacité retirée par les drains : $5 \times 8 \times 12 = 480$ GPU-heures, donc disponible $21\,024$ et utilisation rapportée à la disponibilité $11\,200/21\,024 \approx 53{,}3$ %. Avec 20 % de pertes, le travail productif est $0{,}8 \times 11\,200 = 8960$ GPU-heures, soit 41,7 % de la capacité totale. Ces trois chiffres répondent à trois questions différentes (occupation, qualité du service, efficacité), et un rapport honnête les distingue.
+(a) Chaque commutateur de feuille ne relie que deux nœuds : quatre nœuds en demandent au moins deux, quel que soit l'état de la grappe. Avec les nœuds libres, deux suffisent : `s0` (`tux0`, `tux1`) et `s3` (`tux6`, `tux7`).
+
+(b) `01:00` se lit `minutes:secondes` : une minute, sous le plafond par défaut de 300 secondes. D'après la documentation de `sbatch`, le job reste en attente jusqu'à trouver une allocation au nombre de commutateurs voulu ou jusqu'à la fin de ce délai. Une allocation sur un seul commutateur étant impossible, il perd une minute pour rien, puis il est placé comme s'il n'avait rien demandé.
+
+(c) `--switches=2@01:00:00` (ou `2@60`, en minutes). Il faut aussi que l'administrateur relève `max_switch_wait` à au moins 3 600 secondes dans `SchedulerParameters`, sans quoi l'attente reste plafonnée à cinq minutes. Ici, `s0` et `s3` satisfont déjà la demande : le job démarre aussitôt.
 :::
 
 ::: exo
-[Exercice 9 · ★★★ — Un nœud qui draine toutes les nuits]{.tag} Le nœud `gpu-n07` est drainé chaque nuit vers 3 h avec la raison `health: gpu_xid:79` (valeur simulée), puis remis en service par le contrôle de santé le matin, car l'erreur disparaît. Trois jobs ont été perdus cette semaine. Proposez une démarche d'enquête, une décision de remise en service, et deux changements de politique.
+[Exercice 9 · ★★ — Mesurer l'allocation d'un cluster]{.tag} Un cluster compte 16 nœuds de 8 GPU. Sur une semaine, `sreport` donne 11 200 GPU-heures allouées. Cinq nœuds ont été drainés pendant 12 heures chacun. Calculez l'allocation brute, l'allocation rapportée à la capacité disponible, et le temps de GPU réellement productif si 20 % des GPU-heures allouées ont été perdues en redémarrages.
+:::
+
+::: sol
+Capacité totale : $16 \times 8 \times 168 = 21\,504$ GPU-heures. Allocation brute : $11\,200/21\,504 \approx 52{,}1$ %. Capacité retirée par les drains : $5 \times 8 \times 12 = 480$ GPU-heures, donc disponible $21\,024$ et allocation rapportée à la disponibilité $11\,200/21\,024 \approx 53{,}3$ %. Avec 20 % de pertes, le travail productif est $0{,}8 \times 11\,200 = 8960$ GPU-heures, soit 41,7 % de la capacité totale.
+
+Ces trois chiffres répondent à trois questions différentes : le parc est-il occupé ? les nœuds en état de servir le sont-ils ? quelle part du parc produit un travail utile ? Un rapport honnête les distingue.
+:::
+
+::: exo
+[Exercice 10 · ★★★ — Un nœud qui draine toutes les nuits]{.tag} Le nœud `gpu-n07` est drainé chaque nuit vers 3 h avec la raison `health: gpu_xid:79` (valeur simulée), puis remis en service par le contrôle de santé le matin, car l'erreur disparaît. Trois jobs ont été perdus cette semaine. Proposez une démarche d'enquête, une décision de remise en service, et deux changements de politique.
 :::
 
 ::: sol
@@ -1002,7 +1048,7 @@ Capacité totale : $16 \times 8 \times 168 = 21\,504$ GPU-heures. Utilisation br
 :::
 
 ::: exo
-[Exercice 10 · ★★★ — Slurm, Kubernetes ou les deux ?]{.tag} Pour chacun des trois cas, recommandez Slurm natif, Kubernetes ou Slurm sur Kubernetes et justifiez en trois critères. (a) Un laboratoire de 40 chercheurs qui entraînent des modèles sur 200 GPU et connaissent `sbatch`. (b) Une start-up dont l'essentiel de la charge est de l'inférence servie 24 h sur 24, avec quelques entraînements. (c) Une grande entreprise avec une plateforme Kubernetes existante et une équipe de recherche qui exige ses scripts Slurm.
+[Exercice 11 · ★★★ — Slurm, Kubernetes ou les deux ?]{.tag} Pour chacun des trois cas, recommandez Slurm natif, Kubernetes ou Slurm sur Kubernetes et justifiez en trois critères. (a) Un laboratoire de 40 chercheurs qui entraînent des modèles sur 200 GPU et connaissent `sbatch`. (b) Une start-up dont l'essentiel de la charge est de l'inférence servie 24 h sur 24, avec quelques entraînements. (c) Une grande entreprise avec une plateforme Kubernetes existante et une équipe de recherche qui exige ses scripts Slurm.
 :::
 
 ::: sol
@@ -1024,18 +1070,19 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 -   **Je peux lire un cluster Slurm.** Preuve : un compte rendu de `sinfo`, `squeue` et `sacct` du bac à sable qui explique chaque état et chaque raison.
 -   **Je peux écrire un job qui survit à Slurm.** Preuve : le lab 5.1, partie B, refait avec votre propre script.
 -   **Je peux configurer une politique d'équité et de préemption.** Preuve : le lab 5.2 et les commandes de l'exercice 7.
--   **Je peux décrire un nœud GPU et une topologie.** Preuve : un `slurm.conf` et un `gres.conf` commentés pour un nœud de votre choix, avec leurs sources.
--   **Je peux mesurer l'utilisation d'un cluster honnêtement.** Preuve : l'exercice 8 refait sur les chiffres d'un cluster réel ou simulé.
+-   **Je peux décrire un nœud GPU et une topologie.** Preuve : un `slurm.conf` et un `gres.conf` commentés pour un nœud de votre choix, avec leurs sources, et l'exercice 8.
+-   **Je peux mesurer l'allocation et le gaspillage d'un cluster honnêtement.** Preuve : l'exercice 9 refait sur les chiffres d'un cluster réel ou simulé.
 -   **Je peux automatiser la quarantaine d'un nœud.** Preuve : le lab 5.3 et un contrôle de votre choix.
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
 1.  *Un job de 64 GPU attend depuis trois jours. Que regardez-vous ?* Réponse-type : la raison dans `squeue`, la priorité et ses facteurs avec `sprio`, l'équité de son compte avec `sshare`, sa durée déclarée (backfill), les réservations, les nœuds drainés qui retirent de la capacité, et la fragmentation due aux petits jobs.
-2.  *Comment partager 256 GPU entre quatre équipes sans gaspiller les GPU inactifs ?* Réponse-type : parts d'équité par équipe, une QOS préemptible pour utiliser la capacité inactive à condition que ces jobs sachent reprendre, des quotas de groupe et une mesure d'utilisation hebdomadaire.
+2.  *Comment partager 256 GPU entre quatre équipes sans gaspiller les GPU inactifs ?* Réponse-type : parts d'équité par équipe, une QOS préemptible pour utiliser la capacité inactive à condition que ces jobs sachent reprendre, des quotas de groupe et une mesure hebdomadaire de l'allocation et de l'attente.
 3.  *Un nœud draine toutes les nuits puis revient seul. Que faites-vous ?* Réponse-type : ne pas se fier au retour spontané, enquêter sur les causes corrélées, sortir le nœud de la production après plusieurs drains, le valider par une recette complète.
 
 ## Lectures et références {#refs}
 
+-   Yoo, Jette et Grondona (LLNL). [*SLURM: Simple Linux Utility for Resource Management*](https://doi.org/10.1007/10968987_3), *Job Scheduling Strategies for Parallel Processing*, Lecture Notes in Computer Science, Springer, 2003, p. 44-60 : l'article d'origine, pour les objectifs de conception (simplicité, tolérance aux pannes, portabilité).
 -   SchedMD. [*Multifactor Priority Plugin*](https://slurm.schedmd.com/priority_multifactor.html) : la formule de priorité et les poids (chapitre 3).
 -   SchedMD. [*Fair Tree Fairshare Algorithm*](https://slurm.schedmd.com/fair_tree.html) : l'algorithme d'équité par défaut (chapitre 3).
 -   SchedMD. [*Scheduling Configuration Guide*](https://slurm.schedmd.com/sched_config.html) : le backfill et l'importance des durées (chapitre 3).
@@ -1044,7 +1091,8 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 -   SchedMD. [*Generic Resource (GRES) Scheduling*](https://slurm.schedmd.com/gres.html), [*cgroup.conf*](https://slurm.schedmd.com/cgroup.conf.html) et [*Topology Guide*](https://slurm.schedmd.com/topology.html) : GPU, isolation, topologie (chapitre 5).
 -   SchedMD. [*Prolog and Epilog Guide*](https://slurm.schedmd.com/prolog_epilog.html) et [*sbatch*](https://slurm.schedmd.com/sbatch.html) : prolog, signaux, remise en file (chapitres 2 et 7).
 -   SchedMD. [*sinfo*](https://slurm.schedmd.com/sinfo.html) et [*squeue*](https://slurm.schedmd.com/squeue.html) : états de nœud et raisons d'attente (chapitres 1 et 7).
--   NVIDIA. [*Pyxis*](https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md) : conteneurs sous `srun` (chapitre 8).
+-   NVIDIA. [*Pyxis*](https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md) et [*enroot import*](https://raw.githubusercontent.com/NVIDIA/enroot/master/doc/cmd/import.md) : conteneurs sous `srun`, import d'une image en fichier squashfs (chapitre 8, lab 5.1).
+-   Apptainer. [*GPU Support*](https://apptainer.org/docs/user/latest/gpu.html) : l'option `--nv` et le format SIF (chapitre 8).
 -   LBNL. [*Node Health Check (NHC)*](https://raw.githubusercontent.com/mej/nhc/master/README.md) : bibliothèque ouverte de contrôles de santé de nœuds (chapitre 7).
 -   SchedMD et NVIDIA. [*Slinky*](https://www.nvidia.com/en-us/software/slinky/) : Slurm dans Kubernetes (chapitre 8).
 -   Grattafiori et al. (Meta). [*The Llama 3 Herd of Models*](https://arxiv.org/abs/2407.21783), section 3.3.4 : interruptions et automatisation à 16 000 GPU (chapitre 7).
@@ -1053,7 +1101,7 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ### Documenté {#documente}
 
-Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, `sbatch`, `sinfo`, `squeue`) ont été relus sur les pages officielles de SchedMD, qui affichent la documentation de la version 26.05, lors de la relecture du 25 octobre 2026. Les faits sur Pyxis, NHC et Slinky ont été relus sur leurs pages. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent, parfois abrégées ; les numéros de job, les durées et les décomptes de CPU-secondes varient d'une exécution à l'autre.
+Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, `sbatch`, `sinfo`, `squeue`) ont été relus sur les pages officielles de SchedMD, qui affichent la documentation de la version 26.05, lors de la relecture du 25 octobre 2026. Les faits sur Pyxis, Enroot, Apptainer, NHC et Slinky ont été relus sur leurs pages, de même que le résumé de l'article de Yoo et coauteurs. Les comptes du tableau 5 de Llama 3 et les taux de Kokolis et coauteurs (6,50 et environ 17,5 pannes pour mille nœuds-jours) ont été relus dans les articles le 25 octobre 2026. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent, parfois abrégées ; les numéros de job, les durées et les décomptes de CPU-secondes varient d'une exécution à l'autre.
 
 ### Recommandé {#recommande}
 
@@ -1061,7 +1109,7 @@ L'ordre des chapitres, la règle « peu de partitions, plusieurs QOS », le seui
 
 ### À vérifier {#a-verifier}
 
-La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (`topology/block`) et la préemption ; lisez la documentation de votre version. La raison d'attente `InvalidAccount` n'a pas été reproduite sur ce bac à sable (voir le chapitre 1), et le refus d'une réservation avant ses jobs trop longs (chapitre 4) n'a pas été relu sur la page « Reservations ». Les extraits de `slurm.conf`, `gres.conf` et les scripts GPU des chapitres 2 et 5 n'ont **pas** été exécutés (ils demandent des GPU) ; les scripts ont seulement passé `shellcheck`.
+La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (`topology/block`) et la préemption ; lisez la documentation de votre version. La raison d'attente `InvalidAccount` n'a pas été reproduite sur ce bac à sable (voir le chapitre 1), et le refus d'une réservation avant ses jobs trop longs (chapitre 4) n'a pas été relu sur la page « Reservations ». Les extraits de `slurm.conf`, `gres.conf` et les scripts GPU des chapitres 2 et 5 n'ont **pas** été exécutés (ils demandent des GPU) ; les scripts ont seulement passé `shellcheck`, et seul le mécanisme `trap` et `scontrol requeue` de l'exemple 2.1 a été essayé, sur un job CPU. `AutoDetect=nvidia` n'existe qu'à partir de Slurm 24.11. Les commandes Apptainer, Enroot et Pyxis du chapitre 8 et du lab 5.1 n'ont pas été exécutées : le bac à sable n'a aucun de ces outils.
 
 ### Hors périmètre {#hors-perimetre}
 
