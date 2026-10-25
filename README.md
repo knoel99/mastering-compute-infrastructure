@@ -9,7 +9,8 @@ Le contenu est un ensemble de pages HTML statiques (style dérivé de [`polytech
 - **Cours** : des modules en pages longues (fiche, plan de séances, chapitres avec exemples chiffrés, labs exécutables, exercices corrigés, checkpoint de sortie, références).
 - **Projets de portfolio** : des livrables publiables, réalisables sans GPU dans leur version de base.
 - **Enquête sur les masters HPC** (France, États-Unis, Chine, monde) croisée avec des offres d'emploi, avec données sourcées dans `data/`.
-- **Point de départ** : comparaison d'un profil de référence (`CAREER.md` du dépôt [Certifications](https://github.com/knoel99/Certifications)) au métier visé.
+- **Point de départ** : le métier, cinq profils d'entrée (plateforme et SRE, HPC, ML, logiciel, étudiant), leurs priorités module par module et une grille d'autodiagnostic.
+- **Ce que demande le marché** : une analyse sourcée d'offres d'emploi aux États-Unis, en Europe et en Chine, et la couverture de chaque compétence par le parcours.
 
 ## État d'avancement
 

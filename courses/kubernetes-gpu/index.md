@@ -35,7 +35,7 @@ Vous connaissez déjà Kubernetes. Ce module ne le réexplique donc pas : il se 
 | Clé | Valeur |
 |---|---|
 | Volume | 28 h, dont environ 11 h de lecture, 10 h de labs et 7 h d'exercices |
-| Niveau d'entrée | 2 : Kubernetes en production (pods, Services, opérateurs), Linux et Slurm |
+| Niveau d'entrée | 2 : Linux et Slurm (modules 1 et 5) ; pour Kubernetes, les notions de la section 1.1 suffisent, ou le tutoriel officiel [*Learn Kubernetes Basics*](https://kubernetes.io/docs/tutorials/kubernetes-basics/) avant de commencer |
 | Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), [Module 5 — Slurm](../slurm/index.html) |
 | Pour qui | Cœur : la couche GPU de Kubernetes, la mise en file et le placement des entraînements ; si vous exploitez déjà Kubernetes, survolez les rappels et travaillez les chapitres sur les GPU, les files d'attente et le gang scheduling. |
 | Livrable | un dossier de manifestes de files et de quotas validé, une trace de simulation commentée, une matrice de décision Slurm / Kubernetes défendue par écrit |
@@ -122,13 +122,13 @@ Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas
 
 ## 1. Ce que Kubernetes apporte et ce qui change avec les GPU {#ch1}
 
-Ce chapitre fait l'inventaire : ce que vous savez déjà de Kubernetes et qui reste vrai, ce qui devient faux ou insuffisant dès que la ressource est un GPU et la charge un entraînement, et la correspondance avec les notions de Slurm du module 5.
+Ce chapitre fait l'inventaire : ce que Kubernetes sait déjà faire et qui reste vrai, ce qui devient faux ou insuffisant dès que la ressource est un GPU et la charge un entraînement, et la correspondance avec les notions de Slurm du module 5.
 
-### 1.1. Ce qui est acquis
+### 1.1. Rappel : ce que Kubernetes sait déjà faire
 
-Un lecteur qui exploite Kubernetes connaît la boucle de réconciliation : un état désiré déclaré dans l'API, des contrôleurs qui le rapprochent de l'état observé, un ordonnanceur (*scheduler*) qui attribue les pods aux nœuds, un *kubelet* qui les exécute. Tout cela reste vrai pour l'IA, et c'est précisément l'argument en faveur de Kubernetes : une seule plateforme, une API unique, des opérateurs pour tout ce qui est spécifique.
+Si vous exploitez déjà Kubernetes, survolez cette section ; sinon, elle donne le minimum pour la suite. Kubernetes repose sur une **boucle de réconciliation** ([*Controllers*](https://kubernetes.io/docs/concepts/architecture/controller/)) : un état désiré déclaré dans l'API, des contrôleurs qui le rapprochent de l'état observé, un ordonnanceur (*scheduler*) qui attribue les *pods* (un ou plusieurs conteneurs lancés ensemble sur un nœud) aux nœuds, un *kubelet* qui les exécute sur chaque nœud. Tout cela reste vrai pour l'IA, et c'est précisément l'argument en faveur de Kubernetes : une seule plateforme, une API unique, des opérateurs pour tout ce qui est spécifique.
 
-Trois acquis comptent pour la suite. Les **opérateurs** (une ressource personnalisée plus un contrôleur) sont la forme standard d'extension : Kueue, JobSet, l'opérateur GPU et KubeRay en sont tous. Les **étiquettes, taints et sélecteurs** servent à diriger les pods vers des nœuds. Les **quotas par espace de noms** limitent la consommation. Aucun des trois ne sait, seul, exprimer « ces 16 pods ensemble ou aucun ».
+Trois mécanismes comptent pour la suite. Les **opérateurs** (une ressource personnalisée plus un contrôleur) sont la forme standard d'extension : Kueue, JobSet, l'opérateur GPU et KubeRay en sont tous. Les **étiquettes, taints et sélecteurs** servent à diriger les pods vers des nœuds. Les **quotas par espace de noms** limitent la consommation. Aucun des trois ne sait, seul, exprimer « ces 16 pods ensemble ou aucun ».
 
 ### 1.2. L'unité d'ordonnancement est le pod
 

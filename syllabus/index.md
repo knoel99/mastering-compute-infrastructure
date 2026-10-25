@@ -491,7 +491,7 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 
 **Chapitres :**
 
-1.  Rappel d'architecture : ce qui est acquis pour un lecteur déjà exploitant de Kubernetes, et ce qui change avec les GPU
+1.  Rappel d'architecture : l'essentiel de Kubernetes, et ce qui change avec les GPU
 2.  GPU dans Kubernetes : device plugin, GPU Operator, runtime conteneur, MIG, time-slicing, DRA (Dynamic Resource Allocation)
 3.  Files d'attente et gang scheduling : Kueue, Volcano, ClusterQueue, quotas, préemption, équité
 4.  Charges d'entraînement : JobSet, Kubeflow Trainer (ex Training Operator), indexed jobs, rendez-vous, réseau haute performance (RDMA, multus)

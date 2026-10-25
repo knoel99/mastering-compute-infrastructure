@@ -69,7 +69,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul></li>
 <li><a href="#ch1">1. Ce que Kubernetes apporte et ce qui change avec les GPU</a>
 <ul>
-<li><a href="#ce-qui-est-acquis">1.1. Ce qui est acquis</a></li>
+<li><a href="#rappel-ce-que-kubernetes-sait-déjà-faire">1.1. Rappel : ce que Kubernetes sait déjà faire</a></li>
 <li><a href="#lunité-dordonnancement-est-le-pod">1.2. L'unité d'ordonnancement est le pod</a></li>
 <li><a href="#les-gpu-sont-des-entiers-pas-du-cpu">1.3. Les GPU sont des entiers, pas du CPU</a></li>
 <li><a href="#correspondance-avec-slurm">1.4. Correspondance avec Slurm</a></li>
@@ -180,7 +180,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
-<td>2 : Kubernetes en production (pods, Services, opérateurs), Linux et Slurm</td>
+<td>2 : Linux et Slurm (modules 1 et 5) ; pour Kubernetes, les notions de la section 1.1 suffisent, ou le tutoriel officiel <a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/"><em>Learn Kubernetes Basics</em></a> avant de commencer</td>
 </tr>
 <tr class="odd">
 <td>Prérequis</td>
@@ -390,10 +390,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ol>
 </details>
 <h2 id="ch1">1. Ce que Kubernetes apporte et ce qui change avec les GPU</h2>
-<p>Ce chapitre fait l'inventaire : ce que vous savez déjà de Kubernetes et qui reste vrai, ce qui devient faux ou insuffisant dès que la ressource est un GPU et la charge un entraînement, et la correspondance avec les notions de Slurm du module 5.</p>
-<h3 id="ce-qui-est-acquis">1.1. Ce qui est acquis</h3>
-<p>Un lecteur qui exploite Kubernetes connaît la boucle de réconciliation : un état désiré déclaré dans l'API, des contrôleurs qui le rapprochent de l'état observé, un ordonnanceur (<em>scheduler</em>) qui attribue les pods aux nœuds, un <em>kubelet</em> qui les exécute. Tout cela reste vrai pour l'IA, et c'est précisément l'argument en faveur de Kubernetes : une seule plateforme, une API unique, des opérateurs pour tout ce qui est spécifique.</p>
-<p>Trois acquis comptent pour la suite. Les <strong>opérateurs</strong> (une ressource personnalisée plus un contrôleur) sont la forme standard d'extension : Kueue, JobSet, l'opérateur GPU et KubeRay en sont tous. Les <strong>étiquettes, taints et sélecteurs</strong> servent à diriger les pods vers des nœuds. Les <strong>quotas par espace de noms</strong> limitent la consommation. Aucun des trois ne sait, seul, exprimer « ces 16 pods ensemble ou aucun ».</p>
+<p>Ce chapitre fait l'inventaire : ce que Kubernetes sait déjà faire et qui reste vrai, ce qui devient faux ou insuffisant dès que la ressource est un GPU et la charge un entraînement, et la correspondance avec les notions de Slurm du module 5.</p>
+<h3 id="rappel-ce-que-kubernetes-sait-déjà-faire">1.1. Rappel : ce que Kubernetes sait déjà faire</h3>
+<p>Si vous exploitez déjà Kubernetes, survolez cette section ; sinon, elle donne le minimum pour la suite. Kubernetes repose sur une <strong>boucle de réconciliation</strong> (<a href="https://kubernetes.io/docs/concepts/architecture/controller/"><em>Controllers</em></a>) : un état désiré déclaré dans l'API, des contrôleurs qui le rapprochent de l'état observé, un ordonnanceur (<em>scheduler</em>) qui attribue les <em>pods</em> (un ou plusieurs conteneurs lancés ensemble sur un nœud) aux nœuds, un <em>kubelet</em> qui les exécute sur chaque nœud. Tout cela reste vrai pour l'IA, et c'est précisément l'argument en faveur de Kubernetes : une seule plateforme, une API unique, des opérateurs pour tout ce qui est spécifique.</p>
+<p>Trois mécanismes comptent pour la suite. Les <strong>opérateurs</strong> (une ressource personnalisée plus un contrôleur) sont la forme standard d'extension : Kueue, JobSet, l'opérateur GPU et KubeRay en sont tous. Les <strong>étiquettes, taints et sélecteurs</strong> servent à diriger les pods vers des nœuds. Les <strong>quotas par espace de noms</strong> limitent la consommation. Aucun des trois ne sait, seul, exprimer « ces 16 pods ensemble ou aucun ».</p>
 <h3 id="lunité-dordonnancement-est-le-pod">1.2. L'unité d'ordonnancement est le pod</h3>
 <p>L'ordonnanceur par défaut traite <strong>un pod à la fois</strong> : il filtre les nœuds qui conviennent, les note, lie le pod au meilleur, puis passe au suivant. Un Job de 8 pods est, pour lui, 8 demandes indépendantes. Cela convient à un service web ; cela ne convient pas à un entraînement synchrone, dont chaque pas exige que tous les rangs soient présents.</p>
 <div class="ex">

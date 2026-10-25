@@ -36,7 +36,7 @@ Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriq
 | Clé | Valeur |
 |---|---|
 | Volume | 24 h, dont environ 9 h de lecture, 10 h de labs et 5 h d'exercices |
-| Niveau d'entrée | 2 : Kubernetes, Prometheus et Grafana maîtrisés ; Slurm vu au module 5 |
+| Niveau d'entrée | 2 : Linux et Slurm (modules 1 et 5) ; pour Prometheus, les bases de PromQL suffisent, par exemple le guide officiel [*Getting started*](https://prometheus.io/docs/prometheus/latest/getting_started/) de Prometheus |
 | Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), [Module 5 — Slurm](../slurm/index.html) |
 | Pour qui | Cœur : sémantique des métriques GPU, détection des blocages et objectifs de service (SLO) du calcul ; si vous maîtrisez déjà Prometheus, concentrez-vous sur ces trois points. |
 | Livrable | un exportateur testé, des règles d'alerte testées par promtool et par mutation, un détecteur de blocage dont vous connaissez les fausses alarmes |

@@ -34,7 +34,7 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 | Clé | Valeur |
 |---|---|
 | Volume | 28 h, dont 12 h de lecture, 9,5 h de labs et 6,5 h d'exercices (répartition estimée par l'auteur, non mesurée) |
-| Niveau d'entrée | 3 : Kubernetes pour les GPU et la tolérance aux pannes sont acquis |
+| Niveau d'entrée | 3 : la tolérance aux pannes (module 10) et Kubernetes pour les GPU (module 12) |
 | Prérequis | [Module 12 — Kubernetes pour les GPU](../kubernetes-gpu/index.html), [Module 10 — Tolérance aux pannes](../fault-tolerance/index.html) |
 | Pour qui | Cœur : la plateforme de calcul d'une organisation est presque toujours répartie entre plusieurs fournisseurs. |
 | Livrable | un simulateur de placement testé, un calculateur de coût de déménagement de données testé, un job SkyPilot analysé hors ligne avec sa politique de gouvernance |

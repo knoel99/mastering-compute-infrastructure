@@ -34,7 +34,7 @@ const LESSONS = `LESSONS FROM THE INDEPENDENT REVIEWS OF EARLIER MODULES (each o
 9. Do not state in the page what you did not run: a lab branch that needs a GPU, a cloud account or a cluster is a 'cluster' or 'gpu' lab, linted, with the badge 'unverified'.
 10. Inline SVG: keep text legible at 390 px width (viewBox about 560 px wide or text of at least 14 units), colours only through currentColor and the site CSS variables.`
 
-const WRITE = (id) => `You are writing ONE course module of the public French-language site "Mastering Compute Infrastructure" (repository ${REPO}). Audience: a senior AI/LLM engineer (strong Kubernetes, Prometheus/Grafana, Terraform, FinOps; no HPC schedulers, no InfiniBand/NCCL, no multi-node training operations) who wants to become a compute infrastructure engineer/lead for GPU training fleets.
+const WRITE = (id) => `You are writing ONE course module of the public French-language site "Mastering Compute Infrastructure" (repository ${REPO}). Audience: people of several entry profiles (platform/SRE, HPC admin, ML engineer, software engineer, student; data/curriculum.json, profiles) who want to become compute infrastructure engineers; never address one particular person, state assumed knowledge as a condition.
 
 YOUR MODULE: id "${id}". Read its entry first with:
 ${ENTRY(id)}
@@ -64,7 +64,7 @@ Read ${REPO}/specs/module-contract.md first, then the page. Then:
 1. Recompute at least 10 numbers from worked examples and exercise solutions with Python; fix any error in the page (edit in place with minimal diffs).
 2. Re-check at least 12 external factual claims against the primary source with python3 ${REPO}/tools/fetch_text.py URL --grep 'regex' (versions, defaults, flags, paper numbers, limits). Correct, soften to "ordre de grandeur", or move to "À vérifier" what you cannot confirm. Check every ::: war box has a real source and that every verbatim quote appears in the fetched text.
 3. Run every sandbox lab (PYTHON=${PY} bash labs/${id}/<lab>/verify.sh) TWICE to catch flakiness; also read the lab code for bugs, secrets, and false claims in README. Lint non-sandbox labs. Make sure no assertion depends on wall-clock timing.
-4. Pedagogy: could the reference reader (see contract) follow the module? Are prerequisites respected, jargon defined at first use, exercises solvable with the chapter content, difficulty grades fair? Fix small things; list big ones.
+4. Pedagogy: could readers of every entry profile (data/curriculum.json, profiles) follow the module, with nothing addressed to one particular person? Are prerequisites respected, jargon defined at first use, exercises solvable with the chapter content, difficulty grades fair? Fix small things; list big ones.
 5. Rules: French prose + English code; no employer/client/person names; no invented statistics; badges honest (verified only if ALL labs are sandbox and passed; hand-made fixtures labelled).
 6. Finally run python3 tools/check_gates.py courses/${id} and python3 tools/build.py courses/${id}; both must pass.
 Budget: about 60-90 tool calls. Do not touch other modules or tools/. Return the schema.

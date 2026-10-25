@@ -835,7 +835,7 @@
     "Choisir Slurm, Kubernetes ou les deux (Slurm sur Kubernetes) selon l'équipe et la charge"
    ],
    "chapters": [
-    "Rappel d'architecture : ce qui est acquis pour un lecteur déjà exploitant de Kubernetes, et ce qui change avec les GPU",
+    "Rappel d'architecture : l'essentiel de Kubernetes, et ce qui change avec les GPU",
     "GPU dans Kubernetes : device plugin, GPU Operator, runtime conteneur, MIG, time-slicing, DRA (Dynamic Resource Allocation)",
     "Files d'attente et gang scheduling : Kueue, Volcano, ClusterQueue, quotas, préemption, équité",
     "Charges d'entraînement : JobSet, Kubeflow Trainer (ex Training Operator), indexed jobs, rendez-vous, réseau haute performance (RDMA, multus)",
