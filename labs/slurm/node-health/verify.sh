@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Lab 5.3 check (about 1 minute): health check drains/resumes the node; a failing prolog drains it and holds the job.
+# Lab 5.3 check (about 80 seconds): health check drains/resumes the node; a failing prolog drains it and holds the job.
 set -euo pipefail
 cd "$(dirname "$0")"
 here="$PWD"
@@ -24,6 +24,16 @@ sinfo -R -h -o "%E" | grep -q 'health: gpu_xid:79'
 rm -f /tmp/fake_gpu_xid
 wait_until 60 'sinfo -h -o "%T" | grep -q "^idle"'
 echo "OK part A: node drained with the right reason, then resumed by itself"
+
+echo "--- Part A2: an operator's drain must never be undone by the health check"
+node="$(hostname -s)"
+scontrol update nodename="$node" state=drain reason="operator: planned maintenance"
+sleep 25   # two and a half HealthCheckInterval periods: the node is healthy, yet it must stay drained
+sinfo -R -h -o "%E" | grep -q 'operator: planned maintenance' || { echo "FAIL: the health check undid an operator's drain"; exit 1; }
+sinfo -h -o "%T" | grep -q drain || { echo "FAIL: node is no longer drained"; exit 1; }
+scontrol update nodename="$node" state=resume
+wait_until 30 'sinfo -h -o "%T" | grep -q "^idle"'
+echo "OK part A2: operator drain left alone by the health check"
 
 echo "--- Part B: failing Prolog"
 sed -i '/^HealthCheck/d' /etc/slurm/slurm.conf

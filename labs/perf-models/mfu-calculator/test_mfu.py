@@ -1,4 +1,5 @@
 import math
+import sys
 
 import pytest
 
@@ -48,3 +49,29 @@ def test_sparse_peak_gives_half_the_mfu():
     dense = mfu.mfu_from_tflops_per_gpu(400, 989)
     sparse = mfu.mfu_from_tflops_per_gpu(400, 1979)
     assert math.isclose(sparse / dense, 989 / 1979, rel_tol=1e-9)
+
+
+@pytest.mark.parametrize("call", [
+    pytest.param(lambda: mfu.tokens_per_second(1e6, 0), id="zero-step-time"),
+    pytest.param(lambda: mfu.tokens_per_second(0, 1.0), id="zero-tokens"),
+    pytest.param(lambda: mfu.mfu(1e5, 1e10, 0, 989e12), id="zero-gpus"),
+    pytest.param(lambda: mfu.mfu(1e5, 1e10, 8, 0), id="zero-peak"),
+    pytest.param(lambda: mfu.mfu_from_tflops_per_gpu(400, 0), id="zero-peak-tflops"),
+    pytest.param(lambda: mfu.step_time_for_mfu(0, 2**22, 1e10, 8, 989e12), id="target-mfu-zero"),
+    pytest.param(lambda: mfu.step_time_for_mfu(1.5, 2**22, 1e10, 8, 989e12), id="target-mfu-above-one"),
+])
+def test_other_invalid_arguments_rejected(call):
+    with pytest.raises(ValueError):
+        call()
+
+
+def test_command_line_reproduces_module_example_7_2(monkeypatch, capsys):
+    # the success criterion of lab 2.3: the printed line of the module text
+    argv = ["mfu.py", "--params", "7e9", "--layers", "32", "--heads", "32", "--head-dim", "128", "--seq-len", "4096",
+            "--tokens-per-step", "4194304", "--step-seconds", "7.0", "--gpus", "64", "--peak-tflops", "989"]
+    monkeypatch.setattr(sys, "argv", argv)
+    mfu.main()
+    out = capsys.readouterr().out
+    assert "MFU = 45.9 %" in out
+    assert "tokens/s = 599,186" in out
+    assert "FLOPs/token = 4.844e+10" in out

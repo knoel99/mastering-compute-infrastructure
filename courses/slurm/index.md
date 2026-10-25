@@ -33,7 +33,7 @@ Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, 
 
 | Clé | Valeur |
 |---|---|
-| Volume | 32 h, dont environ 12 h de lecture, 12 h de labs et 8 h d'exercices |
+| Volume | 32 h, dont environ 12 h de lecture, 10 h de labs et 10 h d'exercices, de synthèse et de checkpoint |
 | Niveau d'entrée | 2 : à l'aise avec Linux en ligne de commande (module 1) |
 | Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html) |
 | Statut pour le lecteur de référence | cœur : aucune expérience de Slurm dans le profil, écart de 3 sur 4 |
@@ -47,7 +47,7 @@ Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, 
 -   Lire une file d'attente et expliquer pourquoi un job attend (chapitres 1 et 3).
 -   Configurer partitions, comptes, QOS, équité et préemption pour une politique donnée (chapitres 3 et 4).
 -   Décrire la configuration d'un nœud GPU et une topologie réseau pour le placement (chapitre 5).
--   Mesurer l'utilisation d'un cluster avec `sacct`, `sreport` et `sshare` (chapitre 6).
+-   Mesurer l'utilisation d'un cluster avec `sacct` et `sreport` (chapitre 6), et lire l'équité avec `sshare` (chapitre 3).
 -   Diagnostiquer et mettre en quarantaine un nœud défaillant, automatiquement (chapitre 7).
 -   Situer Slurm face aux conteneurs et à Kubernetes (chapitre 8).
 
@@ -65,8 +65,8 @@ Douze séances, soit 32 h : huit de 3 h et quatre de 2 h. Le niveau ne diminue j
 | 6 | 2 h | 2 | ch. 4 Préemption, réservations, limites | Lab 5.2 partie B |
 | 7 | 3 h | 2 | ch. 5 GPU et topologie | Ex. 7 |
 | 8 | 2 h | 2 | ch. 6 Comptabilité et reporting | Ex. 8 |
-| 9 | 3 h | 3 | ch. 7 Santé des nœuds | Lab 5.3 |
-| 10 | 3 h | 3 | ch. 7 suite, ch. 8 Conteneurs | Ex. 9 |
+| 9 | 3 h | 3 | ch. 7 Santé des nœuds | Lab 5.3 partie A |
+| 10 | 3 h | 3 | ch. 7 suite, ch. 8 Conteneurs | Lab 5.3 partie B ; Ex. 9 |
 | 11 | 3 h | 3 | ch. 8 Slurm sur Kubernetes, synthèse | Ex. 10 |
 | 12 | 2 h | 3 | Checkpoint de sortie, démarrage du Projet 1 | |
 
@@ -106,14 +106,14 @@ Un cluster Slurm est fait de quelques démons qui se parlent par un canal authen
 Un démon de plus, `slurmrestd`, expose une API REST ; nous ne l'utiliserons pas ici.
 
 ::: note
-[Un constat de ce module : sans comptabilité, le job reste en attente]{.tag} En installant Slurm 23.11 sur un bac à sable sans `slurmdbd`, un premier job soumis par `root` reste indéfiniment en attente avec la raison `InvalidAccount`, même si le nœud est libre :
+[Un constat de ce module : sans association, le job est refusé]{.tag} Dans le bac à sable (Slurm 23.11.4), avec `AccountingStorageEnforce=associations,limits,qos`, un utilisateur sans association est refusé dès la soumission :
 
 ~~~text
-JOBID PARTITION  NAME  USER ST  TIME NODES NODELIST(REASON)
-    1     debug  wrap  root PD  0:00     1 (InvalidAccount)
+$ sbatch --wrap='hostname'
+sbatch: error: Batch job submission failed: Invalid account or account/partition combination specified
 ~~~
 
-La cause est que le contrôleur cherche une association (cluster, compte, utilisateur) introuvable. Le script `labs/slurm/slurm-sandbox/setup.sh` règle le problème en installant MariaDB et `slurmdbd`, puis en créant un compte. Ce constat vient d'un test de l'auteur sur cette version, non d'une documentation : il illustre qu'un ordonnanceur « de test » sans comptabilité ne ressemble pas à un cluster réel.
+C'est pourquoi `labs/slurm/slurm-sandbox/setup.sh` installe MariaDB et `slurmdbd`, puis crée un compte et y rattache `root`. La base n'est pourtant pas indispensable pour *exécuter* un job : avec `AccountingStorageType=accounting_storage/none` et sans `AccountingStorageEnforce`, un job soumis par `root` s'exécute aussitôt. Ces deux essais datent du 25 octobre 2026. La raison d'attente `InvalidAccount` du tableau ci-dessous, documentée dans `squeue`, n'a pas pu être reproduite sur ce bac à sable : elle figure dans les points à vérifier.
 :::
 
 ### 1.2. Les entités
@@ -121,7 +121,7 @@ La cause est que le contrôleur cherche une association (cluster, compte, utilis
 -   Un **cluster** regroupe des nœuds sous un contrôleur.
 -   Une **partition** est un groupe de nœuds avec des limites et une politique propres, qu'on peut voir comme une file d'attente.
 -   Un **job** est une demande de ressources suivie d'un programme à exécuter. Une **étape** (*step*) est un lancement parallèle dans un job, créé par `srun`.
--   Les ressources suivies s'appellent des **TRES** (*trackable resources*) : processeurs, mémoire, nœuds, et GRES comme les GPU.
+-   Les ressources suivies s'appellent des **TRES** (*trackable resources*) : processeurs, mémoire, nœuds, et GRES (*generic resources*) comme les GPU.
 -   Une **association** relie un cluster, un compte, un utilisateur et éventuellement une partition ; c'est sur elle que portent les parts d'équité et les limites.
 
 ### 1.3. Le cycle de vie d'un job
@@ -135,13 +135,13 @@ Un job en `PENDING` porte une **raison**, la clé du diagnostic. La documentatio
 | `Priority` | un ou plusieurs jobs de priorité supérieure existent pour cette partition ou cette réservation |
 | `Resources` | le job attend que les ressources demandées se libèrent |
 | `Dependency` | le job dépend d'un autre job qui n'a pas terminé comme demandé |
-| `BeginTime` | l'heure de début au plus tôt n'est pas atteinte (c'est aussi la raison d'un job remis en file) |
+| `BeginTime` | l'heure de début au plus tôt n'est pas atteinte (observé aussi sur un job remis en file, exemple 4.1) |
 | `ReqNodeNotAvail` | un nœud explicitement demandé n'est pas disponible |
 | `PartitionTimeLimit` | la durée demandée dépasse la limite de la partition |
 | `JobHeldUser` | le job est retenu par son propriétaire |
 | `InvalidAccount` | le compte du job n'est pas valide |
 
-Une raison de la famille `Assoc…Limit` (par exemple `AssocGrpCPULimit`) signale qu'une limite attachée à l'association du job est atteinte : la file n'est pas pleine, c'est la politique qui retient.
+Une raison de la famille `Assoc…Limit` (par exemple `AssocGrpCpuLimit`, observée dans le bac à sable avec un quota `GrpTRES=cpu=2` et un job de 3 processeurs) signale qu'une limite attachée à l'association du job est atteinte : la file n'est pas pleine, c'est la politique qui retient.
 
 ::: ex
 [Exemple 1.1 — Lire l'état d'un nœud et d'un job]{.tag} Voici les sorties réelles du bac à sable après le démarrage de `setup.sh` (une machine à 4 processeurs) puis l'exécution du lab 5.1.
@@ -169,7 +169,7 @@ Points clés — chapitre 1
 -   `slurmctld` décide, `slurmd` exécute, `slurmdbd` mémorise, `munge` authentifie.
 -   Un cluster se lit par partitions, nœuds, jobs, étapes et associations ; les ressources suivies sont des TRES.
 -   Un job `PENDING` a toujours une raison : c'est le premier réflexe de diagnostic.
--   Sans `slurmdbd`, pas d'équité, pas de limites par compte ni de rapports ; sur la version testée, un job de test restait même bloqué.
+-   Sans `slurmdbd`, un job s'exécute mais il n'y a ni équité, ni limites par compte, ni rapports ; avec `AccountingStorageEnforce=associations`, un utilisateur sans association est refusé.
 :::
 
 ## 2. Soumettre des jobs {#ch2}
@@ -234,7 +234,7 @@ Les **dépendances** chaînent des jobs : `--dependency=afterok:ID` attend que l
 Slurm arrête les jobs : dépassement de durée, préemption, panne de nœud, annulation. Un script robuste prévoit ces cas.
 
 1.  **Mettez `set -euo pipefail`** en tête : une erreur silencieuse en milieu de script ne doit pas produire un succès apparent.
-2.  **Demandez un signal avant la fin.** `--signal=B:USR1@300` envoie `SIGUSR1` au shell du script 300 secondes avant la limite de durée (`B:` limite l'envoi au shell du script). Le script le transmet au programme, qui sauvegarde son état.
+2.  **Demandez un signal avant la fin.** `--signal=B:USR1@300` envoie `SIGUSR1` au shell du script environ 300 secondes avant la limite de durée (`B:` limite l'envoi au shell du script ; la documentation précise que le signal peut partir jusqu'à 60 secondes plus tôt). Le script le transmet au programme, qui sauvegarde son état.
 3.  **Autorisez la remise en file** avec `--requeue` : Slurm relance alors le job depuis le début de son script, et c'est votre programme qui doit reprendre à son dernier point de sauvegarde.
 4.  **Écrivez de façon atomique.** Un checkpoint écrit dans un fichier temporaire puis renommé ne laisse jamais un fichier à moitié écrit.
 
@@ -254,6 +254,8 @@ def save(step):
 Le script `checkpoint_on_signal.sbatch` transmet le signal du shell au programme et attend vraiment la fin de celui-ci : `wait` revient dès qu'un signal intercepté arrive (avec un statut supérieur à 128), d'où la boucle qui vérifie avec `kill -0` que le programme a bien disparu, puis la sortie avec **son** code de retour.
 
 Deux pièges réels, tous deux rencontrés en écrivant ce lab. Premier piège : Slurm exécute une **copie** du script depuis son répertoire d'attente, de sorte que `${BASH_SOURCE[0]}` ne désigne plus votre dépôt ; on utilise `SLURM_SUBMIT_DIR`, qui est le répertoire d'où `sbatch` a été lancé (et non celui de `--chdir`). Second piège : une première version du script avalait le code de retour, et le job affichait `COMPLETED 0:0` alors que Python n'avait même pas trouvé son fichier. Un job qui échoue doit finir en échec.
+
+`verify.sh` le contrôle en lançant le script depuis un répertoire sans `trainer.py` : l'état attendu est `FAILED` avec `ExitCode 2:0`.
 
 Le lab 5.1 envoie `scancel --signal=USR1 --batch` et vérifie que le checkpoint existe, puis que le job suivant reprend à l'étape sauvegardée.
 :::
@@ -316,7 +318,7 @@ Chaque poids $W$ se règle par un paramètre `PriorityWeight…` de `slurm.conf`
 [Exemple 3.1 — De l'équité à la priorité]{.tag} Dans le lab 5.2, le poids de l'équité est $W_{\text{équité}} = 10\,000$. Un job du compte peu actif obtient un facteur d'équité de 0,75 et un job du compte gros consommateur 0,25. Leurs priorités sont donc $10\,000 \times 0{,}75 = 7500$ et $10\,000 \times 0{,}25 = 2500$, ce que `sprio` affiche :
 
 ~~~text
-$ sprio -o "%i %a %Y %f" -j 10,11
+$ sprio -o "%i %o %Y %f" -j 10,11
 JOBID ACCOUNT PRIORITY FAIRSHARE
 10    teama   2500     0.2500000
 11    teamb   7500     0.7500000
@@ -332,7 +334,7 @@ Pour chaque association, Slurm suit la consommation de ressources (en CPU-second
 Depuis Slurm 19.05, l'algorithme par défaut est **Fair Tree**. Au lieu de calculer un facteur pour chaque utilisateur isolément, il compare des frères entre eux : si le compte A a un meilleur *Level FS* que son frère B, tous les enfants de A passent devant tous les enfants de B, à chaque niveau de l'arbre. Un *Level FS* supérieur à 1 signale une association sous-servie, entre 0 et 1 une association sur-servie ; il est infini pour une association sans consommation.
 
 ::: ex
-[Exemple 3.2 — Lire sshare]{.tag} Après que huit jobs du compte `teama` ont consommé 36 secondes de CPU et ceux de `teamb` rien, `sshare -l` affiche (extrait réel du lab 5.2, deux comptes de parts égales sous un même parent) :
+[Exemple 3.2 — Lire sshare]{.tag} Après que huit jobs de 4 secondes du compte `teama` ont consommé 36 secondes de CPU (38 dans une autre exécution : le décompte varie de quelques secondes) et ceux de `teamb` rien, `sshare -l` affiche (extrait réel du lab 5.2, deux comptes de parts égales sous un même parent) :
 
 ~~~text
 Account   User  NormShares  RawUsage  NormUsage  EffectvUsage  LevelFS  FairShare
@@ -342,7 +344,11 @@ teamb           0.333333         0   0.000000      0.000000       inf
  teamb  root    1.000000         0   0.000000      0.000000       inf  0.750000
 ~~~
 
-`RawUsage` est la consommation en CPU-secondes, `NormUsage` sa part normalisée parmi les frères : `teama` en a consommé 100 %. Le *Level FS* d'une association vaut ici sa part normalisée divisée par sa consommation normalisée : $0{,}333/1{,}0 = 0{,}333$ pour le compte `teama`, supérieur à 1 pour une association sous-servie, et infini pour `teamb` qui n'a rien consommé, comme l'annonce la documentation. Le facteur d'équité est un **classement** : `teamb` obtient 0,75 et `teama` 0,25, d'où les priorités de l'exemple précédent.
+`RawUsage` est la consommation en CPU-secondes, `NormUsage` sa part normalisée parmi les frères : `teama` en a consommé 100 %.
+
+Les parts normalisées valent 0,333 et non 0,5 parce que le compte parent `research` a un troisième enfant, l'utilisateur `root` que `setup.sh` y rattache avec la même part par défaut (1) : `sacctmgr show assoc format=cluster,account,user,share` le montre.
+
+Le *Level FS* d'une association vaut ici sa part normalisée divisée par sa consommation normalisée : $0{,}333/1{,}0 = 0{,}333$ pour le compte `teama`, supérieur à 1 pour une association sous-servie, et infini pour `teamb` qui n'a rien consommé, comme l'annonce la documentation. Le facteur d'équité est un **classement** : `teamb` obtient 0,75 et `teama` 0,25, d'où les priorités de l'exemple précédent.
 
 Le lab 5.2 attend que `PriorityCalcPeriod` (réglé à une minute) rafraîchisse ces chiffres avant de soumettre ses jobs de comparaison.
 :::
@@ -412,11 +418,11 @@ scontrol create reservation starttime=2026-11-06T16:00:00 \
   duration=120 user=root flags=maint,ignore_jobs nodes=ALL
 ~~~
 
-La durée est en minutes. Slurm cessera de lancer les jobs dont la durée déclarée chevaucherait le début de la réservation : c'est une conséquence directe du chapitre précédent, et la raison pour laquelle des jobs « en attente avec des nœuds libres » avant une maintenance sont normaux.
+La durée est en minutes. Par construction, Slurm ne lance pas un job dont la durée déclarée chevaucherait le début de la réservation : c'est la même logique que le backfill du chapitre 3, et la raison pour laquelle des jobs « en attente avec des nœuds libres » avant une maintenance sont normaux (comportement usuel, non relu sur la page « Reservations » : voir les points à vérifier).
 
 ### 4.3. Les limites
 
-Les limites s'attachent aux associations et aux QOS : nombre de jobs en cours ou soumis par utilisateur (`MaxJobs`, `MaxSubmitJobs`), durée maximale (`MaxWall`), ressources totales d'un groupe (`GrpTRES`) ou par utilisateur (`MaxTRESPerUser`). Si une limite est définie à plusieurs niveaux, la documentation de « Resource Limits » explique que celle de plus bas niveau s'applique d'abord et que les niveaux supérieurs complètent ce qu'elle laisse indéfini.
+Les limites s'attachent aux associations et aux QOS : nombre de jobs en cours ou soumis par utilisateur (`MaxJobs`, `MaxSubmitJobs`), durée maximale (`MaxWall`), ressources totales d'un groupe (`GrpTRES`) ou par utilisateur (`MaxTRESPerUser`). Si une limite est définie à plusieurs niveaux, la documentation de « Resource Limits » retient le premier niveau où elle est définie, dans cet ordre : QOS de la partition, QOS du job, association de l'utilisateur, associations des comptes en remontant l'arbre, racine du cluster, puis partition. Les limites `Grp*` font exception : celle du compte, si elle est plus stricte, s'applique avant celle de l'utilisateur.
 
 Un job retenu par une limite porte une raison `Assoc…Limit` ou `QOS…Limit`, qu'on lit dans `squeue` (chapitre 1). Rappelez-vous la condition du chapitre 3 : sans `AccountingStorageEnforce=…limits`, ces limites sont lisibles dans la base mais **jamais appliquées**.
 
@@ -514,7 +520,7 @@ Sans `--gpu-bind=closest`, la répartition peut envoyer une tâche vers un GPU r
 
 Un GPU entier pour une petite expérience est du gaspillage. NVIDIA propose le partitionnement matériel **MIG** (*Multi-Instance GPU*) sur certains modèles ; la page « GRES » de la documentation de Slurm contient une section « MIG Management ». Elle précise qu'avec la détection `nvidia`, Slurm ne détecte pas les instances MIG ni les liens NVLink, et que NVML ne fournit pas de métriques d'utilisation pour les instances MIG : la comptabilité de la mémoire et de l'utilisation GPU n'existe donc pas pour elles.
 
-La conséquence pour l'exploitation : MIG convient aux petites charges d'inférence ou de développement, pas à l'entraînement multi-GPU. Le partage par tranches de temps (*time-slicing*) relève plutôt de Kubernetes (module 12).
+Avec `AutoDetect=nvml`, en revanche, Slurm traite chaque instance MIG comme un GPU distinct. La conséquence pour l'exploitation : MIG convient aux petites charges d'inférence ou de développement, pas à l'entraînement multi-GPU. Le partage par tranches de temps (*time-slicing*) relève plutôt de Kubernetes (module 12).
 
 ### 5.4. Topologie du réseau
 
@@ -532,15 +538,17 @@ SwitchName=s6 Switches=s[4-5]
 
 Les commutateurs de feuille (`s0` à `s3`) listent leurs nœuds, ceux des niveaux supérieurs listent leurs sous-commutateurs. Selon la documentation, l'algorithme identifie le commutateur de plus bas niveau qui peut contenir l'allocation, puis choisit les nœuds sur ses commutateurs de feuille avec un algorithme de meilleur ajustement (*best fit*).
 
-L'option `--switches=N@HH:MM` d'un job fixe le nombre maximal de commutateurs de feuille souhaité et la durée d'attente maximale pour l'obtenir. Un job qui préfère attendre une heure plutôt que de s'étaler sur deux commutateurs écrit `--switches=1@01:00`.
+L'option `--switches=N@durée` d'un job fixe le nombre maximal de commutateurs de feuille souhaité et la durée d'attente maximale pour l'obtenir. La durée suit les formats de `--time` (`minutes`, `minutes:secondes`, `heures:minutes:secondes`) : `01:00` vaut donc **une minute**, pas une heure.
+
+Un job qui préfère attendre une heure plutôt que de s'étaler sur deux commutateurs écrit `--switches=1@01:00:00`. L'administrateur peut plafonner cette attente avec le paramètre `max_switch_wait` de `SchedulerParameters` (300 secondes par défaut d'après le guide de configuration de l'ordonnancement).
 
 ::: ex
-[Exemple 5.2 — Choisir entre attendre et s'étaler]{.tag} Sur les huit nœuds de la topologie ci-dessus, un job demande quatre nœuds. Les nœuds `tux0` et `tux1` sont libres, `tux2` aussi, tandis que `tux3` est occupé ; sous `s2`, `tux4` et `tux5` sont libres. Quatre nœuds libres existent donc, mais sur trois commutateurs de feuille (`s0`, `s1`, `s2`).
+[Exemple 5.2 — Choisir entre attendre et s'étaler]{.tag} Sur les huit nœuds de la topologie ci-dessus, un job demande quatre nœuds. Seuls `tux0` (sous `s0`), `tux2` (sous `s1`), `tux4` et `tux5` (sous `s2`) sont libres. Quatre nœuds libres existent donc, mais sur trois commutateurs de feuille.
 
-Avec `--switches=2@00:30`, Slurm attendra jusqu'à 30 minutes une allocation sur au plus deux commutateurs de feuille avant de céder et d'accepter ce qu'il trouve. Le compromis est classique : attendre améliore la communication mais retarde le démarrage ; pour un job de plusieurs jours, 30 minutes d'attente sont négligeables, pour un job d'une heure elles sont prohibitives.
+Avec `--switches=2@30` (30 minutes), Slurm attendra jusqu'à 30 minutes, sous réserve du plafond `max_switch_wait`, une allocation sur au plus deux commutateurs de feuille avant de céder et d'accepter ce qu'il trouve. Le compromis est classique : attendre améliore la communication mais retarde le démarrage ; pour un job de plusieurs jours, 30 minutes d'attente sont négligeables, pour un job d'une heure elles sont prohibitives.
 :::
 
-Les versions récentes de la documentation décrivent aussi un plugin `topology/block`, qui impose une structure hiérarchique de blocs pour que les jobs restent dans un bloc ; il vise notamment les domaines NVLink de grande taille. Ses détails et sa disponibilité dépendent de votre version : voir la page « Topology » de la documentation de la version installée.
+Les versions récentes de la documentation décrivent aussi un plugin `topology/block`, qui impose une structure hiérarchique de blocs pour que les jobs restent dans un bloc : il cherche à limiter la fragmentation de la grappe, là où `topology/tree` place d'abord le job sur les premières ressources disponibles. Ses détails et sa disponibilité dépendent de votre version : voir la page « Topology » de la documentation de la version installée.
 
 ::: recap
 Points clés — chapitre 5
@@ -548,7 +556,7 @@ Points clés — chapitre 5
 -   Un nœud GPU se déclare dans `slurm.conf` (`Gres=`), `gres.conf` (`AutoDetect=nvml`) et `cgroup.conf` (`ConstrainDevices=yes`).
 -   `--gpus-per-node`, `--gres-flags=enforce-binding` et `--gpu-bind=closest` décrivent la demande et la liaison CPU-GPU.
 -   MIG partage un GPU sans comptabilité d'utilisation GPU : réservez-le aux petites charges.
--   `topology/tree` et `--switches=N@HH:MM` arbitrent entre attente et étalement sur le réseau.
+-   `topology/tree` et `--switches=N@durée` (attention : `01:00` vaut une minute) arbitrent entre attente et étalement sur le réseau.
 :::
 
 ## 6. Comptabilité et reporting {#ch6}
@@ -575,7 +583,7 @@ JobID           JobName    Account  AllocCPUS        State ExitCode    Elapsed C
 26                 wrap   research          1      RUNNING      0:0   00:00:02          2
 ~~~
 
-`ExitCode` s'écrit `code:signal` : d'après la documentation, c'est le code de sortie le plus élevé des étapes du job, suivi après les deux-points du signal qui a éventuellement terminé le processus. Le job 25 s'est donc terminé avec le code 3 et sans signal. `CPUTimeRAW` est le produit du nombre de processeurs alloués par la durée, en secondes : $2 \times 3 = 6$ pour le job 22. C'est cette quantité, sommée par compte, qui alimente l'équité du chapitre 3.
+`ExitCode` s'écrit `code:signal` : d'après la documentation, c'est le code de sortie renvoyé par le script du job, suivi après les deux-points du signal qui a éventuellement terminé le processus (`DerivedExitCode`, lui, est le code le plus élevé des étapes). Le job 25 s'est donc terminé avec le code 3 et sans signal. `CPUTimeRAW` est le produit du nombre de processeurs alloués par la durée, en secondes : $2 \times 3 = 6$ pour le job 22. C'est cette quantité, sommée par compte, qui alimente l'équité du chapitre 3.
 :::
 
 ### 6.2. sreport et ses agrégats
@@ -609,6 +617,7 @@ Un script court suffit pour la deuxième : il lit la sortie de `sacct` au format
 
 ~~~python
 import subprocess
+import sys
 from datetime import datetime
 from statistics import median, quantiles
 
@@ -617,12 +626,20 @@ out = subprocess.run(["sacct", "-X", "-P", "-n", "--format=Submit,Start", "-S", 
 waits = []
 for line in out.splitlines():
     submit, start = line.split("|")
-    if start not in ("Unknown", "None", ""):
+    if start not in ("Unknown", "None", ""):  # a job that has not started yet has no wait to measure
         waits.append((datetime.fromisoformat(start) - datetime.fromisoformat(submit)).total_seconds())
-print(f"jobs: {len(waits)}  median wait: {median(waits):.0f} s  p90: {quantiles(waits, n=10)[-1]:.0f} s")
+if len(waits) < 2:
+    sys.exit("need at least two started jobs to compute a percentile")
+# method="inclusive" never goes beyond the largest observed wait; the default "exclusive" does on small samples
+p90 = quantiles(waits, n=10, method="inclusive")[-1]
+print(f"jobs: {len(waits)}  median wait: {median(waits):.0f} s  p90: {p90:.0f} s")
 ~~~
 
-Lancé sur le bac à sable après quatre jobs d'une seconde, ce script affiche `jobs: 4  median wait: 6 s  p90: 12 s` : même sur un cluster vide, l'attente n'est pas nulle. Il suppose au moins deux jobs démarrés, car `quantiles` exige deux valeurs.
+Ce script est `labs/slurm/slurm-sandbox/examples/wait_stats.py`.
+
+Lancé sur le bac à sable après quatre jobs d'une seconde soumis ensemble, il affiche `jobs: 4  median wait: 6 s  p90: 10 s` (mesure du 25 octobre 2026, à quelques secondes près d'une exécution à l'autre). Même sur un cluster vide, l'attente n'est pas nulle : ces jobs ont démarré à environ 3 secondes d'intervalle.
+
+Avec quatre jobs, le p90 n'a aucune valeur statistique : l'exemple ne montre que la mécanique. L'option `method="inclusive"` évite de dépasser la plus grande attente observée, ce que fait la méthode par défaut sur un petit échantillon. Le script exige au moins deux jobs démarrés, car `quantiles` demande deux valeurs.
 
 ### 6.4. Du rapport au pilotage
 
@@ -652,7 +669,7 @@ Sur un cluster de plusieurs centaines de GPU, des nœuds tombent tous les jours.
 | `allocated` | entièrement alloué | rien |
 | `draining` | marqué *drain* mais des jobs tournent encore | attendre la fin des jobs |
 | `drained` | marqué *drain*, plus aucun job | enquêter, réparer, remettre en service |
-| `down` | considéré en panne, jobs perdus | enquêter en priorité |
+| `down` | indisponible ; Slurm y place parfois un nœud de lui-même après une défaillance | enquêter en priorité |
 | `fail` / `failing` | une défaillance est annoncée mais les jobs en cours peuvent finir | traiter avant la fin des jobs |
 
 Un nœud *drained* ne reçoit aucun nouveau job mais n'interrompt pas les jobs en cours : c'est la mise en quarantaine douce. Le mettre en `down` est plus radical. Les commandes :
@@ -667,7 +684,7 @@ Donner une **raison** est la règle : sans elle, le nœud devient un mystère po
 
 ### 7.2. Le contrôle de santé périodique
 
-Slurm exécute périodiquement, sur chaque nœud, un programme de votre choix. Trois paramètres de `slurm.conf` : `HealthCheckProgram` (le chemin), `HealthCheckInterval` (la période en secondes) et `HealthCheckNodeState` (les états de nœud concernés). Le projet **LBNL Node Health Check** (NHC) est l'implémentation courante : il fournit une bibliothèque de tests (processeurs, mémoire, systèmes de fichiers, réseau, GPU) conçue pour Slurm et d'autres ordonnanceurs.
+Slurm exécute périodiquement, sur chaque nœud, un programme de votre choix. Trois paramètres de `slurm.conf` : `HealthCheckProgram` (le chemin), `HealthCheckInterval` (la période en secondes) et `HealthCheckNodeState` (les états de nœud concernés). Le projet ouvert **LBNL Node Health Check** (NHC) en est une implémentation : il fournit une bibliothèque de tests (processeurs, mémoire, systèmes de fichiers, réseau, GPU) conçue pour Slurm et d'autres ordonnanceurs.
 
 Quelle que soit l'implémentation, un bon contrôle :
 
@@ -700,7 +717,7 @@ Le préfixe `health:` de la raison est la signature du script : lui seul peut re
 Un **prolog** est un script exécuté sur le nœud avant un job, un **epilog** après. La page « Prolog and Epilog Guide » de la documentation précise deux points qui surprennent.
 
 -   Par défaut, le prolog ne s'exécute sur un nœud que lorsqu'il voit **la première étape d'une nouvelle allocation**. Un job qui n'a lancé aucune étape ne déclenche jamais le prolog, sauf si `PrologFlags=Alloc` force l'exécution dès l'allocation. L'epilog, lui, s'exécute toujours.
--   Si le **prolog échoue** (code de sortie non nul), le nœud passe en état `DRAIN` et le job est remis en file ; si l'**epilog échoue**, le nœud passe aussi en `DRAIN`.
+-   Si le **prolog échoue** (code de sortie non nul), le nœud passe en état `DRAIN` et le job est remis en file ; si l'**epilog échoue**, le nœud passe aussi en `DRAIN`. D'après la documentation, le job est alors retenu (*held*), sauf si `nohold_on_prolog_fail` figure dans `SchedulerParameters`.
 
 Un prolog est donc une barrière : un job ne démarre pas sur un nœud qui échoue au contrôle.
 
@@ -711,7 +728,7 @@ Un prolog est donc une barrière : un job ne démarre pas sur un nœud qui écho
 $ squeue -o "%i %T %r"
 JOBID STATE REASON
 15 PENDING launch failed requeued held
-$ sinfo -R
+$ sinfo -R -h -o "%E | %N"
 Prolog error | vm
 ~~~
 
@@ -738,7 +755,7 @@ Un nœud qui est drainé plusieurs fois en peu de temps est un nœud à retirer 
 Points clés — chapitre 7
 
 -   Drainer avec une raison : le nœud reçoit plus de jobs, les jobs en cours finissent.
--   `HealthCheckProgram` exécute un contrôle périodique ; NHC (LBNL) est l'implémentation de référence.
+-   `HealthCheckProgram` exécute un contrôle périodique ; NHC (LBNL) en est une implémentation ouverte.
 -   Un bon contrôle est rapide, idempotent, drainé avec raison, et ne remet en service que ses propres drains.
 -   Un prolog en échec draine le nœud et retient le job : il faut le libérer.
 -   La remise en service suit une procédure écrite ; un nœud qui flotte doit sortir de la production.
@@ -773,7 +790,7 @@ Beaucoup d'organisations ont des années d'investissement dans des scripts Slurm
 |---|---|---|---|
 | Modèle de charge | jobs finis, gros jobs parallèles | services et jobs | jobs finis dans une plateforme de services |
 | File d'attente, équité, préemption | natifs et matures | à ajouter (Kueue, Volcano) | natifs de Slurm |
-| Gang scheduling | natif | à ajouter | natif de Slurm |
+| *Gang scheduling* (tous les processus d'un job démarrent ensemble, ou aucun) | natif | à ajouter | natif de Slurm |
 | Outillage des utilisateurs | scripts `sbatch`, familiers aux chercheurs | manifestes et images | scripts `sbatch` conservés |
 | Exploitation de l'infrastructure | spécialisée HPC | commune avec les services | double compétence |
 
@@ -805,11 +822,11 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y munge slurm-wlm slurmdbd 
 2.  Lancez `sudo bash setup.sh`, puis `sinfo`, `sbatch --wrap='hostname'`, `squeue` et `sacct -X`.
 3.  Soumettez le tableau et la dépendance de la partie A de `verify.sh` en les écrivant vous-même, puis comparez.
 4.  Lisez `examples/trainer.py` et `examples/checkpoint_on_signal.sbatch` ; lancez la partie B : un `scancel --signal=USR1 --batch` déclenche le checkpoint, le job suivant reprend à l'étape sauvegardée.
-5.  Terminez par `sudo bash teardown.sh`.
+5.  Terminez par `sudo bash teardown.sh` (avec `--purge-db`, la comptabilité est aussi effacée).
 
-**Critère de réussite.** `sudo bash verify.sh` affiche « OK part A » puis « OK slurm-sandbox: parts A and B », avec la ligne `start at step N` de la reprise où `N` est l'étape sauvegardée. Temps d'exécution : environ une minute.
+**Critère de réussite.** `sudo bash verify.sh` affiche « OK part A », la ligne `start at step N` de la reprise (où `N` est l'étape sauvegardée), « OK failure propagation » puis « OK slurm-sandbox: parts A and B ». Temps d'exécution : de 40 à 50 secondes mesurées.
 
-**Pour aller plus loin.** Enlevez `slurmdbd` de `slurm.conf` et constatez la raison `InvalidAccount` du chapitre 1. Ajoutez un deuxième nœud simulé (`NodeName=... NodeHostname=...` avec plusieurs `slurmd`) si votre version de Slurm l'autorise.
+**Pour aller plus loin.** Supprimez l'association de `root` (`sacctmgr -i remove user root`) et constatez le refus de `sbatch` du chapitre 1, puis essayez `AccountingStorageType=accounting_storage/none` sans `AccountingStorageEnforce` pour voir un job s'exécuter sans comptabilité. Ajouter un deuxième nœud simulé (plusieurs `slurmd` sur une machine) n'a pas été essayé ici.
 :::
 
 ::: lab
@@ -823,7 +840,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y munge slurm-wlm slurmdbd 
 4.  Partie B : lancez un job `normal` de quatre processeurs, puis un job `urgent` ; vérifiez `Restarts=1` et l'état `PREEMPTED`.
 5.  Changez les poids (`PriorityWeightFairshare`, `PriorityWeightAge`) et relisez `sprio -w`.
 
-**Critère de réussite.** `sudo bash verify.sh` affiche « OK part A » et « OK part B ». Comptez environ quatre minutes : le facteur d'équité n'est recalculé qu'à chaque `PriorityCalcPeriod`.
+**Critère de réussite.** `sudo bash verify.sh` affiche « OK part A » et « OK part B ». Comptez un peu plus de deux minutes (123 s mesurées) : le facteur d'équité n'est recalculé qu'à chaque `PriorityCalcPeriod`, réglé ici à une minute.
 
 **Pour aller plus loin.** Ajoutez un `GraceTime` à la QOS `normal` et vérifiez que le job reçoit un signal avant d'être préempté.
 :::
@@ -834,12 +851,12 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y munge slurm-wlm slurmdbd 
 **Objectif.** Automatiser la mise en quarantaine d'un nœud défaillant et observer le comportement d'un prolog qui échoue. **Durée.** 3 h. **Prérequis matériels.** Ceux du lab 5.1.
 
 1.  Lisez `labs/slurm/node-health/node_check.sh` : repérez les trois contrôles, le préfixe `health:` et la règle de remise en service.
-2.  Partie A : configurez `HealthCheckProgram`, simulez une erreur GPU avec `echo 79 > /tmp/fake_gpu_xid`, attendez que `sinfo -R` affiche `health: gpu_xid:79`, supprimez le fichier, attendez le retour à `idle`.
+2.  Partie A : configurez `HealthCheckProgram`, simulez une erreur GPU avec `echo 79 > /tmp/fake_gpu_xid`, attendez que `sinfo -R` affiche `health: gpu_xid:79`, supprimez le fichier, attendez le retour à `idle`. Drainez ensuite vous-même le nœud avec une raison sans préfixe `health:` et vérifiez, après quelques périodes du contrôle, qu'il reste drainé.
 3.  Partie B : configurez `Prolog=prolog_gate.sh`, recréez l'erreur, soumettez un job et observez `launch failed requeued held` et la raison `Prolog error`.
 4.  Libérez le job avec `scontrol release` après avoir remis le nœud en service.
 5.  Ajoutez un contrôle de votre choix (par exemple l'espace libre d'un volume) et testez-le.
 
-**Critère de réussite.** `sudo bash verify.sh` affiche « OK part A », « OK part B » et « OK node-health ». Durée d'exécution : environ une minute.
+**Critère de réussite.** `sudo bash verify.sh` affiche « OK part A », « OK part A2 », « OK part B » et « OK node-health ». Durée d'exécution : environ 80 secondes mesurées.
 
 **Pour aller plus loin.** Remplacez le compteur simulé par une vraie lecture : `dmesg` pour des erreurs matérielles, ou `nvidia-smi` sur un nœud GPU (module 14).
 :::
@@ -916,7 +933,7 @@ Seul (a) peut démarrer : il termine en 50 min, avant l'heure de début prévue 
 :::
 
 ::: sol
-Les commandes, **exécutées avec succès dans le bac à sable** en remplaçant `gres/gpu` par `cpu`, faute de GPU :
+Les commandes, **exécutées avec succès dans le bac à sable** (le 25 octobre 2026) en remplaçant `gres/gpu` par `cpu`, faute de GPU. `research` est le compte parent du bac à sable ; `recherche` désigne ici l'équipe :
 
 ~~~bash
 sacctmgr -i add account recherche parent=research fairshare=5
@@ -928,7 +945,7 @@ sacctmgr -i modify qos normal set Preempt+=scavenger
 sacctmgr -i modify account recherche set GrpTRES=gres/gpu=64
 ~~~
 
-Deux paramètres sont indispensables : `AccountingStorageEnforce=associations,limits,qos` (sans lui les limites ne sont pas appliquées) et `AccountingStorageTRES=gres/gpu` (pour que les GPU soient suivis). La préemption exige aussi `PreemptType=preempt/qos` et un `PreemptMode`. On vérifie : les parts avec `sshare`, la QOS interactive en soumettant trois GPU pour un utilisateur (le job doit être retenu par une raison de limite), le quota en soumettant au-delà de 64 GPU, et la préemption comme au lab 5.2.
+Deux paramètres sont indispensables : `AccountingStorageEnforce=associations,limits,qos` (sans lui les limites ne sont pas appliquées) et `AccountingStorageTRES=gres/gpu` (pour que les GPU soient suivis). La préemption exige aussi `PreemptType=preempt/qos` et un `PreemptMode`. On vérifie : les parts avec `sshare`, la QOS interactive en soumettant trois GPU pour un utilisateur (le job doit être retenu par une raison de limite ; avec des processeurs au lieu de GPU, le bac à sable a donné `QOSMaxCpuPerUserLimit`), le quota en soumettant au-delà de 64 GPU (`AssocGrpCpuLimit` avec des processeurs), et la préemption comme au lab 5.2.
 :::
 
 ::: exo
@@ -995,16 +1012,16 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 -   SchedMD. [*Prolog and Epilog Guide*](https://slurm.schedmd.com/prolog_epilog.html) et [*sbatch*](https://slurm.schedmd.com/sbatch.html) : prolog, signaux, remise en file (chapitres 2 et 7).
 -   SchedMD. [*sinfo*](https://slurm.schedmd.com/sinfo.html) et [*squeue*](https://slurm.schedmd.com/squeue.html) : états de nœud et raisons d'attente (chapitres 1 et 7).
 -   NVIDIA. [*Pyxis*](https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md) : conteneurs sous `srun` (chapitre 8).
--   LBNL. [*Node Health Check (NHC)*](https://raw.githubusercontent.com/mej/nhc/master/README.md) : contrôle de santé de référence (chapitre 7).
+-   LBNL. [*Node Health Check (NHC)*](https://raw.githubusercontent.com/mej/nhc/master/README.md) : bibliothèque ouverte de contrôles de santé de nœuds (chapitre 7).
 -   SchedMD et NVIDIA. [*Slinky*](https://www.nvidia.com/en-us/software/slinky/) : Slurm dans Kubernetes (chapitre 8).
--   Dubey et al. [*The Llama 3 Herd of Models*](https://arxiv.org/abs/2407.21783), section 3.3.4 : interruptions et automatisation à 16 000 GPU (chapitre 7).
+-   Grattafiori et al. (Meta). [*The Llama 3 Herd of Models*](https://arxiv.org/abs/2407.21783), section 3.3.4 : interruptions et automatisation à 16 000 GPU (chapitre 7).
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, `sbatch`, `sinfo`, `squeue`) ont été relus sur les pages officielles de SchedMD le 24 octobre 2026. Les faits sur Pyxis, NHC et Slinky ont été relus sur leurs pages. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent.
+**Documenté.** Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, `sbatch`, `sinfo`, `squeue`) ont été relus sur les pages officielles de SchedMD, qui affichent la documentation de la version 26.05, lors de la relecture du 25 octobre 2026. Les faits sur Pyxis, NHC et Slinky ont été relus sur leurs pages. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent, parfois abrégées ; les numéros de job, les durées et les décomptes de CPU-secondes varient d'une exécution à l'autre.
 
 **Recommandé.** L'ordre des chapitres, la règle « peu de partitions, plusieurs QOS », le seuil de trois drains en sept jours, la marge de 20 à 30 % sur les durées et le tableau comparatif Slurm, Kubernetes et hybride sont des choix de ce parcours, pas des règles de Slurm.
 
-**À vérifier.** La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (`topology/block`) et la préemption ; lisez la documentation de votre version. Les extraits de `slurm.conf`, `gres.conf` et les scripts GPU des chapitres 2 et 5 n'ont **pas** été exécutés (ils demandent des GPU) ; les scripts ont seulement passé `shellcheck`. L'article fondateur de Slurm (Yoo, Jette et Grondona, 2003) est cité de mémoire et n'a pas été rouvert pour ce module.
+**À vérifier.** La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (`topology/block`) et la préemption ; lisez la documentation de votre version. La raison d'attente `InvalidAccount` n'a pas été reproduite sur ce bac à sable (voir le chapitre 1), et le refus d'une réservation avant ses jobs trop longs (chapitre 4) n'a pas été relu sur la page « Reservations ». Les extraits de `slurm.conf`, `gres.conf` et les scripts GPU des chapitres 2 et 5 n'ont **pas** été exécutés (ils demandent des GPU) ; les scripts ont seulement passé `shellcheck`.
 
 **Hors périmètre.** L'installation d'un cluster multi-nœuds réel et du réseau d'interconnexion (modules 6 et 7), Slurm en mode cloud avec nœuds éphémères, l'API REST `slurmrestd`, les accélérateurs non NVIDIA, et l'administration de la base de comptabilité en production (sauvegardes, purge).

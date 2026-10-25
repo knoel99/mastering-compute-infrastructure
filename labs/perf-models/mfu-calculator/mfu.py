@@ -39,6 +39,10 @@ def mfu_from_tflops_per_gpu(achieved_tflops, peak_tflops):
 
 def step_time_for_mfu(target_mfu, tokens_per_step, flops_tok, n_gpus, peak_flops_per_gpu):
     """Step time that corresponds to a target MFU (inverse of the formula above)."""
+    if not 0 < target_mfu <= 1:
+        raise ValueError("target_mfu must be in (0, 1]")
+    if n_gpus <= 0 or peak_flops_per_gpu <= 0:
+        raise ValueError("n_gpus and peak_flops_per_gpu must be positive")
     return tokens_per_step * flops_tok / (target_mfu * n_gpus * peak_flops_per_gpu)
 
 

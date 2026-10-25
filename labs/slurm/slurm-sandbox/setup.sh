@@ -7,6 +7,8 @@ set -euo pipefail
 
 HOST="$(hostname -s)"
 CPUS="${SANDBOX_CPUS:-$(nproc)}"
+# Password of the throw-away accounting database: random unless SANDBOX_DB_PASS is set (nothing secret is stored in this repository).
+DB_PASS="${SANDBOX_DB_PASS:-$(head -c 24 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')}"
 MEM_MB="${SANDBOX_MEM_MB:-$(awk '/MemTotal/ {printf "%d", $2/1024*0.8}' /proc/meminfo)}"
 
 command -v slurmctld >/dev/null || { echo "install slurm-wlm first" >&2; exit 2; }
@@ -25,9 +27,11 @@ if ! pgrep -x mariadbd >/dev/null; then
 fi
 for _ in $(seq 1 40); do mariadb -e 'select 1' >/dev/null 2>&1 && break; sleep 1; done
 mariadb -e "CREATE DATABASE IF NOT EXISTS slurm_acct_db;
-            CREATE USER IF NOT EXISTS 'slurm'@'localhost' IDENTIFIED BY 'slurmpw';
+            CREATE USER IF NOT EXISTS 'slurm'@'localhost' IDENTIFIED BY '${DB_PASS}';
+            ALTER USER 'slurm'@'localhost' IDENTIFIED BY '${DB_PASS}';
             GRANT ALL ON slurm_acct_db.* TO 'slurm'@'localhost'; FLUSH PRIVILEGES;"
 
+umask 077   # slurmdbd.conf holds the database password: never world-readable, not even for a moment
 cat > /etc/slurm/slurmdbd.conf <<CONF
 AuthType=auth/munge
 DbdHost=localhost
@@ -35,12 +39,13 @@ SlurmUser=root
 StorageType=accounting_storage/mysql
 StorageHost=localhost
 StorageUser=slurm
-StoragePass=slurmpw
+StoragePass=${DB_PASS}
 StorageLoc=slurm_acct_db
 LogFile=/var/log/slurm/slurmdbd.log
 PidFile=/run/slurmdbd.pid
 CONF
 chmod 600 /etc/slurm/slurmdbd.conf
+umask 022
 
 cat > /etc/slurm/slurm.conf <<CONF
 ClusterName=sandbox

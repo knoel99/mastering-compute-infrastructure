@@ -24,8 +24,17 @@ squeue -h -o %i 2>/dev/null | xargs -r scancel >/dev/null 2>&1 || true   # scanc
 stop slurmd 30
 stop slurmctld 60
 signal -KILL slurmscriptd   # a leftover zombie of an earlier controller would make stop() wait for nothing
-if [ "$purge" -eq 1 ] && pgrep -x mariadbd >/dev/null; then
-  mariadb -e 'DROP DATABASE IF EXISTS slurm_acct_db' >/dev/null 2>&1
+if [ "$purge" -eq 1 ]; then
+  if ! pgrep -x mariadbd >/dev/null && [ -d /var/lib/mysql/mysql ]; then
+    # An earlier teardown already stopped MariaDB: start it just long enough to drop the database with SQL
+    # (otherwise the accounting records of that earlier run would survive a "--purge-db").
+    mkdir -p /run/mysqld && chown mysql:mysql /run/mysqld
+    nohup mariadbd --user=mysql --datadir=/var/lib/mysql --socket=/run/mysqld/mysqld.sock >/var/log/mariadb.out 2>&1 </dev/null &
+    for _ in $(seq 1 40); do mariadb -e 'select 1' >/dev/null 2>&1 && break; sleep 1; done
+  fi
+  if pgrep -x mariadbd >/dev/null; then
+    mariadb -e 'DROP DATABASE IF EXISTS slurm_acct_db' >/dev/null 2>&1
+  fi
 fi
 stop slurmdbd 30
 stop mariadbd 30

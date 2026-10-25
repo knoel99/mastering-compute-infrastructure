@@ -28,6 +28,10 @@ def main():
     for e in range(args.min_exp, args.max_exp + 1):
         n = 2**e
         x = torch.ones(n, dtype=torch.float32)
+        y = x.clone()
+        dist.all_reduce(y)  # correctness check on a separate buffer: the sum of `world` ones is `world`
+        if not bool((y == world).all()):
+            raise RuntimeError(f"all_reduce returned a wrong sum for {n} elements")
         for _ in range(args.warmup):
             dist.all_reduce(x)
         times = []
@@ -40,7 +44,8 @@ def main():
         med = torch.tensor([statistics.median(times)], dtype=torch.float64)
         dist.all_reduce(med, op=dist.ReduceOp.MAX)
         rows.append({"bytes": 4 * n, "seconds_median_max_rank": med.item(), "seconds_min_rank0": min(times)})
-        # correctness check: after warmup + repeat reductions of ones, values are world**k (not asserted, only the first reduce is exact)
+        # note: x is reduced in place, so its values grow as world**k over the repetitions (harmless for timing in
+        # float32 up to about 64 ranks and 20 repetitions); only the check on `y` above verifies the result.
     if rank == 0:
         with open(args.out, "w") as f:
             json.dump({"world_size": world, "backend": "gloo", "torch": torch.__version__,

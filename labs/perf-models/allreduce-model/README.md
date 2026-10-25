@@ -1,6 +1,6 @@
 # Lab 2.2 — α-β : prédire puis mesurer
 
-Mesure le temps d'un `all_reduce` pour des messages de 1 Kio à 16 Mio sur 4 processus (backend `gloo`, CPU), ajuste le modèle de l'anneau $T=2(p-1)\alpha+2\frac{p-1}{p}\frac{n}{B}$ et compare prédiction et mesure.
+Mesure le temps d'un `all_reduce` pour des messages de 1 Kio à 16 Mio sur 4 processus (backend `gloo`, CPU), ajuste le modèle de l'anneau $T=2(p-1)\alpha+2\frac{p-1}{p}\frac{n}{B}$ et compare prédiction et mesure. Les quatre processus partagent les mêmes cœurs et communiquent par la boucle locale : ce n'est pas un réseau, et les valeurs ajustées (sur la VM de test à 4 vCPU : α de 0,3 à 0,9 ms et B de 0,7 à 1,9 Go/s sur une dizaine d'exécutions) varient fortement d'une exécution à l'autre. Seule la méthode se transpose.
 
 ```bash
 python3 -m pip install torch numpy --index-url https://download.pytorch.org/whl/cpu   # ou votre installation habituelle

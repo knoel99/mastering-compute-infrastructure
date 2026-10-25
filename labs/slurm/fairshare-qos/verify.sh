@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Lab 5.2 check (about 4 minutes): fairshare orders pending jobs, a QOS preempts and requeues.
+# Lab 5.2 check (a little over 2 minutes; the wait is dominated by PriorityCalcPeriod=1): fairshare orders pending jobs, a QOS preempts and requeues.
 set -euo pipefail
 cd "$(dirname "$0")"
 trap 'bash ../slurm-sandbox/teardown.sh --purge-db >/dev/null 2>&1 || true' EXIT

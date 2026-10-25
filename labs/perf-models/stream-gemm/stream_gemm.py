@@ -14,6 +14,10 @@ import time
 import numpy as np
 
 
+COPY_BYTES_PER_ELEM = 16  # float64: 8 B read + 8 B written
+ADD_BYTES_PER_ELEM = 24   # float64: 16 B read + 8 B written (STREAM counts nominal traffic, not write-allocate)
+
+
 def timeit(fn, repeat=7, warmup=2):
     """Return (min, median) wall time in seconds. The minimum is the least noisy estimate of capability."""
     for _ in range(warmup):
@@ -27,7 +31,11 @@ def timeit(fn, repeat=7, warmup=2):
 
 
 def stream(array_mib, repeat):
-    """STREAM 'copy' (a = b: 1 read + 1 write) and 'add' (a = b + c: 2 reads + 1 write), float64."""
+    """STREAM 'copy' (a = b: 1 read + 1 write) and 'add' (a = b + c: 2 reads + 1 write), float64.
+
+    NumPy element-wise operations are single-threaded: these figures are single-core bandwidth, a lower bound
+    of what the whole memory system can deliver (and they do not depend on OMP_NUM_THREADS).
+    """
     n = array_mib * 2**20 // 8
     a = np.zeros(n)
     b = np.random.default_rng(0).random(n)
@@ -36,8 +44,10 @@ def stream(array_mib, repeat):
     t_add, _ = timeit(lambda: np.add(b, c, out=a), repeat)
     return {
         "array_mib": array_mib,
-        "copy_gbs": 16 * n / t_copy / 1e9,  # 8 B read + 8 B written per element
-        "add_gbs": 24 * n / t_add / 1e9,    # 16 B read + 8 B written per element
+        "copy_bytes_per_elem": COPY_BYTES_PER_ELEM,
+        "add_bytes_per_elem": ADD_BYTES_PER_ELEM,
+        "copy_gbs": COPY_BYTES_PER_ELEM * n / t_copy / 1e9,
+        "add_gbs": ADD_BYTES_PER_ELEM * n / t_add / 1e9,
     }
 
 
@@ -50,7 +60,9 @@ def gemm(sizes, repeat):
         b = rng.random((n, n), dtype=np.float32)
         t, _ = timeit(lambda: a @ b, repeat)
         flops = 2 * n**3
-        out.append({"n": n, "gflops": flops / t / 1e9, "intensity_flop_per_byte": flops / (3 * n * n * 4)})
+        ideal_bytes = 3 * n * n * 4  # float32
+        out.append({"n": n, "flops": flops, "ideal_bytes": ideal_bytes, "gflops": flops / t / 1e9,
+                    "intensity_flop_per_byte": flops / ideal_bytes})
     return out
 
 
@@ -68,7 +80,9 @@ def main():
     s = stream(args.array_mib, args.repeat)
     g = gemm(args.sizes, args.repeat)
     peak = max(r["gflops"] for r in g)
-    ridge = peak / s["add_gbs"]  # FLOP/byte where the memory roof meets the compute roof
+    # FLOP/byte where the memory roof meets the compute roof. Caveat: the GEMM peak uses all BLAS threads while
+    # the bandwidth is single-core, so this ridge is higher than the one of the whole machine.
+    ridge = peak / s["add_gbs"]
     for r in g:
         r["roofline_gflops"] = min(peak, r["intensity_flop_per_byte"] * s["add_gbs"])
         r["measured_over_roofline"] = r["gflops"] / r["roofline_gflops"]
