@@ -1,0 +1,71 @@
+{
+ "average_bus_bandwidth": {
+  "bandwidth": 98.0,
+  "okay": "unchecked"
+ },
+ "nccl_version": 0,
+ "out_of_bounds": {
+  "count": 0,
+  "okay": true
+ },
+ "results": [
+  {
+   "count": 262144,
+   "in_place": {
+    "alg_bw": 55.0,
+    "bus_bw": 98.0,
+    "nwrong": 0,
+    "time": 1.0
+   },
+   "out_of_place": {
+    "alg_bw": 50.0,
+    "bus_bw": 90.0,
+    "nwrong": 0,
+    "time": 1.0
+   },
+   "redop": "sum",
+   "root": "-1",
+   "size": 1048576,
+   "type": "float"
+  },
+  {
+   "count": 16777216,
+   "in_place": {
+    "alg_bw": 55.0,
+    "bus_bw": 98.0,
+    "nwrong": 3,
+    "time": 1.0
+   },
+   "out_of_place": {
+    "alg_bw": 50.0,
+    "bus_bw": 90.0,
+    "nwrong": 0,
+    "time": 1.0
+   },
+   "redop": "sum",
+   "root": "-1",
+   "size": 67108864,
+   "type": "float"
+  },
+  {
+   "count": 268435456,
+   "in_place": {
+    "alg_bw": 55.0,
+    "bus_bw": 98.0,
+    "nwrong": 0,
+    "time": 1.0
+   },
+   "out_of_place": {
+    "alg_bw": 50.0,
+    "bus_bw": 90.0,
+    "nwrong": 0,
+    "time": 1.0
+   },
+   "redop": "sum",
+   "root": "-1",
+   "size": 1073741824,
+   "type": "float"
+  }
+ ],
+ "version": 1
+}

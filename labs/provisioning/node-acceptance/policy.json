@@ -1,0 +1,9 @@
+{
+  "expected_gpus": 8,
+  "expected_pcie_gen": 5,
+  "expected_pcie_width": 16,
+  "min_busbw_gbps": 100.0,
+  "nccl_reject_ratio": 0.9,
+  "nccl_retest_ratio": 0.95,
+  "required_dcgm_tests": ["software", "pcie", "memory"]
+}

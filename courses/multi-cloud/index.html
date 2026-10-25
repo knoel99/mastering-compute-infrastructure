@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC — Mastering Compute Infrastructure</title>
+<meta name="description" content="Placer, déborder et basculer des charges GPU entre fournisseurs sans réécrire les jobs : modèles de capacité, abstraction du fournisseur, gravité des données, préemption, réseau, identité, centres publics et gouvernance.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</h1>
+<p class="subtitle">Module 13 · Phase 4 · 28 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs : 2 sur 3 vérifiés dans un bac à sable ; la branche cloud du lab 13.2 n'est pas exécutée</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> votre équipe a besoin de 256 GPU pendant six semaines, aucun fournisseur n'en a autant de libres aujourd'hui au prix visé, et votre jeu de données de 60 To vit chez l'un d'eux. Où lancez-vous le job, que faites-vous quand on vous le reprend, et combien coûte réellement le déménagement ?</p>
+<p>Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offre (les <em>hyperscalers</em>, très grands clouds publics ; les <em>GPU clouds</em>, fournisseurs spécialisés dans les GPU ; les centres publics), les modèles de capacité, les outils qui abstraient le fournisseur, la gravité des données, le placement avec préemption, le réseau et l'identité, l'accès aux centres nationaux et la gouvernance. Un simulateur de placement et un calculateur de coût de déménagement sont exécutés dans un bac à sable ; un lab de job SkyPilot est analysé hors ligne mais <strong>jamais lancé sur un vrai cloud</strong>.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Un job se place entier, sur un seul site. Ce qui voyage entre fournisseurs, ce sont des jobs, des checkpoints et des jeux de données, jamais le trafic d'un all-reduce. Le coût de ce voyage, en argent et en temps, fait partie de la décision de placement.</p>
+</div>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>28 h, dont 12 h de lecture, 9,5 h de labs et 6,5 h d'exercices (répartition estimée par l'auteur, non mesurée)</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>3 : Kubernetes pour les GPU et la tolérance aux pannes sont acquis</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../kubernetes-gpu/index.html">Module 12 — Kubernetes pour les GPU</a>, <a href="../fault-tolerance/index.html">Module 10 — Tolérance aux pannes</a></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : la plateforme de calcul d'une organisation réelle est presque toujours multi-fournisseurs</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un simulateur de placement testé, un calculateur de coût de déménagement de données testé, un job SkyPilot analysé hors ligne avec sa politique de gouvernance</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>un portable CPU suffit pour les labs 13.1 et 13.3 et pour la branche hors ligne du lab 13.2. La branche cloud du lab 13.2 demande un compte cloud et du crédit : lancez de petits jobs de quelques minutes et vérifiez l'arrêt automatique</td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Situer une offre de calcul (hyperscaler, GPU cloud, centre public, colocation) par ce qu'elle vend, son unité de facturation, son engagement et son réseau (chapitres 1 et 2).</li>
+<li>Calculer le prix d'une heure de GPU <strong>utile</strong> sur une offre préemptible et dire à partir de quelle remise elle bat le prix à la demande (chapitre 2).</li>
+<li>Lire un job SkyPilot, dire ce que l'outil garantit et ce qu'il ne vérifie pas, et le soumettre à une politique de gouvernance (chapitres 3 et 8).</li>
+<li>Chiffrer un déménagement de données : sortie par tranches, stockage pendant le chevauchement, temps de copie, point d'équilibre (chapitre 4).</li>
+<li>Décider si une bascule de fournisseur après une préemption vaut son coût de transfert, avec des chiffres (chapitre 5).</li>
+<li>Expliquer pourquoi un entraînement ne se coupe pas entre fournisseurs et dimensionner quotas et identités (chapitre 6).</li>
+<li>Choisir une voie d'accès à un centre national ou européen et convertir une demande d'heures GPU (chapitre 7).</li>
+<li>Mettre en place inventaire, étiquetage et nettoyage automatique (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Dix séances, soit 28 h : sept de 3 h, deux de 2,5 h et une de 2 h. Le niveau 2 correspond aux méthodes de cœur, le niveau 3 à l'avancé ; il ne diminue jamais. Les durées de chaque séance additionnent exactement celles de ses chapitres, de ses parties de lab et de ses exercices.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 1 Le paysage de l'offre GPU (2,25 h, avec les questions de positionnement)</td>
+<td>Ex. 3 (0,25 h)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2 h</td>
+<td>2</td>
+<td>ch. 2 Modèles de capacité (1,5 h)</td>
+<td>Ex. 4 (0,5 h)</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 3 Abstraire le fournisseur (1,5 h)</td>
+<td>Lab 13.2 partie A : lint, politique, analyse hors ligne (1,5 h)</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 4 Données et gravité (1,75 h)</td>
+<td>Lab 13.3 partie A : carte tarifaire et scénarios (1 h) ; Ex. 1 (0,25 h)</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 5 §5.1 et §5.2 : objectifs et politiques de placement (0,5 h)</td>
+<td>Lab 13.3 partie B : écrire le calculateur (2 h) ; Ex. 7 (0,5 h)</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 5 §5.3 à §5.7 (1 h) ; ch. 6 Réseau et identité (1 h)</td>
+<td>Lab 13.1 partie A : formules et moteur (1 h)</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>3 h</td>
+<td>3</td>
+<td>Séance de lab</td>
+<td>Lab 13.1 partie B : politiques, balayage, critère (3 h)</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 Centres publics (1,5 h)</td>
+<td>Ex. 6, 9, 10, 5 (1,5 h)</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 8 Gouvernance (1 h)</td>
+<td>Lab 13.2 partie B : résidence et jobs étendus (1 h) ; Ex. 11 (1 h)</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>2.5 h</td>
+<td>3</td>
+<td>Synthèse et checkpoint de sortie</td>
+<td>Ex. 8, 12, 2 (2,5 h)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.</p>
+<ol type="1">
+<li><p><strong>Perdre un job.</strong> Un job préemptible subit en moyenne 0,15 interruption par heure d'allocation. Un checkpoint prend 3 minutes et une reprise 10 minutes. Quelle période de checkpoint minimise le gaspillage, et quelle part du temps alloué est perdue ?</p></li>
+<li><p><strong>Déménager un jeu de données.</strong> Vous déplacez 2 To d'un fournisseur A vers un fournisseur B. La sortie est facturée 0,09 USD par Go (sans franchise) et le lien soutient 10 Gbit/s à 80 % d'efficacité. Combien cela coûte-t-il en sortie et combien de temps dure la copie ?</p></li>
+<li><p><strong>Couper un entraînement.</strong> Pourquoi ne répartit-on pas un entraînement de 64 GPU entre deux fournisseurs pour profiter de la capacité de chacun ?</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p>Avec les formules du module 10, rappelées au chapitre 2, <span class="math inline">M = 1/0{,}15 = 6{,}67</span> h, <span class="math inline">C = 0{,}05</span> h et <span class="math inline">R = 0{,}167</span> h. La période optimale vaut <span class="math inline">T^* = \sqrt{2CM} = 0{,}816</span> h, soit 49 minutes. Le gaspillage vaut <span class="math inline">W = C/T^* + (T^*/2 + R)/M = 14{,}7\ \%</span> du temps alloué.</p></li>
+<li><p>2 000 Go à 0,09 USD font <strong>180 USD</strong>. La copie dure <span class="math inline">2000 \times 8 / (10 \times 0{,}8) = 2000</span> s, soit 33 minutes. Le calcul complet, avec tranches et franchise, est l'objet du chapitre 4.</p></li>
+<li><p>À chaque étape, les gradients sont échangés. Entre deux sites, le lien est une liaison longue distance de quelques Gbit/s, contre des centaines de Go/s dans un nœud. Le chapitre 6 chiffre l'écart : environ 20 fois plus de temps de communication pour un modèle de 7 milliards de paramètres.</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. Le paysage de l'offre GPU</h2>
+<p>Ce chapitre fournit une grille de lecture, pas un annuaire. Les offres changent plus vite que ce cours : retenez les questions qui classent un fournisseur, et datez chaque réponse.</p>
+<h3 id="quatre-questions-qui-classent-une-offre">1.1. Quatre questions qui classent une offre</h3>
+<p>Toute offre de calcul GPU, quel que soit son nom commercial, se décrit par quatre réponses.</p>
+<ul>
+<li><strong>Qui exploite le matériel ?</strong> Un fournisseur public vous loue des machines ; un centre national vous alloue des heures ; vous exploitez vous-même un parc en colocation.</li>
+<li><strong>Quelle est l'unité vendue ?</strong> L'instance à l'heure, le nœud réservé pour des jours, un volume d'heures GPU attribué par un comité, ou une baie et sa puissance électrique.</li>
+<li><strong>Quel engagement ?</strong> Aucun, quelques semaines, un à trois ans, ou une durée de projet.</li>
+<li><strong>Quel environnement autour du GPU ?</strong> Interconnexion entre nœuds, stockage, réseau vers l'extérieur, identité, quotas.</li>
+</ul>
+<p>La quatrième question est celle qu'on oublie. Un GPU identique ne donne pas le même entraînement derrière un réseau différent : le chapitre 3 y revient.</p>
+<h3 id="les-familles-doffre">1.2. Les familles d'offre</h3>
+<p>Le tableau classe cinq familles. Il décrit des tendances à vérifier pour chaque fournisseur, pas des propriétés garanties.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Famille</th>
+<th>Ce qu'on achète</th>
+<th>Unité et engagement typiques</th>
+<th>Atout</th>
+<th>Piège</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hyperscalers</td>
+<td>instances et services gérés, régions mondiales</td>
+<td>à la seconde ou à l'heure ; engagements d'usage de 1 à 3 ans ; réservations ciblées</td>
+<td>écosystème complet, quotas et identités matures</td>
+<td>capacité GPU parfois rare, sorties de données facturées</td>
+</tr>
+<tr class="even">
+<td>GPU clouds spécialisés</td>
+<td>nœuds GPU, souvent avec réseau InfiniBand, parfois Kubernetes ou Slurm gérés</td>
+<td>location à l'heure ou contrat de capacité de plusieurs mois</td>
+<td>accès à du matériel récent, réseau pensé pour l'entraînement</td>
+<td>services périphériques plus limités, contrats à lire (module 15)</td>
+</tr>
+<tr class="odd">
+<td>Offres européennes</td>
+<td>variantes des deux précédentes, avec une juridiction et des lieux européens</td>
+<td>comme ci-dessus</td>
+<td>résidence des données, cadre juridique européen</td>
+<td>catalogue plus étroit, à vérifier fournisseur par fournisseur</td>
+</tr>
+<tr class="even">
+<td>Centres nationaux et européens</td>
+<td>heures GPU attribuées sur dossier, via Slurm</td>
+<td>allocation par projet, de quelques mois à un an</td>
+<td>pas de facture à l'heure, matériel de recherche de pointe</td>
+<td>files d'attente, règles d'accès, publication attendue (chapitre 7)</td>
+</tr>
+<tr class="odd">
+<td>Colocation et parc propre</td>
+<td>vos nœuds dans le centre de données d'un tiers</td>
+<td>achat ou bail de plusieurs années</td>
+<td>coût marginal bas à forte occupation, contrôle total</td>
+<td>délai de livraison, exploitation à votre charge (module 15)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour la famille « offres européennes », ce cours ne nomme pas de fournisseur : la liste, les lieux et les tarifs sont des informations datées. Elles relèvent de votre veille et de la section « À vérifier ».</p>
+<h3 id="le-réseau-dun-nœud-dépend-du-fournisseur">1.3. Le réseau d'un nœud dépend du fournisseur</h3>
+<p>La page de référence du YAML de SkyPilot, lue le 24 octobre 2026, décrit l'option <code>network_tier: best</code> fournisseur par fournisseur. Chez AWS, elle active l'Elastic Fabric Adapter (EFA). Chez Google Cloud, elle active GPUDirect-TCPX, TCPXO ou RDMA selon la famille de machines. Chez Nebius, CoreWeave et Together AI, elle active InfiniBand ; sur les clusters Oracle OKE à serveurs nus, elle active RoCEv2.</p>
+<p>Un même <code>torchrun</code> avec NCCL ne se comporte donc pas pareil d'une offre à l'autre. Les variables d'environnement, les images et les pilotes diffèrent. Le module 7 détaille NCCL ; ici, retenez que « indépendant du fournisseur » décrit le job, jamais la performance qu'il obtiendra.</p>
+<h3 id="les-centres-publics-une-famille-à-part">1.4. Les centres publics, une famille à part</h3>
+<p>Un centre national ne vend pas des heures de GPU : il attribue des heures à un projet scientifique. Le Jean Zay de l'IDRIS, en France, en fournit un exemple documenté. Sa page matérielle, lue le 24 octobre 2026, liste une partition de 364 nœuds à quatre GPU NVIDIA H100 SXM5 80 Go et une partition de 52 nœuds à huit GPU A100 SXM4 80 Go. Les nœuds de l'extension Bull BullSequana XH3000 sont reliés en InfiniBand, les anciens nœuds en Omni-Path.</p>
+<p>La demande d'heures passe par le portail eDARI de GENCI, qui exprime les seuils en heures de GPU V100 et donne les équivalences suivantes : 1 GPU H100 vaut 2 GPU A100 ou 4 GPU V100.</p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Que pèse un seuil d'allocation ?</span> Le portail eDARI fixe à 50 kh GPU V100 (50 000 heures) le seuil entre allocation dynamique et allocation régulière. Convertissons-le en H100 puis en durée de calcul.</p>
+<p>La partition H100 compte <span class="math inline">364 \times 4 = 1456</span> GPU, soit 5 824 équivalents V100. Le seuil de 50 000 h V100 équivaut à <span class="math inline">50\,000 / 4 = 12\,500</span> h H100. C'est 8,6 h de l'ensemble de la partition H100, ou 1 562 h (65 jours) pour un job de 8 GPU H100.</p>
+<p>Un entraînement de 8 GPU H100 pendant moins de 65 jours reste donc sous le seuil de l'allocation dynamique, d'après les chiffres lus le 24 octobre 2026. Le chapitre 7 reprend cette conversion pour une demande réelle.</p>
+</div>
+<h3 id="une-fiche-par-fournisseur">1.5. Une fiche par fournisseur</h3>
+<p>Pour comparer, remplissez la même fiche pour chaque candidat et datez-la. Douze lignes suffisent pour commencer.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ligne</th>
+<th>Question</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lieux</td>
+<td>Quelles régions et quelles juridictions ?</td>
+</tr>
+<tr class="even">
+<td>Matériel</td>
+<td>Quels GPU, combien par nœud, quelle mémoire ?</td>
+</tr>
+<tr class="odd">
+<td>Interconnexion</td>
+<td>EFA, InfiniBand, RoCE, Ethernet ? Quelle bande passante par nœud ?</td>
+</tr>
+<tr class="even">
+<td>Stockage</td>
+<td>Système de fichiers parallèle, objet, local ? À quel débit ?</td>
+</tr>
+<tr class="odd">
+<td>Modèle de capacité</td>
+<td>À la demande, réservé, préemptible, contrat ?</td>
+</tr>
+<tr class="even">
+<td>Préavis de préemption</td>
+<td>Combien de secondes, garanti ou au mieux ?</td>
+</tr>
+<tr class="odd">
+<td>Quotas</td>
+<td>Dans quelle unité, par quoi limités, en combien de jours obtenus ?</td>
+</tr>
+<tr class="even">
+<td>Sortie de données</td>
+<td>Tarif par Go, franchise, exceptions ?</td>
+</tr>
+<tr class="odd">
+<td>Identité</td>
+<td>Fédération OIDC (<em>OpenID Connect</em> : jetons d'identité signés), clés longues, rôles ?</td>
+</tr>
+<tr class="even">
+<td>Support et SLA</td>
+<td>Quel délai, quel crédit en cas de panne (SLA : engagement de niveau de service) ?</td>
+</tr>
+<tr class="odd">
+<td>Conformité</td>
+<td>Certifications, résidence, sous-traitants ?</td>
+</tr>
+<tr class="even">
+<td>Sortie du contrat</td>
+<td>Préavis, frais, export des données ?</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li>Quatre questions classent une offre : qui exploite, quelle unité, quel engagement, quel environnement.</li>
+<li>Cinq familles : hyperscalers, GPU clouds, offres européennes, centres publics, colocation. Les tendances ne remplacent pas la fiche datée de chaque fournisseur.</li>
+<li>Le réseau d'un nœud (EFA, GPUDirect, InfiniBand, RoCE) diffère selon le fournisseur : le job est portable, sa performance ne l'est pas.</li>
+<li>Un centre public attribue des heures sur dossier ; il les exprime dans une unité de référence (ici le GPU V100) qu'on sait convertir.</li>
+<li>Une fiche de douze lignes, datée et sourcée, rend deux offres comparables.</li>
+</ul>
+</div>
+<h2 id="ch2">2. Modèles de capacité</h2>
+<p>Un même GPU se vend de six manières. Ce chapitre les classe par ce qu'elles garantissent et par ce qu'elles coûtent réellement, une fois comptée la perte de travail.</p>
+<h3 id="six-modèles">2.1. Six modèles</h3>
+<p>La <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html">documentation d'AWS</a> énumère, parmi ses options d'achat d'instances, la <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-on-demand-instances.html">facturation à la seconde</a> à la demande, les <a href="https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html">Savings Plans</a> (engagement d'un montant horaire pendant un à trois ans), les Reserved Instances (engagement sur une configuration), les Spot Instances et les Capacity Reservations. Les Capacity Blocks for ML s'y ajoutent pour réserver un groupe d'instances GPU sur une date future. Google Cloud distingue, sur la page de ses modèles de provisionnement, quatre modèles : standard (celui par défaut), Spot, Flex-start et lié à une réservation.</p>
+<p>Les noms varient, la structure se retrouve partout.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Modèle</th>
+<th>Ce qu'il garantit</th>
+<th>Ce qu'il ne garantit pas</th>
+<th>Fait documenté</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>À la demande</td>
+<td>une instance, payée à l'usage</td>
+<td>qu'il y ait de la capacité au moment de la demande</td>
+<td>facturation à la seconde chez AWS</td>
+</tr>
+<tr class="even">
+<td>Engagement d'usage</td>
+<td>un prix réduit contre un volume sur 1 à 3 ans</td>
+<td>de la capacité disponible</td>
+<td>Savings Plans : montant horaire engagé</td>
+</tr>
+<tr class="odd">
+<td>Réservation planifiée</td>
+<td>de la capacité à une date et pour une durée</td>
+<td>une annulation, un changement de date</td>
+<td>Capacity Blocks AWS : départ jusqu'à 8 semaines à l'avance, annulation interdite</td>
+</tr>
+<tr class="even">
+<td>Capacité à attente (<em>flex-start</em>)</td>
+<td>de la capacité obtenue après une attente</td>
+<td>un délai</td>
+<td>Flex-start Google : exécution ininterrompue jusqu'à 7 jours (<a href="https://cloud.google.com/compute/docs/instances/about-flex-start-vms">source</a>)</td>
+</tr>
+<tr class="odd">
+<td>Préemptible (<em>spot</em>)</td>
+<td>un prix bas</td>
+<td>de rester en vie</td>
+<td>préavis : 2 min (AWS), 0 s par défaut (Google), 30 s au mieux (Azure)</td>
+</tr>
+<tr class="even">
+<td>Contrat de capacité</td>
+<td>des nœuds sur des mois ou des années</td>
+<td>une flexibilité de sortie</td>
+<td>à lire clause par clause (module 15)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Les Capacity Blocks d'AWS illustrent la réservation planifiée. La documentation indique qu'un bloc réserve jusqu'à 64 instances, avec 256 instances au plus au total, que les annulations ne sont pas permises, que le prix dépend de l'offre et de la demande au moment de l'achat et qu'il est facturé d'avance (page <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/capacity-blocks-pricing-billing.html">tarification et facturation</a>).</p>
+<h3 id="le-préavis-de-préemption">2.2. Le préavis de préemption</h3>
+<p>Une préemption ne prévient pas toujours, et jamais longtemps. Les trois grands fournisseurs documentent des préavis très différents.</p>
+<p>AWS émet un avertissement deux minutes avant l'interruption d'une instance Spot, « au mieux » (<em>best effort</em>). Azure tente de livrer l'événement planifié jusqu'à 30 secondes avant l'éviction. Google Cloud, dont le préavis de préemption vaut 0 seconde par défaut, laisse une période d'arrêt au mieux de 30 secondes au plus pour une VM Spot ; un préavis de 120 secondes se configure à la création.</p>
+<div class="war">
+<p><span class="tag">Préavis nul par défaut chez Google Cloud</span> La documentation des VM Spot de Google Cloud indique que, si la durée du préavis n'est pas précisée ou vaut 0, il n'y a aucun délai dédié entre la détection de la préemption dans les métadonnées et le début de l'arrêt, et que la période d'arrêt est « au mieux » et d'au plus 30 secondes. Elle recommande 120 secondes pour toute charge qui a besoin de plus de 30 secondes. Source : <a href="https://cloud.google.com/compute/docs/instances/spot">Spot VMs</a>, lu le 24 octobre 2026.</p>
+</div>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Le préavis ne suffit jamais à sauvegarder</span> Un modèle de 7 milliards de paramètres occupe environ 16 octets par paramètre en entraînement mixte avec Adam (règle de <a href="https://arxiv.org/abs/1910.02054">ZeRO</a>, module 2), soit <span class="math inline">7 \cdot 10^9 \times 16 = 112</span> Go d'états.</p>
+<p>Pour tout écrire dans un préavis de 30 s, il faut soutenir <span class="math inline">112/30 = 3{,}7</span> Go/s ; dans 120 s, <span class="math inline">112/120 = 0{,}93</span> Go/s, et seulement si tous les rangs écrivent en parallèle vers un stockage qui suit.</p>
+<p>Le préavis sert donc à <strong>vider proprement</strong> (terminer l'étape, signaler la fin), pas à remplacer le checkpoint périodique. C'est ce que montre la répétition du lab 13.2 : un arrêt sans préavis perd les 12 étapes écoulées depuis le dernier checkpoint, un arrêt avec préavis traité par le job n'en perd aucune, et seul le premier cas est garanti partout.</p>
+</div>
+<h3 id="le-coût-dune-heure-utile">2.3. Le coût d'une heure utile</h3>
+<p>Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, avec <span class="math inline">C</span> le coût d'un checkpoint, <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le temps de reprise :</p>
+<p><span class="math display">T^* = \sqrt{2CM}, \qquad W(T) = \frac{C}{T} + \frac{T/2 + R}{M}</span></p>
+<p>La fraction <span class="math inline">W</span> est la part du temps alloué qui ne produit pas de progrès. Au point optimal elle se simplifie en <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span>. Le prix d'une heure <strong>utile</strong> est alors le prix catalogue divisé par <span class="math inline">1 - W</span> :</p>
+<p><span class="math display">p_{\text{utile}} = \frac{p}{1 - W(T^*)}</span></p>
+<p>L'offre préemptible bat l'offre à la demande tant que <span class="math inline">p_{\text{spot}} / (1 - W) &lt; p_{\text{demande}}</span>. La remise minimale vaut donc exactement <span class="math inline">W</span>.</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.2 — La remise qui rembourse les interruptions</span> Prenons un taux de 0,15 interruption par heure (<span class="math inline">M = 6{,}67</span> h), un checkpoint de 3 minutes (<span class="math inline">C = 0{,}05</span> h) et une reprise de 10 minutes (<span class="math inline">R = 0{,}167</span> h). Alors <span class="math inline">T^* = 0{,}8165</span> h, soit 49,0 minutes, et <span class="math inline">W = 0{,}1225 + 0{,}0250 = 0{,}1475</span>.</p>
+<p>Le spot bat l'offre à la demande dès que sa remise dépasse <strong>14,7 %</strong>. À 4,0 unités contre 10,0 à la demande, la remise est de 60 % et le prix de l'heure utile vaut <span class="math inline">4{,}0 / (1 - 0{,}1475) = 4{,}69</span> unités.</p>
+<p>Ces taux d'interruption sont des hypothèses de l'exemple. Mesurez les vôtres sur au moins quelques semaines : ils changent selon la région, l'heure et le type d'instance.</p>
+</div>
+<h3 id="capacité-garantie-et-capacité-bon-marché">2.4. Capacité garantie et capacité bon marché</h3>
+<p>La réservation planifiée et la capacité à attente répondent à un autre problème que le spot : obtenir des GPU <strong>à une date</strong>, pour un entraînement qu'on ne peut pas faire attendre. On paie alors la garantie par un engagement de durée, un paiement anticipé ou un délai. Les deux ne sont pas exclusives : une flotte combine souvent une base réservée, une couche à la demande pour les pics et du préemptible pour les travaux qui savent reprendre.</p>
+<p>Le module 15 donne le modèle de coût total qui tranche entre ces mélanges, ainsi que la lecture des contrats de capacité. Retenez ici le critère opérationnel : <strong>un job qui ne sait pas reprendre n'a pas sa place sur du préemptible</strong>, quelle que soit la remise.</p>
+<h3 id="choisir-un-modèle-par-charge">2.5. Choisir un modèle par charge</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Charge</th>
+<th>Modèle raisonnable</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Expériences courtes, jobs réparables</td>
+<td>préemptible avec reprise automatique</td>
+<td>checkpoint périodique, stockage qui survit à la VM</td>
+</tr>
+<tr class="even">
+<td>Entraînement long sur date ferme</td>
+<td>réservation planifiée ou contrat de capacité</td>
+<td>budget engagé, plan B si le bloc est annulé par le fournisseur</td>
+</tr>
+<tr class="odd">
+<td>Pics imprévus</td>
+<td>à la demande</td>
+<td>plafond de coût, quotas suffisants</td>
+</tr>
+<tr class="even">
+<td>Base permanente</td>
+<td>engagement d'usage ou parc propre</td>
+<td>taux d'occupation élevé et mesuré (module 15)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li>Six modèles : à la demande, engagement d'usage, réservation planifiée, capacité à attente, préemptible, contrat de capacité.</li>
+<li>Les préavis de préemption documentés vont de 0 à 120 secondes, au mieux : ils ne remplacent pas le checkpoint périodique.</li>
+<li>Prix d'une heure utile : <span class="math inline">p / (1 - W)</span> avec <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span> ; la remise minimale du spot vaut <span class="math inline">W</span>.</li>
+<li>Un job qui ne sait pas reprendre n'a pas sa place sur du préemptible.</li>
+<li>Les modèles se combinent : base réservée, pics à la demande, travaux reprenables en préemptible.</li>
+</ul>
+</div>
+<h2 id="ch3">3. Abstraire le fournisseur</h2>
+<p>« Sans réécrire les jobs » recouvre trois problèmes distincts. Chaque outil en résout un, et le confondre avec un autre est la première source de déception.</p>
+<h3 id="trois-problèmes-trois-familles-doutils">3.1. Trois problèmes, trois familles d'outils</h3>
+<ul>
+<li><strong>Provisionner</strong> une infrastructure : réseaux, comptes, buckets, clusters Kubernetes. Terraform et ses <em>providers</em> décrivent cet état de façon déclarative.</li>
+<li><strong>Placer un job</strong> : choisir un lieu et une offre, obtenir la capacité, relancer ailleurs après une préemption. SkyPilot occupe cet espace.</li>
+<li><strong>Répartir des jobs sur plusieurs clusters Kubernetes</strong> : MultiKueue, dans l'écosystème de Kueue, envoie un workload vers l'un des clusters candidats.</li>
+</ul>
+<p>Aucun des trois ne règle à votre place les données (chapitre 4), le réseau et l'identité (chapitre 6) ni la gouvernance (chapitre 8).</p>
+<h3 id="skypilot-un-courtier-entre-les-fournisseurs">3.2. SkyPilot : un courtier entre les fournisseurs</h3>
+<p>SkyPilot a été présenté à NSDI 2023 comme un <em>intercloud broker</em> : un logiciel qui voit l'écosystème des clouds comme un ensemble plutôt que comme des silos. Les auteurs motivent ce courtier par les régulations sur l'emplacement des données et par la protection contre les pannes majeures. L'outil est ouvert.</p>
+<p>Le job se décrit par un fichier YAML : ressources demandées, montages de fichiers, commandes <code>setup</code> et <code>run</code>. À partir de là, un optimiseur choisit le lieu le moins cher parmi ceux qui conviennent, et un <em>provisioner</em> obtient la capacité. L'article décrit un mécanisme de bascule : si l'allocation échoue par manque de capacité ou de quota, le lieu en échec est bloqué temporairement, l'optimiseur recalcule un plan sans lui et le <em>provisioner</em> réessaie.</p>
+<p>Cette bascule sert surtout pour les ressources rares. Selon l'article, il a fallu 3 à 5 tentatives de lieu pour obtenir 8 GPU V100 chez AWS, et 2 à 7 pour 8 GPU T4, selon le moment de la demande.</p>
+<h3 id="les-jobs-managés-et-la-reprise">3.3. Les jobs managés et la reprise</h3>
+<p>Pour un job qui doit survivre aux préemptions, SkyPilot propose les <em>managed jobs</em> (<code>sky jobs launch</code>). Un contrôleur surveille le job, le relance en cas de préemption, de panne de nœud ou de GPU, et nettoie à la fin. La documentation précise que le job doit enregistrer ses checkpoints sur un stockage persistant (volume ou bucket) pour reprendre sans repartir de zéro.</p>
+<p>La stratégie de reprise se choisit dans <code>job_recovery</code>. Avec <code>FAILOVER</code>, le job redémarre dans la même région et passe à la suivante s'il n'y trouve pas de ressources. Avec <code>EAGER_NEXT_REGION</code>, valeur par défaut d'après la documentation, il passe directement à la région suivante. La documentation justifie ce défaut pour le spot : en pratique, une préemption dans une région signale souvent un manque de ressources dans cette région.</p>
+<p>La documentation annonce aussi environ 70 % d'économie sur les coûts GPU avec des instances spot. C'est une affirmation du fournisseur de l'outil, sans conditions publiées sur cette page : traitez-la comme un ordre de grandeur à mesurer chez vous.</p>
+<h3 id="lire-un-job-ligne-à-ligne">3.4. Lire un job, ligne à ligne</h3>
+<p>Le fichier <code>job.yaml</code> du lab 13.2 est l'exemple de ce chapitre. Voici ses ressources et ses montages.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">accelerators</span><span class="kw">:</span><span class="at"> H100:8</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">use_spot</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">max_hourly_cost</span><span class="kw">:</span><span class="at"> </span><span class="fl">120.0</span><span class="co">          # per-instance price cap in USD, a budget guard (example value)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">any_of</span><span class="kw">:</span><span class="co">                         # the optimizer tries the cheapest first and fails over to the next</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">infra</span><span class="kw">:</span><span class="at"> aws/us-east-1</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">infra</span><span class="kw">:</span><span class="at"> gcp/us-central1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">infra</span><span class="kw">:</span><span class="at"> k8s/eu-gpu-cluster</span><span class="co">   # placeholder Kubernetes context</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">job_recovery</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">strategy</span><span class="kw">:</span><span class="at"> EAGER_NEXT_REGION</span><span class="co">   # after a preemption go straight to another location</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_restarts_on_errors</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">file_mounts</span><span class="kw">:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">/checkpoint</span><span class="kw">:</span><span class="co">                    # survives the loss of the VM; its location decides where egress is paid</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span><span class="at"> r2://example-ckpt-bucket</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> MOUNT_CACHED</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> MODEL_CHECKPOINT_RW</span></span></code></pre></div>
+<p>Trois lignes portent la politique. <code>any_of</code> donne trois lieux candidats, dont l'ordre de bascule est décidé par l'optimiseur ; <code>ordered</code> fixerait cet ordre. <code>job_recovery</code> choisit la stratégie de reprise. <code>file_mounts</code> place le checkpoint sur un bucket indépendant des trois lieux, ce qui évite qu'une bascule de AWS vers Google ne paie une sortie à chaque lecture (chapitre 4).</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — Ce que SkyPilot accepte, et ce qu'il laisse passer</span> La branche hors ligne du lab 13.2 charge les fichiers avec le vrai code de SkyPilot 0.14.1 (<code>sky.Task.from_yaml</code>), sans compte cloud. Sortie capturée sur le bac à sable de l'auteur (Linux 6.18, 4 vCPU), le 24 octobre 2026 :</p>
+<pre class="text"><code>skypilot 0.14.1
+  job.yaml: parsed, num_nodes=2, candidates=[&quot;AWS([Spot], {&#39;H100&#39;: 8}, max_cost=$120.0/hr)&quot;, &quot;GCP([Spot], {&#39;H100&#39;: 8}, max_cost=$120.0/hr)&quot;, &quot;Kubernetes([Spot], {&#39;H100&#39;: 8}, max_cost=$120.0/hr)&quot;]
+  rejected as expected: unknown key in resources (InvalidSkyPilotConfigError)
+  rejected as expected: use_spot is not a boolean (InvalidSkyPilotConfigError)
+  rejected as expected: unknown mount mode (InvalidSkyPilotConfigError)
+  rejected as expected: malformed accelerators (ValueError)
+  rejected as expected: unknown top-level key (InvalidSkyPilotConfigError)</code></pre>
+<p>L'analyse attrape les fautes de frappe, les mauvais types et les modes de montage invalides. Elle a aussi rejeté ma première version du fichier : <code>type:</code> n'est permis qu'avec <code>mode: MOUNT_CACHED</code>.</p>
+<p>Elle <strong>accepte</strong> en revanche un nom de stratégie <code>job_recovery</code> invalide, et le fichier <code>bad-job.yaml</code>, qui n'a aucune reprise ni étiquette. Le chapitre 8 montre la politique qui comble ce trou. Rien de tout cela ne prouve qu'un lieu a de la capacité ou que votre quota l'autorise.</p>
+<p>Lecture du code de SkyPilot 0.14.1 (<code>sky/clouds/kubernetes.py</code>), non exécutée : <code>use_spot</code> n'est admis sur un contexte Kubernetes que si ses nœuds portent une étiquette <em>spot</em>. Le troisième lieu de <code>job.yaml</code>, factice, pourrait donc être écarté au lancement alors que l'analyse l'accepte.</p>
+</div>
+<h3 id="terraform-multi-fournisseur">3.5. Terraform multi-fournisseur</h3>
+<p>Terraform sait configurer plusieurs <em>providers</em>, y compris plusieurs configurations d'un même provider grâce à l'argument <code>alias</code>, que la documentation présente comme le moyen de définir plusieurs configurations pour un même fournisseur et de choisir laquelle utiliser pour chaque ressource ou module. Une flotte multi-fournisseurs l'utilise pour créer, de façon répétable, les comptes, les réseaux, les buckets et les clusters dans chaque lieu.</p>
+<p>Ce que Terraform ne fait pas : il ne connaît ni la préemption, ni le placement d'un job, ni la file d'attente. L'abstraction du fournisseur y est celle des <strong>modules que vous écrivez</strong> : un module « cluster GPU » par fournisseur, avec la même interface. C'est un travail d'ingénierie à planifier, pas une propriété de l'outil. Le <a href="../provisioning/index.html">module 6</a> traite le provisionnement en détail.</p>
+<h3 id="kubernetes-sur-plusieurs-clusters">3.6. Kubernetes sur plusieurs clusters</h3>
+<p>MultiKueue est une extension de Kueue. La documentation la présente comme fonctionnalité bêta depuis Kueue v0.9, activée par défaut. Un dispositif MultiKueue comprend un cluster <em>manager</em> et au moins un cluster <em>worker</em>. Quand le workload d'un job obtient une réservation de quota sur le manager, un algorithme de dispatch (<code>AllAtOnce</code>, <code>Incremental</code> ou personnalisé) le crée sur tout ou partie des workers. Dès qu'un worker l'admet, le manager supprime les copies des autres.</p>
+<div class="war">
+<p><span class="tag">Le manager ne travaille pas pour lui-même</span> La documentation de MultiKueue précise que le partage de rôle, où le cluster manager serait aussi l'un de ses propres workers, n'est pas supporté pour l'instant. Un cluster de contrôle dédié est donc une dépense à prévoir. Source : <a href="https://kueue.sigs.k8s.io/docs/concepts/multikueue/">MultiKueue</a>, lu le 24 octobre 2026. Le module 12 traite Kueue.</p>
+</div>
+<h3 id="ce-que-labstraction-ne-cache-pas">3.7. Ce que l'abstraction ne cache pas</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Sujet</th>
+<th>Ce que l'outil abstrait</th>
+<th>Ce qui reste à vous</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lieu et capacité</td>
+<td>la liste des lieux candidats et la bascule</td>
+<td>les quotas, le compte, l'accès à la capacité</td>
+</tr>
+<tr class="even">
+<td>Image et pilotes</td>
+<td>l'image par lieu peut se déclarer</td>
+<td>construire et tester l'image sur chaque fournisseur</td>
+</tr>
+<tr class="odd">
+<td>Interconnexion</td>
+<td>une option <code>network_tier</code></td>
+<td>les variables NCCL, la performance mesurée (module 7)</td>
+</tr>
+<tr class="even">
+<td>Données</td>
+<td>un montage de bucket</td>
+<td>où vit le bucket, ce que coûte le lire depuis ailleurs</td>
+</tr>
+<tr class="odd">
+<td>Identité</td>
+<td>des identifiants par fournisseur</td>
+<td>la fédération, la rotation, les droits minimaux (chapitre 6)</td>
+</tr>
+<tr class="even">
+<td>Coût</td>
+<td>un plafond par instance, un classement par prix catalogue</td>
+<td>l'allocation par équipe, l'imputation (chapitre 8)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>Provisionner (Terraform), placer un job (SkyPilot) et répartir sur des clusters Kubernetes (MultiKueue) sont trois problèmes distincts.</li>
+<li>SkyPilot calcule un placement par coût, bascule par lieu en cas d'échec d'allocation et relance les jobs managés après une préemption, à condition d'un checkpoint sur stockage persistant.</li>
+<li><code>EAGER_NEXT_REGION</code> est la valeur par défaut de reprise : une préemption signale souvent une pénurie dans la région.</li>
+<li>Une analyse hors ligne attrape les fautes de syntaxe, pas les erreurs de politique ni les manques de capacité ou de quota.</li>
+<li>Le job est portable ; l'image, l'interconnexion, les données et l'identité ne le sont pas.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Données et gravité</h2>
+<p>Un GPU se loue à l'heure et se déplace en quelques minutes. Un jeu de données de dizaines de téraoctets se déplace en heures, coûte de l'argent à chaque sortie et laisse deux copies à gouverner. C'est ce qu'on appelle la <strong>gravité des données</strong> : plus un volume est gros, plus il attire les calculs vers l'endroit où il se trouve.</p>
+<h3 id="trois-coûts-dun-déplacement">4.1. Trois coûts d'un déplacement</h3>
+<ul>
+<li><strong>L'argent.</strong> La sortie de données est facturée à l'endroit qu'on quitte ; le stockage est facturé aux deux endroits pendant le chevauchement.</li>
+<li><strong>Le temps.</strong> Une copie de <span class="math inline">D</span> Go sur un lien de <span class="math inline">B</span> Gbit/s à l'efficacité <span class="math inline">\eta</span> dure <span class="math inline">8D / (\eta B)</span> secondes. Pendant ce temps, les GPU attendent ou ne démarrent pas.</li>
+<li><strong>La cohérence.</strong> Deux copies peuvent diverger ; savoir laquelle fait foi est une décision de gouvernance.</li>
+</ul>
+<h3 id="anatomie-dune-facture-de-sortie">4.2. Anatomie d'une facture de sortie</h3>
+<p>Les fournisseurs facturent la sortie vers Internet par tranches mensuelles dégressives, après une franchise. Avec <span class="math inline">f</span> la franchise, <span class="math inline">u_k</span> les bornes cumulées des tranches (comptées après la franchise, <span class="math inline">u_0 = 0</span>) et <span class="math inline">r_k</span> leurs tarifs par Go, le coût mensuel de <span class="math inline">x</span> Go vaut :</p>
+<p><span class="math display">F(x) = \sum_k r_k \cdot \max\bigl(0,\ \min(x - f,\ u_k) - u_{k-1}\bigr)</span></p>
+<p>Chez AWS, les tranches se cumulent sur le mois et sur plusieurs services du compte (EC2, S3, RDS et d'autres, d'après la <a href="https://aws.amazon.com/ec2/pricing/on-demand/">page de tarification EC2</a>) : une franchise déjà consommée par d'autres usages n'est plus disponible. Le lab 13.3 gère ce cas avec le paramètre <code>used_gb</code>.</p>
+<p>Le tableau donne les tarifs lus le 24 octobre 2026 à la source de chaque ligne. <strong>Ne figez jamais ces valeurs</strong> : relisez la page du fournisseur le jour de votre étude.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Offre</th>
+<th>Franchise mensuelle</th>
+<th>Tarif par Go</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AWS, sortie Internet depuis us-east-1</td>
+<td>100 Go</td>
+<td>0,09 USD jusqu'à 10 240 Go, 0,085 jusqu'à 51 200 Go, 0,07 jusqu'à 153 600 Go, 0,05 au-delà (volumes comptés après la franchise)</td>
+<td><a href="https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSDataTransfer/current/index.json">liste de prix AWS</a>, publiée le 2026-09-16</td>
+</tr>
+<tr class="even">
+<td>AWS, de us-east-1 vers une autre région</td>
+<td>aucune</td>
+<td>0,02 USD (vers l'Irlande et l'Oregon)</td>
+<td>même liste de prix</td>
+</tr>
+<tr class="odd">
+<td>Azure, Europe de l'Ouest, <em>routing preference</em> Internet</td>
+<td>100 Go</td>
+<td>0,08 USD jusqu'à 10 100 Go au total, 0,065 jusqu'à 50 100, 0,06 jusqu'à 150 100, 0,04 au-delà</td>
+<td><a href="https://prices.azure.com/api/retail/prices">API de prix Azure</a>, tarif en vigueur depuis 2022-03-01</td>
+</tr>
+<tr class="even">
+<td>Cloudflare R2, tous types de stockage</td>
+<td>sans objet</td>
+<td>0 : pas de frais de sortie (la classe Infrequent Access a des frais de récupération)</td>
+<td><a href="https://developers.cloudflare.com/r2/pricing/">page de prix R2</a>, mise à jour le 1er octobre 2026</td>
+</tr>
+<tr class="odd">
+<td>Backblaze B2</td>
+<td>jusqu'à 3 fois le volume moyen stocké</td>
+<td>0,01 USD au-delà</td>
+<td><a href="https://www.backblaze.com/cloud-storage/pricing">page de prix B2</a>, lue le 2026-10-24</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Google Cloud publie aussi ses tarifs de transfert, mais le tableau de la page lue est aplati et ses colonnes ne se rattachent pas aux en-têtes sans ambiguïté : ce cours ne cite aucun tarif Google et renvoie à la <a href="https://cloud.google.com/vpc/network-pricing">page de prix du réseau</a>.</p>
+<h3 id="un-exemple-publié-avec-des-tarifs-daujourdhui">4.3. Un exemple publié, avec des tarifs d'aujourd'hui</h3>
+<p>L'article SkyPilot offre un cas chiffré. Un pipeline entraîne un ResNet-50 sur ImageNet (150 Go, stocké sur AWS S3). Le plan « tout sur AWS » coûte 85 USD. Le plan choisi par l'optimiseur envoie les données chez Google, pour utiliser un TPU : 57 USD, dont 44 de calcul et 13 de sortie. L'article note en bas de page que, avec une entrée quatre fois plus grosse (600 Go), l'optimiseur renonce au transfert parce que la sortie domine.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — À partir de quelle taille le déménagement perd-il ?</span> La sortie de 13 USD pour 150 Go donne un tarif implicite de <span class="math inline">13/150 = 0{,}0867</span> USD par Go. En gardant fixes les coûts de calcul de l'article (44 et 85 USD), ce que suppose sa note, le déménagement reste avantageux tant que <span class="math inline">44 + 0{,}0867\,D &lt; 85</span>, soit <span class="math inline">D &lt; 41/0{,}0867 = 473</span> Go. Les 150 Go sont sous ce seuil, les 600 Go le dépassent.</p>
+<p>Avec la carte tarifaire d'aujourd'hui (AWS, franchise de 100 Go déjà consommée) le lab 13.3 calcule :</p>
+<pre class="text"><code>[S1] 150 GB leaving AWS us-east-1 (volume of the dataset in the SkyPilot paper, section 5.1.1)
+  free allowance still available :     4.50 USD
+  free allowance already used up :    13.50 USD
+[S2] same, dataset 4x larger (600 GB)
+  free allowance already used up :    54.00 USD</code></pre>
+<p>Sortie capturée sur le bac à sable de l'auteur le 24 octobre 2026. Le tarif actuel de 0,09 USD par Go retrouve les 13 USD de l'article (13,50). Le seuil devient <span class="math inline">41/0{,}09 = 456</span> Go. Si la franchise est encore intacte, la sortie de 150 Go ne coûte que 4,50 USD : la franchise compte pour les petits volumes seulement. Les prix de calcul de l'article (2022-2023) ne sont pas ceux d'aujourd'hui, mais le raisonnement tient.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 560 290" role="img" aria-labelledby="be-t be-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="be-t">
+Coût du plan qui reste sur AWS contre le plan qui déménage les données
+</title>
+<desc id="be-d">Le coût du plan qui reste sur AWS est constant à 85 USD. Le coût du plan qui déménage vaut 44 USD plus 0,0867 USD par Go. Les deux droites se croisent à 473 Go. À 150 Go le déménagement coûte 57 USD, à 600 Go il en coûte 96.</desc> <line x1="60" y1="240" x2="530" y2="240" stroke="currentColor" stroke-width="2"/> <line x1="60" y1="240" x2="60" y2="24" stroke="currentColor" stroke-width="2"/> <text x="295" y="276" text-anchor="middle" font-size="14" fill="currentColor">taille du jeu de données (Go)</text> <text x="14" y="36" font-size="14" fill="currentColor">USD</text> <text x="60" y="258" text-anchor="middle" font-size="14" fill="currentColor">0</text> <text x="295" y="258" text-anchor="middle" font-size="14" fill="currentColor">350</text> <text x="530" y="258" text-anchor="middle" font-size="14" fill="currentColor">700</text> <text x="54" y="244" text-anchor="end" font-size="14" fill="currentColor">0</text> <text x="54" y="84" text-anchor="end" font-size="14" fill="currentColor">85</text> <line x1="60" y1="80" x2="530" y2="80" stroke="currentColor" stroke-width="3"/> <line x1="60" y1="157" x2="530" y2="43" stroke="var(--accent)" stroke-width="3"/> <circle cx="377" cy="80" r="6" fill="var(--accent)"/> <text x="386" y="110" font-size="14" fill="currentColor">égalité à 473 Go</text> <text x="70" y="72" font-size="14" fill="currentColor">rester sur AWS : 85</text> <text x="70" y="188" font-size="14" fill="var(--accent)">déménager : 44 + 0,0867 par Go</text> <circle cx="161" cy="133" r="4" fill="currentColor"/> <text x="170" y="128" font-size="14" fill="currentColor">150 Go : 57</text> <circle cx="463" cy="59" r="4" fill="currentColor"/> <text x="400" y="52" font-size="14" fill="currentColor">600 Go : 96</text>
+</svg>
+<figcaption>
+Le plan qui déménage les données gagne tant que la sortie reste faible devant l'économie de calcul ; il perd au-delà de 473 Go. Chiffres de l'article SkyPilot (NSDI 2023, section 5.1.1), non actualisés.
+</figcaption>
+</figure>
+<h3 id="étaler-un-déménagement-ne-le-rend-pas-toujours-moins-cher">4.4. Étaler un déménagement ne le rend pas toujours moins cher</h3>
+<p>Puisque les tranches et la franchise repartent chaque mois, on pourrait croire qu'étaler un gros transfert sur plusieurs mois réduit la facture. Deux effets s'opposent. Étaler regagne la franchise chaque mois, ce qui compte pour les petits volumes. Étaler perd aussi les tranches dégressives, ce qui compte pour les gros.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.2 — 50 To et 200 To</span> Le lab 13.3 calcule le déménagement de 50 To d'AWS S3 vers R2, avec un mois de stockage double, sur un lien de 10 Gbit/s à 80 % :</p>
+<pre class="text"><code>[S3] 50 TB (50 000 GB) AWS S3 -&gt; R2, one month of double storage, 10 Gbit/s link at 80 %
+  egress   4292.70  dst storage   750.00  src storage  1150.00  TOTAL   6192.70 USD  in 13.9 h (0.58 d)</code></pre>
+<p>La sortie ne fait que 69 % de la facture : le stockage chevauché pèse 31 %. Pour 200 To sortant d'AWS us-east-1, étaler change le total ainsi :</p>
+<pre class="text"><code>[S4] 200 TB (200 000 GB) leaving AWS us-east-1: one month vs split over several months
+  split over 1 month(s):   13886.20 USD   (avg 0.0694 USD/GB)
+  split over 2 month(s):   15624.40 USD   (avg 0.0781 USD/GB)
+  split over 4 month(s):   17170.80 USD   (avg 0.0859 USD/GB)</code></pre>
+<p>Étaler sur deux mois coûte 12,5 % de plus. Pour 300 Go, au contraire, trois mois de 100 Go sortent entièrement dans la franchise : 0 USD contre 18 USD en un mois. Sortie capturée sur le bac à sable de l'auteur le 24 octobre 2026.</p>
+</div>
+<h3 id="copier-ou-relire-à-distance">4.5. Copier ou relire à distance ?</h3>
+<p>Un entraînement qui lit son jeu de données à chaque époque depuis un bucket d'un autre fournisseur paie la sortie à chaque lecture. Copier une fois coûte la sortie, plus le stockage du côté de l'entraînement.</p>
+<p>Pour 150 Go, avec les tarifs de la carte, le lab 13.3 trouve : copie 6,75 USD (4,50 de sortie et 2,25 de stockage R2 sur un mois), contre 4,50 USD pour la première époque lue à distance (la franchise absorbe 100 Go), puis 13,50 USD par époque supplémentaire. La copie gagne dès la deuxième époque. À 90 époques, la relecture distante coûte 1 190 USD contre 6,75. Un cache local à la lecture (le mode <code>MOUNT_CACHED</code> de SkyPilot en est un) réduit le coût de la relecture, mais ne supprime pas la première lecture.</p>
+<h3 id="les-sorties-gratuites-ont-des-conditions">4.6. Les sorties « gratuites » ont des conditions</h3>
+<div class="war">
+<p><span class="tag">Une sortie gratuite pour partir, pas pour exploiter</span> AWS offre la sortie gratuite vers Internet aux clients qui déplacent <strong>toutes</strong> leurs données hors d'AWS, ou toutes celles d'un service donné, après demande au support. Google Cloud l'offre aux clients qui ont l'intention de résilier leur contrat pour le service concerné, avec un préavis et des délais documentés. Aucun de ces deux programmes ne couvre l'exploitation courante d'une flotte sur deux fournisseurs. Sources : <a href="https://aws.amazon.com/blogs/aws/free-data-transfer-out-to-internet-when-moving-out-of-aws/">AWS</a>, <a href="https://cloud.google.com/exit-cloud">Google Cloud</a>, lus le 24 octobre 2026.</p>
+</div>
+<p>Pour les clients européens, le règlement européen sur les données (<em>Data Act</em>) encadre le changement de fournisseur. L'article d'AWS indique que sa dispense suit la direction fixée par ce règlement, et l'addendum contractuel d'AWS exige une demande de changement au moins deux mois avant la date prévue. Le texte du règlement n'a pas pu être relu à la source depuis le bac à sable (EUR-Lex et le site de la Commission refusent les accès) : les dates d'application exactes sont dans « À vérifier ».</p>
+<p>Deux pratiques contournent le problème plutôt que de le payer. Stocker les jeux de données dans un <strong>objet neutre à sortie gratuite</strong>, comme le fait <code>job.yaml</code> avec un bucket R2 : les lectures depuis n'importe quel fournisseur ne paient pas de sortie du côté du stockage. Et <strong>garder les gros jeux près des GPU les moins chers</strong>, plutôt que de chasser le prix horaire.</p>
+<h3 id="résidence-et-conformité">4.7. Résidence et conformité</h3>
+<p>La résidence des données n'est pas un coût mais une contrainte dure : elle retire des candidats avant tout calcul d'optimisation. L'article SkyPilot cite parmi ses motivations les régulations sur l'emplacement et le traitement des données. Dans la pratique, la contrainte se traduit en liste de lieux autorisés, appliquée mécaniquement (la règle <code>--allow-prefix</code> de <code>policy_check.py</code> au chapitre 8) et revue avec le juriste de l'organisation. Ce cours ne donne pas d'avis juridique.</p>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li>Trois coûts de déplacement : argent (sortie et double stockage), temps (<span class="math inline">8D/(\eta B)</span>) et cohérence des copies.</li>
+<li>La sortie se facture par tranches mensuelles dégressives après une franchise, cumulées sur le compte ; les tarifs se relisent le jour de l'étude.</li>
+<li>Un déménagement avantageux à 150 Go peut perdre à 600 Go : calculez le seuil (473 Go dans l'exemple publié, 456 Go avec le tarif actuel).</li>
+<li>Étaler un transfert regagne la franchise mais perd les tranches dégressives ; selon le volume, c'est un gain ou une perte.</li>
+<li>Les programmes de sortie gratuite supposent un départ complet ; un stockage neutre à sortie gratuite contourne la facture.</li>
+</ul>
+</div>
+<h2 id="ch5">5. Placement, files et reprise entre fournisseurs</h2>
+<p>Placer un job, c'est répondre à une question au démarrage et à chaque préemption : où repart-il ? Ce chapitre formule la réponse comme un score, la compare à trois politiques plus naïves sur des tirages communs, et en déduit un seuil de bascule.</p>
+<h3 id="trois-objectifs">5.1. Trois objectifs</h3>
+<p>Un placement équilibre trois objectifs qui se contredisent.</p>
+<ul>
+<li><strong>Le coût</strong>, compté en prix d'une heure <strong>utile</strong> (chapitre 2), plus les frais de déplacement (chapitre 4).</li>
+<li><strong>La latence</strong>, c'est-à-dire le délai avant que le job tourne : copie des données, attente de capacité, démarrage de la VM.</li>
+<li><strong>La fiabilité</strong>, qui est la fréquence des préemptions et la marge avant l'échéance.</li>
+</ul>
+<p>Le lab 13.1 les réunit dans un score à minimiser pour chaque pool candidat. Soit <span class="math inline">w</span> le travail restant en heures, <span class="math inline">n</span> le nombre de GPU, <span class="math inline">W</span> le gaspillage du pool, <span class="math inline">e</span> le tarif de sortie par Go et <span class="math inline">\lambda</span> la valeur d'une heure de retard :</p>
+<p><span class="math display">S = \frac{p}{1-W}\; n\, w \;+\; e\,(\text{Go à copier}) \;+\; \lambda\Bigl(t_{\text{copie}} + t_{\text{attente}} + t_{\text{démarrage}} + \frac{w}{1-W}\Bigr)</span></p>
+<p>Le paramètre <span class="math inline">\lambda</span> vient de l'activité, pas du code : c'est ce que coûte un jour de retard (une échéance de conférence, une fenêtre de lancement). Le simulateur ne sait pas le choisir.</p>
+<h3 id="quatre-politiques">5.2. Quatre politiques</h3>
+<ul>
+<li><strong><code>stay</code></strong> relance toujours dans le même pool et attend de la capacité. C'est la référence sans mouvement.</li>
+<li><strong><code>cheapest</code></strong>, le chasseur de prix, va toujours vers le prix catalogue le plus bas et attend sa capacité. Il ignore le gaspillage et le coût de déplacement.</li>
+<li><strong><code>failover</code></strong> prend le moins cher <strong>parmi les pools qui accordent de la capacité maintenant</strong>. C'est ce que fait une liste <code>any_of</code> avec bascule : le premier lieu qui répond gagne.</li>
+<li><strong><code>aware</code></strong> minimise le score <span class="math inline">S</span> du paragraphe précédent.</li>
+</ul>
+<p>Dans SkyPilot, <code>ordered</code> fixe l'ordre d'essai et <code>any_of</code> le laisse à l'optimiseur ; <code>FAILOVER</code> et <code>EAGER_NEXT_REGION</code> règlent où repart un job managé après une panne (chapitre 3). Aucun ne calcule à votre place le seuil de la section 5.4.</p>
+<h3 id="ce-que-donne-le-simulateur">5.3. Ce que donne le simulateur</h3>
+<p>Le scénario du lab 13.1 est entièrement <strong>synthétique</strong> : quatre pools de trois fournisseurs, un job de 64 GPU et 120 h de calcul utile, un checkpoint de 112 Go, un tarif de sortie de 0,09 u par Go et <span class="math inline">\lambda = 40</span> u par heure. Les lignes du tableau suivant donnent la moyenne sur 200 graines, les mêmes pour chaque politique.</p>
+<pre class="text"><code>SYNTHETIC pools (u = arbitrary unit):
+  a-od    provider A  price 10.00  hazard 0.00/h  p_avail 0.90  price per useful GPU-hour 10.000
+  a-spot  provider A  price  4.00  hazard 0.15/h  p_avail 0.60  price per useful GPU-hour  4.695
+  b-spot  provider B  price  3.00  hazard 0.30/h  p_avail 0.80  price per useful GPU-hour  3.867
+  c-spot  provider C  price  3.40  hazard 0.10/h  p_avail 0.50  price per useful GPU-hour  3.851
+job: 64 GPUs x 120 h of work, deadline 240 h, checkpoint 112 GB, home provider A; 200 seeds, lam = 40 u/h
+ data GB    policy     cost u  finish h  late %  moves  preempt
+       0      stay      36577     145.6     0.0   0.00    21.57
+       0  cheapest      30285     159.5     0.0   1.00    46.95
+       0  failover      53967     135.9     0.0   6.46    18.14
+       0     aware      29785     139.4     0.0   1.04    13.29
+         aware - stay:     -6791 u (+/- 175, paired over 200 seeds)
+    1000      stay      36577     145.6     0.0   0.00    21.57
+    1000  cheapest      30409     160.0     0.0   1.00    47.16
+    1000  failover      51273     138.6     0.0   6.84    20.33
+    1000     aware      29974     140.3     0.0   1.00    13.82
+         aware - stay:     -6603 u (+/- 173, paired over 200 seeds)
+   10000      stay      36577     145.6     0.0   0.00    21.57
+   10000  cheapest      31180     162.3     0.0   1.00    47.23
+   10000  failover      53457     142.5     0.0   6.71    20.09
+   10000     aware      30815     143.0     0.0   1.00    13.93
+         aware - stay:     -5761 u (+/- 173, paired over 200 seeds)
+   30000      stay      36577     145.6     0.0   0.00    21.57
+   30000  cheapest      32934     167.6     0.0   1.00    46.80
+   30000  failover      57822     150.6     0.0   6.84    19.37
+   30000     aware      32584     148.4     0.0   1.00    13.59
+         aware - stay:     -3992 u (+/- 181, paired over 200 seeds)
+   60000      stay      36577     145.6     0.0   0.00    21.57
+   60000  cheapest      35621     175.7     0.0   1.00    46.56
+   60000  failover      58942     167.1     0.0   7.30    21.14
+   60000     aware      35251     156.5     0.0   1.00    13.72
+         aware - stay:     -1326 u (+/- 173, paired over 200 seeds)
+  100000      stay      36577     145.6     0.0   0.00    21.57
+  100000  cheapest      39226     186.9     0.0   1.00    46.47
+  100000  failover      66546     184.9     0.0   6.83    20.13
+  100000     aware      36577     145.6     0.0   0.00    21.57
+         aware - stay:        +0 u (+/- 0, paired over 200 seeds)
+worst ratio aware / min(other policies) over the scan: 1.000
+mean moves of &#39;aware&#39; by dataset size: 0:1.04, 1000:1.00, 10000:1.00, 30000:1.00, 60000:1.00, 100000:0.00
+smallest scanned dataset for which &#39;aware&#39; (almost) never moves: 100000 GB
+CRITERION (moves of &#39;aware&#39; non-increasing with data size; cost &lt;= 1.05 x the best other policy): OK</code></pre>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — Lire le tableau</span> Sortie capturée sur le bac à sable de l'auteur le 24 octobre 2026 (<code>python3 scenarios.py --seeds 200</code>, reproductible à l'identique). Colonnes : taille du jeu de données, politique, coût moyen en u, fin moyenne en heures, part en retard, déménagements, préemptions.</p>
+<p>Sans donnée à déplacer, <code>cheapest</code> (30 285 u) et <code>aware</code> (29 785 u) battent <code>stay</code> (36 577 u). Mais <code>cheapest</code> subit 47 préemptions contre 13 et finit 20 h plus tard, parce qu'il vise le pool le moins cher au catalogue (b-spot) et non le moins cher par heure utile.</p>
+<p>À 100 To, le chasseur de prix paie 39 226 u, 7,2 % de plus que <code>stay</code>, et finit 41 h plus tard. <code>aware</code> reste sur place (0 déménagement) et retrouve exactement le coût de <code>stay</code>. <code>failover</code> coûte 47,5 % de plus que <code>stay</code> dès 0 To : c'est le piège du paragraphe suivant.</p>
+</div>
+<h3 id="le-piège-du-pool-à-la-demande">5.4. Le piège du pool à la demande</h3>
+<p>La politique <code>failover</code> atterrit chez le pool à la demande chaque fois que les pools spot refusent au moment de la demande. Ce pool n'est jamais préempté : rien ne ramène donc jamais le job sur du spot. Dans le tableau, le coût de 53 967 u contre 36 577 u pour <code>stay</code>, à 0 Go de données, le montre ; le test <code>test_on_demand_trap_costs_more_than_waiting_for_spot</code> reproduit le mécanisme sur un cas minimal.</p>
+<p>Les 6,5 déménagements viennent d'un autre effet : à chaque préemption, <code>failover</code> reprend la décision et saute d'un fournisseur spot à l'autre (observé en journalisant les décisions du simulateur sur les mêmes 200 graines ; <code>scenarios.py</code> ne l'affiche pas).</p>
+<p>Une liste <code>any_of</code> qui mélange spot et à la demande a ce comportement. Les parades sont de ne mettre à la demande dans la liste qu'en dernier recours explicite (<code>ordered</code>), de plafonner la durée d'un job sur du à-la-demande, ou de réévaluer le placement périodiquement. Le simulateur ne réévalue qu'à la préemption : c'est une limite assumée du lab.</p>
+<h3 id="le-seuil-de-bascule">5.5. Le seuil de bascule</h3>
+<p>Pour la politique <code>aware</code>, le seuil de taille de données au-delà duquel on ne bascule plus se calcule directement.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.2 — À partir de quel jeu de données reste-t-on ?</span> Passer du pool a-spot (4,695 u par heure utile) au pool c-spot (3,851) économise <span class="math inline">0{,}8442 \times 64 \times 120 = 6\,483</span> u sur 120 h (valeurs non arrondies). Chaque Go déplacé coûte 0,09 u de sortie, plus le temps de copie valorisé : <span class="math inline">\lambda \times 8/(10 \times 0{,}8)/3600 = 0{,}011</span> u par Go, soit 0,101 u par Go au total.</p>
+<p>Au premier ordre, le seuil vaut <span class="math inline">6483/0{,}101 \approx 64\,000</span> Go. Le calcul exact du score (<code>Aware.score</code> à l'instant 0, les deux pools refusant la capacité, avec le checkpoint, le démarrage et la durée de chaque pool) donne <strong>65 931 Go</strong> : un peu plus de 65 To. La commande <code>python3 threshold.py</code> du lab 13.1 le recalcule.</p>
+<p>Ce seuil dépend de <span class="math inline">\lambda</span> : 71 925 Go si le temps ne vaut rien, 41 786 Go si une heure de retard vaut 400 u (même commande). Le balayage du tableau le confirme : <code>aware</code> déménage en moyenne une fois à 60 To, jamais à 100 To.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 560 300" role="img" aria-labelledby="fl-t fl-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="fl-t">
+Décision après une préemption
+</title>
+<desc id="fl-d">Après une préemption, le job perd le travail depuis le dernier checkpoint. Trois options : attendre le même pool, changer de pool chez le même fournisseur sans sortie de données, ou changer de fournisseur en payant la sortie du checkpoint et du jeu de données absent.</desc> <defs><marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker></defs> <rect x="140" y="14" width="280" height="46" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="280" y="34" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Préemption</text> <text x="280" y="52" text-anchor="middle" font-size="14" fill="currentColor">travail perdu : dernier checkpoint</text> <line x1="280" y1="60" x2="280" y2="86" stroke="var(--accent)" stroke-width="3" marker-end="url(#ar5)"/> <text x="280" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Calculer le score S de chaque pool</text> <line x1="150" y1="116" x2="80" y2="152" stroke="var(--accent)" stroke-width="3" marker-end="url(#ar5)"/> <line x1="280" y1="114" x2="280" y2="152" stroke="var(--accent)" stroke-width="3" marker-end="url(#ar5)"/> <line x1="410" y1="116" x2="480" y2="152" stroke="var(--accent)" stroke-width="3" marker-end="url(#ar5)"/> <rect x="8" y="154" width="170" height="104" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="93" y="176" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Même pool</text> <text x="93" y="198" text-anchor="middle" font-size="14" fill="currentColor">pas de sortie</text> <text x="93" y="218" text-anchor="middle" font-size="14" fill="currentColor">attente de capacité</text> <text x="93" y="238" text-anchor="middle" font-size="14" fill="currentColor">prix : le même</text> <rect x="195" y="154" width="170" height="104" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="280" y="176" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Même fournisseur</text> <text x="280" y="198" text-anchor="middle" font-size="14" fill="currentColor">autre pool, sans sortie</text> <text x="280" y="218" text-anchor="middle" font-size="14" fill="currentColor">autre prix, autre taux</text> <text x="280" y="238" text-anchor="middle" font-size="14" fill="currentColor">capacité différente</text> <rect x="382" y="154" width="170" height="104" rx="6" fill="var(--side-bg)" stroke="var(--accent)" stroke-width="3"/> <text x="467" y="176" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Autre fournisseur</text> <text x="467" y="198" text-anchor="middle" font-size="14" fill="currentColor">sortie : checkpoint</text> <text x="467" y="218" text-anchor="middle" font-size="14" fill="currentColor">+ données absentes</text> <text x="467" y="238" text-anchor="middle" font-size="14" fill="currentColor">+ temps de copie</text> <text x="280" y="284" text-anchor="middle" font-size="14" fill="currentColor">on choisit le plus petit S, pas le plus bas prix</text>
+</svg>
+<figcaption>
+Trois issues après une préemption. Seule la troisième déclenche une sortie de données ; le score S les met toutes sur la même échelle de coût.
+</figcaption>
+</figure>
+<h3 id="reprise-entre-fournisseurs">5.6. Reprise entre fournisseurs</h3>
+<p>Une reprise ailleurs exige trois choses disponibles <strong>depuis n'importe quel lieu candidat</strong> : le dernier checkpoint, le jeu de données et l'image. Le plus simple est un stockage objet neutre pour les deux premiers (chapitre 4), et une image publiée dans un registre accessible partout.</p>
+<p>L'article SkyPilot rapporte un cas favorable (ses auteurs écrivent <em>a good case</em>) sur une charge de bio-informatique. Le courtier a déplacé rapidement les 22 jobs préemptés vers une autre région, restée sans préemption pendant toute l'expérience. La région d'origine continuait de préempter dans toutes ses zones, ce qui causait beaucoup de traînards avec la stratégie à région unique. L'article présente aussi, sur une trace réelle de huit jours avec 24 VM spot de GCP, le cumul des préemptions au cours du temps.</p>
+<p>Les auteurs précisent que cette politique n'est pas toujours meilleure que de rester dans la région : un job parti d'une région calme peut être déplacé vers une région plus agitée.</p>
+<p>Une règle de sécurité complète le score : une <strong>garde d'échéance</strong>. Avant de choisir une offre préemptible, vérifiez que la fin attendue, <span class="math inline">t_{\text{démarrage}} + t_{\text{attente}} + w/(1-W)</span>, laisse une marge avant l'échéance ; sinon retenez le pool fiable. La politique « couverte » du <a href="../../projects/multi-provider-scheduler/index.html">projet 4</a> le fait pour une file de jobs, avec une capacité limitée par pool.</p>
+<h3 id="les-files">5.7. Les files</h3>
+<p>Le placement d'un job isolé ne dit rien de la file. Quand dix jobs veulent les mêmes GPU, l'ordre de service compte autant que le lieu. Sur Slurm, c'est la priorité, l'équité et la préemption par QOS du <a href="../slurm/index.html">module 5</a> ; sur Kubernetes, ce sont les files et les quotas de Kueue du <a href="../kubernetes-gpu/index.html">module 12</a>, avec MultiKueue pour dispatcher vers plusieurs clusters. L'algorithme <code>Incremental</code> de MultiKueue évite de créer le workload partout en même temps, au prix d'un démarrage plus lent (par défaut, trois clusters par tour et cinq minutes avant le tour suivant).</p>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Un score de placement additionne le prix de l'heure utile, la sortie de données et la valeur du temps ; <span class="math inline">\lambda</span> vient de l'activité, pas du code.</li>
+<li>Quatre politiques sur tirages communs : <code>stay</code>, <code>cheapest</code>, <code>failover</code> (piège du pool à la demande) et <code>aware</code>.</li>
+<li>Sur le scénario synthétique, <code>aware</code> n'est jamais plus cher que les autres et reste sur place au-delà d'environ 66 To de données.</li>
+<li>Le seuil de bascule se calcule : économie par heure utile fois travail restant, divisée par le coût par Go déplacé.</li>
+<li>Une reprise entre fournisseurs suppose checkpoint, données et image accessibles de partout, et une garde d'échéance.</li>
+</ul>
+</div>
+<h2 id="ch6">6. Réseau et identité</h2>
+<p>Un job placé ailleurs doit pouvoir joindre ses données, s'authentifier et obtenir ses GPU. Ce chapitre traite ce qui circule entre les sites, ce qui les identifie et ce qui les limite.</p>
+<h3 id="un-job-égale-un-site">6.1. Un job égale un site</h3>
+<p>Pourquoi ne pas coupler les GPU de deux fournisseurs pour un seul entraînement ? Parce que chaque étape échange les gradients, et que le lien entre sites est sans commune mesure avec celui d'un site.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — Un all-reduce entre deux sites</span> Un modèle de 7 milliards de paramètres a des gradients de <span class="math inline">2 \times 7 \cdot 10^9 = 14</span> Go en BF16. Reprenons le modèle du module 2 : chaque rang émet <span class="math inline">2\,\frac{p-1}{p}\,n</span> octets dans un anneau.</p>
+<p>Dans un site, 64 GPU à 40 Go/s (valeurs de l'exercice 11 du module 2) échangent ces gradients en <span class="math inline">2 \times \frac{63}{64} \times 14/40 = 0{,}69</span> s.</p>
+<p>Entre deux sites reliés à 10 Gbit/s à 80 % d'efficacité, soit 1 Go/s, avec <span class="math inline">p = 2</span> : <span class="math inline">2 \times \frac{1}{2} \times 14/1 = 14</span> s par étape. C'est <strong>20 fois</strong> plus long, avant tout recouvrement et en ignorant la latence de la liaison. Ces bandes passantes sont des hypothèses d'exemple.</p>
+<p>Le job ne se coupe donc pas : il se place entier, et seuls ses checkpoints et ses données traversent la liaison.</p>
+</div>
+<h3 id="ce-qui-traverse-la-liaison">6.2. Ce qui traverse la liaison</h3>
+<p>Entre fournisseurs circulent le plan de contrôle (ordres de lancement, supervision), les checkpoints, les jeux de données et les journaux. Les options de connexion vont de l'Internet public avec chiffrement à un VPN de site à site, puis à une interconnexion privée ou un appairage (<em>peering</em>). Le choix dépend du volume et de la sensibilité.</p>
+<p>Les liaisons privées ont leur propre tarif, parfois par port et par heure, parfois par volume : ce cours n'en cite aucun, car aucune page tarifaire n'a été relue pour ce module. Mesurez le débit réel <strong>de bout en bout</strong> avec <code>iperf3</code> entre deux VM des sites concernés avant de promettre un délai de copie.</p>
+<h3 id="identités-fédérées">6.3. Identités fédérées</h3>
+<p>Chaque fournisseur a son propre système d'identités. Mettre des clés d'accès longues dans un fichier de job ou dans une variable d'environnement est le chemin le plus court vers un incident. La documentation de Google Cloud présente la fédération d'identité de charge de travail (<em>Workload Identity Federation</em>) comme le moyen de donner à des charges hors Google, y compris sur AWS ou Azure, un accès à ses ressources au moyen d'identités fédérées plutôt que d'une clé de compte de service.</p>
+<p>Le principe se généralise : un fournisseur d'identité de confiance délivre un jeton court à la charge, le fournisseur cible l'échange contre des droits limités, et rien de durable n'est stocké. Dans SkyPilot, les secrets se déclarent dans <code>secrets:</code> et se passent au lancement ; la règle E4 de <code>policy_check.py</code> refuse un secret placé dans <code>envs</code>.</p>
+<h3 id="comptes-projets-et-quotas">6.4. Comptes, projets et quotas</h3>
+<p>La première cause d'échec d'un lancement est souvent le quota, avant même la capacité. L'article SkyPilot le dit : une allocation échoue soit par manque de capacité dans un lieu, soit par manque de quota du compte. La documentation d'AWS exprime les quotas d'instances en <strong>nombre maximal de vCPU</strong> par famille, avec des lignes distinctes comme « Running On-Demand P instances », et un tableau séparé pour les instances Spot et un autre pour les Capacity Blocks.</p>
+<p>Deux conséquences. Le quota se calcule en vCPU, pas en GPU ou en nœuds, donc en nombre de nœuds fois le nombre de vCPU du type d'instance. Et un parc qui mélange à la demande et spot doit demander les deux quotas. Les délais d'obtention varient : demandez-les avant d'en avoir besoin.</p>
+<h3 id="segmenter">6.5. Segmenter</h3>
+<p>Un compte ou un projet par équipe et par environnement limite les dégâts d'une erreur et rend les coûts lisibles (chapitre 8). Côté réseau, les nœuds d'entraînement n'ont besoin que de sortir vers les stockages et le plan de contrôle, pas de recevoir du trafic public. Le module 16 traite la sécurité d'une plateforme partagée.</p>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li>Un entraînement ne se coupe pas entre sites : 14 s contre 0,7 s par étape dans l'exemple, soit 20 fois plus.</li>
+<li>Entre sites ne circulent que le contrôle, les checkpoints, les données et les journaux ; mesurez le débit de bout en bout.</li>
+<li>Préférez des identités fédérées à jetons courts aux clés longues ; les secrets ne vont jamais dans <code>envs</code>.</li>
+<li>Les quotas d'instances se comptent en vCPU, par famille, séparément pour le spot : demandez-les à l'avance.</li>
+<li>Un compte ou un projet par équipe et par environnement rend dégâts et coûts lisibles.</li>
+</ul>
+</div>
+<h2 id="ch7">7. Centres publics de calcul : accès et articulation avec le cloud</h2>
+<p>Les centres nationaux et européens offrent des GPU sans facture à l'heure, à condition de passer par une procédure d'attribution. Pour une équipe d'infrastructure, ils sont une troisième source de capacité, avec leurs propres règles.</p>
+<h3 id="un-autre-contrat-des-heures-attribuées">7.1. Un autre contrat : des heures attribuées</h3>
+<p>Dans un cloud, vous payez ce que vous allouez. Dans un centre public, un comité attribue un volume d'heures à un projet, vous le consommez par jobs soumis à Slurm, et vous rendez un rapport. L'unité n'est pas la monnaie mais l'heure de GPU d'un type donné ; la conversion entre types de GPU (section 1.4) fait partie de la demande.</p>
+<p>Les dossiers répondent à des critères scientifiques et à une procédure : ce ne sont pas des commandes. Aucune garantie de délai n'existe, hors des voies rapides décrites plus bas.</p>
+<h3 id="en-france-genci-idris-edari">7.2. En France : GENCI, IDRIS, eDARI</h3>
+<p>Le portail eDARI de GENCI reçoit les demandes d'heures sur les calculateurs nationaux, dont Jean Zay à l'IDRIS. La page lue le 24 octobre 2026 distingue l'accès <strong>dynamique</strong> et l'accès <strong>régulier</strong>. Le seuil entre les deux est fixé à 50 kh GPU V100, avec les équivalences 1 GPU H100 = 2 GPU A100 = 4 GPU V100. L'exemple donné par la page : une demande de 30 kh A100 est redirigée vers une allocation régulière.</p>
+<p>La même page annonce la clôture de l'appel pour les accès réguliers le 8 février 2027 à 9 h. Les conditions affichées sont d'appartenir ou d'être associé à une structure de recherche française, de faire de la recherche donnant lieu à publication et de déposer un rapport d'activité à la fin de l'attribution. Elle précise aussi que les appels d'EuroHPC sont ouverts en permanence.</p>
+<h3 id="en-europe-eurohpc-et-les-usines-dia">7.3. En Europe : EuroHPC et les usines d'IA</h3>
+<p>L'entreprise commune EuroHPC propose des appels à plusieurs échelles. Pour les <em>AI Factories</em>, la page lue le 24 octobre 2026 liste trois modes d'accès, tous marqués « ouverts » ce jour-là.</p>
+<ul>
+<li><strong>Playground</strong> s'adresse aux PME, aux jeunes entreprises et aux utilisateurs débutants. L'accès se fait en file FIFO (premier arrivé, premier servi), avec un démarrage sous deux jours ouvrés et un accompagnement d'intégration.</li>
+<li><strong>Fast Lane</strong> vise les PME et jeunes entreprises qui font de l'IA avec des allocations de taille moyenne.</li>
+<li><strong>Large Scale</strong> concerne les modèles et applications qui demandent plus de 50 000 heures de GPU, pour un an au maximum.</li>
+</ul>
+<p>Pour les supercalculateurs, les appels portent sur les applications d'IA et à forte intensité de données, l'accès régulier, l'accès à très grande échelle et l'accès pour le développement. Ce dernier est un appel continuellement ouvert, avec un délai maximal de deux semaines avant le début d'accès après dépôt.</p>
+<h3 id="aux-états-unis">7.4. Aux États-Unis</h3>
+<p>Le programme <a href="https://allocations.access-ci.org/project-types">ACCESS</a> de la NSF organise l'attribution en quatre types de projets, Explore, Discover, Accelerate et Maximize, selon l'ampleur des besoins. On peut démarrer par un projet Explore et monter en gamme. Le projet pilote <a href="https://nairrpilot.org/">NAIRR</a> (<em>National AI Research Resource</em>) vise à relier chercheurs et enseignants américains à des ressources de calcul, de données et de formation ; sa page annonce que la NSF a désigné le 1er septembre 2026 un centre d'exploitation qui prolonge le pilote. Comme en Europe, les règles d'éligibilité varient et se lisent sur la page de chaque programme.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — Quelle voie pour quelle demande ?</span> Deux demandes converties avec les équivalences d'eDARI (1 H100 = 4 V100).</p>
+<p>Un entraînement de 64 GPU H100 pendant 72 h consomme <span class="math inline">64 \times 72 = 4\,608</span> h H100, soit <span class="math inline">4608 \times 4 = 18\,432</span> h V100. C'est 37 % du seuil de 50 000 h : une allocation <strong>dynamique</strong> convient.</p>
+<p>Un entraînement de 256 GPU H100 pendant 14 jours consomme <span class="math inline">256 \times 14 \times 24 = 86\,016</span> h H100, soit 344 064 h V100, 6,9 fois le seuil : il faut une allocation <strong>régulière</strong>, déposée avant la clôture de l'appel, avec un justificatif scientifique, ou une voie européenne comme Large Scale (au-dessus de 50 000 heures GPU, unité de type non précisée par la page).</p>
+<p>Les dates et seuils sont ceux lus le 24 octobre 2026. Relisez les appels avant de planifier.</p>
+</div>
+<h3 id="articuler-un-centre-public-et-un-cloud">7.5. Articuler un centre public et un cloud</h3>
+<p>Un centre public et un cloud ne se substituent pas, ils se complètent. Le tableau liste les différences qui comptent pour l'infrastructure.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspect</th>
+<th>Cloud</th>
+<th>Centre public</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Accès</td>
+<td>compte et carte bancaire ou contrat</td>
+<td>dossier scientifique, comité, rapport</td>
+</tr>
+<tr class="even">
+<td>Délai</td>
+<td>minutes, si la capacité existe</td>
+<td>dépend de l'appel ; ordre de grandeur, non sourcé : semaines à mois pour un appel à échéance, quelques jours pour une voie rapide</td>
+</tr>
+<tr class="odd">
+<td>Unité</td>
+<td>monnaie, à la seconde ou à l'heure</td>
+<td>heures GPU attribuées, d'un type donné</td>
+</tr>
+<tr class="even">
+<td>Outil de soumission</td>
+<td>API, SkyPilot, Kubernetes</td>
+<td>Slurm (module 5)</td>
+</tr>
+<tr class="odd">
+<td>Données</td>
+<td>vos buckets</td>
+<td>systèmes de fichiers du centre, soumis à ses règles</td>
+</tr>
+<tr class="even">
+<td>Reprise</td>
+<td>à vous de la concevoir (chapitre 5)</td>
+<td>à vous aussi : la préemption par QOS existe, et le checkpoint reste indispensable</td>
+</tr>
+<tr class="odd">
+<td>Objectif</td>
+<td>production, commercial possible</td>
+<td>recherche, publication attendue</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>SkyPilot sait cibler un cluster Slurm : la page de référence de son YAML mentionne <code>infra: slurm</code>, y compris pour des clusters AWS HyperPod. Un centre public précis reste un cas à tester, car les règles d'accès, d'installation d'outils et de réseau des nœuds varient d'un centre à l'autre.</p>
+<p>La stratégie raisonnable est d'utiliser le centre pour le gros calcul de recherche qui entre dans son cadre, et le cloud pour ce qui demande de la souplesse ou de la confidentialité. La passerelle entre les deux est le checkpoint portable : un format que les deux environnements savent relire.</p>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>Un centre public attribue des heures de GPU sur dossier ; l'unité est un type de GPU, convertible (1 H100 = 2 A100 = 4 V100 selon eDARI).</li>
+<li>eDARI distingue accès dynamique et régulier autour de 50 kh V100 ; EuroHPC propose Playground, Fast Lane et Large Scale pour les usines d'IA.</li>
+<li>ACCESS (États-Unis) organise quatre niveaux de projet ; le pilote NAIRR ouvre d'autres ressources.</li>
+<li>Les appels, seuils et dates changent : citez-les datés et relisez-les avant de planifier.</li>
+<li>Cloud et centre public se complètent : checkpoint portable et outils de soumission différents.</li>
+</ul>
+</div>
+<h2 id="ch8">8. Gouvernance : inventaire, étiquettes, coûts, nettoyage</h2>
+<p>Une flotte multi-fournisseurs multiplie les endroits où une ressource oubliée coûte de l'argent. La gouvernance est le travail qui rend chaque ressource attribuable à une équipe et supprimable sans enquête.</p>
+<h3 id="inventaire-et-étiquetage">8.1. Inventaire et étiquetage</h3>
+<p>Un inventaire commence par une règle : toute ressource porte au moins une équipe, un projet et un responsable. SkyPilot les pose avec <code>resources.labels</code>, que sa documentation décrit comme des étiquettes appliquées aux instances. Chez AWS, une étiquette ne figure dans les rapports de facturation qu'après son <strong>activation</strong> dans la console de facturation, d'après la documentation sur les étiquettes d'allocation de coûts : une étiquette posée mais non activée n'imputera rien.</p>
+<h3 id="des-coûts-comparables-entre-fournisseurs">8.2. Des coûts comparables entre fournisseurs</h3>
+<p>Chaque fournisseur a son format de facture, ses noms et ses unités. FOCUS (<em>FinOps Open Cost and Usage Specification</em>), que la FinOps Foundation décrit comme un format unifié de données de facturation de sources multiples, normalise ces données pour réduire le travail de rapprochement. La page de présentation de la spécification renvoie aux notes de la version 1.4 (lue le 24 octobre 2026). L'allocation par équipe et le <em>showback</em> sont traités au <a href="../finops-capacity/index.html">module 15</a>, qui construit un rapport depuis les traces de l'ordonnanceur.</p>
+<h3 id="nettoyer-automatiquement">8.3. Nettoyer automatiquement</h3>
+<p>Le coût d'une ressource oubliée est proportionnel au temps. SkyPilot permet de déclarer <code>resources.autostop</code> avec <code>idle_minutes</code> et <code>down: true</code>, qui arrête et supprime le cluster inactif. Pour un job managé, le cluster temporaire est nettoyé à la fin par le contrôleur.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.1 — Le week-end d'un nœud oublié</span> Un nœud de 8 GPU lancé le vendredi à 18 h et retrouvé le lundi à 8 h reste alloué 62 h. À un prix de 4 u par GPU-heure (valeur d'exemple), cela fait <span class="math inline">8 \times 62 \times 4 = 1\,984</span> u. Avec un arrêt automatique après 30 minutes d'inactivité, la perte maximale est de <span class="math inline">8 \times 0{,}5 \times 4 = 16</span> u, soit 124 fois moins.</p>
+<p>Un <code>down: true</code> vaut mieux qu'un simple arrêt : une VM arrêtée garde en général ses disques, qui continuent d'être facturés. La règle E5 de <code>policy_check.py</code> l'exige pour un cluster interactif.</p>
+</div>
+<h3 id="la-gouvernance-comme-code">8.4. La gouvernance comme code</h3>
+<p>Une règle écrite dans un wiki n'est pas appliquée. Le lab 13.2 propose <code>policy_check.py</code>, un lint des fichiers de job qui ne lit que le YAML. Les règles E sont des erreurs, les règles W des avertissements.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Règle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>E1</td>
+<td>les étiquettes <code>team</code>, <code>project</code> et <code>owner</code> sont présentes</td>
+</tr>
+<tr class="even">
+<td>E2</td>
+<td>un job <code>use_spot</code> déclare <code>job_recovery</code></td>
+</tr>
+<tr class="odd">
+<td>E3</td>
+<td>un job <code>use_spot</code> monte un bucket en écriture pour reprendre</td>
+</tr>
+<tr class="even">
+<td>E4</td>
+<td>aucun secret n'est dans <code>envs</code></td>
+</tr>
+<tr class="odd">
+<td>E5</td>
+<td>un cluster interactif a <code>autostop</code> (au plus 60 minutes) avec <code>down: true</code></td>
+</tr>
+<tr class="even">
+<td>E6</td>
+<td>avec <code>--allow-prefix</code>, tout lieu candidat est dans la liste autorisée</td>
+</tr>
+<tr class="odd">
+<td>W1 à W4</td>
+<td>pas de plafond de coût ; un seul lieu candidat ; bucket d'un autre fournisseur ; lieu non vérifiable (contexte Kubernetes ou Slurm, avec <code>--allow-prefix</code>)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="ex">
+<p><span class="tag">Exemple 8.2 — Un job que SkyPilot accepte et que la politique refuse</span> Sortie capturée sur le bac à sable de l'auteur le 24 octobre 2026, pour <code>bad-job.yaml</code> du lab 13.2 :</p>
+<pre class="text"><code>bad-job.yaml: E1 error: label &#39;project&#39; is missing
+bad-job.yaml: E1 error: label &#39;owner&#39; is missing
+bad-job.yaml: E2 error: use_spot without job_recovery
+bad-job.yaml: E3 error: use_spot without a writable mounted bucket to resume from
+bad-job.yaml: E4 error: envs.HF_TOKEN looks like a credential: use secrets:
+bad-job.yaml: W1 warning: no max_hourly_cost
+bad-job.yaml: W2 warning: fewer than two candidate locations: nowhere to fail over
+bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
+<p>Le même fichier est accepté par <code>sky.Task.from_yaml</code> (exemple 3.1). La politique et l'analyse de syntaxe sont deux contrôles différents ; il faut les deux. Lancée dans une intégration continue sur le dépôt des fichiers de job, la politique bloque ces fichiers avant tout lancement.</p>
+</div>
+<h3 id="une-revue-périodique">8.5. Une revue périodique</h3>
+<p>Trois contrôles réguliers évitent la dérive.</p>
+<ul>
+<li><strong>Inventaire contre facture.</strong> Chaque ligne de facture d'un fournisseur se rattache à une étiquette ; la part sans étiquette est un indicateur à suivre.</li>
+<li><strong>Orphelins.</strong> Toute ressource sans job actif depuis une durée fixée est signalée, puis supprimée après préavis.</li>
+<li><strong>Quotas et engagements.</strong> Les quotas demandés, les engagements en cours et leurs dates de fin sont dans un tableau revu chaque trimestre avec la finance (module 15).</li>
+</ul>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Toute ressource porte équipe, projet et responsable ; chez AWS, les étiquettes d'allocation doivent être activées pour apparaître dans la facturation.</li>
+<li>Un format commun (FOCUS) rend les coûts de plusieurs fournisseurs comparables.</li>
+<li>L'arrêt automatique avec suppression borne la perte d'une ressource oubliée (124 fois moins dans l'exemple).</li>
+<li>La gouvernance s'écrit en code, relue et testée comme le reste ; elle complète l'analyse de syntaxe de l'outil.</li>
+<li>Trois revues régulières : inventaire contre facture, orphelins, quotas et engagements.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Trois labs, 9,5 h au total : 4 h, 2,5 h et 3 h. Les labs 13.1 et 13.3 sont de type <code>sandbox</code> et ont été exécutés ; le lab 13.2 est de type <code>cluster</code> et sa branche cloud n'a <strong>jamais été exécutée</strong> (voir ci-dessous).</p>
+<div class="lab">
+<p><span class="tag">Lab 13.1 — Simulateur de placement sensible aux coûts</span></p>
+<p><strong>Objectif.</strong> Comparer quatre politiques de placement d'un job préemptible sur des tirages communs, et trouver la taille de données au-delà de laquelle basculer ne vaut plus son coût. <strong>Durée.</strong> 4 h (partie A, 1 h : formules et moteur ; partie B, 3 h : politiques, balayage, critère). <strong>Prérequis matériels.</strong> Portable CPU, Python 3 avec <code>pytest</code> ; ni GPU ni compte cloud. Les données du scénario sont <strong>synthétiques</strong>.</p>
+<ol type="1">
+<li>Lisez la docstring de <code>labs/multi-cloud/cost-aware-placement/reference/placement.py</code> : tirages communs, facturation d'une allocation, sémantique du checkpoint et de la copie.</li>
+<li>Dans <code>starter/placement.py</code>, écrivez <code>young_daly</code>, <code>waste</code>, <code>price_per_useful_hour</code> et <code>transfer_hours</code>. Lancez <code>IMPL=starter python -m pytest -q tests</code> : les tests de formules passent.</li>
+<li>Écrivez <code>move_cost</code>, <code>paired_diff</code> et <code>Aware.score</code>. Relisez la timeline exacte avec une préemption forcée dans <code>tests/test_placement.py</code> et refaites son calcul à la main.</li>
+<li>Lancez <code>python3 scenarios.py --seeds 200</code> avec la référence et reproduisez le tableau du chapitre 5, puis refaites-le avec <code>--impl starter</code> une fois vos fonctions écrites.</li>
+<li>Faites varier <code>--lam</code> (0, 40, 400) et relevez entre quelles deux tailles de la grille <code>aware</code> cesse de déménager, puis lancez <code>python3 threshold.py</code> pour le seuil exact et comparez à l'exemple 5.2.</li>
+<li>Changez <code>p_avail</code> du pool a-spot et le tarif de sortie : décrivez ce qui bascule en premier.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>verify.sh</code> affiche la ligne <code>CRITERION (moves of 'aware' non-increasing with data size; cost &lt;= 1.05 x the best other policy): OK</code>, puis <code>CRITERION (threshold positive and non-increasing with lam): OK</code>, après des tests verts côté référence et rouges côté départ. Les critères sont <strong>structurels</strong>, pas des valeurs : le nombre de déménagements de <code>aware</code> ne croît pas avec la taille des données, son coût ne dépasse jamais de 5 % la meilleure des trois autres politiques, et le seuil de taille baisse quand <code>lam</code> monte. Aucun temps mesuré n'est testé.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez le même scénario dans le <a href="../../projects/multi-provider-scheduler/index.html">projet 4</a>, qui gère plusieurs jobs et une capacité limitée.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 13.2 — Un job SkyPilot indépendant du fournisseur</span></p>
+<p><strong>Objectif.</strong> Écrire et contrôler un job managé qui survit à la préemption, avec sa politique de gouvernance. <strong>Durée.</strong> 2,5 h (partie A, 1,5 h : étapes 1 à 5 ; partie B, 1 h : étapes 6 et 7 ; l'étape 8, facultative, s'ajoute). <strong>Prérequis matériels.</strong> Portable CPU, Python 3 avec <code>pytest</code> et <code>pyyaml</code>, <code>yamllint</code> et <code>shellcheck</code> recommandés ; la branche d'analyse de SkyPilot exige <code>pip install skypilot==0.14.1</code> dans un environnement à part. La branche cloud exige un compte et du crédit.</p>
+<p><strong>Type <code>cluster</code>.</strong> Ce qui a été exécuté : lint, règles de gouvernance, analyse hors ligne par SkyPilot 0.14.1 et répétition locale de la reprise. <strong>Ce qui ne l'a pas été : tout lancement réel (<code>sky jobs launch</code>), toute bascule entre fournisseurs, toute préemption réelle.</strong></p>
+<ol type="1">
+<li>Lisez <code>job.yaml</code> ligne à ligne et repérez où se décident le lieu, la reprise et le checkpoint.</li>
+<li>Lancez <code>bash verify.sh</code>. Sans SkyPilot, la section « 3. offline parse » du script affiche <code>SKIPPED</code> ; créez un environnement avec <code>skypilot==0.14.1</code> et relancez avec <code>SKY_PYTHON=…</code>.</li>
+<li>Lancez <code>python3 policy_check.py bad-job.yaml</code>, corrigez le fichier jusqu'à zéro erreur, puis refaites passer l'analyse SkyPilot.</li>
+<li>Lisez <code>train.py</code> (écriture atomique, reprise, gestionnaire de SIGTERM) et <code>rehearse_preemption.sh</code>.</li>
+<li>Lancez <code>rehearse_preemption.sh</code> et relevez les étapes perdues avec et sans préavis.</li>
+<li>Appliquez la règle de résidence : <code>python3 policy_check.py job.yaml --allow-prefix aws/eu- --allow-prefix gcp/europe-</code>, puis <code>job-eu.yaml</code>.</li>
+<li>Écrivez d'abord le test, puis la règle W5 : un job <code>use_spot</code> sans <code>max_restarts_on_errors</code> est signalé.</li>
+<li>Sur un vrai compte (non exécuté par l'auteur) : <code>sky check</code>, puis <code>sky jobs launch -n pretrain-demo job.yaml</code> avec de vrais buckets, et coupez la VM depuis la console.</li>
+</ol>
+<p><strong>Critère de réussite hors ligne.</strong> <code>verify.sh</code> affiche <code>OK skypilot parse: 4 files accepted (bad-job.yaml is valid for SkyPilot, only the policy refuses it), 5 mutations rejected</code>, <code>15 passed</code>, et <code>OK preemption rehearsal: resumed runs match the uninterrupted run exactly</code>. <strong>Critère sur cluster (non vérifié)</strong> : après la perte d'une VM, <code>sky jobs queue</code> montre au moins une reprise et le journal affiche un <code>resumed_from_step=</code> non nul.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez un lieu Slurm (<code>infra: slurm</code>) à <code>any_of</code> et lisez ce que <code>policy_check.py --allow-prefix …</code> en dit (W4).</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 13.3 — Coût réel d'un déménagement de données</span></p>
+<p><strong>Objectif.</strong> Programmer et tester le calculateur du chapitre 4, puis l'appliquer à vos propres volumes. <strong>Durée.</strong> 3 h (partie A, 1 h : carte tarifaire, scénarios ; partie B, 2 h : écrire les fonctions). <strong>Prérequis matériels.</strong> Portable CPU, Python 3 avec <code>pytest</code> et <code>pyyaml</code>. Les tarifs de <code>rates.yaml</code> sont <strong>réels et datés du 24 octobre 2026</strong> ; relisez-les le jour de votre étude.</p>
+<ol type="1">
+<li>Ouvrez <code>labs/multi-cloud/egress-cost/rates.yaml</code> : pour chaque entrée, retrouvez la source et la date. Ouvrez une source et vérifiez une valeur.</li>
+<li>Lancez <code>bash verify.sh</code> et lisez le tableau des scénarios S1 à S5.</li>
+<li>Dans <code>starter/egress.py</code>, écrivez <code>tiered_cost</code> : franchise, tranches, position de départ <code>used_gb</code>. Lancez les tests.</li>
+<li>Écrivez <code>split_cost</code>, <code>transfer_hours</code>, <code>storage_cost</code>, puis <code>move_cost</code>.</li>
+<li>Écrivez <code>breakeven_gpu_hours</code> et <code>copy_vs_remote_read</code>.</li>
+<li>Remplacez les tarifs par ceux d'un fournisseur de votre choix (page de prix lue aujourd'hui) et refaites S3 pour un volume qui vous concerne.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>verify.sh</code> affiche <code>18 passed</code> pour la référence et <code>18 failed</code> pour le départ, puis le tableau, dont <code>[S1] ... free allowance already used up : 13.50 USD</code>, et finit par <code>ok: egress-cost reference passes, starter fails as intended</code>. Les montants du tableau sont de l'arithmétique exacte à partir de la carte ; ils changeront avec <strong>vos</strong> tarifs, et c'est le but.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez le coût des requêtes et des lectures de données froides, puis un second site de destination, et comparez l'étalement sur plusieurs mois.</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<p>Les tarifs et les paramètres sont donnés dans chaque énoncé : les corrigés ont été recalculés avec le code des labs, et les commandes citées ont été exécutées.</p>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★ — Une facture de sortie</span> Un compte AWS sort 5 To (5 000 Go) en un mois depuis us-east-1. La franchise est de 100 Go, puis le tarif est de 0,09 USD par Go jusqu'à 10 240 Go (chapitre 4). Calculez la facture (a) si la franchise est intacte, (b) si d'autres usages du compte l'ont déjà consommée.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Après la franchise, il reste <span class="math inline">5000 - 100 = 4900</span> Go à 0,09 USD : <strong>441,00 USD</strong>.</p></li>
+<li><p>La franchise étant consommée, les 5 000 Go sont tous facturés : $5000 09 = $ <strong>450,00 USD</strong>.</p></li>
+</ol>
+<p>Vérification avec le lab 13.3 : <code>tiered_cost(5000, tiers, 100)</code> rend 441,0 et <code>tiered_cost(5000, tiers, 100, used_gb=100)</code> rend 450,0. La franchise ne pèse que 9 USD sur ce volume ; elle domine seulement les petits transferts.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Lire une sortie de politique</span> Reprenez la sortie de l'exemple 8.2 pour <code>bad-job.yaml</code>. Pour chacune des cinq erreurs E1 à E4 et des deux avertissements, donnez la modification minimale du YAML qui la fait disparaître. Laquelle de ces erreurs SkyPilot détecterait-il seul à l'analyse ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Corrections minimales, une par ligne.</p>
+<ul>
+<li><strong>E1</strong> : ajouter <code>project</code> et <code>owner</code> sous <code>resources.labels</code>.</li>
+<li><strong>E2</strong> : ajouter <code>job_recovery: {strategy: EAGER_NEXT_REGION}</code>.</li>
+<li><strong>E3</strong> : monter un bucket en écriture, par exemple <code>/checkpoint</code> avec <code>mode: MOUNT_CACHED</code>.</li>
+<li><strong>E4</strong> : déplacer <code>HF_TOKEN</code> de <code>envs</code> vers <code>secrets</code> et le passer au lancement.</li>
+<li><strong>W1</strong> : ajouter <code>max_hourly_cost</code>.</li>
+<li><strong>W2</strong> : remplacer <code>infra: aws</code> par une liste <code>any_of</code> de deux lieux au moins.</li>
+</ul>
+<p><strong>Aucune</strong> de ces erreurs n'est détectée par l'analyse de SkyPilot : le fichier est valide (exemple 3.1). Le fichier corrigé avec un lieu AWS et un lieu Google (<code>bad-job-fixed.yaml</code> dans le lab, à lire après l'essai) donne 0 erreur et un seul avertissement, W3 : le bucket <code>s3://</code> du jeu de données est lu depuis un lieu Google, donc avec une sortie de données. Avec deux lieux AWS, W3 ne se déclencherait pas. Cet avertissement est légitime et se traite au chapitre 4.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★ — Convertir une demande d'heures</span> Avec les équivalences d'eDARI (1 H100 = 2 A100 = 4 V100) et le seuil de 50 kh V100 entre accès dynamique et régulier (chapitre 1 et chapitre 7), classez (a) une demande de 12 000 h H100, (b) une demande de 40 000 h A100. (c) Quelle est la plus grosse demande en h A100 qui reste dynamique ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">12\,000 \times 4 = 48\,000</span> h V100, sous le seuil : <strong>dynamique</strong>.</p></li>
+<li><p><span class="math inline">40\,000 \times 2 = 80\,000</span> h V100, au-dessus : <strong>régulière</strong>.</p></li>
+<li><p><span class="math inline">50\,000 / 2 = 25\,000</span> h A100.</p></li>
+</ol>
+<p>La page eDARI donne le même raisonnement pour 30 kh A100 (60 kh V100, donc régulier). Lue le 24 octobre 2026 : relisez le seuil avant de planifier.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★★ — La remise qui justifie le spot</span> Un taux d'interruption de 0,2 par heure, un checkpoint de 2 minutes, une reprise de 12 minutes. Calculez <span class="math inline">T^*</span>, <span class="math inline">W</span> et la remise minimale du spot. Le spot à 4,0 u bat-il une offre à la demande à 5,0 u ? À 4,5 u ? Utilisez les formules du chapitre 2.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Ici <span class="math inline">M = 1/0{,}2 = 5</span> h, <span class="math inline">C = 2/60 = 0{,}0333</span> h et <span class="math inline">R = 0{,}2</span> h. La période optimale vaut <span class="math inline">T^* = \sqrt{2 \times 0{,}0333 \times 5} = 0{,}577</span> h, soit <strong>34,6 minutes</strong>.</p>
+<p>Le gaspillage vaut <span class="math inline">W = \sqrt{2C/M} + R/M = 0{,}1155 + 0{,}04 = 0{,}1555</span>. La remise minimale est donc de <strong>15,6 %</strong>, et le prix de l'heure utile du spot à 4,0 u vaut <span class="math inline">4{,}0/0{,}8445 = 4{,}74</span> u.</p>
+<p>Face à 5,0 u, la remise est de 20 % : le spot gagne (4,74 contre 5,0). Face à 4,5 u, la remise n'est que de 11,1 % : il perd (4,74 contre 4,5). Le gain dépend des taux que vous mesurez, pas du prix catalogue seul.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★★ — Combien coûte une préemption ?</span> La répétition du lab 13.2 affiche : « kill : resumed from step 125, lost 12 steps ». Dans un vrai job de 64 GPU, une étape dure 90 s et un checkpoint a lieu toutes les 25 étapes. (a) Combien de GPU-heures cette préemption a-t-elle fait perdre ? (b) Quelle perte moyenne attendre par préemption si elle tombe à un instant uniforme ? (c) Quel intervalle de checkpoint, en étapes, garde cette perte moyenne sous 5 GPU-heures ? (d) Pourquoi ne pas descendre à une étape ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">12 \times 90 = 1080</span> s, soit 0,30 h ; sur 64 GPU : <strong>19,2 GPU-h</strong>.</p></li>
+<li><p>La perte moyenne vaut la moitié de l'intervalle : <span class="math inline">12{,}5</span> étapes, soit $12{,}5 / 3600 = $ <strong>20 GPU-h</strong>.</p></li>
+<li><p>La perte moyenne <span class="math inline">= (K/2) \times 90/3600 \times 64 = 0{,}8\,K</span> GPU-h. Pour rester sous 5, il faut <span class="math inline">K &lt; 6{,}25</span> étapes.</p></li>
+<li><p>Chaque checkpoint coûte du temps de GPU (le terme <span class="math inline">C/T</span> de <span class="math inline">W</span>). La période optimale équilibre ce coût et la perte attendue ; elle se calcule avec Young et Daly, pas avec la seule perte moyenne.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★★ — Diagnostic : le job qui coûte 47 % de plus</span> Dans le tableau de l'exemple 5.1, à 0 Go de données, la politique <code>failover</code> coûte 53 967 u contre 36 577 u pour <code>stay</code>, finit plus tôt (135,9 h contre 145,6 h) et déménage 6,46 fois en moyenne. Expliquez ces trois observations, proposez deux corrections pour un fichier <code>job.yaml</code> réel, et dites quel test du lab les couvre.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><code>failover</code> prend le moins cher <strong>parmi les pools qui répondent maintenant</strong>. Quand les pools spot refusent, il atterrit sur le pool à la demande à 10 u, qui n'est jamais préempté ; rien ne le ramène vers le spot. D'où le coût (+47,5 %) et la fin plus précoce : <code>failover</code> n'attend presque jamais de capacité et le pool à la demande ne subit pas de préemption.</p>
+<p>Les nombreux déménagements ont une autre cause : la décision est reprise à chaque préemption, et le moins cher qui répond est souvent un spot d'un autre fournisseur (observé en journalisant les décisions du simulateur ; <code>scenarios.py</code> ne l'affiche pas).</p>
+<p>Corrections : (1) retirer le pool à la demande de <code>any_of</code>, ou le placer en dernier dans une liste <code>ordered</code> ; (2) borner la durée sur le pool à la demande et réévaluer le placement périodiquement, ce que le lab ne fait pas.</p>
+<p>Le test <code>test_on_demand_trap_costs_more_than_waiting_for_spot</code> du lab 13.1 reproduit le mécanisme sur un cas minimal.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★★ — Étaler ou non ?</span> Comparez le coût d'un envoi unique, d'un envoi réparti en deux mois égaux et d'un envoi sur trois mois, avec les tarifs AWS du chapitre 4 (franchise de 100 Go par mois, 0,09 USD par Go jusqu'à 10 240 Go, puis 0,085), pour (a) 1 000 Go et (b) 20 000 Go. (c) À partir de quel volume l'étalement sur deux mois cesse-t-il d'être avantageux ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>En un mois : <span class="math inline">900 \times 0{,}09 = 81{,}00</span> USD. En deux mois de 500 Go : <span class="math inline">2 \times 400 \times 0{,}09 = 72{,}00</span>. En trois mois de 333,3 Go : <span class="math inline">3 \times 233{,}3 \times 0{,}09 = 63{,}00</span>. L'étalement gagne : la franchise est regagnée chaque mois.</p></li>
+<li><p>En un mois :</p></li>
+</ol>
+<p><span class="math display">10\,240 \times 0{,}09 + 9\,660 \times 0{,}085 = 1\,742{,}70\ \text{USD}</span></p>
+<p>En deux mois de 10 000 Go : <span class="math inline">2 \times 9\,900 \times 0{,}09 = 1\,782{,}00</span>. En trois mois : 1 773,00. L'étalement perd : la deuxième tranche à 0,085 n'est plus atteinte.</p>
+<ol start="3" type="a">
+<li>Les coûts s'égalent là où <span class="math inline">F(x) = 2F(x/2)</span>. Une recherche numérique avec <code>split_cost</code> du lab donne environ <strong>12 140 Go</strong>, où les deux plans coûtent 1 074,60 USD. Au-delà, l'étalement sur deux mois coûte plus.</li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★★ — Déménager 40 To pour 0,8 u de moins ?</span> Un job de 32 GPU doit faire 200 h de calcul utile. Un site B est moins cher de 0,8 u par GPU-heure <strong>utile</strong> que le site A où vivent les données : 40 To (40 000 Go) plus un checkpoint de 112 Go. La sortie coûte 0,09 u par Go, le lien soutient 10 Gbit/s à 80 % et une heure de retard vaut 100 u. (a) Faut-il déménager ? (b) À quel tarif de sortie la décision bascule-t-elle ? (c) Et si une heure de retard vaut 400 u ? (d) Que changeriez-vous dans l'architecture ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>L'économie vaut <span class="math inline">32 \times 200 \times 0{,}8 = 5\,120</span> u. Le déplacement coûte <span class="math inline">40\,112 \times 0{,}09 = 3\,610</span> u de sortie, et la copie dure <span class="math inline">40\,112 \times 8 / 8 / 3600 = 11{,}1</span> h, valorisées <span class="math inline">1\,114</span> u. Le gain net est de <strong>+396 u</strong> : marginal, et sensible à toutes les hypothèses.</p></li>
+<li><p>La décision bascule quand le tarif de sortie atteint $(5120 - 1114)/40,112 = $ <strong>0,0999 u par Go</strong>, c'est-à-dire presque le tarif de 0,09 u : une erreur de 11 % sur le tarif suffit.</p></li>
+<li><p>À 400 u par heure, le temps vaut 4 457 u et le gain net passe à <strong>−2 947 u</strong> : ne déménagez pas.</p></li>
+<li><p>Le vrai levier est de ne pas payer la sortie : un stockage objet à sortie gratuite pour les données fait passer le gain à <span class="math inline">5\,120 - 1\,114 = +4\,006</span> u. À défaut, il vaut mieux lancer le job là où vivent les données.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★★ — Un all-reduce entre deux sites</span> Un modèle de 13 milliards de paramètres a des gradients de <span class="math inline">2 \times 13 \cdot 10^9 = 26</span> Go. Comparez le temps du all-reduce en anneau, <span class="math inline">2\,\frac{p-1}{p}\,\frac{n}{B}</span>, (a) sur 64 GPU d'un site à 40 Go/s, (b) entre deux sites (<span class="math inline">p = 2</span>) reliés à 5 Gbit/s à 80 % d'efficacité. Quelle part d'une étape de 8 s de calcul la communication occupe-t-elle dans chaque cas, sans recouvrement ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>$2 /40 = $ <strong>1,28 s</strong>.</p></li>
+<li><p>Le lien utile vaut <span class="math inline">5 \times 0{,}8 / 8 = 0{,}5</span> Go/s. Avec <span class="math inline">p = 2</span> : $2 /0{,}5 = $ <strong>52 s</strong>, soit 40,6 fois plus que dans le cas (a).</p></li>
+</ol>
+<p>Part de la communication dans l'étape : <span class="math inline">1{,}28/(8+1{,}28) = 13{,}8\ \%</span> dans un site, <span class="math inline">52/(8+52) = 86{,}7\ \%</span> entre deux sites. Entre sites, les GPU passent près de neuf dixièmes du temps à attendre : le job ne se coupe pas.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 10 · ★ — Un quota en vCPU</span> Vous voulez 16 nœuds de 8 GPU, 25 % à la demande et 75 % en spot. Le type d'instance expose 192 vCPU par nœud (valeur d'énoncé). (a) Quels quotas faut-il demander ? (b) Le quota spot accordé est de 2 000 vCPU : combien de nœuds spot peuvent démarrer, et que faites-vous des autres ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Les quotas se comptent en vCPU, séparément pour le à-la-demande et le spot (chapitre 6). Il faut <span class="math inline">4 \times 192 = 768</span> vCPU à la demande et <span class="math inline">12 \times 192 = 2\,304</span> vCPU en spot, soit 3 072 vCPU au total.</p></li>
+<li><p><span class="math inline">\lfloor 2000 / 192 \rfloor = 10</span> nœuds spot, soit 1 920 vCPU. Les 2 nœuds restants se repositionnent ailleurs : à la demande si le quota le permet, sur un autre lieu ou un autre fournisseur, ou en attendant un relèvement du quota. C'est le rôle de la bascule de l'article SkyPilot : une allocation échoue par manque de capacité <strong>ou</strong> de quota.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 11 · ★★★ — Résidence des données</span> Le jeu de données du job de <code>job.yaml</code> ne peut pas quitter l'UE. Appliquez la règle de résidence du lab 13.2 (<code>--allow-prefix aws/eu- --allow-prefix gcp/europe-</code>) à <code>job.yaml</code> puis à <code>job-eu.yaml</code>. Interprétez les messages, listez ce que l'outil ne vérifie pas, et dites ce qui change pour la bascule et pour le coût.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Sortie capturée sur le bac à sable de l'auteur le 24 octobre 2026 :</p>
+<pre class="text"><code>job.yaml: E6 error: aws/us-east-1 is outside the allowed locations [&#39;aws/eu-&#39;, &#39;gcp/europe-&#39;]
+job.yaml: E6 error: gcp/us-central1 is outside the allowed locations [&#39;aws/eu-&#39;, &#39;gcp/europe-&#39;]
+job.yaml: W4 warning: k8s/eu-gpu-cluster: a context name does not prove where the cluster runs
+job.yaml: 2 error(s), 1 warning(s)
+job-eu.yaml: W4 warning: k8s/eu-gpu-cluster: a context name does not prove where the cluster runs
+job-eu.yaml: 0 error(s), 1 warning(s)</code></pre>
+<p>Deux lieux sont hors liste ; <code>job-eu.yaml</code> les remplace par <code>aws/eu-west-3</code> et <code>gcp/europe-west4</code>. L'outil <strong>ne vérifie pas</strong> : la région réelle du contexte Kubernetes (W4 le dit), la juridiction et l'emplacement du bucket de checkpoint (un bucket R2 n'a pas de préfixe de région dans ce YAML), ni les sauvegardes et les journaux.</p>
+<p>Pour la bascule, les candidats restent trois, mais la liste est plus étroite : la probabilité de trouver de la capacité baisse, et la bascule vers un lieu hors UE est interdite même si elle serait moins chère. Le coût attendu se mesure en relançant le simulateur du lab 13.1 avec seulement les pools autorisés.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 12 · ★★★ — Tempête de bascule</span> Une région tombe et 40 jobs, qui utilisent tous le même jeu de données de 20 To (20 000 Go) et ont chacun un checkpoint de 112 Go, repartent en même temps chez un fournisseur B, sur une liaison partagée de 10 Gbit/s à 80 %. Avec les tarifs AWS du chapitre 4 (franchise intacte), calculez pour (a) une copie du jeu de données par job, (b) une copie partagée du jeu de données et un checkpoint par job, (c) les seuls checkpoints, le jeu étant déjà répliqué : le volume, la facture et la durée. Proposez une architecture.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">40 \times (112 + 20\,000) = 804\,480</span> Go. Avec les quatre tranches du tableau, $921{,}6 + 3,481{,}6 + 7,168 + 32,539 = $ <strong>44 110 USD</strong>, et 223,5 h sur la liaison partagée.</p></li>
+<li><p><span class="math inline">20\,000 + 40 \times 112 = 24\,480</span> Go : <strong>2 124 USD</strong> (2 123,50) et 6,8 h.</p></li>
+<li><p><span class="math inline">40 \times 112 = 4\,480</span> Go : <strong>394 USD</strong> et 1,24 h.</p></li>
+</ol>
+<p>Architecture : réplication continue du jeu de données vers un stockage neutre à sortie gratuite, ce qui amène le cas (c) ; ordre de reprise par priorité pour étaler les 1,24 h de copie ; plafond du nombre de transferts simultanés ; vérification que les images sont publiées chez le fournisseur B ; et un exercice de bascule régulier, comme un jeu de chaos. La liaison partagée est le goulot : la quarantième reprise attend la fin des 39 autres copies si on les sérialise.</p>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux classer une offre de calcul et la comparer à une autre.</strong> Preuve : deux fiches de douze lignes (section 1.5), datées et sourcées, pour deux fournisseurs de votre choix.</li>
+<li><strong>Je peux dire à partir de quelle remise le spot bat la demande.</strong> Preuve : l'exercice 4 refait avec des taux d'interruption que vous avez mesurés.</li>
+<li><strong>Je peux relire un job SkyPilot et dire ce que l'outil ne vérifie pas.</strong> Preuve : la sortie de <code>verify.sh</code> du lab 13.2 et une correction de <code>bad-job.yaml</code>.</li>
+<li><strong>Je peux chiffrer un déménagement de données.</strong> Preuve : le calculateur testé du lab 13.3 appliqué à vos tarifs lus le jour même.</li>
+<li><strong>Je peux décider d'une bascule avec des chiffres.</strong> Preuve : le tableau du lab 13.1 et le seuil de l'exemple 5.2 recalculé pour vos paramètres.</li>
+<li><strong>Je peux expliquer pourquoi un entraînement ne se coupe pas entre sites.</strong> Preuve : l'exercice 9 refait avec vos débits mesurés.</li>
+<li><strong>Je peux choisir une voie d'accès à un centre public.</strong> Preuve : la conversion de l'exemple 7.1 pour une demande réelle, avec les appels relus.</li>
+<li><strong>Je peux écrire une politique de gouvernance exécutable.</strong> Preuve : une règle ajoutée à <code>policy_check.py</code> avec son test, lancée en intégration continue.</li>
+</ul>
+<p>Trois questions d'entretien à pouvoir traiter oralement en deux minutes chacune.</p>
+<ol type="1">
+<li><em>Nous voulons utiliser du spot sur trois fournisseurs. Qu'est-ce qui peut mal tourner ?</em> Réponse-type : le préavis (0 à 120 s) ne suffit pas à sauvegarder, donc il faut un checkpoint périodique sur un stockage qui survit à la VM ; le piège du pool à la demande qui ne rend jamais la main ; les quotas, qui se comptent en vCPU et séparément pour le spot ; les sorties de données à chaque bascule ; la mesure des taux d'interruption réels.</li>
+<li><em>Un jeu de données de 40 To est chez le fournisseur A, le fournisseur B est 20 % moins cher. Déménagez-vous ?</em> Réponse-type : calculer l'économie sur les heures utiles, la comparer au coût de sortie par tranches et au temps de copie valorisé ; vérifier la sensibilité au tarif et à la valeur du temps ; envisager un stockage neutre à sortie gratuite ou de lancer le job où vivent les données ; ne pas compter sur la sortie gratuite de départ, qui suppose de quitter le fournisseur.</li>
+<li><em>Comment garder une flotte multi-fournisseurs sous contrôle ?</em> Réponse-type : étiquettes obligatoires (équipe, projet, responsable), politique de job exécutable en intégration continue, arrêt automatique avec suppression, coûts normalisés dans un format commun, revue périodique de l'inventaire, des orphelins et des quotas.</li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<p>Sauf mention contraire, les pages ci-dessous ont été lues le 24 octobre 2026 ; ce sont des pages vivantes, relisez-les avant de décider.</p>
+<ul>
+<li>Yang et al. <em>SkyPilot: An Intercloud Broker for Sky Computing</em>. NSDI 2023. <a href="https://www.usenix.org/conference/nsdi23/presentation/yang-zongheng">usenix.org</a>, <a href="https://www.usenix.org/system/files/nsdi23-yang-zongheng.pdf">texte</a> : §4 pour l'optimiseur et la bascule, §5.1 pour l'exemple de sortie de données du chapitre 4, §5.2 pour la bascule entre régions.</li>
+<li>SkyPilot. <em>YAML specification</em>. Lue le 24 octobre 2026. <a href="https://docs.skypilot.co/en/latest/reference/yaml-spec.html">docs.skypilot.co</a> : <code>any_of</code>, <code>ordered</code>, <code>job_recovery</code>, <code>file_mounts</code>, <code>autostop</code>, <code>labels</code>, <code>network_tier</code>.</li>
+<li>SkyPilot. <em>Managed Jobs</em>. Lue le 24 octobre 2026. <a href="https://docs.skypilot.co/en/latest/examples/managed-jobs.html">docs.skypilot.co</a> : reprise après préemption, checkpoints sur stockage persistant, jobs sur spot.</li>
+<li>AWS. <em>Spot Instance interruption notices</em>. <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html">docs.aws.amazon.com</a> : le préavis de deux minutes, au mieux.</li>
+<li>Google Cloud. <em>Spot VMs</em>. <a href="https://cloud.google.com/compute/docs/instances/spot">cloud.google.com</a> : la durée de préavis configurable et la période d'arrêt au mieux.</li>
+<li>Microsoft. <em>Azure Spot Virtual Machines</em>. <a href="https://learn.microsoft.com/en-us/azure/virtual-machines/spot-vms">learn.microsoft.com</a> : les événements planifiés, jusqu'à 30 secondes.</li>
+<li>AWS. <em>Capacity Blocks for ML</em>. <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-blocks.html">docs.aws.amazon.com</a> : réservation planifiée de GPU, limites et annulation.</li>
+<li>AWS. <em>Liste de prix AWSDataTransfer</em> (API de prix). <a href="https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSDataTransfer/current/index.json">pricing.us-east-1.amazonaws.com</a> : tarifs de sortie lus pour le lab 13.3.</li>
+<li>Microsoft. <em>Azure Retail Prices API</em>. <a href="https://prices.azure.com/api/retail/prices">prices.azure.com</a> : tarifs de bande passante de la région <code>westeurope</code>.</li>
+<li>Cloudflare. <em>R2 pricing</em>. <a href="https://developers.cloudflare.com/r2/pricing/">developers.cloudflare.com</a> : stockage et absence de frais de sortie.</li>
+<li>Kueue. <em>MultiKueue</em>. <a href="https://kueue.sigs.k8s.io/docs/concepts/multikueue/">kueue.sigs.k8s.io</a> : manager, workers, flux de dispatch et limites.</li>
+<li>GENCI. <em>eDARI</em>. <a href="https://www.edari.fr/">edari.fr</a> : seuils d'accès, équivalences de GPU, conditions et appels en cours.</li>
+<li>IDRIS. <em>Jean Zay : matériel</em>. <a href="http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware">idris.fr</a> : partitions GPU et réseaux d'interconnexion.</li>
+<li>EuroHPC JU. <em>AI Factories access calls</em>. <a href="https://eurohpc-ju.europa.eu/ai-factories/ai-factories-access-calls_en">eurohpc-ju.europa.eu</a> : les trois modes d'accès aux usines d'IA.</li>
+<li>FinOps Foundation. <em>What is FOCUS?</em> <a href="https://focus.finops.org/what-is-focus/">focus.finops.org</a> : le format de données de facturation du chapitre 8.</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.</p>
+<p><strong>Recommandé.</strong> Le score de placement du chapitre 5, la valeur <span class="math inline">\lambda</span> du temps comme paramètre d'activité, la garde d'échéance, la règle « un job égale un site », le stockage neutre à sortie gratuite pour les checkpoints, les règles E1 à E6 et W1 à W4 de <code>policy_check.py</code> et leur choix d'étiquettes sont des choix de ce parcours, pas des normes. Les trois politiques naïves du lab 13.1 sont des cas d'école volontairement simples.</p>
+<p><strong>À vérifier.</strong> Tous les tarifs, franchises et dates d'appel cités changent : relisez la page du fournisseur le jour de la décision. Les tarifs de transfert de Google Cloud ne sont pas cités (tableau de la page aplati). Les règles exactes et les dates d'application du règlement européen sur les données (<em>Data Act</em>), notamment la fin des frais de changement de fournisseur, n'ont pas été relues à la source (EUR-Lex et le site de la Commission refusent l'accès depuis le bac à sable) ; le contrat de chaque fournisseur fait foi. L'annonce d'environ 70 % d'économie de la documentation SkyPilot est une affirmation du fournisseur de l'outil. Les offres et capacités des GPU clouds et des offres européennes, la liste des fournisseurs européens, les liaisons privées et leurs tarifs, la valeur de la préemption sur des GPU récents et l'état des appels d'EuroHPC, d'eDARI, d'ACCESS et du NAIRR sont instables et non documentés ici. Les règles d'installation d'outils et de réseau d'un centre public précis ne sont pas décrites.</p>
+<p><strong>Mesuré dans le bac à sable, pas vérifié sur un cloud.</strong> SkyPilot 0.14.1 rejette <code>type:</code> avec <code>mode: MOUNT</code>, les fautes de frappe et les mauvais types, et accepte un nom de stratégie <code>job_recovery</code> invalide (observation du 24 octobre 2026). Lu dans le code de SkyPilot 0.14.1 sans l'exécuter : le spot sur un contexte Kubernetes exige une étiquette de nœud. Le job <code>job.yaml</code> n'a jamais été lancé sur un compte cloud ni sur un cluster Kubernetes. Les trois politiques et le scénario du lab 13.1 sont synthétiques, tout comme les taux d'interruption, de disponibilité et le tarif de sortie de 0,09 u par Go de ce lab.</p>
+<p><strong>Hors périmètre.</strong> L'entraînement distribué entre fournisseurs, la négociation des contrats et le modèle de coût total (module 15), la sécurité d'une plateforme partagée (module 16), le provisionnement par Terraform en détail (module 6), la performance de NCCL sur chaque interconnexion (module 7), le droit des données et les certifications.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/kubernetes-gpu/index.html"><span class="k">← Précédent</span>Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a><a class="next" href="../../courses/observability/index.html"><span class="k">Suivant →</span>Module 14 — Observabilité et fiabilité d'une flotte GPU</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

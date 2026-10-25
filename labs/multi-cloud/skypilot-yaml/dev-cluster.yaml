@@ -1,0 +1,20 @@
+# Interactive cluster (sky launch): the governance rule is that it stops by itself when idle.
+# Tested offline with SkyPilot 0.14.1 (sky.Task.from_yaml); never launched on a real cloud by the author.
+name: dev-box
+
+resources:
+  accelerators: A100:1
+  infra: gcp/europe-west4
+  max_hourly_cost: 10.0
+  autostop:
+    idle_minutes: 30
+    down: true                    # tear the cluster down, do not just stop it (a stopped cluster still bills its disk)
+  labels:
+    team: llm-platform
+    project: dev-box
+    owner: platform-oncall
+
+workdir: .
+
+run: |
+  nvidia-smi

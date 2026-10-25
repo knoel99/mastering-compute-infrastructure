@@ -1,0 +1,9 @@
+galaxy_info:
+  author: course
+  description: Baseline configuration of a GPU compute node (limits, sysctl, modprobe, health timer).
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - name: Ubuntu
+      versions: [noble]
+dependencies: []

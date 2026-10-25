@@ -1,0 +1,213 @@
+{
+ "DCGM Diagnostic": {
+  "test_categories": [
+   {
+    "category": "Deployment",
+    "tests": [
+     {
+      "name": "software",
+      "results": [
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 0,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 1,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 2,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 3,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 4,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 5,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 6,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 7,
+        "info": [],
+        "status": "Pass"
+       }
+      ],
+      "test_summary": {
+       "status": "Pass"
+      }
+     }
+    ]
+   },
+   {
+    "category": "Integration",
+    "tests": [
+     {
+      "name": "pcie",
+      "results": [
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 0,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 1,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 2,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 3,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 4,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 5,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 6,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 7,
+        "info": [],
+        "status": "Pass"
+       }
+      ],
+      "test_summary": {
+       "status": "Pass"
+      }
+     }
+    ]
+   },
+   {
+    "category": "Hardware",
+    "tests": [
+     {
+      "name": "memory",
+      "results": [
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 0,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 1,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 2,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 3,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 4,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 5,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 6,
+        "info": [],
+        "status": "Pass"
+       },
+       {
+        "entity_group": "GPU",
+        "entity_group_id": 1,
+        "entity_id": 7,
+        "info": [],
+        "status": "Pass"
+       }
+      ],
+      "test_summary": {
+       "status": "Pass"
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

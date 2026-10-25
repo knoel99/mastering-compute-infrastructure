@@ -1,0 +1,22 @@
+# Every default is overridable from the inventory. The values are EXAMPLES chosen for the lab,
+# not vendor recommendations: validate them against your own workload.
+gpu_node_config_revision: "unset"
+
+gpu_node_limits:
+  - {domain: "*", type: "-", item: memlock, value: unlimited}
+  - {domain: "*", type: "-", item: nofile, value: 1048576}
+
+gpu_node_sysctl:
+  vm.swappiness: 1
+  vm.max_map_count: 1048576
+  net.core.somaxconn: 4096
+
+# The DCGM documentation lists a loaded nouveau driver as a failure condition of its deployment test.
+gpu_node_blacklist_nouveau: true
+
+# "log": handlers append a line to <node_root>/var/log/gpu_node_actions.log (what the lab uses).
+# "systemd": handlers really run sysctl, update-initramfs and systemctl (production only).
+gpu_node_service_backend: log
+
+# ANTI-PATTERN SWITCH for exercise 1: true embeds a timestamp in a managed file, so every run reports a change.
+gpu_node_stamp: false

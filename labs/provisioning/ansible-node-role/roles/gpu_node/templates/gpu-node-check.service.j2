@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Quick GPU node health check (revision {{ gpu_node_config_revision }})
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/gpu-node-check --quick

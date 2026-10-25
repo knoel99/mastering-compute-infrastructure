@@ -16,7 +16,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **8 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **12 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
@@ -63,9 +63,9 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 <div class="cards">
 <a class="card" href="courses/slurm/index.html"><h4>Slurm et exploitation d'un cluster HPC</h4><p class="meta">Module 05 · 32 h · Cœur</p><p>L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.</p></a>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Provisioning, images et santé des nœuds GPU</h4><p class="meta">Module 06 · 24 h · Cœur · en préparation</p><p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p></div>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Réseaux haute performance : InfiniBand, RoCE et NCCL</h4><p class="meta">Module 07 · 28 h · Cœur · en préparation</p><p>Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.</p></div>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Stockage et E/S pour l'entraînement</h4><p class="meta">Module 08 · 24 h · Cœur · en préparation</p><p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p></div>
+<a class="card" href="courses/provisioning/index.html"><h4>Provisioning, images et santé des nœuds GPU</h4><p class="meta">Module 06 · 24 h · Cœur</p><p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p></a>
+<a class="card" href="courses/networking/index.html"><h4>Réseaux haute performance : InfiniBand, RoCE et NCCL</h4><p class="meta">Module 07 · 28 h · Cœur</p><p>Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.</p></a>
+<a class="card" href="courses/storage/index.html"><h4>Stockage et E/S pour l'entraînement</h4><p class="meta">Module 08 · 24 h · Cœur</p><p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p></a>
 </div>
 
 <h3 class="phase" id="phase3">Phase 3 — Systèmes d'entraînement distribué</h3>
@@ -84,7 +84,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 <div class="cards">
 <a class="card" href="courses/kubernetes-gpu/index.html"><h4>Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</h4><p class="meta">Module 12 · 28 h · Cœur</p><p>Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.</p></a>
-<div class="card" style="opacity:.78;border-style:dashed"><h4>Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</h4><p class="meta">Module 13 · 28 h · Cœur · en préparation</p><p>Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.</p></div>
+<a class="card" href="courses/multi-cloud/index.html"><h4>Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</h4><p class="meta">Module 13 · 28 h · Cœur</p><p>Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.</p></a>
 <a class="card" href="courses/observability/index.html"><h4>Observabilité et fiabilité d'une flotte GPU</h4><p class="meta">Module 14 · 24 h · Cœur</p><p>Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.</p></a>
 <a class="card" href="courses/finops-capacity/index.html"><h4>FinOps, capacité, énergie et achats de calcul</h4><p class="meta">Module 15 · 24 h · Cœur</p><p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p></a>
 </div>

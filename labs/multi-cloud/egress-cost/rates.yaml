@@ -1,0 +1,61 @@
+# Rate card for the egress-cost lab. EVERY entry below was read on 2026-10-24 from the source named in `source`.
+# Prices change: before any real decision, re-read the provider's price page the same day and replace the values.
+# Volumes are in the provider's own billing GB (decimal or binary depending on the provider: the difference, 7 % at
+# most for GB vs GiB, is small next to the other uncertainties; check it in the provider's price page).
+# `tiers` apply to the volume BEYOND `free_gb`, cumulative per billing month: [{upto_gb, usd_per_gb}], last upto_gb null.
+read_on: 2026-10-24
+
+aws_use1_internet_out:
+  what: data transfer out to the internet from US East (N. Virginia)
+  source: >-
+    AWS Price List API, offer AWSDataTransfer, publicationDate 2026-09-16T13:22:08Z, SKU HQEH3ZWJVT46JHRG
+    (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSDataTransfer/current/index.json)
+  # "100 gigabytes per month free", all services and regions (AWS EC2 on-demand pricing page, 2026-10-24)
+  free_gb_month: 100
+  tiers:
+    - {upto_gb: 10240, usd_per_gb: 0.09}     # first 10 TB / month beyond the free tier
+    - {upto_gb: 51200, usd_per_gb: 0.085}    # next 40 TB
+    - {upto_gb: 153600, usd_per_gb: 0.07}    # next 100 TB
+    - {upto_gb: null, usd_per_gb: 0.05}      # greater than 150 TB
+
+aws_use1_to_eu_ireland:
+  what: data transfer between regions, US East (N. Virginia) to EU (Ireland)
+  source: >-
+    AWS Price List API, offer AWSDataTransfer, publicationDate 2026-09-16T13:22:08Z, SKU NW4B786HNAH6HZ7R
+  free_gb_month: 0
+  tiers:
+    - {upto_gb: null, usd_per_gb: 0.02}
+
+azure_westeurope_internet_out:
+  what: data transfer out, Routing Preference Internet, Standard, region westeurope
+  source: >-
+    Azure Retail Prices API, serviceName Bandwidth, armRegionName westeurope, product "Bandwidth - Routing
+    Preference: Internet", meter "Standard Data Transfer Out", effectiveStartDate 2022-03-01
+    (https://prices.azure.com/api/retail/prices)
+  free_gb_month: 100
+  tiers:
+    - {upto_gb: 10000, usd_per_gb: 0.08}     # tier starting at 100 GB
+    - {upto_gb: 50000, usd_per_gb: 0.065}    # tier starting at 10 100 GB
+    - {upto_gb: 150000, usd_per_gb: 0.06}    # tier starting at 50 100 GB
+    - {upto_gb: null, usd_per_gb: 0.04}      # tier starting at 150 100 GB
+
+r2_egress:
+  what: Cloudflare R2, data transfer to the internet
+  source: "Cloudflare R2 pricing page, 'Last updated Oct 1, 2026': no charges for egress bandwidth for any storage class"
+  free_gb_month: 0
+  tiers:
+    - {upto_gb: null, usd_per_gb: 0.0}
+
+storage:                       # USD per GB-month
+  aws_s3_standard_use1:
+    source: >-
+      AWS Price List API, offer AmazonS3, us-east-1, publicationDate 2026-10-15T17:35:40Z, S3 Standard
+      (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonS3/current/us-east-1/index.json)
+    tiers:
+      - {upto_gb: 51200, usd_per_gb: 0.023}
+      - {upto_gb: 512000, usd_per_gb: 0.022}
+      - {upto_gb: null, usd_per_gb: 0.021}
+  r2_standard:
+    source: "Cloudflare R2 pricing page, 'Last updated Oct 1, 2026', Standard storage"
+    tiers:
+      - {upto_gb: null, usd_per_gb: 0.015}

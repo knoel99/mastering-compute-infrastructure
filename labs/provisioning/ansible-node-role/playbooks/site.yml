@@ -1,0 +1,6 @@
+---
+- name: Configure GPU compute nodes
+  hosts: gpu_nodes
+  gather_facts: false
+  roles:
+    - role: gpu_node

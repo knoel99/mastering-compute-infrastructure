@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+# revision {{ gpu_node_config_revision }}
+{% for key, value in gpu_node_sysctl | dictsort %}
+{{ key }} = {{ value }}
+{% endfor %}

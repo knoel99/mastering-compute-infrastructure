@@ -1,0 +1,50 @@
+# Managed job (sky jobs launch): a training run that may start on any of three infras and survives preemption.
+# Tested offline with SkyPilot 0.14.1 (sky.Task.from_yaml); NEVER launched on a real cloud by the author.
+# Every name below (buckets, kubernetes context, labels) is a placeholder: replace it before use.
+# Caveat read in the SkyPilot 0.14.1 source (sky/clouds/kubernetes.py), NOT run: use_spot is accepted on a Kubernetes
+# context only if its nodes carry a spot label; otherwise the code lists spot as unsupported there (a launch-time check).
+name: pretrain-demo
+
+resources:
+  accelerators: H100:8
+  use_spot: true
+  max_hourly_cost: 120.0          # per-instance price cap in USD, a budget guard (example value)
+  any_of:                         # the optimizer tries the cheapest first and fails over to the next
+    - infra: aws/us-east-1
+    - infra: gcp/us-central1
+    - infra: k8s/eu-gpu-cluster   # placeholder Kubernetes context
+  job_recovery:
+    strategy: EAGER_NEXT_REGION   # after a preemption go straight to another location
+    max_restarts_on_errors: 2     # also retry the job a couple of times on a non-zero exit code
+  labels:                         # cost allocation: see policy_check.py
+    team: llm-platform
+    project: pretrain-demo
+    owner: platform-oncall
+
+num_nodes: 2
+
+file_mounts:
+  /checkpoint:                    # survives the loss of the VM; its location decides where egress is paid
+    source: r2://example-ckpt-bucket
+    mode: MOUNT_CACHED
+    type: MODEL_CHECKPOINT_RW
+  /data:                          # read-only dataset: `type` is only allowed together with MOUNT_CACHED (SkyPilot 0.14.1)
+    source: r2://example-dataset-bucket
+    mode: MOUNT_CACHED
+    type: DATASET_RO
+
+envs:
+  CKPT_DIR: /checkpoint/pretrain-demo
+  TOTAL_STEPS: "100000"
+
+secrets:
+  WANDB_API_KEY: ""               # passed at launch time: sky jobs launch --secret WANDB_API_KEY
+
+setup: |
+  pip install -r requirements.txt
+
+run: |
+  MASTER_ADDR=$(echo "$SKYPILOT_NODE_IPS" | head -n1)
+  torchrun --nnodes="$SKYPILOT_NUM_NODES" --nproc_per_node="$SKYPILOT_NUM_GPUS_PER_NODE" \
+    --node_rank="$SKYPILOT_NODE_RANK" --master_addr="$MASTER_ADDR" --master_port=29500 \
+    train.py --ckpt-dir "$CKPT_DIR" --total-steps "$TOTAL_STEPS" --resume auto

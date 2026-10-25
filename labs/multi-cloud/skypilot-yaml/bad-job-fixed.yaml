@@ -1,0 +1,32 @@
+# bad-job.yaml after the minimal fixes of exercise 2: zero errors, and the W3 warning on purpose (read it AFTER trying).
+# The HF_TOKEN value moved from envs to secrets (empty here, passed at launch time). Placeholders, as everywhere in this lab.
+name: pretrain-fixed
+
+resources:
+  accelerators: H100:8
+  use_spot: true
+  max_hourly_cost: 120.0
+  any_of:                         # one AWS and one Google location: this is what triggers W3 for the s3:// bucket
+    - infra: aws/us-east-1
+    - infra: gcp/us-central1
+  job_recovery:
+    strategy: EAGER_NEXT_REGION
+  labels:
+    team: llm-platform
+    project: pretrain-fixed
+    owner: platform-oncall
+
+file_mounts:
+  /data:
+    source: s3://example-dataset-bucket
+    mode: COPY
+  /checkpoint:
+    source: r2://example-ckpt-bucket
+    mode: MOUNT_CACHED
+    type: MODEL_CHECKPOINT_RW
+
+secrets:
+  HF_TOKEN: ""                    # passed at launch time: sky jobs launch --secret HF_TOKEN
+
+run: |
+  python train.py

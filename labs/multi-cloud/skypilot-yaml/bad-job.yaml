@@ -1,0 +1,21 @@
+# A job that SkyPilot accepts but that breaks the team's rules: used by the tests and by chapter 8 of the course.
+# The HF_TOKEN value is a dummy string, not a credential.
+name: pretrain-bad
+
+resources:
+  accelerators: H100:8
+  use_spot: true
+  infra: aws
+  labels:
+    team: llm-platform
+
+envs:
+  HF_TOKEN: hf_dummy_value_for_the_lint_demo
+
+file_mounts:
+  /data:
+    source: s3://example-dataset-bucket
+    mode: COPY
+
+run: |
+  python train.py

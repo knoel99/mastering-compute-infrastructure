@@ -1,0 +1,43 @@
+---
+# PRODUCTION SKETCH: linted and syntax-checked by verify.sh, NEVER executed in the lab (it needs a Slurm
+# controller and real nodes). Pattern: drain, wait for the jobs to end, converge, reboot, check, resume.
+- name: Update GPU nodes in batches through Slurm
+  hosts: gpu_nodes
+  gather_facts: false
+  serial: "{{ update_batch | default(1) }}"
+  max_fail_percentage: 0
+  vars:
+    slurm_controller: slurm-ctl
+    acceptance_cmd: /opt/acceptance/acceptance.sh --level quick
+  tasks:
+    - name: Drain the node with a reason (running jobs finish)
+      ansible.builtin.command: >-
+        scontrol update nodename={{ inventory_hostname }} state=drain reason="update {{ gpu_node_config_revision }}"
+      delegate_to: "{{ slurm_controller }}"
+      changed_when: true
+
+    - name: Wait until no job runs on the node
+      ansible.builtin.command: squeue -h -w {{ inventory_hostname }} -o %i
+      delegate_to: "{{ slurm_controller }}"
+      register: running
+      until: running.stdout == ""
+      retries: 1440
+      delay: 60
+      changed_when: false
+
+    - name: Apply the node role
+      ansible.builtin.include_role:
+        name: gpu_node
+
+    - name: Reboot and wait for the node to come back
+      ansible.builtin.reboot:
+        reboot_timeout: 1800
+
+    - name: Run the quick acceptance (a non-zero status stops this batch and the rollout)
+      ansible.builtin.command: "{{ acceptance_cmd }}"
+      changed_when: false
+
+    - name: Return the node to scheduling
+      ansible.builtin.command: scontrol update nodename={{ inventory_hostname }} state=resume
+      delegate_to: "{{ slurm_controller }}"
+      changed_when: true

@@ -1,0 +1,9 @@
+# PUBLIC excerpt: NCCL user guide, "Logging" page, https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/logging.html
+# (page header shows NCCL 2.32; excerpts are labelled there as "NCCL logs; only the relevant lines are shown"; read on 2026-10-24)
+NCCL version 2.30.3+cuda13.0
+[2026-05-05 06:16:47] node-01:189884:189884 [3] plugin/net.cc:334 NCCL WARN Failed to initialize any NET plugin
+[2026-05-05 06:16:47] node-01:189884:189884 [3] plugin/net.cc:208 (ncclNetPluginInit) NCCL ATTN Failed to initialize NET plugin IB
+node-01:3873285:3873285 [0] NCCL INFO Initialized NET plugin IB
+node-01:3873285:3873285 [0] NCCL INFO Assigned NET plugin IB to comm
+node-01:3873285:3873285 [0] NCCL INFO Using network IB
+node-01:3873285:3873285 [0] NCCL INFO DMA-BUF is available on GPU device 0

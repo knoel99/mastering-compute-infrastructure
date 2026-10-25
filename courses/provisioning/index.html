@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Provisioning, images et santé des nœuds GPU — Mastering Compute Infrastructure</title>
+<meta name="description" content="Du châssis nu au nœud en production : démarrage réseau, images, Ansible et Terraform, pile GPU, recette et burn-in, mises à jour, RMA et supervision hors bande.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">Provisioning, images et santé des nœuds GPU</h1>
+<p class="subtitle">Module 06 · Phase 2 · 24 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs : 3 vérifiés dans un bac à sable, la recette GPU non exécutée</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> comment passer d'un châssis qui vient d'être vissé dans une baie à un nœud qui peut recevoir un entraînement de deux semaines, de façon répétable, et comment savoir que le centième nœud est identique au premier ? Un ingénieur d'infrastructure ne se juge pas à la première installation, mais à la deux-centième, et à la façon dont il remplace un nœud en panne un mardi à 3 h.</p>
+<p>Ce module suit la vie d'un nœud : démarrage réseau et images, configuration idempotente avec Ansible, description de la flotte avec Terraform, pile logicielle du GPU, recette et <em>burn-in</em> (test de rodage sous charge), mises à jour sans arrêter la production, remplacement sous garantie (<em>RMA</em>), et supervision par le contrôleur de gestion (<em>BMC</em>) quand le système d'exploitation ne répond plus.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Déclarez l'état voulu, laissez des outils idempotents le réaliser, puis <strong>prouvez-le</strong> avant de laisser un job entrer. Un nœud dont on ne peut pas montrer la recette n'est pas en production : il est seulement allumé.</p>
+</div>
+<p>Les labs s'exécutent sans GPU, par simulation. Chaque simulation est étiquetée comme telle sur la page et dans le README du lab : un BMC simulé n'est pas un BMC, un répertoire n'est pas un nœud, et une preuve de recette synthétique n'est pas une mesure. Les parties qui exigent du matériel ou un cluster (la collecte réelle de la recette, le démarrage PXE de bout en bout, un vrai BMC, la mise à jour en production) sont au mieux lintées ou vérifiées en syntaxe, et <strong>jamais exécutées ici</strong>.</p>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>24 h, dont 8 h de lecture, 10,5 h de labs et 5,5 h d'exercices</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>2 : à l'aise avec Linux, systemd et le réseau (module 1)</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : Kubernetes, Terraform et FinOps sont acquis, mais ni le démarrage réseau, ni la recette GPU, ni les BMC</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un rôle Ansible testé, un module Terraform qui dérive tout de la carte des nœuds, un script de recette dont la logique de décision est testée, un client Redfish testé</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>un portable ou une VM Linux, sans GPU ; Terraform, ansible-core et dnsmasq pour les labs. La recette réelle demande un nœud GPU avec DCGM (optionnel ; coût non chiffré ici, à demander à votre fournisseur)</td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/homelab-slurm/index.html">Projet 1 — Mini-cluster Slurm instrumenté</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Décrire la chaîne firmware, DHCP, TFTP, iPXE, HTTP, image, configuration, enregistrement dans l'ordonnanceur, et dire où elle casse (chapitres 1 et 2).</li>
+<li>Écrire un rôle Ansible idempotent, le tester en mode vérification, le déployer par lots avec un canari et protéger un secret (chapitre 3).</li>
+<li>Décrire une flotte avec Terraform, lire un plan, détecter une dérive et refuser une destruction involontaire (chapitre 4).</li>
+<li>Vérifier la compatibilité pilote, CUDA et Fabric Manager d'un nœud avant qu'un job n'échoue (chapitre 5).</li>
+<li>Concevoir une recette à trois issues (accepter, rejouer, refuser) et expliquer pourquoi un code de retour ne suffit pas (chapitre 6).</li>
+<li>Planifier une mise à jour progressive et dimensionner un volant de nœuds de rechange (chapitre 7).</li>
+<li>Interroger un BMC par Redfish et décider de drainer un nœud sur sa santé matérielle (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Neuf séances, soit 24 h. Chaque séance contient ses chapitres, sa part de lab et ses exercices, et un exercice n'est placé qu'après la séance qui enseigne ce dont il a besoin. Le niveau ne diminue jamais.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>2 h</td>
+<td>1</td>
+<td>ch. 1 Cycle de vie d'un nœud (45 min) ; questions de positionnement (15 min) ; ch. 2 §2.1 La chaîne de démarrage (30 min)</td>
+<td>Ex. 1</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2 h</td>
+<td>1</td>
+<td>ch. 2 §2.2 à §2.5 Démarrage réseau et images</td>
+<td>Ex. 2, 3</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 3 Gestion de configuration avec Ansible</td>
+<td>Lab 6.1 partie A ; Ex. 4</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 4 Terraform pour la flotte</td>
+<td>Lab 6.1 partie B ; Ex. 5</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3 h</td>
+<td>2</td>
+<td>Synthèse des chapitres 2 à 4 par le lab</td>
+<td>Lab 6.2</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 5 Pile GPU, ch. 6 §6.1 à §6.3 Tests, outils et remappage</td>
+<td>Ex. 6, 8</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 6 §6.4 et §6.5 Recette : règles de décision</td>
+<td>Lab 6.3 partie A ; Ex. 7</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 Mises à jour, pannes et RMA</td>
+<td>Lab 6.3 partie B ; Ex. 9</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 8 BMC, Redfish et IPMI</td>
+<td>Lab 6.4 ; Ex. 10, 11</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et le chapitre 6.</p>
+<ol type="1">
+<li><p><strong>Idempotence.</strong> Un script shell installe un paquet et ajoute une ligne à un fichier de configuration. Que se passe-t-il à la deuxième exécution, et que change un outil de configuration déclarative ?</p></li>
+<li><p><strong>Premier octet.</strong> Un serveur sans disque démarre sur le réseau. Dans quel ordre interroge-t-il quels services, et que télécharge-t-il en premier ?</p></li>
+<li><p><strong>Couche fautive.</strong> <code>nvidia-smi</code> liste huit GPU sur un nœud neuf, mais l'initialisation de NCCL (la bibliothèque NVIDIA de communication collective entre GPU) échoue dans le premier job. Citez trois couches logicielles ou matérielles à contrôler avant de soupçonner le code d'entraînement.</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p>Le script ajoute la ligne une seconde fois et peut échouer sur le paquet déjà présent : il décrit des actions. Un outil déclaratif décrit un état et n'agit que si l'état réel diffère ; relancé sur un nœud conforme, il ne change rien. Voir le chapitre 3.</p></li>
+<li><p>Le micrologiciel (<em>firmware</em>) demande une adresse par DHCP, reçoit l'adresse d'un serveur et le nom d'un programme d'amorçage, le télécharge par TFTP (iPXE ou GRUB), puis ce programme télécharge noyau, <em>initrd</em> (le petit système de fichiers que le noyau charge en mémoire au démarrage) et image, le plus souvent par HTTP. Voir le chapitre 2.</p></li>
+<li><p>Par exemple : la version du pilote face à celle de CUDA dans le conteneur, le service Fabric Manager sur un système à NVSwitch, la topologie PCIe et NVLink (liens dégradés), le réseau d'interconnexion. Voir les chapitres 5 et 6.</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. Cycle de vie d'un nœud : recette, installation, exploitation, retrait</h2>
+<p>Un nœud GPU n'est pas un objet qu'on installe une fois. Il traverse des états, chacun avec une porte d'entrée vérifiable et une porte de sortie. Ce chapitre fixe le vocabulaire du module et montre, chiffres publiés à l'appui, pourquoi la porte qui sépare « installé » de « en production » est celle qui rapporte le plus.</p>
+<h3 id="les-états-dun-nœud">1.1. Les états d'un nœud</h3>
+<p>Le parcours ci-dessous est un choix pédagogique de ce module, pas une norme. Il distingue ce que l'inventaire sait d'un nœud (identité), ce que les outils de configuration lui ont fait (état voulu) et ce que l'ordonnanceur en pense (état de service).</p>
+<figure class="fig">
+<svg viewBox="0 0 560 250" role="img" aria-labelledby="lc-t lc-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="lc-t">
+Cycle de vie d'un nœud GPU
+</title>
+<desc id="lc-d">Quatre états en ligne : reçu, installé, recette, production. De la production on passe à drainé, puis à réparation, qui retourne à la recette, ou au retrait.</desc> <defs><marker id="lc-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs> <g fill="var(--bg)" stroke="currentColor" stroke-width="1.5"> <rect x="8" y="30" width="96" height="46" rx="6"/> <rect x="124" y="30" width="96" height="46" rx="6"/> <rect x="240" y="30" width="96" height="46" rx="6" stroke="var(--accent)" stroke-width="3"/> <rect x="356" y="30" width="100" height="46" rx="6"/> <rect x="356" y="150" width="100" height="46" rx="6"/> <rect x="196" y="150" width="120" height="46" rx="6"/> <rect x="30" y="150" width="120" height="46" rx="6"/> </g> <g fill="currentColor" font-size="15" text-anchor="middle"> <text x="56" y="58">reçu</text> <text x="172" y="58">installé</text> <text x="288" y="58">recette</text> <text x="406" y="58">production</text> <text x="406" y="178">drainé</text> <text x="256" y="178">réparation</text> <text x="90" y="178">retiré</text> <text x="280" y="22" fill="var(--accent)">la porte qui compte</text> <text x="416" y="118" text-anchor="start" font-size="14">panne, mise à jour</text> </g> <g stroke="currentColor" stroke-width="1.8" fill="none" marker-end="url(#lc-a)"> <path d="M104 53H122"/><path d="M220 53H238"/><path d="M336 53H354"/> <path d="M406 76V148"/><path d="M356 173H318"/><path d="M196 173H152"/> <path d="M256 150V80" stroke-dasharray="5 4"/> </g> <text x="262" y="118" font-size="14" fill="currentColor">rejeu de la recette</text>
+</svg>
+<figcaption>
+Les sept états de ce module. Le rectangle épais est la recette : un nœud n'y reçoit aucun job. Après une réparation, il repasse par la recette (flèche pointillée).
+</figcaption>
+</figure>
+<p>Dans Slurm (module 5), un nœud en recette est drainé avec une raison explicite, par exemple <code>acceptance</code>. Le drain est le mécanisme qui matérialise l'état : le nœud existe, il est joignable, aucun job n'y entre.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>État</th>
+<th>Porte d'entrée</th>
+<th>Qui en décide</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>reçu</td>
+<td>numéro de série, MAC et adresse du BMC saisis dans l'inventaire</td>
+<td>l'inventaire (lab 6.2)</td>
+</tr>
+<tr class="even">
+<td>installé</td>
+<td>image déployée, configuration convergée (<code>changed=0</code> à la seconde passe)</td>
+<td>l'outil de configuration (lab 6.1)</td>
+</tr>
+<tr class="odd">
+<td>recette</td>
+<td>tests du chapitre 6 passés sans rejet</td>
+<td>le script de recette (lab 6.3)</td>
+</tr>
+<tr class="even">
+<td>production</td>
+<td>verdict <em>accept</em>, nœud remis en service dans l'ordonnanceur</td>
+<td>l'ordonnanceur</td>
+</tr>
+<tr class="odd">
+<td>drainé</td>
+<td>contrôle de santé en échec ou mise à jour planifiée</td>
+<td>l'automatisation</td>
+</tr>
+<tr class="even">
+<td>réparation</td>
+<td>intervention, éventuellement échange sous garantie</td>
+<td>un humain, avec dossier</td>
+</tr>
+<tr class="odd">
+<td>retiré</td>
+<td>fin de vie ou échange définitif, identité révoquée</td>
+<td>l'inventaire</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="pourquoi-la-porte-de-la-recette-rapporte-le-plus">1.2. Pourquoi la porte de la recette rapporte le plus</h3>
+<p>Deux publications de Meta donnent des ordres de grandeur sur de très grands clusters d'entraînement. Elles décrivent leur flotte, pas la vôtre : lisez-les comme des échelles, pas comme des cibles.</p>
+<div class="war">
+<p><span class="tag">Ce que mesurent deux grands clusters</span> Sur 54 jours d'entraînement de Llama 3 405B, <a href="https://arxiv.org/abs/2407.21783">Dubey et al. (2024)</a> comptent 466 interruptions de job, dont 47 planifiées (firmware, configuration) et 419 inattendues. Environ 78 % des interruptions inattendues sont attribuées à du matériel confirmé ou suspecté. Le temps d'entraînement effectif dépasse 90 %, avec une maintenance automatisée qui provoque au moins une interruption par jour.</p>
+<p><a href="https://arxiv.org/abs/2410.21680">Kokolis et al. (2024)</a> mesurent sur deux clusters de recherche des taux moyens de 6,50 (RSC-1) et 2,34 (RSC-2) pannes pour 1 000 nœuds-jours, qui varient dans le temps (de l'ordre de 2,5 à 17,5 sur RSC-1). Le MTTF (<em>mean time to failure</em>, temps moyen avant panne) est de 7,9 h pour les jobs de 1 024 GPU contre 47,7 jours pour ceux de 8 GPU.</p>
+<p>Ils décrivent aussi des « nœuds citrons » (<em>lemon nodes</em>) : 40 nœuds identifiés, dont l'éviction fait passer les échecs de gros jobs (512 GPU et plus) de 14 % à 4 %. Les mêmes auteurs signalent jusqu'à 50-75 % de perte de bande passante réseau pendant la mise en service de l'un des clusters.</p>
+</div>
+<p>La leçon d'infrastructure est simple. Quand un job occupe 1 024 GPU, un seul nœud défaillant l'arrête. Un nœud qui sort de l'usine ou de la réparation avec un défaut latent coûte alors des centaines de GPU-heures avant qu'on ne le trouve. La recette déplace la découverte du défaut avant le premier job.</p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Lire un tableau publié avec méfiance</span> Le tableau 5 de l'article Llama 3 classe les 419 interruptions inattendues par composant. Le script <code>labs/provisioning/exercise-calcs/calc.py</code> en recopie les 18 lignes et les recoupe avec le texte (sortie réelle, Python 3.13, 2026-10-24) :</p>
+<pre class="text"><code>$ python3 calc.py llama
+sum of counts      : 419  (the text says 419 unexpected interruptions)
+sum of printed %   : 94.9
+mismatch           : Faulty GPU: 148/419 = 35.3 % but the table prints 30.1 %
+interruptions/day  : 8.63 total, 7.76 unexpected, 0.87 planned (466, 419, 47 over 54 days)</code></pre>
+<p>Les effectifs recoupent bien le texte, mais la ligne « Faulty GPU » affiche 30,1 % alors que 148 sur 419 donne 35,3 %, et les pourcentages imprimés ne totalisent que 94,9 %. L'article est internement incohérent sur ce point : une coquille probable, que nous ne corrigeons pas à sa place. Retenez les <strong>effectifs</strong>, utilisables, et ne citez pas ce pourcentage seul.</p>
+</div>
+<h3 id="identité-et-inventaire-la-source-de-vérité">1.3. Identité et inventaire : la source de vérité</h3>
+<p>Tout le reste du module suppose qu'un nœud a une identité stable et lisible par des machines. Quatre éléments suffisent à commencer : le numéro de série du châssis, l'adresse MAC de l'interface de démarrage, l'adresse du BMC, et la position (baie, hauteur). On y ajoute plus tard les identifiants des GPU, que <code>nvidia-smi</code> expose, et ceux des cartes réseau.</p>
+<p>Le point de départ de ce module est une <strong>carte des nœuds</strong>, un fichier déclaratif de votre dépôt. Le lab 6.2 en dérive l'inventaire Ansible, la configuration DHCP, le script de démarrage et les lignes <code>NodeName=</code> de Slurm. Écrire une information à un seul endroit est la seule façon pour que quatre outils ne divergent jamais.</p>
+<p>La recette a besoin d'une référence. Plutôt qu'une valeur lue sur une fiche technique, comparez chaque nœud à un nœud « doré » (<em>golden node</em>) que vous avez qualifié à la main, et à la médiane de la flotte. Le seuil d'acceptation de la bande passante, au chapitre 6, est un paramètre de site mesuré ainsi.</p>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li>Un nœud traverse sept états ; chaque porte d'entrée est une preuve, pas une impression.</li>
+<li>Sur de grands clusters publiés, une part majoritaire des interruptions inattendues vient du matériel ; un job de 1 024 GPU a un MTTF de quelques heures (7,9 h chez Kokolis et al.).</li>
+<li>Un tableau publié se recoupe avant d'être cité : celui de Llama 3 est incohérent sur un pourcentage.</li>
+<li>L'identité d'un nœud vit dans un fichier déclaratif unique, dont les autres outils sont dérivés.</li>
+</ul>
+</div>
+<h2 id="ch2">2. Démarrage réseau et images : PXE, iPXE, MAAS, Warewulf, BCM</h2>
+<p>Un serveur neuf n'a ni système ni configuration : tout ce qu'il sait faire, c'est demander du réseau. Ce chapitre décrit la chaîne qui le mène de là à un noyau Linux, la façon dont on choisit ce que le serveur reçoit, et les trois familles d'outils que vous rencontrerez, avec leurs forces et leurs limites telles que leurs documentations les décrivent.</p>
+<h3 id="la-chaîne-de-démarrage">2.1. La chaîne de démarrage</h3>
+<p>La documentation de Warewulf décrit la séquence générique du démarrage réseau d'un nœud de cluster. Le micrologiciel (BIOS ou UEFI) initialise le matériel, dont la carte réseau, puis son client PXE (<em>Preboot eXecution Environment</em>, le démarrage réseau intégré au firmware) obtient une adresse par BOOTP/DHCP. Le serveur DHCP répond avec une adresse et une option « serveur suivant » (<em>next-server</em>) qui désigne où télécharger, par TFTP (<em>Trivial File Transfer Protocol</em>, un protocole minimal de transfert de fichiers), un programme d'amorçage : iPXE ou GRUB.</p>
+<p>Ce programme lit sa configuration et télécharge le noyau, l'image et les compléments de configuration, ici par HTTP. Enfin Linux démarre avec cette image comme système de fichiers racine.</p>
+<figure class="fig">
+<svg viewBox="0 0 560 330" role="img" aria-labelledby="bc-t bc-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="bc-t">
+Chaîne de démarrage réseau
+</title>
+<desc id="bc-d">Six étapes de haut en bas : firmware, DHCP, TFTP, iPXE, HTTP, Linux. L'étape iPXE refait une requête DHCP avant de recevoir l'URL d'un script.</desc> <defs><marker id="bc-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs> <g fill="var(--bg)" stroke="currentColor" stroke-width="1.5"> <rect x="10" y="8" width="190" height="38" rx="6"/><rect x="10" y="62" width="190" height="38" rx="6"/> <rect x="10" y="116" width="190" height="38" rx="6"/><rect x="10" y="170" width="190" height="38" rx="6" stroke="var(--accent)" stroke-width="3"/> <rect x="10" y="224" width="190" height="38" rx="6"/><rect x="10" y="278" width="190" height="38" rx="6"/> </g> <g fill="currentColor" font-size="15"> <text x="105" y="33" text-anchor="middle">firmware (PXE)</text><text x="105" y="87" text-anchor="middle">serveur DHCP</text> <text x="105" y="141" text-anchor="middle">serveur TFTP</text><text x="105" y="195" text-anchor="middle">iPXE s'exécute</text> <text x="105" y="249" text-anchor="middle">serveur HTTP</text><text x="105" y="303" text-anchor="middle">noyau Linux</text> <text x="222" y="33" font-size="14">demande une adresse</text><text x="222" y="87" font-size="14">adresse + nom du programme</text> <text x="222" y="141" font-size="14">télécharge le binaire iPXE</text><text x="222" y="195" font-size="14" fill="var(--accent)">refait un DHCP, reçoit une URL</text> <text x="222" y="249" font-size="14">script, noyau, initrd, image</text><text x="222" y="303" font-size="14">enregistrement au scheduler</text> </g> <g stroke="currentColor" stroke-width="1.8" fill="none" marker-end="url(#bc-a)"> <path d="M105 46V60"/><path d="M105 100V114"/><path d="M105 154V168"/><path d="M105 208V222"/><path d="M105 262V276"/> </g>
+</svg>
+<figcaption>
+Les deux demandes DHCP : celle du firmware reçoit le binaire iPXE, celle d'iPXE reçoit l'adresse d'un script. Sans cette distinction, le serveur renverrait iPXE indéfiniment.
+</figcaption>
+</figure>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Étape</th>
+<th>Protocole</th>
+<th>Panne typique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>adresse</td>
+<td>DHCP</td>
+<td>aucun serveur sur le bon VLAN, ou deux serveurs qui répondent</td>
+</tr>
+<tr class="even">
+<td>programme d'amorçage</td>
+<td>TFTP</td>
+<td>mauvais fichier pour l'architecture (BIOS ou UEFI)</td>
+</tr>
+<tr class="odd">
+<td>script, noyau, image</td>
+<td>HTTP</td>
+<td>URL absente, image trop grosse pour la mémoire disponible</td>
+</tr>
+<tr class="even">
+<td>système démarré</td>
+<td>Linux</td>
+<td>pilote réseau absent de l'<em>initrd</em>, disque non vu</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="la-boucle-ipxe-et-sa-parade">2.2. La boucle iPXE et sa parade</h3>
+<p>Beaucoup de firmwares ne savent faire que du TFTP. On les amène donc à charger iPXE, qui sait faire du HTTP et exécuter des scripts. Mais iPXE, au démarrage, refait sa propre requête DHCP : si le serveur lui répond de nouveau « télécharge iPXE », la machine charge iPXE qui charge iPXE, sans fin.</p>
+<div class="war">
+<p><span class="tag">La boucle d'iPXE, un piège documenté</span> La page <em>Chainloading iPXE</em> du projet décrit exactement ce cas : le DHCP doit répondre autrement à la deuxième requête, soit par un script intégré à iPXE ou un script <code>autoexec</code>, soit en ne livrant le binaire iPXE qu'à la première requête. Voir <a href="https://ipxe.org/howto/chainloading">ipxe.org/howto/chainloading</a>.</p>
+</div>
+<p>Avec dnsmasq, on distingue les deux requêtes par l'option DHCP 175, que seul iPXE envoie. Le lab 6.2 génère cette configuration depuis la carte des nœuds. En voici le cœur, tel que Terraform l'a écrit :</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Une configuration PXE générée et validée</span> Extrait de <code>prod-dnsmasq.conf</code> produit par <code>labs/provisioning/terraform-fleet</code> (adresses de documentation RFC 5737), puis la validation de syntaxe par dnsmasq 2.91 (Ubuntu 24.04, 2026-10-24) :</p>
+<pre class="text"><code>dhcp-range=192.0.2.2,static
+dhcp-match=set:ipxe,175
+dhcp-match=set:efi64,option:client-arch,7
+dhcp-match=set:efi64,option:client-arch,9
+dhcp-boot=tag:!ipxe,tag:efi64,ipxe.efi
+dhcp-boot=tag:!ipxe,tag:!efi64,undionly.kpxe
+dhcp-boot=tag:ipxe,http://192.0.2.2/prod-boot.ipxe
+
+$ dnsmasq --test -C prod-dnsmasq.conf
+dnsmasq: syntax check OK.</code></pre>
+<p>Lecture : <code>static</code> ne distribue d'adresse qu'aux machines listées par une ligne <code>dhcp-host</code> (une machine inconnue ne reçoit rien). Le firmware, sans l'option 175, reçoit un binaire iPXE choisi selon son architecture annoncée dans l'option 93 (le <a href="https://www.rfc-editor.org/rfc/rfc4578.txt">RFC 4578</a> attribue 9 à EFI x86-64 et 7 à EFI Byte Code ; des firmwares UEFI x86-64 annoncent l'un ou l'autre selon les constructeurs : le gabarit couvre les deux, à confirmer par une capture sur votre matériel). iPXE, lui, reçoit l'URL d'un script.</p>
+<p><strong>Ce que cela ne prouve pas.</strong> <code>--test</code> ne vérifie que la syntaxe. Aucune machine, réelle ou virtuelle, n'a démarré sur cette configuration dans le bac à sable : le chemin PXE de bout en bout est <strong>non testé</strong> ici.</p>
+</div>
+<p>Le script <code>boot.ipxe</code> généré identifie le nœud par sa MAC, choisit un profil (<code>gpu</code> ou <code>cpu</code>) et refuse de démarrer une machine inconnue :</p>
+<pre class="text"><code>#!ipxe
+set base http://192.0.2.2/images
+isset ${net0/mac} || goto unknown
+iseq ${net0/mac} 02:00:00:00:02:01 &amp;&amp; goto node_gpu_n01 ||
+...
+:unknown
+echo MAC ${net0/mac} is not in the inventory: refusing to boot</code></pre>
+<p>Les commandes <code>iseq</code>, <code>goto</code>, <code>kernel</code>, <code>initrd</code> et <code>boot</code> et le réglage <code>net0/mac</code> sont décrits dans la documentation d'iPXE. Le lab vérifie la structure du script (chaque <code>goto</code> a son étiquette, les MAC sont uniques), pas son exécution.</p>
+<h3 id="deux-philosophies-dimage">2.3. Deux philosophies d'image</h3>
+<p>Une fois le noyau démarré, la question est ce qui constitue le système. Deux familles dominent.</p>
+<ul>
+<li><strong>Sans état</strong> (<em>stateless</em>). L'image du système est téléchargée à chaque démarrage et vit en mémoire ; le disque, s'il existe, ne porte que des données locales. Un nœud défectueux se « répare » par un redémarrage. La mise à jour consiste à changer l'image puis à redémarrer les nœuds.</li>
+<li><strong>Avec état</strong> (<em>stateful</em>). L'image est écrite sur le disque du nœud par un installateur, puis le nœud démarre sur disque. Les mises à jour peuvent se faire en place, ce qui laisse les nœuds diverger si on n'y prend garde.</li>
+</ul>
+<p>Entre les deux, une troisième voie, très répandue : installer une image générique, puis laisser un outil de configuration (chapitre 3) faire converger le nœud. Elle demande moins d'outillage au départ et plus de discipline ensuite.</p>
+<p>La documentation de Warewulf signale un détail d'exploitation utile quel que soit l'outil : en mode « une seule étape », l'image est livrée directement par le programme d'amorçage, ce qui ne fonctionne pas dans tous les environnements (certaines dispositions de mémoire ne sont pas gérées par iPXE ni GRUB pour de grosses images). En « deux étapes », un petit système d'amorçage récupère l'image complète, ce qui est souvent plus rapide.</p>
+<h3 id="trois-outils-leurs-forces-et-leurs-limites">2.4. Trois outils, leurs forces et leurs limites</h3>
+<p>Les faits ci-dessous viennent des pages officielles lues le 24 octobre 2026. Les limites marquées « raisonnement » sont des déductions de ce parcours, pas des affirmations des projets.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Outil</th>
+<th>Ce que sa documentation établit</th>
+<th>Limites à évaluer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MAAS (Canonical)</td>
+<td>mise sous tension par le BMC, démarrage d'un environnement éphémère en mémoire (programme d'amorçage par TFTP ou HTTP, puis noyau, <em>initrd</em> et système de fichiers fournis par MAAS), scripts de profilage matériel et de tests, puis déploiement : <em>curtin</em> partitionne et écrit l'image, <em>cloud-init</em> la personnalise ; pilotes d'alimentation dont IPMI et Redfish ; fournisseur Terraform <code>canonical/maas</code></td>
+<td>installation avec état (raisonnement) ; périmètre et images à confirmer pour votre distribution</td>
+</tr>
+<tr class="even">
+<td>Warewulf</td>
+<td>provisionnement sans état de grappes Linux, images gérables avec des outils de conteneurs, surcouches (<em>overlays</em>) de configuration, commandes <code>wwctl</code> dont <code>node sensors</code></td>
+<td>l'état local est reconstruit à chaque démarrage (raisonnement) ; le pilote GPU est figé dans l'image</td>
+</tr>
+<tr class="odd">
+<td>NVIDIA Base Command Manager (BCM)</td>
+<td>simplifie le provisionnement des clusters, la gestion des charges et la supervision de l'infrastructure (d'après la page de la documentation) ; guide de déploiement d'un système personnalisé sur DGX ; licence gratuite proposée par la page produit</td>
+<td>produit propriétaire ; <strong>conditions de licence à relire le jour de l'achat</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>D'autres projets existent et n'ont pas été évalués ici : OpenCHAMI (plateforme ouverte de gestion de systèmes HPC), OpenStack Ironic (service de nœuds nus) et xCAT. Leurs pages d'accueil ont été lues ; leurs capacités n'ont pas été comparées.</p>
+<p>Le choix se joue moins sur une fonctionnalité que sur trois questions : qui possède l'image et son cycle de vie, comment on reconstruit un nœud à l'identique, et quelle équipe sait déboguer le démarrage à 3 h du matin. L'exercice 3 les met en balance.</p>
+<h3 id="le-réseau-de-démarrage-nest-pas-de-confiance">2.5. Le réseau de démarrage n'est pas de confiance</h3>
+<p>N'importe quelle machine du VLAN de démarrage peut répondre à une requête DHCP ou servir un faux noyau : le démarrage réseau classique n'authentifie pas le serveur. Isolez ce réseau, n'y laissez que les nœuds et le serveur de provisionnement, et conservez la règle de la section 2.2 : une machine absente de l'inventaire ne reçoit ni adresse ni image.</p>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li>La chaîne est : firmware, DHCP, TFTP (iPXE), HTTP (script, noyau, image), Linux, enregistrement dans l'ordonnanceur.</li>
+<li>Distinguez les deux requêtes DHCP (firmware, puis iPXE) pour ne pas boucler ; dnsmasq le fait avec l'option 175.</li>
+<li>Sans état, avec état ou installation puis configuration : trois choix, avec des coûts d'exploitation différents.</li>
+<li>MAAS, Warewulf et BCM sont documentés sur ce qu'ils font ; leurs limites se jugent sur votre contexte et sur les conditions du jour.</li>
+<li>Une machine inconnue ne reçoit rien ; le réseau de démarrage est isolé.</li>
+</ul>
+</div>
+<h2 id="ch3">3. Gestion de configuration : Ansible, idempotence, inventaires, secrets</h2>
+<p>Une image ou une installation donne un système ; la configuration le rend conforme. Sur une flotte, la propriété qui compte est la <strong>convergence prouvée</strong> : après chaque exécution, on sait que le nœud est dans l'état voulu, et on sait le dire en un chiffre. Ce chapitre utilise Ansible, outil sans agent qui parle à ses cibles par SSH, et le rôle du lab 6.1.</p>
+<h3 id="idempotence-définition-et-preuve">3.1. Idempotence, définition et preuve</h3>
+<p>Le glossaire d'Ansible définit l'idempotence ainsi : une opération est idempotente si le résultat de son exécution unique est exactement le même que celui de son exécution répétée, sans intervention entre-temps. Les modules déclaratifs (<code>template</code>, <code>file</code>, <code>sysctl</code>) comparent l'état réel à l'état voulu et n'agissent que s'ils diffèrent.</p>
+<p>La preuve pratique est le décompte <code>changed</code> de la récapitulation (<em>PLAY RECAP</em>) à la <strong>seconde</strong> exécution : zéro partout. Un <code>changed=1</code> récurrent est un défaut du rôle, pas un détail cosmétique, car une flotte qui ne converge jamais ne peut jamais être déclarée conforme.</p>
+<p>Les trois causes habituelles sont les modules <code>command</code> et <code>shell</code> sans <code>changed_when</code>, les valeurs qui changent à chaque exécution (horodatage, aléatoire) dans un fichier géré, et les fichiers réécrits avec des permissions différentes de celles que le module relit.</p>
+<h3 id="un-rôle-un-inventaire">3.2. Un rôle, un inventaire</h3>
+<p>Le rôle <code>gpu_node</code> du lab 6.1 pose des limites de ressources, des paramètres noyau, la liste noire du pilote <code>nouveau</code> (la documentation de DCGM compte un <code>nouveau</code> chargé parmi les causes d'échec de son test de déploiement), une minuterie systemd de contrôle rapide et un fait local qui publie la révision de configuration. Il suit l'arborescence standard d'Ansible : <code>defaults/</code>, <code>tasks/</code>, <code>templates/</code>, <code>handlers/</code>, <code>meta/</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set kernel parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ansible.builtin.template</span><span class="kw">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">src</span><span class="kw">:</span><span class="at"> sysctl.conf.j2</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">dest</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;{{ node_root }}/etc/sysctl.d/90-gpu-training.conf&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;0644&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">notify</span><span class="kw">:</span><span class="at"> Apply sysctl settings</span></span></code></pre></div>
+<p>La variable <code>node_root</code> est l'astuce du lab : sur la flotte réelle elle est vide et les chemins sont ceux du système ; dans le bac à sable, elle désigne un répertoire par nœud, et la connexion <code>local</code> remplace SSH. Le code du rôle est identique dans les deux cas, et rien ne touche <code>/etc</code> de la machine d'essai.</p>
+<p>L'inventaire range les nœuds en groupes (ici <code>gpu_nodes</code>) ; les valeurs communes vont dans <code>group_vars/gpu_nodes.yml</code>, les exceptions dans <code>host_vars/&lt;nom&gt;.yml</code>. Au lab 6.2, l'inventaire n'est plus écrit à la main : Terraform le génère depuis la carte des nœuds, en groupes de racks.</p>
+<h3 id="les-gestionnaires-nagissent-que-sur-un-changement">3.3. Les gestionnaires n'agissent que sur un changement</h3>
+<p>Recharger les paramètres noyau ou régénérer l'<em>initramfs</em> à chaque exécution serait coûteux et parfois dangereux. Un <em>handler</em> est une tâche qui ne s'exécute que si une tâche l'a notifiée <strong>et</strong> a signalé un changement ; par défaut, les gestionnaires tournent à la fin du jeu de tâches, une seule fois.</p>
+<p>Le lab prouve la règle sans lancer de vraie commande : en mode <code>log</code>, chaque gestionnaire ajoute une ligne à <code>var/log/gpu_node_actions.log</code>. Après la première exécution le journal compte trois lignes (sysctl, initramfs, systemd) ; après la seconde, toujours trois. Le mode <code>systemd</code> du même rôle lance les vraies commandes et n'a été que linté.</p>
+<h3 id="mode-vérification-et-mode-différence">3.4. Mode vérification et mode différence</h3>
+<p><code>--check</code> simule : Ansible dit ce qu'il changerait sans le faire ; <code>--diff</code> affiche les différences de contenu. La documentation prévient que la simulation ne produit pas de sortie pour les tâches dont une condition dépend du résultat d'une tâche précédente. Elle valide donc bien une configuration déclarative, moins bien un enchaînement impératif.</p>
+<p>C'est l'outil de détection de dérive d'une flotte : lancé périodiquement en <code>--check</code>, il liste les nœuds dont l'état réel a quitté l'état voulu, sans rien modifier.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — Convergence, idempotence et dérive sur un nœud</span> Sorties réelles du bac à sable (ansible-core 2.21.5, Python 3.13, 2026-10-24), nœud simulé <code>gpu-n01</code>. Première exécution, puis seconde :</p>
+<pre class="text"><code>gpu-n01 : ok=9 changed=9 unreachable=0 failed=0 skipped=3 rescued=0 ignored=0
+gpu-n01 : ok=6 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0</code></pre>
+<p>Les neuf changements sont six tâches et trois gestionnaires ; les trois tâches ignorées sont les variantes <code>systemd</code> des gestionnaires, inutiles dans ce mode. On modifie ensuite à la main <code>memlock unlimited</code> en <code>memlock 1</code>, puis on lance <code>--check --diff</code> :</p>
+<pre class="text"><code>-* - memlock 1
++* - memlock unlimited
+ * - nofile 1048576
+changed: [gpu-n01]</code></pre>
+<p>Le fichier n'est pas modifié par <code>--check</code> (le lab compare son contenu avant et après) ; l'exécution réelle suivante le corrige, puis une troisième exécution revient à <code>changed=0</code>. Les chiffres sont reproductibles : <code>bash labs/provisioning/ansible-node-role/verify.sh</code>.</p>
+</div>
+<h3 id="déployer-par-lots-avec-un-canari">3.5. Déployer par lots, avec un canari</h3>
+<p>Changer la configuration de toute une flotte d'un coup est la façon la plus rapide de la mettre toute en panne. Le mot-clé <code>serial</code> découpe le jeu de tâches en lots ; chaque lot est un jeu complet sur un sous-ensemble de nœuds. Avec <code>max_fail_percentage: 0</code>, un seul échec dans un lot interrompt la suite.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Roll the node configuration out in batches</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> gpu_nodes</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">gather_facts</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">serial</span><span class="kw">:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">&quot;100%&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">max_fail_percentage</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span></code></pre></div>
+<p>Le premier lot ne contient qu'un nœud, le <strong>canari</strong>. Si l'on injecte un échec sur lui, le lab constate que les deux autres nœuds ne sont jamais touchés (leurs fichiers de configuration n'existent pas). Sans cette garde, un rôle défectueux atteint toute la flotte avant qu'on ait lu la première erreur. La documentation d'Ansible précise aussi que, si tous les hôtes d'un lot échouent, le jeu échoue.</p>
+<p>Dans une exploitation réelle, on intercale avant le rôle une étape de drain (chapitre 7) et après lui une étape de validation qui remet le nœud en service. Le lab les simule par des lignes dans <code>rollout.log</code>.</p>
+<h3 id="secrets">3.6. Secrets</h3>
+<p>Un mot de passe de BMC n'a rien à faire en clair dans un dépôt. <code>ansible-vault encrypt_string</code> chiffre une valeur (AES-256) en une variable inscriptible dans un fichier YAML ordinaire ; le mot de passe de chiffrement se passe par fichier ou par script, jamais par argument.</p>
+<p>Chiffrer ne suffit pas, car Ansible affiche volontiers les valeurs qu'il manipule. Le lab écrit le fichier d'identifiants en mode <code>0600</code> avec <code>no_log: true</code>.</p>
+<div class="note">
+<p><span class="tag">Une mesure du lab : sans no_log, le secret fuit dans --diff</span> Le lab génère un secret aléatoire à chaque exécution, le chiffre, déploie le fichier avec <code>--diff</code>, puis vérifie que le secret n'apparaît ni dans le fichier chiffré ni dans la sortie. En retirant <code>no_log: true</code> du playbook, la vérification échoue : le mot de passe apparaît dans la sortie de <code>--diff</code>. C'est une observation du bac à sable, pas une garantie générale.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>L'idempotence se prouve par <code>changed=0</code> à la seconde exécution ; un horodatage dans un fichier géré la détruit (le lab le démontre).</li>
+<li>Les gestionnaires ne tournent qu'après un changement : « pas de changement, pas de redémarrage ».</li>
+<li><code>--check --diff</code> est un détecteur de dérive sans effet de bord, avec ses limites sur les tâches conditionnelles.</li>
+<li><code>serial</code> et <code>max_fail_percentage</code> font d'un nœud le canari de la flotte.</li>
+<li>Un secret se chiffre, se dépose en <code>0600</code> et se protège de l'affichage par <code>no_log</code>.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Terraform pour l'infrastructure : état, modules, environnements, dérive</h2>
+<p>Vous connaissez Terraform. Ce chapitre ne le réexplique pas : il en fixe l'usage pour une flotte GPU, où l'objet décrit est souvent un serveur physique que Terraform ne sait pas visser dans une baie. Il montre ce qu'il gère bien (la carte des nœuds et tout ce qui s'en dérive), et ce qu'il ne doit jamais pouvoir détruire.</p>
+<h3 id="ce-que-terraform-gère-dans-une-flotte">4.1. Ce que Terraform gère dans une flotte</h3>
+<p>Terraform garde dans son état la correspondance entre les objets déclarés dans la configuration et les objets réels qu'il a créés. Pour un cluster de GPU dans un nuage, ces objets sont des instances, des réseaux, des volumes. Pour un cluster sur site, il n'y a pas d'API de « création de serveur » universelle ; Terraform reste utile à deux endroits.</p>
+<p>Le premier est la <strong>carte des nœuds</strong>, source de vérité du lab 6.2, dont il rend les fichiers dérivés : inventaire, DHCP, Slurm, démarrage. Le second est l'orchestration d'un outil de provisionnement qui expose une API : un fournisseur <code>canonical/maas</code> existe dans le registre Terraform (version 2.10.0 publiée le 2026-09-09, d'après l'API du registre).</p>
+<p>Dans le lab, les objets sont des fichiers locaux et des enregistrements <code>terraform_data</code>, une ressource du fournisseur intégré (aucun téléchargement) qui, d'après sa documentation, suit le cycle de vie standard d'une ressource sans effectuer d'autre action directe. Chaque nœud y devient un objet distinct de l'état, ce qui rend visible la disparition d'un nœud de la carte.</p>
+<h3 id="plan-application-et-dérive">4.2. Plan, application et dérive</h3>
+<p><code>terraform plan</code> compare la configuration, l'état et la réalité rafraîchie. Avec <code>-detailed-exitcode</code>, la documentation fixe le code de sortie : 0 si le plan est vide, 2 s'il contient des changements (1 pour une erreur). C'est le test d'idempotence et de dérive à brancher dans une intégration continue ; le mode <code>-refresh-only</code> ne met à jour que l'état pour refléter la réalité.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — Idempotence, dérive, retrait d'un nœud</span> Le lab 6.2, sorties réelles (Terraform 1.16.7, <code>hashicorp/local</code> 2.9.1, 2026-10-24). Environnement <code>prod</code>, six nœuds :</p>
+<pre class="text"><code>Plan: 11 to add, 0 to change, 0 to destroy.     # première application
+plan -detailed-exitcode = 0                     # seconde passe : rien à faire
+Plan: 1 to add, 0 to change, 0 to destroy.      # après une ligne ajoutée à la main : code 2
+Plan: 4 to add, 0 to change, 5 to destroy.      # après retrait de cpu-n01 de la carte</code></pre>
+<p>Onze objets : six enregistrements de nœud et cinq fichiers. Dans le troisième plan, la ressource <code>local_file</code> modifiée à la main est <strong>retirée de l'état</strong> au rafraîchissement puis recréée (« 1 to add », pas « 1 to change »). C'est un comportement observé avec ce fournisseur, non une règle de Terraform.</p>
+<p>Dans le quatrième, retirer <code>cpu-n01</code> détruit son enregistrement (<code>terraform_data.node["cpu-n01"] will be destroyed</code>) et <strong>remplace</strong> les quatre fichiers qui dépendent de la liste des nœuds : 4 créations, 5 destructions. Le fichier <code>dnsmasq.conf</code>, qui n'en dépend pas, ne bouge pas.</p>
+</div>
+<h3 id="modules-environnements-validation">4.3. Modules, environnements, validation</h3>
+<p>Le module <code>fleet</code> prend la carte des nœuds, <code>cluster_name</code> et <code>output_dir</code>. Les environnements <code>dev</code> et <code>prod</code> sont deux répertoires qui appellent le même module avec des valeurs différentes. Le choix entre répertoires séparés et espaces de travail (<em>workspaces</em>) relève de la préférence de l'équipe ; ce parcours recommande les répertoires, parce qu'une revue de code montre alors directement ce qui diffère entre les environnements.</p>
+<p>La validation est le vrai gain. Les règles s'expriment dans des blocs <code>validation</code> et échouent avant tout changement :</p>
+<pre class="hcl"><code>validation {
+  condition     = length(distinct([for n in values(var.nodes) : n.mac])) == length(var.nodes)
+  error_message = &quot;Two nodes share the same MAC address: the DHCP server could not tell them apart.&quot;
+}</code></pre>
+<p>Le lab en a cinq sur la carte des nœuds (et une sixième sur le nom du cluster) : forme des adresses MAC, unicité des MAC, unicité des adresses IP et BMC, forme des adresses IPv4, nombre de GPU parmi 0, 4 et 8. La commande <code>terraform test</code> (disponible depuis Terraform 1.6) exécute des scénarios sans rien créer : trois ici, dont deux qui <strong>doivent</strong> être refusés grâce à <code>expect_failures</code>.</p>
+<h3 id="ce-qui-ne-doit-jamais-se-détruire">4.4. Ce qui ne doit jamais se détruire</h3>
+<p>Une destruction involontaire est la pire opération possible sur un parc de serveurs. L'option <code>prevent_destroy</code> semble faite pour l'empêcher, mais la documentation précise sa limite.</p>
+<div class="war">
+<p><span class="tag">prevent_destroy ne protège pas d'un retrait de la configuration</span> La page <em>lifecycle</em> indique qu'à l'exception de <code>create_before_destroy</code>, Terraform n'enregistre pas la règle de cycle de vie dans l'état. En conséquence, il détruit l'infrastructure réelle lors d'un <code>apply</code> si vous retirez la <strong>configuration</strong> de la ressource, même avec <code>prevent_destroy</code>. Voir <a href="https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle">developer.hashicorp.com/terraform/language/meta-arguments/lifecycle</a>.</p>
+</div>
+<p>Trois pratiques en découlent. Faites relire par un humain le résumé <code>Plan:</code> de chaque changement qui touche la carte des nœuds, et refusez tout plan qui détruit plus que prévu. Gardez pour les nœuds physiques une ressource qui ne représente qu'un <strong>enregistrement</strong>, pas la machine : détruire l'enregistrement ne doit rien éteindre. Enfin, stockez l'état dans un système distant avec verrouillage, car l'état est une source de vérité partagée.</p>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li>Terraform garde la correspondance configuration et objets réels ; sur site, il dérive les fichiers de la carte des nœuds et pilote les outils à API.</li>
+<li><code>plan -detailed-exitcode</code> vaut 0 (rien) ou 2 (changements) : c'est le test de dérive d'une intégration continue.</li>
+<li>Les blocs <code>validation</code> et <code>terraform test</code> refusent une carte invalide avant tout changement.</li>
+<li><code>prevent_destroy</code> ne protège pas d'un retrait de configuration : relisez le résumé <code>Plan:</code> et ne modélisez pas la machine, seulement son enregistrement.</li>
+</ul>
+</div>
+<h2 id="ch5">5. La pile GPU : pilote, CUDA, Fabric Manager, DCGM, conteneurs</h2>
+<p>La majorité des pannes « mystérieuses » d'un nœud neuf sont des incompatibilités entre couches installées par des mains différentes. Ce chapitre ordonne ces couches, donne les règles de compatibilité documentées par NVIDIA et montre comment les transformer en un contrôle automatique.</p>
+<h3 id="les-couches">5.1. Les couches</h3>
+<figure class="fig">
+<svg viewBox="0 0 560 330" role="img" aria-labelledby="st-t st-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="st-t">
+Les couches logicielles d'un nœud GPU
+</title>
+<desc id="st-d">Six couches empilées. Les quatre du bas sont installées sur l'hôte, les deux du haut vivent dans l'image du conteneur. Le pilote de l'hôte limite la version de CUDA que le conteneur peut utiliser.</desc> <g fill="var(--bg)" stroke="currentColor" stroke-width="1.5"> <rect x="10" y="10" width="330" height="40" rx="6"/><rect x="10" y="58" width="330" height="40" rx="6"/> <rect x="10" y="118" width="330" height="40" rx="6"/><rect x="10" y="166" width="330" height="40" rx="6" stroke="var(--accent)" stroke-width="3"/> <rect x="10" y="214" width="330" height="40" rx="6"/><rect x="10" y="262" width="330" height="40" rx="6"/> </g> <g fill="currentColor" font-size="15"> <text x="24" y="35">framework (PyTorch)</text><text x="24" y="83">CUDA toolkit, NCCL</text> <text x="24" y="143">runtime de conteneur, toolkit NVIDIA</text><text x="24" y="191">services : Fabric Manager, DCGM</text> <text x="24" y="239">pilote : module noyau + bibliothèques</text><text x="24" y="287">firmware : GPU, NVSwitch, BIOS, BMC</text> <text x="352" y="38" font-size="14">dans l'image</text><text x="352" y="86" font-size="14">du job</text> <text x="352" y="146" font-size="14">sur l'hôte</text><text x="352" y="194" font-size="14" fill="var(--accent)">à garder alignés</text> <text x="352" y="242" font-size="14">(le pilote borne</text><text x="352" y="262" font-size="14">la version de CUDA)</text> </g>
+</svg>
+<figcaption>
+Les deux couches du haut appartiennent aux utilisateurs, les quatre du bas à l'équipe d'infrastructure. La recette vérifie que les quatre du bas sont cohérentes entre elles et avec l'image.
+</figcaption>
+</figure>
+<h3 id="pilote-et-cuda-la-table-de-compatibilité">5.2. Pilote et CUDA : la table de compatibilité</h3>
+<p>Le guide de compatibilité CUDA établit la règle de la compatibilité de version mineure : depuis CUDA 11, une application compilée avec un toolkit d'une famille majeure peut tourner, avec des fonctionnalités limitées, sur un système dont le pilote est au moins égal au minimum de cette famille.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Toolkit CUDA</th>
+<th>Pilote minimal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>13.x</td>
+<td>580 ou plus</td>
+</tr>
+<tr class="even">
+<td>12.x</td>
+<td>525 ou plus</td>
+</tr>
+<tr class="odd">
+<td>11.x</td>
+<td>450 ou plus</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le paquet de compatibilité ascendante (<code>cuda-compat-&lt;majeur&gt;-&lt;mineur&gt;</code>) permet d'exécuter une application construite avec un toolkit plus récent sur un pilote plus ancien, d'une famille majeure à l'autre. La documentation le réserve aux GPU de centre de données, à certaines références RTX « serveur » et aux cartes Jetson.</p>
+<p>Le partage des rôles est la clé de lecture : le pilote est une propriété du <strong>nœud</strong>, la version de CUDA une propriété du <strong>job</strong>. L'infrastructure n'a pas la main sur la seconde ; elle doit pouvoir répondre à la question « quelle version de CUDA ce nœud accepte-t-il ? » avant que le job ne la pose.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — Un contrôle de compatibilité en une ligne</span> Le script <code>labs/provisioning/exercise-calcs/calc.py compat</code> applique la table. Sorties réelles :</p>
+<pre class="text"><code>$ python3 calc.py compat --driver 570 --cuda 12.9
+CUDA 12.9 needs driver &gt;= 525; driver 570 -&gt; OK
+$ python3 calc.py compat --driver 570 --cuda 13.0
+CUDA 13.0 needs driver &gt;= 580; driver 570 -&gt; TOO OLD</code></pre>
+<p>Un nœud en pilote 570 accepte donc les images CUDA 12 et refuse les images CUDA 13. La recette (chapitre 6) refait ce contrôle dans <code>check_stack</code>, pour la version de CUDA que vous déclarez comme cible du site.</p>
+</div>
+<h3 id="fabric-manager-sur-les-systèmes-à-nvswitch">5.3. Fabric Manager sur les systèmes à NVSwitch</h3>
+<p>Les serveurs à huit GPU de NVIDIA (plateformes HGX et DGX) relient leurs GPU par des NVSwitch, commutateurs de la liaison GPU à GPU NVLink. Le guide de Fabric Manager (FM) décrit un processus privilégié qui configure ces commutateurs, forme une fabrique mémoire commune entre les GPU participants et surveille les liens NVLink. Le guide indique que l'administrateur doit <strong>activer et démarrer à la main</strong> le service <code>nvidia-fabricmanager</code> après une installation par paquets individuels.</p>
+<p>Les règles de version sont explicites. Au démarrage, FM vérifie la compatibilité de la pile pilote chargée et s'arrête si elle est incompatible. Sur les systèmes antérieurs à la quatrième génération de NVSwitch (avant NVLink 5), la version de la bibliothèque doit correspondre à celle de FM. À partir de la branche de pilote 620, FM et les composants NVSwitch s'installent indépendamment du pilote, avec une version sémantique propre (2.0.x).</p>
+<div class="war">
+<p><span class="tag">Un Fabric Manager de mauvaise version s'arrête</span> Le tableau des dépendances du guide dit, pour les systèmes antérieurs à NVLink 5 : si la version de la bibliothèque <code>libnvidia-fmdrv.so.1</code> ne correspond pas à celle de Fabric Manager, FM s'arrête et signale que la version de la bibliothèque n'est pas prise en charge. Une mise à jour partielle, qui ne change que le pilote, peut, par déduction de ce parcours, produire cette situation. Voir le <a href="https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/index.html">guide Fabric Manager</a>.</p>
+</div>
+<h3 id="les-autres-services-de-lhôte">5.4. Les autres services de l'hôte</h3>
+<p>Trois éléments complètent la liste des contrôles de la recette.</p>
+<ul>
+<li><strong>Le démon de persistance</strong> <code>nvidia-persistenced</code> : la page <em>Driver Persistence</em> de NVIDIA le décrit comme un démon d'espace utilisateur qui maintient l'état du pilote entre deux jobs CUDA, avec une approche plus robuste que le mode de persistance historique (<a href="https://docs.nvidia.com/deploy/driver-persistence/persistence-daemon.html">docs.nvidia.com/deploy/driver-persistence</a>).</li>
+<li><strong>Les conteneurs.</strong> Le guide du NVIDIA Container Toolkit exige d'abord le pilote ; <code>nvidia-ctk runtime configure --runtime=docker</code> configure le runtime. Depuis la version 1.18.0, une spécification CDI (<em>Container Device Interface</em>, description standard des périphériques exposés aux conteneurs) est générée et tenue à jour par le service <code>nvidia-cdi-refresh</code> ; certaines situations demandent toujours une régénération manuelle.</li>
+<li><strong>DCGM</strong>, qui fournit le diagnostic de la recette et la surveillance continue (module 14).</li>
+</ul>
+<h3 id="piéger-les-versions">5.5. Piéger les versions</h3>
+<p>Trois habitudes évitent la plupart des surprises. Fixez les versions de pilote et de Fabric Manager comme <strong>variables du rôle</strong>, jamais comme « la dernière » ; mettez-les à jour ensemble, dans une mise à jour progressive (chapitre 7) qui se termine par la recette. Enregistrez les versions observées parmi les preuves de recette : le fichier <code>versions.json</code> du lab 6.3 en est la trace.</p>
+<p>Enfin, testez toute montée de version sur un petit groupe de nœuds de pré-production avant la flotte. Ce n'est pas une règle de NVIDIA, c'est la conclusion pratique du fait que les couches du milieu s'installent séparément et se cassent ensemble.</p>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Pilote, services, runtime de conteneur : le pilote borne la version de CUDA que les jobs peuvent utiliser (13.x exige 580, 12.x exige 525, 11.x exige 450 selon la table de compatibilité).</li>
+<li>Sur NVSwitch, FM doit tourner, être démarré à la main, et correspondre à la version du pilote avant NVLink 5.</li>
+<li>Le démon de persistance, <code>nouveau</code> en liste noire et CDI font partie du contrôle d'un nœud.</li>
+<li>Fixez les versions en variables, mettez-les à jour ensemble et gardez-les parmi les preuves de recette.</li>
+</ul>
+</div>
+<h2 id="ch6">6. Recette et burn-in : DCGM, gpu-burn, nccl-tests, mémoire, PCIe, NVLink</h2>
+<p>La recette répond à une question à trois issues : ce nœud peut-il entrer en production (<em>accept</em>), faut-il rejouer une partie des tests (<em>retest</em>), ou doit-il rester dehors et ouvrir un dossier (<em>reject</em>). Ce chapitre décrit les outils qui produisent les preuves, puis les règles qui les transforment en verdict. La logique de décision est testée dans le lab 6.3 ; la collecte sur de vrais GPU ne l'est pas.</p>
+<h3 id="des-tests-à-plusieurs-profondeurs">6.1. Des tests à plusieurs profondeurs</h3>
+<p>La documentation de DCGM Diagnostics (<code>dcgmi diag</code>) propose quatre niveaux d'exécution, <code>-r 1</code> à <code>-r 4</code>, dont chacun inclut les précédents. Elle les destine à des usages différents : le niveau 1 comme mesure de disponibilité, le niveau 2 comme épilogue après une panne, les niveaux 3 et 4 comme analyse a posteriori par un administrateur.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Niveau</th>
+<th>Durée annoncée (mesurée sur des systèmes Hopper, génération de GPU H100)</th>
+<th>Usage documenté</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>-r 1</code></td>
+<td>moins de 2,5 s</td>
+<td>état de préparation</td>
+</tr>
+<tr class="even">
+<td><code>-r 2</code></td>
+<td>moins de 2,5 min (4 GPU), moins de 10,5 min (8 GPU)</td>
+<td>épilogue sur panne</td>
+</tr>
+<tr class="odd">
+<td><code>-r 3</code></td>
+<td>moins de 10 min (4 GPU), moins de 35 min (8 GPU)</td>
+<td>diagnostic matériel</td>
+</tr>
+<tr class="even">
+<td><code>-r 4</code></td>
+<td>moins de 45 min (4 GPU), moins de 2,25 h (8 GPU)</td>
+<td>diagnostic matériel long</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Ces durées sont des <strong>bornes supérieures</strong> données par le constructeur pour un modèle de GPU ; mesurez les vôtres. Le choix d'utiliser le niveau 2 à chaque démarrage et le niveau 3 à la réception est un choix de ce parcours, pas une prescription de NVIDIA.</p>
+<p>La documentation précise aussi ce que DCGM Diagnostics n'est pas : un outil de diagnostic matériel complet, un outil de réparation, un remplaçant des outils de diagnostic de terrain, ni un support du processus de RMA. Gardez cette limite en tête avant de brandir un résultat <code>Pass</code> comme preuve de bonne santé.</p>
+<h3 id="les-outils-et-ce-quils-prouvent">6.2. Les outils et ce qu'ils prouvent</h3>
+<ul>
+<li><strong><code>dcgmi diag -r N -j</code></strong> : tests logiciels (bibliothèques, <code>nouveau</code>), PCIe et NVLink, mémoire, bande passante mémoire, puis contraintes de calcul et de puissance aux niveaux supérieurs. L'option <code>-j</code> produit du JSON ; le code de sortie 226 signifie « diagnostic exécuté, mais il a signalé une erreur », le 205 « le diagnostic demande d'isoler ».</li>
+<li><strong><code>gpu_burn</code></strong> : sature les GPU pour révéler des défauts sensibles à la chaleur et à la puissance. Options lues dans son README : <code>-m N%</code> (part de mémoire), <code>-d</code> (doubles), <code>-tc</code> (cœurs tensoriels). Il termine par <code>Tested N GPUs:</code> suivi de <code>GPU i: OK</code> ou <code>GPU i: FAULTY</code>.</li>
+<li><strong>nccl-tests</strong> : mesure les collectives NCCL et <strong>vérifie les valeurs</strong>. Une collective correcte à la mauvaise vitesse et une collective rapide mais fausse sont deux pannes distinctes.</li>
+<li><strong><code>nvbandwidth</code></strong> : mesure la bande passante de copies entre hôte et GPU et entre GPU. Il complète nccl-tests ; le lab ne l'exécute pas.</li>
+<li><strong><code>nvidia-smi -q -d PERFORMANCE</code></strong> : affiche l'état de performance et les « Clocks Event Reasons » (plafond de puissance logiciel, ralentissement thermique…), qui expliquent un GPU plus lent que ses voisins.</li>
+<li><strong>Le journal du noyau</strong> : les erreurs <code>NVRM: Xid</code> pendant la recette (codes d'erreur que le pilote NVIDIA écrit dans le journal du noyau). Le catalogue NVIDIA décrit le code 79 comme « GPU has fallen off the bus ».</li>
+</ul>
+<p>La bande passante de bus est la grandeur de comparaison de nccl-tests, car l'algorithme de bande passante <span class="math inline">S/t</span> dépend du nombre de rangs. Pour un all-reduce sur <span class="math inline">n</span> rangs, la documentation de nccl-tests donne :</p>
+<p><span class="math display">\text{busbw} = \text{algbw} \times \frac{2(n-1)}{n}, \qquad \text{algbw} = \frac{S}{t}</span></p>
+<p>Pour <span class="math inline">n = 8</span>, le facteur vaut <span class="math inline">1{,}75</span>. Le programme peut aussi juger lui-même : si la variable d'environnement <code>NCCL_TESTS_MIN_BW</code> est fixée, il marque la moyenne de bande passante de bus comme échouée quand elle tombe sous 0,9 fois cette valeur (lu dans le code source, branche principale, le 24 octobre 2026).</p>
+<h3 id="mémoire-du-gpu-remappage-de-lignes-et-rma">6.3. Mémoire du GPU, remappage de lignes et RMA</h3>
+<p>Les GPU de centre de données remappent les lignes de mémoire HBM (<em>High Bandwidth Memory</em>, la mémoire empilée de ces GPU) qui produisent des erreurs non corrigibles. Le guide de gestion des erreurs mémoire de NVIDIA définit deux drapeaux qui gouvernent la recette. Le drapeau <em>remapping pending</em> signale qu'un remappage aura lieu à la <strong>prochaine réinitialisation du GPU</strong>. Le drapeau <em>remapping failure</em> signale que le matériel ne peut plus remapper.</p>
+<p>Le guide énumère les événements qui lèvent le second : une tentative de remappage sur une banque mémoire (<em>bank</em>) qui compte déjà huit lignes non corrigibles remappées, sur une ligne déjà remappée, ou après 512 remappages au total. Il précise que le critère de RMA est rempli quand ce drapeau est levé <strong>et validé</strong> par l'outil de diagnostic de terrain de NVIDIA.</p>
+<p>Les règles de la recette en découlent : drapeau <em>failure</em> levé, rejet et dossier ; drapeau <em>pending</em> levé, réinitialisation du GPU (<code>nvidia-smi -r</code>) puis nouvelle recette. La documentation de <code>nvidia-smi</code> précise que, si Fabric Manager ne tourne pas (ou pour une architecture antérieure à Ampere), les GPU reliés en NVLink à un GPU réinitialisé doivent l'être dans la même commande. Dans le doute, drainez le nœud entier avant toute réinitialisation.</p>
+<h3 id="du-faisceau-de-preuves-au-verdict">6.4. Du faisceau de preuves au verdict</h3>
+<p>Le script <code>acceptance.sh</code> range les preuves dans un répertoire : <code>smi.csv</code>, <code>dcgm.json</code> et <code>dcgm.rc</code>, <code>nccl.json</code>, <code>burn.log</code>, <code>xid.log</code>, <code>versions.json</code>. Puis <code>run_decision.py</code> applique six règles de contrôle, une par famille de preuves, dont chacune produit des constats de gravité <em>reject</em> ou <em>retest</em> :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Règle</th>
+<th>Rejet</th>
+<th>Rejeu</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pile</td>
+<td>pilote trop ancien pour CUDA, FM inactif ou de version différente, <code>nouveau</code> chargé</td>
+<td>version de CUDA inconnue</td>
+</tr>
+<tr class="even">
+<td><code>nvidia-smi</code></td>
+<td>nombre de GPU inattendu, drapeau <em>failure</em>, erreur ECC (correction d'erreurs de la mémoire) non corrigible, lien PCIe dégradé</td>
+<td>drapeau <em>pending</em></td>
+</tr>
+<tr class="odd">
+<td>DCGM</td>
+<td>test en échec, sortie 226 ou 205</td>
+<td>outil en erreur, test requis absent</td>
+</tr>
+<tr class="even">
+<td>nccl-tests</td>
+<td>valeurs fausses, bande passante sous 90 % de la référence</td>
+<td>entre 90 % et 95 %, ou non lancé en recette complète</td>
+</tr>
+<tr class="odd">
+<td>gpu_burn</td>
+<td>un GPU <code>FAULTY</code></td>
+<td>non lancé en recette complète</td>
+</tr>
+<tr class="even">
+<td>journal</td>
+<td>toute erreur Xid pendant la recette</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le verdict est le pire des constats. Les seuils de ces règles (90 %, 95 %, nombre de GPU, largeur PCIe) sont dans <code>policy.json</code> : ce sont des <strong>paramètres de site</strong>, à étalonner sur le nœud doré du chapitre 1. Les valeurs du lab sont rondes à dessein.</p>
+<div class="key">
+<p><span class="tag">Un code de retour n'est pas un verdict</span> Ne décidez jamais sur le seul code de sortie d'un outil. Un outil peut terminer proprement en ayant signalé un défaut dans sa sortie, une version peut changer la sémantique d'un code, et un test absent ne se manifeste par aucun code. Le lab teste ce cas : un JSON DCGM dont un test échoue alors que le code vaut 0 est rejeté.</p>
+</div>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — Trois nœuds, trois verdicts</span> Le lab rejoue des preuves <strong>synthétiques</strong> (aucun GPU, aucun nombre mesuré) à travers <code>acceptance.sh --fixtures</code>. Pour chaque scénario, le code de sortie est celui du script et le constat est extrait du JSON de verdict qu'il affiche (sorties réelles, mises en forme sur une ligne) :</p>
+<pre class="text"><code>fixtures/remap_failure   -&gt; exit 1   GPU 3: row-remapping failure flag set (RMA candidate)
+fixtures/pending_remap   -&gt; exit 3   GPU 5: remap/retirement pending, takes effect at the next GPU reset: reset then retest
+fixtures/nccl_marginal   -&gt; exit 3   bus bandwidth 93.0 GB/s is 93% of the baseline: marginal, run again
+fixtures/dcgm_fail_rc0   -&gt; exit 1   DCGM test &#39;memory&#39; status Fail (entities [4])</code></pre>
+<p>Le jeu de tests compte 30 cas ; la solution de référence les passe tous (<code>30 passed</code>) et le squelette <code>starter/decide.py</code>, qui accepte tout, en échoue 24 (<code>24 failed, 6 passed</code>) : c'est la preuve que les tests discriminent. Vous complétez le squelette au lab 6.3.</p>
+</div>
+<h3 id="ce-que-la-collecte-réelle-ajoute-et-ce-qui-reste-non-vérifié">6.5. Ce que la collecte réelle ajoute, et ce qui reste non vérifié</h3>
+<p>La branche réelle de <code>acceptance.sh</code> (celle qui lance les outils) tient en quelques lignes. L'extrait ci-dessous est simplifié et correspond au niveau <code>full</code> ; le niveau <code>quick</code> lance <code>dcgmi diag -r 2</code> et ne lance ni <code>gpu_burn</code> ni nccl-tests.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nvidia-smi</span> <span class="at">--query-gpu</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$smi_fields</span><span class="st">&quot;</span> <span class="at">--format</span><span class="op">=</span>csv <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$evidence</span><span class="st">/smi.csv&quot;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dcgmi</span> diag <span class="at">-r</span> 3 <span class="at">-j</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$evidence</span><span class="st">/dcgm.json&quot;</span> <span class="kw">||</span> <span class="va">rc</span><span class="op">=</span><span class="va">$?</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gpu_burn</span> <span class="st">&quot;</span><span class="va">$burn_seconds</span><span class="st">&quot;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$evidence</span><span class="st">/burn.log&quot;</span> <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">||</span> <span class="fu">true</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;</span><span class="va">$nccl_bin</span><span class="st">&quot;</span> <span class="at">-b</span> 8 <span class="at">-e</span> 1G <span class="at">-f</span> 2 <span class="at">-g</span> <span class="st">&quot;</span><span class="va">$gpus</span><span class="st">&quot;</span> <span class="at">-J</span> <span class="st">&quot;</span><span class="va">$evidence</span><span class="st">/nccl.json&quot;</span> <span class="op">&gt;</span> <span class="st">&quot;</span><span class="va">$evidence</span><span class="st">/nccl.txt&quot;</span> <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">||</span> <span class="fu">true</span></span></code></pre></div>
+<p>Elle a passé <code>bash -n</code> et <code>shellcheck</code>, et <strong>n'a jamais tourné sur un GPU</strong>. Cinq points y sont à vérifier chez vous : la liste des champs de <code>nvidia-smi --query-gpu</code> (contrôlez-la avec <code>--help-query-gpu</code>), l'enveloppe exacte du JSON de <code>dcgmi diag</code> (la documentation n'en montre qu'un fragment), les noms de clés du JSON de nccl-tests (lus dans le code source de la branche principale, qui peut changer), la version de CUDA runtime et la génération de NVSwitch.</p>
+<p>Le script lit ces deux dernières dans des variables d'environnement faute de mieux (<code>CUDA_RUNTIME_VERSION</code>, <code>NVSWITCH_GENERATION</code>). Sans elles, la version de CUDA vaut <code>unknown</code> (verdict <em>retest</em>) et le contrôle de Fabric Manager est ignoré : renseignez-les.</p>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li>DCGM propose quatre profondeurs de test ; leurs durées sont des bornes constructeur à remesurer, et l'outil ne remplace ni le diagnostic de terrain ni le processus de RMA.</li>
+<li>nccl-tests donne un débit de bus comparable entre nombres de rangs (<span class="math inline">\text{algbw}\times 2(n-1)/n</span> pour un all-reduce) et vérifie les valeurs.</li>
+<li>Le drapeau de remappage <em>pending</em> appelle une réinitialisation, le drapeau <em>failure</em> appelle un dossier ; les seuils de RMA sont ceux de NVIDIA.</li>
+<li>Le verdict à trois issues est le pire des constats ; les seuils sont des paramètres de site.</li>
+<li>La collecte réelle reste à valider sur votre matériel.</li>
+</ul>
+</div>
+<h2 id="ch7">7. Mises à jour et pannes : rolling updates, firmware, RMA, traçabilité</h2>
+<p>Une flotte n'est jamais « à jour » une fois pour toutes : noyau, pilote, firmware, configuration changent toute l'année, pendant que des jobs de plusieurs jours occupent les GPU. Ce chapitre traite deux difficultés liées : changer sans interrompre la production, et gérer les nœuds qui tombent malgré tout, jusqu'à leur remplacement sous garantie.</p>
+<h3 id="une-mise-à-jour-progressive-en-cinq-temps">7.1. Une mise à jour progressive en cinq temps</h3>
+<p>Le schéma est toujours le même. On <strong>draine</strong> un lot de nœuds (l'ordonnanceur n'y place plus de job, les jobs en cours finissent), on <strong>change</strong>, on <strong>redémarre</strong>, on <strong>vérifie</strong> par la recette rapide, puis on <strong>remet en service</strong>. Trois garde-fous l'encadrent : un canari en premier lot, une taille de lot bornée par la capacité que vous pouvez perdre, et un arrêt de tout le déploiement au premier échec.</p>
+<p>La commande de redémarrage de Slurm applique ce schéma. D'après la documentation de <code>scontrol</code>, <code>reboot</code> redémarre les nœuds quand ils deviennent inactifs, avec le <code>RebootProgram</code> de <code>slurm.conf</code>. L'option <code>ASAP</code> pose le drapeau <code>DRAIN</code> pour empêcher de nouveaux jobs et fixe la raison à « Reboot ASAP ». Après le redémarrage, le programme de contrôle de santé s'exécute <strong>une fois</strong>, puis le nœud s'enregistre.</p>
+<div class="war">
+<p><span class="tag">scontrol reboot, sans ASAP, ne bloque pas les nouveaux jobs</span> La page <em>scontrol</em> le dit : par défaut, la commande n'empêche pas de nouveaux jobs d'être planifiés sur les nœuds avant le redémarrage. Il faut utiliser <code>ASAP</code> ou drainer les nœuds au préalable. Un nœud qui ne s'enregistre pas dans le délai <code>ResumeTimeout</code> reçoit la raison « reboot timed out ». Voir <a href="https://slurm.schedmd.com/scontrol.html">slurm.schedmd.com/scontrol.html</a> (page lue le 24 octobre 2026, version courante de la documentation).</p>
+</div>
+<p>Le playbook <code>playbooks/production_update.yml</code> du lab 6.1 écrit le même enchaînement avec Ansible : drain, attente de la fin des jobs, rôle, redémarrage, recette rapide, remise en service, par lots (<code>serial</code>) et arrêt au premier échec. C'est une <strong>esquisse de production</strong> : syntaxe vérifiée et passée au linter, jamais exécutée, car elle exige un contrôleur Slurm et de vrais nœuds.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — Combien dure une mise à jour progressive ?</span> Une flotte de 64 nœuds, des jobs de 24 h au plus, un redémarrage suivi de validation de 15 minutes, et la décision de ne jamais retirer plus de 8 nœuds à la fois (12,5 %). Dans le pire cas, chaque lot attend le plus long job, puis redémarre :</p>
+<p><span class="math display">T_{\text{pire}} = \left\lceil \frac{N}{b} \right\rceil \times \left( T_{\text{job}} + T_{\text{reboot}} \right)</span></p>
+<p>Avec <span class="math inline">N = 64</span> et <span class="math inline">b = 8</span>, il y a 8 lots de 24,25 h. Sortie réelle de <code>calc.py rolling --nodes 64 --batch 8 --walltime-h 24 --reboot-h 0.25</code> :</p>
+<pre class="text"><code>nodes=64 batch=8 -&gt; 8 waves
+worst case per wave: wait for the longest job (24.0 h) + reboot and validation (0.25 h) = 24.25 h
+worst case total   : 194.00 h = 8.08 days
+capacity offline   : at most 8/64 = 12.5 % of the nodes at any time</code></pre>
+<p>C'est un <strong>majorant</strong> : en pratique, les jobs ne durent pas tous 24 h et les lots se chevauchent. Il montre surtout le compromis : doubler le lot divise la durée par deux et double la capacité retirée.</p>
+</div>
+<h3 id="firmware-le-plus-risqué-des-changements">7.2. Firmware : le plus risqué des changements</h3>
+<p>Un nœud GPU porte plusieurs firmwares : BIOS, BMC, cartes réseau, GPU, NVSwitch. L'article Llama 3 cite les mises à jour de firmware et de noyau parmi les opérations d'une maintenance automatisée, qui provoque, dans leur exploitation, au moins une interruption d'entraînement par jour. Le coût d'une mise à jour se compte donc aussi en jobs interrompus.</p>
+<p>Trois règles de ce parcours, à valider avec vos constructeurs : relever les versions de firmware dans l'inventaire (elles font partie de l'identité d'un nœud) ; ne jamais mettre à jour un firmware sans matrice de compatibilité du constructeur avec le pilote et le BMC ; mettre à jour d'abord le canari, puis rejouer la recette complète, pas seulement la recette rapide. Les outils de mise à jour de firmware ne sont pas couverts ici (voir la section « Sources et portée »).</p>
+<h3 id="pannes-traçabilité-rma">7.3. Pannes, traçabilité, RMA</h3>
+<p>Un nœud en panne est drainé avec une raison lisible (module 5), puis traité selon une arborescence simple : un défaut logiciel se règle par réinstallation de l'image ; un défaut matériel transitoire par réinitialisation puis recette ; un défaut matériel avéré par remplacement de la pièce ou échange sous garantie. Chaque branche se termine par une recette complète : un nœud réparé n'est pas un nœud qualifié.</p>
+<p>Le dossier de RMA se constitue avec les preuves déjà produites : numéro de série du châssis et identifiants des GPU, verdict de recette avec ses constats, rapport DCGM, journal Xid, valeur des drapeaux de remappage. NVIDIA rappelle que la décision revient à son outil de diagnostic de terrain ; votre dossier sert à la déclencher, pas à la remplacer.</p>
+<p>La traçabilité sert une seconde fin : repérer les nœuds « citrons » dont les pannes se répètent. Kokolis et al. signalent que l'historique est indispensable pour trouver les nœuds défectueux, et citent parmi les signaux les plus corrélés le nombre de jobs distincts qui ont exclu le nœud, le nombre d'erreurs Xid distinctes et le nombre de tickets de réparation ouverts pour lui. Tenez donc un registre d'événements par nœud (drains, raisons, verdicts, tickets, pièces remplacées), et conservez-le au-delà de la vie de l'image.</p>
+<h3 id="dimensionner-un-volant-de-nœuds-de-rechange">7.4. Dimensionner un volant de nœuds de rechange</h3>
+<p>Combien de nœuds de réserve garder pour absorber les pannes pendant qu'on réparait ? Si les nœuds tombent au taux <span class="math inline">\lambda</span> par nœud et par jour et restent en réparation <span class="math inline">T</span> jours, la loi de Little donne le nombre moyen de nœuds hors service dans une flotte de <span class="math inline">N</span> nœuds :</p>
+<p><span class="math display">\bar{R} = N \cdot \lambda \cdot T</span></p>
+<p>Le nombre réel fluctue autour de cette moyenne ; on le modélise par une loi de Poisson de moyenne <span class="math inline">\bar{R}</span> et l'on retient le plus petit nombre de réserves dont la probabilité de suffire atteint le niveau choisi (95 % ici). Ce modèle suppose des pannes indépendantes : des pannes corrélées (nœuds citrons, panne d'un commutateur) le rendent optimiste.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.2 — Un volant pour 256 nœuds</span> Entrées : un taux de 2,5 pannes pour 1 000 nœuds-jours, du même ordre que les 2,34 publiés par Kokolis et al. pour RSC-2 (6,50 pour RSC-1, avec des périodes jusqu'à environ 17,5), et une réparation de 10 jours, <strong>hypothèse de l'exemple</strong>. Sortie réelle de <code>calc.py spares</code> :</p>
+<pre class="text"><code>failures per week  : 256 x 0.0025 x 7 = 4.48
+nodes in repair    : mean 6.40 (Little: arrival rate x 10.0 days)
+Poisson quantile   : P(in repair &lt;= 11) = 0.969 &gt;= 0.95  -&gt; keep 11 spare nodes</code></pre>
+<p>Soit 11 nœuds de rechange, 4,3 % de la flotte, pour couvrir 95 % des situations avec ces entrées. Contrôle indépendant : avec SciPy, la fonction de répartition de la loi de Poisson de moyenne 6,4 vaut 0,939 en 10 et 0,969 en 11. Avec un taux de pointe de 17,5, la moyenne passerait à 44,8 : le volant se dimensionne sur votre taux <strong>mesuré</strong>, pas sur un ordre de grandeur emprunté.</p>
+</div>
+<h3 id="retirer-un-nœud-proprement">7.5. Retirer un nœud proprement</h3>
+<p>Le retrait est le dernier état. Il révoque l'identité du nœud : suppression de la ligne <code>dhcp-host</code> et de l'entrée d'inventaire (c'est une modification de la carte des nœuds du chapitre 4, relue avant application), retrait de la liste <code>NodeName=</code> de Slurm, désactivation des comptes du BMC et effacement des disques selon votre politique de sécurité. L'effacement sécurisé n'est pas couvert par ce module.</p>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>Une mise à jour progressive se fait en cinq temps (drainer, changer, redémarrer, vérifier, remettre) avec un canari, un lot borné et un arrêt au premier échec.</li>
+<li><code>scontrol reboot</code> sans <code>ASAP</code> ne bloque pas les nouveaux jobs ; avec <code>ASAP</code>, le nœud est drainé puis redémarré.</li>
+<li>Le temps de pire cas d'un déploiement par lots vaut le nombre de lots multiplié par la durée du plus long job plus le redémarrage.</li>
+<li>La recette complète clôt toute réparation ; le registre d'événements par nœud sert le RMA et la détection des nœuds citrons.</li>
+<li>Le volant de rechange se calcule : moyenne de Little, quantile de Poisson, taux mesuré chez vous.</li>
+</ul>
+</div>
+<h2 id="ch8">8. BMC, Redfish, IPMI et supervision hors bande</h2>
+<p>Quand le système d'exploitation ne répond plus, tout ce qui reste est le <strong>BMC</strong> (<em>baseboard management controller</em>), un petit ordinateur indépendant embarqué dans le serveur, avec sa propre interface réseau. Il permet d'allumer, d'éteindre, de lire des capteurs et d'ouvrir une console sans passer par le système. C'est aussi, pour cette raison, la porte la plus sensible de la machine.</p>
+<h3 id="ce-quun-bmc-permet-et-loutil-historique">8.1. Ce qu'un BMC permet, et l'outil historique</h3>
+<p>L'usage le plus courant dans une chaîne de provisionnement est la mise sous tension à distance : MAAS utilise le BMC pour allumer la machine et propose des pilotes d'alimentation dont IPMI et Redfish. Un BMC fournit aussi les capteurs (températures, ventilateurs, alimentations), un journal d'événements matériels et une console série par le réseau. Le projet OpenBMC publie une pile de firmware de BMC ouverte.</p>
+<p>L'interface historique est <strong>IPMI</strong>. L'outil <code>ipmitool</code> (version 1.8.19 sur Ubuntu 24.04) en expose les commandes : <code>chassis</code> (état et alimentation), <code>sdr</code> et <code>sensor</code> (capteurs), <code>sel</code> (journal), <code>sol</code> (console par le réseau), <code>user</code> (comptes) et <code>mc</code> (contrôleur de gestion). Son aide documente les options de connexion (<code>-I</code> interface, <code>-H</code> hôte, <code>-U</code> utilisateur, <code>-C</code> suite de chiffrement) et plusieurs manières de passer le mot de passe.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ipmitool</span> <span class="at">-I</span> lanplus <span class="at">-H</span> <span class="st">&quot;</span><span class="va">$BMC_HOST</span><span class="st">&quot;</span> <span class="at">-U</span> <span class="st">&quot;</span><span class="va">$BMC_USER</span><span class="st">&quot;</span> <span class="at">-E</span> chassis power status</span></code></pre></div>
+<p>L'option <code>-E</code> lit le mot de passe dans la variable <code>IPMI_PASSWORD</code> ; l'option <code>-P mot-de-passe</code> le place sur la ligne de commande, où tous les utilisateurs locaux le voient dans la liste des processus. Utilisez <code>-E</code> ou <code>-f fichier</code>. Cette commande est dans <code>labs/provisioning/redfish-oob/ipmi_example.sh</code> ; elle n'a pas été exécutée (aucun BMC), seulement vérifiée par <code>shellcheck</code>, et sa syntaxe est celle de l'aide de la version installée.</p>
+<h3 id="redfish-une-api-rest-normalisée">8.2. Redfish : une API REST normalisée</h3>
+<p>Redfish, publié par le DMTF, est l'interface moderne : HTTP, JSON, hypermédia. La spécification DSP0266 (version 1.22.0, 5 février 2025) fixe que l'URL racine d'un service Redfish 1.x est <code>/redfish/v1/</code> et que le service ne doit pas exiger d'authentification pour la servir. Elle exige que toute requête avec authentification Basic passe en HTTPS ; l'authentification par session est l'alternative.</p>
+<p>Le client découvre les ressources en suivant les liens (<code>@odata.id</code>) à partir de la racine, sans coder en dur <code>/Systems/1</code> : les constructeurs diffèrent. Dans le schéma des ressources du DMTF, la santé d'un composant (<code>Status.Health</code>) prend l'une des valeurs <code>OK</code>, <code>Warning</code>, <code>Critical</code>, et <code>HealthRollup</code> agrège celle des sous-composants. L'action <code>ComputerSystem.Reset</code> annonce dans la ressource les valeurs de <code>ResetType</code> qu'elle accepte (par exemple <code>GracefulShutdown</code>, <code>ForceRestart</code>, <code>PowerCycle</code>).</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.1 — Un client Redfish contre un BMC simulé</span> Le lab 6.4 lance <code>mock_bmc.py</code>, un <strong>simulateur</strong> qui suit ces chemins et ces noms, avec une santé forcée à <code>Critical</code>, et interroge-le avec <code>redfish_client.py</code>. Sorties réelles (Python 3.13, 2026-10-24) :</p>
+<pre class="text"><code>/redfish/v1/Systems/1: power=On health=Critical rollup=Critical
+/redfish/v1/Chassis/1: power=None health=Critical rollup=Critical
+worst=Critical action=drain
+OK wrong password: exit 2 (error: 401 on /redfish/v1/Systems)</code></pre>
+<p>Le code de sortie 1 signifie « agir » (<code>drain</code> pour <code>Critical</code>, <code>watch</code> pour <code>Warning</code>), le 2 « erreur » (mauvais mot de passe, BMC injoignable). Neuf tests couvrent : racine lisible sans authentification, ressources protégées, verdict selon la pire santé, valeur inconnue traitée comme avertissement, <code>Reset</code> refusé côté client s'il sort de la liste annoncée, et refusé côté serveur si on force la requête.</p>
+<p><strong>Limites.</strong> Le simulateur parle HTTP, ce que la spécification interdit pour l'authentification Basic ; le client n'a jamais été lancé contre un vrai BMC ; sessions, événements et extensions constructeur sont hors du simulateur.</p>
+</div>
+<h3 id="du-signal-hors-bande-à-une-décision">8.3. Du signal hors bande à une décision</h3>
+<p>Le BMC voit ce que le système ne voit pas : une alimentation redondante défaillante, un ventilateur arrêté, une température critique, un nœud figé. La règle de ce parcours est de <strong>ne jamais agir automatiquement au-delà du drain</strong>. Un <code>Critical</code> ou un <code>Warning</code> persistant draine le nœud avec une raison ; un humain, ou une procédure documentée et limitée en fréquence, décide du redémarrage.</p>
+<p>Quand le nœud est figé, le BMC est le seul chemin : arrêt progressif d'abord, puis redémarrage forcé, puis coupure et remise sous tension, du moins brutal au plus brutal. Chaque escalade s'inscrit dans le registre d'événements du chapitre 7 : un nœud qu'on doit couper trois fois est un candidat à la recette complète, pas un nœud « réparé ».</p>
+<h3 id="sécuriser-le-bmc">8.4. Sécuriser le BMC</h3>
+<p>Un BMC compromis donne le contrôle du serveur sous le système d'exploitation, y compris son firmware. Les pratiques de ce parcours, <strong>non sourcées ici</strong> car les pages de guidance des agences que nous avons tenté de lire ont refusé l'accès depuis le bac à sable : réseau de gestion isolé et non routable depuis les réseaux utilisateurs, aucun compte par défaut conservé, mots de passe uniques par machine et hors du dépôt (chapitre 3), HTTPS avec certificats vérifiés, interfaces inutilisées désactivées, et firmware du BMC tenu à jour comme n'importe quel autre.</p>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Le BMC est un ordinateur indépendant : il allume, éteint, lit les capteurs et sert de dernier recours.</li>
+<li>IPMI est l'interface historique (<code>ipmitool</code>) ; passez le mot de passe par <code>-E</code> ou <code>-f</code>, jamais <code>-P</code>.</li>
+<li>Redfish : racine <code>/redfish/v1/</code> sans authentification, Basic uniquement en HTTPS, santé <code>OK</code>, <code>Warning</code> ou <code>Critical</code>, action de reset annoncée avec ses valeurs permises.</li>
+<li>Le signal hors bande draine ; il ne redémarre pas seul.</li>
+<li>Le réseau de gestion est isolé, les identifiants sont uniques et secrets.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Les quatre labs tournent sur un portable ou une VM Linux <strong>sans GPU</strong>, n'exigent pas les droits root (seule l'installation des paquets en a besoin) et ne touchent jamais la configuration de la machine : chaque nœud est un répertoire temporaire. Les outils utilisés ont été testés le 24 octobre 2026 avec Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7 (fournisseur <code>hashicorp/local</code> 2.9.1), dnsmasq 2.91 et shellcheck. Installation préalable :</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> .venv/bin/activate</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install ansible-core ansible-lint yamllint pytest</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> dnsmasq-base shellcheck</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Terraform &gt;= 1.6 : binaire officiel sur releases.hashicorp.com, vérifié par la somme SHA-256</span></span></code></pre></div>
+<p>Chaque lab se lance avec <code>PYTHON=$(which python) bash verify.sh</code> depuis son dossier <code>labs/provisioning/&lt;lab&gt;/</code>. Les scripts n'affirment rien sur la durée d'exécution : ils comptent des changements, des codes de sortie et des lignes de fichier.</p>
+<div class="lab">
+<p><span class="tag">Lab 6.1 — Un rôle Ansible de nœud de calcul</span></p>
+<p><strong>Objectif.</strong> Faire converger trois nœuds simulés avec un rôle idempotent, détecter et corriger une dérive, déployer par lots avec un canari et protéger un secret. <strong>Durée.</strong> 3 h (partie A 1,5 h, partie B 1,5 h). <strong>Prérequis matériels.</strong> Portable CPU, Python et ansible-core ; coût nul ; aucun root.</p>
+<ol type="1">
+<li>Partie A. Lisez <code>roles/gpu_node/tasks/main.yml</code> et <code>handlers/main.yml</code> : repérez chaque <code>notify</code> et le mécanisme <code>node_root</code>.</li>
+<li>Lancez deux fois <code>playbooks/site.yml</code> avec <code>-e lab_root=$(mktemp -d)</code> et relevez <code>changed</code> dans chaque récapitulation.</li>
+<li>Remplacez <code>unlimited</code> par <code>1</code> dans un fichier géré, puis lancez <code>--check --diff --limit gpu-n02</code> : le fichier doit rester tel quel. Corrigez avec une exécution réelle.</li>
+<li>Partie B. Lancez <code>playbooks/rolling.yml</code>, puis ajoutez <code>-e fail_host=gpu-n01</code> et vérifiez que les deux autres nœuds ne reçoivent rien.</li>
+<li>Générez un secret, chiffrez-le avec <code>ansible-vault encrypt_string</code> et déployez <code>playbooks/secrets.yml</code> avec <code>--diff</code> : le secret ne doit apparaître ni dans la sortie ni ailleurs que dans un fichier <code>0600</code>. Retirez ensuite <code>no_log: true</code> et constatez la fuite.</li>
+<li>Relancez deux fois <code>site.yml</code> avec <code>-e gpu_node_stamp=true</code> : c'est le défaut d'idempotence de l'exercice 4.</li>
+<li>Lisez <code>playbooks/production_update.yml</code> (drain, attente, rôle, redémarrage, recette rapide, remise en service), sans l'exécuter.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> sort avec le code 0 et affiche <code>OK idempotence: changed=0 and the action log did not grow (3 lines)</code> puis, en dernière ligne, <code>OK ansible-node-role: converge, idempotence, check-mode drift, rolling abort, vaulted secret</code>. Ce sont des compteurs et des contenus de fichier, jamais des durées. Comptez environ une minute.</p>
+<p><strong>Pour aller plus loin.</strong> Passez <code>gpu_node_service_backend: systemd</code> sur une VM jetable avec systemd et vérifiez que les gestionnaires lancent les vraies commandes. Ajoutez un test Molecule si vous le connaissez (non couvert ici).</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 6.2 — Terraform : une flotte décrite en code</span></p>
+<p><strong>Objectif.</strong> Dériver d'une seule carte des nœuds l'inventaire Ansible, la configuration DHCP et PXE, le script iPXE et les lignes Slurm ; lire un plan ; provoquer et corriger une dérive. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Portable CPU, Terraform 1.6 ou plus, accès au registre pour télécharger <code>hashicorp/local</code> 2.9.1 (version épinglée dans <code>versions.tf</code>, une seule fois) ; dnsmasq et ansible-core pour deux contrôles facultatifs.</p>
+<ol type="1">
+<li>Lisez <code>modules/fleet/variables.tf</code> : les cinq règles de validation de la carte des nœuds.</li>
+<li>Dans <code>modules/fleet</code>, lancez <code>terraform init -backend=false</code>, <code>validate</code>, <code>test</code>, et lisez <code>tests/fleet.tftest.hcl</code>.</li>
+<li>Dans <code>envs/prod</code>, appliquez avec <code>-var output_dir=&lt;répertoire&gt;</code> et inspectez les cinq fichiers produits ; passez <code>prod-dnsmasq.conf</code> à <code>dnsmasq --test -C</code>.</li>
+<li>Ajoutez une ligne à la main à <code>prod-dhcp-hosts.conf</code>, lancez <code>plan -detailed-exitcode</code> (code 2), puis appliquez.</li>
+<li>Retirez <code>cpu-n01</code> de <code>terraform.tfvars</code> et lisez le résumé <code>Plan:</code> (exercice 5).</li>
+<li>Dupliquez une adresse MAC et lisez le message de validation.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> sort avec le code 0, affiche <code>dnsmasq: syntax check OK.</code> et <code>OK removing cpu-n01 destroys its record (1) and replaces the 4 node-dependent files (4 destroy + 4 add); dnsmasq.conf does not depend on the node list</code>, puis <code>OK terraform-fleet: validate, test, apply, idempotence, drift, node removal, input validation</code>. Environ dix secondes une fois le fournisseur en cache. <strong>Aucun démarrage PXE n'est testé :</strong> seuls la syntaxe de dnsmasq et la structure du script iPXE sont vérifiées.</p>
+<p><strong>Pour aller plus loin.</strong> Remplacez <code>local_file</code> par le fournisseur <code>canonical/maas</code> sur un MAAS de test (non couvert), ou ajoutez un environnement <code>staging</code>. Testez le démarrage réel avec une VM et un bridge isolé si vous disposez de KVM.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 6.3 — Recette d'un nœud GPU</span></p>
+<p><strong>Objectif.</strong> Écrire et tester les règles de décision d'une recette (accepter, rejouer, refuser) à partir de preuves ; connaître la collecte réelle. <strong>Durée.</strong> 3 h (partie A 1,5 h, partie B 1,5 h). <strong>Prérequis matériels.</strong> Portable CPU et pytest pour tout sauf l'étape 6 ; <strong>un nœud GPU avec DCGM, gpu-burn et nccl-tests pour l'étape 6, non vérifiée et facultative</strong>.</p>
+<ol type="1">
+<li>Partie A. Lisez <code>acceptance.sh</code> et <code>policy.json</code> : les sept fichiers de preuves, les trois codes de sortie, les seuils de site.</li>
+<li>Lancez <code>bash verify.sh</code>, puis rejouez à la main <code>acceptance.sh --fixtures fixtures/&lt;scénario&gt;</code> pour <code>remap_failure</code>, <code>pending_remap</code>, <code>nccl_marginal</code>, <code>dcgm_fail_rc0</code> et <code>multi</code>.</li>
+<li>Lisez <code>lib/parsers.py</code> et <code>reference/decide.py</code> ; repérez la table de compatibilité CUDA et les codes 226 et 205.</li>
+<li>Partie B. Remplissez <code>starter/decide.py</code> jusqu'à ce que <code>IMPL=starter python -m pytest tests</code> passe.</li>
+<li>Ajoutez un scénario à <code>make_fixtures.py</code> (par exemple des erreurs ECC corrigibles seulement) et le test qui l'accompagne.</li>
+<li>Facultatif, sur matériel : lancez <code>./acceptance.sh --level quick</code>, comparez le verdict à votre attente et corrigez les écarts de format (champs de <code>nvidia-smi</code>, enveloppe JSON de DCGM).</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> sort avec le code 0, affiche <code>30 passed</code> pour la solution de référence, une ligne <code>starter (failures expected): ... failed ...</code> pour le squelette, les verdicts <code>good -&gt; exit 0</code>, <code>remap_failure -&gt; exit 1</code> et <code>nccl_marginal -&gt; exit 3</code>, puis <code>OK node-acceptance (replay branch): decision rules proven on synthetic evidence</code>. <strong>Le lab porte le type <code>gpu</code> et le badge « non vérifié » :</strong> la branche de rejeu est vérifiée, la collecte réelle ne l'est pas, et le script le rappelle en dernière ligne (<code>NOT EXECUTED: live branch on real GPUs</code>).</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez un compteur de rejeux par nœud (au troisième <em>retest</em>, rejeter), puis branchez le verdict sur <code>scontrol update state=drain</code> (module 5).</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 6.4 — Supervision hors bande avec Redfish</span></p>
+<p><strong>Objectif.</strong> Interroger un BMC simulé par Redfish, décider de drainer sur sa santé et n'accepter qu'un reset annoncé par le service. <strong>Durée.</strong> 1,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3 et pytest ; aucun BMC.</p>
+<ol type="1">
+<li>Lisez <code>mock_bmc.py</code> : les chemins, la racine sans authentification, la liste <code>ResetType@Redfish.AllowableValues</code>.</li>
+<li>Lisez <code>redfish_client.py</code> : découverte par liens, pire santé, valeurs inconnues traitées comme avertissement, mot de passe en variable d'environnement.</li>
+<li>Lancez <code>python -m pytest tests</code>.</li>
+<li>Démarrez le simulateur en arrière-plan avec <code>--health Critical</code>, interrogez-le avec le client et relevez le code de sortie ; arrêtez le processus que vous avez lancé.</li>
+<li>Ajoutez une règle (par exemple, un <code>PowerState</code> éteint sur un nœud censé tourner) avec son test.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> sort avec le code 0 et affiche <code>9 passed</code>, <code>worst=Critical action=drain</code>, <code>OK exit status 1 = drain advised</code>, puis <code>OK redfish-oob: client logic proven against a SIMULATED service (never against a real BMC)</code>. Le simulateur parle HTTP, par commodité : n'envoyez jamais d'identifiants réels sans HTTPS.</p>
+<p><strong>Pour aller plus loin.</strong> Remplacez le simulateur par l'émulateur de votre constructeur s'il en publie un, ou par un vrai BMC de test, avec HTTPS et un compte dédié en lecture seule.</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<p>Les chiffres des énoncés marqués « fictifs » sont inventés pour l'exercice. Les calculs des corrigés sont refaits par <code>bash labs/provisioning/exercise-calcs/verify.sh</code>.</p>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★★ — Le MTTF d'un gros job</span> Kokolis et al. rapportent, sur leurs deux clusters de recherche, un MTTF de 47,7 jours pour les jobs de 8 GPU et de 7,9 h pour les jobs de 1 024 GPU. Si les pannes étaient indépendantes et de même taux par GPU, le MTTF d'un job de <span class="math inline">N</span> GPU vaudrait <span class="math inline">\text{MTTF}(8)\times 8/N</span>.</p>
+<ol type="a">
+<li>Calculez la prédiction pour 1 024 GPU. (b) Comparez-la à la mesure. (c) En supposant des pannes sans mémoire à la cadence de 7,9 h, combien d'interruptions attendez-vous pendant un job de 1 024 GPU de 72 h ? (d) Qu'en déduisez-vous pour la valeur d'une recette ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>47,7 jours valent <span class="math inline">47{,}7\times 24 = 1\,144{,}8</span> h, donc la prédiction est <span class="math inline">1\,144{,}8\times 8/1024 = 8{,}94</span> h.</p></li>
+<li><p>La mesure, 7,9 h, vaut 0,88 fois la prédiction : les pannes sont un peu plus fréquentes que ne le prévoit l'indépendance. Le rapport du nombre de GPU est 128, celui des MTTF 145 : même ordre de grandeur, donc le modèle en <span class="math inline">1/N</span> est une bonne approximation de premier ordre. Que l'écart vienne de pannes corrélées ou de composants partagés est une hypothèse que ces deux chiffres ne permettent pas de trancher.</p></li>
+<li><p><span class="math inline">72/7{,}9 = 9{,}1</span> interruptions attendues en trois jours.</p></li>
+<li><p>À ce rythme, chaque nœud à défaut latent qu'on écarte avant le premier job supprime des interruptions, et chacune coûte la reprise depuis le dernier point de sauvegarde sur 1 024 GPU. Les points (a) et (b) se refont avec <code>calc.py mttf --ref-gpus 8 --ref-days 47.7 --gpus 1024 --measured-hours 7.9</code>.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Ordre de démarrage et boucle</span> Remettez dans l'ordre les six événements : (a) iPXE exécute un script, (b) le firmware demande une adresse DHCP, (c) le binaire iPXE est téléchargé par TFTP, (d) le DHCP renvoie l'URL d'un script, (e) le noyau et l'<em>initrd</em> sont téléchargés par HTTP, (f) Linux démarre.</p>
+<p>Un nœud recharge iPXE en boucle sans jamais atteindre le noyau. Quelle est la cause la plus probable et quelle ligne de <code>dnsmasq.conf</code> du lab 6.2 la corrige-t-elle ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>L'ordre est (b), (c), puis iPXE refait un DHCP, (d), (a), (e), (f).</p>
+<p>La cause est que le serveur DHCP répond à la <strong>seconde</strong> requête, celle d'iPXE, par le nom du binaire iPXE au lieu de l'URL d'un script : iPXE se recharge indéfiniment. C'est le cas décrit par la documentation d'iPXE.</p>
+<p>La parade se lit dans <code>modules/fleet/templates/dnsmasq.conf.tftpl</code>. La ligne <code>dhcp-match=set:ipxe,175</code> marque les clients qui envoient l'option 175 (iPXE). Les lignes <code>dhcp-boot=tag:!ipxe,…</code> ne servent le binaire qu'aux autres clients, et <code>dhcp-boot=tag:ipxe,http://…/prod-boot.ipxe</code> donne à iPXE l'URL de son script. Si la ligne <code>tag:ipxe</code> manque, ou si les lignes du binaire n'ont pas <code>tag:!ipxe</code>, la boucle apparaît.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★★★ — Choisir un outil de provisionnement</span> Pour chacun de ces trois contextes, recommandez MAAS, Warewulf, Base Command Manager ou « image générique plus Ansible », et justifiez par trois critères et par le coût caché du choix. (a) Un laboratoire, 32 nœuds HGX, deux administrateurs, Ubuntu, Slurm. (b) Une plateforme de 600 nœuds, six ingénieurs, images construites en intégration continue à partir de conteneurs. (c) Un déploiement de nœuds DGX pour lequel un support éditeur est exigé par contrat.</p>
+<p>N'inventez aucun chiffre : vous disposez des faits du chapitre 2.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Il n'y a pas de réponse unique ; voici une réponse défendable, avec ce qu'il resterait à vérifier.</p>
+<ol type="a">
+<li><p><strong>Image générique plus Ansible</strong>, ou MAAS si l'équipe veut un inventaire matériel et une mise sous tension par le BMC. Critères : peu d'administrateurs donc peu d'outils à apprendre ; Ubuntu est déjà le système cible ; la flotte est assez petite pour qu'une dérive se corrige par <code>--check</code>. Coût caché : la discipline d'idempotence repose sur l'équipe.</p></li>
+<li><p><strong>Warewulf</strong>. Critères : les images viennent déjà de l'intégration continue, et la documentation de Warewulf les décrit comme gérables avec des outils de conteneurs ; le sans-état rend le remplacement trivial ; l'échelle du parc justifie une chaîne d'image. Coût caché : l'état local se reconstruit à chaque démarrage, et le pilote GPU est figé dans l'image, donc toute montée de pilote est une nouvelle image.</p></li>
+<li><p><strong>Base Command Manager</strong>. Critères : la contrainte de support éditeur domine ; l'outil est documenté pour le déploiement sur DGX ; il couvre provisionnement, charges et supervision. Coût caché : produit propriétaire dont il faut relire les conditions de licence le jour de l'achat, et dépendance à l'écosystème de l'éditeur.</p></li>
+</ol>
+<p>Une bonne réponse nomme à chaque fois ce qu'elle abandonne, et ce qu'il faut tester avant de s'engager (le temps de reconstruction d'un nœud, par exemple).</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★ — Lire un PLAY RECAP</span> Voici la sortie <strong>réelle</strong> d'une seconde exécution du lab 6.1 avec <code>-e gpu_node_stamp=true</code> (extrait, 2026-10-24) :</p>
+<pre class="text"><code>TASK [gpu_node : Raise per-process limits for training jobs] ****
+ # revision unset
+-# generated 2026-10-24 22:53:13.022874
++# generated 2026-10-24 22:53:19.423646
+ * - memlock unlimited
+changed: [gpu-n01]
+
+gpu-n01 : ok=6 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0</code></pre>
+<ol type="a">
+<li>Quelle ligne explique <code>changed=1</code> ? (b) Pourquoi est-ce un défaut pour une flotte de 200 nœuds ? (c) Proposez deux corrections.</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>La ligne <code># generated …</code> : le gabarit y insère l'heure courante (<code>now()</code>), donc le contenu rendu diffère à chaque exécution et le module <code>template</code> signale un changement.</p></li>
+<li><p>La seconde exécution ne vaudra jamais <code>changed=0</code> : on ne peut plus distinguer une exécution à vide d'une vraie dérive. Une surveillance fondée sur <code>changed&gt;0</code> alerte en permanence, ou on la désactive, et une dérive réelle passe inaperçue. La flotte n'est jamais « convergée ».</p></li>
+<li><p>Première correction : retirer l'horodatage du gabarit ; la révision de configuration (<code>gpu_node_config_revision</code>), constante entre deux exécutions, suffit à tracer la version. Seconde : si une date est utile, la consigner dans un journal que le rôle n'écrase pas, par exemple le journal d'actions, et non dans un fichier géré. Vérification : deux exécutions de suite donnent <code>changed=0</code>. L'étape G de <code>verify.sh</code> fait reproduire le défaut pour que vous le reconnaissiez.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★ — Lire un plan Terraform</span> Après avoir retiré <code>cpu-n01</code> de la carte des nœuds de l'environnement <code>prod</code>, <code>terraform plan</code> affiche (extrait réel, Terraform 1.16.7) :</p>
+<pre class="text"><code>  # module.fleet.local_file.ansible_inventory must be replaced
+  # module.fleet.local_file.boot_ipxe must be replaced
+  # module.fleet.local_file.dhcp_hosts must be replaced
+  # module.fleet.local_file.slurm_nodes must be replaced
+  # module.fleet.terraform_data.node[&quot;cpu-n01&quot;] will be destroyed
+  # (because key [&quot;cpu-n01&quot;] is not in for_each map)
+Plan: 4 to add, 0 to change, 5 to destroy.</code></pre>
+<ol type="a">
+<li>Que détruit-on, et pourquoi 5 destructions pour 4 créations ? (b) Pourquoi le fichier <code>dnsmasq.conf</code> n'apparaît-il pas ? (c) Que changerait-il si les nœuds étaient des instances d'un nuage ? (d) Quelle garde mettez-vous en intégration continue ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>On détruit l'enregistrement du nœud (<code>terraform_data.node["cpu-n01"]</code>) et on remplace quatre fichiers qui dépendent de la liste des nœuds : chaque remplacement compte une destruction et une création. Cinq destructions, quatre créations.</p></li>
+<li><p><code>dnsmasq.conf</code> ne mentionne aucun nœud : son contenu ne change pas.</p></li>
+<li><p>Une destruction y serait <strong>réelle</strong> : l'instance et ses disques disparaîtraient. D'où la règle du chapitre 4 : relire le résumé <code>Plan:</code> et ne modéliser que des enregistrements pour les machines physiques.</p></li>
+<li><p>Exécuter <code>terraform plan -detailed-exitcode</code> ; le code 2 est normal, mais on refuse la fusion si le nombre de destructions dépasse ce que la demande annonce, ou on exige une approbation humaine dès qu'une ressource de type machine apparaît dans la liste. Rappelez-vous que <code>prevent_destroy</code> ne protège pas d'un retrait de la configuration.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★ — Compatibilité pilote et CUDA</span> Quatre nœuds ont les pilotes 535, 550, 570 et 580. Trois images utilisent CUDA 11.8, 12.4 et 13.0. Avec la table de compatibilité du chapitre 5, dressez la matrice des paires acceptées.</p>
+<p>Sur un HGX de troisième génération de NVSwitch, le pilote est en 580.0.1 et le paquet Fabric Manager en 575.0.1. Que prévoit la documentation ? Une équipe exige CUDA 13.0 sur le nœud en pilote 570 : donnez deux options.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Les minima sont 450 pour CUDA 11, 525 pour CUDA 12, 580 pour CUDA 13. Les pilotes 535, 550 et 570 acceptent CUDA 11.8 et 12.4 et refusent CUDA 13.0 ; le pilote 580 accepte les trois. Contrôle : <code>calc.py compat --driver 570 --cuda 13.0</code> répond <code>TOO OLD</code>, et <code>--driver 570 --cuda 12.9</code> répond <code>OK</code>.</p>
+<p>Avant NVLink 5, la version de la bibliothèque doit correspondre à celle de Fabric Manager : avec 580.0.1 et 575.0.1, FM s'arrête et signale que la version de la bibliothèque n'est pas prise en charge. Il faut aligner les deux versions (le lab 6.3 rejette ce cas avec <code>fm_mismatch</code>).</p>
+<p>Pour CUDA 13.0 sur le pilote 570 : (1) mettre le pilote à 580 ou plus, par une mise à jour progressive suivie de la recette ; (2) si le GPU est un GPU de centre de données, installer le paquet de compatibilité ascendante <code>cuda-compat</code> correspondant, que la documentation réserve à certains matériels. Dans les deux cas, testez sur un canari.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★★ — Lire la sortie d'une recette</span> Voici le verdict <strong>réel</strong> de <code>acceptance.sh --fixtures fixtures/multi</code> (preuves synthétiques) :</p>
+<pre class="text"><code>{ &quot;findings&quot;: [
+  { &quot;message&quot;: &quot;GPU 2: PCIe link gen5 x8 below gen5 x16&quot;, &quot;severity&quot;: &quot;reject&quot; },
+  { &quot;message&quot;: &quot;GPU 5: remap/retirement pending, takes effect at the next GPU reset: reset then retest&quot;, &quot;severity&quot;: &quot;retest&quot; },
+  { &quot;message&quot;: &quot;bus bandwidth 93.0 GB/s is 93% of the baseline: marginal, run again&quot;, &quot;severity&quot;: &quot;retest&quot; } ],
+  &quot;verdict&quot;: &quot;reject&quot; }</code></pre>
+<ol type="a">
+<li>Pourquoi le verdict est-il <em>reject</em> alors que deux constats sont des <em>retest</em> ? (b) Dans quel ordre traitez-vous les trois constats ? (c) Peut-on conclure que le lien PCIe dégradé explique la bande passante ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Le verdict est le pire des constats : un seul rejet suffit, car on ne remet pas en production un nœud qui a une panne avérée, quels que soient les autres constats.</p></li>
+<li><p>D'abord le rejet : un lien PCIe négocié en x8 au lieu de x16 est une cause physique ou de configuration (carte mal enfichée, riser, réglage du BIOS) qu'une réinitialisation ne corrige pas ; vérifiez l'état du lien avec <code>lspci -vv</code>. Ensuite seulement, la réinitialisation du GPU 5 pour que le remappage en attente prenne effet, puis la <strong>recette complète rejouée</strong>, car le défaut corrigé peut avoir modifié les autres résultats.</p></li>
+<li><p>Non. Rien dans ces preuves ne l'établit : une collective NCCL entre GPU reliés en NVLink ne traverse pas le lien PCIe de la même façon. C'est une hypothèse à tester en rejouant : si la bande passante reste marginale après correction du lien, c'est une autre cause.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★ — Bande passante de bus</span> Rappel : pour un all-reduce sur <span class="math inline">n</span> rangs de <span class="math inline">S</span> octets en un temps <span class="math inline">t</span>,</p>
+<p><span class="math display">\text{algbw} = \frac{S}{t}, \qquad \text{busbw} = \text{algbw}\times\frac{2(n-1)}{n}</span></p>
+<p>avec 1 GiB = <span class="math inline">2^{30}</span> octets et 1 GB = <span class="math inline">10^{9}</span> octets. La référence du site (nœud doré, valeur <strong>fictive</strong>) est de 200 GB/s de bande passante de bus. La politique du lab : accepter à 95 % ou plus, rejouer entre 90 % et 95 %, rejeter sous 90 %.</p>
+<p>Un all-reduce de 4 GiB sur 8 GPU prend 36 ms sur un nœud et 41 ms sur un autre. Calculez algbw, busbw, le pourcentage de la référence et le verdict de chacun. Quel serait le facteur sur 16 rangs, et pourquoi compare-t-on le busbw plutôt que l'algbw ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Pour 36 ms : <span class="math inline">S = 4\times 2^{30} = 4{,}295\times 10^{9}</span> octets, algbw <span class="math inline">= 4{,}295\times 10^{9}/0{,}036 = 119{,}3</span> GB/s. Le facteur vaut <span class="math inline">2\times 7/8 = 1{,}75</span>, donc busbw <span class="math inline">= 208{,}8</span> GB/s, soit 104 % de la référence : <em>accept</em>.</p>
+<p>Pour 41 ms : algbw <span class="math inline">= 104{,}8</span> GB/s, busbw <span class="math inline">= 183{,}3</span> GB/s, soit 92 % : entre 90 % et 95 %, donc <em>retest</em>.</p>
+<p>Sur 16 rangs le facteur est <span class="math inline">2\times 15/16 = 1{,}875</span>. On compare le busbw parce que l'algbw dépend du nombre de rangs : à matériel identique, il diminue quand <span class="math inline">n</span> augmente, alors que le busbw reflète l'usage des liens indépendamment de <span class="math inline">n</span> (documentation de nccl-tests). Les valeurs sortent de <code>calc.py busbw --ranks 8 --size-gib 4 --ms 36 --baseline 200</code> (et <code>--ms 41</code>).</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★★★ — Un nœud intermittent</span> Un nœud passe la recette cinq fois de suite avec ces bandes passantes de bus, en pourcentage de la référence : 98, 97, 91, 96, 89. Les autres nœuds de la flotte donnent 98 avec un écart-type d'environ 1 point (valeurs <strong>fictives</strong>). Le diagnostic DCGM de niveau 3 est propre et aucun Xid n'est apparu.</p>
+<p>Qualifiez la situation, listez des hypothèses ordonnées, proposez pour chacune un test discriminant, et fixez une règle de décision. Précisez ce que cinq mesures ne permettent pas de conclure.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Situation.</strong> En écarts à 98 : 0, −1, −7, −2, −9 points, soit 0, 1, 7, 2 et 9 écarts-types de la flotte. Deux mesures sur cinq sont très loin du bruit habituel : ce n'est pas du bruit de mesure, et ce nœud n'est pas comme les autres. Cinq mesures ne suffisent pas pour estimer une fréquence de panne ni pour distinguer deux causes ; elles justifient seulement de ne pas accepter le nœud.</p>
+<p><strong>Hypothèses (non démontrées), avec le test qui les départage.</strong></p>
+<ol type="1">
+<li>Limitation thermique ou de puissance : lire les <em>Clocks Event Reasons</em> de <code>nvidia-smi -q -d PERFORMANCE</code> pendant une charge soutenue, comparer les températures à celles des voisins.</li>
+<li>Lien dégradé ou instable (PCIe, NVLink, réseau) : relire les compteurs d'erreurs et l'état des liens, mesurer par paires avec <code>nvbandwidth</code>.</li>
+<li>Interférence d'un autre processus sur le nœud : vérifier qu'aucun job ni service n'occupe les GPU pendant la recette.</li>
+<li>Défaut matériel intermittent : diagnostic de niveau 4 et gpu-burn prolongé, puis échanger les composants suspects de place pour voir si le défaut suit la pièce.</li>
+</ol>
+<p><strong>Règle de décision.</strong> Une règle écrite d'avance, de la forme « trois recettes complètes consécutives à 95 % ou plus avant remise en service ; au-delà de cinq essais, rejet et ouverture d'un dossier ». Les seuils sont un choix de site. Conservez les cinq mesures dans le registre d'événements du nœud : un nœud revenu deux fois pour le même motif est un candidat « citron ».</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 10 · ★★ — Dimensionner une mise à jour progressive</span> Une flotte de 120 nœuds, des jobs de 48 h au plus, un redémarrage plus validation de 20 minutes (0,333 h) : valeurs <strong>fictives</strong>. Vous ne pouvez pas retirer plus de 10 % des nœuds à la fois. Formule du pire cas, avec <span class="math inline">N</span> nœuds et des lots de <span class="math inline">b</span> nœuds :</p>
+<p><span class="math display">T = \left\lceil \frac{N}{b} \right\rceil \times \left( T_{\text{job}} + T_{\text{reboot}} \right)</span></p>
+<ol type="a">
+<li>Calculez la taille de lot et la durée de pire cas. (b) Combien gagne-t-on en doublant le lot, et à quel prix ? (c) Proposez une manière de réduire le pire cas sans retirer plus de capacité.</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Le lot maximal est <span class="math inline">b = 12</span> nœuds (10 % de 120). Il y a <span class="math inline">\lceil 120/12\rceil = 10</span> lots de <span class="math inline">48{,}333</span> h, soit <span class="math inline">483{,}3</span> h <span class="math inline">= 20{,}1</span> jours.</p></li>
+<li><p>Avec <span class="math inline">b = 24</span>, il y a 5 lots, soit <span class="math inline">241{,}7</span> h <span class="math inline">= 10{,}1</span> jours : la durée est divisée par deux, mais 20 % de la capacité est retirée à la fois. C'est un compromis de politique, pas un calcul.</p></li>
+<li><p>Le pire cas suppose que chaque lot attend un job de 48 h. On le réduit en limitant la durée maximale des jobs d'une partition le temps de la mise à jour, en planifiant les lots sur les nœuds dont les jobs se terminent le plus tôt, ou en réservant une fenêtre de maintenance annoncée aux utilisateurs. Les valeurs viennent de <code>calc.py rolling --nodes 120 --batch 12 --walltime-h 48 --reboot-h 0.3333</code> (et <code>--batch 24</code>).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 11 · ★★★ — Remplacer un nœud et dimensionner le volant</span> Dans une flotte de 256 nœuds, le client Redfish d'un nœud renvoie <code>Critical</code> et le journal du noyau contient une erreur Xid 79. Rédigez la procédure de remplacement sans interrompre la production : étapes ordonnées, qui agit, quelles preuves sont conservées, quel retour en arrière, et quelle recette précède la remise en service.</p>
+<p>Dimensionnez ensuite le volant de nœuds de rechange pour un taux de 2,5 pannes pour 1 000 nœuds-jours et un délai de réparation de <strong>21 jours</strong> (RMA lent, valeur fictive), à 95 %. Comparez à 10 jours et expliquez ce que vous arbitrez.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Procédure.</strong></p>
+<ol type="1">
+<li>Drainer le nœud avec une raison lisible (<code>scontrol update … state=drain reason=…</code>) ; les jobs en cours finissent ou sont repris depuis leur point de sauvegarde. Responsable : l'automatisation, sur le signal du client Redfish et du journal Xid.</li>
+<li>Geler les preuves : rapport DCGM, journal Xid, valeur des drapeaux de remappage, numéros de série et identifiants des GPU, historique des drains du nœud.</li>
+<li>Substituer un nœud de rechange recetté, en l'ajoutant à la carte des nœuds (relue, plan lu), pour que Slurm voie la capacité revenir.</li>
+<li>Réinitialiser le GPU si le diagnostic l'autorise, puis recette complète. Si elle échoue ou si le défaut revient, ouvrir le dossier de remplacement avec les preuves de l'étape 2.</li>
+<li>À l'arrivée de la pièce, réparer, puis <strong>recette complète</strong> avant tout retour en service ; consigner l'événement dans le registre du nœud.</li>
+<li>Retour en arrière : tant que la recette échoue, le nœud reste drainé ; rien n'est supprimé de la carte avant le remplacement définitif.</li>
+</ol>
+<p><strong>Volant.</strong> Avec 10 jours, la moyenne de nœuds en réparation vaut <span class="math inline">256\times 0{,}0025\times 10 = 6{,}4</span> et 11 réserves couvrent 95 % des cas (probabilité cumulée 0,969). Avec 21 jours, la moyenne passe à 13,44 et il en faut 20 (probabilité 0,966) : 7,8 % de la flotte au lieu de 4,3 %.</p>
+<p><strong>Arbitrage.</strong> Chaque réserve est de la capacité payée et inactive ; raccourcir le délai de RMA (contrat, stock de pièces sur site) coûte aussi. La comparaison se fait en nœuds-équivalents : 9 réserves de plus contre un meilleur délai de réparation. Le prix de chaque option se lit sur la page du fournisseur le jour de la décision, pas ici. Calcul : <code>calc.py spares --nodes 256 --rate-per-1000-node-days 2.5 --repair-days 21 --quantile 0.95</code>.</p>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux décrire la chaîne de démarrage d'un nœud et la dépanner.</strong> Preuve : le schéma du chapitre 2 refait de mémoire, avec la panne probable à chaque étape, et l'exercice 2.</li>
+<li><strong>Je peux écrire un rôle Ansible dont la seconde exécution donne <code>changed=0</code>.</strong> Preuve : le lab 6.1, avec votre propre tâche ajoutée et la récapitulation des deux passes.</li>
+<li><strong>Je peux déployer un changement par lots et l'arrêter au premier échec.</strong> Preuve : le lab 6.1, partie B, avec le canari en échec.</li>
+<li><strong>Je peux décrire une flotte avec Terraform et lire un plan.</strong> Preuve : le lab 6.2 et l'exercice 5 refaits sur un nouveau nœud.</li>
+<li><strong>Je peux vérifier la cohérence de la pile GPU d'un nœud.</strong> Preuve : <code>check_stack</code> complété au lab 6.3 et l'exercice 6.</li>
+<li><strong>Je peux concevoir une recette à trois issues.</strong> Preuve : <code>starter/decide.py</code> complété jusqu'à ce que les tests passent, et un scénario supplémentaire de votre cru.</li>
+<li><strong>Je peux dimensionner une mise à jour et un volant de rechange.</strong> Preuve : les exercices 10 et 11 refaits sur des chiffres de votre flotte.</li>
+<li><strong>Je peux interroger un BMC par Redfish et en tirer une décision.</strong> Preuve : le lab 6.4 et la règle ajoutée.</li>
+</ul>
+<p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
+<ol type="1">
+<li><em>Vous recevez 64 nœuds GPU neufs. Que faites-vous avant d'ouvrir la production ?</em> Réponse-type : inventaire d'identité (série, MAC, BMC), installation par image, convergence idempotente prouvée (<code>changed=0</code>), vérification de la pile (pilote, CUDA, Fabric Manager), recette complète (DCGM, burn-in, nccl-tests comparé à un nœud doré, journal des Xid), verdict à trois issues, remise en service progressive par un canari, et conservation des preuves.</li>
+<li><em>Comment mettez-vous à jour le pilote de 500 nœuds pendant que les jobs tournent ?</em> Réponse-type : mise à jour progressive en lots bornés par la capacité acceptable, canari en premier, drain avec attente de la fin des jobs, redémarrage, recette rapide, remise en service, arrêt au premier échec ; estimation du pire cas ; fenêtre annoncée aux utilisateurs.</li>
+<li><em>Un nœud tombe toutes les semaines puis « revient tout seul ». Que faites-vous ?</em> Réponse-type : ne pas se fier au retour spontané ; consulter le registre d'événements (drains, Xid, tickets) ; recette complète et plus longue ; comparer aux autres nœuds ; au-delà d'un seuil écrit d'avance, retrait et dossier de remplacement : c'est un candidat « nœud citron ».</li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<ul>
+<li>Dubey et al. <a href="https://arxiv.org/abs/2407.21783"><em>The Llama 3 Herd of Models</em></a>, 2024, section 3.3.4 et tableau 5 : interruptions, causes et maintenance automatisée (chapitres 1 et 7).</li>
+<li>Kokolis et al. <a href="https://arxiv.org/abs/2410.21680"><em>Revisiting Reliability in Large-Scale Machine Learning Research Clusters</em></a>, 2024 : taux de pannes, MTTF selon la taille du job, nœuds citrons (chapitres 1 et 7).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/dcgm-diagnostics.html"><em>DCGM Diagnostics</em></a>, guide utilisateur de DCGM : niveaux, JSON, codes de sortie (chapitre 6).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/deploy/cuda-compatibility/latest/"><em>CUDA Compatibility</em></a> : compatibilité de version mineure et ascendante (chapitre 5).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/index.html"><em>Fabric Manager User Guide</em></a> : démarrage, version, systèmes à NVSwitch (chapitre 5).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/deploy/a100-gpu-mem-error-mgmt/latest/index.html"><em>GPU Memory Error Management</em></a> : remappage de lignes, drapeaux et critères de RMA (chapitres 6 et 7).</li>
+<li>NVIDIA. <a href="https://raw.githubusercontent.com/NVIDIA/nccl-tests/master/doc/PERFORMANCE.md"><em>nccl-tests — performance metrics</em></a> : algbw, busbw (chapitre 6).</li>
+<li>Ansible. Sources de la documentation : <a href="https://raw.githubusercontent.com/ansible/ansible-documentation/devel/docs/docsite/rst/playbook_guide/playbooks_checkmode.rst">mode vérification</a>, <a href="https://raw.githubusercontent.com/ansible/ansible-documentation/devel/docs/docsite/rst/playbook_guide/playbooks_handlers.rst">gestionnaires</a>, <a href="https://raw.githubusercontent.com/ansible/ansible-documentation/devel/docs/docsite/rst/playbook_guide/guide_rolling_upgrade.rst">mises à jour progressives</a> et <a href="https://raw.githubusercontent.com/ansible/ansible-documentation/devel/docs/docsite/rst/reference_appendices/glossary.rst">glossaire</a> pour l'idempotence (chapitre 3).</li>
+<li>HashiCorp. <a href="https://developer.hashicorp.com/terraform/cli/commands/plan"><em>terraform plan</em></a> et <a href="https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle"><em>lifecycle</em></a> : codes de sortie, <code>prevent_destroy</code> (chapitre 4).</li>
+<li>Projet iPXE. <a href="https://ipxe.org/howto/chainloading"><em>Chainloading iPXE</em></a> et <a href="https://ipxe.org/scripting"><em>Scripting</em></a> : boucle d'amorçage et scripts (chapitre 2).</li>
+<li>Warewulf. <a href="https://warewulf.org/docs/main/getting-started/provisioning.html"><em>The Provisioning Process</em></a> et Canonical, <a href="https://canonical.com/maas/docs/stable/explanation/deploying-machines/"><em>MAAS : commissioning et déploiement</em></a> : deux chaînes de provisionnement documentées (chapitre 2).</li>
+<li>DMTF. <a href="https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.22.0.pdf"><em>Redfish Specification DSP0266 1.22.0</em></a>, 2025 : racine, authentification, hypermédia (chapitre 8).</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/scontrol.html"><em>scontrol</em></a> : <code>reboot</code>, <code>ASAP</code>, <code>nextstate</code> (chapitre 7).</li>
+<li>LBNL. <a href="https://raw.githubusercontent.com/mej/nhc/master/README.md"><em>Node Health Check (NHC)</em></a> : contrôle de santé de référence pour Slurm (chapitres 6 et 7).</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de <code>dcgmi diag</code>, option <code>-j</code>, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable <code>NCCL_TESTS_MIN_BW</code> ; sémantique de <code>scontrol reboot</code> ; racine <code>/redfish/v1/</code>, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, codes de sortie de <code>terraform plan</code>, limite de <code>prevent_destroy</code>. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, <code>hashicorp/local</code> 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale).</p>
+<p><strong>Recommandé.</strong> Les sept états du cycle de vie ; la recette en trois issues et ses seuils (90 % et 95 %) ; le nœud doré comme référence ; la règle « pas d'action automatique au-delà du drain » pour les signaux du BMC ; les répertoires plutôt que les espaces de travail Terraform ; la lecture humaine du résumé <code>Plan:</code> ; le registre d'événements par nœud ; l'usage du niveau 2 de DCGM à chaque démarrage et du niveau 3 à la réception ; les pratiques de sécurité du BMC. Ce sont des choix de ce parcours, pas des règles des outils.</p>
+<p><strong>À vérifier.</strong> (1) La liste des champs de <code>nvidia-smi --query-gpu</code> et l'enveloppe du JSON de <code>dcgmi diag</code> : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) Les valeurs de l'option DHCP 93 annoncées par vos firmwares UEFI (7 ou 9). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt <code>ansible-documentation</code>. (11) Le comportement de <code>hashicorp/local</code> face à un fichier modifié est une observation sur la version 2.9.1.</p>
+<p><strong>Hors périmètre.</strong> La configuration de Slurm elle-même (<a href="../slurm/index.html">module 5</a>), le réseau d'interconnexion et NCCL en profondeur (<a href="../networking/index.html">module 7</a>), la supervision continue des GPU (<a href="../observability/index.html">module 14</a>), l'opérateur GPU de Kubernetes (<a href="../kubernetes-gpu/index.html">module 12</a>), la construction d'images (Packer, intégration continue), les outils de mise à jour de firmware, le démarrage sécurisé et l'attestation, l'effacement sécurisé des disques, les API de provisionnement des nuages, OpenTofu, OpenCHAMI, OpenStack Ironic et xCAT (cités sans évaluation), et les partitions multi-locataires de NVSwitch.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/slurm/index.html"><span class="k">← Précédent</span>Module 05 — Slurm et exploitation d'un cluster HPC</a><a class="next" href="../../courses/networking/index.html"><span class="k">Suivant →</span>Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "_comment": "Public figures transcribed by hand on 2026-10-24 from the NVIDIA DGX SuperPOD H100 reference architecture (tables 3 and 4). They are inputs to a comparison, not measurements.",
+  "superpod_h100": {
+    "source_url": "https://docs.nvidia.com/dgx-superpod/reference-architecture-scalable-infrastructure-h100/latest/dgx-superpod-architecture.html (table 3) and .../network-fabrics.html (table 4)",
+    "radix": 64,
+    "rows": [
+      {"su": 1,  "nodes": 31,   "gpus": 248,   "leaf": 8,   "spine": 4,   "core": 0,   "spine_leaf_cables": 256},
+      {"su": 2,  "nodes": 63,   "gpus": 504,   "leaf": 16,  "spine": 8,   "core": 0,   "spine_leaf_cables": 512},
+      {"su": 3,  "nodes": 95,   "gpus": 760,   "leaf": 24,  "spine": 16,  "core": 0,   "spine_leaf_cables": 768,
+       "note": "formula gives 12 spines; the reference design keeps 16 (hypothesis: same spine count as 4 SU, to grow without recabling)"},
+      {"su": 4,  "nodes": 127,  "gpus": 1016,  "leaf": 32,  "spine": 16,  "core": 0,   "spine_leaf_cables": 1024},
+      {"su": 8,  "nodes": 256,  "gpus": 2048,  "leaf": 64,  "spine": 32,  "core": 0,   "spine_leaf_cables": 2048},
+      {"su": 16, "nodes": 512,  "gpus": 4096,  "leaf": 128, "spine": 128, "core": 64,  "spine_leaf_cables": 4096},
+      {"su": 32, "nodes": 1024, "gpus": 8192,  "leaf": 256, "spine": 256, "core": 128, "spine_leaf_cables": 8192},
+      {"su": 56, "nodes": 2048, "gpus": 16384, "leaf": 512, "spine": 512, "core": 256, "spine_leaf_cables": 16384,
+       "note": "source inconsistency: 56 SU x 32 nodes = 1792, but the table lists 2048 nodes; we use the node and GPU counts, not the SU label"}
+    ]
+  },
+  "al_fares_2008": {
+    "source_url": "http://ccr.sigcomm.org/online/files/p63-alfares.pdf",
+    "k48_hosts_quoted": 27648
+  }
+}

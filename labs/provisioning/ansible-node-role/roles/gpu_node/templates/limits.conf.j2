@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+# revision {{ gpu_node_config_revision }}
+{% if gpu_node_stamp %}
+# generated {{ now(utc=true) }}
+{% endif %}
+{% for l in gpu_node_limits %}
+{{ l.domain }} {{ l.type }} {{ l.item }} {{ l.value }}
+{% endfor %}

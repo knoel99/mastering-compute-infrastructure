@@ -1,0 +1,9 @@
+index, uuid, driver_version, persistence_mode, ecc.errors.uncorrected.volatile.total, remapped_rows.pending, remapped_rows.failure, retired_pages.pending, pcie.link.gen.current, pcie.link.width.current
+0, GPU-00000000-0000-0000-0000-000000000000, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+1, GPU-00000000-0000-0000-0000-000000000001, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+2, GPU-00000000-0000-0000-0000-000000000002, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+3, GPU-00000000-0000-0000-0000-000000000003, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+4, GPU-00000000-0000-0000-0000-000000000004, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+5, GPU-00000000-0000-0000-0000-000000000005, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+6, GPU-00000000-0000-0000-0000-000000000006, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16
+7, GPU-00000000-0000-0000-0000-000000000007, 580.0.1, Enabled, 0, 0, 0, [N/A], 5, 16

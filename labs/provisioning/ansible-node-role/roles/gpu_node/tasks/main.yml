@@ -1,0 +1,50 @@
+---
+- name: Create the directories the role writes into
+  ansible.builtin.file:
+    path: "{{ node_root }}{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /etc/security/limits.d
+    - /etc/sysctl.d
+    - /etc/modprobe.d
+    - /etc/systemd/system
+    - /etc/ansible/facts.d
+    - /var/log
+
+- name: Raise per-process limits for training jobs
+  ansible.builtin.template:
+    src: limits.conf.j2
+    dest: "{{ node_root }}/etc/security/limits.d/90-gpu-training.conf"
+    mode: "0644"
+
+- name: Set kernel parameters
+  ansible.builtin.template:
+    src: sysctl.conf.j2
+    dest: "{{ node_root }}/etc/sysctl.d/90-gpu-training.conf"
+    mode: "0644"
+  notify: Apply sysctl settings
+
+- name: Keep the nouveau driver away from NVIDIA GPUs
+  ansible.builtin.template:
+    src: blacklist-nouveau.conf.j2
+    dest: "{{ node_root }}/etc/modprobe.d/blacklist-nouveau.conf"
+    mode: "0644"
+  when: gpu_node_blacklist_nouveau | bool
+  notify: Rebuild initramfs
+
+- name: Install the health check service and timer
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ node_root }}/etc/systemd/system/{{ item }}"
+    mode: "0644"
+  loop:
+    - gpu-node-check.service
+    - gpu-node-check.timer
+  notify: Reload systemd
+
+- name: Publish the configuration revision as a local fact
+  ansible.builtin.template:
+    src: gpu_node.fact.j2
+    dest: "{{ node_root }}/etc/ansible/facts.d/gpu_node.fact"
+    mode: "0644"

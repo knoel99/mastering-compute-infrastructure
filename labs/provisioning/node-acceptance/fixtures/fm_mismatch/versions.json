@@ -1,0 +1,8 @@
+{
+ "cuda_runtime": "13.0",
+ "driver": "580.0.1",
+ "fabric_manager": "575.0.1",
+ "fabric_manager_active": true,
+ "nouveau_loaded": false,
+ "nvswitch_generation": 3
+}

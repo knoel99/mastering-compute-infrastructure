@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Stockage et E/S pour l'entraînement — Mastering Compute Infrastructure</title>
+<meta name="description" content="Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, formats de données, chargeurs, checkpoints et caches, avec des mesures par compteurs.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">Stockage et E/S pour l'entraînement</h1>
+<p class="subtitle">Module 08 · Phase 2 · 24 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable (disque local, pas de système de fichiers parallèle)</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> votre entraînement de 256 GPU est-il lent parce que les GPU attendent leurs données, ou parce qu'un checkpoint arrête tout le monde toutes les demi-heures ? Dans les deux cas, la réponse tient dans trois nombres que l'on peut mesurer : un débit, une taille de requête et un nombre d'opérations de métadonnées.</p>
+<p>Ce module vous apprend à <strong>dimensionner</strong> le stockage d'un entraînement (lecture du jeu de données, écriture et relecture des checkpoints), à <strong>choisir</strong> entre système de fichiers parallèle, NFS et stockage objet, à <strong>diagnostiquer</strong> un chargeur de données lent et à <strong>concevoir</strong> un cache. Les mesures viennent d'une machine Linux sans GPU, avec des compteurs du noyau plutôt qu'avec des chronomètres.</p>
+<p>Ce module ne remplace pas le module 10 sur les pannes : le protocole d'un checkpoint correct (atomicité, intégrité, reprise) y est traité. Ici, on s'occupe de ce que le checkpoint <strong>coûte au stockage</strong> et de ce que le stockage <strong>coûte à l'entraînement</strong>.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Ne croyez aucun débit que vous n'avez pas mesuré avec un compteur, et ne changez pas de matériel avant d'avoir changé le motif d'accès. Passer de millions de petites lectures à quelques grosses lectures séquentielles rapporte plus qu'un stockage dix fois plus cher.</p>
+</div>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>24 h : environ 9,5 h de lecture, 9,25 h de labs, 3,5 h d'exercices et 0,5 h de bilan de sortie, soit 22,75 h, plus une marge d'environ 1 h répartie sur les séances</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>2 : à l'aise avec Linux en ligne de commande (module 1) et avec PyTorch</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a>, en particulier le chapitre 7 sur le cache de pages et <code>fio</code></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : vous connaissez les chargeurs PyTorch, mais pas les systèmes de fichiers parallèles ni la dimension E/S d'un checkpoint à grande échelle</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un rapport de dimensionnement E/S d'un entraînement (lecture, checkpoint, cache, capacité) et la table de décision du chargeur appliquée à une mesure</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>un portable ou une VM Linux sans GPU ; <code>fio</code>, PyTorch CPU et <code>pytest</code> ; <code>pyarrow</code> et <code>webdataset</code> en option. Les parties qui demandent un GPU (<code>pin_memory</code>, GPUDirect Storage) ou un vrai système de fichiers parallèle sont décrites, <strong>pas exécutées</strong></td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Estimer le débit de lecture d'un entraînement et le débit d'écriture d'un checkpoint à partir de la taille d'un échantillon, du nombre de GPU et de la période de sauvegarde (chapitre 1, lab 8.4).</li>
+<li>Dire ce qu'est un système de fichiers parallèle, et régler le <em>striping</em> d'un fichier à partir d'un besoin de débit (chapitre 2).</li>
+<li>Comparer NFS, stockage objet et passerelles FUSE sur la cohérence, la latence, les métadonnées et le coût, sans chiffre de fournisseur non sourcé (chapitre 3).</li>
+<li>Chiffrer l'amplification de lecture d'un format de données (fichiers, shards, fichier empaqueté, Parquet) avec des compteurs (chapitre 4, lab 8.2).</li>
+<li>Diagnostiquer un entraînement limité par ses données : part d'attente, workers, CPU, profileur (chapitre 5, lab 8.1).</li>
+<li>Modéliser le coût bloquant d'un checkpoint synchrone et asynchrone, et dimensionner son débit (chapitre 6, lab 8.3).</li>
+<li>Prévoir le taux de succès d'un cache et concevoir un cache à plusieurs niveaux (chapitre 7).</li>
+<li>Planifier capacité, rétention, quotas et sauvegardes d'un programme d'entraînement (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Huit séances de 3 h, soit 24 h. Chaque séance contient ses chapitres, son lab (ou sa partie de lab) et ses exercices dans sa durée, avec une marge. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé : il ne diminue jamais.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3 h</td>
+<td>1</td>
+<td>ch. 1 Besoins d'E/S d'un entraînement ; questions de positionnement</td>
+<td>Lab 8.4 partie A ; Ex. 1, 2</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3 h</td>
+<td>1</td>
+<td>ch. 2 Systèmes de fichiers parallèles ; ch. 3 NFS, objet, FUSE</td>
+<td>Ex. 3, 4, 5</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 4 Formats de données</td>
+<td>Lab 8.2 partie A ; Ex. 6</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 5 Chargeurs de données</td>
+<td>Lab 8.2 partie B ; Ex. 7</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>3 h</td>
+<td>2</td>
+<td>révision des chapitres 4 et 5</td>
+<td>Lab 8.1 ; Ex. 8</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>3 h</td>
+<td>2</td>
+<td>ch. 6 E/S de checkpoint</td>
+<td>Lab 8.3 parties A, B et D ; Ex. 9</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 7 Mise en cache</td>
+<td>Lab 8.3 partie C ; Lab 8.4 partie B</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 8 Capacité, durée de vie, coût ; checkpoint de sortie</td>
+<td>Ex. 10, 11, 12</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.</p>
+<ol type="1">
+<li><p><strong>Où est le débit ?</strong> Un entraînement de texte déjà découpé en jetons de 2 octets tourne sur 256 GPU, chacun consommant 8 000 jetons par seconde. Quel débit de lecture cela représente-t-il ? Et le checkpoint d'un modèle de 70 milliards de paramètres, à 14 octets par paramètre ?</p></li>
+<li><p><strong>Petits fichiers.</strong> Pourquoi lire 4 096 fichiers de 16 Kio est-il plus coûteux que lire une archive de 64 Mio qui contient les mêmes octets, même sur un disque rapide ?</p></li>
+<li><p><strong>Attente.</strong> Un job laisse ses GPU inactifs 85 % du temps, en attente de données. Quelle est la première mesure à faire avant d'ajouter des workers au chargeur ?</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p>Le texte demande <span class="math inline">256 \times 8000 \times 2 = 4{,}1</span> Mo/s, soit presque rien : la lecture d'un jeu de texte pré-tokenisé n'est pas le problème. Le checkpoint pèse <span class="math inline">70 \cdot 10^{9} \times 14 = 980</span> Go, qu'il faut écrire en rafale. C'est lui qui dimensionne le stockage (chapitres 1 et 6).</p></li>
+<li><p>Chaque fichier coûte au moins une ouverture, une lecture et une fermeture, soit des opérations de métadonnées et des requêtes de petite taille. Le temps d'une requête vaut <span class="math inline">\alpha + n/B</span> : pour <span class="math inline">n</span> petit, c'est la latence <span class="math inline">\alpha</span> qui domine (chapitres 3 et 4).</p></li>
+<li><p>Mesurer où le temps d'attente passe : la part d'attente (<em>stall</em>) de la boucle, puis le CPU réellement consommé par les workers. Des workers qui dorment sont limités par la latence ; des workers à 100 % de CPU sont limités par le calcul de prétraitement, et en ajouter ne sert à rien (chapitre 5).</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. Besoins d'E/S d'un entraînement</h2>
+<p>Avant de choisir un système de fichiers, il faut savoir ce qui doit y passer. Ce chapitre découpe l'entraînement en quatre flux d'E/S, rappelle les trois grandeurs qui les décrivent et pose les deux formules de dimensionnement qui servent dans tout le module.</p>
+<h3 id="quatre-flux">1.1. Quatre flux</h3>
+<p>Un entraînement n'a pas <em>une</em> charge de stockage, mais quatre, qui n'ont ni les mêmes motifs d'accès ni les mêmes victimes.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Flux</th>
+<th>Motif d'accès</th>
+<th>Ce qui le rend difficile</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Jeu de données</td>
+<td>lecture, répétée à chaque époque, souvent dans un ordre aléatoire</td>
+<td>latence par échantillon, nombre de fichiers, cache</td>
+</tr>
+<tr class="even">
+<td>Checkpoint</td>
+<td>écriture en rafale par tous les rangs à la fois, relecture à la reprise</td>
+<td>débit agrégé ; bloque l'entraînement</td>
+</tr>
+<tr class="odd">
+<td>Journaux et métriques</td>
+<td>petites écritures continues, parfois dans un fichier partagé</td>
+<td>verrous, nombre de fichiers créés</td>
+</tr>
+<tr class="even">
+<td>Artefacts (code, conteneurs, environnements)</td>
+<td>lecture simultanée par tous les nœuds au démarrage</td>
+<td>tous les nœuds demandent les mêmes fichiers au même instant</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le jeu de données est un flux <strong>chronique</strong> : il dure toute la campagne et son débit se lisse. Le checkpoint est un flux <strong>aigu</strong> : il est bref, synchronisé entre tous les rangs, et c'est son pic qui dimensionne le stockage. Les deux autres sont petits en octets mais grands en nombre d'opérations.</p>
+<h3 id="trois-grandeurs-un-modèle">1.2. Trois grandeurs, un modèle</h3>
+<p>Trois grandeurs décrivent un accès au stockage : le <strong>débit</strong> <span class="math inline">B</span> en octets par seconde, la <strong>latence</strong> <span class="math inline">\alpha</span> du premier octet, et le <strong>nombre d'opérations</strong> par seconde (IOPS pour les blocs, opérations de métadonnées pour les fichiers). Le temps d'une requête de <span class="math inline">n</span> octets vaut</p>
+<p><span class="math display">T(n) = \alpha + \frac{n}{B}</span></p>
+<p>C'est le modèle α-β du <a href="../perf-models/index.html#ch6">chapitre 6 du module 2</a> ; la loi de Little du <a href="../linux-systems/index.html#ch7">chapitre 7 du module 1</a> relie le nombre de requêtes en vol au débit et à la latence. De ces formules sort la <strong>taille de demi-performance</strong> <span class="math inline">n_{1/2} = \alpha B</span> : une requête de cette taille n'atteint que la moitié du débit maximal, une requête dix fois plus petite en atteint moins de 10 %.</p>
+<p>Retenez la conséquence : un système peut afficher un débit maximal élevé et délivrer très peu à qui lui envoie de petites requêtes. Le chapitre 4 mesure ce phénomène sur un disque.</p>
+<h3 id="dimensionner-la-lecture">1.3. Dimensionner la lecture</h3>
+<p>Le débit de lecture à fournir est le produit du nombre de consommateurs, du rythme de chacun et de la taille d'un échantillon :</p>
+<p><span class="math display">B_{\text{lecture}} = N_{\text{GPU}} \times r_{\text{échantillons/s}} \times s_{\text{octets}}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Texte, images, vidéo sur 256 GPU</span> Les entrées sont des <strong>valeurs d'exemple</strong>, pas des mesures de produits. Calculées avec <code>iosizing.py demo</code> (lab 8.4).</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Charge</th>
+<th>Hypothèses par GPU</th>
+<th>Débit agrégé</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>texte tokenisé</td>
+<td>8 000 jetons/s, 2 octets par jeton</td>
+<td>4,1 Mo/s</td>
+</tr>
+<tr class="even">
+<td>images</td>
+<td>3 000 images/s, 110 ko par image</td>
+<td>84,5 Go/s</td>
+</tr>
+<tr class="odd">
+<td>clips vidéo</td>
+<td>20 clips/s, 2 Mo par clip</td>
+<td>10,2 Go/s</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le texte pré-tokenisé demande un débit négligeable ; les images en demandent plus de vingt mille fois plus. Deux charges de « calcul d'IA » n'ont donc pas le même problème de stockage. Pour le texte, ce sont le nombre de fichiers et le checkpoint qui comptent ; pour les images et la vidéo, c'est aussi le débit.</p>
+</div>
+<p>Le débit moyen ne dit rien du nombre de fichiers : 3 000 images par seconde sur 256 GPU, ce sont près de 770 000 ouvertures de fichier par seconde si chaque image est un fichier. Les chapitres 2 à 4 reviennent sur ce point.</p>
+<h3 id="dimensionner-le-checkpoint">1.4. Dimensionner le checkpoint</h3>
+<p>Pour un modèle de <span class="math inline">\Psi</span> paramètres entraîné avec Adam en précision mixte, le <a href="https://arxiv.org/abs/1910.02054">papier ZeRO</a> compte 2 octets par paramètre pour les poids en demi-précision, 2 pour les gradients et 12 pour l'état de l'optimiseur. Un checkpoint n'a pas besoin des gradients : on retient ici <span class="math inline">14\Psi</span> octets, comme au <a href="../fault-tolerance/index.html#ch2">chapitre 2 du module 10</a>.</p>
+<p>Si l'écriture doit tenir dans une fraction <span class="math inline">f</span> de la période <span class="math inline">\tau</span> entre deux checkpoints, le débit d'écriture agrégé requis est</p>
+<p><span class="math display">B_{\text{écriture}} = \frac{S}{f \, \tau}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 1.2 — Un modèle de 70 milliards de paramètres</span> L'état pèse <span class="math inline">70 \cdot 10^{9} \times 14 = 980</span> Go. Avec une période de 30 minutes et une écriture limitée à 10 % de la période (180 s), il faut <span class="math inline">980 / 180 = 5{,}4</span> Go/s en écriture agrégée. Pour relire tout l'état en 120 s à la reprise, il faut 8,2 Go/s en lecture. Calculé avec <code>iosizing.py demo</code>.</p>
+<p>Comparez avec l'exemple 1.1 : pour du texte, le stockage est dimensionné par <strong>un checkpoint toutes les demi-heures</strong>, pas par la lecture du jeu de données.</p>
+</div>
+<div class="war">
+<p><span class="tag">Des écritures de checkpoint en rafale saturent le réseau de stockage</span> Le rapport Llama 3 (section 3.3.1) décrit le stockage d'entraînement de Meta : le système de fichiers distribué Tectonic offre 240 Po sur 7 500 serveurs équipés de SSD, avec un débit soutenable de 2 To/s et un pic de 7 To/s. Les auteurs écrivent : « A major challenge is supporting the highly bursty checkpoint writes that saturate the storage fabric for short durations. » L'état de modèle par GPU va de 1 Mo à 4 Go. Source : <a href="https://arxiv.org/abs/2407.21783">Dubey et al., 2024</a>, lu le 24 octobre 2026.</p>
+</div>
+<h3 id="journaux-et-artefacts">1.5. Journaux et artefacts</h3>
+<p>Les journaux ne dépendent pas du débit mais de la discipline : un fichier par rang évite les verrous d'un fichier partagé, au prix de nombreux fichiers. Les artefacts posent le problème inverse : tous les nœuds lisent le même conteneur ou le même environnement Python au démarrage, ce qui concentre la charge sur les mêmes fichiers. La parade est de copier une fois vers un stockage local ou un cache (chapitre 7), pas d'augmenter le débit du serveur.</p>
+<p>Le lab 8.4 contient les fonctions de dimensionnement de ce chapitre sous forme de code testé. La partie A vous fait refaire les exemples 1.1 et 1.2 avec vos propres chiffres.</p>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li>Quatre flux : jeu de données (chronique), checkpoint (aigu), journaux, artefacts. Chacun a son motif d'accès.</li>
+<li>Le temps d'une requête vaut <span class="math inline">\alpha + n/B</span> ; la taille de demi-performance <span class="math inline">\alpha B</span> dit à partir de quelle taille de requête le débit est bon.</li>
+<li>Lecture : consommateurs × rythme × taille ; checkpoint : <span class="math inline">S/(f\tau)</span> avec <span class="math inline">S = 14\Psi</span> octets.</li>
+<li>Pour du texte tokenisé, le checkpoint dimensionne le stockage ; pour des images ou de la vidéo, la lecture compte aussi.</li>
+<li>Le débit moyen ne dit rien du nombre d'opérations de métadonnées.</li>
+</ul>
+</div>
+<h2 id="ch2">2. Systèmes de fichiers parallèles</h2>
+<p>Un seul serveur de fichiers plafonne en débit et en opérations. Un système de fichiers parallèle répartit les données sur de nombreux serveurs et les métadonnées sur d'autres, pour que des centaines de clients lisent et écrivent en même temps.</p>
+<h3 id="le-principe-séparer-métadonnées-et-données">2.1. Le principe : séparer métadonnées et données</h3>
+<p>La documentation de BeeGFS l'énonce ainsi : le système « combines multiple storage servers to provide a highly scalable shared network file system with striped file contents », grâce à une séparation des métadonnées et du contenu. Les serveurs de stockage conservent des morceaux du contenu des fichiers ; les serveurs de métadonnées coordonnent le placement et informent les clients ; les clients contactent <strong>directement</strong> les serveurs de stockage pour les E/S.</p>
+<p>Le <a href="https://doc.lustre.org/lustre_manual.xhtml">manuel de Lustre</a> décrit la même architecture avec d'autres noms. Un serveur de métadonnées (MDS) gère les noms et les répertoires, stockés sur une ou plusieurs cibles de métadonnées (MDT). Un serveur de stockage d'objets (OSS) assure les E/S de fichiers pour une ou plusieurs cibles de stockage (OST) ; le manuel indique qu'un OSS sert en général de deux à huit OST de 16 Tio au plus.</p>
+<figure class="fig">
+<svg viewBox="0 0 560 330" role="img" aria-labelledby="pfs-t pfs-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="pfs-t">
+Système de fichiers parallèle et striping
+</title>
+<desc id="pfs-d">Des clients envoient les opérations de métadonnées au serveur de métadonnées et lisent ou écrivent les données directement sur plusieurs cibles de stockage. Un fichier est découpé en blocs répartis en tourniquet sur quatre cibles.</desc> <rect x="20" y="14" width="100" height="40" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="70.0" y="39.0" text-anchor="middle" font-size="14" fill="currentColor">client 1</text> <rect x="140" y="14" width="100" height="40" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="190.0" y="39.0" text-anchor="middle" font-size="14" fill="currentColor">client 2</text> <rect x="260" y="14" width="100" height="40" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="310.0" y="39.0" text-anchor="middle" font-size="14" fill="currentColor">client 3</text> <text x="390" y="39" font-size="14" fill="currentColor">… N clients</text> <line x1="20" y1="80" x2="540" y2="80" stroke="currentColor" stroke-width="3"/> <text x="280" y="74" text-anchor="middle" font-size="14" fill="currentColor">réseau</text> <rect x="20" y="110" width="150" height="56" fill="var(--accent)" fill-opacity=".35" stroke="currentColor" stroke-width="1.5"/> <text x="95.0" y="135.0" text-anchor="middle" font-size="14" fill="currentColor">serveur de</text> <text x="95.0" y="152.0" text-anchor="middle" font-size="14" fill="currentColor">métadonnées</text> <text x="95" y="188" text-anchor="middle" font-size="14" fill="currentColor">noms, répertoires,</text><text x="95" y="206" text-anchor="middle" font-size="14" fill="currentColor">placement des blocs</text> <rect x="200" y="110" width="76" height="56" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="238.0" y="135.0" text-anchor="middle" font-size="14" fill="currentColor">cible 0</text> <text x="238.0" y="152.0" text-anchor="middle" font-size="14" fill="currentColor">données</text> <rect x="288" y="110" width="76" height="56" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="326.0" y="135.0" text-anchor="middle" font-size="14" fill="currentColor">cible 1</text> <text x="326.0" y="152.0" text-anchor="middle" font-size="14" fill="currentColor">données</text> <rect x="376" y="110" width="76" height="56" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="414.0" y="135.0" text-anchor="middle" font-size="14" fill="currentColor">cible 2</text> <text x="414.0" y="152.0" text-anchor="middle" font-size="14" fill="currentColor">données</text> <rect x="464" y="110" width="76" height="56" fill="currentColor" fill-opacity=".10" stroke="currentColor" stroke-width="1.5"/> <text x="502.0" y="135.0" text-anchor="middle" font-size="14" fill="currentColor">cible 3</text> <text x="502.0" y="152.0" text-anchor="middle" font-size="14" fill="currentColor">données</text> <line x1="95" y1="54" x2="95" y2="110" stroke="currentColor" stroke-dasharray="5 4"/> <line x1="238" y1="80" x2="238" y2="110" stroke="currentColor"/> <line x1="326" y1="80" x2="326" y2="110" stroke="currentColor"/> <line x1="414" y1="80" x2="414" y2="110" stroke="currentColor"/> <line x1="502" y1="80" x2="502" y2="110" stroke="currentColor"/> <text x="372" y="188" text-anchor="middle" font-size="14" fill="currentColor">les clients lisent et écrivent les données</text><text x="372" y="206" text-anchor="middle" font-size="14" fill="currentColor">directement sur les cibles</text> <text x="20" y="250" font-size="14" font-weight="700" fill="currentColor">un fichier de 8 blocs, nombre de cibles = 4 :</text> <rect x="20" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.15" stroke="currentColor"/> <text x="51" y="282" text-anchor="middle" font-size="14" fill="currentColor">b0 → c0</text> <rect x="84" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.3" stroke="currentColor"/> <text x="115" y="282" text-anchor="middle" font-size="14" fill="currentColor">b1 → c1</text> <rect x="148" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.44999999999999996" stroke="currentColor"/> <text x="179" y="282" text-anchor="middle" font-size="14" fill="currentColor">b2 → c2</text> <rect x="212" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.6" stroke="currentColor"/> <text x="243" y="282" text-anchor="middle" font-size="14" fill="currentColor">b3 → c3</text> <rect x="276" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.15" stroke="currentColor"/> <text x="307" y="282" text-anchor="middle" font-size="14" fill="currentColor">b4 → c0</text> <rect x="340" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.3" stroke="currentColor"/> <text x="371" y="282" text-anchor="middle" font-size="14" fill="currentColor">b5 → c1</text> <rect x="404" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.44999999999999996" stroke="currentColor"/> <text x="435" y="282" text-anchor="middle" font-size="14" fill="currentColor">b6 → c2</text> <rect x="468" y="262" width="62" height="30" fill="var(--accent)" fill-opacity="0.6" stroke="currentColor"/> <text x="499" y="282" text-anchor="middle" font-size="14" fill="currentColor">b7 → c3</text> <text x="20" y="318" font-size="14" fill="currentColor">bloc k sur la cible k mod 4 : quatre cibles se partagent le débit du fichier</text>
+</svg>
+<figcaption>
+Architecture commune des systèmes de fichiers parallèles : les métadonnées passent par un serveur dédié, les données par les cibles de stockage. Ici un fichier de huit blocs est réparti en tourniquet sur quatre cibles (valeurs de l'illustration, pas d'un système réel).
+</figcaption>
+</figure>
+<h3 id="le-striping">2.2. Le striping</h3>
+<p>Le <strong>striping</strong> découpe un fichier en blocs de taille fixe répartis en tourniquet sur plusieurs cibles. Deux paramètres le règlent : le nombre de cibles (<em>stripe count</em>) et la taille d'un bloc (<em>stripe size</em>). Le manuel de Lustre indique que les valeurs par défaut du système sont de <strong>1</strong> cible et de <strong>1 Mo</strong>, modifiables par répertoire ou par fichier avec <code>lfs setstripe -c</code>.</p>
+<p>La documentation de BeeGFS donne un exemple de répertoire configuré en <code>RAID0</code> avec 4 cibles et des blocs de 1 Mio, modifiable avec <code>beegfs entry set --num-targets=… --chunk-size=…</code> ; ces réglages s'appliquent aux <strong>nouveaux</strong> fichiers du répertoire, pas à ceux qui existent déjà.</p>
+<p>La règle de pouce du manuel de Lustre est de « stripe over as few objects as will meet those needs and no more ». Répartir sur plus de cibles accroît le débit possible d'<strong>un</strong> fichier, mais coûte ailleurs.</p>
+<ul>
+<li><strong>Pour augmenter le striping :</strong> un fichier très grand ou accédé par de nombreux nœuds à la fois a besoin de plus de bande passante que ne peut en fournir un seul OSS.</li>
+<li><strong>Contre :</strong> plus de verrous et d'opérations réseau pour <code>stat</code> et <code>unlink</code> ; plus de contention sur les serveurs ; un risque accru (la panne d'un serveur abîme une partie de <em>chaque</em> fichier réparti partout) ; aucun bénéfice pour les petits fichiers.</li>
+</ul>
+<p>Un fichier écrit par plusieurs nœuds pose un problème de plus : si plus d'un client écrit dans un même bloc, ils se disputent le verrou, même quand leurs écritures ne se recouvrent pas. Le manuel recommande d'aligner les E/S sur les blocs, et depuis Lustre 2.13 de pouvoir placer plus d'un bloc par cible (<em>overstriping</em>).</p>
+<h3 id="dimensionner-le-striping">2.3. Dimensionner le striping</h3>
+<p>Si un fichier doit être lu ou écrit à <span class="math inline">B_{\text{req}}</span> et qu'une cible délivre <span class="math inline">b</span>, il faut au moins</p>
+<p><span class="math display">k = \left\lceil \frac{B_{\text{req}}}{b} \right\rceil</span></p>
+<p>cibles. Le manuel donne une borne voisine, raisonnée par serveur : le plus grand nombre de cibles utile est borné par le débit que demandent les clients divisé par la performance d'un OSS. Au-delà, on ajoute des coûts sans gain.</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Combien de cibles pour un fichier de checkpoint ?</span> Valeurs d'exemple. On veut écrire un fichier partagé à 6 Go/s ; une cible délivre 1,5 Go/s. Il faut <span class="math inline">\lceil 6/1{,}5 \rceil = 4</span> cibles. Avec le striping par défaut (1 cible), le fichier plafonne à 1,5 Go/s, soit quatre fois trop peu.</p>
+<p>Le débit <strong>agrégé</strong> d'un système est borné par le côté le plus étroit : avec 64 clients de 2,5 Go/s et 12 serveurs de 15 Go/s, il vaut <span class="math inline">\min(160, 180) = 160</span> Go/s, limité par les clients. Calculé avec <code>iosizing.py demo</code>.</p>
+</div>
+<h3 id="les-métadonnées-goulot-silencieux">2.4. Les métadonnées, goulot silencieux</h3>
+<p>Chaque <code>open</code>, <code>stat</code> ou <code>unlink</code> passe par le serveur de métadonnées. Un jeu de données de dix millions de fichiers, lu une fois par époque avec trois opérations par fichier (ouverture, lecture des attributs, fermeture), fait <span class="math inline">3 \cdot 10^{7}</span> opérations de métadonnées par époque. Le débit des données ne les accélère pas : c'est le rythme du serveur de métadonnées, exprimé en opérations par seconde, qui les borne.</p>
+<p>Deux mécanismes atténuent le problème. Les métadonnées peuvent être <strong>réparties</strong> sur plusieurs serveurs (BeeGFS le permet, Lustre le fait avec plusieurs MDT). Et, depuis Lustre 2.11, la fonction <em>Data on MDT</em> place les petits fichiers directement sur la cible de métadonnées, ce qui « improves small file IO ». La vraie parade reste de ne pas créer des millions de petits fichiers (chapitre 4).</p>
+<div class="war">
+<p><span class="tag">Une configuration documentée : un seul OST par défaut, parce que les petits fichiers dominent</span> La page du système de fichiers de travail de Perlmutter au NERSC décrit un système Lustre tout flash de 44 Po, d'un débit agrégé supérieur à 6 To/s et de 4 millions d'IOPS (accès aléatoires de 4 Kio), avec 16 serveurs de métadonnées et 370 OST. Elle précise : « By default files on Perlmutter are striped across a single OST. Given the large number of small files on our system, this is a compromise ». Source : <a href="https://docs.nersc.gov/filesystems/perlmutter-scratch/">NERSC, Perlmutter scratch</a>, lu le 24 octobre 2026.</p>
+</div>
+<h3 id="quatre-systèmes-honnêtement">2.5. Quatre systèmes, honnêtement</h3>
+<p>Ce tableau ne contient que ce que ce module a <strong>lu à la source</strong> le 24 octobre 2026. Il ne classe pas les produits : aucun banc d'essai comparatif n'a été lu, et les chiffres de débit des fournisseurs ne se comparent pas d'une page à l'autre.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Système</th>
+<th>Ce que la documentation lue établit</th>
+<th>Réglage de répartition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lustre</td>
+<td>clients, serveurs de métadonnées (MDS, MDT) et de stockage (OSS, OST) ; Data on MDT depuis 2.11 ; quotas utilisateur, groupe et projet</td>
+<td>nombre et taille de blocs, par répertoire ou par fichier ; défaut 1 cible et 1 Mo</td>
+</tr>
+<tr class="even">
+<td>BeeGFS</td>
+<td>services client, métadonnées, stockage et gestion ; clients en contact direct avec le stockage ; métadonnées répartissables ; module noyau côté client</td>
+<td>nombre de cibles et taille de bloc par répertoire</td>
+</tr>
+<tr class="odd">
+<td>GPFS / IBM Storage Scale</td>
+<td><strong>non relu</strong> : la documentation d'IBM a répondu HTTP 403 depuis le bac à sable</td>
+<td>à vérifier à la source</td>
+</tr>
+<tr class="even">
+<td>WEKA</td>
+<td>système de fichiers parallèle distribué (la page lue nomme le produit « NeuralMesh by WEKA »), exécuté dans l'espace utilisateur en conteneurs Linux, cohérence forte et compatibilité POSIX complète annoncées ; quotas, instantanés et hiérarchisation vers un stockage objet</td>
+<td>non relu en détail</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Ce que ces systèmes ont en commun compte plus que ce qui les distingue : une séparation des métadonnées, un débit qui croît avec le nombre de serveurs, et un motif d'accès idéal fait de <strong>gros</strong> fichiers lus ou écrits par <strong>gros</strong> morceaux.</p>
+<h3 id="comment-choisir">2.6. Comment choisir</h3>
+<p>Le choix se joue sur la charge, pas sur la marque. Posez cinq questions avant de comparer des offres : quel est le nombre de fichiers du jeu de données et leur taille médiane ? Quel pic de checkpoint (chapitre 1) ? Combien de clients simultanés ? Qui exploitera le système, avec quelle expérience ? Quel test de recette le fournisseur accepte-t-il de passer sur vos motifs d'accès (chapitre 6, section 6.7) ?</p>
+<p>Un fournisseur qui répond par un débit maximal agrégé sans dire la taille de requête ni le nombre de clients ne répond pas à la question : l'exemple 1.1 montre pourquoi.</p>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li>Un système de fichiers parallèle sépare métadonnées et données ; les clients parlent directement aux serveurs de stockage.</li>
+<li>Le striping répartit un fichier en tourniquet : règle de pouce de Lustre, « as few objects as will meet those needs and no more ».</li>
+<li>Cibles nécessaires : <span class="math inline">\lceil B_{\text{req}}/b \rceil</span> ; débit agrégé : le minimum du côté clients et du côté serveurs.</li>
+<li>Les métadonnées sont le goulot silencieux : des millions de petits fichiers coûtent en opérations, pas en octets.</li>
+<li>Ce module n'a pas relu GPFS à la source ; ne comparez pas des chiffres de fournisseurs sans la taille de requête.</li>
+</ul>
+</div>
+<h2 id="ch3">3. NFS, objet (S3), FUSE et caches</h2>
+<p>Les systèmes parallèles du chapitre 2 ne sont pas le seul endroit où vivent les données. Les répertoires personnels, les environnements Python et souvent les jeux de données sont sur NFS ; les jeux de données massifs et les checkpoints archivés sont de plus en plus dans un stockage objet. Chacun offre des garanties différentes, et une erreur de garantie se paie en corruption silencieuse plus qu'en lenteur.</p>
+<h3 id="nfs-et-la-cohérence-à-la-fermeture">3.1. NFS et la cohérence à la fermeture</h3>
+<p>NFS expose à un client un répertoire exporté par un serveur. Sa garantie de cohérence est volontairement faible. La page <code>nfs(5)</code> la décrit comme la <em>close-to-open consistency</em> : à l'ouverture d'un fichier, le client envoie une requête <code>GETATTR</code> ou <code>ACCESS</code> « regardless of the freshness of the file's cached attributes » ; à la fermeture, il écrit au serveur les modifications en attente, pour que l'ouvreur suivant les voie. Le comportement se désactive avec l'option <code>nocto</code>.</p>
+<p>Les conséquences sont concrètes. Un fichier écrit par un nœud puis fermé est visible d'un autre nœud qui l'ouvre ensuite : un checkpoint écrit puis relu est sûr. Un lecteur qui garde un fichier ouvert, ou un journal suivi en direct depuis un autre nœud, peut voir des données périmées. Le cache d'attributs (<code>acregmin</code>, <code>acregmax</code>, <code>acdirmin</code>, <code>acdirmax</code>, ou <code>actimeo</code> pour tous à la fois) ajoute une fenêtre de péremption sur les listages de répertoires.</p>
+<p>Côté débit, un serveur NFS classique est un point unique : son réseau et ses disques bornent ce que tous les clients obtiennent ensemble. L'option <code>nconnect=n</code> ouvre plusieurs connexions TCP entre client et serveur, « up to a limit of 16 », ce qui aide quand le client dispose de plusieurs cartes réseau ; elle ne crée pas de bande passante serveur.</p>
+<h3 id="le-stockage-objet">3.2. Le stockage objet</h3>
+<p>Un stockage objet range des objets entiers sous des clés. On lit un objet (ou une plage d'octets), on en écrit un nouveau, on le supprime ; on ne modifie pas un objet en place et il n'y a pas de renommage atomique. Amazon S3 fournit, selon son guide, « strong read-after-write consistency for PUT and DELETE requests of objects » dans toutes les régions ; les listages, métadonnées et étiquettes sont eux aussi fortement cohérents.</p>
+<p>Le débit passe par le <strong>parallélisme</strong>. Le guide de performance indique qu'une application peut atteindre « at least 3,500 PUT/COPY/POST/DELETE or 5,500 GET/HEAD requests per second per partitioned Amazon S3 prefix », sans limite au nombre de préfixes, et que la montée en charge est progressive.</p>
+<p>La latence du premier octet d'un GET est élevée devant celle d'un disque local, donc la taille de demi-performance <span class="math inline">\alpha B</span> est grande : on lit par <strong>grandes plages</strong> et on garde beaucoup de requêtes en vol. La loi de Little donne la concurrence nécessaire : requêtes en vol = débit de requêtes × latence moyenne.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — 20 Go/s depuis un magasin d'objets</span> Valeurs d'exemple pour la cible ; 5 500 GET/s par préfixe est le <strong>minimum</strong> documenté ci-dessus (« at least »), pas un plafond : on le prend ici comme hypothèse prudente. Calculé avec <code>iosizing.py</code>.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Taille d'une requête</th>
+<th>Requêtes par seconde pour 20 Go/s</th>
+<th>Préfixes nécessaires</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>plages de 8 Mio</td>
+<td>2 384</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>objets de 128 Kio</td>
+<td>152 588</td>
+<td>28</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>La même charge demande soixante-quatre fois plus de requêtes quand les objets sont soixante-quatre fois plus petits. Le gain des gros objets ne vient pas du réseau : il vient de la réduction du nombre de requêtes, donc de la latence cumulée et du coût de facturation par requête.</p>
+</div>
+<div class="war">
+<p><span class="tag">Un stockage objet qui monte en charge renvoie des erreurs 503</span> Le guide de performance d'Amazon S3 précise que la montée en charge « happens gradually and is not instantaneous » et que, pendant que S3 s'adapte à un débit de requêtes plus élevé, l'application peut voir des erreurs <code>503 (Slow Down)</code>. Un chargeur de données qui passe d'un coup de zéro à des dizaines de milliers de GET par seconde doit donc réessayer avec un délai croissant, pas échouer. Source : <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html">guide de l'utilisateur d'Amazon S3, optimisation des performances</a>, lu le 24 octobre 2026.</p>
+</div>
+<h3 id="fuse-un-système-de-fichiers-qui-nen-est-pas-tout-à-fait-un">3.3. FUSE : un système de fichiers qui n'en est pas tout à fait un</h3>
+<p>FUSE permet à un processus utilisateur de répondre aux opérations de fichiers du noyau ; c'est ainsi qu'on monte un magasin d'objets comme un répertoire. Ce confort a un prix : la sémantique d'un magasin d'objets ne se laisse pas toute émuler.</p>
+<p>Le dépôt de Mountpoint pour Amazon S3 documente ses choix. Le client est optimisé pour la lecture séquentielle de gros objets, avec plusieurs requêtes concurrentes quand la lecture est séquentielle ; il accepte les lectures aléatoires. Il crée de nouveaux objets par écritures séquentielles depuis le début du fichier. Il ne supporte pas <code>rename</code> sur un bucket général, car cela exigerait de nombreux appels ; il ne gère ni lien physique ni lien symbolique ; la suppression est désactivée par défaut (option <code>--allow-delete</code>).</p>
+<div class="war">
+<p><span class="tag">Le protocole « fichier temporaire puis renommage » ne fonctionne pas sur un montage objet</span> Le <a href="https://raw.githubusercontent.com/awslabs/mountpoint-s3/main/doc/SEMANTICS.md">document de sémantique de Mountpoint</a> (lu le 24 octobre 2026) indique que le renommage n'est pas émulé sur les buckets généraux. Un code de checkpoint qui écrit <code>ckpt.tmp</code> puis le renomme échoue ou se comporte autrement sur un tel montage. Le motif adapté est celui du <a href="../fault-tolerance/index.html#ch3">chapitre 3 du module 10</a> : écrire le manifeste en dernier et n'accepter qu'une version dont le manifeste existe.</p>
+</div>
+<h3 id="une-comparaison-honnête">3.4. Une comparaison honnête</h3>
+<p>Le tableau compare des <strong>garanties</strong>, pas des vitesses. Les vitesses se mesurent chez vous (section suivante) ; aucun chiffre de débit ou de latence de fournisseur n'est repris ici.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Critère</th>
+<th>NFS</th>
+<th>Système de fichiers parallèle</th>
+<th>Stockage objet</th>
+<th>Objet monté par FUSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cohérence</td>
+<td>à la fermeture (<em>close-to-open</em>), cache d'attributs</td>
+<td>POSIX ; Lustre applique par défaut la cohérence POSIX</td>
+<td>forte, lecture après écriture (S3)</td>
+<td>celle de l'objet, avec des cas limites documentés</td>
+</tr>
+<tr class="even">
+<td>Renommage atomique</td>
+<td>oui</td>
+<td>oui</td>
+<td>non</td>
+<td>non sur un bucket général (Mountpoint)</td>
+</tr>
+<tr class="odd">
+<td>Débit qui croît avec la taille</td>
+<td>non : borné par le serveur</td>
+<td>oui : plus de serveurs, plus de débit</td>
+<td>oui : plus de préfixes et de connexions</td>
+<td>dépend du client</td>
+</tr>
+<tr class="even">
+<td>Petits fichiers</td>
+<td>un aller-retour par ouverture</td>
+<td>métadonnées partagées, goulot du chapitre 2</td>
+<td>une requête par objet</td>
+<td>une requête par objet, plus le coût FUSE</td>
+</tr>
+<tr class="odd">
+<td>À mesurer d'abord</td>
+<td><span class="math inline">\alpha</span> et <span class="math inline">B</span> sur un montage</td>
+<td><span class="math inline">\alpha</span>, <span class="math inline">B</span>, opérations de métadonnées</td>
+<td>latence du premier octet, requêtes par seconde</td>
+<td>débit séquentiel du client</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="mesurer-les-trois-nombres-de-votre-stockage">3.5. Mesurer les trois nombres de votre stockage</h3>
+<p>La méthode est la même pour tout stockage : mesurer <span class="math inline">\alpha</span>, <span class="math inline">B</span> et la taille de demi-performance avec des requêtes de taille croissante. Le lab 8.2 (partie B) le fait avec <code>fio</code> sur un fichier de 512 Mio en <code>O_DIRECT</code>, profondeur de file 1, et ajuste <span class="math inline">T = \alpha + n/B</span>. Pour un autre système, lancez <code>python3 fio_gap.py --dir &lt;point de montage&gt;</code> ; un montage NFS n'a <strong>pas</strong> été testé ici.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.2 — Les trois nombres du disque du bac à sable</span> Capturé sur la VM de test (4 vCPU, disque virtuel <code>virtio</code>, 2026-10-24), <code>fio_gap.py</code>, lectures aléatoires en <code>O_DIRECT</code> à profondeur de file 1 :</p>
+<pre class="text"><code>pattern      bs      IOPS       MiB/s  mean lat us
+read         1M      1692        1692        589.3
+randread     1M      1568        1568        635.2
+randread   128k      9605        1201        103.1
+randread    16k     15162         237         64.9
+randread     4k     17043          67         57.7
+alpha-beta fit on random reads: alpha = 55 us, B = 1936 MiB/s, half-performance size = 109 KiB, median error 8 %
+gap: sequential 1M reads give 25x the bandwidth of random 4k reads</code></pre>
+<p>Deux lectures. D'abord, des requêtes de 4 Kio donnent 67 Mio/s sur un disque capable de 1 700 Mio/s : un facteur 25 d'écart qui vient entièrement de la taille de la requête. Ensuite, la lecture aléatoire de 1 Mio vaut la séquentielle : ce disque virtuel n'a pas de pénalité de déplacement de tête. Sur un disque rotatif ou un système de fichiers réseau, il y en aurait une en plus.</p>
+<p>Ces valeurs sont celles <strong>de ce bac à sable</strong>, pas celles d'un stockage de production, et elles bougent : sur huit exécutions du lab, <span class="math inline">n_{1/2}</span> a valu de 91 à 122 Kio et l'écart de 21 à 27 fois.</p>
+</div>
+<h3 id="le-coût-dun-stockage">3.6. Le coût d'un stockage</h3>
+<p>Le coût d'un stockage se décompose en trois lignes : la capacité (prix du To par mois, multiplié par le nombre de copies), les requêtes (surtout pour l'objet) et les sorties de données hors de la région ou du fournisseur. Ce module ne cite <strong>aucun prix</strong> : lisez la page de prix du fournisseur le jour de votre calcul, et relisez-la avant chaque engagement.</p>
+<p>Ce qu'un module de stockage peut affirmer sans prix, c'est l'effet de vos choix sur le <strong>nombre de requêtes</strong>. Un téraoctet en objets de 100 ko se lit en <span class="math inline">10^{7}</span> requêtes ; le même téraoctet en plages de 16 Mio, en environ 59 600, soit près de 170 fois moins. Si votre facture contient un prix par requête, cet écart se retrouve sur la ligne correspondante.</p>
+<div class="key">
+<p><span class="tag">Lire la garantie avant d'y poser un protocole</span> NFS garantit la cohérence à la fermeture, S3 la lecture après écriture, un montage FUSE moins que les deux. Un protocole de checkpoint qui suppose le renommage atomique ne tient pas sur tous.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>NFS : cohérence à la fermeture (<code>nocto</code> la désactive), cache d'attributs, débit borné par le serveur ; <code>nconnect</code> jusqu'à 16 connexions.</li>
+<li>S3 : cohérence forte lecture après écriture ; au moins 5 500 GET/s par préfixe (valeur documentée) ; erreurs 503 pendant la montée en charge.</li>
+<li>La latence du premier octet impose de grandes plages et du parallélisme ; la concurrence vaut débit de requêtes × latence.</li>
+<li>FUSE ne rend pas un magasin d'objets POSIX : pas de renommage sur un bucket général avec Mountpoint.</li>
+<li>Mesurez <span class="math inline">\alpha</span>, <span class="math inline">B</span> et <span class="math inline">n_{1/2}</span> sur votre stockage avec <code>fio_gap.py</code> ; ne comparez pas des chiffres de fournisseurs.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Formats de données pour l'entraînement</h2>
+<p>Un jeu de données de texte ou d'images peut être rangé de bien des façons, et la façon change le nombre d'ouvertures, la taille des requêtes et la quantité d'octets lus pour rien. Ce chapitre les mesure avec des compteurs, sur le même jeu synthétique, dans quatre dispositions.</p>
+<h3 id="pourquoi-le-format-compte">4.1. Pourquoi le format compte</h3>
+<p>Reprenons l'ajustement de l'exemple 3.2 : <span class="math inline">\alpha = 55\ \mu</span>s, <span class="math inline">B = 1\,936</span> Mio/s, soit <span class="math inline">n_{1/2} = 109</span> Kio. L'efficacité d'une requête de <span class="math inline">n</span> octets, c'est-à-dire la part du débit maximal qu'elle atteint, vaut</p>
+<p><span class="math display">\eta(n) = \frac{n/B}{\alpha + n/B}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — Quelle part du disque un échantillon de 16 Kio utilise-t-il ?</span> Calculé avec <code>request_efficiency</code> (lab 8.4), avec les <span class="math inline">\alpha</span> et <span class="math inline">B</span> de l'exemple 3.2.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Taille de la requête</th>
+<th>Efficacité</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4 Kio</td>
+<td>3,5 %</td>
+</tr>
+<tr class="even">
+<td>16 Kio (un échantillon de notre jeu)</td>
+<td>12,8 %</td>
+</tr>
+<tr class="odd">
+<td>128 Kio</td>
+<td>54,0 %</td>
+</tr>
+<tr class="even">
+<td>1 Mio</td>
+<td>90,4 %</td>
+</tr>
+<tr class="odd">
+<td>4 Mio</td>
+<td>97,4 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Lire chaque échantillon de 16 Kio comme une requête à part n'utilise que 13 % du disque. Lire des morceaux de 1 Mio qui contiennent soixante-quatre échantillons en utilise 90 %. C'est toute la justification des <strong>shards</strong> : regrouper les échantillons pour que chaque requête dépasse <span class="math inline">n_{1/2}</span>.</p>
+</div>
+<h3 id="le-jeu-et-les-dispositions">4.2. Le jeu et les dispositions</h3>
+<p>Le lab 8.2 écrit 4 096 échantillons de 16 Kio (64 Mio de jetons de 16 bits pseudo-aléatoires, graine fixe : des données <strong>synthétiques</strong>, seule la disposition compte) dans quatre dispositions. Un fichier par échantillon. Huit archives tar de 512 échantillons selon la convention WebDataset. Un fichier unique de jetons concaténés, lu avec <code>pread</code> (lecture à un décalage donné) ou avec <code>mmap</code> (le fichier est projeté en mémoire, ses pages se chargent à la demande). Un fichier Parquet à groupes de 256 lignes.</p>
+<p>Pour chaque lecteur, le lab évince d'abord le cache de pages des fichiers du jeu, puis lit trois compteurs de <code>/proc/self/io</code> : <code>syscr</code> (nombre d'appels <code>read</code>), <code>rchar</code> (octets renvoyés par les appels de lecture) et <code>read_bytes</code> (octets réellement lus sur la couche de stockage, d'après <code>proc_pid_io(5)</code>). Le nombre d'ouvertures est compté par un crochet d'audit Python. Ces compteurs sont ceux de <strong>ce processus</strong> : un autre processus de la machine ne les fausse pas, à la différence de <code>/proc/diskstats</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> drop_cache(paths: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Ask the kernel to evict the clean pages of these files (no root needed; dirty pages must be flushed first).&quot;&quot;&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> p <span class="kw">in</span> paths:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        fd <span class="op">=</span> os.<span class="bu">open</span>(p, os.O_RDONLY)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            os.posix_fadvise(fd, <span class="dv">0</span>, <span class="dv">0</span>, os.POSIX_FADV_DONTNEED)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">finally</span>:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            os.close(fd)</span></code></pre></div>
+<h3 id="lire-le-tableau">4.3. Lire le tableau</h3>
+<div class="ex">
+<p><span class="tag">Exemple 4.2 — Quatre dispositions, neuf lectures</span> Capturé sur la VM de test (noyau 6.18, lecture anticipée de 128 Kio, 2026-10-24), <code>run_shards.py</code>. Les opérations comptées par <code>opens</code> sont celles que Python demande ; la colonne est <code>n/a</code> pour Parquet, dont les ouvertures sont faites en C++.</p>
+<pre class="text"><code>layout        pattern         n  opens read()/smp asked/pay device/pay   warm smp/s
+files         sequential   4096   4096      2.00      1.00      1.00        24157
+files         random       1024   1024      2.00      1.00      1.00        22771
+tar shards    sequential   4096      8      1.75      1.09      1.10        11808
+tar shards    random       1024      8      1.00      1.00      1.30        26742
+packed pread  sequential   4096      1      1.00      1.00      1.00        31709
+packed pread  random       1024      1      1.00      1.00      1.04        29318
+packed mmap   random       1024      1      0.00      0.00      3.41        25199
+parquet       sequential   4096    n/a      0.00      1.00      1.00        17868
+parquet       random       1024    n/a      1.00    256.09      4.00          337</code></pre>
+<p><code>asked/pay</code> est le rapport entre les octets lus par les appels <code>read</code> et les octets utiles ; <code>device/pay</code>, le rapport entre les octets réellement lus sur la couche de stockage et les octets utiles. La dernière colonne est un débit <strong>à chaud, donné pour information</strong> et jamais testé : sur cette machine, le chronomètre est peu fiable (chapitre 7 du module 1).</p>
+</div>
+<p>Ligne par ligne :</p>
+<ul>
+<li><strong>Un fichier par échantillon :</strong> une ouverture par échantillon (4 096), et deux <code>read</code> (les données puis la fin de fichier). Par octet lu, rien d'amplifié (<code>device/pay</code> = 1,00) : le coût est dans les ouvertures, donc dans les métadonnées et la latence par fichier.</li>
+<li><strong>Shards, lecture séquentielle :</strong> 8 ouvertures pour 4 096 échantillons. <code>asked/pay</code> vaut 1,09 : les en-têtes tar et les membres <code>.json</code> ajoutent 9 % d'octets lus.</li>
+<li><strong>Shards, lecture aléatoire par index :</strong> 1,30 à la couche bloc. Une explication cohérente avec l'arithmétique, non vérifiée par ce lab : les charges utiles ne commencent pas sur une frontière de page, donc un échantillon de 16 Kio touche cinq pages au lieu de quatre.</li>
+<li><strong>Fichier empaqueté :</strong> <code>pread</code> reste à 1,04 ; <code>mmap</code> en lecture aléatoire monte à <strong>3,41</strong> : le noyau lit autour du défaut de page (hypothèse de lecture anticipée, non vérifiée ici). La lecture anticipée de 128 Kio du périphérique est affichée par le lab.</li>
+<li><strong>Parquet aléatoire :</strong> 256,09 octets lus par octet utile. Chaque échantillon relit son groupe de 256 lignes entier. La colonne <code>device/pay</code> n'affiche que 4,00 : le jeu (64 Mio) tient dans le cache de pages, donc chaque groupe n'est lu qu'une fois sur le disque ; sur un jeu plus grand que la mémoire, elle se rapprocherait de 256.</li>
+</ul>
+<h3 id="les-shards-et-webdataset">4.4. Les shards et WebDataset</h3>
+<p>Le format <a href="https://raw.githubusercontent.com/webdataset/webdataset/main/README.md">WebDataset</a> est un ensemble de fichiers tar avec deux conventions : les fichiers qui forment un échantillon partagent le même nom de base, et les shards sont numérotés <code>quelquechose-000000.tar</code>, souvent écrits en notation à accolades. Le README affirme qu'il permet des « purely sequential I/O pipelines » et chiffre le gain à « 3x-10x for local drives compared to random access » : c'est une <strong>affirmation du projet, non reproduite ici</strong>.</p>
+<p>Notre mesure dit autre chose, et c'est utile : elle ne montre pas de gain de débit à chaud (le jeu tient en mémoire), mais elle chiffre ce qui change à froid : 8 ouvertures contre 4 096, des requêtes séquentielles, et 10 % de surcoût d'octets. Les shards du lab sont lisibles par la vraie bibliothèque <code>webdataset</code> (test du lab).</p>
+<p>Le prix des shards est le mélange. Un tirage aléatoire global sur un jeu en shards redevient un accès aléatoire. La pratique est de mélanger l'ordre des shards puis de mélanger dans un tampon en mémoire, ce qui donne un ordre moins aléatoire qu'un tirage global. Le README note aussi la limite : équilibrer exactement le nombre d'échantillons entre nœuds sur une époque est délicat, d'où le ré-échantillonnage des shards en multi-nœuds.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_tar_sequential(ds: Dataset, order<span class="op">=</span><span class="va">None</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    acc <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> path <span class="kw">in</span> ds.shard_paths:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> tarfile.<span class="bu">open</span>(path, <span class="st">&quot;r|&quot;</span>) <span class="im">as</span> tar:  <span class="co"># stream mode: strictly sequential, no seek</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> ti <span class="kw">in</span> tar:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> ti.name.endswith(<span class="st">&quot;.bin&quot;</span>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                    acc <span class="op">^=</span> digest(<span class="bu">int</span>(ti.name.split(<span class="st">&quot;.&quot;</span>)[<span class="dv">0</span>]), tar.extractfile(ti).read())</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> acc</span></code></pre></div>
+<h3 id="jetons-pré-empaquetés-et-mmap">4.5. Jetons pré-empaquetés et <code>mmap</code></h3>
+<p>Pour du texte, la disposition la plus simple est de concaténer tous les jetons dans un fichier unique. nanoGPT le fait : <code>train.bin</code> est ouvert avec <code>np.memmap(..., dtype=np.uint16, mode='r')</code> et chaque batch tire des positions aléatoires avec <code>torch.randint(len(data) - block_size, (batch_size,))</code>. Un échantillon est une tranche du fichier : pas de métadonnées, pas de remplissage, une seule ouverture.</p>
+<p>Le coût caché est celui du motif : sur un jeu plus grand que la mémoire, chaque tirage aléatoire est une lecture de petite taille. L'exemple 4.2 montre que <code>pread</code> ne lit presque rien de trop (1,04), alors que <code>mmap</code> lit 3,4 fois les octets utiles à froid. Quand le jeu tient dans le cache de pages, <code>mmap</code> est excellent ; quand il ne tient pas, préférez <code>pread</code> ou des lectures par blocs.</p>
+<h3 id="parquet-et-arrow">4.6. Parquet et Arrow</h3>
+<p>La <a href="https://raw.githubusercontent.com/apache/parquet-format/master/README.md">spécification de Parquet</a> définit un fichier comme une suite de <strong>groupes de lignes</strong> ; un groupe contient un <strong>bloc de colonne</strong> par colonne ; un bloc est découpé en <strong>pages</strong>, « conceptually an indivisible unit (in terms of compression and encoding) ». L'unité de lecture est donc le bloc de colonne d'un groupe, jamais une ligne.</p>
+<p>D'où l'amplification mesurée : lire une ligne coûte un groupe entier. Pour un groupe de <span class="math inline">g</span> lignes, la lecture aléatoire d'un échantillon lit environ <span class="math inline">g</span> fois les octets utiles ; le lab mesure 256,09 avec <span class="math inline">g = 256</span>. À l'inverse, des groupes trop petits ne passent pas <span class="math inline">n_{1/2}</span> en lecture séquentielle. La taille du groupe de lignes arbitre entre les deux ; l'exercice 6 le chiffre.</p>
+<p>Arrow est le pendant en mémoire : un format colonnaire que Hugging Face Datasets utilise pour son cache local, « memory-mapped for fast lookup », ce qui permet de manipuler de grands jeux avec peu de mémoire vive selon leur documentation. Les mêmes réserves que pour <code>mmap</code> s'appliquent.</p>
+<h3 id="choisir">4.7. Choisir</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Disposition</th>
+<th>Lecture séquentielle</th>
+<th>Accès aléatoire à un échantillon</th>
+<th>Ouvertures par époque</th>
+<th>Quand l'utiliser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>un fichier par échantillon</td>
+<td>sans amplification, mais une requête par échantillon</td>
+<td>idem</td>
+<td>un par échantillon</td>
+<td>prototypes et petits jeux</td>
+</tr>
+<tr class="even">
+<td>shards tar</td>
+<td>bonne : 1,10 mesuré</td>
+<td>par index : 1,30 ; sinon mélange par tampon</td>
+<td>un par shard</td>
+<td>pré-entraînement multi-nœuds, stockage objet</td>
+</tr>
+<tr class="odd">
+<td>fichier de jetons</td>
+<td>optimale : 1,00 mesuré</td>
+<td><code>pread</code> 1,04 ; <code>mmap</code> 3,41 à froid</td>
+<td>un</td>
+<td>texte pré-tokenisé</td>
+</tr>
+<tr class="even">
+<td>Parquet</td>
+<td>bonne</td>
+<td>amplifiée d'un facteur égal aux lignes par groupe</td>
+<td>peu</td>
+<td>données tabulaires, lecture de colonnes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p><span class="tag">Trois nombres par format</span> Pour tout format, notez le nombre d'ouvertures par époque, la taille moyenne d'une requête et le rapport <code>device/pay</code>. Si vous ne les connaissez pas, vous ne savez pas ce que votre jeu de données demande au stockage.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li>Une requête de <span class="math inline">n</span> octets utilise <span class="math inline">\eta = (n/B)/(\alpha + n/B)</span> du débit : 16 Kio n'en utilisent que 13 % sur le disque du bac à sable, 1 Mio en utilise 90 %.</li>
+<li>Un fichier par échantillon coûte une ouverture par échantillon ; les shards en coûtent une par shard (4 096 contre 8 mesurés).</li>
+<li><code>mmap</code> en accès aléatoire à froid a lu 3,4 fois les octets utiles contre 1,04 pour <code>pread</code> sur cette machine.</li>
+<li>Une ligne Parquet coûte un groupe de lignes entier : 256,09 octets lus par octet utile avec 256 lignes par groupe.</li>
+<li>Le mélange est le prix des shards : mélanger les shards puis un tampon, pas tout le jeu.</li>
+</ul>
+</div>
+<h2 id="ch5">5. Chargeurs de données</h2>
+<p>Un chargeur lent est la cause la plus fréquente d'un GPU qui attend, et la plus mal diagnostiquée : on ajoute des workers au hasard. Ce chapitre donne une définition mesurable du problème, un modèle du premier ordre, une table de décision et un profileur.</p>
+<h3 id="anatomie-du-dataloader">5.1. Anatomie du <code>DataLoader</code></h3>
+<p>Le <code>DataLoader</code> de PyTorch lance <code>num_workers</code> processus qui exécutent <code>Dataset.__getitem__</code>, assemblent les batchs et les renvoient au processus principal par une file. Les paramètres qui comptent sont décrits dans la docstring du code source (lue le 24 octobre 2026).</p>
+<ul>
+<li><code>num_workers</code> : « how many subprocesses to use for data loading. <code>0</code> means that the data will be loaded in the main process ».</li>
+<li><code>prefetch_factor</code> : le nombre de batchs chargés à l'avance <strong>par worker</strong>. Avec 2, il y a au total <code>2 * num_workers</code> batchs préchargés ; le défaut est 2 dès que <code>num_workers &gt; 0</code>.</li>
+<li><code>persistent_workers</code> : si vrai, les workers ne sont pas arrêtés après une passe complète sur le jeu, ce qui évite de les redémarrer à chaque époque.</li>
+<li><code>pin_memory</code> : copie les tenseurs dans de la mémoire épinglée (<em>pinned</em>) avant de les rendre, pour accélérer le transfert vers le GPU. Il n'a d'effet qu'avec un GPU : <strong>non mesuré ici</strong>.</li>
+</ul>
+<p>Les résultats sont livrés <strong>dans l'ordre</strong>. Le code de l'itérateur multiprocessus garde <code>_rcvd_idx</code>, l'« idx of the next task to be returned in <strong>next</strong> » : un batch lent retarde tous ceux qui le suivent, même s'ils sont prêts. C'est la première explication que l'on essaie pour un écart du modèle plus bas ; le paramètre <code>in_order=False</code> désactive cette propriété (docstring de la branche <code>main</code>, essayé avec PyTorch 2.14.1).</p>
+<h3 id="mesurer-la-part-dattente">5.2. Mesurer la part d'attente</h3>
+<p>La grandeur à mesurer est la <strong>part d'attente</strong> (<em>stall</em>) : le temps passé à attendre le prochain batch, divisé par le temps total de la boucle.</p>
+<p><span class="math display">\text{stall} = \frac{\sum t_{\text{attente}}}{\sum t_{\text{attente}} + \sum t_{\text{pas}}}</span></p>
+<p>Le papier sur les <em>data stalls</em> (Mohan et coauteurs, VLDB 2021) distingue les <strong>prep stalls</strong> (temps de prétraitement) des <strong>fetch stalls</strong> (temps d'E/S) et mesure les premiers et les seconds par une technique différentielle : comparer le temps d'époque avec des données réelles et avec des données déjà prêtes en mémoire. Le lab 8.1 applique la même idée en simulant le GPU par une attente fixe. La boucle mesurée tient en dix lignes :</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_batches):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        t0 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">next</span>(it)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        t1 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        time.sleep(step_s)  <span class="co"># the simulated GPU step</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        t2 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        wait <span class="op">+=</span> t1 <span class="op">-</span> t0</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        step <span class="op">+=</span> t2 <span class="op">-</span> t1</span></code></pre></div>
+<h3 id="un-modèle-du-premier-ordre">5.3. Un modèle du premier ordre</h3>
+<p>Un échantillon coûte <span class="math inline">c</span> secondes à un worker : une attente d'E/S <span class="math inline">t_{\text{io}}</span> et un calcul <span class="math inline">t_{\text{cpu}}</span>. Un batch de <span class="math inline">B</span> échantillons coûte donc <span class="math inline">Bc</span> à un worker.</p>
+<p>Avec <span class="math inline">W</span> workers, le chargeur produit <span class="math inline">W/(Bc)</span> batchs par seconde.</p>
+<p>Les cœurs plafonnent ce débit : avec <span class="math inline">C</span> cœurs, il ne dépasse pas <span class="math inline">C/(B\,t_{\text{cpu}})</span>. Le pas GPU dure <span class="math inline">t_{\text{pas}}</span> ; la boucle attend dès que le chargeur produit moins vite qu'elle ne consomme.</p>
+<p><span class="math display">\text{stall} = \max\Bigl(0,\; 1 - t_{\text{pas}} \cdot \min\bigl(\tfrac{W}{B c},\; \tfrac{C}{B\,t_{\text{cpu}}}\bigr)\Bigr)</span></p>
+<p>Sans worker, le chargement et le pas s'enchaînent : le <em>stall</em> vaut <span class="math inline">Bc/(Bc + t_{\text{pas}})</span>.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — Combien de workers pour un pas de 12 ms ?</span> Jeu <strong>simulé</strong> : lecture distante de 6 ms par échantillon dont 5 % dix fois plus lentes (donc <span class="math inline">t_{\text{io}}</span> moyen de <span class="math inline">6 \times (1 + 0{,}05 \times 9) = 8{,}7</span> ms), décodage de 1 ms, batch de 8, pas GPU de 12 ms (le GPU consommerait 83 batchs par seconde). Donc <span class="math inline">c = 9{,}7</span> ms et <span class="math inline">Bc = 77{,}6</span> ms. Capturé sur la VM de test à 4 vCPU (2026-10-24), <code>run_lab.py</code>, <code>DataLoader</code> réel :</p>
+<pre class="text"><code>workers prefetch  batch/s     stall     model cpu/wkr
+      0        -     10.2      88 %      87 %    0.00
+      1        2     11.8      86 %      85 %    0.14
+      2        2     21.5      74 %      69 %    0.12
+      4        2     41.5      50 %      38 %    0.12
+      8        2     71.1      14 %       0 %    0.10</code></pre>
+<p>Le modèle suit la mesure à 12 points près au plus jusqu'à 4 workers. À 8 workers il annonce 0 % alors qu'on mesure 14 % (de 13 % à 17 % selon les exécutions) : c'est un <strong>modèle optimiste</strong>, qui raisonne sur des taux moyens.</p>
+<p>La première explication essayée, la livraison des batchs dans l'ordre (un échantillon lent retarde son batch et les suivants), <strong>ne tient pas</strong> : avec <code>in_order=False</code> (<code>python3 run_lab.py --no-in-order</code>), le <em>stall</em> à 8 workers reste de 16 % à 19 % sur six exécutions, contre 13 % à 17 % avec l'ordre imposé (mesuré le 2026-10-25). L'écart reste inexpliqué ; hypothèse non testée : la variabilité des temps de service et la file de taille finie, que des taux moyens ignorent.</p>
+<p>La colonne <code>cpu/wkr</code> (CPU consommé par worker, de 0,10 à 0,14) montre des workers presque inactifs : ils attendent des lectures, ils ne calculent pas.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 560 330" role="img" aria-labelledby="stall-t stall-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="stall-t">
+Temps perdu à attendre les données selon le nombre de workers
+</title>
+<desc id="stall-d">Courbe mesurée et courbe du modèle : la part du temps où la boucle attend un batch passe de 88 pour cent sans worker à 14 pour cent avec huit workers ; le modèle est optimiste.</desc> <line x1="70" y1="270.0" x2="530" y2="270.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="275.0" text-anchor="end" font-size="14" fill="currentColor">0 %</text> <line x1="70" y1="210.0" x2="530" y2="210.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="215.0" text-anchor="end" font-size="14" fill="currentColor">25 %</text> <line x1="70" y1="150.0" x2="530" y2="150.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="155.0" text-anchor="end" font-size="14" fill="currentColor">50 %</text> <line x1="70" y1="90.0" x2="530" y2="90.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="95.0" text-anchor="end" font-size="14" fill="currentColor">75 %</text> <line x1="70" y1="30.0" x2="530" y2="30.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="35.0" text-anchor="end" font-size="14" fill="currentColor">100 %</text> <rect x="70" y="30" width="460" height="240" fill="none" stroke="currentColor" stroke-width="1.5"/> <text x="100.0" y="292" text-anchor="middle" font-size="14" fill="currentColor">0</text> <text x="200.0" y="292" text-anchor="middle" font-size="14" fill="currentColor">1</text> <text x="300.0" y="292" text-anchor="middle" font-size="14" fill="currentColor">2</text> <text x="400.0" y="292" text-anchor="middle" font-size="14" fill="currentColor">4</text> <text x="500.0" y="292" text-anchor="middle" font-size="14" fill="currentColor">8</text> <text x="300.0" y="316" text-anchor="middle" font-size="14" fill="currentColor">nombre de workers</text> <polyline points="100,61 200,66 300,104 400,179 500,270" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/> <polyline points="100,59 200,64 300,92 400,150 500,236" fill="none" stroke="var(--accent)" stroke-width="3.5"/> <circle cx="100" cy="59" r="5" fill="var(--accent)" stroke="currentColor"/> <circle cx="200" cy="64" r="5" fill="var(--accent)" stroke="currentColor"/> <circle cx="300" cy="92" r="5" fill="var(--accent)" stroke="currentColor"/> <circle cx="400" cy="150" r="5" fill="var(--accent)" stroke="currentColor"/> <circle cx="500" cy="236" r="5" fill="var(--accent)" stroke="currentColor"/> <line x1="86" y1="48" x2="126" y2="48" stroke="var(--accent)" stroke-width="3.5"/><text x="134" y="53" font-size="14" fill="currentColor">mesuré</text> <line x1="220" y1="48" x2="260" y2="48" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="268" y="53" font-size="14" fill="currentColor">modèle</text> <text x="14" y="150.0" text-anchor="middle" font-size="14" fill="currentColor" transform="rotate(-90 14 150.0)">part d'attente (stall)</text>
+</svg>
+<figcaption>
+Part d'attente selon le nombre de workers, mesurée (trait plein) et prédite (tirets) pour l'exemple 5.1. Le modèle est optimiste à 8 workers : mesure 14 %, modèle 0 %. Jeu simulé, <code>DataLoader</code> réel.
+</figcaption>
+</figure>
+<p>L'exemple porte aussi sur <code>prefetch_factor</code>. Avec 8 workers, passer de 1 à 2 batchs préchargés a fait passer le <em>stall</em> de 24 % à 15 % ; aller à 4 puis 8 ne l'a pas amélioré (17 % et 17 %). Une file plus profonde absorbe la gigue, pas un manque de débit. Ces écarts de quelques points sont du même ordre que le bruit : une de nos exécutions de contrôle a donné 31 % pour 2 batchs préchargés, visiblement perturbée par la charge de la machine.</p>
+<h3 id="quand-les-workers-ne-servent-plus-le-goulot-cpu">5.4. Quand les workers ne servent plus : le goulot CPU</h3>
+<p>Si le prétraitement coûte du CPU (décodage d'images, tokenisation, augmentation), ajouter des workers cesse d'aider dès que les cœurs sont saturés. Le papier sur les <em>data stalls</em> conclut dans son tableau 1 que les réseaux étudiés ont besoin « anywhere between 3 – 24 CPU cores per GPU » pour le prétraitement et passent jusqu'à 65 % du temps d'époque dans le prétraitement des données.</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.2 — Un chargeur CPU sature à 4 cœurs</span> Jeu <strong>simulé</strong> : 8 ms de CPU par échantillon (du vrai CPU), aucune attente d'E/S. Capturé sur la même VM, <code>run_lab.py</code>. Le modèle utilise le CPU <strong>mesuré</strong> par échantillon (lu dans <code>/proc/&lt;pid&gt;/stat</code> des workers), calibré sur la ligne à 2 workers, pas les 8 ms nominaux.</p>
+<pre class="text"><code>workers prefetch  batch/s     stall     model cpu/wkr    cpu/sample
+      1        2     14.6      82 %      82 %    1.00     8.5 ms
+      2        2     28.6      65 %      65 %    0.97     8.5 ms
+      4        2     52.1      37 %      29 %    0.85     8.2 ms
+      8        2     53.0      34 %      29 %    0.46     8.6 ms</code></pre>
+<p>De 1 à 2 workers, le débit double ; de 4 à 8 il passe de 52,1 à 53,0 batchs par seconde : la machine a 4 cœurs, ils sont pleins (4 workers à 0,85 cœur, soit 3,4 cœurs ; 8 workers à 0,46, soit 3,7 cœurs). Le CPU mesuré par échantillon (8,2 à 8,6 ms) est proche du coût nominal : le coût réel d'un échantillon est un compteur qu'on lit, il ne se devine pas.</p>
+</div>
+<h3 id="une-table-de-décision">5.5. Une table de décision</h3>
+<p>Trois mesures suffisent à choisir l'action : le <em>stall</em>, le nombre de workers et le CPU consommé par worker. Le lab les réunit dans une fonction.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> diagnose(stall: <span class="bu">float</span>, worker_cpu_util: <span class="bu">float</span>, workers: <span class="bu">int</span>, cores: <span class="bu">int</span>, threshold: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.05</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;The decision table of the lab, as code. Inputs are things you can measure on a real job.&quot;&quot;&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> stall <span class="op">&lt;</span> threshold:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&quot;GPU-bound: the loader keeps up; do not touch it&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> workers <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&quot;serial loading: set num_workers &gt; 0 first&quot;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> worker_cpu_util <span class="op">&gt;=</span> <span class="fl">0.7</span> <span class="kw">or</span> workers <span class="op">*</span> worker_cpu_util <span class="op">&gt;=</span> <span class="fl">0.8</span> <span class="op">*</span> cores:</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">&quot;CPU-bound loader: cheaper transforms, pre-processed data, or more cores per GPU&quot;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;latency-bound loader: more workers, deeper prefetch, bigger sequential reads (shards)&quot;</span></span></code></pre></div>
+<p>Le CPU par worker suppose que les cœurs ne sont pas pris par d'autres processus : lors d'une exécution du lab sur une machine partagée, 8 workers à 0,36 cœur chacun ont été diagnostiqués « à latence » alors que le chargeur était limité par le CPU.</p>
+<p>Les seuils (5 % de <em>stall</em>, 0,7 cœur par worker, 80 % des cœurs) sont un choix de ce parcours, pas une norme. Ils servent à rendre la décision explicite : un chargeur à latence se soigne par plus de parallélisme ou de plus grosses lectures (chapitre 4), un chargeur CPU par un prétraitement moins coûteux ou fait une fois pour toutes (jetons pré-empaquetés), jamais par plus de workers.</p>
+<h3 id="le-profileur">5.6. Le profileur</h3>
+<p><code>torch.profiler</code> nomme l'attente du chargeur : une ligne <code>enumerate(DataLoader)#…__next__</code> apparaît dans la table, avec le nombre d'appels et le temps total. Si cette ligne dépasse nettement le temps du pas, la boucle est limitée par les données ; sur un GPU, on la compare aux plages vides de la ligne de temps CUDA (non exécuté ici).</p>
+<div class="ex">
+<p><span class="tag">Exemple 5.3 — Lire la ligne <code>enumerate(DataLoader)</code></span> Capturé sur la VM de test (12 batchs, pas simulé de 12 ms, même jeu que l'exemple 5.1), <code>run_lab.py</code>, partie C :</p>
+<pre class="text"><code>workers=0  enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__    calls=12  total= 1051.8 ms  per call=  87.7 ms
+workers=4  enumerate(DataLoader)#_MultiProcessingDataLoaderIter.__next__  calls=12  total=  245.2 ms  per call=  20.4 ms</code></pre>
+<p>Sans worker, le chargeur coûte 87,7 ms par batch dans le fil principal, plus de sept fois le pas de 12 ms : la boucle attend. Avec 4 workers, il tombe à 20,4 ms par appel, encore supérieur au pas : la boucle attend toujours. Les deux mesures (12 batchs ici, 40 dans l'exemple 5.1, échauffements différents) ne se comparent pas chiffre à chiffre. Le nom de la classe (<code>SingleProcess</code> ou <code>MultiProcessing</code>) vous dit aussi quel itérateur tourne vraiment.</p>
+</div>
+<h3 id="épingler-la-mémoire-et-un-chargeur-par-machine">5.7. Épingler la mémoire, et un chargeur par machine</h3>
+<p>L'option <code>pin_memory</code> copie les batchs dans de la mémoire épinglée avant de les rendre : le transfert vers le GPU peut alors se faire par DMA, et en parallèle du calcul. Sa valeur se mesure sur un nœud GPU en comparant <code>True</code> et <code>False</code> avec un jeu synthétique : ce test n'est <strong>pas</strong> exécuté ici.</p>
+<p>À grande échelle, le papier MegaScale décrit une autre économie : sur chaque machine, un chargeur dédié unique lit les données dans de la mémoire partagée, puis chaque processus GPU copie ce dont il a besoin vers sa mémoire. Les auteurs indiquent que cela supprime les lectures redondantes quand plusieurs processus du même nœud lisent les mêmes données.</p>
+<div class="war">
+<p><span class="tag">Les données dominent le temps d'époque dans de nombreux cas</span> L'analyse de Mohan et coauteurs sur des serveurs d'un grand cluster de production de Microsoft conclut : « in many cases, DNN training time is dominated by data stall time », et leur bibliothèque CoorDL réduit le temps d'entraînement d'un facteur pouvant aller jusqu'à 5 sur un serveur par rapport à DALI. L'étude porte sur la vision et l'audio, avec un prétraitement lourd : pour du texte pré-tokenisé, le constat ne s'applique pas tel quel (exemple 1.1). Source : <a href="https://arxiv.org/abs/2007.06775">arXiv:2007.06775</a>, lu le 24 octobre 2026.</p>
+</div>
+<div class="key">
+<p><span class="tag">Mesurez, puis ajoutez</span> Ajouter des workers sans avoir mesuré le CPU par worker est un pari. Un chargeur à latence se soigne avec du parallélisme ; un chargeur CPU, avec moins de calcul par échantillon.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Le <em>stall</em> est la part du temps de boucle passée à attendre un batch ; il se mesure autour de <code>next()</code>.</li>
+<li>Modèle : le <em>stall</em> vaut un moins le produit du pas GPU par le débit du chargeur (workers sur coût d'un batch, plafonné par les cœurs) ; il est optimiste (14 % mesuré contre 0 % prédit à 8 workers), et la livraison dans l'ordre n'en est pas la cause (<code>in_order=False</code> ne change rien).</li>
+<li><code>prefetch_factor</code> au-delà de 2 n'a rien apporté sur nos mesures ; il lisse la gigue.</li>
+<li>Un chargeur CPU sature quand les cœurs sont pleins : 52,1 contre 53,0 batchs par seconde entre 4 et 8 workers sur 4 cœurs.</li>
+<li>La table de décision prend trois mesures : <em>stall</em>, workers, CPU par worker. <code>pin_memory</code> n'a pas été mesuré (pas de GPU).</li>
+</ul>
+</div>
+<h2 id="ch6">6. E/S de checkpoint</h2>
+<p>Le chapitre 1 a chiffré ce qu'un checkpoint doit écrire. Ce chapitre mesure ce qu'il coûte réellement : une écriture durable, la part qui bloque l'entraînement, et ce qui change quand plusieurs rangs écrivent à la fois. Le protocole complet (somme de contrôle, manifeste, reprise exacte) est celui du <a href="../fault-tolerance/index.html#ch3">module 10</a> ; on ne le répète pas.</p>
+<h3 id="ce-quon-écrit">6.1. Ce qu'on écrit</h3>
+<p>Un checkpoint de <span class="math inline">\Psi</span> paramètres pèse <span class="math inline">14\Psi</span> octets (section 1.4). Dans un entraînement parallèle, chaque rang en détient une part, de 1 Mo à 4 Go par GPU dans le rapport Llama 3. Le choix entre un fichier par rang et un fichier partagé, et celui du format, relèvent du module 10 ; ce qui nous intéresse est le nombre d'octets, le nombre de fichiers et le moment où tous les rangs écrivent.</p>
+<h3 id="le-coût-dune-écriture-durable">6.2. Le coût d'une écriture durable</h3>
+<p>Une écriture ordinaire (<code>write</code>) est absorbée par le cache de pages : elle est rapide et <strong>pas durable</strong>, car rien ne dit que les octets ont atteint le disque (chapitre 7 du module 1). Le protocole durable écrit un fichier temporaire, appelle <code>fsync</code>, renomme, puis synchronise le répertoire. <code>O_DIRECT</code> contourne le cache et exige des tampons, des décalages et des longueurs alignés : une écriture de 1 000 octets échoue avec <code>EINVAL</code> (test du lab).</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    tmp <span class="op">=</span> path <span class="op">+</span> <span class="st">&quot;.tmp&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    mv <span class="op">=</span> <span class="bu">memoryview</span>(buf)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    t0 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(tmp, <span class="st">&quot;wb&quot;</span>) <span class="im">as</span> f:</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> off <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(buf), chunk):</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> fail_after <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> off <span class="op">&gt;=</span> fail_after:</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">OSError</span>(<span class="st">&quot;injected failure&quot;</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>            f.write(mv[off:off <span class="op">+</span> chunk])</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            _pace(<span class="bu">min</span>(off <span class="op">+</span> chunk, <span class="bu">len</span>(buf)), t0, throttle_mbps)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        f.flush()</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        os.fsync(f.fileno())</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    os.replace(tmp, path)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    fsync_dir(os.path.dirname(os.path.abspath(path)))</span></code></pre></div>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — Ce que coûte la durabilité sur un disque virtuel</span> Capturé sur la VM de test (4 vCPU, ext4 sur disque virtuel, 2026-10-24), <code>bench_ckpt.py</code>, partie A : médiane de cinq exécutions après une exécution d'échauffement, état d'octets pseudo-aléatoires, durées en millisecondes.</p>
+<pre class="text"><code>    size   buffered      fsync   O_DIRECT   snapshot
+      16       12.0       27.9       49.6        2.5
+      64       51.6      106.9      155.5        6.9
+     128      102.1      283.3      356.4       12.0
+fit T = alpha + S/B on fsync: alpha = 0.0 ms, B = 518 MiB/s, median error 13 %, leave-one-out 25 %</code></pre>
+<p>À 128 Mio, l'écriture ordinaire prend 102 ms (1,2 Gio/s) mais n'est pas durable. Le protocole avec <code>fsync</code> en prend 283 (452 Mio/s), soit 2,8 fois plus : c'est le prix de la durabilité. <code>O_DIRECT</code> en prend 356. L'ajustement <span class="math inline">T = \alpha + S/B</span> donne <span class="math inline">B = 518</span> Mio/s avec 13 % d'erreur médiane. Sur nos exécutions, <span class="math inline">B</span> a varié de 499 à 590 Mio/s et l'erreur médiane de 2 % à 13 % : rapportez des médianes et dites la dispersion.</p>
+<p>Avec trois tailles seulement, l'ajustement avait donné un <span class="math inline">\alpha</span> négatif (−3,5 ms), ramené à 0 par le code, alors que d'autres exécutions ont donné +3,6 et +4,0 ms : <span class="math inline">\alpha</span> n'est pas identifiable ici, seul <span class="math inline">B</span> se lit.</p>
+</div>
+<p>La colonne <code>snapshot</code> est la copie de l'état dans un tampon de l'hôte, <strong>simulation</strong> de la copie GPU vers hôte (il n'y a pas de GPU ici) : 12 ms pour 128 Mio, soit environ 10 Gio/s. Elle est près de vingt-quatre fois plus courte que l'écriture durable. C'est cet écart que le checkpoint asynchrone exploite.</p>
+<h3 id="temps-bloquant-et-temps-de-persistance">6.3. Temps bloquant et temps de persistance</h3>
+<p>Soit <span class="math inline">T_p</span> la durée de la persistance, <span class="math inline">s</span> celle du snapshot et <span class="math inline">I</span> l'intervalle entre deux checkpoints. Un checkpoint synchrone bloque pendant <span class="math inline">T_p</span> ; un checkpoint asynchrone bloque pendant <span class="math inline">s</span>, plus ce qui reste de l'écriture précédente si elle dépasse l'intervalle :</p>
+<p><span class="math display">\text{sync} = \frac{T_p}{I} \qquad \text{async} = \frac{s + \max(0,\, T_p - I)}{I}</span></p>
+<p>Le temps qui entre dans la formule de Young du module 10 est le temps <strong>bloquant</strong>, pas la durée totale. Mais si <span class="math inline">T_p</span> dépasse <span class="math inline">I</span>, l'écriture ne tient plus dans l'intervalle et son reliquat bloque à son tour : l'asynchrone ne vaut plus rien.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.2 — Synchrone contre asynchrone, mesuré contre modèle</span> Partie B du lab : un pas d'entraînement <strong>simulé</strong> de 20 ms, un stockage <strong>simulé</strong> à 200 Mio/s (l'écrivain se bride lui-même), un état de 32 Mio. Persistance mesurée : 206 ms ; snapshot : 3 ms. Capturé sur la VM de test.</p>
+<pre class="text"><code>every N steps   sync meas.   sync model  async meas.  async model
+          10        96.9%       102.8%         8.9%         4.3%
+          40        28.3%        25.7%         1.4%         0.4%</code></pre>
+<p>Tous les 10 pas (200 ms), l'intervalle vaut presque la durée d'écriture : le synchrone double le temps (96,9 %), l'asynchrone coûte 8,9 %. Tous les 40 pas (800 ms), le synchrone coûte 28,3 % et l'asynchrone 1,4 %. Le modèle suit à quelques points près ; l'asynchrone est un peu plus coûteux que prévu (8,9 % contre 4,3 %), écart que nous n'avons pas cherché à expliquer. Le lab accepte 10 points d'écart.</p>
+</div>
+<p>La figure applique les deux formules à l'exemple d'un état dont la persistance dure 240 s (exercice 9) avec un snapshot de 3 s. Le surcoût synchrone suit <span class="math inline">240/I</span> ; l'asynchrone reste de l'ordre du pour cent tant que <span class="math inline">I &gt; 240</span> s, puis s'effondre. <strong>Le coude se trouve à <span class="math inline">I = T_p</span>.</strong></p>
+<figure class="fig">
+<svg viewBox="0 0 560 330" role="img" aria-labelledby="ovh-t ovh-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="ovh-t">
+Surcoût d'un checkpoint selon l'intervalle
+</title>
+<desc id="ovh-d">Pour une écriture de 240 secondes, le surcoût synchrone vaut 240 divisé par l'intervalle. Le surcoût asynchrone reste de l'ordre du pour cent tant que l'intervalle dépasse 240 secondes, puis remonte vite.</desc> <line x1="70" y1="264.0" x2="530" y2="264.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="269.0" text-anchor="end" font-size="14" fill="currentColor">0 %</text> <line x1="70" y1="204.0" x2="530" y2="204.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="209.0" text-anchor="end" font-size="14" fill="currentColor">25 %</text> <line x1="70" y1="144.0" x2="530" y2="144.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="149.0" text-anchor="end" font-size="14" fill="currentColor">50 %</text> <line x1="70" y1="84.0" x2="530" y2="84.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="89.0" text-anchor="end" font-size="14" fill="currentColor">75 %</text> <line x1="70" y1="24.0" x2="530" y2="24.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="29.0" text-anchor="end" font-size="14" fill="currentColor">100 %</text> <line x1="70" y1="24" x2="70" y2="264" stroke="currentColor" stroke-opacity=".2"/><text x="70" y="286" text-anchor="middle" font-size="14" fill="currentColor">1 min</text> <line x1="226" y1="24" x2="226" y2="264" stroke="currentColor" stroke-opacity=".2"/><text x="226" y="286" text-anchor="middle" font-size="14" fill="currentColor">4 min</text> <line x1="329" y1="24" x2="329" y2="264" stroke="currentColor" stroke-opacity=".2"/><text x="329" y="286" text-anchor="middle" font-size="14" fill="currentColor">10 min</text> <line x1="452" y1="24" x2="452" y2="264" stroke="currentColor" stroke-opacity=".2"/><text x="452" y="286" text-anchor="middle" font-size="14" fill="currentColor">30 min</text> <line x1="530" y1="24" x2="530" y2="264" stroke="currentColor" stroke-opacity=".2"/><text x="530" y="286" text-anchor="middle" font-size="14" fill="currentColor">1 h</text> <rect x="70" y="24" width="460" height="240" fill="none" stroke="currentColor" stroke-width="1.5"/> <polyline points="70.0,24.0 77.7,24.0 85.3,24.0 93.0,24.0 100.7,24.0 108.3,24.0 116.0,24.0 123.7,24.0 131.3,24.0 139.0,24.0 146.7,24.0 154.3,24.0 162.0,24.0 169.7,24.0 177.3,24.0 185.0,24.0 192.7,24.0 200.3,24.0 208.0,24.0 215.7,24.0 223.3,24.0 231.0,35.0 238.7,50.1 246.3,64.2 254.0,77.4 261.7,89.7 269.3,101.2 277.0,111.9 284.7,121.9 292.3,131.3 300.0,140.1 307.7,148.2 315.3,155.9 323.0,163.0 330.7,169.7 338.3,175.9 346.0,181.7 353.7,187.1 361.3,192.2 369.0,196.9 376.7,201.4 384.3,205.5 392.0,209.4 399.7,213.0 407.3,216.3 415.0,219.5 422.7,222.4 430.3,225.2 438.0,227.7 445.7,230.1 453.3,232.3 461.0,234.4 468.7,236.4 476.3,238.2 484.0,239.9 491.7,241.5 499.3,243.0 507.0,244.4 514.7,245.7 522.3,246.9 530.0,248.0" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/> <polyline points="70.0,24.0 77.7,24.0 85.3,24.0 93.0,24.0 100.7,24.0 108.3,24.0 116.0,24.0 123.7,24.0 131.3,24.0 139.0,24.0 146.7,24.0 154.3,45.1 162.0,75.4 169.7,103.7 177.3,130.1 185.0,154.8 192.7,177.8 200.3,199.3 208.0,219.4 215.7,238.2 223.3,255.7 231.0,261.1 238.7,261.3 246.3,261.5 254.0,261.7 261.7,261.8 269.3,262.0 277.0,262.1 284.7,262.2 292.3,262.3 300.0,262.5 307.7,262.6 315.3,262.6 323.0,262.7 330.7,262.8 338.3,262.9 346.0,263.0 353.7,263.0 361.3,263.1 369.0,263.2 376.7,263.2 384.3,263.3 392.0,263.3 399.7,263.4 407.3,263.4 415.0,263.4 422.7,263.5 430.3,263.5 438.0,263.5 445.7,263.6 453.3,263.6 461.0,263.6 468.7,263.7 476.3,263.7 484.0,263.7 491.7,263.7 499.3,263.7 507.0,263.8 514.7,263.8 522.3,263.8 530.0,263.8" fill="none" stroke="var(--accent)" stroke-width="3.5"/> <line x1="226" y1="24" x2="226" y2="264" stroke="var(--accent)" stroke-dasharray="3 3"/> <text x="234" y="60" font-size="14" fill="currentColor">intervalle = durée</text><text x="234" y="78" font-size="14" fill="currentColor">d'écriture (240 s)</text> <line x1="370" y1="94" x2="410" y2="94" stroke="var(--accent)" stroke-width="3.5"/><text x="418" y="99" font-size="14" fill="currentColor">asynchrone</text> <line x1="370" y1="120" x2="410" y2="120" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/><text x="418" y="125" font-size="14" fill="currentColor">synchrone</text> <text x="300.0" y="312" text-anchor="middle" font-size="14" fill="currentColor">intervalle entre checkpoints (échelle logarithmique)</text> <text x="14" y="144.0" text-anchor="middle" font-size="14" fill="currentColor" transform="rotate(-90 14 144.0)">surcoût (plafonné à 100 %)</text>
+</svg>
+<figcaption>
+Surcoût d'un checkpoint selon l'intervalle, pour une persistance de 240 s et un snapshot de 3 s (formules de la section 6.3, tracées avec <code>sync_overhead</code> et <code>async_overhead</code> ; pas une mesure). Le coude de la courbe asynchrone est à l'intervalle égal à la durée d'écriture.
+</figcaption>
+</figure>
+<h3 id="le-tampon-de-préparation">6.4. Le tampon de préparation</h3>
+<p>Le snapshot copie l'état dans un tampon de l'hôte. Allouer ce tampon à chaque checkpoint est une erreur. La partie D du lab copie 256 Mio dans un tampon neuf, puis de nouveau dans le même.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.3 — Le premier accès à un tampon neuf</span> Capturé sur la VM de test, <code>bench_ckpt.py</code>, partie D (indicatif, non testé) :</p>
+<pre class="text"><code>Part D - informational: snapshot copy of 256 MiB, first into a new buffer, then into the same one
+   first copy   1417 ms   second copy     25 ms   ratio 56.3</code></pre>
+<p>La première copie coûte cinquante fois la seconde. L'écart dépend de l'état de la mémoire de la machine (fautes de page ; sur une VM, peut-être l'attribution tardive de la mémoire par l'hôte, hypothèse non vérifiée) et varie d'une exécution à l'autre. Il justifie la règle d'ingénierie : allouer et toucher le tampon une fois (c'est le rôle de la mémoire épinglée réutilisée dans les vrais entraîneurs), puis le réutiliser.</p>
+</div>
+<p>Cette réutilisation impose la règle du module 10 : <strong>une seule persistance en vol</strong>. Tant que l'écriture précédente lit le tampon, le snapshot suivant doit attendre. C'est ce que fait <code>AsyncCheckpointer.save</code>, et c'est là que se mesure le temps d'attente de l'exemple 6.2.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>._stage <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> <span class="bu">len</span>(<span class="va">self</span>._stage) <span class="op">!=</span> <span class="bu">len</span>(state):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.prepare(<span class="bu">len</span>(state))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        t0 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.wait()  <span class="co"># the staging buffer is still being written: at most one persistence in flight</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        t1 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        np.copyto(<span class="va">self</span>._stage, state)  <span class="co"># the consistent snapshot: the only part that must stop training</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        t2 <span class="op">=</span> time.perf_counter()</span></code></pre></div>
+<p>Le budget de mémoire d'hôte est la taille de l'état local par nœud : pour 980 Go répartis sur 1 024 GPU, 0,96 Go par GPU, soit 7,7 Go par nœud de 8 GPU pour un snapshot en vol. Ce n'est pas énorme ; c'est un budget à ne pas oublier quand le chargeur de données préalloue lui aussi de la mémoire partagée.</p>
+<h3 id="plusieurs-écrivains-un-seul-stockage">6.5. Plusieurs écrivains, un seul stockage</h3>
+<p>Quand les rangs écrivent chacun leur part, l'agrégat dépend de ce que le stockage peut absorber. La partie C du lab écrit 128 Mio au total, répartis sur 1, 2 puis 4 processus qui écrivent chacun leur fichier avec le protocole durable.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.4 — Des écrivains parallèles sur un seul disque</span> Capturé sur la VM de test, <code>bench_ckpt.py</code>, partie C. Médiane de trois exécutions après deux exécutions d'échauffement ; chaque écrivain se chronomètre depuis une barrière.</p>
+<pre class="text"><code>       1 writers  wall    164 ms  aggregate    781 MiB/s
+       2 writers  wall    148 ms  aggregate    867 MiB/s
+       4 writers  wall    136 ms  aggregate    944 MiB/s</code></pre>
+<p>Quadrupler le nombre d'écrivains n'a gagné que 21 % de débit agrégé : il n'y a qu'<strong>un</strong> disque virtuel. Ce que le lab mesure ici est la contention d'un seul périphérique, pas le passage à l'échelle d'un système de fichiers parallèle : sur un tel système, le débit agrégé suit <span class="math inline">\min(\text{clients},\text{serveurs})</span> (section 2.3), tant que les écrivains sont répartis sur des cibles différentes.</p>
+<p>Un écrivain seul atteint ici 781 Mio/s, plus que les 518 Mio/s de l'ajustement de l'exemple 6.1, sans que nous l'expliquions. Hypothèse non testée : l'option de montage <code>discard</code>, qui pénaliserait le renommage par-dessus un fichier existant (partie A) mais pas la création d'un fichier neuf (partie C).</p>
+</div>
+<p>Fichier par rang ou fichier partagé ? Un fichier par rang évite les verrous mais crée autant de fichiers que de rangs à chaque checkpoint : 1 024 créations simultanées sur le serveur de métadonnées, puis autant de fichiers à effacer à la rotation. Un fichier partagé demande un striping suffisant (section 2.3) et des écritures alignées sur les blocs : le manuel de Lustre explique que plus d'un client écrivant dans un même bloc provoque des échanges de verrous, même sans recouvrement.</p>
+<h3 id="la-relecture">6.6. La relecture</h3>
+<p>À la reprise, tous les rangs relisent leur part en même temps : c'est un pic de lecture, pas d'écriture. Le débit de lecture requis pour relire en <span class="math inline">R</span> secondes est <span class="math inline">S/R</span> (exemple 1.2 : 8,2 Go/s pour 120 s). Le module 10 décrit comment MegaScale réduit cette charge en faisant lire une partition par un rang du groupe de parallélisme de données, qui la diffuse ensuite.</p>
+<p>Un checkpoint complet contient aussi <strong>l'état du chargeur de données</strong>. CheckFreq (Mohan et coauteurs, FAST 2021) l'énonce : le système maintient l'invariant selon lequel chaque élément du jeu est utilisé exactement une fois par époque « by checkpointing data loader state using a light-weight resumable iterator ». Sans cela, une reprise rejoue ou saute des échantillons.</p>
+<h3 id="la-recette-dun-stockage-de-checkpoint">6.7. La recette d'un stockage de checkpoint</h3>
+<p>Un fournisseur de stockage ou de cloud donne un débit maximal ; ce qui vous importe est le débit pour <strong>votre</strong> motif. Le critère « débit et latence d'écriture d'un checkpoint » figure déjà dans la matrice de décision du <a href="../finops-capacity/index.html#ch8">module 15</a>. Une recette utile contient cinq essais, chacun avec un critère de réussite tiré de vos formules, caches froids, trois répétitions, médiane rapportée.</p>
+<ol type="1">
+<li><strong>Rafale d'écriture :</strong> <span class="math inline">N</span> clients écrivent chacun <span class="math inline">S/N</span> avec le protocole durable ; temps jusqu'au dernier <code>fsync</code> ; critère : <span class="math inline">S/(f\tau)</span> du chapitre 1.</li>
+<li><strong>Rafale de lecture :</strong> les mêmes clients relisent, caches froids ; critère : <span class="math inline">S/R</span>.</li>
+<li><strong>Lecture séquentielle agrégée :</strong> <span class="math inline">N</span> clients lisent de gros fichiers ; critère : le débit de lecture du chapitre 1.</li>
+<li><strong>Lecture aléatoire :</strong> à la taille d'un échantillon ; critère : <span class="math inline">\eta(n)</span> du chapitre 4 sur <span class="math inline">\alpha</span> et <span class="math inline">B</span> mesurés.</li>
+<li><strong>Métadonnées :</strong> créations et lectures d'attributs par seconde ; critère : les opérations par époque de l'exemple 2.1 divisées par la durée que vous acceptez.</li>
+</ol>
+<p><code>bench_ckpt.py --dir &lt;point de montage&gt;</code> et <code>fio_gap.py --dir &lt;point de montage&gt;</code> couvrent les essais 1 et 4 sur un seul client ; le test multi-clients et le test de métadonnées sont à écrire pour votre système et n'ont <strong>pas</strong> été exécutés ici.</p>
+<div class="key">
+<p><span class="tag">Le temps qui compte</span> Pour l'entraînement, le coût d'un checkpoint est son temps <strong>bloquant</strong>, pas sa durée d'écriture, tant que l'écriture tient dans l'intervalle. Dès qu'elle ne tient plus, l'asynchrone ne protège plus.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li>Écriture ordinaire (non durable), protocole <code>fsync</code> + renommage et <code>O_DIRECT</code> n'ont pas le même coût : 102, 283 et 356 ms pour 128 Mio sur le disque du bac à sable.</li>
+<li>Synchrone : <span class="math inline">T_p/I</span> ; asynchrone : <span class="math inline">(s + \max(0, T_p - I))/I</span> ; le coude est à <span class="math inline">I = T_p</span>.</li>
+<li>Allouer le tampon de snapshot une fois : sur la VM de test, la première copie de 256 Mio dans un tampon neuf a coûté 1 417 ms, la suivante 25 ms.</li>
+<li>Plusieurs écrivains sur un seul disque ne passent pas à l'échelle ; sur un système parallèle, l'agrégat suit <span class="math inline">\min(\text{clients},\text{serveurs})</span>.</li>
+<li>Un checkpoint contient l'état du chargeur ; une recette de stockage teste vos motifs avec des critères chiffrés.</li>
+</ul>
+</div>
+<h2 id="ch7">7. Mise en cache : NVMe local, cache distribué, GPUDirect Storage</h2>
+<p>Un cache évite de relire plusieurs fois, depuis le stockage partagé, ce que l'entraînement relit à chaque époque. Il se juge à son taux de succès, et ce taux dépend d'une politique d'éviction que le noyau a choisie pour d'autres charges que la vôtre.</p>
+<h3 id="les-niveaux">7.1. Les niveaux</h3>
+<p>Entre le GPU et le stockage partagé, il y a typiquement trois niveaux. La mémoire de l'hôte, où le cache de pages du noyau garde ce qui a été lu récemment. Le disque NVMe local du nœud. Et, parfois, un cache partagé entre nœuds.</p>
+<p>Le guide utilisateur du DGX H100 de NVIDIA décrit deux volumes : un « Data Cache » de 8 disques NVMe de 3,84 To en RAID 0, soit <span class="math inline">8 \times 3{,}84 = 30{,}72</span> To par nœud, et un volume système de 2 disques de 1,92 To en RAID 1. Un volume en RAID 0 ne survit pas à la perte d'un disque : traitez-le comme un cache, jamais comme un stockage.</p>
+<p>Un cache a deux nombres : sa capacité, comparée à celle du jeu de données, et le rapport entre sa vitesse et celle du stockage derrière. Le débit moyen d'une lecture dont une fraction <span class="math inline">h</span> des octets vient du cache est la moyenne <strong>harmonique</strong> des deux vitesses :</p>
+<p><span class="math display">B_{\text{eff}} = \frac{1}{h/B_{\text{cache}} + (1-h)/B_{\text{stockage}}}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — Pourquoi 50 % de succès ne donne pas la moyenne</span> Valeurs d'exemple : cache à 6 Go/s, stockage à 1 Go/s. À <span class="math inline">h = 0{,}5</span>, le débit effectif n'est pas <span class="math inline">(6+1)/2 = 3{,}5</span> Go/s mais 1,71 Go/s : les octets lents dominent le temps. Pour atteindre 3 Go/s, il faut <span class="math inline">h = (1 - 1/3)/(1 - 1/6) = 0{,}80</span> : 80 % de succès. Calculé avec <code>effective_read_bandwidth</code> (lab 8.4).</p>
+</div>
+<h3 id="le-piège-du-lru-en-époques-aléatoires">7.2. Le piège du LRU en époques aléatoires</h3>
+<p>Le cache de pages du noyau évince en gros les pages les moins récemment utilisées (LRU). Or un entraînement relit tout le jeu à chaque époque, dans un ordre aléatoire différent. Si le jeu est plus grand que le cache, ce motif est le pire cas pour le LRU : ce qu'on vient de lire est évincé avant d'être relu.</p>
+<p>Le papier sur les <em>data stalls</em> le constate (tableau 1) : « OS Page Cache is inefficient for DNN training due to thrashing ». Ses auteurs proposent un cache logiciel, MinIO, spécialisé pour l'entraînement : les éléments, une fois en cache, ne sont <strong>jamais remplacés</strong>. Quand le cache est plein, les autres requêtes vont au stockage. Avec <span class="math inline">x = C/D</span>, le rapport de la taille du cache à celle du jeu, un tel cache a un taux de succès de <span class="math inline">x</span>.</p>
+<p>Pour le LRU, la dérivation de ce parcours (champ moyen, détaillée dans la docstring de <code>lru_epoch_hit_ratio</code>) donne</p>
+<p><span class="math display">h_{\text{LRU}}(x) = x + (1 - x)\ln(1 - x)</span></p>
+<p>Entre deux usages d'un échantillon, le cache voit la fin de l'époque précédente et le début de l'époque courante ; les deux groupes se recouvrent un peu, ce qui compte les échantillons en double une seule fois. C'est une <strong>dérivation de ce cours</strong>, pas un résultat publié : le lab la vérifie par simulation.</p>
+<div class="ex">
+<p><span class="tag">Exemple 7.2 — LRU contre cache sans éviction</span> Calculé avec <code>iosizing.py demo</code> ; la simulation (2 000 échantillons, cache de 1 000, six époques, graine 0) donne 0,151 pour le LRU et 0,500 pour le cache sans éviction.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Cache / jeu de données</th>
+<th>Cache sans éviction</th>
+<th>LRU (formule)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>25 %</td>
+<td>25 %</td>
+<td>3,4 %</td>
+</tr>
+<tr class="even">
+<td>50 %</td>
+<td>50 %</td>
+<td>15,3 %</td>
+</tr>
+<tr class="odd">
+<td>75 %</td>
+<td>75 %</td>
+<td>40,3 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Avec un cache de la moitié du jeu, le LRU ne garde que 15 % de succès : le tiers de ce que garde un cache qui ne supprime jamais. Avec les vitesses de l'exemple 7.1, cela fait 1,15 Go/s au lieu de 1,71 Go/s.</p>
+</div>
+<figure class="fig">
+<svg viewBox="0 0 560 330" role="img" aria-labelledby="lru-t lru-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="lru-t">
+Taux de succès d'un cache selon sa taille relative
+</title>
+<desc id="lru-d">Un cache qui ne supprime jamais ses entrées suit la diagonale. Un cache LRU lu en époques d'ordre aléatoire reste très en dessous : 15 pour cent à la moitié du jeu de données.</desc> <line x1="70" y1="264" x2="530" y2="264" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="269" text-anchor="end" font-size="14" fill="currentColor">0 %</text> <text x="70" y="286" text-anchor="middle" font-size="14" fill="currentColor">0 %</text> <line x1="70" y1="204.0" x2="530" y2="204.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="209.0" text-anchor="end" font-size="14" fill="currentColor">25 %</text> <text x="185.0" y="286" text-anchor="middle" font-size="14" fill="currentColor">25 %</text> <line x1="70" y1="144.0" x2="530" y2="144.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="149.0" text-anchor="end" font-size="14" fill="currentColor">50 %</text> <text x="300.0" y="286" text-anchor="middle" font-size="14" fill="currentColor">50 %</text> <line x1="70" y1="84.0" x2="530" y2="84.0" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="89.0" text-anchor="end" font-size="14" fill="currentColor">75 %</text> <text x="415.0" y="286" text-anchor="middle" font-size="14" fill="currentColor">75 %</text> <line x1="70" y1="24" x2="530" y2="24" stroke="currentColor" stroke-opacity=".2"/> <text x="62" y="29" text-anchor="end" font-size="14" fill="currentColor">100 %</text> <text x="530" y="286" text-anchor="middle" font-size="14" fill="currentColor">100 %</text> <rect x="70" y="24" width="460" height="240" fill="none" stroke="currentColor" stroke-width="1.5"/> <line x1="70" y1="264" x2="530" y2="24" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/> <polyline points="70.0,264.0 79.2,264.0 88.4,263.8 97.6,263.6 106.8,263.2 116.0,262.8 125.2,262.2 134.4,261.5 143.6,260.7 152.8,259.9 162.0,258.8 171.2,257.7 180.4,256.5 189.6,255.1 198.8,253.6 208.0,251.9 217.2,250.1 226.4,248.2 235.6,246.1 244.8,243.9 254.0,241.6 263.2,239.0 272.4,236.3 281.6,233.5 290.8,230.4 300.0,227.2 309.2,223.8 318.4,220.1 327.6,216.3 336.8,212.2 346.0,208.0 355.2,203.4 364.4,198.7 373.6,193.6 382.8,188.3 392.0,182.7 401.2,176.7 410.4,170.5 419.6,163.8 428.8,156.7 438.0,149.3 447.2,141.3 456.4,132.8 465.6,123.7 474.8,113.9 484.0,103.3 493.2,91.7 502.4,78.9 511.6,64.5 520.8,47.6 530.0,24.0" fill="none" stroke="var(--accent)" stroke-width="3.5"/> <circle cx="300.0" cy="144.0" r="5" fill="var(--key-bar)" stroke="currentColor"/><circle cx="300.0" cy="227.17766166719343" r="5" fill="var(--accent)" stroke="currentColor"/> <text x="312.0" y="168.0" font-size="14" fill="currentColor">50 %</text><text x="288.0" y="215" text-anchor="end" font-size="14" fill="currentColor">15 %</text> <text x="125.19999999999999" y="163.2" font-size="14" fill="currentColor" transform="rotate(-30 125.19999999999999 163.2)">cache sans éviction : x</text> <text x="323.0" y="244.8" font-size="14" fill="currentColor">LRU : x + (1 − x) ln(1 − x)</text> <text x="300.0" y="312" text-anchor="middle" font-size="14" fill="currentColor">taille du cache / taille du jeu de données (x)</text> <text x="14" y="144.0" text-anchor="middle" font-size="14" fill="currentColor" transform="rotate(-90 14 144.0)">taux de succès</text>
+</svg>
+<figcaption>
+Taux de succès selon la taille relative du cache pour des époques en ordre aléatoire : cache sans éviction (tirets) et LRU (trait plein). Formules du lab 8.4, vérifiées par simulation à 3 points près.
+</figcaption>
+</figure>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> effective_read_bandwidth(hit_ratio: <span class="bu">float</span>, cache_bw: <span class="bu">float</span>, backend_bw: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Average rate when a fraction `hit_ratio` of the bytes comes from the cache: harmonic mix of the two speeds.&quot;&quot;&quot;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">1.0</span> <span class="op">/</span> (hit_ratio <span class="op">/</span> cache_bw <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> hit_ratio) <span class="op">/</span> backend_bw)</span></code></pre></div>
+<h3 id="un-cache-par-nœud-affecter-les-shards">7.3. Un cache par nœud : affecter les shards</h3>
+<p>Sur plusieurs nœuds en parallélisme de données, chaque nœud ne lit à chaque époque qu'une part <span class="math inline">D/N</span> du jeu. Si les shards sont réaffectés au hasard à chaque époque, un nœud a déjà vu un shard donné à l'époque <span class="math inline">k</span> avec la probabilité</p>
+<p><span class="math display">p_k = 1 - \left(1 - \frac{1}{N}\right)^{k-1}</span></p>
+<p>avec <span class="math inline">N</span> nœuds, tant que son cache peut tout contenir. Pour <span class="math inline">N = 4</span> nœuds et <span class="math inline">k = 3</span>, <span class="math inline">p_3 = 1 - (3/4)^2 = 43{,}75\ \%</span>. Pour <span class="math inline">N = 32</span>, la probabilité à l'époque 2 est de 3 %, et à l'époque 10 de 25 % : le cache se remplit très lentement.</p>
+<p>La vitesse d'un nœud dépend alors de ce qui manque. Soit <span class="math inline">h</span> la part déjà en cache, <span class="math inline">b</span> la part du débit du stockage partagé qui revient à un nœud (débit total divisé par <span class="math inline">N</span>) et <span class="math inline">r_{\text{besoin}}</span> le débit que le nœud voudrait consommer.</p>
+<p>Les octets qui manquent viennent du stockage : le nœud va donc à <span class="math inline">r = \min\bigl(r_{\text{besoin}},\, b/(1-h)\bigr)</span>, et une époque dure <span class="math inline">D/N</span> divisé par <span class="math inline">r</span> (lab 8.4, <code>epoch_times</code>).</p>
+<p>La parade est une affectation <strong>collante</strong> : chaque nœud reçoit toujours les mêmes shards. Dès l'époque 2, sa part tient dans son cache et tout est servi localement. Le papier CoorDL décrit une idée voisine, un cache partitionné coordonné entre les serveurs. Le prix est un mélange moins aléatoire : un nœud ne voit jamais les échantillons d'un autre. On le compense en changeant la partition rarement (toutes les <span class="math inline">K</span> époques) ou en mélangeant à l'intérieur de gros shards. L'exercice 10 chiffre l'écart.</p>
+<h3 id="pré-chauffage-et-invalidation">7.4. Pré-chauffage et invalidation</h3>
+<p>Le <strong>pré-chauffage</strong> consiste à copier les shards vers le disque local avant que l'entraînement ne commence, par exemple dans l'étape d'initialisation d'un job Slurm (<a href="../slurm/index.html">module 5</a>). Il transforme une première époque limitée par le stockage partagé en une copie dont on connaît la durée : octets locaux divisés par le débit du stockage.</p>
+<p>Quant à l'<strong>invalidation</strong>, la parade la plus sûre est de l'éviter : traitez les shards comme immuables. Une nouvelle version du jeu est un nouveau répertoire (ou un nouveau préfixe) avec un manifeste qui liste les shards et leurs empreintes ; la clé du cache est le chemin plus l'empreinte. On supprime les anciennes versions après vérification. C'est une <strong>recommandation de ce parcours</strong>, pas une propriété d'un produit.</p>
+<h3 id="gpudirect-storage">7.5. GPUDirect Storage</h3>
+<p>Le guide de <a href="https://docs.nvidia.com/gpudirect-storage/overview-guide/index.html">GPUDirect Storage</a> (GDS) le décrit comme un chemin direct pour des transferts par accès direct à la mémoire entre la mémoire du GPU et le stockage, ce qui « avoids a bounce buffer through the CPU » et peut soulager la bande passante du système et la charge du CPU.</p>
+<p>Il convient surtout aux gros transferts qui ne passent pas par le CPU : lecture et écriture d'un checkpoint depuis la mémoire GPU, ou lots déjà prêts. Il apporte peu si le CPU doit de toute façon décoder les données (inférence de ce parcours, pas une phrase du guide).</p>
+<div class="war">
+<p><span class="tag">GPUDirect Storage exige l'accès direct au fichier</span> Le guide indique que, pour des transferts directs entre la mémoire du GPU et le stockage, « the file must be opened in O_DIRECT mode » ; sinon, le contenu peut être mis en tampon dans la mémoire du CPU, ce qui est incompatible avec le transfert direct.</p>
+<p>Depuis CUDA 12.2 (GDS 1.7.x), la bibliothèque cuFile prend le chemin <code>O_DIRECT</code> pour des tampons, tailles et décalages alignés même si le fichier n'a pas été ouvert ainsi. Source : <a href="https://docs.nvidia.com/gpudirect-storage/overview-guide/index.html">NVIDIA, GDS Overview Guide</a>, lu le 24 octobre 2026. <strong>Non exécuté ici : pas de GPU.</strong></p>
+</div>
+<p>Côté CPU, le lab 8.3 illustre la contrainte d'alignement de <code>O_DIRECT</code> (ce n'est pas une mesure de GDS) : une écriture de 1 000 octets échoue avec <code>EINVAL</code>.</p>
+<div class="key">
+<p><span class="tag">Un cache se juge à son taux de succès</span> Avant d'acheter du NVMe local, calculez <span class="math inline">x = C/D</span> et le taux de succès de votre politique. Un cache de la moitié du jeu qui évince en LRU ne rend que 15 % de succès.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>Le débit effectif d'un cache est une moyenne harmonique : 50 % de succès entre 6 et 1 Go/s donne 1,71 Go/s, pas 3,5.</li>
+<li>En époques aléatoires, un LRU rend <span class="math inline">x + (1-x)\ln(1-x)</span> de succès ; un cache sans éviction, <span class="math inline">x</span> (15 % contre 50 % à moitié du jeu).</li>
+<li>Affectation collante des shards : à partir de l'époque 2, la part d'un nœud est locale ; au hasard, le cache se remplit à <span class="math inline">1 - (1-1/N)^{k-1}</span>.</li>
+<li>Traitez les shards comme immuables : l'invalidation se règle par un manifeste et des empreintes.</li>
+<li>GPUDirect Storage évite le tampon CPU et exige <code>O_DIRECT</code> ; non exécuté sans GPU.</li>
+</ul>
+</div>
+<h2 id="ch8">8. Capacité, durée de vie des données, sauvegardes, quotas, coût au To</h2>
+<p>Un stockage qui tient le débit peut quand même s'arrêter parce qu'il est plein, parce qu'un quota refuse une écriture, ou parce qu'une purge a effacé un checkpoint. Ce chapitre traite de ce qui dure et de ce qu'il coûte.</p>
+<h3 id="quatre-classes-de-durée-de-vie">8.1. Quatre classes de durée de vie</h3>
+<p>Toutes les données ne méritent pas le même traitement. Quatre classes suffisent à les ranger : l'<strong>éphémère</strong> (caches, fichiers temporaires), le <strong>travail en cours</strong> (jeu de données courant, checkpoints actifs), le <strong>durable</strong> (code, configurations, manifestes, checkpoints finaux) et l'<strong>archive</strong>. Les exploitants les distinguent aussi.</p>
+<p>Le NERSC décrit le système de fichiers de travail de Perlmutter comme un stockage temporaire de gros fichiers, avec purge. Le centre IDRIS décrit Jean Zay avec un système de fichiers parallèle Lustre et trois dispositifs de stockage : 8,5 Po sur SSD, 44 Po sur disques rotatifs et 56 Po sur bandes (page de matériel, lue le 24 octobre 2026). Ce sont trois niveaux de coût et de vitesse.</p>
+<div class="war">
+<p><span class="tag">Une purge efface ce qui n'a pas été lu depuis huit semaines</span> La page du NERSC sur Perlmutter scratch avertit : « The scratch file system is purged. Any file not accessed within 8 weeks is subject to deletion. » Le NERSC utilise la date d'accès (<em>atime</em>) et précise que, passé ce délai, un fichier « may be purged at any time » ; il ajoute que « Ultimately, it is the user's responsibility to prevent data loss ». Un checkpoint de sécurité écrit puis jamais relu est un candidat à la purge. Source : <a href="https://docs.nersc.gov/filesystems/perlmutter-scratch/">NERSC, Perlmutter scratch</a>, lu le 24 octobre 2026.</p>
+</div>
+<h3 id="la-vie-dun-checkpoint">8.2. La vie d'un checkpoint</h3>
+<p>Sans politique, les checkpoints s'accumulent. La rotation du module 10 garde les <span class="math inline">K</span> derniers et un checkpoint ancien « de sécurité » tous les <span class="math inline">L</span> checkpoints. Le stockage retenu en fin de campagne est donc <span class="math inline">(K + \lfloor n/L \rfloor) \times S</span> pour <span class="math inline">n</span> checkpoints écrits.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.1 — Rotation d'un modèle de 70 milliards de paramètres</span> <span class="math inline">S = 980</span> Go ; 100 000 pas, un checkpoint tous les 500 pas, soit <span class="math inline">n = 200</span> ; <span class="math inline">K = 3</span> et <span class="math inline">L = 10</span>. On retient <span class="math inline">3 + 20 = 23</span> checkpoints, soit <strong>22,5 To</strong>, contre 196 To sans rotation : 173,5 To économisés. Pendant la rotation, le nouveau checkpoint est écrit et validé <strong>avant</strong> que le plus ancien soit supprimé : le pic est de <span class="math inline">(K+1) \times S = 3{,}92</span> To. Calculé avec <code>iosizing.py demo</code>.</p>
+</div>
+<p>Deux conséquences. D'abord, le quota doit couvrir le <strong>pic</strong>, pas le régime établi : un checkpoint qui échoue par manque de place au moment de la rotation est un échec de plus à gérer. Ensuite, les checkpoints de sécurité à long terme n'ont pas leur place sur un stockage purgé ; ils vont sur un niveau durable (section 8.1).</p>
+<h3 id="les-jeux-de-données-et-leurs-copies">8.3. Les jeux de données et leurs copies</h3>
+<p>Chaque transformation d'un jeu de données en crée une copie : brut, filtré, tokenisé, découpé en shards. La capacité à prévoir est la somme des copies que vous gardez, pas la taille du jeu brut. Gardez pour chaque copie un manifeste (liste de fichiers, empreintes, version du code qui l'a produite) : c'est ce qui permet de supprimer une copie dérivée en sachant la régénérer, et d'expliquer un résultat plus tard.</p>
+<h3 id="les-sauvegardes">8.4. Les sauvegardes</h3>
+<p>Une sauvegarde répond à deux questions : combien de données peut-on perdre (l'objectif de point de reprise, RPO) et combien de temps peut-on attendre pour les retrouver (l'objectif de temps de reprise, RTO). Les réponses diffèrent par classe. Le code, les configurations et les manifestes se sauvegardent toujours ; les checkpoints finaux et les résultats d'évaluation aussi ; les caches, le scratch et les checkpoints intermédiaires non.</p>
+<p>Les outils existent : la documentation de WEKA liste des instantanés et une copie d'instantané vers un stockage objet ; le dépôt de Mountpoint recommande d'activer le versionnage du bucket quand on autorise la suppression. Quel que soit l'outil, <strong>testez une restauration</strong> : une sauvegarde jamais restaurée est une hypothèse.</p>
+<h3 id="les-quotas">8.5. Les quotas</h3>
+<p>Un quota limite l'espace, parfois le nombre de fichiers, par utilisateur, groupe ou projet. Le manuel de Lustre documente <code>lfs setquota</code> avec les options <code>-u</code>, <code>-g</code> et <code>-p</code>, et précise que les quotas de <code>root</code> ne sont <strong>pas</strong> appliqués. Le NERSC dit ce qui se passe quand un quota est dépassé : « you will not be able to write to the file system until you reduce your usage ».</p>
+<p>Pour un entraînement, cela signifie qu'un checkpoint peut échouer <strong>parce qu'un quota est atteint</strong>, sans que le système de fichiers soit plein. La garde la plus simple est de vérifier l'espace libre avant d'écrire et de faire pivoter avant de manquer de place ; le lab 8.4 contient <code>free_space_ok</code> et <code>peak_checkpoint_bytes</code>. Pour les quotas de fichiers, un fichier par rang et par checkpoint les épuise vite : 1 024 rangs et 23 checkpoints retenus font 23 552 fichiers.</p>
+<h3 id="le-coût-au-to">8.6. Le coût au To</h3>
+<p>Le coût mensuel d'un programme est la somme, sur les niveaux, de la capacité multipliée par le nombre de copies et par le prix du To-mois du niveau, plus les requêtes et les sorties de données :</p>
+<p><span class="math display">C = \sum_{\text{niveaux}} T_i \times m_i \times p_i</span></p>
+<p>La fonction <code>monthly_cost</code> du lab prend le prix en argument : <strong>aucun prix n'est donné</strong> dans ce module. Lisez la page de prix de votre fournisseur le jour de votre calcul, avec ses unités (To ou Tio, mois de 30 jours ou non) et ses lignes annexes.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.2 — Ce que change le niveau de stockage</span> Même programme que l'exemple 8.1 : 22,5 To de checkpoints, 20 To de jeu tokenisé, 2 To de journaux et artefacts (le « chaud », 44,5 To), plus 60 To de données brutes. Si tout est au prix <span class="math inline">p</span> du niveau chaud : 104,5 To × <span class="math inline">p</span>. Si les 60 To bruts sont dans un niveau <strong>supposé</strong> à un quart du prix : <span class="math inline">(44{,}5 + 60/4) \times p = 59{,}5\ p</span>, soit 43 % de moins. Le quart est une hypothèse pour l'illustration, pas un prix. Calculé avec <code>iosizing.py exercises</code>.</p>
+</div>
+<h3 id="observer-le-stockage">8.7. Observer le stockage</h3>
+<p>Quatre familles de métriques suffisent à un tableau de bord de stockage : l'espace et les fichiers consommés par rapport au quota, par équipe ; l'âge des fichiers par rapport à la politique de purge ; la durée et le volume de chaque checkpoint (médiane et queue de distribution, par campagne) ; et la part d'attente des chargeurs (<em>stall</em>) relevée dans les journaux d'entraînement. Le <a href="../observability/index.html#ch3">module 14</a> montre comment les exposer à Prometheus.</p>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Quatre classes : éphémère, travail en cours, durable, archive ; une purge efface ce qui n'a pas été lu (huit semaines au NERSC).</li>
+<li>Rotation : <span class="math inline">(K + \lfloor n/L \rfloor) \times S</span> retenus ; le quota doit couvrir le pic <span class="math inline">(K+1) \times S</span>.</li>
+<li>Chaque transformation d'un jeu de données crée une copie : prévoir la somme, garder un manifeste.</li>
+<li>Une sauvegarde se juge à sa restauration ; un quota atteint fait échouer une écriture sans que le disque soit plein.</li>
+<li>Le coût est <span class="math inline">\sum T_i m_i p_i</span> ; lisez le prix le jour même, ne figez aucun chiffre.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Les quatre labs s'exécutent sur une machine Linux <strong>sans GPU</strong> et sans système de fichiers parallèle : ils mesurent un vrai <code>DataLoader</code> PyTorch, de vraies E/S sur le disque local et des compteurs du noyau. Les éléments simulés (lecture distante, décodage, pas GPU, stockage lent) sont étiquetés comme tels dans chaque <code>README.md</code> et dans les énoncés ci-dessous. Les durées (2,5 h, 2,5 h, 2,5 h et 1,75 h) font 9,25 h, comme dans la fiche. Installation préalable :</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> venv/bin/activate</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch <span class="at">--index-url</span> https://download.pytorch.org/whl/cpu</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install numpy pytest pyarrow webdataset</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> fio          <span class="co"># nécessaire au lab 8.2, partie B</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PWD</span><span class="st">/venv/bin/python&quot;</span>  <span class="co"># honoré par chaque verify.sh</span></span></code></pre></div>
+<div class="lab">
+<p><span class="tag">Lab 8.1 — Démasquer un chargeur de données lent</span></p>
+<p><strong>Objectif.</strong> Mesurer la part d'attente d'une boucle d'entraînement, la comparer à un modèle, distinguer un chargeur à latence d'un chargeur CPU et lire le profileur. <strong>Durée.</strong> 2,5 h (séance 5). <strong>Prérequis matériels.</strong> Un portable ou une VM Linux de 4 cœurs au moins, Python avec PyTorch CPU, <code>numpy</code> et <code>pytest</code> ; aucun GPU. <strong>Simulé :</strong> la lecture distante, le décodage et le pas GPU ; <strong>réel :</strong> le <code>DataLoader</code>, le temps d'attente, le CPU des workers, le profileur.</p>
+<ol type="1">
+<li>Lisez <code>labs/storage/loader-bottleneck/loader_lab.py</code> : repérez où l'attente d'E/S, le décodage et le pas GPU sont simulés, et la mesure autour de <code>next()</code>.</li>
+<li>Lancez <code>bash verify.sh</code> (environ 30 s) et lisez les trois tableaux A, B et C.</li>
+<li>Refaites à la main la prédiction du modèle pour 2 workers (coût <span class="math inline">c</span>, coût d'un batch, débit, <em>stall</em>) et comparez à la colonne <code>model</code>.</li>
+<li>Relancez <code>python3 run_lab.py --batches 100</code> : les mesures sont-elles plus stables ?</li>
+<li>Changez <code>STEP_S</code> dans <code>run_lab.py</code> (6 ms, puis 24 ms) : à partir de combien de workers le chargeur suit-il le GPU ? Prédisez avec <code>predict_stall</code> avant de mesurer.</li>
+<li>Appliquez <code>diagnose</code> à une ligne d'un job réel (<em>stall</em>, workers, CPU par worker).</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK loader-bottleneck</code> : le <em>stall</em> mesuré reste à moins de 25 points du modèle pour le chargeur à latence (35 points pour le chargeur CPU à 4 et 8 workers, dont le modèle suppose 4 cœurs libres), il baisse quand les workers augmentent, et passer de 4 à 8 workers sur le chargeur CPU ne gagne pas plus de 50 % de débit (il doublerait si les cœurs ne limitaient pas).</p>
+<p>Sur la VM de test (2026-10-24) : <code>OK loader-bottleneck: stall 0/1/2/4/8 workers = 88 % / 86 % / 74 % / 50 % / 14 %; CPU-bound ceiling 52.1 -&gt; 53.0 batch/s (4 -&gt; 8 workers)</code>. Vos valeurs seront différentes.</p>
+<p><strong>Pour aller plus loin.</strong> Lancez <code>python3 run_lab.py --no-in-order</code> et comparez le <em>stall</em> à 8 workers à celui du modèle : la livraison dans l'ordre explique-t-elle l'écart ? Sur un nœud GPU, comparez <code>pin_memory=True</code> et <code>False</code> avec le même jeu synthétique, et lisez la ligne de temps CUDA du profileur. <strong>Non exécuté ici.</strong></p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 8.2 — Shards et lecture séquentielle</span></p>
+<p><strong>Objectif.</strong> Chiffrer, avec des compteurs du noyau, ce que quatre dispositions d'un même jeu coûtent en ouvertures, en appels <code>read</code> et en octets lus, puis mesurer l'effet de la taille de requête avec <code>fio</code>. <strong>Durée.</strong> 2,5 h : partie A (compteurs) 1,5 h en séance 3, partie B (<code>fio</code>) 1 h en séance 4. <strong>Prérequis matériels.</strong> Linux, Python avec <code>numpy</code> et <code>pytest</code>, <code>pyarrow</code> et <code>webdataset</code> recommandés, <code>fio</code>, environ 200 Mio de disque libre ; aucun GPU. <strong>Simulé :</strong> les données (graine fixe) ; <strong>réel :</strong> les fichiers, le noyau, <code>fio</code>.</p>
+<ol type="1">
+<li>Lisez <code>labs/storage/shard-format/shard_lab.py</code> : les quatre dispositions, les lecteurs, <code>measure</code> et ses compteurs.</li>
+<li>Partie A : lancez <code>python3 run_shards.py</code> et recopiez le tableau (ouvertures, <code>read()</code> par échantillon, <code>asked/pay</code>, <code>device/pay</code>).</li>
+<li>Vérifiez que les ouvertures valent 4 096, 8 et 1 pour les trois dispositions, et expliquez pourquoi un fichier coûte deux <code>read()</code>.</li>
+<li>Relancez avec <code>--samples 8192</code> : quels compteurs changent, lesquels non ?</li>
+<li>Partie B : lancez <code>python3 fio_gap.py</code>, relevez <span class="math inline">\alpha</span>, <span class="math inline">B</span> et <span class="math inline">n_{1/2}</span>, et calculez l'efficacité d'une requête de 16 Kio avec la formule du chapitre 4.</li>
+<li>Lisez <code>read_ahead_kb</code> de votre disque et expliquez la ligne <code>mmap</code> aléatoire ; écrivez votre hypothèse avant de la tester.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK shard-format</code> : sommes de contrôle exactes ; 4 096, 8 et 1 ouvertures ; octets lus sur le périphérique entre 0,9 et 1,6 fois la charge utile pour les lectures séquentielles et <code>pread</code> ; <code>mmap</code> aléatoire au moins 1,5 fois plus que <code>pread</code> ; Parquet aléatoire entre 0,75 et 1,25 fois 256 octets lus par octet utile ; <code>fio</code> : 1 Mio donne plus de deux fois la bande passante de 4 Kio.</p>
+<p>Sur la VM de test : <code>OK shard-format: opens files/tar/packed = 4096/8/1; mmap random device/payload 3.4 vs pread 1.0; parquet asked/payload 256; fio gap 25x, n_1/2 = 109 KiB</code>. Si <code>pyarrow</code> ou <code>webdataset</code> manquent, <code>verify.sh</code> le dit et saute ces lignes.</p>
+<p><strong>Pour aller plus loin.</strong> Lancez <code>fio_gap.py --dir &lt;point de montage&gt;</code> sur un NFS ou un système parallèle, et comparez <span class="math inline">\alpha</span>, <span class="math inline">B</span> et <span class="math inline">n_{1/2}</span> à ceux du disque local. <strong>Non testé ici.</strong></p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 8.3 — Coût d'un checkpoint</span></p>
+<p><strong>Objectif.</strong> Mesurer le coût d'écritures durables, ajuster <span class="math inline">T = \alpha + S/B</span>, et confronter le modèle de surcoût synchrone et asynchrone à une boucle d'entraînement simulée. <strong>Durée.</strong> 2,5 h : parties A, B et D 1,5 h en séance 6, partie C 1 h en séance 7. <strong>Prérequis matériels.</strong> Linux, Python avec <code>numpy</code> et <code>pytest</code>, un disque qui accepte <code>O_DIRECT</code> ; aucun GPU. <strong>Simulé :</strong> le pas d'entraînement, le stockage lent de la partie B (l'écrivain se bride) et la copie GPU vers hôte (une copie en mémoire) ; <strong>réel :</strong> les écritures, <code>fsync</code>, <code>rename</code>, <code>O_DIRECT</code>.</p>
+<ol type="1">
+<li>Lisez <code>labs/storage/checkpoint-io/ckpt_io.py</code> : les trois écritures, <code>AsyncCheckpointer</code>, la boucle simulée.</li>
+<li>Partie A : lancez <code>python3 bench_ckpt.py</code>, relevez le rapport <code>fsync</code> sur écriture ordinaire, l'ajustement et son erreur médiane ; relancez trois fois et notez la dispersion.</li>
+<li>Partie B : calculez à la main le surcoût synchrone et asynchrone pour un checkpoint tous les 40 pas, puis comparez au tableau.</li>
+<li>Changez <code>--throttle-mbps</code> (50, puis 800) : prédisez où se trouve le coude (<span class="math inline">I = T_p</span>), puis mesurez.</li>
+<li>Partie C : relevez le gain agrégé de 1 à 4 écrivains et expliquez pourquoi il est faible sur un seul disque.</li>
+<li>Partie D : relevez le rapport entre la première et la seconde copie dans un tampon.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK checkpoint-io</code> : relecture exacte des trois modes, erreur médiane de l'ajustement sous 60 %, protocole <code>fsync</code> plus de 1,2 fois plus lent qu'une écriture ordinaire à la plus grande taille, surcoût simulé synchrone à moins de 15 points (ou 35 % en relatif) du modèle, asynchrone à moins de 10 points, et asynchrone sous la moitié du synchrone.</p>
+<p>Sur la VM de test : <code>OK checkpoint-io: fit B = 518 MiB/s, error 13 %; sync 28.3 % vs model 25.7 %; async 1.4 % vs model 0.4 %</code>. Vos valeurs seront différentes ; les parties C et D n'ont pas de seuil.</p>
+<p><strong>Pour aller plus loin.</strong> Lancez <code>bench_ckpt.py --dir &lt;point de montage&gt;</code> sur le stockage de votre cluster. Un test multi-clients (section 6.7) reste à écrire. <strong>Non testé ici.</strong></p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 8.4 — Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité</span></p>
+<p><strong>Objectif.</strong> Refaire chaque calcul du module avec du code testé, puis avec vos propres chiffres. <strong>Durée.</strong> 1,75 h : partie A 1 h en séance 1, partie B 0,75 h en séance 7. <strong>Prérequis matériels.</strong> Python et <code>pytest</code> ; aucun autre outil. <strong>Simulé :</strong> la simulation de cache est une simulation (graine fixe) ; les entrées des exemples sont des <strong>valeurs d'exemple</strong>.</p>
+<ol type="1">
+<li>Partie A : lancez <code>python3 iosizing.py demo</code> et refaites les exemples 1.1 et 1.2 avec la taille d'échantillon, le nombre de GPU et la période de votre propre campagne. Les exemples 2.1 et 3.1 se refont de la même façon une fois les chapitres 2 et 3 lus (séance 2).</li>
+<li>Ajoutez à <code>test_iosizing.py</code> un test pour un cas que vous inventez (par exemple 9 Go/s sur des cibles de 2 Go/s) et faites-le passer.</li>
+<li>Partie B : comparez <code>lru_epoch_hit_ratio(0.5)</code> et <code>simulate_epoch_hit_ratio(2000, 1000, 6, "lru")</code>, puis essayez <span class="math inline">x = 0{,}9</span>.</li>
+<li>Appelez <code>epoch_times</code> avec votre nombre de nœuds et vos débits, en affectation <code>sticky</code> puis <code>random</code>, et tracez la différence.</li>
+<li>Calculez la rétention et le pic de votre campagne avec <code>retained_checkpoint_bytes</code> et <code>peak_checkpoint_bytes</code> (en séance 8, après le chapitre 8).</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK io-sizing</code> (16 tests fournis) : la simulation du LRU est à 3 points de la formule, le cache sans éviction à 3 points de <span class="math inline">x</span>, et votre test passe. Sur la VM de test : <code>OK io-sizing: 70B checkpoint = 980 GB, LRU 15 % vs pinned 50 % hits at cache = 50 % of data</code>.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez un modèle de coût avec le prix lu le jour même sur la page de votre fournisseur (<code>monthly_cost</code> le prend en argument).</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★ — Texte ou images : combien lit-on ?</span> Un cluster de 512 GPU entraîne (a) un modèle de texte déjà découpé en jetons de 2 octets, à 12 000 jetons par seconde et par GPU ; (b) un modèle d'images, à 2 500 images par seconde et par GPU, chaque image pesant 120 ko (valeurs d'exemple). Calculez le débit de lecture agrégé de chaque charge, leur rapport, et le nombre d'ouvertures de fichier par seconde de la charge (b) si chaque image est un fichier.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><span class="math inline">512 \times 12\,000 \times 2 = 12\,288\,000</span> octets par seconde, soit 12,3 Mo/s. (b) <span class="math inline">512 \times 2\,500 \times 120\,000 = 153{,}6 \cdot 10^{9}</span> octets par seconde, soit 153,6 Go/s. Le rapport est de 12 500.</li>
+</ol>
+<p>Pour (b) en fichiers : <span class="math inline">512 \times 2\,500 = 1\,280\,000</span> ouvertures par seconde. Le texte ne pose pas de problème de débit ; pour les images, le débit <strong>et</strong> le nombre d'ouvertures posent problème, et c'est le second qui fait s'effondrer un serveur de métadonnées (chapitres 2 et 4). Attention aux unités : on utilise ici des octets décimaux (1 Go = <span class="math inline">10^9</span> octets), comme les fournisseurs.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Checkpoint d'un modèle de 180 milliards de paramètres</span> Un modèle de <span class="math inline">180 \cdot 10^{9}</span> paramètres est sauvegardé à raison de 14 octets par paramètre, toutes les 20 minutes. (a) Quelle est la taille d'un checkpoint ? (b) Quel débit d'écriture agrégé faut-il pour que l'écriture tienne dans 5 % de la période ? (c) Quel débit de lecture pour relire l'état en 300 s ? (d) Si le stockage délivre 25 Go/s en écriture, quelle fraction de la période occupe l'écriture ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">S = 180 \cdot 10^{9} \times 14 = 2{,}52</span> To.</p></li>
+<li><p>Le débit d'écriture agrégé requis est</p></li>
+</ol>
+<p><span class="math display">B = \frac{S}{f\tau} = \frac{2{,}52 \cdot 10^{12}}{0{,}05 \times 1\,200} = 42\ \text{Go/s}</span></p>
+<ol start="3" type="a">
+<li><p>Pour la relecture : <span class="math inline">2{,}52 \cdot 10^{12}/300 = 8{,}4</span> Go/s.</p></li>
+<li><p>À 25 Go/s, l'écriture dure <span class="math inline">100{,}8</span> s, soit <span class="math inline">100{,}8/1\,200 = 8{,}4</span> % de la période : 1,7 fois la cible de 5 %. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e2.*</code>).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★ — Lire un striping BeeGFS</span> Voici un extrait de ce que la documentation de BeeGFS montre pour <code>beegfs entry info</code> sur un répertoire :</p>
+<pre class="text"><code>Stripe pattern details:
++ Type: RAID0
++ Chunksize: 1M
++ Number of storage targets: desired: 4</code></pre>
+<ol type="a">
+<li>Un fichier de 10 Mio est créé dans ce répertoire. Combien de blocs, et combien sur chaque cible, en supposant une répartition en tourniquet ? (b) Même question pour un fichier de 300 Kio. (c) Quelle commande fait utiliser 8 cibles et des blocs de 4 Mio aux fichiers <strong>futurs</strong> de ce répertoire, et que devient un fichier existant ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li>10 blocs de 1 Mio ; le bloc <span class="math inline">k</span> va sur la cible <span class="math inline">k \bmod 4</span> : les cibles 0 et 1 en reçoivent 3, les cibles 2 et 3 en reçoivent 2. (b) Un seul bloc (moins de 1 Mio), donc une seule cible : pas de parallélisme, comme pour tout petit fichier (chapitre 2). (c) <code>beegfs entry set --num-targets=8 --chunk-size=4MiB &lt;répertoire&gt;</code> ; la documentation précise que les paramètres s'appliquent aux <strong>nouveaux</strong> fichiers, pas aux existants, qui gardent leur répartition.</li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★★ — Combien de cibles pour un fichier partagé ?</span> Un fichier de checkpoint partagé doit être écrit à 12 Go/s. Le système a 32 cibles de stockage qui délivrent chacune 2,5 Go/s, et 64 clients de 3 Go/s chacun. (a) Que donne le striping par défaut (1 cible) ? (b) Combien de cibles faut-il au minimum, et avec 20 % de marge ? (c) Combien de clients faut-il pour tenir 14,4 Go/s ? (d) Quel est le débit agrégé du système ? (e) Pourquoi ne pas régler 32 cibles pour tous les fichiers du répertoire ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>2,5 Go/s, soit 4,8 fois trop peu.</p></li>
+<li><p><span class="math inline">\lceil 12/2{,}5 \rceil = 5</span> cibles ; avec 20 % de marge, <span class="math inline">\lceil 14{,}4/2{,}5 \rceil = 6</span> cibles.</p></li>
+<li><p><span class="math inline">\lceil 14{,}4/3 \rceil = 5</span> clients au moins.</p></li>
+<li><p><span class="math inline">\min(64 \times 3,\; 32 \times 2{,}5) = \min(192, 80) = 80</span> Go/s, limité par les cibles : l'écriture à 14,4 Go/s passe.</p></li>
+<li><p>Le manuel de Lustre donne les raisons : le striping ajoute des verrous et des opérations réseau pour <code>stat</code> et <code>unlink</code>, de la contention entre fichiers, un risque accru (une panne de serveur abîme une partie de chaque fichier) et aucun bénéfice pour les petits fichiers. On règle le striping <strong>par répertoire</strong>, pour les gros fichiers seulement. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e4.*</code>).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★ — Combien de requêtes pour 20 Go/s ?</span> Un chargeur doit lire 20 Go/s depuis un magasin d'objets dont le débit documenté est d'<strong>au moins</strong> 5 500 GET par seconde et par préfixe (on prend ce minimum comme hypothèse prudente). Calculez le nombre de GET par seconde et de préfixes nécessaires (a) pour des objets de 100 ko, (b) pour des plages de 8 Mio.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><span class="math inline">20 \cdot 10^{9} / 100\,000 = 200\,000</span> GET/s, soit <span class="math inline">\lceil 200\,000/5\,500 \rceil = 37</span> préfixes. (b) <span class="math inline">20 \cdot 10^{9} / (8 \times 2^{20}) = 2\,384</span> GET/s, soit 1 préfixe. Même débit, 84 fois moins de requêtes : c'est l'argument des gros objets et des shards (chapitre 3).</li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★★ — Quelle taille de groupe de lignes Parquet ?</span> Un jeu d'échantillons de 20 ko est stocké dans Parquet sur un magasin distant, de latence par requête <span class="math inline">\alpha = 5</span> ms et de débit <span class="math inline">B = 1</span> Go/s (valeurs d'exemple). Pour des groupes de 50, 1 000 et 100 000 lignes, calculez la taille du groupe, l'efficacité <span class="math inline">\eta</span> d'une lecture d'un groupe, l'amplification d'un accès aléatoire à un échantillon et le nombre d'échantillons par seconde qu'une connexion lit en accès aléatoire. Quelle taille choisissez-vous pour une lecture en flux avec mélange par tampon ? Pour de l'accès aléatoire ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>La taille de demi-performance est <span class="math inline">n_{1/2} = \alpha B = 5</span> Mo. Avec <span class="math inline">\eta(n) = (n/B)/(\alpha + n/B)</span> :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Lignes par groupe</th>
+<th>Taille du groupe</th>
+<th>Efficacité</th>
+<th>Amplification (accès aléatoire)</th>
+<th>Échantillons/s par connexion (accès aléatoire)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>50</td>
+<td>1 Mo</td>
+<td>16,7 %</td>
+<td>50</td>
+<td>166,7</td>
+</tr>
+<tr class="even">
+<td>1 000</td>
+<td>20 Mo</td>
+<td>80 %</td>
+<td>1 000</td>
+<td>40</td>
+</tr>
+<tr class="odd">
+<td>100 000</td>
+<td>2 Go</td>
+<td>99,75 %</td>
+<td>100 000</td>
+<td>0,5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Pour le flux avec mélange par tampon, 1 000 lignes (20 Mo, soit quatre fois <span class="math inline">n_{1/2}</span>) donne 80 % d'efficacité sans granularité excessive ; 100 000 lignes gagne 20 points mais impose de lire des blocs de 2 Go. Pour l'accès aléatoire, <strong>aucune</strong> taille ne convient : 50 lignes amplifient déjà 50 fois et n'utilisent que 17 % du débit. Il faut sortir l'accès aléatoire de Parquet (fichier empaqueté avec index, chapitre 4). Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e6.*</code>).</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★★ — Petits objets contre shards : la concurrence</span> On veut lire 30 To par époque de 6 heures depuis un magasin d'objets. Chaque requête a une latence de 20 ms avant le premier octet, puis 100 Mo/s par connexion (valeurs d'exemple). Pour (a) des objets de 100 ko et (b) des plages de 16 Mio, calculez le débit d'une connexion, le nombre de connexions simultanées nécessaires (loi de Little : connexions = requêtes par seconde × durée d'une requête), les GET par seconde et les préfixes (5 500 GET/s chacun, minimum documenté pris comme hypothèse prudente). Que conclure ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Le débit visé est <span class="math inline">30 \cdot 10^{12}/21\,600 = 1{,}39</span> Go/s. (a) Une requête de 100 ko dure <span class="math inline">0{,}020 + 10^{5}/10^{8} = 0{,}021</span> s : une connexion donne 4,76 Mo/s, donc il faut <span class="math inline">1{,}39 \cdot 10^{9} / 4{,}76 \cdot 10^{6} = 292</span> connexions, pour 13 889 GET/s et 3 préfixes. (b) Une plage de 16 Mio dure <span class="math inline">0{,}020 + 16{,}78 \cdot 10^{6}/10^{8} = 0{,}188</span> s : 89,3 Mo/s par connexion, donc 16 connexions suffisent (15,5 calculées), pour 83 GET/s et 1 préfixe.</p>
+<p>Avec de petits objets, la latence domine : il faut près de dix-neuf fois plus de connexions et dépasser le minimum documenté d'un préfixe. Des shards lus par grandes plages ramènent le problème à une quinzaine de connexions. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e7.*</code>).</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★ — Lire le tableau d'un chargeur</span> Un job de 8 GPU sur un nœud de 32 cœurs donne le tableau suivant (<strong>fictif</strong>, pour l'exercice). Appliquez la table de décision de la section 5.5 (<code>diagnose</code>, seuils 5 % de <em>stall</em>, 0,7 cœur par worker, 80 % des cœurs) à chaque ligne, dites combien de cœurs sont occupés à 32 workers et quel est le nombre de cœurs par GPU, puis proposez deux actions pour la dernière ligne.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Workers</th>
+<th><em>Stall</em></th>
+<th>CPU par worker</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>62 %</td>
+<td>n/a</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>41 %</td>
+<td>0,18</td>
+</tr>
+<tr class="odd">
+<td>24</td>
+<td>19 %</td>
+<td>0,42</td>
+</tr>
+<tr class="even">
+<td>32</td>
+<td>17 %</td>
+<td>0,86</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<p>Avec <code>loader_lab.diagnose(stall, util, workers, cores=32)</code> : 0 worker, chargement <strong>en série</strong> (activer <code>num_workers</code>) ; 8 workers, chargeur <strong>à latence</strong> (8 × 0,18 = 1,4 cœur seulement) ; 24 workers, encore <strong>à latence</strong> (24 × 0,42 = 10,1 cœurs, sous le seuil de 25,6) ; 32 workers, chargeur <strong>CPU</strong> (0,86 ≥ 0,7).</p>
+<p>À 32 workers, <span class="math inline">32 \times 0{,}86 = 27{,}5</span> cœurs sont occupés sur 32 : les cœurs sont presque saturés, et passer de 24 à 32 workers n'a gagné que 2 points de <em>stall</em>. Il y a <span class="math inline">32/8 = 4</span> cœurs par GPU, dans la fourchette de 3 à 24 cœurs par GPU que l'étude sur les <em>data stalls</em> observe pour le prétraitement. Deux actions : réduire le coût par échantillon (prétraiter une fois, jetons ou images pré-empaquetés, chapitre 4) ; ajouter des cœurs ou déporter le décodage. Ajouter des workers ne sert à rien.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★★ — Un checkpoint qui arrête tout</span> Un job de 512 GPU écrit un checkpoint de 1,2 To toutes les 30 minutes. Un horodatage autour de l'appel de sauvegarde mesure 240 s de blocage. (a) Quel débit effectif cela représente-t-il ? (b) Quel surcoût ? (c) On rend le checkpoint asynchrone, avec un snapshot de 3 s et la même durée de persistance : quel surcoût pour un intervalle de 30 minutes, de 5 minutes et de 3 minutes ? (d) Quel débit d'écriture faut-il pour tenir un intervalle de 3 minutes ? (e) Que concluez-vous sur la fréquence ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">1{,}2 \cdot 10^{12}/240 = 5</span> Go/s.</p></li>
+<li><p>Synchrone : <span class="math inline">240/1\,800 = 13{,}3</span> %.</p></li>
+<li><p>Asynchrone, avec la formule de la section 6.3 : à 30 min, <span class="math inline">3/1\,800 = 0{,}17</span> % ; à 5 min, <span class="math inline">3/300 = 1</span> % ; à 3 min (180 s, moins que <span class="math inline">T_p = 240</span> s), <span class="math inline">(3 + 60)/180 = 35</span> %. Le synchrone à 5 min coûterait <span class="math inline">240/300 = 80</span> %.</p></li>
+<li><p>Pour que l'écriture tienne dans 180 s : <span class="math inline">1{,}2 \cdot 10^{12}/180 = 6{,}7</span> Go/s (sans marge).</p></li>
+<li><p>L'asynchrone permet de passer de 30 à 5 minutes pour 1 % de surcoût, mais il ne sert plus dès que <span class="math inline">T_p &gt; I</span> : à 3 minutes, le surcoût remonte à 35 %. Descendre plus bas exige de réduire <span class="math inline">T_p</span> (plus de débit, un état plus petit, un niveau en mémoire du module 10), pas de rendre l'écriture « plus asynchrone ». Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e9.*</code>).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 10 · ★★★ — Concevoir le cache d'un jeu de 40 To</span> 32 nœuds de 8 GPU entraînent sur un jeu de 40 To découpé en shards. Chaque nœud dispose d'un cache NVMe local de <span class="math inline">8 \times 3{,}84 = 30{,}72</span> To (configuration documentée du DGX H100) et a besoin de 3 Go/s. Le stockage partagé délivre 40 Go/s au total (valeur d'exemple). Chaque nœud lit <span class="math inline">D/N</span> du jeu par époque. Le cache ne supprime jamais ses entrées.</p>
+<ol type="a">
+<li>Quelle fraction du jeu le cache d'un nœud représente-t-il, et quel serait le taux de succès d'un LRU si un seul nœud lisait tout le jeu ? (b) Quelle est la durée d'une époque à pleine vitesse, et de la première époque ? (c) Avec des shards réaffectés au hasard à chaque époque, calculez la durée des époques 2, 5, 10 et 20, et le total sur 20 époques. (d) Même question avec une affectation collante. (e) Que recommandez-vous, et quel en est le prix ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">x = 30{,}72/40 = 0{,}768</span> ; un LRU rendrait <span class="math inline">x + (1-x)\ln(1-x) = 0{,}429</span> si un seul nœud lisait tout le jeu. (b) Chaque nœud lit <span class="math inline">40/32 = 1{,}25</span> To par époque. À 3 Go/s : 417 s. La première époque est limitée par le stockage partagé, soit <span class="math inline">40/32 = 1{,}25</span> Go/s par nœud : 1 000 s.</p></li>
+<li><p>Avec une affectation aléatoire, la probabilité qu'un shard soit déjà dans le cache de ce nœud à l'époque <span class="math inline">k</span> est <span class="math inline">1 - (1 - 1/32)^{k-1}</span> ; la vitesse est <span class="math inline">\min(3,\; 1{,}25/(1 - h))</span> Go/s. Durées : époque 2, 969 s ; époque 5, 881 s ; époque 10, 751 s ; époque 20, 547 s ; total sur 20 époques : <strong>15 042 s</strong>.</p></li>
+<li><p>Avec une affectation collante, l'époque 1 coûte 1 000 s, puis la part de 1,25 To de chaque nœud est locale : 417 s par époque, soit un total de <strong>8 917 s</strong>.</p></li>
+<li><p>L'affectation collante, 1,69 fois plus rapide sur 20 époques, et elle ne charge plus le stockage partagé après l'époque 1. Le prix : un nœud ne voit toujours que sa partition, donc un mélange moins aléatoire ; on change la partition toutes les <span class="math inline">K</span> époques (chacune coûte alors une époque partiellement froide) ou on mélange à l'intérieur de gros shards. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e10.*</code>).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 11 · ★★★ — Une tempête de métadonnées</span> Un jeu de 120 millions d'images de 110 ko est stocké sous forme de fichiers sur un système parallèle. Chaque époque lit chaque fichier une fois, avec 3 opérations de métadonnées par fichier. Le serveur de métadonnées soutient 50 000 opérations par seconde (<strong>valeur supposée</strong> ; à mesurer avec un outil de test de métadonnées).</p>
+<ol type="a">
+<li>Combien de temps de métadonnées par époque ? (b) Et si le jeu est converti en shards de 1 000 échantillons ? (c) Combien de temps coûte la conversion elle-même, sachant qu'elle lit chaque fichier une fois et que le stockage délivre 5 Go/s ? (d) Proposez un plan.</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">120 \cdot 10^{6} \times 3 = 3{,}6 \cdot 10^{8}</span> opérations, soit <span class="math inline">3{,}6 \cdot 10^{8}/50\,000 = 7\,200</span> s : <strong>2 heures de métadonnées par époque</strong>, quelle que soit la vitesse des données. (b) 120 000 shards, donc <span class="math inline">360\,000</span> opérations, soit 7,2 s.</p></li>
+<li><p>La conversion lit 13,2 To ; à 5 Go/s, cela prend 44 minutes de données. Mais elle lit aussi 120 millions de fichiers : elle paie <strong>une dernière fois</strong> la facture de métadonnées de 2 heures. Le temps est donc borné par <span class="math inline">\max(2\ \text{h},\, 0{,}73\ \text{h}) = 2</span> h, et lancer plus de clients n'y change rien si le serveur de métadonnées est le goulot.</p></li>
+<li><p>Plan : convertir une fois en shards de 1 000 échantillons (environ 110 Mo, très au-dessus de <span class="math inline">n_{1/2}</span>), les nommer avec un numéro et une version, mélanger l'ordre des shards et un tampon en mémoire (chapitre 4), vérifier par somme de contrôle et compter les échantillons avant de supprimer l'original. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e11.*</code>).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 12 · ★★★ — Le plan de capacité d'un programme de six mois</span> Un modèle de 70 milliards de paramètres (<span class="math inline">S = 980</span> Go) s'entraîne 100 000 pas, avec un checkpoint tous les 500 pas. Rotation : les 3 derniers plus un sur 10 (retenus : <span class="math inline">(K + \lfloor n/L \rfloor) S</span> ; pic pendant la rotation : <span class="math inline">(K+1) S</span>). Données : 60 To de brut, 20 To de jeu tokenisé en shards, 2 To de journaux et d'artefacts. Le système de travail purge les fichiers non lus depuis 8 semaines.</p>
+<ol type="a">
+<li>Quels volumes de checkpoints retenus et de pic ? (b) Quelle quotité demandez-vous sur le système de travail, avec 15 % de marge, en comptant un checkpoint de plus pour le pic ? (c) Où mettez-vous chaque classe de données au vu de la purge ? (d) Combien de fichiers de checkpoint avec 1 024 rangs et un fichier par rang ? (e) Coût relatif si le brut est au quart du prix du chaud (hypothèse) ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><span class="math inline">n = 100\,000/500 = 200</span> checkpoints écrits ; retenus : <span class="math inline">3 + 20 = 23</span>, soit <span class="math inline">23 \times 0{,}98 = 22{,}5</span> To ; pic de la rotation : <span class="math inline">4 \times 0{,}98 = 3{,}92</span> To. Sans rotation : 196 To.</p></li>
+<li><p>Le chaud vaut <span class="math inline">22{,}54 + 20 + 2 = 44{,}54</span> To ; en ajoutant un checkpoint pour le pic, <span class="math inline">(44{,}54 + 0{,}98) \times 1{,}15 = 52{,}3</span> To. (c) Le brut (60 To, relu rarement) va en archive ou sur un niveau froid. Les shards tokenisés sont relus à chaque époque, donc leur date d'accès se renouvelle, mais gardez une copie sur un niveau durable. Les 20 checkpoints « un sur dix » vont sur un niveau durable <strong>sans purge</strong> : écrits puis jamais relus, ils seraient purgés au bout de 8 semaines. Les 3 derniers restent sur le système de travail. (d) <span class="math inline">1\,024 \times 23 = 23\,552</span> fichiers, à ajouter au quota de fichiers.</p></li>
+<li><p>Tout au prix chaud <span class="math inline">p</span> : <span class="math inline">22{,}54 + 20 + 2 + 60 = 104{,}54</span> To × <span class="math inline">p</span>. Avec le brut au quart du prix : <span class="math inline">44{,}54 + 15 = 59{,}54</span> To × <span class="math inline">p</span>, soit 43 % de moins. Le quart est une hypothèse. Commande : <code>python3 iosizing.py exercises</code> (valeurs <code>e12.*</code>).</p></li>
+</ol>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux estimer le débit de lecture et le débit de checkpoint d'un entraînement.</strong> Preuve : les exercices 1 et 2 refaits avec les chiffres de votre cluster, via <code>iosizing.py</code>.</li>
+<li><strong>Je peux régler un striping et dimensionner un système parallèle.</strong> Preuve : l'exercice 4 refait pour votre débit visé, avec la règle « le moins de cibles possible ».</li>
+<li><strong>Je peux choisir entre NFS, objet et FUSE pour un usage donné.</strong> Preuve : un tableau des garanties de cohérence et de renommage de votre candidat, avec la source.</li>
+<li><strong>Je peux chiffrer l'amplification d'un format de données.</strong> Preuve : le tableau du lab 8.2 pour votre jeu, avec ouvertures, requêtes et octets lus.</li>
+<li><strong>Je peux diagnostiquer un chargeur lent.</strong> Preuve : le <em>stall</em>, les workers et le CPU par worker d'un job réel, et la ligne de la table de décision qui en découle (exercice 8).</li>
+<li><strong>Je peux modéliser le coût d'un checkpoint.</strong> Preuve : le lab 8.3 sur votre stockage et l'exercice 9 refait avec vos mesures.</li>
+<li><strong>Je peux prévoir et concevoir un cache.</strong> Preuve : l'exercice 10 refait avec vos tailles, y compris le choix de l'affectation des shards.</li>
+<li><strong>Je peux planifier la capacité d'un programme.</strong> Preuve : l'exercice 12 refait pour votre campagne, avec rétention, pic, quotas et coût sans prix figé.</li>
+</ul>
+<p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
+<ol type="1">
+<li><em>Vos GPU sont à 60 % d'utilisation et le job charge des images depuis NFS. Que faites-vous ?</em> Réponse-type : mesurer d'abord la part d'attente autour du <code>next()</code> du chargeur, puis le CPU par worker pour distinguer latence et calcul ; compter les fichiers et les ouvertures par époque ; mesurer <span class="math inline">\alpha</span> et <span class="math inline">B</span> du montage ; passer à des shards lus par gros morceaux ; mettre en cache sur NVMe local avec une affectation collante ; ne pas ajouter de workers avant d'avoir lu le CPU.</li>
+<li><em>Un checkpoint de 1,2 To arrête l'entraînement 4 minutes toutes les 30 minutes. Comment réduisez-vous le coût ?</em> Réponse-type : distinguer temps bloquant et temps de persistance ; passer en deux phases (snapshot puis écriture de fond, une seule persistance en vol) pour tomber de 13 % à moins de 1 % ; vérifier que la persistance tient dans l'intervalle ; augmenter le débit (striping, un fichier par rang) ou descendre la fréquence si elle ne tient plus.</li>
+<li><em>Comment dimensionneriez-vous le stockage d'un cluster de 256 GPU pour un programme de six mois ?</em> Réponse-type : les quatre flux ; lecture = consommateurs × rythme × taille, checkpoint = <span class="math inline">S/(f\tau)</span> avec <span class="math inline">S = 14\Psi</span> ; rétention et pic de rotation ; quotas d'espace et de fichiers ; niveaux de durée de vie face à la purge ; une recette de stockage avec des critères chiffrés ; aucun prix figé, à relire le jour de l'engagement.</li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<ul>
+<li>Whamcloud et la communauté Lustre. <a href="https://doc.lustre.org/lustre_manual.xhtml"><em>Lustre Software Release 2.x Operations Manual</em></a>, lu le 24 octobre 2026 : composants (§ 1.2.2), striping (chap. 19), Data on MDT (chap. 20), quotas (chap. 25), petits fichiers (§ 34.10) ; chapitres 2, 6 et 8.</li>
+<li>ThinkParQ. <a href="https://doc.beegfs.io/latest/architecture/overview.html"><em>BeeGFS documentation, Architecture</em></a> et <a href="https://doc.beegfs.io/latest/advanced_topics/striping.html"><em>Striping</em></a> : séparation métadonnées et données, <code>beegfs entry set</code> ; chapitre 2 et exercice 3.</li>
+<li>WEKA. <a href="https://docs.weka.io/weka-system-overview/about"><em>Documentation, About</em></a> : nature du système, conteneurs, quotas, instantanés ; chapitres 2 et 8.</li>
+<li>NERSC. <a href="https://docs.nersc.gov/filesystems/perlmutter-scratch/"><em>Perlmutter scratch</em></a> et IDRIS. <a href="http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware"><em>Jean Zay : matériel</em></a> : exemples d'exploitants (système tout flash, purge de huit semaines, trois niveaux de stockage) ; chapitres 2 et 8.</li>
+<li>Linux man-pages. <a href="https://man7.org/linux/man-pages/man5/nfs.5.html"><em>nfs(5)</em></a> et <a href="https://man7.org/linux/man-pages/man5/proc_pid_io.5.html"><em>proc_pid_io(5)</em></a> : cohérence à la fermeture, <code>nconnect</code>, compteurs <code>rchar</code>, <code>syscr</code>, <code>read_bytes</code> ; chapitres 3 et 4.</li>
+<li>Amazon Web Services. <em>Amazon S3 User Guide</em> : <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html">modèle de cohérence</a> et <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html">optimisation des performances</a> : cohérence forte, requêtes par préfixe, erreurs 503 ; chapitre 3.</li>
+<li>AWS Labs. <a href="https://raw.githubusercontent.com/awslabs/mountpoint-s3/main/doc/SEMANTICS.md"><em>Mountpoint for Amazon S3, SEMANTICS.md</em></a> : ce qu'un montage objet ne fait pas ; chapitre 3.</li>
+<li>Breuel. <a href="https://raw.githubusercontent.com/webdataset/webdataset/main/README.md"><em>WebDataset, README</em></a> : format de shards tar et ses limites ; chapitre 4.</li>
+<li>Apache. <a href="https://raw.githubusercontent.com/apache/parquet-format/master/README.md"><em>Parquet format</em></a>, Hugging Face. <a href="https://huggingface.co/docs/datasets/about_arrow"><em>Datasets : about Arrow</em></a> et Karpathy. <a href="https://raw.githubusercontent.com/karpathy/nanoGPT/master/train.py"><em>nanoGPT, train.py</em></a> : groupes de lignes, mémoire projetée, jetons empaquetés ; chapitre 4.</li>
+<li>PyTorch. <a href="https://raw.githubusercontent.com/pytorch/pytorch/main/torch/utils/data/dataloader.py"><em>Code source de <code>torch.utils.data.DataLoader</code></em></a>, docstring : paramètres et ordre de livraison ; chapitre 5. (La page de documentation HTML n'a pas livré de texte exploitable depuis le bac à sable.)</li>
+<li>Mohan, Phanishayee, Raniwala, Chidambaram. <a href="https://arxiv.org/abs/2007.06775"><em>Analyzing and Mitigating Data Stalls in DNN Training</em></a>, VLDB 2021 : <em>prep stalls</em> et <em>fetch stalls</em>, cache de pages, MinIO ; chapitres 5 et 7.</li>
+<li>Mohan, Phanishayee, Chidambaram. <a href="https://www.usenix.org/conference/fast21/presentation/mohan"><em>CheckFreq: Frequent, Fine-Grained DNN Checkpointing</em></a>, FAST 2021 : checkpoint en deux phases, état du chargeur ; chapitre 6.</li>
+<li>Dubey et al. <a href="https://arxiv.org/abs/2407.21783"><em>The Llama 3 Herd of Models</em></a>, 2024, § 3.3.1 : le stockage d'un entraînement à 16 000 GPU ; chapitre 1.</li>
+<li>Jiang et al. <a href="https://arxiv.org/abs/2402.15627"><em>MegaScale</em></a>, 2024, section 3 : un chargeur dédié par machine ; chapitre 5.</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/gpudirect-storage/overview-guide/index.html"><em>GPUDirect Storage Overview Guide</em></a> et <a href="https://docs.nvidia.com/dgx/dgxh100-user-guide/introduction-to-dgxh100.html"><em>DGX H100 User Guide</em></a> : chemin direct GPU-stockage, configuration NVMe d'un nœud ; chapitre 7.</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les faits attribués à une source dans le texte ont été relus à la source le 24 octobre 2026 : les composants, les valeurs par défaut et les limites de striping, Data on MDT, la règle « as few objects… » et les quotas de Lustre ; l'architecture et le striping de BeeGFS ; la description générale de WEKA ; les chiffres du système de travail de Perlmutter, sa politique de purge et le matériel de Jean Zay ; la cohérence à la fermeture, <code>nconnect</code> et les compteurs de <code>/proc/&lt;pid&gt;/io</code> ; la cohérence et les débits par préfixe de S3 ; la sémantique de Mountpoint ; le format WebDataset ; la définition de Parquet, le cache mémoire projeté de Hugging Face Datasets et le <code>train.bin</code> de nanoGPT ; la docstring de <code>DataLoader</code> ; les résultats et le cache MinIO de l'étude sur les <em>data stalls</em> ; le résumé de CheckFreq ; le paragraphe sur le stockage de Llama 3 ; le chargeur unique par machine de MegaScale ; le guide de GPUDirect Storage et la configuration NVMe du DGX H100. Tous les chiffres des exemples et des corrigés viennent de <code>iosizing.py</code> (commandes <code>demo</code> et <code>exercises</code>) ou des sorties des labs, exécutés dans le bac à sable le 24 octobre 2026 (noyau Linux 6.18, 4 vCPU, PyTorch 2.14.1 CPU, <code>fio</code> 3.36, <code>pyarrow</code> 26.0.0, <code>webdataset</code> 1.0.2).</p>
+<p><strong>Recommandé.</strong> L'ordre des chapitres ; les quatre flux d'E/S ; les seuils de la table de décision du chargeur (5 %, 0,7 cœur, 80 %) ; le protocole « shards immuables avec manifeste » pour l'invalidation ; l'affectation collante des shards ; la recette de stockage en cinq essais ; les quatre classes de durée de vie ; la politique de sauvegarde par classe ; la rotation <span class="math inline">K</span> derniers plus un sur <span class="math inline">L</span> avec un quota couvrant le pic. Ce sont des choix de ce parcours, pas des normes.</p>
+<p><strong>À vérifier.</strong> (1) La documentation de GPFS / IBM Storage Scale a répondu HTTP 403 : aucun fait sur ce système n'est avancé, et celle de WEKA n'a été lue que dans sa page de présentation. (2) La formule du taux de succès d'un LRU en époques aléatoires est une <strong>dérivation de ce parcours</strong> (champ moyen), vérifiée par simulation à 3 points près ; ce n'est pas un résultat publié. Le modèle d'affectation collante ou aléatoire est une simplification (cache sans éviction, parts égales). (3) L'écart entre le modèle du chargeur et la mesure à 8 workers n'est pas expliqué : la livraison dans l'ordre a été testée (<code>in_order=False</code>) et écartée. Plusieurs autres explications sont des <strong>hypothèses non testées</strong> : l'amplification de 3,4 de <code>mmap</code> (lecture autour de la faute de page), le 1,30 de la lecture aléatoire de shards (échantillons à cheval sur cinq pages), l'écart de l'asynchrone mesuré (8,9 %) et prédit (4,3 %), le coût de la première copie dans un tampon neuf (attribution tardive de la mémoire par l'hôte) et l'effet de l'option <code>discard</code> sur les écritures parallèles. (4) Les entrées des exemples (3 000 images par seconde, 110 ou 120 ko par image, 8 000 jetons par seconde, latences de 20 ms, 40 Go/s de débit partagé, 50 000 opérations de métadonnées par seconde, quart de prix) sont des <strong>valeurs d'exemple</strong>, pas des mesures de produits. (5) L'affirmation de WebDataset sur un gain de 3 à 10 fois n'a pas été reproduite. (6) Le manuel de Lustre lu est celui du site officiel ; vérifiez la version de votre déploiement pour les fonctions citées avec un numéro (2.11, 2.13). (7) <code>pin_memory</code> et GPUDirect Storage n'ont pas été exécutés (pas de GPU) ; <code>fio_gap.py</code> et <code>bench_ckpt.py</code> n'ont pas été lancés sur NFS, ni sur un système parallèle, ni sur un stockage objet monté. (8) La page de documentation HTML de <code>DataLoader</code> n'a pas livré de texte : les paramètres viennent de la docstring du code source (branche <code>main</code>, lue le 24 octobre 2026) ; relisez la documentation de votre version. (9) Aucun prix n'est cité.</p>
+<p><strong>Hors périmètre.</strong> La conception d'un système de fichiers parallèle ou d'un stockage Ceph ; les réseaux de stockage (RDMA, NVMe sur fabric : module 7) ; le protocole et le format d'un checkpoint (atomicité, sommes de contrôle, reprise : module 10) ; les volumes Kubernetes et leurs pilotes CSI (module 12) ; le chiffrement au repos et le contrôle d'accès (module 16) ; le décodage d'images sur GPU (DALI) ; les tarifs des fournisseurs ; l'exécution de GPUDirect Storage.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/networking/index.html"><span class="k">← Précédent</span>Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a><a class="next" href="../../courses/fault-tolerance/index.html"><span class="k">Suivant →</span>Module 10 — Pannes, checkpointing et reprise automatique</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

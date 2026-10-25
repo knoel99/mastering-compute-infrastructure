@@ -1,0 +1,2 @@
+# Site-wide values for the group. A node-specific value would go in host_vars/<name>.yml.
+gpu_node_config_revision: "2026-10-24.1"

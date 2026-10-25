@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Réseaux haute performance : InfiniBand, RoCE et NCCL — Mastering Compute Infrastructure</title>
+<meta name="description" content="Pourquoi un entraînement multi-nœuds est limité par le réseau : RDMA, InfiniBand, RoCE v2, topologies fat-tree, NVLink, NCCL, mesure et diagnostic.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
+<header id="title-block-header">
+<h1 class="title">Réseaux haute performance : InfiniBand, RoCE et NCCL</h1>
+<p class="subtitle">Module 07 · Phase 2 · 28 h</p>
+<p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs 7.1 et 7.2 vérifiés dans un bac à sable ; lab 7.3 (GPU) non exécuté</span></p>
+</header>
+<h2 id="intro">Introduction et vue d'ensemble</h2>
+<p><strong>La question à laquelle ce module répond :</strong> pourquoi un job qui tourne bien sur un nœud ralentit-il dès qu'il en occupe deux, et comment le démontrer avec des mesures plutôt qu'avec des soupçons ? Dans un entraînement multi-nœuds, chaque étape se termine par un échange de gradients. Le réseau décide alors si les GPU calculent ou s'ils attendent.</p>
+<p>Ce module vous apprend à <strong>choisir</strong> une technologie (InfiniBand ou RoCE), à <strong>dimensionner</strong> une topologie, à <strong>lire</strong> le journal d'initialisation de NCCL et à <strong>mesurer</strong> un réseau avec <code>nccl-tests</code> et <code>perftest</code>. Les calculs sont refaits par un calculateur testé. Une partie des commandes est exécutée pour de vrai, dans un bac à sable, sur un simulateur InfiniBand et le gestionnaire de sous-réseau réel OpenSM. Rien n'est exécuté sur des GPU : le lab 7.3 le dit.</p>
+<div class="key">
+<p><span class="tag">Règle de ce module</span> Un réseau d'entraînement se juge en débit de bus mesuré, comparé à ce que le matériel promet. Un écart se cherche couche par couche, du câble jusqu'au framework, en commençant par la couche la plus basse qui peut l'expliquer.</p>
+</div>
+<h3 id="fiche">Fiche du module</h3>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Clé</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Volume</td>
+<td>28 h, dont 10,5 h de lecture (positionnement compris), 9 h de labs, 8 h d'exercices et 0,5 h de checkpoint</td>
+</tr>
+<tr class="even">
+<td>Niveau d'entrée</td>
+<td>2 : à l'aise avec Linux (module 1) et avec le modèle α-β (module 2)</td>
+</tr>
+<tr class="odd">
+<td>Prérequis</td>
+<td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a>, <a href="../perf-models/index.html">Module 2 — Architecture matérielle et modèles de performance</a></td>
+</tr>
+<tr class="even">
+<td>Statut pour le lecteur de référence</td>
+<td>cœur : aucune expérience d'InfiniBand ni de NCCL dans le profil, écart de 3 sur 4</td>
+</tr>
+<tr class="odd">
+<td>Livrable</td>
+<td>un calculateur de topologie testé, un analyseur de journaux NCCL testé et un script de recette <code>nccl-tests</code> linté</td>
+</tr>
+<tr class="even">
+<td>Environnement</td>
+<td>un portable Linux avec Python 3 suffit pour les labs 7.1 et 7.2 ; la partie B du lab 7.1 utilise trois paquets Ubuntu. Le lab 7.3 demande deux nœuds GPU : consultez la page tarifaire de votre fournisseur le jour même</td>
+</tr>
+<tr class="odd">
+<td>Projets liés</td>
+<td><a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="acquis">Ce que vous saurez vérifier</h3>
+<ul>
+<li>Convertir un débit de lien en débit utile et dire pourquoi la MTU compte (chapitre 1).</li>
+<li>Expliquer ce que fait RDMA et ce que change GPUDirect (chapitre 2).</li>
+<li>Lire l'état d'un sous-réseau InfiniBand et dire ce que fait son gestionnaire de sous-réseau (chapitre 3).</li>
+<li>Comparer InfiniBand et RoCE v2 sur la perte, le contrôle de congestion et la configuration, en citant des déploiements documentés (chapitres 3 et 4).</li>
+<li>Dimensionner un fat-tree, calculer sa sur-souscription et justifier un choix (chapitre 5).</li>
+<li>Lire la topologie vue par un nœud GPU et vérifier l'affinité GPU-carte réseau (chapitre 6).</li>
+<li>Expliquer comment NCCL choisit un algorithme et lire son journal <code>NCCL_DEBUG=INFO</code> (chapitre 7).</li>
+<li>Mesurer avec <code>nccl-tests</code> et <code>perftest</code>, interpréter un écart et isoler une panne par bissection (chapitre 8).</li>
+</ul>
+<h3 id="seances">Plan de séances</h3>
+<p>Onze séances, soit 28 h : trois de 3 h, six de 2,5 h et deux de 2 h. Le niveau ne diminue jamais. Chaque séance tient dans sa durée : lecture, lab et exercices compris, avec les estimations de 30 minutes par exercice ★, 1 h par ★★ et 1 h 30 par ★★★.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Séance</th>
+<th>Durée</th>
+<th>Niveau</th>
+<th>Contenu</th>
+<th>Pratique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>3 h</td>
+<td>1</td>
+<td>ch. 1 Rappels réseau (1 h avec le positionnement), ch. 2 RDMA et GPUDirect (1,5 h)</td>
+<td>Questions de positionnement ; Ex. 1 (0,5 h)</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>2.5 h</td>
+<td>1</td>
+<td>ch. 3 InfiniBand (1,5 h)</td>
+<td>Ex. 2 et 3 (1 h)</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 4 Ethernet pour l'IA : RoCE v2 (1,5 h)</td>
+<td>Ex. 4 (1 h)</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>2 h</td>
+<td>2</td>
+<td>ch. 5 Topologies (1,5 h)</td>
+<td>Ex. 5 (0,5 h)</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 6 Dans le nœud (1 h)</td>
+<td>Lab 7.1 partie A (1,5 h)</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 3 et 5 en pratique : OpenSM sur un fabric simulé</td>
+<td>Lab 7.1 partie B (1,5 h) ; Ex. 6 (1 h)</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>2.5 h</td>
+<td>2</td>
+<td>ch. 7 NCCL (1,5 h)</td>
+<td>Ex. 7 (1 h)</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>3 h</td>
+<td>2</td>
+<td>Lab 7.2 en entier</td>
+<td>Lab 7.2 (3 h)</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>2.5 h</td>
+<td>3</td>
+<td>ch. 8 Mesure et diagnostic (1 h)</td>
+<td>Ex. 8 (1,5 h)</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>3 h</td>
+<td>3</td>
+<td>ch. 8 en pratique : recette <code>nccl-tests</code>, partie A</td>
+<td>Lab 7.3 partie A (1,5 h) ; Ex. 9 (1,5 h)</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>2 h</td>
+<td>3</td>
+<td>ch. 8 en pratique : recette sur cluster, partie B</td>
+<td>Lab 7.3 partie B (1,5 h) ; Checkpoint de sortie (0,5 h) ; démarrage du Projet 2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="avant">Avant de commencer</h2>
+<p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez directement au module suivant.</p>
+<ol type="1">
+<li><p><strong>Un lien de 400 Gb/s.</strong> Combien cela fait-il en Go/s ? Avec un temps d'aller-retour supposé de 5 µs, combien d'octets faut-il garder « en vol » pour saturer ce lien ?</p></li>
+<li><p><strong>Lire un débit de bus.</strong> Un all-reduce de 1 Gio sur 16 GPU affiche un débit de bus de 40 Go/s. Quels sont son débit algorithmique et son temps ?</p></li>
+<li><p><strong>Compter les commutateurs.</strong> Vous devez relier 1 024 GPU, un lien de 400 Gb/s chacun, avec des commutateurs de 64 ports et sans sur-souscription. Combien de niveaux et combien de commutateurs ?</p></li>
+</ol>
+<details class="sol"><summary>Corrigé</summary>
+<p><strong>Réponses.</strong></p>
+<ol type="1">
+<li><p>Un octet fait 8 bits : <span class="math inline">400 / 8 = 50</span> Go/s. Le produit bande passante-délai vaut <span class="math inline">50 \cdot 10^{9} \times 5 \cdot 10^{-6} = 250\,000</span> octets, soit environ 244 Kio. Voir le chapitre 1.</p></li>
+<li><p>Pour un all-reduce, le débit de bus vaut le débit algorithmique multiplié par <span class="math inline">2(p-1)/p</span> (module 2, chapitre 6). Ici <span class="math inline">2 \times 15/16 = 1{,}875</span>, donc le débit algorithmique vaut <span class="math inline">40/1{,}875 \approx 21{,}3</span> Go/s et le temps <span class="math inline">2^{30} / 21{,}3 \cdot 10^{9} \approx 50{,}3</span> ms. Voir le chapitre 8.</p></li>
+<li><p>Avec 64 ports, un commutateur relie au plus 64 GPU. Deux niveaux sans sur-souscription (32 ports vers les GPU, 32 vers le haut) donnent <span class="math inline">32 \times 64 = 2\,048</span> GPU au maximum : deux niveaux suffisent. Il faut <span class="math inline">1024/32 = 32</span> commutateurs de feuille et <span class="math inline">1024/64 = 16</span> commutateurs de colonne, soit 48. Voir le chapitre 5 et la commande <code>python3 fabric.py --endpoints 1024</code> du lab 7.1.</p></li>
+</ol>
+</details>
+<h2 id="ch1">1. Rappels : latence, débit utile, MTU, flux et congestion</h2>
+<p>Ce chapitre fixe le vocabulaire réseau dont les autres ont besoin. Vous connaissez déjà TCP/IP ; l'objectif est de savoir convertir un chiffre de fiche technique en débit réellement disponible pour un all-reduce.</p>
+<h3 id="latence-débit-nominal-et-débit-utile">1.1. Latence, débit nominal et débit utile</h3>
+<p>Un lien se décrit par trois chiffres. Son <strong>débit nominal</strong> est le nombre de bits que le matériel émet par seconde : 400 Gb/s pour une carte récente. Sa <strong>latence</strong> est le temps de premier octet. Son <strong>débit utile</strong> (<em>goodput</em>) est la part du débit nominal qui transporte vos données, une fois retirés les en-têtes et les trames de contrôle.</p>
+<p>Les fiches annoncent des bits par seconde, les outils de mesure des octets par seconde. La conversion est une simple division par huit : 400 Gb/s font 50 Go/s. Cette division est la source d'erreur la plus fréquente des premières recettes réseau.</p>
+<p>Le <strong>produit bande passante-délai</strong> (<em>bandwidth-delay product</em>, BDP) donne la quantité de données qu'un émetteur doit garder « en vol » pour que le lien ne reste pas vide en attendant les accusés de réception :</p>
+<p><span class="math display">\text{BDP} = B \times \text{RTT}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 1.1 — Combien d'octets en vol pour un lien de 400 Gb/s ?</span> Avec <span class="math inline">B = 50</span> Go/s et un temps d'aller-retour supposé de 5 µs (une hypothèse d'école, pas une mesure), le BDP vaut <span class="math inline">50 \cdot 10^{9} \times 5 \cdot 10^{-6} = 250\,000</span> octets, soit 244 Kio ou environ 61 paquets de 4 096 octets.</p>
+<p>Un émetteur qui n'a que 64 Kio en vol ne peut utiliser qu'un quart du lien. C'est l'une des raisons pour lesquelles une carte RDMA suit elle-même, dans son matériel, les opérations en vol, plutôt que de laisser un noyau les compter.</p>
+</div>
+<h3 id="en-têtes-mtu-et-débit-utile">1.2. En-têtes, MTU et débit utile</h3>
+<p>Chaque paquet porte des en-têtes qui ne transportent pas vos données. Pour RoCE v2 (chapitre 4), le noyau Linux définit les tailles suivantes dans <code>include/rdma/ib_pack.h</code> : en-tête Ethernet 14 octets, IPv4 20, UDP 8, <em>Base Transport Header</em> (BTH) 12 et contrôle d'intégrité (ICRC) 4. Les en-têtes étendus de certaines opérations s'ajoutent ; nous les négligeons.</p>
+<p>La <strong>MTU InfiniBand</strong> est la taille maximale de la charge utile d'un paquet. La bibliothèque <code>libibverbs</code> n'accepte que cinq valeurs : 256, 512, 1 024, 2 048 et 4 096 octets (énumération <code>ibv_mtu</code> de <code>verbs.h</code>). Sur Ethernet, la MTU IP doit contenir la charge utile plus 44 octets (IP, UDP, BTH, ICRC).</p>
+<p>Sur le fil s'ajoutent la séquence de contrôle de trame, le préambule et l'espace inter-trame : 24 octets, valeur standard d'Ethernet que ce module n'a pas relue à la source (voir « À vérifier »). Le débit utile d'un paquet de charge <span class="math inline">m</span> vaut alors :</p>
+<p><span class="math display">\eta(m) = \frac{m}{m + 14 + 44 + 24}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 1.2 — Pourquoi la MTU de 1 500 octets coûte cher</span> Pour <span class="math inline">m = 1\,024</span>, <span class="math inline">\eta = 1024/1106 = 92{,}6\ \%</span>, soit 46,3 Go/s sur 50. Pour <span class="math inline">m = 4\,096</span>, <span class="math inline">\eta = 4096/4178 = 98{,}0\ \%</span>, soit 49,0 Go/s.</p>
+<p>Avec la MTU Ethernet classique de 1 500 octets, la charge utile ne peut dépasser <span class="math inline">1500 - 44 = 1456</span> octets : la plus grande MTU InfiniBand utilisable est 1 024. Passer aux trames jumbo (MTU IP d'au moins 4 140 octets pour <span class="math inline">m = 4096</span>) rend 2,7 Go/s par lien. Ces valeurs sortent de la commande <code>python3 fabric.py --goodput 1024 2048 4096</code> du lab 7.1.</p>
+</div>
+<h3 id="contrôle-de-flux-et-contrôle-de-congestion">1.3. Contrôle de flux et contrôle de congestion</h3>
+<p>Deux mécanismes distincts protègent un réseau, et on les confond souvent. Le <strong>contrôle de flux</strong> empêche un émetteur de submerger <strong>un récepteur</strong> : fenêtre de réception de TCP, crédits d'InfiniBand, trames de pause d'Ethernet. Le <strong>contrôle de congestion</strong> empêche un ensemble d'émetteurs de submerger <strong>le réseau</strong> : perte de paquets pour TCP, marquage ECN (notification explicite de congestion, section 4.4), algorithmes à débit réglé.</p>
+<p>Le premier est local à un lien ; le second est de bout en bout. Un réseau « sans perte » est un réseau où le contrôle de flux s'applique lien par lien, de sorte que les tampons ne débordent jamais. Il évite les pertes mais déplace le problème : une pause se propage de proche en proche. Les chapitres 3 et 4 détaillent les deux solutions d'InfiniBand et d'Ethernet.</p>
+<h3 id="pourquoi-lentraînement-est-un-trafic-difficile">1.4. Pourquoi l'entraînement est un trafic difficile</h3>
+<p>Un entraînement en parallélisme de données émet, à chaque étape, des échanges synchrones de très gros messages : peu de flux, tous démarrant en même temps, chacun capable de saturer une carte. Le réseau d'un fournisseur de cloud voit au contraire des millions de petits flux sans corrélation.</p>
+<p>Cette différence a des conséquences documentées. Les concepteurs du réseau HPN d'Alibaba constatent que ces flux peu nombreux et très gros favorisent la polarisation du hachage d'ECMP (<em>Equal-Cost Multi-Path</em>), qui répartit mal le trafic. Nous y reviendrons aux chapitres 4 et 5. Retenez pour l'instant le modèle du module 2 : <span class="math inline">T(n) = \alpha + n/B</span>, avec un débit de bus qui se compare à la bande passante du lien (voir <a href="../perf-models/index.html#ch6">le chapitre 6 du module 2</a>).</p>
+<div class="recap">
+<p>Points clés — chapitre 1</p>
+<ul>
+<li>Bits par seconde sur les fiches, octets par seconde dans les outils : divisez par huit.</li>
+<li>Le BDP donne les octets à garder en vol : 250 000 octets pour 400 Gb/s et 5 µs.</li>
+<li>Le débit utile dépend de la MTU : 92,6 % à 1 024 octets, 98,0 % à 4 096 sur RoCE v2.</li>
+<li>Contrôle de flux : protéger un récepteur. Contrôle de congestion : protéger le réseau.</li>
+</ul>
+</div>
+<h2 id="ch2">2. RDMA, verbs et GPUDirect</h2>
+<p>Ce chapitre explique pourquoi les réseaux d'entraînement n'utilisent pas TCP pour les gros transferts et ce que « RDMA » change concrètement pour un GPU.</p>
+<h3 id="pourquoi-contourner-le-noyau">2.1. Pourquoi contourner le noyau</h3>
+<p>Avec TCP, chaque transfert traverse le noyau : appels système, copies entre tampons, interruptions. À haut débit, ce coût devient important. Les auteurs de DCQCN (un protocole de contrôle de congestion pour RoCE, chapitre 4 ; Microsoft et Mellanox, 2015) mesurent le surcoût de TCP en processeur et le comparent à RDMA dans leur figure 1, sur des cartes de 40 Gb/s.</p>
+<p>RDMA (<em>Remote Direct Memory Access</em>) déplace la copie vers la carte réseau. Le programme enregistre une zone de mémoire auprès de la carte, puis lui confie des opérations : la carte lit ou écrit directement cette mémoire, sans passer par le noyau sur le chemin des données. Des opérations « unilatérales » écrivent même dans la mémoire du pair sans réveiller son processeur.</p>
+<h3 id="les-objets-des-verbs">2.2. Les objets des verbs</h3>
+<p>L'interface de programmation s'appelle <em>verbs</em> ; la bibliothèque est <code>libibverbs</code>, du projet <code>rdma-core</code>. Six objets suffisent pour comprendre les journaux et les outils.</p>
+<ul>
+<li>Le <strong>contexte de périphérique</strong> désigne la carte (<code>mlx5_0</code> par exemple).</li>
+<li>Le <strong>domaine de protection</strong> regroupe les ressources qui peuvent s'utiliser ensemble.</li>
+<li>La <strong>région mémoire</strong> est une zone enregistrée : la carte obtient ses adresses physiques et des clés d'accès. Les pages sont épinglées.</li>
+<li>La <strong>paire de files</strong> (<em>queue pair</em>, QP) est le canal : une file d'émission et une de réception.</li>
+<li>La <strong>file de complétion</strong> (CQ) signale la fin des opérations.</li>
+<li>La <strong>requête de travail</strong> décrit une opération : envoi, réception, écriture RDMA, lecture RDMA, opération atomique.</li>
+</ul>
+<p>Le type de transport d'une QP règle la fiabilité. <code>ib_write_bw</code> accepte <code>RC</code>, <code>XRC</code>, <code>UC</code> et <code>DC</code> pour <code>--connection</code>, avec <code>RC</code> (connexion fiable) par défaut, comme le montre l'exemple suivant.</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.1 — Ce que le bac à sable n'a pas</span> Les commandes suivantes ont été exécutées le 2026-10-24 sur la VM Linux 6.18 du bac à sable, avec les paquets Ubuntu 24.04 <code>perftest</code> 24.01.0 et <code>rdma-core</code> 50.0.</p>
+<pre class="text"><code>$ ibv_devinfo
+Failed to get IB devices list: Function not implemented
+$ ib_write_bw --help | grep -E &#39;^ +-(a|c|q|s|m),&#39;
+  -a, --all  Run sizes from 2 till 2^23
+  -c, --connection=&lt;RC/XRC/UC/DC&gt;  Connection type RC/XRC/UC/DC (default RC)
+  -m, --mtu=&lt;mtu&gt;  MTU size : 256 - 4096 (default port mtu)
+  -q, --qp=&lt;num of qp&#39;s&gt;  Num of qp&#39;s(default 1)
+  -s, --size=&lt;size&gt;  Size of message to exchange (default 65536)</code></pre>
+<p>Le noyau du bac à sable est compilé sans la pile InfiniBand (<code>CONFIG_INFINIBAND</code> absent), et aucune carte n'existe : aucun transfert RDMA ne peut y être mesuré. Les labs 7.1 et 7.2 contournent cette limite sans la cacher : ils testent des calculs et des analyseurs, et un simulateur qui parle seulement le plan de gestion (chapitre 3).</p>
+</div>
+<h3 id="les-coûts-cachés">2.3. Les coûts cachés</h3>
+<p>RDMA n'est pas gratuit. L'enregistrement d'une région épingle des pages et programme la carte : on enregistre une fois, puis on réutilise. Les bibliothèques comme NCCL conservent donc des tampons enregistrés et des connexions ouvertes ; la documentation de NCCL consacre une section à l'enregistrement de tampons.</p>
+<p>Chaque QP consomme des ressources de la carte. Un job de plusieurs milliers de rangs ouvre beaucoup de connexions. Les paramètres comme <code>NCCL_IB_QPS_PER_CONNECTION</code> existent pour arbitrer entre un meilleur étalement du trafic et ce coût.</p>
+<h3 id="gpudirect-rdma">2.4. GPUDirect RDMA</h3>
+<p>Sans aide, les données d'un GPU doivent d'abord être copiées dans la mémoire de l'hôte, puis lues par la carte réseau : deux traversées de PCIe et deux accès à la mémoire de l'hôte. <strong>GPUDirect RDMA</strong> ouvre un chemin direct. D'après la documentation CUDA, c'est un chemin direct d'échange de données entre le GPU et un périphérique tiers (carte réseau, carte d'acquisition, adaptateur de stockage), qui utilise des fonctions standard de PCI Express.</p>
+<figure class="fig">
+<svg viewBox="0 0 560 250" role="img" aria-labelledby="gdr-t gdr-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="gdr-t">
+Chemin des données avec et sans GPUDirect RDMA
+</title>
+<desc id="gdr-d">En haut, sans GPUDirect : le GPU copie vers la mémoire de l'hôte, puis la carte réseau lit cette mémoire. En bas, avec GPUDirect RDMA : la carte réseau lit directement la mémoire du GPU.</desc> <defs><marker id="gdr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker></defs> <text x="10" y="24" font-size="15" font-weight="700" fill="currentColor">Sans GPUDirect : 2 traversées de PCIe</text> <rect x="10" y="40" width="110" height="50" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="65" y="70" text-anchor="middle" font-size="15" fill="currentColor">GPU</text> <rect x="225" y="40" width="130" height="50" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="290" y="70" text-anchor="middle" font-size="15" fill="currentColor">mémoire hôte</text> <rect x="440" y="40" width="110" height="50" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="495" y="70" text-anchor="middle" font-size="15" fill="currentColor">carte réseau</text> <line x1="122" y1="65" x2="222" y2="65" stroke="var(--accent)" stroke-width="3" marker-end="url(#gdr-a)"/> <line x1="357" y1="65" x2="437" y2="65" stroke="var(--accent)" stroke-width="3" marker-end="url(#gdr-a)"/> <text x="10" y="150" font-size="15" font-weight="700" fill="currentColor">Avec GPUDirect RDMA : 1 traversée</text> <rect x="10" y="166" width="110" height="50" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="65" y="196" text-anchor="middle" font-size="15" fill="currentColor">GPU</text> <rect x="440" y="166" width="110" height="50" rx="6" fill="var(--side-bg)" stroke="currentColor" stroke-width="2"/> <text x="495" y="196" text-anchor="middle" font-size="15" fill="currentColor">carte réseau</text> <line x1="122" y1="191" x2="437" y2="191" stroke="var(--accent)" stroke-width="3" marker-end="url(#gdr-a)"/> <text x="280" y="182" text-anchor="middle" font-size="14" fill="currentColor">PCIe, sans copie par l'hôte</text>
+</svg>
+<figcaption>
+Chemin d'un tampon GPU vers le réseau, sans puis avec GPUDirect RDMA. Schéma pédagogique, pas une mesure.
+</figcaption>
+</figure>
+<p>Trois conditions pratiques, toutes tirées de la documentation de NCCL et de CUDA. Le module noyau <code>nvidia-peermem</code> doit être chargé à chaque démarrage (aucun service ne le charge automatiquement) ; avec le pilote NVIDIA ouvert et un noyau récent, NCCL peut utiliser la fonction DMA-BUF à la place. Enfin, le GPU et la carte réseau doivent se trouver assez « près » l'un de l'autre sur le bus PCIe (chapitre 6).</p>
+<div class="ex">
+<p><span class="tag">Exemple 2.2 — Le trafic mémoire que GPUDirect épargne</span> Un GPU envoie 1 Gio par étape. Sans GPUDirect, l'hôte écrit 1 Gio dans sa mémoire puis le relit : 2 Gio de trafic mémoire pour 1 Gio sur le réseau, auxquels s'ajoute le même coût à la réception. Avec GPUDirect RDMA, ce trafic disparaît.</p>
+<p>À huit cartes de 400 Gb/s saturées dans un sens, cela représente 400 Go/s de réseau, donc 800 Go/s de trafic mémoire dans l'hôte à l'émission. Comparez ce chiffre à la bande passante mémoire de la fiche de votre serveur : la lecture est instructive, mais cette bande passante n'est pas citée ici faute de source relue.</p>
+</div>
+<div class="war">
+<p><span class="tag">Une option de BIOS qui casse GPUDirect</span> La documentation de NCCL signale que la virtualisation des entrées-sorties (VT-d, IOMMU) et les services de contrôle d'accès PCI (ACS) peuvent rediriger tout le trafic pair-à-pair vers le contrôleur racine du processeur, avec une chute de performance notable, voire un blocage. Le remède documenté consiste à les désactiver sur les ponts PCI concernés. Source : <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/gpu_troubleshooting.html">NCCL, « GPU troubleshooting »</a>.</p>
+</div>
+<h3 id="gpudirect-storage">2.5. GPUDirect Storage</h3>
+<p>Le même principe s'applique au stockage. <strong>GPUDirect Storage</strong> (GDS) offre un chemin de transfert direct entre la mémoire du GPU et le stockage, qui évite un tampon intermédiaire dans la mémoire du processeur, d'après le guide de NVIDIA. L'intérêt pour vous : la lecture des jeux de données et l'écriture des <em>checkpoints</em> (module 10, <a href="../fault-tolerance/index.html">tolérance aux pannes</a>) chargent moins le processeur et la mémoire de l'hôte.</p>
+<div class="recap">
+<p>Points clés — chapitre 2</p>
+<ul>
+<li>RDMA sort le noyau du chemin des données ; la carte lit et écrit une mémoire enregistrée.</li>
+<li>Six objets de verbs : contexte, domaine de protection, région mémoire, paire de files, file de complétion, requête.</li>
+<li>Le bac à sable n'a ni pile InfiniBand ni carte : aucun transfert RDMA n'y est mesuré.</li>
+<li>GPUDirect RDMA supprime deux accès mémoire de l'hôte par transfert ; il exige <code>nvidia-peermem</code> ou DMA-BUF, et des ACS désactivés.</li>
+<li>GPUDirect Storage évite le tampon intermédiaire pour le stockage.</li>
+</ul>
+</div>
+<h2 id="ch3">3. InfiniBand : un réseau géré</h2>
+<p>InfiniBand n'est pas « de l'Ethernet plus rapide » : c'est une architecture complète, avec son transport, son routage et son gestionnaire central. Ce chapitre montre ce qu'il faut savoir pour l'exploiter, avec des sorties réellement capturées sur un simulateur.</p>
+<h3 id="un-sous-réseau-un-gestionnaire">3.1. Un sous-réseau, un gestionnaire</h3>
+<p>Un <strong>sous-réseau</strong> InfiniBand regroupe des commutateurs et des adaptateurs de canal d'hôte (HCA). Chaque port reçoit un <strong>LID</strong> (<em>local identifier</em>), adresse de niveau 2 attribuée par le <strong>gestionnaire de sous-réseau</strong> (<em>subnet manager</em>, SM). Chaque matériel porte aussi un identifiant mondial, le <strong>GUID</strong>.</p>
+<p>Le SM découvre la topologie par des balayages (<em>sweeps</em>), attribue les LID et calcule les <strong>tables de transfert linéaires</strong> (LFT) de chaque commutateur : pour chaque LID de destination, le port de sortie. Les commutateurs n'exécutent pas de protocole de routage : ils appliquent les tables du SM. À l'inverse, un réseau Ethernet routé repose sur des protocoles distribués.</p>
+<p>L'implémentation libre est <strong>OpenSM</strong> (paquet <code>opensm</code>). Les journaux du SM du bac à sable montrent ses états : <code>Entering DISCOVERING state</code>, puis <code>Entering MASTER state</code>. En production, plusieurs SM tournent : un maître et des veilleurs.</p>
+<h3 id="débits-et-générations">3.2. Débits et générations</h3>
+<p>La carte ConnectX-7 d'InfiniBand offre des ports de 400 Gb/s, d'après la page NVIDIA Quantum-2. Cette génération s'appelle <strong>NDR</strong> ; sa famille de commutateurs Quantum-2 compte 64 ports de 400 Gb/s ou 128 ports de 200 Gb/s sur 32 connecteurs OSFP, pour 51,2 Tb/s de débit agrégé bidirectionnel. La plateforme suivante, Quantum-X800, annonce du 800 Gb/s de bout en bout d'après <a href="https://www.nvidia.com/en-us/networking/products/infiniband/quantum-x800/">sa page produit</a> (génération XDR, appellation non relue).</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.1 — Lire une ligne d'<code>iblinkinfo</code></span> Voici une ligne capturée le 2026-10-24 avec <code>iblinkinfo</code> (infiniband-diags 50.0) sur un fabric <strong>simulé</strong> par <code>ibsim</code> 0.10, dont les liens sont déclarés « 4xEDR ». Elle sort de la commande <code>python3 ibsim_check.py --iblinkinfo</code> du lab 7.1 (les LID sont ceux que le gestionnaire de sous-réseau a attribués) :</p>
+<pre class="text"><code>0x000000000010003f     44    1[  ] ==( 4X      25.78125 Gbps Active/  LinkUp)==&gt;      18    4[  ] &quot;leaf7&quot; (Could be 12X )</code></pre>
+<p>Le suffixe <code>(Could be 12X)</code> n'entre pas dans le calcul. Le débit est celui d'une <strong>voie</strong> : 25,78125 Gb/s. Le lien en a quatre (<code>4X</code>), soit 103,125 Gb/s bruts. Avec l'encodage de ligne 64b/66b, le débit de données vaut <span class="math inline">103{,}125 \times 64/66 = 100</span> Gb/s, c'est-à-dire un lien EDR. L'encodage 64b/66b n'a pas été relu dans la spécification (voir « À vérifier ») ; le rapport exact de 100 est cependant un bon signe de cohérence.</p>
+<p>Les états à surveiller sont <code>Active</code> et <code>LinkUp</code>, puis le débit attendu : la documentation de NCCL demande que le débit affiché corresponde à celui du réseau, sans « baisse inattendue » (<em>downshift</em>).</p>
+</div>
+<h3 id="opensm-et-ses-moteurs-de-routage">3.3. OpenSM et ses moteurs de routage</h3>
+<p>Le SM choisit un <strong>moteur de routage</strong>. L'aide d'OpenSM 3.3.23 (paquet Ubuntu 24.04) liste : <code>updn</code>, <code>dnup</code>, <code>file</code>, <code>ftree</code>, <code>lash</code>, <code>dor</code>, <code>torus-2QoS</code>, <code>nue</code>, <code>dfsssp</code> et <code>sssp</code>. Le moteur par défaut est <em>Min Hop</em>. Plusieurs moteurs peuvent être donnés, séparés par des virgules : OpenSM essaie le suivant si le précédent échoue, et se rabat toujours sur <em>Min Hop</em> sauf si <code>no_fallback</code> figure dans la liste.</p>
+<p>Le moteur <code>ftree</code> est conçu pour les fat-trees (chapitre 5) ; <code>dor</code> et <code>torus-2QoS</code> visent les tores ; <code>lash</code> évite les interblocages par des voies virtuelles. Le choix dépend de la topologie. Un moteur qui ne reconnaît pas la topologie échoue, ce qu'il faut savoir diagnostiquer.</p>
+<div class="ex">
+<p><span class="tag">Exemple 3.2 — <code>ftree</code> accepte un fat-tree sain et refuse un fat-tree amputé</span> Le lab 7.1 (partie B) génère des fabrics à deux niveaux, les fait découvrir par OpenSM 3.3.23 (<code>-R ftree</code>) sur <code>ibsim</code> 0.10, puis lit la table de transfert d'une feuille avec <code>ibroute</code>. Trois fabrics, sorties capturées le 2026-10-24 :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Fabric</th>
+<th>Moteur retenu</th>
+<th>Câbles feuille-colonne</th>
+<th>Destinations distantes de <code>leaf0</code> par lien montant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8 feuilles × 4 GPU, 4 colonnes (1:1)</td>
+<td><code>ftree</code></td>
+<td>32 sur 32 attendus</td>
+<td>7, 7, 7, 7</td>
+</tr>
+<tr class="even">
+<td>8 feuilles × 6 GPU, 2 colonnes (3:1)</td>
+<td><code>ftree</code></td>
+<td>16 sur 16 attendus</td>
+<td>21, 21</td>
+</tr>
+<tr class="odd">
+<td>Idem au premier, avec 1 câble retiré</td>
+<td><code>minhop</code></td>
+<td>31 sur 32</td>
+<td>8, 7, 7, 6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Dans les deux premiers cas, <code>ftree</code> répartit les destinations de façon égale sur les liens montants. Dans le troisième, OpenSM écrit <code>Fabric topology is not a fat-tree</code>, puis <code>ftree: cannot build lid matrices</code>, puis <code>minhop tables configured on all switches</code>. Un seul câble manquant a suffi à désactiver le moteur prévu, et la répartition devient inégale.</p>
+</div>
+<h3 id="routage-statique-routage-adaptatif-calcul-dans-le-réseau">3.4. Routage statique, routage adaptatif, calcul dans le réseau</h3>
+<p>Les LFT associent une destination à un port, pas un flux. Le routage est donc <strong>statique</strong> : deux flux vers des destinations différentes peuvent emprunter le même lien montant, sans que le SM le sache. L'équilibre de l'exemple 3.2 est un équilibre par destination, pas par trafic.</p>
+<p>La page produit de NVIDIA pour Quantum-2 annonce du routage adaptatif avancé et SHARPv3. Le routage adaptatif choisit dynamiquement le chemin selon l'état du réseau, au lieu d'appliquer une table fixe ; SHARP déporte des réductions dans les commutateurs. NCCL sait l'exploiter : la documentation indique que <code>NVLS</code> et <code>NVLSTree</code> activent le délestage NVLink SHARP, et NCCL propose aussi des algorithmes <code>CollnetDirect</code> et <code>CollnetChain</code>, destinés à la réduction dans le réseau. Le détail des mécanismes dépend de votre version : voir « À vérifier ».</p>
+<h3 id="opérations-quotidiennes">3.5. Opérations quotidiennes</h3>
+<p>Une exploitation InfiniBand repose sur quelques contrôles réguliers, tous disponibles dans le paquet <code>infiniband-diags</code>.</p>
+<ul>
+<li><code>ibstat</code> et <code>ibstatus</code> : état du port (<code>Active</code>), état physique (<code>LinkUp</code>), type de lien, débit. À lancer sur chaque nœud avant un job.</li>
+<li><code>iblinkinfo</code> : tous les liens du sous-réseau, avec largeur et débit. Un lien qui négocie moins de voies ou un débit inférieur se voit ici.</li>
+<li><code>ibnetdiscover</code> : la topologie découverte. Comparez-la à la topologie attendue : une différence signale un câble manquant ou croisé.</li>
+<li><code>ibroute</code> et <code>ibtracert</code> : tables de transfert et chemin d'un paquet.</li>
+<li>Les compteurs d'erreurs de port, lus par <code>perfquery</code>, signalent un câble qui se dégrade avant qu'il ne tombe (voir « À vérifier » pour les noms exacts).</li>
+</ul>
+<p>La comparaison de la topologie découverte avec la topologie attendue est justement ce que fait la partie B du lab 7.1, avec des compteurs de commutateurs, de nœuds et de liens.</p>
+<div class="recap">
+<p>Points clés — chapitre 3</p>
+<ul>
+<li>Le SM attribue les LID et calcule les tables de chaque commutateur ; il se surveille comme un service critique.</li>
+<li>NDR = 400 Gb/s par port (ConnectX-7, Quantum-2) ; Quantum-X800 vise 800 Gb/s.</li>
+<li>Les voies s'additionnent : 4 × 25,78125 Gb/s × 64/66 = 100 Gb/s.</li>
+<li><code>ftree</code> demande un vrai fat-tree : un câble manquant suffit pour retomber sur <em>Min Hop</em> et déséquilibrer les liens.</li>
+<li>Le routage par tables est statique ; routage adaptatif et SHARP sont des options matérielles à valider.</li>
+</ul>
+</div>
+<h2 id="ch4">4. Ethernet pour l'IA : RoCE v2, PFC, ECN et DCQCN</h2>
+<p>Ce chapitre présente la voie Ethernet vers le RDMA. Elle est plus flexible que la voie InfiniBand, mais elle déplace vers l'exploitant des réglages que le SM d'InfiniBand cache. Il s'appuie sur des articles de déploiements réels, cités avec leurs limites.</p>
+<h3 id="roce-v2-le-transport-infiniband-dans-des-paquets-udp">4.1. RoCE v2 : le transport InfiniBand dans des paquets UDP</h3>
+<p><strong>RoCE v2</strong> (<em>RDMA over Converged Ethernet</em>, version 2) encapsule le transport InfiniBand dans UDP, lui-même dans IP. Le paquet est donc routable. Le registre de l'IANA attribue le port UDP 4791 au service <code>roce</code> (« IP Routable RocE » dans le registre), à la demande de l'InfiniBand Trade Association (entrée du 2014-10-17).</p>
+<p>Le port UDP source varie d'un flux à l'autre. Les auteurs de DCQCN notent que l'en-tête UDP sert justement à l'ECMP : les commutateurs hachent les champs IP et UDP pour répartir les flux sur les chemins équivalents. Ce hachage est la source de beaucoup de problèmes de performance, comme le chapitre 5 le montrera.</p>
+<p>Côté NCCL, deux variables concernent spécifiquement RoCE. <code>NCCL_IB_GID_INDEX</code> choisit l'indice d'identifiant global utilisé en mode RoCE ; la documentation renvoie à la commande <code>show_gids</code> pour le trouver. <code>NCCL_IB_TC</code> fixe le champ de classe de trafic, ce qui permet d'aiguiller le trafic vers la file que le réseau protège.</p>
+<h3 id="pourquoi-roce-veut-un-réseau-sans-perte">4.2. Pourquoi RoCE veut un réseau sans perte</h3>
+<p>Les cartes RoCE implémentent le transport fiable en matériel, avec une reprise sur perte simple. D'après l'article de DCQCN, RoCE v2 a besoin du contrôle de flux par priorité (PFC, section 4.3) pour obtenir un réseau Ethernet sans perte. Sans cela, la moindre perte coûte cher.</p>
+<p>Avec une reprise de type <em>go-back-N</em>, le récepteur écarte les paquets suivant le paquet perdu et l'émetteur retransmet tout depuis ce paquet. Au pire, cela retransmet une fenêtre entière. Si la perte n'est pas détectée par un accusé négatif, c'est un délai de garde qui règle la reprise, et un délai de garde se compte en centaines de millisecondes, voire en secondes : le défaut documenté de NCCL est de 4,3 s par tentative.</p>
+<div class="ex">
+<p><span class="tag">Exemple 4.1 — Le prix d'une perte</span> Reprenons le BDP de l'exemple 1.1 : 250 000 octets en vol, soit 61 paquets de 4 096 octets. Une perte peut donc forcer jusqu'à 61 retransmissions pour un seul paquet perdu.</p>
+<p>Si la reprise passe par le délai de garde, la documentation de NCCL donne la règle : le délai vaut <span class="math inline">4{,}096\ \mu\text{s} \times 2^{t}</span> pour la valeur <code>NCCL_IB_TIMEOUT</code> <span class="math inline">= t</span>. Pour <span class="math inline">t = 17</span>, le délai vaut 536,9 ms, et avec 7 tentatives le temps total avant erreur atteint 3,8 s. À 5 µs d'aller-retour, 536,9 ms représentent 107 374 allers-retours.</p>
+<p>Une perte isolée ne se « voit » pas dans la moyenne d'un débit ; elle se voit dans le temps de l'étape la plus lente, puisque l'all-reduce attend le dernier rang.</p>
+</div>
+<h3 id="pfc-sans-perte-mais-avec-des-effets-de-bord">4.3. PFC : sans perte, mais avec des effets de bord</h3>
+<p>Le <em>Priority-based Flow Control</em> (PFC) de l'IEEE 802.1Qbb suspend l'émission d'une file de priorité quand le tampon du récepteur approche de la saturation. Le mécanisme est local à un lien et agit par port et par priorité, pas par flux. Les auteurs de DCQCN en tirent trois défauts : blocage en tête de file, injustice entre flux et « flux victime » pénalisé par une congestion qui n'est pas la sienne.</p>
+<p>Le blocage se propage : un récepteur lent suspend le commutateur en amont, qui suspend ses propres voisins, de proche en proche. Un incident local peut devenir un incident de tout le réseau. Une étude de Microsoft sur RDMA déployé à grande échelle documente trois cas concrets.</p>
+<div class="war">
+<p><span class="tag">Trois pannes d'un RDMA Ethernet à grande échelle</span> Guo et al. (SIGCOMM 2016) décrivent trois pannes de déploiements RoCE v2 en production.</p>
+<ul>
+<li>Un <strong>livelock</strong> du transport, causé par une reprise de type <em>go-back-0</em> qui réémet tout le message depuis le début. La correction recommandée est <em>go-back-N</em>.</li>
+<li>Un <strong>interblocage PFC</strong> (<em>deadlock</em>), provoqué par des paquets inondés vers tous les ports parce que leur destination manquait dans la table d'adresses d'un commutateur.</li>
+<li>Une <strong>tempête de trames de pause</strong> (<em>PFC pause frame storm</em>), causée par une carte réseau défaillante qui émet des pauses sans fin et finit par paralyser tout le réseau.</li>
+</ul>
+<p>Source : <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/11/rdma_sigcomm2016.pdf">RDMA over Commodity Ethernet at Scale</a>, sections 4.1 à 4.3. Ces pannes ont été observées avant 2016 sur du matériel de l'époque ; les produits ont changé, les familles de pannes restent à connaître.</p>
+</div>
+<h3 id="ecn-et-dcqcn">4.4. ECN et DCQCN</h3>
+<p>La <strong>notification explicite de congestion</strong> (ECN, RFC 3168) permet à un routeur de marquer un paquet au lieu de le jeter : il positionne le codepoint <em>Congestion Experienced</em> (CE) dans l'en-tête IP. Le récepteur renvoie l'information à l'émetteur, qui réduit son débit.</p>
+<p><strong>DCQCN</strong> (<em>Data Center Quantized Congestion Notification</em>) applique cette idée à RoCE v2. L'article le décrit comme « a rate-based, end-to-end congestion protocol » qui s'appuie sur QCN et DCTCP. Il comprend trois acteurs. Le commutateur (<em>congestion point</em>) marque les paquets avec une probabilité qui monte entre deux seuils de file, <span class="math inline">K_{\min}</span> et <span class="math inline">K_{\max}</span>, grâce à la fonction RED standard. Le récepteur (<em>notification point</em>) renvoie des paquets de notification de congestion (CNP) au plus une fois par intervalle. L'émetteur (<em>reaction point</em>) réduit son débit à la réception d'un CNP, puis le remonte avec des minuteurs et des compteurs.</p>
+<p>DCQCN n'a donc besoin que des fonctions RED et ECN standard des commutateurs, mais du matériel de la carte. Il ne supprime pas PFC : les flux démarrent à plein débit, et sans PFC cela peut provoquer des pertes (§6 de l'article). L'idée est de déclencher le marquage ECN avant que PFC n'intervienne, de sorte que PFC reste un filet de sécurité.</p>
+<h3 id="ce-que-disent-trois-déploiements-documentés">4.5. Ce que disent trois déploiements documentés</h3>
+<p>Trois publications décrivent un réseau Ethernet pour de gros entraînements. Elles divergent sur la congestion, ce qui est la meilleure raison de ne pas considérer DCQCN comme un réglage « par défaut ».</p>
+<ul>
+<li><strong>Llama 3</strong> (Meta, 2024). Le modèle de 405 milliards de paramètres a été entraîné sur un réseau RoCE (commutateurs Arista 7800 et Minipack2 OCP) ; les petits modèles l'ont été sur Quantum-2 InfiniBand. Les deux réseaux sont à 400 Gb/s et réglés pour des performances équivalentes, d'après l'article. Meta fait tourner un cluster de 24 000 GPU sans DCQCN (16 000 au plus pour le préentraînement, dit une note de l'article), grâce à des commutateurs à grands tampons dans la couche de colonne, à un équilibrage de charge amélioré (<em>E-ECMP</em>) et à 16 flux entre deux GPU plutôt qu'un.</li>
+<li><strong>MegaScale</strong> (ByteDance, 2024). Les commutateurs sont à base de puces Tomahawk 4 (64 ports de 400 Gb/s) en trois couches. Les auteurs constatent qu'avec DCQCN par défaut, l'all-to-all peut provoquer des niveaux élevés de PFC et un blocage en tête de file ; ils conçoivent un algorithme qui combine Swift et DCQCN, et règlent les minuteries de retransmission de NCCL.</li>
+<li><strong>HPN</strong> (Alibaba Cloud, 2024). Le réseau a deux niveaux et deux plans, relie 15 000 GPU par <em>pod</em> et remplace le commutateur de baie unique par deux, pour supprimer le point de défaillance unique. Il vise la polarisation du hachage d'ECMP plus que la congestion.</li>
+</ul>
+<p>Le tableau résume les différences entre les deux technologies, uniquement avec des éléments relus pour ce module. Il ne désigne pas de vainqueur : il montre les questions à poser.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>InfiniBand</th>
+<th>RoCE v2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Qui calcule les routes ?</td>
+<td>Le SM, centralement, avec des tables par destination</td>
+<td>Le routage IP des commutateurs, avec hachage ECMP des flux</td>
+</tr>
+<tr class="even">
+<td>Qui évite la perte ?</td>
+<td>Le niveau 2 sans perte de l'architecture (à vérifier dans la spécification)</td>
+<td>À construire : PFC, ECN, DCQCN ou, chez Meta, tampons profonds et équilibrage</td>
+</tr>
+<tr class="odd">
+<td>Réglages côté NCCL</td>
+<td>Peu</td>
+<td><code>NCCL_IB_GID_INDEX</code>, <code>NCCL_IB_TC</code>, délais de garde</td>
+</tr>
+<tr class="even">
+<td>Pannes typiques</td>
+<td>Moteur de routage, SM, câbles</td>
+<td>Interblocage PFC, tempêtes de pause, hachage polarisé</td>
+</tr>
+<tr class="odd">
+<td>Fournisseurs</td>
+<td>Un seul écosystème de commutateurs</td>
+<td>Plusieurs, dont des commutateurs ouverts (OCP)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="key">
+<p><span class="tag">Choisir</span> Les deux réseaux de Llama 3 ont été réglés pour des performances équivalentes : le choix se fait sur le coût, les compétences de l'équipe et le fournisseur, pas sur une supériorité technique. Demandez toujours à qui appartiendra le réglage de la congestion.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 4</p>
+<ul>
+<li>RoCE v2 est le transport InfiniBand sur UDP (port 4791) : routable, mais exigeant en réglages.</li>
+<li>Il suppose un réseau sans perte ; une perte coûte jusqu'à une fenêtre, un délai de garde coûte des centaines de millisecondes.</li>
+<li>PFC évite la perte mais propage les pauses ; Guo et al. documentent livelock, interblocage et tempête de pause.</li>
+<li>DCQCN combine marquage ECN, CNP et réduction de débit ; PFC reste un filet de sécurité.</li>
+<li>Meta (sans DCQCN), ByteDance (Swift et DCQCN) et Alibaba (deux plans) ont fait trois choix différents.</li>
+</ul>
+</div>
+<h2 id="ch5">5. Topologies : fat-tree, rails et sur-souscription</h2>
+<p>La topologie fixe le débit que le réseau peut tenir quand tous les GPU parlent en même temps. Ce chapitre donne les formules qui se refont à la main, vérifiées par un calculateur testé et comparées à des configurations publiées.</p>
+<h3 id="le-fat-tree">5.1. Le fat-tree</h3>
+<p>Un <strong>fat-tree</strong> est un arbre où les liens deviennent plus gros (ou plus nombreux) en montant vers la racine, de sorte que la capacité ne se réduit pas. Al-Fares, Loukissas et Vahdat (SIGCOMM 2008) le construisent avec des commutateurs identiques de <span class="math inline">k</span> ports. Il y a <span class="math inline">k</span> <em>pods</em> de deux couches de <span class="math inline">k/2</span> commutateurs, et chaque commutateur de bordure dessert <span class="math inline">k/2</span> hôtes.</p>
+<p>Le cœur compte <span class="math inline">(k/2)^2</span> commutateurs. Le résultat : <span class="math inline">k^3/4</span> hôtes et <span class="math inline">5k^2/4</span> commutateurs. Pour <span class="math inline">k = 48</span>, l'article cite 27 648 hôtes ; la formule donne 2 880 commutateurs.</p>
+<p>Avec des commutateurs de <span class="math inline">r</span> ports sans sur-souscription, deux niveaux (feuilles et colonnes) desservent au plus <span class="math inline">r^2/2</span> points d'accès ; trois niveaux, <span class="math inline">r^3/4</span>. Pour <span class="math inline">N</span> points d'accès, le nombre de commutateurs vaut <span class="math inline">3N/r</span> à deux niveaux et <span class="math inline">5N/r</span> à trois :</p>
+<p><span class="math display">N_{\max}^{(2)} = \frac{r^2}{2}, \qquad N_{\max}^{(3)} = \frac{r^3}{4}, \qquad S^{(2)} = \frac{3N}{r}, \qquad S^{(3)} = \frac{5N}{r}</span></p>
+<figure class="fig">
+<svg viewBox="0 0 560 300" role="img" aria-labelledby="ft-t ft-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
+<title id="ft-t">
+Fat-tree à deux niveaux
+</title>
+<desc id="ft-d">Deux commutateurs de colonne reliés chacun aux quatre commutateurs de feuille ; chaque feuille dessert deux GPU. Aucune sur-souscription : autant de liens montants que de liens vers les GPU.</desc> <g stroke="var(--accent)" stroke-width="2"> <line x1="170" y1="70" x2="75" y2="150"/><line x1="170" y1="70" x2="205" y2="150"/><line x1="170" y1="70" x2="345" y2="150"/><line x1="170" y1="70" x2="475" y2="150"/> <line x1="390" y1="70" x2="75" y2="150"/><line x1="390" y1="70" x2="205" y2="150"/><line x1="390" y1="70" x2="345" y2="150"/><line x1="390" y1="70" x2="475" y2="150"/> </g> <g stroke="currentColor" stroke-width="2"> <line x1="75" y1="170" x2="45" y2="240"/><line x1="75" y1="170" x2="105" y2="240"/> <line x1="205" y1="170" x2="175" y2="240"/><line x1="205" y1="170" x2="235" y2="240"/> <line x1="345" y1="170" x2="315" y2="240"/><line x1="345" y1="170" x2="375" y2="240"/> <line x1="475" y1="170" x2="445" y2="240"/><line x1="475" y1="170" x2="505" y2="240"/> </g> <g fill="var(--side-bg)" stroke="currentColor" stroke-width="2"> <rect x="120" y="45" width="100" height="40" rx="6"/><rect x="340" y="45" width="100" height="40" rx="6"/> <rect x="30" y="150" width="90" height="36" rx="6"/><rect x="160" y="150" width="90" height="36" rx="6"/><rect x="300" y="150" width="90" height="36" rx="6"/><rect x="430" y="150" width="90" height="36" rx="6"/> <circle cx="45" cy="250" r="12"/><circle cx="105" cy="250" r="12"/><circle cx="175" cy="250" r="12"/><circle cx="235" cy="250" r="12"/><circle cx="315" cy="250" r="12"/><circle cx="375" cy="250" r="12"/><circle cx="445" cy="250" r="12"/><circle cx="505" cy="250" r="12"/> </g> <g font-size="15" text-anchor="middle" fill="currentColor"> <text x="170" y="71">colonne 0</text><text x="390" y="71">colonne 1</text> <text x="75" y="173">feuille 0</text><text x="205" y="173">feuille 1</text><text x="345" y="173">feuille 2</text><text x="475" y="173">feuille 3</text> <text x="280" y="285" font-size="14">GPU (un port de carte réseau chacun)</text> </g>
+</svg>
+<figcaption>
+Fat-tree à deux niveaux : 4 feuilles, 2 colonnes, 8 GPU. Chaque feuille offre autant de ports montants (2) que de ports vers les GPU (2) : sur-souscription 1:1.
+</figcaption>
+</figure>
+<div class="ex">
+<p><span class="tag">Exemple 5.1 — Retrouver les chiffres d'une architecture de référence</span> Le guide d'architecture du DGX SuperPOD H100 publie, pour des commutateurs InfiniBand de 64 ports, le nombre de feuilles, de colonnes et de cœurs selon la taille, en unités évolutives (<em>scalable units</em>, SU) de 32 nœuds. La commande <code>python3 fabric.py --compare</code> du lab 7.1 recalcule ces nombres avec les formules ci-dessus (sortie capturée le 2026-10-24, quatre lignes sur huit, notes de fin de ligne omises) :</p>
+<pre class="text"><code>OK   SU= 1 gpus=   248 published={&#39;leaf&#39;: 8, &#39;spine&#39;: 4, &#39;core&#39;: 0} computed={&#39;leaf&#39;: 8, &#39;spine&#39;: 4, &#39;core&#39;: 0}
+DIFF SU= 3 gpus=   760 published={&#39;leaf&#39;: 24, &#39;spine&#39;: 16, &#39;core&#39;: 0} computed={&#39;leaf&#39;: 24, &#39;spine&#39;: 12, &#39;core&#39;: 0}
+OK   SU=16 gpus=  4096 published={&#39;leaf&#39;: 128, &#39;spine&#39;: 128, &#39;core&#39;: 64} computed={&#39;leaf&#39;: 128, &#39;spine&#39;: 128, &#39;core&#39;: 64}
+OK   SU=56 gpus= 16384 published={&#39;leaf&#39;: 512, &#39;spine&#39;: 512, &#39;core&#39;: 256} computed={&#39;leaf&#39;: 512, &#39;spine&#39;: 512, &#39;core&#39;: 256}</code></pre>
+<p>Sept lignes sur huit concordent. La différence pour 3 SU tient à la conception : le tableau garde 16 colonnes avec 768 câbles, soit 48 ports utilisés sur 64 par colonne, ce qui laisse penser (hypothèse) que le nombre de colonnes est conservé pour passer à 4 SU sans recâbler.</p>
+<p>La ligne « 56 » est incohérente dans la source : 56 SU de 32 nœuds font 1 792 nœuds, alors que le tableau indique 2 048 nœuds et 16 384 GPU. Le calculateur utilise le nombre de GPU, pas l'étiquette.</p>
+</div>
+<h3 id="la-sur-souscription">5.2. La sur-souscription</h3>
+<p>Le <strong>taux de sur-souscription</strong> compare ce que les points d'accès peuvent émettre à la capacité qui monte. Al-Fares et ses coauteurs l'expriment par un rapport : 1:1 signifie que tous les hôtes peuvent parler à n'importe quel autre à pleine vitesse ; 5:1 ne laisse disponible que 20 % de la bande passante des hôtes pour certains motifs de trafic.</p>
+<p>Une feuille de 64 ports qui réserve 48 ports aux GPU et 16 aux colonnes affiche 3:1. L'intérêt est le coût : moins de commutateurs et surtout moins de câbles optiques. Le tableau suivant est calculé par le lab 7.1 (<code>--endpoints N --radix 64 --leaf-down D</code>), en comptant deux émetteurs-récepteurs optiques par lien entre commutateurs.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>GPU</th>
+<th>Ports bas/haut</th>
+<th>Niveaux</th>
+<th>Feuilles</th>
+<th>Colonnes</th>
+<th>Cœurs</th>
+<th>Commutateurs</th>
+<th>Émetteurs-récepteurs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2 048</td>
+<td>32/32 (1:1)</td>
+<td>2</td>
+<td>64</td>
+<td>32</td>
+<td>0</td>
+<td>96</td>
+<td>4 096</td>
+</tr>
+<tr class="even">
+<td>2 048</td>
+<td>48/16 (≈3:1)</td>
+<td>2</td>
+<td>43</td>
+<td>11</td>
+<td>0</td>
+<td>54</td>
+<td>1 376</td>
+</tr>
+<tr class="odd">
+<td>4 096</td>
+<td>32/32 (1:1)</td>
+<td>3</td>
+<td>128</td>
+<td>128</td>
+<td>64</td>
+<td>320</td>
+<td>16 384</td>
+</tr>
+<tr class="even">
+<td>4 096</td>
+<td>48/16 (≈3:1)</td>
+<td>3</td>
+<td>86</td>
+<td>48</td>
+<td>24</td>
+<td>158</td>
+<td>5 824</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Le prix des économies est le débit quand le trafic traverse le niveau sur-souscrit. Un modèle jouet suffit pour raisonner : une fraction <span class="math inline">f</span> des octets traverse le niveau au débit <span class="math inline">B/o</span>, le reste va à <span class="math inline">B</span>. Le temps par octet vaut <span class="math inline">\big((1-f)+f\,o\big)/B</span>, donc :</p>
+<p><span class="math display">B_{\text{eff}} = \frac{B}{1 + f\,(o-1)}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 5.2 — Le 1:7 de Llama 3</span> L'article de Llama 3 décrit des baies de 16 GPU, 192 baies par <em>pod</em> soit 3 072 GPU en bande passante de bissection complète, et huit <em>pods</em> soit 24 576 GPU ; la couche d'agrégation a un taux de sur-souscription de « 1:7 ». Nous lisons cette notation comme « un septième de la bande passante complète » (à vérifier).</p>
+<p>Dans cette lecture, un GPU dispose de <span class="math inline">400/7 \approx 57</span> Gb/s, soit 7,1 Go/s, vers un autre <em>pod</em>, contre 50 Go/s dans son <em>pod</em>. L'article précise que le parallélisme et l'ordonnanceur sont conçus pour minimiser les communications entre <em>pods</em> : c'est précisément ce que le modèle jouet recommande, en réduisant <span class="math inline">f</span>.</p>
+</div>
+<h3 id="topologies-à-rails">5.3. Topologies à rails</h3>
+<p>Dans un nœud GPU, chaque GPU possède sa propre carte réseau (chapitre 6). Une topologie <strong>à rails</strong> (<em>rail-optimized</em>) relie la carte numéro <span class="math inline">k</span> de tous les nœuds à un même ensemble de feuilles, le rail <span class="math inline">k</span>. Le guide du DGX SuperPOD H100 l'énonce ainsi : « Each group of 32 nodes is rail-aligned. Traffic per rail of the DGX H100 systems is always one hop away from the other 31 nodes in a SU. »</p>
+<p>L'avantage est que les cartes de même numéro local se parlent en un saut, sous une même feuille. NCCL aligne son choix de carte sur le GPU : dans les journaux synthétiques du lab 7.2, le GPU local 3 sort par la carte 3. Le coût de comptage est nul : huit rails de 128 nœuds utilisent autant de commutateurs qu'un fabric plat de 1 024 points d'accès (48, test du lab 7.1). L'inconvénient est un domaine de panne plus étendu : une feuille tombée prive un rail de tous les nœuds.</p>
+<p>MegaScale relie les huit cartes de 200 Gb/s d'un serveur à huit commutateurs différents (en multi-rails), divise un port de 400 Gb/s de baie en deux ports de 200 Gb/s pour réduire les conflits de hachage, et place les nœuds gourmands sous un même commutateur de baie. HPN adopte deux plans et deux commutateurs de baie par serveur. Trois constructions différentes, une même idée : réduire le nombre de chemins sur lesquels le hachage peut se tromper.</p>
+<h3 id="dragonfly-et-au-delà">5.4. Dragonfly et au-delà</h3>
+<p>À très grande échelle, un fat-tree à trois niveaux coûte beaucoup de câbles. Une topologie <strong>dragonfly</strong> regroupe des commutateurs en groupes entièrement connectés, reliés entre eux par un petit nombre de liens globaux ; elle réduit le nombre de câbles longs au prix d'un routage plus subtil, qui exige du routage adaptatif. La page de NVIDIA pour Quantum-2 annonce plus d'un million de nœuds de 400 Gb/s avec un DragonFly+ à quatre niveaux de commutateurs (trois sauts).</p>
+<p>OpenSM propose des moteurs dédiés aux topologies non arborescentes (<code>dor</code>, <code>lash</code>, <code>torus-2QoS</code>, voir le chapitre 3). L'article fondateur du dragonfly n'a pas été relu pour ce module (voir « À vérifier »), et la plupart des entraînements décrits dans ce cours tiennent dans un fat-tree.</p>
+<h3 id="placement-sensible-à-la-topologie">5.5. Placement sensible à la topologie</h3>
+<p>La topologie n'a de valeur que si l'ordonnanceur la connaît. Slurm la décrit par <code>topology/tree</code> et l'option <code>--switches</code> (voir <a href="../slurm/index.html#ch5">le chapitre 5 du module 5</a>) ; sur Kubernetes, on étiquette les nœuds par feuille et par bloc (module 12). Le coût d'une allocation éparpillée est celui de l'exemple 5.2 : plus de trafic qui traverse les niveaux hauts.</p>
+<p>Dans le sens inverse, NCCL lit la topologie du nœud et en déduit ses anneaux et ses arbres (chapitre 7). Une topologie fausse, une allocation éparpillée ou une affinité mal réglée donnent le même symptôme : un débit de bus en dessous de l'attendu, sans erreur.</p>
+<div class="recap">
+<p>Points clés — chapitre 5</p>
+<ul>
+<li>Un fat-tree de commutateurs à <span class="math inline">r</span> ports dessert <span class="math inline">r^2/2</span> points d'accès en 2 niveaux, <span class="math inline">r^3/4</span> en 3.</li>
+<li>Sans sur-souscription : <span class="math inline">3N/r</span> commutateurs à 2 niveaux, <span class="math inline">5N/r</span> à 3. Le calculateur reproduit sept des huit lignes du DGX SuperPOD H100.</li>
+<li>La sur-souscription économise des commutateurs et des émetteurs-récepteurs ; elle coûte du débit pour le trafic qui traverse le niveau.</li>
+<li>Les topologies à rails gardent le trafic de même rang local à un saut.</li>
+<li>Le placement par l'ordonnanceur compte autant que la topologie.</li>
+</ul>
+</div>
+<h2 id="ch6">6. Dans le nœud : NVLink, NVSwitch, PCIe et affinité</h2>
+<p>Avant de sortir du serveur, un octet traverse plusieurs liens de vitesses très différentes. Ce chapitre donne l'ordre de grandeur de chacun et la grammaire que NCCL utilise pour décrire la distance entre un GPU, un autre GPU et une carte réseau.</p>
+<h3 id="une-hiérarchie-de-liens">6.1. Une hiérarchie de liens</h3>
+<p>Dans un serveur GPU récent, quatre familles de liens coexistent. <strong>NVLink</strong> relie les GPU entre eux, par l'intermédiaire de <strong>NVSwitch</strong> quand le serveur en contient. <strong>PCIe</strong> relie les GPU, les cartes réseau, le stockage et les processeurs. Les <strong>cartes réseau</strong> quittent le serveur. Entre processeurs, un lien d'interconnexion (QPI ou UPI, d'après la documentation de NCCL) joint les sockets.</p>
+<p>La page produit du H100 de NVIDIA annonce une quatrième génération de NVLink à 900 Go/s d'interconnexion GPU-GPU, avec PCIe Gen5. Le guide utilisateur du DGX H100 décrit huit cartes ConnectX-7 à un port, jusqu'à 400 Gb/s chacune, pour le réseau de calcul, et deux cartes ConnectX-7 à deux ports Ethernet pour le stockage et l'administration. Le stockage a donc ses propres cartes, distinctes des huit cartes du réseau de calcul.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.1 — NVLink contre carte réseau</span> Huit cartes de 400 Gb/s font 3 200 Gb/s, soit 400 Go/s par sens et par serveur, à raison de 50 Go/s par GPU. Le rapport de 900 Go/s (NVLink) à 50 Go/s (une carte) vaut 18.</p>
+<p>NVIDIA ne précise pas, dans la page citée, si les 900 Go/s se comptent par sens ou en bidirectionnel. En divisant par deux, le rapport tombe à 9 : l'ordre de grandeur reste celui d'un facteur dix. La conséquence est structurante : les collectives doivent faire le plus de travail possible à l'intérieur du nœud avant de toucher le réseau.</p>
+</div>
+<h3 id="la-grammaire-des-chemins">6.2. La grammaire des chemins</h3>
+<p>NCCL détecte la topologie du nœud et classe chaque paire de composants selon un <strong>type de chemin</strong>. Le code source de NCCL (<code>src/graph/topo.cc</code>) en liste douze : <code>LOC</code>, <code>NVL</code>, <code>NVB</code>, <code>C2C</code>, <code>PIX</code>, <code>PXB</code>, <code>P2C</code>, <code>PXN</code>, <code>PHB</code>, <code>SYS</code>, <code>NET</code> et <code>DIS</code>. La documentation des variables d'environnement définit les types qui concernent le PCIe :</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Sens (documentation de NCCL)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NVL</code></td>
+<td>les GPU sont reliés par NVLink</td>
+</tr>
+<tr class="even">
+<td><code>PIX</code></td>
+<td>sur le même commutateur PCI</td>
+</tr>
+<tr class="odd">
+<td><code>PXB</code></td>
+<td>à travers un ou plusieurs commutateurs PCI</td>
+</tr>
+<tr class="even">
+<td><code>PHB</code></td>
+<td>sur le même nœud NUMA (même socket, module 1), le trafic traverse le processeur</td>
+</tr>
+<tr class="odd">
+<td><code>SYS</code></td>
+<td>entre nœuds NUMA, par l'interconnexion entre sockets</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Deux variables règlent la distance maximale tolérée. <code>NCCL_P2P_LEVEL</code> fixe la distance au-delà de laquelle NCCL n'utilise plus le transport pair-à-pair entre GPU ; <code>NCCL_NET_GDR_LEVEL</code> fixe la distance maximale entre carte réseau et GPU pour GPUDirect RDMA. La documentation déconseille d'écrire les valeurs sous forme d'entiers (les valeurs numériques changent d'une version à l'autre) et recommande les noms de types.</p>
+<h3 id="laffinité-gpu-carte-réseau">6.3. L'affinité GPU-carte réseau</h3>
+<p>La règle pratique est simple : chaque GPU doit trouver, sous le même commutateur PCI (type <code>PIX</code>), la carte réseau qui lui sert de sortie. Alors GPUDirect RDMA est actif, et le trafic ne remonte pas au processeur. Si la carte est à distance <code>PHB</code> ou <code>SYS</code> et que <code>NCCL_NET_GDR_LEVEL</code> est inférieur, NCCL désactive GPUDirect pour cette paire et passe par la mémoire de l'hôte (chapitre 2).</p>
+<p>Trois contrôles de routine : lire la matrice de topologie du nœud (<code>nvidia-smi topo -m</code>) ; faire écrire à NCCL sa vision avec <code>NCCL_TOPO_DUMP_FILE</code> (disponible depuis la version 2.6) ; vérifier que les services de contrôle d'accès PCI (ACS) sont désactivés (chapitre 2). Côté ordonnanceur, <code>--gpu-bind=closest</code> rapproche chaque tâche de son GPU (voir <a href="../slurm/index.html#ch5">le chapitre 5 du module 5</a>).</p>
+<p>NCCL connaît aussi un type de chemin <code>PXN</code> et une variable <code>NCCL_PXN_DISABLE</code>. L'idée, détaillée dans le blog de NVIDIA sur NCCL 2.12 (non relu ici), est qu'un GPU peut envoyer par la carte réseau d'un GPU voisin relié en NVLink ; le comportement exact est à vérifier dans votre version.</p>
+<div class="ex">
+<p><span class="tag">Exemple 6.2 — Qui sort par quelle carte ?</span> Un serveur à huit GPU et huit cartes montre, dans le journal synthétique du lab 7.2, des lignes de la forme <code>Channel 00/0 : 7[7] -&gt; 8[0] [send] via NET/IB/7/GDRDMA</code>. Lisez-la ainsi : le rang 7, sur le GPU 7, envoie au rang 8, GPU 0 de l'autre nœud, par la carte numéro 7 du plugin IB, avec GPUDirect RDMA.</p>
+<p>Si la ligne se terminait par <code>NET/IB/7</code> sans <code>/GDRDMA</code>, la carte 7 passerait par la mémoire de l'hôte : un indice de ACS, de <code>nvidia-peermem</code> absent ou d'une distance trop grande. C'est le genre de lecture que l'analyseur du lab 7.2 automatise.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 6</p>
+<ul>
+<li>Dans un nœud, NVLink dépasse la carte réseau d'au moins un ordre de grandeur (900 Go/s contre 50 Go/s par GPU, selon la convention de comptage).</li>
+<li>NCCL classe les distances en types de chemin : <code>NVL</code>, <code>PIX</code>, <code>PXB</code>, <code>PHB</code>, <code>SYS</code>, <code>NET</code>…</li>
+<li><code>NCCL_P2P_LEVEL</code> et <code>NCCL_NET_GDR_LEVEL</code> fixent la distance maximale pour le pair-à-pair et GPUDirect.</li>
+<li>Visez un GPU et une carte réseau sous le même commutateur PCI ; contrôlez ACS.</li>
+<li>Le réseau de stockage est séparé du réseau de calcul sur les serveurs de référence.</li>
+</ul>
+</div>
+<h2 id="ch7">7. NCCL : algorithmes, protocoles et journaux</h2>
+<p>NCCL (<em>NVIDIA Collective Communications Library</em>) est la bibliothèque qui transforme un <code>all_reduce</code> de PyTorch en transferts sur NVLink et sur le réseau. Elle choisit seule des algorithmes et des chemins ; vous devez savoir lire ses choix.</p>
+<h3 id="ce-que-nccl-fait-pour-vous">7.1. Ce que NCCL fait pour vous</h3>
+<p>Une application crée un <strong>communicateur</strong> qui regroupe des rangs, puis appelle des collectives : all-reduce, all-gather, reduce-scatter, broadcast, reduce, all-to-all. À l'initialisation, NCCL amorce une connexion entre les rangs (<em>bootstrap</em>), détecte la topologie, cherche des anneaux et des arbres, ouvre des connexions réseau et réserve des tampons. Ensuite chaque collective découpe les données en <strong>canaux</strong> qui avancent en parallèle.</p>
+<p>Tout se passe de façon asynchrone sur un flux CUDA : une collective qui ne se termine jamais ne produit aucune erreur immédiate, elle bloque le flux. C'est pourquoi les journaux, les délais de garde et les outils de diagnostic du chapitre 8 comptent.</p>
+<h3 id="les-algorithmes">7.2. Les algorithmes</h3>
+<p>La documentation de <code>NCCL_ALGO</code> liste les algorithmes avec la version qui les introduit : <code>Ring</code> et <code>Tree</code> (depuis 2.5), <code>CollnetDirect</code> et <code>CollnetChain</code> (2.14 et suivantes, réduction dans le réseau), <code>NVLS</code> (2.17) et <code>NVLSTree</code> (2.18), qui utilisent la réduction dans les commutateurs NVLink, et <code>PAT</code> (2.23). Sans réglage, NCCL choisit selon la topologie et l'architecture.</p>
+<p>Les formules du module 2 donnent l'idée. L'anneau coûte <span class="math inline">2(p-1)</span> latences ; un arbre, de l'ordre de <span class="math inline">\log_2 p</span>. Le blog de NVIDIA sur NCCL 2.4 explique que l'anneau fait croître la latence linéairement avec le nombre de GPU, ce qui empêche de dépasser quelques centaines de GPU, et présente les <strong>arbres binaires doubles</strong> : bande passante complète et latence logarithmique. Sur le supercalculateur Summit, jusqu'à 24 576 GPU, le gain de latence atteint 180 fois par rapport à l'anneau.</p>
+<p><span class="math display">T_{\text{anneau}} = 2(p-1)\,\alpha + 2\,\frac{p-1}{p}\,\frac{n}{B} \qquad T_{\text{arbre}} \approx 2\log_2 p\;\alpha + 2\,\frac{n}{B}</span></p>
+<div class="ex">
+<p><span class="tag">Exemple 7.1 — 1 024 rangs : l'anneau face à l'arbre, en latence</span> Prenons 128 nœuds de 8 GPU. Hypothèses d'école : 1 µs de latence entre GPU d'un même nœud, 5 µs entre nœuds. Un anneau qui traverse tous les GPU paie <span class="math inline">2\big[(1024-128)\times 1 + 128 \times 5\big] = 3\,072</span> µs de latence pure.</p>
+<p>Un arbre sur les nœuds, avec une chaîne dans chaque nœud, paie <span class="math inline">2\times 7 \times 5 + 2 \times 7 \times 1 = 84</span> µs. Le rapport est d'environ 37. Ce n'est qu'un modèle jouet, avec des latences supposées ; l'ordre de grandeur est conforme à celui du blog (jusqu'à 180× à 24 576 GPU) sans le démontrer.</p>
+<p>Pour un message de 1 Gio sur le même réseau, le terme de bande passante domine (de l'ordre de 40 ms à 50 Go/s) et l'écart de latence (3 ms contre 0,08 ms) pèse peu. C'est pourquoi NCCL choisit selon la taille.</p>
+</div>
+<h3 id="les-protocoles">7.3. Les protocoles</h3>
+<p>NCCL propose trois protocoles : <code>LL</code>, <code>LL128</code> et <code>Simple</code>. La documentation décourage de fixer <code>NCCL_PROTO</code>, sauf pour désactiver un protocole en cas de bug suspecté. Elle avertit que forcer <code>LL128</code> sur une plate-forme qui ne le supporte pas peut corrompre des données. Par défaut, <code>LL</code>, <code>LL128</code> et <code>Simple</code> sont actifs sur les plates-formes qui acceptent <code>LL128</code>, et <code>LL</code> et <code>Simple</code> ailleurs.</p>
+<h3 id="les-variables-denvironnement-utiles">7.4. Les variables d'environnement utiles</h3>
+<p>NCCL a des dizaines de variables. Le tableau liste celles dont vous aurez besoin pour diagnostiquer. Les descriptions viennent du guide d'utilisation de NCCL (page « Environment Variables », en-tête version 2.32, lue le 2026-10-24).</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NCCL_DEBUG</code></td>
+<td>niveau de journal : <code>VERSION</code>, <code>WARN</code>, <code>INFO</code>, <code>TRACE</code> (et <code>ATTN</code> depuis 2.32)</td>
+</tr>
+<tr class="even">
+<td><code>NCCL_DEBUG_SUBSYS</code></td>
+<td>filtre par sous-système (<code>INIT</code>, <code>NET</code>, <code>GRAPH</code>, <code>TUNING</code>…) ; défaut <code>INIT,BOOTSTRAP,ENV</code></td>
+</tr>
+<tr class="odd">
+<td><code>NCCL_DEBUG_FILE</code></td>
+<td>fichier de journal ; <code>%h</code> et <code>%p</code> insèrent le nom d'hôte et le PID</td>
+</tr>
+<tr class="even">
+<td><code>NCCL_SOCKET_IFNAME</code></td>
+<td>interfaces IP utilisées, par préfixes ; <code>=eth0</code> pour un nom exact</td>
+</tr>
+<tr class="odd">
+<td><code>NCCL_IB_HCA</code></td>
+<td>cartes RDMA à utiliser ; <code>=mlx5_0:1</code> pour un nom exact</td>
+</tr>
+<tr class="even">
+<td><code>NCCL_IB_GID_INDEX</code>, <code>NCCL_IB_TC</code></td>
+<td>indice GID (mode RoCE) et classe de trafic</td>
+</tr>
+<tr class="odd">
+<td><code>NCCL_IB_TIMEOUT</code>, <code>NCCL_IB_RETRY_CNT</code></td>
+<td>délai de garde de bas niveau et nombre de tentatives</td>
+</tr>
+<tr class="even">
+<td><code>NCCL_NET_GDR_LEVEL</code>, <code>NCCL_P2P_LEVEL</code></td>
+<td>distance maximale pour GPUDirect et le pair-à-pair</td>
+</tr>
+<tr class="odd">
+<td><code>NCCL_ALGO</code>, <code>NCCL_PROTO</code></td>
+<td>restreindre les algorithmes et protocoles (à manier avec prudence)</td>
+</tr>
+<tr class="even">
+<td><code>NCCL_TOPO_DUMP_FILE</code></td>
+<td>écrit la topologie détectée (depuis 2.6)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Une variable posée « au cas où » est une dette : documentez qui l'a posée, pourquoi, et avec quelle mesure avant et après.</p>
+<h3 id="lire-un-journal-nccl_debuginfo">7.5. Lire un journal <code>NCCL_DEBUG=INFO</code></h3>
+<p>Chaque ligne du journal commence par <code>hôte:pid:tid [GPU] NCCL INFO</code>. L'ordre des lignes suit l'initialisation. Tous les formats ci-dessous ont été relus dans le code de NCCL (<code>init.cc</code>, <code>search.cc</code>, <code>topo.cc</code>, <code>p2p.cc</code>, <code>net.cc</code>, <code>bootstrap.cc</code>, lecture du 2026-10-24) ; ils changent d'une version à l'autre, d'où la tolérance de l'analyseur du lab 7.2.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ligne (extrait)</th>
+<th>Ce qu'elle dit</th>
+<th>Anomalie typique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Bootstrap: Using eth0:…</code></td>
+<td>interface IP du <em>bootstrap</em></td>
+<td>mauvaise interface (<code>docker0</code>, <code>lo</code>)</td>
+</tr>
+<tr class="even">
+<td><code>Using network IB</code></td>
+<td>plugin réseau retenu</td>
+<td><code>Socket</code> : retour au TCP, aucun RDMA</td>
+</tr>
+<tr class="odd">
+<td><code>NET/IB : GPU Direct RDMA Enabled for HCA 3 'mlx5_3'</code></td>
+<td>une ligne par carte vue</td>
+<td>moins de cartes que de GPU ; <code>Disabled</code></td>
+</tr>
+<tr class="even">
+<td><code>comm … rank 11 nRanks 16 nNodes 2 localRanks 8 …</code></td>
+<td>identité du rang</td>
+<td>rangs absents</td>
+</tr>
+<tr class="odd">
+<td><code>Pattern 4, crossNic 0, nChannels 4, bw …, type NVL/PIX</code></td>
+<td>résultat de la recherche de graphe</td>
+<td><code>type …/SYS</code> : chemin lointain</td>
+</tr>
+<tr class="even">
+<td><code>Ring 00 : 10 -&gt; 11 -&gt; 12</code></td>
+<td>voisins de ce rang dans l'anneau</td>
+<td>anneau non fermé</td>
+</tr>
+<tr class="odd">
+<td><code>Channel 00/0 : 7[7] -&gt; 8[0] [send] via NET/IB/7/GDRDMA</code></td>
+<td>transport d'un lien</td>
+<td><code>via NET/IB/7</code> sans <code>/GDRDMA</code></td>
+</tr>
+<tr class="even">
+<td><code>… - Init COMPLETE</code></td>
+<td>fin de l'initialisation du rang</td>
+<td>absent : rang bloqué</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="ex">
+<p><span class="tag">Exemple 7.2 — Lire un journal sain, puis un journal cassé</span> L'analyseur du lab 7.2 lit des journaux <strong>synthétiques</strong> (générés par <code>make_fixtures.py</code> d'après les formats ci-dessus, avec des valeurs inventées). Sorties capturées le 2026-10-24 (lignes raccourcies par « ... ») :</p>
+<pre class="text"><code>healthy_2node_ib.log: NCCL 2.30.3+cuda13.0; 16/16 ranks on 2 nodes; network IB; HCAs per host {&#39;node-01&#39;: 8, &#39;node-02&#39;: 8}; channels [4]; init complete on 16 ranks
+  [INFO ] rails_used: NICs carrying ring traffic per host: {&#39;node-01&#39;: 4, &#39;node-02&#39;: 4} out of {&#39;node-01&#39;: 8, &#39;node-02&#39;: 8}
+socket_fallback.log: ...
+  [ERROR] socket_network: NCCL uses the Socket (TCP) transport between nodes: no RDMA network was selected
+degraded_rail.log: ...
+  [ERROR] hca_mismatch: hosts see different numbers of HCAs: {&#39;node-01&#39;: 8, &#39;node-02&#39;: 7}
+hang_in_init.log: ...
+  [ERROR] init_incomplete: ranks without &#39;Init COMPLETE&#39;: [11] (stuck in initialisation or log truncated)</code></pre>
+<p>Dans le journal sain, seules 4 cartes sur 8 portent du trafic d'anneau : il n'y a que 4 canaux. Rien ne dit que c'est un défaut ; cela se lit et se compare avec le nombre de canaux que NCCL ouvrirait dans votre version. Les trois autres journaux montrent un retour au TCP, une carte manquante sur le nœud 2 et un rang qui n'a jamais fini son initialisation.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 7</p>
+<ul>
+<li>NCCL détecte la topologie, cherche anneaux et arbres, ouvre des canaux et des connexions, puis choisit algorithme et protocole selon la taille.</li>
+<li>Anneau : <span class="math inline">2(p-1)</span> latences ; arbre binaire double : latence logarithmique, bande passante complète (NCCL 2.4).</li>
+<li>Ne fixez <code>NCCL_ALGO</code> et <code>NCCL_PROTO</code> que pour isoler un bug ; <code>LL128</code> forcé sur une plate-forme non supportée peut corrompre des données.</li>
+<li><code>NCCL_DEBUG=INFO</code> plus <code>NCCL_DEBUG_SUBSYS</code> filtrent le journal ; <code>Using network</code>, <code>GPU Direct RDMA</code>, <code>Ring</code>, <code>Channel</code> et <code>Init COMPLETE</code> sont les lignes à lire.</li>
+<li>Mesurez avant et après toute variable.</li>
+</ul>
+</div>
+<h2 id="ch8">8. Mesure et diagnostic : nccl-tests, perftest, hangs et liens dégradés</h2>
+<p>Un réseau d'entraînement se recette comme un équipement : avec un protocole, des chiffres attendus et un rapport. Ce chapitre donne les outils, une méthode par couches et la façon d'isoler un composant défaillant.</p>
+<h3 id="nccl-tests-et-le-débit-de-bus">8.1. nccl-tests et le débit de bus</h3>
+<p>Le dépôt <code>nccl-tests</code> de NVIDIA fournit un programme par collective (<code>all_reduce_perf</code>, <code>all_gather_perf</code>…). Chaque programme balaie des tailles de message et affiche, pour chaque taille, le temps, le débit algorithmique et le débit de bus, en place et hors place, plus une colonne <code>#wrong</code> qui compte les éléments faux. Les options utiles : <code>-b</code> et <code>-e</code> (tailles minimale et maximale), <code>-f</code> (facteur multiplicatif), <code>-g</code> (GPU par processus), <code>-n</code> (itérations), <code>-w</code> (itérations de chauffe), <code>-c</code> (vérification des résultats).</p>
+<p>Le <strong>débit algorithmique</strong> est <span class="math inline">S/t</span>. Le <strong>débit de bus</strong> le multiplie par un facteur qui dépend de l'opération et du nombre de rangs <span class="math inline">n</span>, pour obtenir un chiffre comparable à la bande passante matérielle. Facteurs de la page <code>PERFORMANCE.md</code> : all-reduce <span class="math inline">2(n-1)/n</span> ; reduce-scatter, all-gather et all-to-all <span class="math inline">(n-1)/n</span> ; broadcast et reduce 1. La page résume : « The bus bandwidth should reflect the speed of the hardware bottleneck : NVLink, PCI, QPI, or network. »</p>
+<p>Deux détails sauvent des heures. D'abord, la variable <code>NCCL_TESTS_MIN_BW</code> fait échouer le programme quand le débit de bus moyen tombe sous 0,9 fois sa valeur (code source de <code>common.cu</code>). Ce « moyen » est la moyenne de toutes les tailles du balayage, petites comprises : 17 Go/s pour un plateau de 48 Go/s sur la table synthétique de l'exemple 8.1.</p>
+<p>Fixez donc la valeur d'après la moyenne imprimée par un essai antérieur du même balayage, ou limitez le test à une grande taille (<code>-b 4G -e 4G</code>). Une valeur de fiche technique ferait échouer un réseau sain.</p>
+<p>Ensuite, <code>NCCL_TESTS_SPLIT</code> découpe les GPU en groupes qui exécutent la même opération en parallèle : avec <code>MOD 8</code> sur des nœuds de 8 GPU, on obtient huit opérations, chacune avec un GPU par nœud, donc uniquement sur le réseau inter-nœuds. Le débit affiché est celui d'un groupe, moyenné sur les rangs par défaut ; l'option <code>-a 3</code> retient le rang le plus lent. Un seul tableau sort : il révèle un rail lent sans le nommer.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.1 — Lire une table <code>nccl-tests</code> avec l'analyseur du lab 7.3</span> Le lab 7.3 fournit des tables <strong>synthétiques</strong> (modèle d'anneau α-β, bruit de 1,5 %, jamais mesurées sur GPU) au format de <code>nccl-tests</code>. Sortie capturée le 2026-10-24 sur la table « saine » (16 rangs, débit de bus attendu de 48 Go/s) :</p>
+<pre class="text"><code>all_reduce_synthetic_ok.txt: 32 sizes; plateau busbw 48.5 GB/s; 90% of it reached at 134217728 B; smallest-size time 356.1 us; fit {&#39;B_gbs&#39;: 47.914, &#39;alpha_us&#39;: 12.049, &#39;intercept_us&#39;: 361.46}
+OK nccl-tests output</code></pre>
+<p>Lecture : le plateau du débit de bus (48,5 Go/s) correspond à l'attendu ; il est atteint à 128 Mio ; le temps au plus petit message (356 µs) est un temps de latence, pas de bande passante. L'ajustement du modèle du module 2 retrouve <span class="math inline">B \approx 48</span> Go/s et <span class="math inline">\alpha \approx 12</span> µs, les paramètres du générateur. Sur une vraie mesure, le désaccord entre le modèle et la table est l'information utile.</p>
+</div>
+<h3 id="les-outils-de-bas-niveau">8.2. Les outils de bas niveau</h3>
+<p>Quand <code>nccl-tests</code> est mauvais, descendez d'une couche. La documentation de dépannage de NCCL recommande dans l'ordre :</p>
+<ul>
+<li><code>ibstat</code> et <code>ibstatus</code> : port <code>Active</code>, état physique <code>LinkUp</code>, bon type de lien, bon débit sans baisse inattendue.</li>
+<li><code>ib_write_bw -d &lt;carte&gt; -a</code> sur un serveur, puis <code>ib_write_bw -d &lt;carte&gt; &lt;serveur&gt; -a</code> sur le client : bande passante point à point sur toutes les tailles. Les variantes <code>--use_cuda=&lt;gpu&gt;</code> testent la mémoire GPU, donc GPUDirect.</li>
+<li><code>ib_write_lat</code> : la latence ; une bande passante correcte peut cacher des queues de latence mauvaises.</li>
+<li><code>rdma statistic</code> : compteurs du transport. Surveillez <code>rnr_nak_retry_err</code>, <code>packet_seq_err</code>, <code>implied_nak_seq_err</code> et <code>local_ack_timeout_err</code> pendant un test : des valeurs croissantes indiquent perte, reprises ou autres problèmes de transport.</li>
+</ul>
+<p>La comparaison entre mémoire de l'hôte et mémoire GPU, pour la même paire de cartes, est un test rapide de GPUDirect : si le chemin GPU est nettement plus lent, cherchez ACS, <code>nvidia-peermem</code> ou la distance PCIe (chapitres 2 et 6).</p>
+<h3 id="une-méthode-par-couches">8.3. Une méthode par couches</h3>
+<p>Un symptôme « lent » ou « bloqué » a de nombreuses causes. Le tableau associe des symptômes à une couche et à un premier outil, du plus bas au plus haut.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symptôme</th>
+<th>Couche soupçonnée</th>
+<th>Premier contrôle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Blocage à l'initialisation</td>
+<td>amorçage, interface IP, pare-feu</td>
+<td><code>NCCL_SOCKET_IFNAME</code>, <code>NCCL_DEBUG_SUBSYS=INIT,BOOTSTRAP</code>, rangs sans <code>Init COMPLETE</code></td>
+</tr>
+<tr class="even">
+<td>Débit bas partout</td>
+<td>débit du lien, GPUDirect, PCIe</td>
+<td><code>ibstat</code> (débit), lignes <code>GPU Direct RDMA</code>, ACS</td>
+</tr>
+<tr class="odd">
+<td>Débit bas sur un seul rail</td>
+<td>câble, port, carte</td>
+<td><code>NCCL_TESTS_SPLIT="MOD 8"</code> avec <code>-a 3</code>, puis <code>ibstat</code> carte par carte</td>
+</tr>
+<tr class="even">
+<td>Arrêts intermittents</td>
+<td>pertes, congestion, retransmissions</td>
+<td><code>rdma statistic</code>, <code>ib_write_lat</code>, compteurs de commutateur</td>
+</tr>
+<tr class="odd">
+<td>Résultats faux</td>
+<td>transport ou matériel</td>
+<td>colonne <code>#wrong</code> de <code>nccl-tests</code></td>
+</tr>
+<tr class="even">
+<td>Bon test, job lent</td>
+<td>recouvrement, placement</td>
+<td>module 9 ; topologie des nœuds alloués</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="isoler-un-composant-par-bissection">8.4. Isoler un composant par bissection</h3>
+<p>Sur un parc de <span class="math inline">N</span> nœuds avec un nœud défaillant, tester les nœuds un par un coûte <span class="math inline">N</span> essais. Une bissection coupe l'ensemble en deux moitiés, teste chacune avec <code>nccl-tests</code>, garde la moitié mauvaise et recommence : <span class="math inline">\lceil \log_2 N \rceil</span> essais suffisent. Pour 128 nœuds, 7 essais au lieu de 128.</p>
+<p>La méthode suppose qu'une moitié contenant le nœud défaillant est reconnaissable, donc un test stable et un seuil fixé à l'avance (<code>--expect-busbw</code> de l'analyseur du lab 7.3). Elle ne marche pas pour une panne qui n'apparaît qu'à l'échelle (par exemple un lien de commutateur surchargé par plusieurs groupes) : dans ce cas, testez par rail et par feuille.</p>
+<h3 id="blocages-délais-de-garde-et-observabilité">8.5. Blocages, délais de garde et observabilité</h3>
+<p>Un blocage est le pire symptôme : aucune erreur, des GPU à 100 % puis à 0 %. Trois pratiques documentées. D'abord, NCCL contient un sous-système RAS pour diagnostiquer les blocages et les arrêts brutaux, avec ses propres variables (<code>NCCL_RAS_ENABLE</code>, <code>NCCL_RAS_ADDR</code>, <code>NCCL_RAS_TIMEOUT_FACTOR</code>). Ensuite, Meta décrit, pour Llama 3, une version de NCCL (NCCLX) qui vide ses traces quand un chien de garde ou un battement de cœur expire, avec l'état des transferts en cours entre tous les rangs. Enfin, l'article MegaScale décrit l'analyse des dépassements de délai de NCCL pour désigner le nœud défaillant.</p>
+<p>Le délai de garde lui-même est un compromis. Avec <code>NCCL_IB_TIMEOUT</code> <span class="math inline">= t</span>, le délai de bas niveau vaut <span class="math inline">4{,}096\ \mu\text{s} \times 2^t</span>, et le temps avant erreur vaut ce délai multiplié par <code>NCCL_IB_RETRY_CNT</code>. Le tableau de la documentation, recalculé par nos soins : pour 7 tentatives, <span class="math inline">t = 17</span> donne 3,8 s, <span class="math inline">t = 20</span> donne 30 s et <span class="math inline">t = 22</span> donne 120 s. Un délai long évite les fausses alertes sur un grand réseau, mais retarde la détection d'un vrai blocage de la durée correspondante.</p>
+<p>Les compteurs de ports InfiniBand, les compteurs <code>rdma statistic</code> et les métriques GPU gagnent à être exportés vers votre supervision pour détecter une dégradation avant le job : voir <a href="../observability/index.html">le module 14, observabilité</a>, et <a href="../fault-tolerance/index.html">le module 10, tolérance aux pannes</a> pour la reprise.</p>
+<h3 id="le-rapport-de-recette">8.6. Le rapport de recette</h3>
+<p>Une recette réseau ne se résume pas à « ça marche ». Le rapport consigne : les versions (NCCL, pilote, micrologiciel des cartes, <code>nccl-tests</code>), les variables d'environnement, la commande exacte, le débit de bus attendu avec sa source (fiche, calcul du chapitre 1), le plateau mesuré, les résultats par rail, et les écarts expliqués. C'est la discipline du <a href="../perf-models/index.html#ch8">module 2</a>, appliquée au réseau, et le point d'entrée du <a href="../../projects/scaling-study/index.html">Projet 2</a>.</p>
+<div class="ex">
+<p><span class="tag">Exemple 8.2 — Quel débit attendre sur un lien de 400 Gb/s ?</span> Avec 50 Go/s nominaux et un débit utile de 98,0 % pour une MTU InfiniBand de 4 096 (chapitre 1), le plafond d'un all-reduce multi-nœuds limité par la carte est de <span class="math inline">50 \times 0{,}9804 = 49{,}0</span> Go/s par GPU. Un plateau mesuré à 45 Go/s représente 92 % de ce plafond ; à 26 Go/s, 53 %.</p>
+<p>Ce plafond est un majorant, pas une promesse : les protocoles de NCCL et le recouvrement avec le calcul font baisser le débit réel. Prenez l'attendu dans une fiche ou une mesure antérieure de la même configuration, et utilisez ce calcul pour juger si l'attendu est plausible.</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 8</p>
+<ul>
+<li>Débit de bus = débit algorithmique × facteur (2(n−1)/n pour all-reduce) ; il se compare à la bande passante du matériel.</li>
+<li><code>NCCL_TESTS_MIN_BW</code> transforme la mesure en test d'acceptation ; <code>NCCL_TESTS_SPLIT</code> isole les rails.</li>
+<li>Descendez d'une couche à la fois : <code>nccl-tests</code>, <code>ib_write_bw</code> et <code>ib_write_lat</code>, <code>ibstat</code>, <code>rdma statistic</code>.</li>
+<li>Une bissection trouve un nœud défaillant parmi <span class="math inline">N</span> en <span class="math inline">\lceil\log_2 N\rceil</span> essais.</li>
+<li>Les délais de garde (<code>NCCL_IB_TIMEOUT</code>) arbitrent entre fausses alertes et détection tardive.</li>
+</ul>
+</div>
+<h2 id="labs">Labs</h2>
+<p>Trois labs, 9 h au total. Les labs 7.1 et 7.2 s'exécutent dans un bac à sable Linux sans GPU et ont été exécutés par l'auteur (Ubuntu 24.04, 4 vCPU, le 2026-10-24). Le lab 7.3 demande des GPU : il est <strong>linté et testé sur des tables synthétiques</strong>, mais son exécution réelle n'a pas été faite ; c'est pourquoi le badge du module est « non vérifié ». Les scripts <code>verify.sh</code> honorent <code>PYTHON=/chemin/vers/python</code>.</p>
+<div class="lab">
+<p><span class="tag">Lab 7.1 — Dimensionner un fat-tree</span></p>
+<p><strong>Objectif.</strong> Dimensionner des fat-trees avec un calculateur testé, le confronter aux chiffres publiés du DGX SuperPOD H100, puis vérifier avec le <strong>vrai</strong> gestionnaire de sous-réseau OpenSM, sur un fabric simulé, qu'un fabric généré par le calculateur est reconnu comme un fat-tree. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h). <strong>Prérequis matériels.</strong> Un portable Linux avec Python 3 et <code>pytest</code>. Partie B : <code>sudo apt-get install -y ibsim-utils opensm infiniband-diags</code> (testé sur Ubuntu 24.04 : ibsim 0.10, OpenSM 3.3.23, infiniband-diags 50.0, en tant que root). Aucun GPU, aucun coût.</p>
+<ol type="1">
+<li>Lisez <code>labs/networking/topology-sizing/fabric.py</code> : repérez <code>size_fabric</code>, la formule <code>5N/r</code> à trois niveaux, <code>effective_bandwidth</code> et <code>goodput_fraction</code>.</li>
+<li>Partie A. Lancez <code>python3 fabric.py --compare</code> : sept lignes sur huit du DGX SuperPOD H100 doivent concorder ; lisez la note de <code>published.json</code> sur la ligne à 3 SU et sur l'incohérence de la ligne « 56 ».</li>
+<li>Lancez <code>python3 fabric.py --endpoints 2048 --radix 64 --leaf-down 48</code> et retrouvez la ligne 54 commutateurs du tableau du chapitre 5. Puis <code>python3 fabric.py --goodput 1024 2048 4096</code>.</li>
+<li>Partie B. Lisez <code>ibsim_check.py</code> : il écrit un fabric pour <code>ibsim</code>, lance OpenSM avec <code>-R ftree</code>, relit la topologie avec <code>ibnetdiscover</code> et les tables avec <code>ibroute</code>. Lancez-le trois fois : <code>python3 ibsim_check.py</code>, <code>python3 ibsim_check.py --radix 8 --down 6 --leaves 8</code> et <code>python3 ibsim_check.py --drop-link</code>.</li>
+<li>Expliquez pourquoi le troisième fabric échoue : relisez les trois lignes d'OpenSM affichées par <code>OpenSM said:</code>.</li>
+<li>Lancez <code>./verify.sh</code>.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK part A » (12 tests, sept lignes publiées retrouvées), puis « OK part B », puis <code>OK topology-sizing (parts A and B)</code>.</p>
+<p>Propriétés structurelles vérifiées : les compteurs de commutateurs, d'hôtes et de câbles découverts égalent ceux du calculateur, le déséquilibre des liens montants d'une feuille est d'au plus 1 pour les fabrics sains, et le fabric amputé est rejeté par <code>ftree</code>.</p>
+<p>Ligne capturée : <code>radix=8 down=6 up=2 leaves=8: engine=ftree switches=10/10 hosts=48/48 host_links=48/48 switch_links=16/16 max_uplink_imbalance=0</code>.</p>
+<p>Sans les paquets de la partie B, le script affiche <code>SKIP part B</code> et se termine par <code>OK topology-sizing (part A only)</code> : dans ce cas, seule la partie A est vérifiée.</p>
+<p><strong>Pour aller plus loin.</strong> Étendez <code>ibsim_check.py</code> à trois niveaux. Ajoutez une quatrième configuration où une colonne entière est retirée, et observez le moteur retenu. Le simulateur ne transporte aucun paquet : ne mesurez pas de débit avec lui.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 7.2 — Lire un journal NCCL</span></p>
+<p><strong>Objectif.</strong> Écrire et tester un analyseur de journaux <code>NCCL_DEBUG=INFO</code> qui extrait la topologie, le réseau, les cartes, les anneaux et le moment où un rang cesse de progresser. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable Linux avec Python 3 et <code>pytest</code>. Aucun GPU. <strong>Données :</strong> les journaux du dossier <code>fixtures/</code> sont <strong>synthétiques</strong> (générés par <code>make_fixtures.py</code> avec des formats relus dans le code de NCCL, des valeurs inventées), sauf <code>public_nccl_docs.log</code>, un extrait de neuf lignes de la documentation de NCCL, avec sa source.</p>
+<ol type="1">
+<li>Lisez <code>make_fixtures.py</code> : l'en-tête cite le fichier source de NCCL pour chaque format de message. Relancez-le et constatez que les fichiers committés sont reproduits à l'identique.</li>
+<li>Lancez <code>python3 nccl_log.py fixtures/healthy_2node_ib.log</code>, puis les trois journaux cassés avec <code>--expect</code> pour le code d'erreur attendu.</li>
+<li>Lisez <code>nccl_log.py</code> : repérez <code>ring_is_single_cycle</code>, la reconnaissance des lignes et la tolérance aux lignes inconnues.</li>
+<li>Ajoutez une règle de votre choix, par exemple un avertissement quand un rang passe par <code>via NET/IB/…</code> sans <code>/GDRDMA</code>, avec un test et un journal synthétique qui la déclenche.</li>
+<li>Lancez <code>./verify.sh</code>.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> <code>./verify.sh</code> passe 11 tests et se termine par <code>OK nccl-log-reading: healthy log clean, 3 broken logs diagnosed with the expected code</code>. Le journal sain ne produit aucune erreur ; chaque journal cassé produit exactement l'erreur attendue (<code>socket_network</code>, <code>hca_mismatch</code>, <code>init_incomplete</code>).</p>
+<p><strong>Pour aller plus loin.</strong> Lancez l'analyseur sur un vrai journal de votre cluster (<code>NCCL_DEBUG=INFO NCCL_DEBUG_FILE=nccl.%h.%p.log</code>), et notez les lignes dont le format a changé. Ajoutez les lignes de la famille <code>TUNING</code> pour extraire l'algorithme et le protocole retenus.</p>
+</div>
+<div class="lab">
+<p><span class="tag">Lab 7.3 — nccl-tests sur un vrai cluster</span></p>
+<p><strong>Objectif.</strong> Préparer et interpréter une recette <code>all_reduce_perf</code> sous Slurm sur deux nœuds de huit GPU. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h).</p>
+<p><strong>Prérequis matériels.</strong> Partie A : un portable Linux avec Python 3, <code>pytest</code> et <code>shellcheck</code> (optionnel). Partie B : deux nœuds de huit GPU avec Slurm, <code>nccl-tests</code> compilé avec <code>MPI=1</code> et un <code>srun</code> capable de lancer des rangs MPI ; coût indicatif : voir la page tarifaire de votre fournisseur le jour même.</p>
+<p><strong>État de vérification.</strong> La partie A est exécutée par <code>verify.sh</code> ; la partie B n'a <strong>pas</strong> été exécutée par l'auteur.</p>
+<ol type="1">
+<li>Partie A. Lisez <code>run_all_reduce.sbatch</code> : repérez <code>NCCL_DEBUG_FILE</code> avec <code>%h</code> et <code>%p</code>, la conversion de <code>MIN_BUSBW_GBS</code> en <code>NCCL_TESTS_MIN_BW</code>, et <code>--gpu-bind=closest</code>.</li>
+<li>Lancez <code>./verify.sh</code> : <code>bash -n</code>, <code>shellcheck</code>, les neuf tests de l'analyseur et l'analyse de deux tables synthétiques (une saine, une dégradée).</li>
+<li>Lisez <code>parse_nccl_tests.py</code> : l'ajustement du modèle α-β du module 2 (moindres carrés pondérés par <span class="math inline">1/T^2</span>) et les seuils.</li>
+<li>Partie B. Exportez <code>NCCL_TESTS_DIR</code> et <code>MIN_BUSBW_GBS</code> (le plateau attendu, tiré de la fiche ou d'une mesure antérieure, voir l'exemple 8.2 ; seul l'analyseur l'utilise), puis <code>sbatch run_all_reduce.sbatch</code>. Pour que <code>nccl-tests</code> fasse lui-même échouer le job, exportez aussi <code>MIN_AVG_BUSBW_GBS</code>, la moyenne « Avg bus bandwidth » d'un essai antérieur du même balayage (section 8.1).</li>
+<li>Lancez <code>python3 parse_nccl_tests.py nccl-allreduce-&lt;jobid&gt;.out --expect-busbw "$MIN_BUSBW_GBS"</code>, puis relancez le test avec <code>NCCL_TESTS_SPLIT="MOD 8"</code> : <code>sbatch run_all_reduce.sbatch -a 3</code> rapporte le rail le plus lent.</li>
+<li>Rédigez la recette (exemple 8.2 et section 8.6) : versions, variables, commande, plateau, écarts.</li>
+</ol>
+<p><strong>Critère de réussite.</strong> Partie A : <code>./verify.sh</code> se termine par <code>OK nccl-tests-run (lint and parser only): the GPU run itself is NOT verified here</code>. Partie B : l'analyseur affiche <code>OK nccl-tests output</code>, c'est-à-dire un plateau de débit de bus d'au moins 80 % du débit attendu et aucune erreur <code>#wrong</code>, et le rapport explique tout écart par rail.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez <code>all_gather_perf</code> et <code>reduce_scatter_perf</code> et vérifiez leurs facteurs de débit de bus. Si vous avez un cluster InfiniBand, comparez <code>ib_write_bw</code> entre deux cartes (mémoire hôte puis <code>--use_cuda</code>) au résultat de NCCL.</p>
+</div>
+<h2 id="ex">Exercices</h2>
+<p>Neuf exercices : quatre ★ (environ 30 minutes), trois ★★ (1 h) et deux ★★★ (1 h 30). Les constantes de débit utile (en-têtes 14 + 44 octets, 24 octets sur le fil) sont celles du chapitre 1. Les valeurs marquées « hypothèse » sont des données d'énoncé, pas des mesures.</p>
+<div class="exo">
+<p><span class="tag">Exercice 1 · ★ — Débit utile et MTU</span> Un serveur envoie en RoCE v2 sur un lien de 400 Gb/s. (a) Avec une MTU IP de 1 500 octets, quelle est la plus grande MTU InfiniBand utilisable ? (b) Quel débit utile, en Go/s, obtient-on avec cette MTU, puis avec une MTU InfiniBand de 4 096 sur des trames jumbo ? (c) Combien de Go/s et quel pourcentage perd-on avec la première ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>La MTU IP doit contenir la charge utile plus 44 octets : <span class="math inline">1500 - 44 = 1456</span>. Parmi 256, 512, 1 024, 2 048 et 4 096, la plus grande valeur qui tient est 1 024.</p></li>
+<li><p>Le débit utile vaut <span class="math inline">m/(m + 14 + 44 + 24)</span>. Pour 1 024 : <span class="math inline">1024/1106 = 0{,}9259</span>, soit 46,29 Go/s sur 50. Pour 4 096 : <span class="math inline">4096/4178 = 0{,}9804</span>, soit 49,02 Go/s.</p></li>
+<li><p>La perte est de <span class="math inline">49{,}02 - 46{,}29 = 2{,}73</span> Go/s, soit 5,6 % du débit utile à 4 096. Vérification : <code>python3 fabric.py --goodput 1024 4096</code>.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 2 · ★ — Le trafic mémoire que GPUDirect épargne</span> Un serveur de 8 GPU envoie 4 Gio par GPU et par étape, et en reçoit autant. Sans GPUDirect RDMA, chaque octet émis est écrit puis relu dans la mémoire de l'hôte, et chaque octet reçu aussi. (a) Quel volume de trafic mémoire par étape ? (b) La carte de chaque GPU tient 49,0 Go/s (chapitre 1) : quelle durée de réseau et quel débit mémoire cela exige-t-il ? (c) Si la mémoire de l'hôte soutient 500 Go/s (hypothèse), de combien l'étape est-elle ralentie ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Par GPU : <span class="math inline">4 \times 2</span> Gio à l'émission et <span class="math inline">4 \times 2</span> Gio à la réception, soit 16 Gio ; pour 8 GPU, 128 Gio.</p></li>
+<li><p>Quatre Gio à 49,02 Go/s durent <span class="math inline">4 \times 2^{30} / 49{,}02 \cdot 10^{9} = 0{,}0876</span> s. Le débit mémoire requis vaut <span class="math inline">128 \times 2^{30} / 0{,}0876 \approx 1\,569</span> Go/s, soit 1,6 To/s.</p></li>
+<li><p>À 500 Go/s, la mémoire met <span class="math inline">128 \times 2^{30} / 500 \cdot 10^{9} = 0{,}275</span> s : 3,1 fois plus que le réseau. La mémoire de l'hôte devient le goulot, ce qui justifie GPUDirect RDMA (chapitre 2).</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 3 · ★ — Lire <code>ibstat</code></span> Voici trois extraits <strong>fictifs</strong> de <code>ibstat</code>, sur un nœud de 8 cartes de 400 Gb/s.</p>
+<pre class="text"><code>CA &#39;mlx5_2&#39;   Port 1: State: Active   Physical state: LinkUp   Rate: 400  Link layer: InfiniBand
+CA &#39;mlx5_5&#39;   Port 1: State: Active   Physical state: LinkUp   Rate: 100  Link layer: InfiniBand
+CA &#39;mlx5_6&#39;   Port 1: State: Init     Physical state: LinkUp   Rate: 400  Link layer: InfiniBand</code></pre>
+<ol type="a">
+<li>Appliquez la liste de contrôle du chapitre 3 : quelles cartes sont en défaut, et pourquoi ? (b) Dans un modèle où NCCL répartit les données à parts égales entre 8 canaux, un canal par carte, quel est l'effet de la carte <code>mlx5_5</code> sur le débit de bus du nœud, avec 49,0 Go/s par carte saine ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p><code>mlx5_2</code> est saine : <code>Active</code>, <code>LinkUp</code>, 400. <code>mlx5_5</code> est <code>Active</code> mais négocie 100 au lieu de 400 : c'est la baisse de débit inattendue (<em>downshift</em>) que la documentation de NCCL demande de détecter ; cherchez câble, émetteur-récepteur ou port du commutateur. <code>mlx5_6</code> est en <code>Init</code> : le lien est physiquement monté mais le port n'est pas configuré, ce qui pointe vers le gestionnaire de sous-réseau (injoignable ou arrêté, ou balayage pas encore passé).</p></li>
+<li><p>Chaque canal porte un huitième des données. Le canal de <code>mlx5_5</code> va quatre fois moins vite, donc l'opération dure quatre fois plus : le débit de bus tombe à un quart, environ <span class="math inline">49{,}0/4 = 12{,}3</span> Go/s au lieu de 49,0. Ce résultat vient du modèle à parts égales, qui est une hypothèse ; un autre partage donnerait un autre chiffre, mais jamais le débit d'une carte saine.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 4 · ★★ — La réserve de tampon de PFC</span> Pour qu'un PFC suffise, le tampon d'un port doit pouvoir absorber ce qui arrive pendant que la pause se propage : <span class="math inline">B \times (2 t_{\text{prop}} + t_{\text{réaction}})</span> plus deux trames maximales. C'est un modèle simplifié, un ordre de grandeur et non la formule d'un constructeur.</p>
+<p>Hypothèses : lien de 50 Go/s, 5 ns par mètre de fibre, réaction de 1 µs, trame de 4 096 + 82 octets, commutateur de 64 ports, tampon partagé de 64 Mo.</p>
+<ol type="a">
+<li>Calculez la réserve par port et par priorité pour des câbles de 100 m, puis 500 m. (b) Quelle part du tampon prennent 2 priorités sans perte sur 64 ports, dans chaque cas ? (c) Combien de priorités tiennent dans 25 % du tampon à 100 m ? Concluez.</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li>À 100 m, le délai vaut :</li>
+</ol>
+<p><span class="math display">2 \times 100 \times 5\ \text{ns} + 1\ \mu\text{s} = 2\ \mu\text{s}</span></p>
+<p>Les octets en vol valent <span class="math inline">50 \cdot 10^{9} \times 2 \cdot 10^{-6} = 100\,000</span> ; deux trames ajoutent <span class="math inline">2 \times 4178 = 8\,356</span> : 108 356 octets. À 500 m, le délai vaut 6 µs : 300 000 + 8 356 = 308 356 octets.</p>
+<ol start="2" type="a">
+<li><p>Pour <span class="math inline">64 \times 2 = 128</span> réserves : 13,87 Mo à 100 m, soit 21,7 % de 64 Mo ; 39,47 Mo à 500 m, soit 61,7 %.</p></li>
+<li><p>Dans 25 % de 64 Mo, soit 16 Mo : <span class="math inline">16 \cdot 10^{6} / (64 \times 108\,356) = 2{,}3</span> : 2 priorités à 100 m. À 500 m, le même calcul donne 0,81 : aucune priorité n'y tient.</p></li>
+</ol>
+<p>Conclusion : plus les câbles s'allongent, plus la réserve consomme le tampon qui sert aussi à absorber les rafales. Un PFC sûr se limite à des liaisons courtes et à peu de priorités ; c'est un argument pour le DCQCN de Meta ou de ByteDance (chapitre 4) qui cherche à déclencher le marquage avant la pause.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 5 · ★ — Sur-souscription et placement des rangs</span> Un fabric de 2 048 GPU est sur-souscrit à 3:1 : 43 feuilles de 48 GPU ; une carte débite 50 Go/s. Utilisez <span class="math inline">B_{\text{eff}} = B/(1 + f(o-1))</span>. (a) Quelle fraction <span class="math inline">f</span> du trafic d'un anneau traverse les feuilles si les rangs consécutifs partagent la feuille ? (b) Et si l'ordre des rangs est aléatoire ? (c) Donnez <span class="math inline">B_{\text{eff}}</span> dans les deux cas, et la fraction maximale <span class="math inline">f</span> qui conserve 80 % de <span class="math inline">B</span>.</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Dans un anneau de 2 048 rangs, il y a 2 048 liens ; avec un ordre par feuille, seul le passage d'une feuille à la suivante traverse : 43 liens, donc <span class="math inline">f = 43/2048 = 0{,}021</span>.</p></li>
+<li><p>Avec un ordre aléatoire, le rang suivant est dans une autre feuille avec la probabilité <span class="math inline">1 - 47/2047 = 0{,}977</span> : <span class="math inline">f \approx 0{,}977</span>.</p></li>
+<li><p>Cas (a) : <span class="math inline">50/(1 + 0{,}021 \times 2) = 48{,}0</span> Go/s. Cas (b) : <span class="math inline">50/(1 + 0{,}977 \times 2) = 16{,}9</span> Go/s. Pour 80 % : <span class="math inline">1/(1+2f) \ge 0{,}8</span> donne <span class="math inline">f \le 0{,}125</span>. L'ordre des rangs, donc le placement, change le débit d'un facteur près de 3 sur un fabric sur-souscrit.</p></li>
+</ol>
+<p>Limite du modèle : c'est une moyenne, alors qu'un anneau est borné par son lien le plus lent. En (a), chaque feuille ne fait monter qu'un flux, qui tient dans un seul de ses 16 liens montants : le débit réel est plus proche de 50 que de 48 Go/s. En (b), jusqu'à 48 flux se partagent 16 liens montants, au mieux un tiers de <span class="math inline">B</span> (16,7 Go/s) : le modèle y est presque exact.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 6 · ★★ — Lire une matrice de chemins</span> Voici la distance, <strong>fictive</strong>, que NCCL pourrait détecter dans un serveur à 4 GPU (G0 à G3) et 2 cartes (N0, N1), avec les types de chemin du chapitre 6. G0 et G1 sont sur le socket 0, G2 et G3 sur le socket 1.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>G1</th>
+<th>G2</th>
+<th>G3</th>
+<th>N0</th>
+<th>N1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>G0</td>
+<td>NVL</td>
+<td>NVL</td>
+<td>NVL</td>
+<td>PIX</td>
+<td>SYS</td>
+</tr>
+<tr class="even">
+<td>G1</td>
+<td></td>
+<td>NVL</td>
+<td>NVL</td>
+<td>PXB</td>
+<td>SYS</td>
+</tr>
+<tr class="odd">
+<td>G2</td>
+<td></td>
+<td></td>
+<td>NVL</td>
+<td>SYS</td>
+<td>PIX</td>
+</tr>
+<tr class="even">
+<td>G3</td>
+<td></td>
+<td></td>
+<td></td>
+<td>SYS</td>
+<td>PXB</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol type="a">
+<li>Avec <code>NCCL_P2P_LEVEL=PIX</code>, G0 et G3 utilisent-ils le pair-à-pair ? (b) Avec <code>NCCL_NET_GDR_LEVEL=PIX</code>, quels GPU gardent GPUDirect RDMA ? Et avec <code>PXB</code> ? (c) Quelle carte chaque GPU doit-il utiliser, et combien de GPU partagent chaque carte ? (d) Avec <code>NCCL_NET_GDR_LEVEL=LOC</code>, que devient le trafic réseau ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Oui. Le type <code>NVL</code> est plus proche que <code>PIX</code> ; la distance maximale autorisée est donc respectée. Le pair-à-pair reste actif entre GPU reliés en NVLink.</p></li>
+<li><p>Avec <code>PIX</code> : seuls G0 (avec N0) et G2 (avec N1), dont les chemins vers leur carte sont de type <code>PIX</code>. G1 et G3 sont à distance <code>PXB</code> de leur carte et perdent GPUDirect : leur trafic passe par la mémoire de l'hôte. Avec <code>PXB</code>, les quatre GPU le gardent.</p></li>
+<li><p>G0 et G1 utilisent N0 (même socket), G2 et G3 utilisent N1 : deux GPU par carte. Si la carte est de 50 Go/s, chaque GPU dispose de 25 Go/s au plus quand les deux émettent ensemble ; le serveur n'a que deux « rails » pour quatre GPU.</p></li>
+<li><p><code>LOC</code> interdit toujours GPUDirect : tout le trafic réseau est transféré via la mémoire de l'hôte (chapitre 2), avec le surcoût de l'exercice 2.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 7 · ★★ — Faut-il sur-souscrire ?</span> Vous dimensionnez le réseau d'un cluster de 2 048 GPU, un port de 400 Gb/s par GPU, commutateurs de 64 ports. Option A : 1:1. Option B : 48 ports vers les GPU et 16 vers les colonnes (≈ 3:1).</p>
+<ol type="a">
+<li><p>Donnez commutateurs et émetteurs-récepteurs inter-commutateurs de chaque option, et les économies de B. Rappel : feuilles = ⌈GPU / ports bas⌉ ; liens montants = feuilles × ports hauts ; colonnes = ⌈liens montants / 64⌉ ; deux émetteurs-récepteurs par lien.</p></li>
+<li><p>Les gradients de 7 milliards de paramètres en BF16 (14 Go) sont réduits par un anneau de 2 048 rangs, de durée <span class="math inline">2\,\frac{p-1}{p}\,\frac{n}{B}</span> (latence négligée, module 2) : calculez le temps de communication sans sur-souscription, puis avec <span class="math inline">o = 3</span> pour <span class="math inline">f = 0{,}1</span> et <span class="math inline">f = 0{,}25</span>.</p></li>
+<li><p>Sur une étape de 5,0 s (hypothèse) dont cette communication n'est pas recouverte, quel surcoût de temps et quel seuil de rentabilité en part du coût total du cluster ?</p></li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>A : 64 feuilles et 32 colonnes, soit 96 commutateurs et 4 096 émetteurs-récepteurs. B : 43 feuilles et 11 colonnes, soit 54 commutateurs et 1 376 émetteurs-récepteurs (<code>python3 fabric.py --endpoints 2048 --radix 64 --leaf-down 48</code>). Économies : <span class="math inline">1 - 54/96 = 43{,}8</span> % des commutateurs et <span class="math inline">1 - 1376/4096 = 66{,}4</span> % des émetteurs-récepteurs.</p></li>
+<li><p>Avec le temps de l'anneau, latence négligée :</p></li>
+</ol>
+<p><span class="math display">T = 2\,\frac{p-1}{p}\,\frac{n}{B}</span></p>
+<p>On obtient 0,560 s à 50 Go/s. Avec <span class="math inline">f = 0{,}1</span>, le débit effectif vaut 41,7 Go/s et <span class="math inline">T = 0{,}672</span> s. Avec <span class="math inline">f = 0{,}25</span>, il vaut 33,3 Go/s et <span class="math inline">T = 0{,}840</span> s.</p>
+<ol start="3" type="a">
+<li>Le surcoût vaut 0,112 s (2,2 % de 5,0 s) pour <span class="math inline">f = 0{,}1</span>, et 0,280 s (5,6 %) pour <span class="math inline">f = 0{,}25</span>. Un temps d'étape plus long de 2,2 % revient à 2,2 % d'heures-GPU en plus.</li>
+</ol>
+<p>B est rentable si ses économies dépassent environ 2,2 % du coût total du cluster, à <span class="math inline">f = 0{,}1</span> ; 5,6 % si le placement est moins bon. Sans les prix réels (consultez les devis du jour), on ne peut pas conclure ; on sait en revanche que la décision dépend de <span class="math inline">f</span>, donc du placement et de la parallélisation choisie, et qu'un recouvrement du calcul et de la communication réduirait le surcoût.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 8 · ★★★ — Un rang qui ne finit jamais son initialisation</span> Le job de 16 rangs sur 2 nœuds se bloque au démarrage, sans erreur. L'analyseur du lab 7.2 affiche (journal <strong>synthétique</strong> <code>hang_in_init.log</code>) :</p>
+<pre class="text"><code>hang_in_init.log: NCCL 2.30.3+cuda13.0; 16/16 ranks on 2 nodes; network IB; HCAs per host {&#39;node-01&#39;: 8, &#39;node-02&#39;: 8}; channels [4]; init complete on 15 ranks
+  [ERROR] init_incomplete: ranks without &#39;Init COMPLETE&#39;: [11] (stuck in initialisation or log truncated)</code></pre>
+<p>Les lignes des rangs voisins sont <code>node-02:4010 [2] … Channel 00/0 : 10[2] -&gt; 11[3] via P2P/CUMEM</code> puis <code>… Init COMPLETE</code> pour le rang 10 ; pour le rang 11 (<code>node-02:4011 [3]</code>), la dernière ligne est <code>Channel 03/0 : 11[3] -&gt; 12[4] via P2P/CUMEM</code> : les quatre canaux sont décrits, mais <code>Init COMPLETE</code> manque. (a) Que peut-on établir avec certitude, et que ne peut-on pas ? (b) Donnez cinq vérifications ordonnées, avec les commandes. (c) Quel changement de journalisation évite l'ambiguïté « journal tronqué » ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Établi : les 16 rangs ont écrit leur ligne de communicateur ; 15 ont terminé ; le rang 11 est celui du GPU local 3 du second nœud ; le réseau retenu est IB sur les deux nœuds et les 8 cartes y sont vues. Non établi : la cause. Le journal montre où le rang s'arrête, pas pourquoi ; et rien ne distingue un processus bloqué d'un journal tronqué ou d'une sortie non vidée.</p></li>
+<li><p>Dans l'ordre : 1) le processus 11 est-il vivant (<code>ps</code>, <code>nvidia-smi</code>) et que fait-il (<code>py-spy dump</code> ou <code>strace -p</code>) ? 2) le noyau du nœud 2 signale-t-il une erreur de GPU ou de carte (<code>dmesg</code>) ? 3) la carte de ce rail est-elle saine (<code>ibstat</code>, état et débit de <code>mlx5_3</code>) ? 4) la connectivité réseau est-elle bonne entre les deux nœuds (<code>ib_write_bw</code> sur <code>mlx5_3</code>) ? 5) un <code>all_reduce_perf</code> à deux nœuds hors du nœud 2 passe-t-il (bissection du chapitre 8) ?</p></li>
+<li><p>Un fichier de journal par processus, avec <code>NCCL_DEBUG_FILE=nccl.%h.%p.log</code>, et <code>NCCL_DEBUG_SUBSYS=INIT,NET</code> pour avoir les lignes de connexion. La documentation précise que, si le nom de fichier n'est pas unique entre processus, la sortie peut être perdue ou corrompue. Avec un fichier par processus, l'absence de <code>Init COMPLETE</code> devient un fait, pas un doute.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 9 · ★★★ — Diagnostic intégré : table et journal</span> Sur un cluster de 16 GPU sur 2 nœuds, la recette donne (tables et journaux <strong>synthétiques</strong>, supposés issus du même cluster) :</p>
+<pre class="text"><code>all_reduce_synthetic_degraded.txt: 32 sizes; plateau busbw 26.2 GB/s; 90% of it reached at 67108864 B; smallest-size time 364.9 us; fit {&#39;B_gbs&#39;: 25.951, &#39;alpha_us&#39;: 12.129, &#39;intercept_us&#39;: 363.885}
+  PROBLEM: plateau busbw 26.2 GB/s is 55% of the expected 48 GB/s (tolerance 80%)
+degraded_rail.log:  HCAs per host {&#39;node-01&#39;: 8, &#39;node-02&#39;: 7}
+  [ERROR] hca_mismatch: hosts see different numbers of HCAs: {&#39;node-01&#39;: 8, &#39;node-02&#39;: 7}
+  [WARN ] gdr_disabled: GPU Direct RDMA disabled for [&#39;node-01:mlx5_3&#39;]</code></pre>
+<ol type="a">
+<li>Quel rapport plateau/attendu, et que prédit l'hypothèse « un rail à moitié de sa capacité, parts égales » ? (b) Le journal propose deux causes ; lesquelles, et comment les séparer ? (c) Proposez le plan d'essais pour un parc de 128 nœuds, avec le nombre maximal d'essais. (d) Que mettez-vous dans le rapport d'incident ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><span class="math inline">26{,}2/48 = 0{,}546</span>, soit 55 %. Avec huit canaux à parts égales dont un à moitié de débit, le temps double et le plateau vaut <span class="math inline">48/2 = 24</span> Go/s ; l'écart avec 26,2 est de 9 %, cohérent avec le modèle. Attention : le générateur de la table a simplement fixé <span class="math inline">B = 26</span> Go/s ; la lecture « un rail à moitié » est une hypothèse d'exercice, pas une propriété de la table.</li>
+</ol>
+<p>L'ajustement α-β retrouve la même bande passante effective (25,95 Go/s) et un α inchangé (12,1 µs) : la latence n'a pas bougé, c'est la bande passante qui a chuté. Cela exclut un problème de petits messages.</p>
+<ol start="2" type="a">
+<li>Cause 1 : sur le nœud 2, il manque la carte 5 (7 cartes pour 8 GPU) ; deux GPU doivent partager une carte, soit un rail à moitié de capacité. Cause 2 : sur le nœud 1, GPUDirect RDMA est désactivé pour <code>mlx5_3</code> ; le trafic de ce rail transite par la mémoire de l'hôte.</li>
+</ol>
+<p>Pour les séparer : <code>NCCL_TESTS_SPLIT="MOD 8"</code> avec <code>-a 3</code> confirme qu'un rail est lent mais ne le nomme pas ; <code>ibstat</code> sur chaque carte, puis un essai à deux nœuds avec un seul GPU par nœud (le GPU 5, puis le GPU 3) désignent le coupable. Un essai lent avec le GPU 5 désigne la cause 1, avec le GPU 3 la cause 2 ; si les deux le sont, les deux causes existent.</p>
+<ol start="3" type="a">
+<li><p>Un premier essai par rail identifie le rail. Ensuite une bissection sur les 128 nœuds : <span class="math inline">\lceil \log_2 128 \rceil = 7</span> essais pour isoler un nœud. Au plus 8 essais, contre 128 un par un. Seuil fixé à l'avance : 80 % du plateau attendu, avec <code>--expect-busbw 48</code> de l'analyseur (tolérance par défaut 0,8).</p></li>
+<li><p>Les versions de NCCL et du pilote, les variables posées, la commande exacte, le plateau attendu et sa source, la table par rail, la liste des nœuds exclus, la cause trouvée, la correction et la table de contrôle après correction. Mention explicite : les chiffres de cet exercice sont synthétiques.</p></li>
+</ol>
+</details>
+<h2 id="exit">Checkpoint de sortie</h2>
+<p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
+<ul>
+<li><strong>Je peux convertir un débit de fiche en débit attendu.</strong> Preuve : l'exercice 1 refait pour votre carte et votre MTU, avec le débit utile en Go/s.</li>
+<li><strong>Je peux expliquer RDMA et GPUDirect.</strong> Preuve : le schéma du chapitre 2 redessiné pour votre serveur, avec le trafic mémoire de l'exercice 2.</li>
+<li><strong>Je peux lire l'état d'un sous-réseau InfiniBand.</strong> Preuve : l'exercice 3 refait sur la sortie réelle de <code>ibstat</code> d'un de vos nœuds, ou sur la sortie du lab 7.1 partie B.</li>
+<li><strong>Je peux comparer InfiniBand et RoCE v2 avec des sources.</strong> Preuve : le tableau du chapitre 4 complété pour votre contexte, avec une source par ligne.</li>
+<li><strong>Je peux dimensionner un fat-tree.</strong> Preuve : le calculateur du lab 7.1 et l'arbitrage chiffré de l'exercice 7.</li>
+<li><strong>Je peux lire un journal NCCL.</strong> Preuve : l'analyseur du lab 7.2 et le diagnostic de l'exercice 8.</li>
+<li><strong>Je peux recetter un réseau d'entraînement.</strong> Preuve : le script du lab 7.3 et un rapport de recette au format de la section 8.6.</li>
+</ul>
+<p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
+<ol type="1">
+<li><em>Notre job de 128 GPU atteint la moitié du débit de bus attendu. Par où commencez-vous ?</em> Réponse-type : fixer l'attendu et sa source, puis descendre par couches : <code>ibstat</code> (débit, état), journal NCCL (réseau, GPUDirect, nombre de cartes), <code>nccl-tests</code> par rail avec <code>NCCL_TESTS_SPLIT</code>, <code>ib_write_bw</code> entre paires, compteurs <code>rdma statistic</code>. Isoler par bissection, écrire les mesures dans un rapport.</li>
+<li><em>InfiniBand ou RoCE pour 4 096 GPU ?</em> Réponse-type : les deux ont servi à des entraînements de grande taille (Llama 3 sur les deux, réglés pour des performances équivalentes) ; décider sur le coût, les compétences, le fournisseur et le propriétaire du réglage de la congestion. Citer les risques de RoCE (PFC, hachage ECMP) et ceux d'InfiniBand (SM, écosystème fermé), puis demander un essai de recette sur chaque option.</li>
+<li><em>Pourquoi ne pas sur-souscrire à 3:1 pour économiser ?</em> Réponse-type : cela dépend de la fraction du trafic qui traverse le niveau. Avec un placement sensible à la topologie, le surcoût peut être faible ; avec un placement quelconque, le débit est divisé par le taux. Chiffrer les deux cas, comparer au coût du réseau, et prévoir comment l'ordonnanceur garantit le placement.</li>
+</ol>
+<h2 id="refs">Lectures et références</h2>
+<ul>
+<li>NVIDIA. <em>NCCL User Guide</em> : <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html">Environment Variables</a>, <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting.html">Troubleshooting</a>, <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/logging.html">Logging</a>. Consulté le 24 octobre 2026 (version 2.32 en en-tête). Chapitres 6 à 8 : variables, formats de journal, dépannage.</li>
+<li>NVIDIA. <em>nccl-tests</em> : <a href="https://raw.githubusercontent.com/NVIDIA/nccl-tests/master/README.md">README</a> et <a href="https://raw.githubusercontent.com/NVIDIA/nccl-tests/master/doc/PERFORMANCE.md">PERFORMANCE.md</a>. Chapitre 8 : options, débit algorithmique et de bus.</li>
+<li>Zhu et al. <em>Congestion Control for Large-Scale RDMA Deployments</em> (DCQCN). SIGCOMM 2015. <a href="https://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p523.pdf">PDF</a>. Chapitre 4, sections 2 et 3.</li>
+<li>Guo et al. <em>RDMA over Commodity Ethernet at Scale</em>. SIGCOMM 2016. <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/11/rdma_sigcomm2016.pdf">PDF</a>. Chapitre 4, section 4 : livelock, interblocage, tempête de pause.</li>
+<li>Al-Fares, Loukissas, Vahdat. <em>A Scalable, Commodity Data Center Network Architecture</em>. SIGCOMM 2008. <a href="http://ccr.sigcomm.org/online/files/p63-alfares.pdf">PDF</a>. Chapitre 5, section 3.</li>
+<li>Dubey et al. <a href="https://arxiv.org/abs/2407.21783"><em>The Llama 3 Herd of Models</em></a>. 2024. Section 3.3 : réseau RoCE de 24 000 GPU, sur-souscription, équilibrage, journalisation de NCCLX.</li>
+<li>Jiang et al. <a href="https://arxiv.org/abs/2402.15627"><em>MegaScale</em></a>. 2024. Section 3.6 : topologie, conflits ECMP, contrôle de congestion, délais de retransmission.</li>
+<li>Qian et al. <em>Alibaba HPN: A Data Center Network for Large Language Model Training</em>. SIGCOMM 2024. <a href="https://ennanzhai.github.io/pub/sigcomm24-hpn.pdf">PDF</a>. Chapitre 5 : deux plans, deux commutateurs de baie.</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/dgx-superpod/reference-architecture-scalable-infrastructure-h100/latest/network-fabrics.html"><em>DGX SuperPOD H100 Reference Architecture</em></a>, pages « DGX SuperPOD Architecture » et « Network Fabrics » ; <a href="https://docs.nvidia.com/dgx/dgxh100-user-guide/introduction-to-dgxh100.html"><em>DGX H100 User Guide</em></a>. Chapitres 5 et 6 : comptes de composants, cartes du serveur.</li>
+<li>NVIDIA. <a href="https://www.nvidia.com/en-us/data-center/h100/"><em>NVIDIA H100</em></a> et <a href="https://www.nvidia.com/en-us/networking/quantum2/"><em>Quantum-2 InfiniBand</em></a>, pages produit consultées le 24 octobre 2026. Chapitres 3 et 6 : NVLink, ConnectX-7, 64 ports de 400 Gb/s.</li>
+<li>NVIDIA. <a href="https://developer.nvidia.com/blog/massively-scale-deep-learning-training-nccl-2-4/"><em>Massively Scale Your Deep Learning Training with NCCL 2.4</em></a>. Chapitre 7 : arbres binaires doubles.</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/cuda/gpudirect-rdma/"><em>GPUDirect RDMA</em></a> et <a href="https://docs.nvidia.com/gpudirect-storage/overview-guide/index.html"><em>GPUDirect Storage</em></a>. Chapitre 2.</li>
+<li>Patarasuk, Yuan. <a href="https://www.cs.fsu.edu/~xyuan/paper/09jpdc.pdf"><em>Bandwidth optimal all-reduce algorithms for clusters of workstations</em></a>. JPDC 69, 2009. Origine de la borne <span class="math inline">2n(p-1)/p</span> du module 2.</li>
+<li>SchedMD. <a href="https://slurm.schedmd.com/topology.html"><em>Topology Guide</em></a>. Chapitre 5, placement : voir aussi le <a href="../slurm/index.html#ch5">chapitre 5 du module 5</a>.</li>
+</ul>
+<h2 id="sources">Sources et portée</h2>
+<p><strong>Documenté.</strong> Les noms, versions d'introduction et comportements des variables et algorithmes de NCCL (guide d'utilisation, pages « Environment Variables », « Troubleshooting », « Logging »), les formules de débit de bus et les options de <code>nccl-tests</code>, la variable <code>NCCL_TESTS_MIN_BW</code> et la structure du tableau de sortie (code source de <code>nccl-tests</code>), les formats des messages de journal de NCCL (code source de <code>init.cc</code>, <code>search.cc</code>, <code>topo.cc</code>, <code>p2p.cc</code>, <code>net.cc</code> et <code>bootstrap.cc</code>), les tailles d'en-têtes (<code>ib_pack.h</code> du noyau Linux) et les valeurs de MTU (<code>verbs.h</code>), le port UDP 4791 (registre de l'IANA), les affirmations sur DCQCN, PFC et ECN (article de DCQCN, RFC 3168), les trois pannes de Guo et al., les formules du fat-tree (Al-Fares et al.), les comptes du DGX SuperPOD H100, les débits des cartes et commutateurs (pages NVIDIA), les réseaux de Llama 3, MegaScale et HPN, et la latence logarithmique des arbres binaires doubles ont été relus à la source le 24 octobre 2026. Les sorties d'OpenSM 3.3.23, <code>ibsim</code> 0.10, <code>infiniband-diags</code> 50.0 et <code>perftest</code> 24.01.0 sont celles du bac à sable ; les calculs des exemples et des corrigés sont refaits par <code>labs/networking/topology-sizing/fabric.py</code> ou par un script Python.</p>
+<p><strong>Recommandé.</strong> L'ordre des chapitres, le modèle jouet de sur-souscription, la réserve de tampon PFC de l'exercice 4, le modèle à parts égales entre canaux, la bissection, le seuil de 80 % du plateau attendu et la liste de contrôle en couches sont des choix pédagogiques de ce parcours, pas des normes. Les valeurs de latence de l'exemple 7.1 et tous les chiffres « hypothèse » sont des données d'école.</p>
+<p><strong>À vérifier.</strong> (1) Les 24 octets de trame Ethernet sur le fil (séquence de contrôle, préambule, espace inter-trame), l'encodage 64b/66b, la norme IEEE 802.1Qbb de PFC, la correspondance XDR = 800 Gb/s, les noms exacts des compteurs de port InfiniBand et le niveau 2 sans perte avec contrôle de flux par crédits d'InfiniBand sont des connaissances courantes <strong>non relues</strong> dans la spécification (payante ou inaccessible depuis le bac à sable). (2) Les mécanismes du routage adaptatif, de SHARP, de <code>PXN</code> et des algorithmes CollNet dépendent de la version et n'ont pas été relus. (3) L'article fondateur du dragonfly et le fat-tree de Leiserson (1985) n'ont pas été relus. (4) La lecture du « 1:7 » de Llama 3 comme « un septième de la bande passante » est une interprétation. (5) Les journaux NCCL et les tables <code>nccl-tests</code> du module sont <strong>synthétiques</strong> : les formats changent d'une version à l'autre et aucune exécution sur GPU n'a eu lieu. (6) Les pages produit de NVIDIA ne précisent pas si les 900 Go/s de NVLink se comptent par sens ou en bidirectionnel. (7) Plusieurs éditeurs (ACM, IEEE Xplore) répondent 403 aux outils automatiques : les articles sont lus sur les copies d'auteur citées.</p>
+<p><strong>Hors périmètre.</strong> L'architecture interne des commutateurs, Ultra Ethernet, les réseaux d'inférence, le réseau de stockage (module 8), le choix d'un parallélisme et son recouvrement (module 9), la supervision (module 14) et le coût des réseaux, dont les prix changent chaque trimestre : consultez les devis du jour.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../../courses/provisioning/index.html"><span class="k">← Précédent</span>Module 06 — Provisioning, images et santé des nœuds GPU</a><a class="next" href="../../courses/storage/index.html"><span class="k">Suivant →</span>Module 08 — Stockage et E/S pour l'entraînement</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../../assets/theme.js"></script>
+</body>
+</html>

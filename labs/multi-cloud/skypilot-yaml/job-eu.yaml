@@ -1,0 +1,35 @@
+# The job of job.yaml restricted to locations in the EU, for a dataset that must not leave it (exercise 11).
+# Whether a Kubernetes context really runs in the EU is NOT provable from its name: policy_check.py warns (W4).
+# Tested offline with SkyPilot 0.14.1 (sky.Task.from_yaml); never launched on a real cloud by the author.
+name: pretrain-demo-eu
+
+resources:
+  accelerators: H100:8
+  use_spot: true
+  max_hourly_cost: 120.0
+  any_of:
+    - infra: aws/eu-west-3
+    - infra: gcp/europe-west4
+    - infra: k8s/eu-gpu-cluster   # placeholder Kubernetes context
+  job_recovery:
+    strategy: EAGER_NEXT_REGION
+    max_restarts_on_errors: 2
+  labels:
+    team: llm-platform
+    project: pretrain-demo
+    owner: platform-oncall
+
+num_nodes: 2
+
+file_mounts:
+  /checkpoint:
+    source: r2://example-ckpt-bucket-eu
+    mode: MOUNT_CACHED
+    type: MODEL_CHECKPOINT_RW
+
+envs:
+  CKPT_DIR: /checkpoint/pretrain-demo
+  TOTAL_STEPS: "100000"
+
+run: |
+  python train.py --ckpt-dir "$CKPT_DIR" --total-steps "$TOTAL_STEPS" --resume auto

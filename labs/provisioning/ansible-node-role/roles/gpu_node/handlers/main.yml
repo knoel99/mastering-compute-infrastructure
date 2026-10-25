@@ -1,0 +1,47 @@
+---
+# Handlers only run when a task notified them AND reported "changed". With the "log" backend they
+# record what a production run would do, so the lab can prove "no change => no restart".
+- name: Apply sysctl settings
+  ansible.builtin.lineinfile:
+    path: "{{ node_root }}/var/log/gpu_node_actions.log"
+    line: "{{ now(utc=true, fmt='%Y-%m-%dT%H:%M:%S.%f') }} sysctl --system"
+    create: true
+    mode: "0644"
+  when: gpu_node_service_backend == 'log'
+
+- name: Apply sysctl settings (real)
+  ansible.builtin.command: sysctl --system
+  changed_when: true
+  when: gpu_node_service_backend == 'systemd'
+  listen: Apply sysctl settings
+
+- name: Rebuild initramfs
+  ansible.builtin.lineinfile:
+    path: "{{ node_root }}/var/log/gpu_node_actions.log"
+    line: "{{ now(utc=true, fmt='%Y-%m-%dT%H:%M:%S.%f') }} update-initramfs -u (reboot needed)"
+    create: true
+    mode: "0644"
+  when: gpu_node_service_backend == 'log'
+
+- name: Rebuild initramfs (real)
+  ansible.builtin.command: update-initramfs -u
+  changed_when: true
+  when: gpu_node_service_backend == 'systemd'
+  listen: Rebuild initramfs
+
+- name: Reload systemd
+  ansible.builtin.lineinfile:
+    path: "{{ node_root }}/var/log/gpu_node_actions.log"
+    line: "{{ now(utc=true, fmt='%Y-%m-%dT%H:%M:%S.%f') }} systemctl daemon-reload; enable --now gpu-node-check.timer"
+    create: true
+    mode: "0644"
+  when: gpu_node_service_backend == 'log'
+
+- name: Reload systemd (real)
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: gpu-node-check.timer
+    enabled: true
+    state: started
+  when: gpu_node_service_backend == 'systemd'
+  listen: Reload systemd

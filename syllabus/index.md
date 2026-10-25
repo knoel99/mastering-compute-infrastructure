@@ -215,11 +215,13 @@ L'ordonnanceur de référence du calcul scientifique et de l'entraînement : par
 
 **Projets qui s'appuient sur ce module :** Projet 1, Projet 6.
 
-### Module 06 — Provisioning, images et santé des nœuds GPU (plan, 24 h) {#provisioning}
+### Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 24 h) {#provisioning}
 
 Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
+
+**Cours complet :** [Provisioning, images et santé des nœuds GPU](courses/provisioning/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -244,6 +246,7 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 -   **Un rôle Ansible de nœud de calcul** (bac à sable, sans GPU) : Rôle Ansible (muni de molecule ou ansible-playbook --check) qui configure limites, sysctl, services ; tests d'idempotence en local connection.
 -   **Terraform : une flotte décrite en code** (bac à sable, sans GPU) : Module Terraform avec provider local/null et sorties ; terraform validate/plan en local ; gestion de la dérive expliquée.
 -   **Recette d'un nœud GPU** (GPU requis) : Script de recette qui enchaîne nvidia-smi, DCGM diag, gpu-burn, nccl-tests ; lint et simulation des sorties pour le test ; exécution réelle documentée (GPU requis).
+-   **Supervision hors bande avec Redfish** (bac à sable, sans GPU) : Supervision hors bande avec Redfish
 
 **Sources à lire et faits à vérifier :**
 
@@ -253,11 +256,13 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 
 **Projets qui s'appuient sur ce module :** Projet 1, Projet 6.
 
-### Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (plan, 28 h) {#networking}
+### Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (rédigé, 28 h) {#networking}
 
 Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance).
+
+**Cours complet :** [Réseaux haute performance : InfiniBand, RoCE et NCCL](courses/networking/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -291,11 +296,13 @@ Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, 
 
 **Projets qui s'appuient sur ce module :** Projet 2, Projet 6.
 
-### Module 08 — Stockage et E/S pour l'entraînement (plan, 24 h) {#storage}
+### Module 08 — Stockage et E/S pour l'entraînement (rédigé, 24 h) {#storage}
 
 Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
+
+**Cours complet :** [Stockage et E/S pour l'entraînement](courses/storage/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -320,6 +327,7 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 -   **Démasquer un chargeur de données lent** (bac à sable, sans GPU) : Boucle PyTorch avec Dataset synthétique ; varier workers/prefetch ; mesurer débit et temps d'attente GPU simulé ; tableau de décision.
 -   **Shards et lecture séquentielle** (bac à sable, sans GPU) : Convertir un jeu en shards tar/Parquet ; comparer lecture aléatoire et séquentielle avec fio/Python ; chiffrer l'écart.
 -   **Coût d'un checkpoint** (bac à sable, sans GPU) : Écrire des checkpoints de tailles variées (sync/async/fsync) et modéliser débit et temps de blocage.
+-   **Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité** (bac à sable, sans GPU) : Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité
 
 **Sources à lire et faits à vérifier :**
 
@@ -497,11 +505,13 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 
 **Projets qui s'appuient sur ce module :** Projet 6.
 
-### Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (plan, 28 h) {#multi-cloud}
+### Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (rédigé, 28 h) {#multi-cloud}
 
 Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.
 
 **Prérequis :** module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 10 (Pannes, checkpointing et reprise automatique).
+
+**Cours complet :** [Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](courses/multi-cloud/index.html).
 
 **Ce que vous saurez vérifier :**
 

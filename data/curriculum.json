@@ -381,6 +381,12 @@
      "title": "Recette d'un nœud GPU",
      "kind": "gpu",
      "idea": "Script de recette qui enchaîne nvidia-smi, DCGM diag, gpu-burn, nccl-tests ; lint et simulation des sorties pour le test ; exécution réelle documentée (GPU requis)."
+    },
+    {
+     "id": "redfish-oob",
+     "title": "Supervision hors bande avec Redfish",
+     "kind": "sandbox",
+     "idea": "Supervision hors bande avec Redfish"
     }
    ],
    "facts": [
@@ -498,6 +504,12 @@
      "title": "Coût d'un checkpoint",
      "kind": "sandbox",
      "idea": "Écrire des checkpoints de tailles variées (sync/async/fsync) et modéliser débit et temps de blocage."
+    },
+    {
+     "id": "io-sizing",
+     "title": "Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité",
+     "kind": "sandbox",
+     "idea": "Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité"
     }
    ],
    "facts": [
