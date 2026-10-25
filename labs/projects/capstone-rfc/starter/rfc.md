@@ -40,7 +40,7 @@ un sous-titre `### Hypothèses et limites`.
 
 ## Sécurité
 
-À compléter.
+À compléter : identité, isolation entre équipes, secrets et audit, avec un mécanisme concret pour chacun.
 
 ## Migration
 
@@ -56,4 +56,5 @@ un sous-titre `### Hypothèses et limites`.
 
 ## Annexes
 
-À compléter.
+À compléter : le choix de l'ordonnanceur, la sur-souscription réseau acceptée pour le pré-entraînement et le débit
+d'écriture des checkpoints (exigence R7), avec leurs hypothèses.

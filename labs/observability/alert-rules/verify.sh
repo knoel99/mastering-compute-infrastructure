@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Lab 14.2 check (about 1 minute, no GPU): generated files fresh, rules valid, tests green, lint clean, 12 mutants killed.
+# Lab 14.2 check (about 1 minute, no GPU): generated files fresh, rules valid, tests green, lint clean,
+# exercise 11 (mixed NVIDIA + AMD fleet) green, 12 mutants killed.
 set -euo pipefail
 cd "$(dirname "$0")"
 PY="${PYTHON:-python3}"
@@ -23,6 +24,10 @@ GOMAXPROCS=2 promtool test rules tests/platform.rules.test.yml
 GOMAXPROCS=2 promtool test rules tests/slo.rules.test.yml
 GOMAXPROCS=2 promtool test rules tests/wait_quantile.test.yml
 
-echo "--- 5. mutation testing"
+echo "--- 5. exercise 11: the tensor-idle join on a mixed NVIDIA + AMD fleet (synthetic series)"
+promtool check rules exercises/mixed_fleet.rules.yml
+GOMAXPROCS=2 promtool test rules exercises/mixed_fleet.test.yml
+
+echo "--- 6. mutation testing"
 "$PY" mutate.py
 echo "OK alert-rules"

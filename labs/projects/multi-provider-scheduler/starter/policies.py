@@ -9,7 +9,7 @@ import math  # noqa: F401
 
 
 def young_daly_min(ckpt_cost_min, mtbf_min):
-    """T* = sqrt(2 C M) (see project 3)."""
+    """T* = sqrt(2 C M) (module 10, project 3)."""
     raise NotImplementedError
 
 
@@ -43,7 +43,9 @@ class Hedged:
     """Minimise the EXPECTED cost per productive GPU-hour, with a deadline guard and a Young-Daly interval.
 
     For an offer with hazard h per hour: M = 60/h minutes, T* = young_daly_min(C, M), waste W = waste_fraction(T*, C, M, R)
-    capped at max_waste; expected cost per productive GPU-hour = price / (1 - W). An on-demand offer has W = 0.
+    capped at max_waste, with C = job.ckpt_cost_min and R = job.restart_cost_min (reload only: the startup billed after
+    an interruption is left out, a simplification); expected cost per productive GPU-hour = price / (1 - W).
+    An on-demand offer has W = 0.
     A SPOT offer is eligible only if now + startup + remaining/(1 - W) + guard_min <= deadline.
     Ties break on the offer id. The checkpoint interval is max(C + 1, round(T*)), or math.inf without hazard."""
 

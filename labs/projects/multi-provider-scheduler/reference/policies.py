@@ -3,7 +3,7 @@ import math
 
 
 def young_daly_min(ckpt_cost_min, mtbf_min):
-    """First-order optimal compute time between checkpoints, T* = sqrt(2 C M) (see project 3)."""
+    """First-order optimal compute time between checkpoints, T* = sqrt(2 C M) (module 10, project 3)."""
     return math.sqrt(2.0 * ckpt_cost_min * mtbf_min)
 
 
@@ -41,7 +41,9 @@ class OnDemandOnly:
 class Hedged:
     """Minimise the EXPECTED cost per productive GPU-hour, with a deadline guard and a Young-Daly interval.
 
-    expected cost per productive GPU-hour = price / (1 - W(T*)); an offer is eligible only if the expected
+    W uses R = job.restart_cost_min only: the startup billed after an interruption is left out (a simplification;
+    the project page compares it with the exact model and the simulator).
+    expected cost per productive GPU-hour = price / (1 - W(T*)); a spot offer is eligible only if the expected
     completion time (remaining work / (1 - W) + startup) leaves `guard` minutes before the deadline.
     """
 

@@ -60,6 +60,7 @@ Les labs s'exécutent sans GPU, par simulation. Chaque simulation est étiqueté
 
 -   **Phase 2 — Exploiter un cluster** (semaines 10-20) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html).
+-   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Administration Linux, Terraform, infrastructure as code, Ansible, gestion de configuration, Supervision GPU (DCGM), Planification de capacité, Sécurité, conformité, Réseau (général), Provisioning bare-metal, Virtualisation (KVM, MIG, vGPU), Santé matérielle (burn-in, diagnostics, RMA), Slurm, Conteneurs, Collectives (NCCL, RCCL, HCCL), CUDA, programmation GPU, Checkpoint, tolérance aux pannes, Achats, relation fournisseurs, Astreinte, fiabilité (SRE), Expérience HPC, CI/CD, automatisation (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->

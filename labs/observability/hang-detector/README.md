@@ -1,6 +1,6 @@
 # Lab 14.3 — Détecteur de job bloqué
 
-Deux parties dans un même dossier.
+Quatre parties dans un même dossier.
 
 ## Partie A — Détecteurs sur séries **simulées**
 
@@ -20,18 +20,27 @@ Deux parties dans un même dossier.
 
 `regress.py` enregistre trois runs **simulés** de 1 200 pas (référence, `thermal` : fréquence du GPU le plus lent à 65 % dès le pas 600, `lrbug` : taux d'apprentissage trois fois trop grand dès le pas 600) par l'API **réelle** de MLflow (base SQLite temporaire), puis les classe en comparant débit, perte à pas égal et fréquence minimale à la référence. `drift.py` compare un CUSUM à un seuil fixe sur une baisse de 3 % (séries simulées). Prérequis : `pip install mlflow-skinny sqlalchemy alembic` ; sans MLflow, la partie C s'annonce « SKIPPED » et ne valide rien. MLflow 3.17.2 refuse le magasin de fichiers (mode maintenance) : d'où SQLite.
 
+## Partie D — Un span par pas, avec OpenTelemetry
+
+`trace_steps.py` émet, avec le SDK **réel** d'OpenTelemetry, un span `train_step` par pas et un span enfant par phase (`data`, `forward_backward`, `all_reduce`, `optimizer`). Aucun collecteur : `ConsoleSpanExporter(out=fichier, formatter=...)` écrit chaque span comme une ligne JSON. Les durées des phases sont **simulées** et passées comme instants de début et de fin explicites : rien ne dépend de l'horloge. Le pas 13 a un chargement de données lent (1,70 s au lieu de 0,10 s, valeur supposée). Le script relit le fichier, reconstruit les pas par les liens de parenté et nomme la phase qui ralentit le pas le plus lent. Prérequis : `pip install opentelemetry-sdk` (testé : 1.45.1) ; sans lui, la partie D s'annonce « SKIPPED ».
+
+## Une partie sautée n'est pas une réussite
+
+Si la partie C ou la partie D est sautée, `verify.sh` termine par `PARTIAL hang-detector (...)` au lieu de `OK hang-detector`, avec le code 0 ; `STRICT=1 bash verify.sh` sort alors avec le code 1.
+
 ## Lancer
 
 ```bash
-export PYTHON=/chemin/vers/python      # torch (CPU suffit), pytest, mlflow-skinny, sqlalchemy, alembic
+export PYTHON=/chemin/vers/python      # torch (CPU suffit), pytest, mlflow-skinny, sqlalchemy, alembic, opentelemetry-sdk
 bash verify.sh                          # ~35 s ; aucune assertion sur une durée
 python3 evaluate.py --quick             # tableau en 2 s
 python3 real_hang.py                    # la partie B seule (~8 s)
+python3 trace_steps.py                  # la partie D seule
 ```
 
 ## Branches vérifiées
 
-Parties A, B et C exécutées par l'auteur le 2026-10-24 sur la VM du bac à sable (4 vCPU, sans GPU). **Non vérifié** : tout ce qui concerne NCCL et de vrais GPU (le comportement du watchdog NCCL, la signature de l'utilisation GPU pendant un blocage).
+Parties A, B et C exécutées par l'auteur le 2026-10-24, partie D le 2026-10-25, sur la VM du bac à sable (4 vCPU, sans GPU). **Non vérifié** : tout ce qui concerne NCCL et de vrais GPU (le comportement du watchdog NCCL, la signature de l'utilisation GPU pendant un blocage).
 
 ## Pour aller plus loin
 

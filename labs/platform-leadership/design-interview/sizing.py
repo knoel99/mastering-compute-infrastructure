@@ -12,7 +12,7 @@ SECONDS_PER_DAY = 86400.0
 
 
 def train_flops(params, tokens):
-    """Total training FLOPs: 6 x P x D."""
+    """Total training FLOPs: 6 x N x D (N parameters, D tokens)."""
     return 6.0 * params * tokens
 
 

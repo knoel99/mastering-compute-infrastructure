@@ -37,12 +37,11 @@ Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriq
 |---|---|
 | Volume | 24 h, dont environ 9 h de lecture, 10 h de labs et 5 h d'exercices |
 | Niveau d'entrée | 2 : Linux et Slurm (modules 1 et 5) ; pour Prometheus, les bases de PromQL suffisent, par exemple le guide officiel [*Getting started*](https://prometheus.io/docs/prometheus/latest/getting_started/) de Prometheus |
-| Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), [Module 5 — Slurm](../slurm/index.html) |
+| Prérequis | [Module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [Module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html) |
 | Pour qui | Cœur : sémantique des métriques GPU, détection des blocages et objectifs de service (SLO) du calcul ; si vous maîtrisez déjà Prometheus, concentrez-vous sur ces trois points. |
 | Livrable | un exportateur testé, des règles d'alerte testées par promtool et par mutation, un détecteur de blocage dont vous connaissez les fausses alarmes |
-| Environnement | un portable ou une VM Linux, **sans GPU** ; `promtool` (paquet apt `prometheus`), Python avec `prometheus_client`, `torch` CPU, `pytest`, `pyyaml` (et `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3) ; Slurm du module 5 pour la branche en direct |
-| Projets liés | [Projet 5 — Observabilité GPU et pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
-
+| Environnement | un portable ou une VM Linux, **sans GPU** ; `promtool` (paquet apt `prometheus`), Python avec `prometheus_client`, `torch` CPU, `pytest`, `pyyaml` (et `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3, `opentelemetry-sdk` pour sa partie D) ; Slurm du module 5 pour la branche en direct |
+| Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 ### Ce que vous saurez vérifier {#acquis}
 
 -   Dire ce qu'une métrique GPU mesure vraiment, en particulier pourquoi `DCGM_FI_DEV_GPU_UTIL` ne dit pas si le GPU travaille (chapitres 1 et 2).
@@ -56,7 +55,7 @@ Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriq
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
+-   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 33-44) : placer, observer et facturer des charges sur plusieurs fournisseurs.
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html).
 -   **Prépare** : [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
@@ -71,8 +70,8 @@ Dix séances, soit 24 h. Le niveau ne diminue jamais d'une séance à la suivant
 |---|---|---|---|---|
 | 1 | 2.5 h | 1 | ch. 1 Ce qu'on observe, le piège des moyennes | Questions de positionnement ; Ex. 1 |
 | 2 | 2 h | 2 | ch. 2 Métriques GPU : DCGM | Ex. 2 |
-| 3 | 2.5 h | 2 | ch. 3 Prometheus et Grafana pour le calcul | Lab 14.1 partie A ; Ex. 3 |
-| 4 | 2 h | 2 | ch. 4 Journaux et traces | Lecture de la partie B du lab 14.3 ; Ex. 4 |
+| 3 | 2.5 h | 2 | ch. 3 Prometheus et Grafana pour le calcul | Lab 14.1 partie A ; Ex. 3, 11 |
+| 4 | 2 h | 2 | ch. 4 Journaux et traces | Lecture des parties B et D du lab 14.3 ; Ex. 4 |
 | 5 | 2.5 h | 2 | ch. 5 Observabilité des ordonnanceurs | Lab 14.1 partie B (Slurm) ; Ex. 5 |
 | 6 | 2.5 h | 2 | ch. 6 SLO de plateforme et goodput | Lab 14.2 première moitié ; Ex. 6 |
 | 7 | 3 h | 3 | ch. 7 Pannes silencieuses | Lab 14.2 mutation ; Ex. 7, 8 |
@@ -131,7 +130,7 @@ Une flotte d'entraînement se lit en cinq couches. Chacune a sa source, son ryth
 -   **Le modèle et l'entraîneur** : perte, pas d'optimisation, tokens par seconde, durée des étapes. C'est la seule couche qui sait si le travail avance.
 -   **Les GPU** : fréquences, température, puissance, mémoire, erreurs matérielles (codes XID : les messages d'erreur du pilote NVIDIA), activité des unités de calcul (DCGM, chapitre 2).
 -   **Le nœud** : processeur, mémoire, disque, noyau, réseau. Les erreurs matérielles apparaissent aussi dans le journal du noyau.
--   **Le réseau et le stockage** : compteurs d'erreurs des cartes, débit de lecture des données, latence d'écriture des points de contrôle.
+-   **Le réseau et le stockage** : compteurs d'erreurs des cartes, débit de lecture des données, latence d'écriture des *checkpoints* (points de reprise de l'entraînement).
 -   **L'ordonnanceur** : files, états des nœuds, jobs en attente ou en échec (chapitre 5).
 
 <figure class="fig">
@@ -256,7 +255,7 @@ Un point qui concerne Slurm : DCGM ne sait rien des jobs. Le code source de dcgm
 Les métriques du groupe « profil » portent un commentaire dans le fichier : elles sont prises en charge sur les GPU de centre de données de génération Volta ou plus récente. Sur d'autres GPU, elles sont absentes : une règle qui en dépend doit gérer ce cas.
 
 ::: note
-[Une jauge qui ressemble à un compteur]{.tag} `DCGM_FI_DEV_XID_ERRORS` est une **jauge** dont le texte d'aide dit « valeur de la dernière erreur XID rencontrée ». Elle ne compte pas les erreurs : elle reste non nulle jusqu'à la réinitialisation du GPU, et un `rate()` dessus n'a aucun sens. Une règle correcte teste `> 0` et la durée `for` évite les rebonds. Le projet 5 en fait un test.
+[Une jauge qui ressemble à un compteur]{.tag} `DCGM_FI_DEV_XID_ERRORS` est une **jauge** dont le texte d'aide dit « valeur de la dernière erreur XID rencontrée ». Elle ne compte pas les erreurs : elle garde la dernière valeur rencontrée, et un `rate()` dessus n'a aucun sens. Les sources lues ne disent pas quand elle revient à zéro (à vérifier sur matériel, voir le projet 5). Une règle correcte teste `> 0` et la durée `for` évite les rebonds. Le projet 5 en fait un test.
 :::
 
 ### 2.3. Ce que l'utilisation GPU ne dit pas
@@ -292,7 +291,7 @@ DCGM_FI_DEV_POWER_USAGE{gpu="5",...} 255
 DCGM_FI_DEV_XID_ERRORS{gpu="6",...} 79
 ~~~
 
-Le GPU 3 est chaud et ralenti : un traînard thermique. Le GPU 5 a une utilisation de 99 %, une puissance nettement sous la normale (255 W contre environ 620 W) et un tensor à zéro : la signature du blocage supposée plus haut. Le GPU 6 a rapporté un code XID 79. Le catalogue XID de NVIDIA l'associe à « GPU has fallen off the bus » : le GPU n'est plus joignable sur le bus, ce qui impose en général une intervention sur le nœud.
+Le GPU 3 est chaud et ralenti : un traînard thermique. Le GPU 5 a une utilisation de 99 %, une puissance nettement sous la normale (255 W contre environ 620 W, la moyenne des cinq GPU sains du nœud) et un tensor à zéro : la signature du blocage supposée plus haut. Le GPU 6 a rapporté un code XID 79. Le catalogue XID de NVIDIA l'associe à « GPU has fallen off the bus » : le GPU n'est plus joignable sur le bus, ce qui impose en général une intervention sur le nœud.
 
 Les codes 94 et 95 du même catalogue concernent les GPU qui isolent les erreurs mémoire (à partir des A100) : le 94 reste confiné à une application, qu'il faut relancer, le 95 touche plusieurs applications et impose de réinitialiser le GPU.
 
@@ -302,6 +301,14 @@ Les codes 94 et 95 du même catalogue concernent les GPU qui isolent les erreurs
 Ce n'est pas une erreur de l'exposition mais une règle de style que les étiquettes d'un fournisseur ne respectent pas. Conséquence : ne mettez pas ce lint en barrière sur la sortie d'un exportateur tiers, et gardez des noms conformes pour vos propres métriques (le lab 14.1 passe le lint). Source : sortie réelle de `promtool`, relevée par l'auteur.
 :::
 
+### 2.5. Hors de NVIDIA : mêmes questions, autres noms
+
+Une flotte peut mêler des GPU NVIDIA et AMD, voire des accélérateurs Ascend ([module 4, chapitre 9](../gpu-programming/index.html#ch9)). Chez AMD, l'*AMD Device Metrics Exporter* (documentation de la version 1.5.3, lue le 25 octobre 2026) publie au format Prometheus sur le port 5000. Ses séries sont en minuscules (`gpu_gfx_activity`, `gpu_clock`) et portent les étiquettes `gpu_id` et `hostname`, là où dcgm-exporter écrit `gpu` et `Hostname`.
+
+Les équivalences ne sont pas exactes. `GPU_GFX_ACTIVITY`, le pendant de `GPU_UTIL`, est un pourcentage d'usage du moteur graphique ; en mode partitionné, il n'est rapporté que pour la partition principale. `GPU_PROF_TENSOR_ACTIVE_PERCENT`, le pendant de `PIPE_TENSOR_ACTIVE`, est un **pourcentage** d'utilisation des unités matricielles (MFMA), là où DCGM donne une fraction entre 0 et 1 ; il n'est pas exporté sur les GPU Radeon.
+
+L'intégration de cet exportateur à Slurm ajoute, par un prologue et un épilogue, les étiquettes `job_id` et `job_user` aux métriques : c'est l'étiquette que la section 3.2 déconseille, à mesurer avant de l'activer. Pour Ascend, la santé se lit par `npu-smi info` (module 4, § 9.5) ; son exportateur n'a pas été relu ici. **Non vérifié** : rien de cette section n'a tourné sur un GPU AMD ou un accélérateur Ascend. L'exercice 11 réécrit une alerte pour une flotte mixte.
+
 ::: recap
 Points clés — chapitre 2
 
@@ -310,6 +317,7 @@ Points clés — chapitre 2
 -   `XID_ERRORS` est une jauge du dernier code, non un compteur ; le XID 79 est « GPU has fallen off the bus ».
 -   DCGM ne connaît pas les jobs : la jointure avec Slurm est à votre charge.
 -   La signature « utilisation haute, tensor nul » d'un blocage est une hypothèse à valider sur votre matériel.
+-   Hors de NVIDIA, les questions restent mais les noms, les unités et les étiquettes changent (AMD : pourcentages, `gpu_id`, `hostname`) : normalisez avant de joindre.
 :::
 
 ## 3. Prometheus et Grafana pour le calcul {#ch3}
@@ -353,7 +361,7 @@ expr: avg by (job) (DCGM_FI_PROF_PIPE_TENSOR_ACTIVE
       * on (Hostname, gpu) group_left (job) slurm_job_gpu_allocated) < 0.05
 ~~~
 
-Cette règle est celle du projet 5 (`labs/projects/gpu-observability/reference/rules/gpu.rules.yml`), testée avec `promtool`. Seule la série d'association porte le job : elle apparaît et disparaît avec lui, les 25 séries du GPU restent stables. Deux protections complètent la parade : la limite `sample_limit` d'un travail de scrape, qui fait échouer le scrape entier si l'exportateur dépasse le nombre d'échantillons autorisé (le défaut 0 signifie aucune limite), et un test de budget de séries dans la suite de tests de l'exportateur, comme dans le lab 14.1.
+Le projet 5 vous fera écrire et tester avec `promtool` une règle de ce type (`JobStalled`). Seule la série d'association porte le job : elle apparaît et disparaît avec lui, les 25 séries du GPU restent stables. Deux protections complètent la parade : la limite `sample_limit` d'un travail de scrape, qui fait échouer le scrape entier si l'exportateur dépasse le nombre d'échantillons autorisé (le défaut 0 signifie aucune limite), et un test de budget de séries dans la suite de tests de l'exportateur, comme dans le lab 14.1.
 
 ### 3.3. Règles d'enregistrement
 
@@ -376,7 +384,7 @@ Le test `tests/platform.rules.test.yml` fournit cinq rangs du job `j1` à 1,0 s 
 
 Trois particularités du calcul méritent d'être traitées explicitement.
 
-**Les séries de job naissent et meurent.** Quand un job se termine, ses séries ne se mettent plus à jour et deviennent périmées (*stale*). Une alerte « plus de progrès » ne peut donc pas reposer sur l'absence : une série absente ne ressemble pas à une série qui stagne. Il faut deux alertes distinctes, l'une sur la stagnation d'un compteur présent (lab 14.3), l'autre sur la disparition d'un exportateur attendu (`up == 0`, lab 14.2).
+**Les séries de job naissent et meurent.** Quand un job se termine, ses séries ne se mettent plus à jour et deviennent périmées (*stale*). Une alerte « plus de progrès » ne peut donc pas reposer sur l'absence : une série absente ne ressemble pas à une série qui stagne. Il faut deux alertes distinctes, toutes deux dans le lab 14.2 : l'une sur la stagnation d'un compteur présent (`JobNoProgress`), l'autre sur la disparition d'un exportateur attendu (`up == 0`, `GpuTelemetryDown`).
 
 **Les métriques de fin de job.** Pour exposer le code de retour ou la durée d'un job, le collecteur *textfile* de `node_exporter` lit tous les fichiers `*.prom` d'un répertoire. Son README recommande d'écrire dans un fichier temporaire puis de le renommer (`mv`), de façon atomique. Un *epilog* Slurm convient à cet usage. La *Pushgateway*, elle, n'est recommandée par la documentation que pour le résultat d'un traitement par lots **au niveau du service**, sans lien avec une machine ; elle n'oublie jamais une série poussée tant qu'on ne l'efface pas.
 
@@ -416,14 +424,16 @@ Loki indexe des **flux** définis par leurs étiquettes, pas le contenu des lign
 La requête ci-dessus est écrite d'après la syntaxe de LogQL et n'a **pas** été exécutée : il n'y a pas de Loki dans le bac à sable. ELK joue le même rôle avec un autre modèle de coût (index plein texte) ; le critère de choix est le volume et la durée de rétention de vos journaux, à mesurer.
 
 ::: ex
-[Exemple 4.1 — Le volume d'un journal par pas]{.tag} Un job de 1 024 rangs journalise une ligne de 200 octets à chaque pas de 2 s. Débit : $1024 \times 0{,}5 \times 200 = 102\,400$ octets par seconde, soit 8,85 Go par jour pour **un seul job**. Journaliser un pas sur 50, plus chaque événement rare (point de contrôle, évaluation, erreur), le ramène à environ 0,18 Go par jour. Ces chiffres sont arithmétiques (taille de ligne et cadence supposées).
+[Exemple 4.1 — Le volume d'un journal par pas]{.tag} Un job de 1 024 rangs journalise une ligne de 200 octets à chaque pas de 2 s. Débit : $1024 \times 0{,}5 \times 200 = 102\,400$ octets par seconde, soit 8,85 Go par jour pour **un seul job**. Journaliser un pas sur 50, plus chaque événement rare (checkpoint, évaluation, erreur), le ramène à environ 0,18 Go par jour. Ces chiffres sont arithmétiques (taille de ligne et cadence supposées).
 :::
 
 ### 4.2. Localiser un rang fautif
 
+Le [chapitre 8 du module 9](../distributed-training/index.html#ch8) et son lab 9.3 ont localisé un rang bloqué à la main ; ici, on fait de ces signaux des métriques et des alertes.
+
 Le journal le plus précieux d'un blocage est celui des **entrées dans les collectives**. Quand un rang ne rejoint jamais une opération collective (une opération où tous les rangs doivent entrer, comme la somme des gradients, *all-reduce*), tous les autres l'attendent. Il suffit de comparer, rang par rang, le dernier pas où la collective a été **entrée** et celui où elle s'est **terminée** : le rang qui est resté en arrière est le fautif.
 
-C'est le principe du *flight recorder* de PyTorch, que Llama Team décrit comme une fonction qui capture les métadonnées des collectives et les piles dans un tampon circulaire, ce qui permet de diagnostiquer rapidement les blocages. Il s'active par `TORCH_NCCL_TRACE_BUFFER_SIZE` (une valeur positive, 2 000 recommandé selon le tutoriel) et `TORCH_NCCL_DUMP_ON_TIMEOUT`, qui écrit un fichier par rang à l'expiration du délai. Ce délai est, d'après la documentation de PyTorch 2.14, de 10 minutes par défaut avec NCCL et de 30 minutes avec les autres moteurs.
+C'est le principe du *flight recorder* de PyTorch (module 9, § 8.3), qui vide ses enregistrements à l'expiration du délai d'une collective : d'après la documentation de PyTorch 2.14, 10 minutes par défaut avec NCCL et 30 minutes avec les autres moteurs.
 
 ::: ex
 [Exemple 4.2 — Un vrai blocage, localisé par les journaux et par les piles]{.tag} Partie B du lab 14.3, **réelle** mais sur CPU : deux processus `torch.distributed` (moteur `gloo`), le rang 1 s'arrête avant la collective du pas 150 (un `time.sleep` injecté). Un observateur à l'horloge réelle voit le compteur de progression stagner 3 s ; le programme envoie `SIGUSR1` aux deux processus et `faulthandler` écrit leurs piles. Sortie capturée sur la VM du bac à sable, le 24 octobre 2026 :
@@ -445,7 +455,9 @@ Le rang 0 est bloqué dans `all_reduce` ; le rang 1 est dans `time.sleep`. Les j
 
 ### 4.3. Les traces
 
-Dans OpenTelemetry, un *span* représente une unité de travail ou une opération, et les spans forment les traces. Pour un entraînement, un pas se découpe naturellement : chargement des données, calcul avant et arrière, communication, mise à jour, parfois écriture d'un point de contrôle. La trace dit si l'étape lente est le calcul (un traînard), la communication (le réseau) ou les données (le stockage).
+Dans OpenTelemetry, un *span* représente une unité de travail ou une opération, et les spans forment les traces. Pour un entraînement, un pas se découpe naturellement : chargement des données, calcul avant et arrière, communication, mise à jour, parfois écriture d'un checkpoint. La trace dit si l'étape lente est le calcul (un traînard), la communication (le réseau) ou les données (le stockage).
+
+La partie D du lab 14.3 le montre sans collecteur : le SDK OpenTelemetry émet un span par pas et un span enfant par phase, que son exportateur `ConsoleSpanExporter` écrit ligne à ligne dans un fichier. Sur vingt pas aux durées **simulées**, le script retrouve par les liens de parenté que le pas 13 dure 3,25 s au lieu de 1,65 s, dont 1,70 s de chargement des données (médiane : 0,10 s).
 
 L'article MegaScale (Jiang et al., 2024) décrit un outil qui enregistre des événements CUDA à grain fin pour produire une carte de chaleur et une chronologie à l'échelle du système, et des messages de battement de cœur pour la détection d'anomalies en temps réel. Le coût d'une trace systématique est rédhibitoire : 1 024 rangs × 5 spans par pas de 2 s font $2\,560$ spans par seconde, soit 221 millions par jour. **Échantillonnez** : un pas sur cent produit 2,2 millions de spans par jour, et on trace en plus tous les pas plus lents qu'un seuil.
 
@@ -497,6 +509,8 @@ La raison d'attente de Slurm (`Priority`, `Resources`, `JobHeldUser`, `Dependenc
 
 Le regroupement est un choix de ce cours ; les raisons sont celles de Slurm. Son intérêt est de distinguer ce qui pèse sur le SLO de la plateforme (`capacity`) de ce qui n'y pèse pas (`user`).
 
+Deux classes s'ajoutent hors de ce tableau. Un job en cours n'a pas de raison d'attente : il porte la classe `none`. Pour un nœud drainé ou en panne, `slurm_node_drain_info` classe la raison de drainage d'après le préfixe convenu au module 5 : `health`, `maintenance` ou `other`.
+
 ::: ex
 [Exemple 5.1 — La file vue par l'exportateur, sur un vrai Slurm]{.tag} Sur le bac à sable (Slurm 23.11.4, 4 CPU), cinq jobs de 3 CPU se disputent le nœud, qui est ensuite drainé avec la raison `health: gpu_xid:79`. Sortie réelle de `exporter.py` en mode direct, le 24 octobre 2026 (la partie GPU, elle, provient de la fixture simulée) :
 
@@ -523,7 +537,7 @@ Le délai d'attente d'un job est la différence entre son démarrage et sa soumi
 
 Pour une file réelle, la soumission est un mauvais départ : un job retenu par son propriétaire ou en attente d'une dépendance semble attendre des heures sans que la plateforme y soit pour rien. Le champ `Eligible` de `sacct` (début de l'éligibilité) est plus juste ; le lab utilise `Submit` pour rester simple, et cette limite est à lever en production.
 
-Pour le quantile $\phi$ de $N$ jobs, `histogram_quantile` vise le rang $r = \phi N$, prend le premier seau $i$ dont le décompte cumulé $c_i$ atteint ce rang, puis interpole linéairement dans ce seau, comme si ses observations y étaient réparties uniformément :
+Pour le quantile $\phi$ de $n$ jobs, `histogram_quantile` vise le rang $r = \phi n$, prend le premier seau $i$ dont le décompte cumulé $c_i$ atteint ce rang, puis interpole linéairement dans ce seau, comme si ses observations y étaient réparties uniformément :
 
 $$q = b_{i-1} + (b_i - b_{i-1})\,\frac{r - c_{i-1}}{c_i - c_{i-1}}$$
 
@@ -563,11 +577,11 @@ Le budget d'erreur change la conversation : tant qu'il en reste, on peut prendre
 
 ### 6.2. Trois SLI pour une plateforme GPU
 
-1.  **Disponibilité de la capacité** : GPU-heures utilisables sur GPU-heures totales. Un nœud drainé ou en panne retire sa capacité. Source : `slurm_nodes` et `slurm_cpus` du chapitre 5. Décidez à l'avance si la maintenance planifiée compte comme une indisponibilité.
+1.  **Disponibilité de la capacité** : GPU-heures utilisables sur GPU-heures totales. Un nœud drainé ou en panne retire sa capacité. Source : l'état des nœuds (`slurm_nodes`, chapitre 5), pondéré par leur nombre de GPU, que Slurm déclare comme GRES (module 5) ; le lab 14.1 ne compte que les CPU (`slurm_cpus`). Décidez à l'avance si la maintenance planifiée compte comme une indisponibilité.
 2.  **Délai d'attente** : part des jobs dont l'attente imputable à la plateforme (classe `capacity`, depuis l'éligibilité) est sous un seuil, par QOS. Un seuil de 10 minutes pour la QOS normale et de quelques secondes pour une QOS urgente sont des exemples ; ils découlent de vos engagements.
 3.  **Goodput** : part du temps alloué qui produit des pas d'entraînement utiles (6.4).
 
-Les cibles chiffrées (95 %, 98 %) sont des **choix** de ce parcours pour les exemples, pas des normes.
+Les cibles chiffrées (95 %, 99 %, 99,5 %) sont des **choix** de ce parcours pour les exemples, pas des normes.
 
 ### 6.3. Des alertes qui réveillent pour de bonnes raisons
 
@@ -606,7 +620,9 @@ Les alertes n'ont volontairement **pas** de `for` : le Workbook déconseille les
 :::
 
 ::: note
-[Alertmanager : grouper plutôt que multiplier]{.tag} Quand un rack perd son refroidissement, des dizaines d'alertes `GPUHot` partent en même temps. Alertmanager déduplique, groupe et route les alertes, et gère les silences et les inhibitions. Groupez par nom d'alerte et par une étiquette de domaine de panne (rack, commutateur). Sa documentation précise que si une alerte est résolue avant la fin de `group_wait`, aucune notification n'est envoyée pour elle, ce qui réduit le bruit des alertes instables. Cette configuration n'est pas exécutée dans le bac à sable.
+[Alertmanager : grouper plutôt que multiplier]{.tag} Quand un rack perd son refroidissement, des dizaines d'alertes `GPUHot` partent en même temps (lab 14.2 : plus de 85 °C pendant 5 minutes, seuil illustratif). Alertmanager déduplique, groupe et route les alertes, et gère les silences et les inhibitions. Groupez par nom d'alerte et par une étiquette de domaine de panne (rack, commutateur). Sa documentation précise que si une alerte est résolue avant la fin de `group_wait`, aucune notification n'est envoyée pour elle, ce qui réduit le bruit des alertes instables. Cette configuration n'est pas exécutée dans le bac à sable.
+
+La règle `GPUHot` porte aussi `keep_firing_for: 10m`. Selon la documentation de Prometheus, l'alerte reste alors active 10 minutes après la dernière évaluation où sa condition tenait, contre les alertes qui oscillent et les fausses résolutions. Le test du lab le vérifie : le GPU refroidit à la 20e minute, l'alerte est encore active à la 25e et résolue à la 32e.
 :::
 
 ### 6.4. Le goodput
@@ -615,14 +631,14 @@ Les alertes n'ont volontairement **pas** de `for` : le Workbook déconseille les
 [Goodput et ETTR]{.tag} Le rapport technique de Llama 3 définit le temps d'entraînement effectif comme le temps passé en entraînement utile sur le temps écoulé, et rapporte plus de 90 % tout en acceptant des maintenances automatisées. Kokolis et al. (2024) définissent l'*Effective Training Time Ratio* (ETTR) comme le rapport entre le temps d'exécution productif et le temps réel disponible d'une exécution, et le goodput comme la quantité de travail productif accompli par unité de temps, à l'échelle d'une grappe. Dans ce module, « goodput » désigne par commodité le rapport par job (proche de l'ETTR).
 :::
 
-Pour piloter une plateforme, il faut décomposer ce rapport en pertes que l'on sait nommer. Pour un job qui s'arrête en moyenne toutes les $M$ secondes, qui écrit un point de contrôle toutes les $\tau$ secondes pour un coût $\delta$, et dont chaque panne coûte une détection $d$, un redémarrage $R$ et la moitié d'un intervalle de travail refait :
+Pour piloter une plateforme, il faut décomposer ce rapport en pertes que l'on sait nommer. Pour un job qui s'arrête en moyenne toutes les $M$ secondes, qui écrit un checkpoint toutes les $\tau$ secondes pour un coût $\delta$, et dont chaque panne coûte une détection $d$, un redémarrage $R$ et la moitié d'un intervalle de travail refait :
 
 $$G = 1 - \frac{\delta}{\tau} - \frac{d + R + \tau/2}{M}$$
 
 ::: ex
 [Exemple 6.2 — Un job de sept jours, 256 GPU]{.tag} Paramètres **supposés** pour l'exemple : $M = 12$ h, $\tau = 30$ min, $\delta = 60$ s, $R = 10$ min, 30 % des pannes sont des blocages détectés après $d$ secondes, les autres des plantages vus en 30 s. Avec une détection des blocages par le seul délai NCCL ($d = 600$ s, documenté) :
 
-Le coût des points de contrôle est $\delta/\tau = 3{,}33\ \%$. La perte moyenne par panne est :
+Le coût des checkpoints est $\delta/\tau = 3{,}33\ \%$. La perte moyenne par panne est :
 
 $$0{,}3 \times (600 + 600 + 900) + 0{,}7 \times (30 + 600 + 900) = 1\,701\ \text{s}$$
 
@@ -650,9 +666,9 @@ Avec un détecteur à phase déclarée à 246 s (lab 14.3, valeur **simulée**),
 <text x="460.0" y="147" font-size="12" fill="currentColor">travail refait : 2.08 %</text>
 <text x="20" y="20" font-size="12" fill="currentColor">100 % du temps alloué</text>
 </svg>
-<figcaption>Budget de temps d'un job hypothétique (paramètres de l'exemple 6.2, tous supposés sauf le calcul). Le goodput est la part verte.</figcaption>
+<figcaption>Budget de temps d'un job hypothétique (paramètres de l'exemple 6.2, tous supposés sauf le calcul). Le goodput est le grand segment coloré, à gauche.</figcaption>
 </figure>
-L'intervalle de point de contrôle voisin de l'optimum de Young et Daly, $\sqrt{2\delta M} = 2\,277$ s soit 38 minutes, donnerait un résultat très proche : voir le [projet 3](../../projects/resilient-trainer/index.html) et le [module 10](../fault-tolerance/index.html).
+L'intervalle de checkpoint voisin de l'optimum de Young et Daly, $\sqrt{2\delta M} = 2\,277$ s soit 38 minutes, donnerait un résultat très proche : voir le [projet 3](../../projects/resilient-trainer/index.html) et le [module 10](../fault-tolerance/index.html).
 :::
 
 ::: recap
@@ -670,6 +686,8 @@ Les pannes bruyantes se détectent toutes seules : un processus qui meurt, un n�
 
 ### 7.1. Une typologie
 
+Le [module 10, chapitre 5](../fault-tolerance/index.html#ch5) a posé les symptômes (crash, blocage, lenteur, silence) et la pulsation placée dans la boucle ; ce chapitre les traduit en métriques, en alertes et en coût de détection.
+
 | Panne | Signature visible | Piège |
 |---|---|---|
 | Blocage d'une collective | le compteur de pas stagne ; l'utilisation GPU peut rester haute | un seuil sur l'utilisation ne voit rien |
@@ -679,7 +697,7 @@ Les pannes bruyantes se détectent toutes seules : un processus qui meurt, un n�
 | Corruption silencieuse | résultat faux sans erreur | indétectable par les métriques d'état |
 
 ::: war
-[Ce que la production rapporte]{.tag} Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a recensé 466 interruptions de job, dont 47 planifiées et 419 imprévues ; environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou suspectés (pannes de GPU ou de composants, corruption silencieuse de données…), les GPU représentant 58,7 % de toutes les causes imprévues.
+[Ce que la production rapporte]{.tag} Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a recensé 466 interruptions de job, dont 47 planifiées et 419 imprévues ; environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou suspectés (pannes de GPU ou de composants, corruption silencieuse de données…), les GPU représentant 268 des 419 interruptions imprévues (64 % recalculé à partir des comptes du tableau 5 ; le texte de l'article dit 58,7 %, voir le [module 10, § 1.3](../fault-tolerance/index.html#ch1)).
 
 Le rapport décrit aussi les traînards : « Sometimes, hardware issues may cause still-functioning but slow stragglers that are hard to detect. Even a single straggler can slow down thousands of other GPUs, often appearing as functioning but slow communications. » Source : [Dubey et al., *The Llama 3 Herd of Models*, section 3.3.4](https://arxiv.org/abs/2407.21783).
 :::
@@ -688,10 +706,10 @@ Le rapport décrit aussi les traînards : « Sometimes, hardware issues may caus
 
 La seule preuve qu'un entraînement avance est que son compteur de pas augmente. L'utilisation GPU, la puissance et l'activité tensorielle sont des indices ; le pas est la preuve. Deux détecteurs sont à distinguer :
 
--   la **vivacité** (*heartbeat*) : le processus répond encore. Elle détecte un plantage, pas un blocage, car le fil d'exécution qui émet le signal continue de tourner pendant qu'une collective est bloquée ;
--   le **progrès** : un compteur de pas, avec une fenêtre de stagnation.
+-   la **vivacité** (*heartbeat*, signal de vie émis par un fil séparé) : le processus répond encore. Elle détecte un plantage, pas un blocage, car le fil d'exécution qui émet le signal continue de tourner pendant qu'une collective est bloquée ;
+-   le **progrès** : un compteur de pas, avec une fenêtre de stagnation ; c'est la « pulsation » du [module 10, § 5.3](../fault-tolerance/index.html#les-pulsations), émise dans la boucle principale.
 
-Le progrès a un défaut : l'entraînement s'arrête légitimement. Un point de contrôle, une évaluation, un blocage de données mettent le compteur à l'arrêt. Une fenêtre plus courte que la plus longue pause légitime déclenche de fausses alarmes ; plus longue, elle retarde la détection. Toute la difficulté est de choisir cette fenêtre en connaissance des pauses.
+Le progrès a un défaut : l'entraînement s'arrête légitimement. Un checkpoint, une évaluation, un blocage de données mettent le compteur à l'arrêt. Une fenêtre plus courte que la plus longue pause légitime déclenche de fausses alarmes ; plus longue, elle retarde la détection. Toute la difficulté est de choisir cette fenêtre en connaissance des pauses.
 
 L'astuce du lab 14.3 est que l'entraîneur **déclare sa phase** (`train`, `ckpt`, `eval`) : chaque phase reçoit alors sa propre tolérance, et la fenêtre de stagnation ne s'applique qu'à la phase d'entraînement.
 
@@ -773,7 +791,7 @@ La phase déclarée donne zéro fausse alarme dès 246 s : la détection est env
 Zéro fausse alarme sur 900 heures de runs sains ne prouve pas que le taux soit nul : la règle des trois donne une borne supérieure d'environ $3/900 = 0{,}0033$ par heure à 95 %. Pour estimer un taux plus bas il faut plus d'heures, donc plus de runs : mesurez sur la production, pas seulement en simulation.
 
 ::: ex
-[Exemple 7.2 — Ce que coûte le délai]{.tag} Un blocage détecté en 600 s plutôt qu'en 246 s sur un job de 512 GPU gaspille $(600 - 246)/3600 \times 512 = 50{,}3$ GPU-heures de plus par incident. À l'inverse, une fausse alarme qui tue un job de 256 GPU et lui fait perdre en moyenne un quart d'heure de travail coûte $0{,}25 \times 256 = 64$ GPU-heures. La bonne fenêtre minimise la somme des deux, pondérée par la fréquence des blocages réels : voir l'exercice 6.
+[Exemple 7.2 — Ce que coûte le délai]{.tag} Un blocage détecté en 600 s plutôt qu'en 246 s sur un job de 512 GPU gaspille $(600 - 246)/3600 \times 512 = 50{,}3$ GPU-heures de plus par incident. À l'inverse, une fausse alarme qui tue un job de 256 GPU et lui fait perdre en moyenne un quart d'heure de travail coûte $0{,}25 \times 256 = 64$ GPU-heures. La bonne fenêtre minimise la somme des deux, pondérée par la fréquence des blocages réels : voir l'exercice 8.
 :::
 
 ### 7.3. Les traînards : mesurer le calcul, pas l'étape
@@ -808,13 +826,23 @@ Une précaution : le rapport de Llama 3 note une variation diurne de 1 à 2 % du
 
 ### 7.5. Tests de santé continus
 
-Les métriques disent l'état passé ; un test de santé **provoque** l'erreur avant le job. DCGM fournit des diagnostics à trois niveaux (`dcgmi diag -r 1`, `-r 2`, `-r 3`) dont les durées documentées sont de l'ordre de la seconde, de 2 minutes et de 15 minutes ; la documentation réserve les niveaux moyen et long aux cas où un job a échoué ou un GPU est suspect, et à l'investigation de problèmes matériels. Le niveau court convient à un épilogue Slurm (module [5](../slurm/index.html)).
+Les métriques disent l'état passé ; un test de santé **provoque** l'erreur avant le job. DCGM fournit quatre niveaux de diagnostic (`dcgmi diag -r 1` à `-r 4`, chacun incluant les précédents ; la page *Feature Overview* n'en décrit que trois). Sur des systèmes Hopper, la documentation de *DCGM Diagnostics* annonce moins de 2,5 s pour le niveau 1, moins de 2,5 min sur 4 GPU et 10,5 min sur 8 GPU pour le niveau 2, et, sur 8 GPU, moins de 35 min pour le niveau 3 et 2,25 h pour le niveau 4 ([module 6, chapitre 6](../provisioning/index.html#ch6)).
+
+Elle destine le niveau 1 à la vérification avant un job, le niveau 2 à l'épilogue après une panne, les niveaux 3 et 4 à l'analyse par un administrateur. Le niveau 1 tient donc dans un prologue Slurm ; le niveau 2, dans un épilogue déclenché après un échec ([module 5](../slurm/index.html)).
 
 ::: war
 [Des vérifications de santé périodiques, calibrées]{.tag} Kokolis et al. (2024) décrivent, sur deux grappes de recherche à A100, des vérifications de santé exécutées toutes les cinq minutes sur chaque nœud, avec des codes de retour succès, échec ou avertissement, allant des erreurs XID aux points de montage manquants. Ils les calibrent de sorte que moins de 1 % des jobs terminés avec succès aient vu une vérification échouer, et un nœud qui échoue passe en remédiation et n'est plus ordonnancé. Source : [arXiv:2410.21680](https://arxiv.org/abs/2410.21680), section sur les vérifications de santé.
 :::
 
-La conception recommandée est stratifiée : des vérifications **bon marché et fréquentes** (XID, ECC, fréquences, erreurs PCIe et NVLink) toutes les quelques minutes ; un diagnostic de niveau 1 ou 2 à l'épilogue de chaque job ; un diagnostic complet à la mise en service et après une réparation. Un nœud qui échoue est drainé avec une raison au préfixe convenu (`health:`, module 5) ; seules les raisons que le contrôle sait clore sans ambiguïté sont remises en service automatiquement.
+La conception recommandée est stratifiée : des vérifications **bon marché et fréquentes** (XID, ECC, fréquences, erreurs PCIe et NVLink) toutes les quelques minutes ; un diagnostic de niveau 1 au prologue de chaque job et de niveau 2 à l'épilogue d'un job en échec ; un diagnostic long (niveau 3 ou 4) à la mise en service et après une réparation. Un nœud qui échoue est drainé avec une raison au préfixe convenu (`health:`, module 5) ; seules les raisons que le contrôle sait clore sans ambiguïté sont remises en service automatiquement.
+
+### 7.6. Les compteurs du réseau
+
+Le rapport de Llama 3 cité au § 7.1 note que les traînards apparaissent souvent comme des communications lentes : le réseau a lui aussi ses pannes silencieuses. Le collecteur `infiniband` de `node_exporter`, actif par défaut sous Linux, lit les compteurs des ports dans `/sys/class/infiniband` et les expose avec les étiquettes `device` et `port`.
+
+Trois compteurs servent d'abord, d'après les descriptions du code source du collecteur : `node_infiniband_symbol_error_total` (erreurs mineures sur une voie physique), `node_infiniband_link_downed_total` (lien tombé faute d'avoir récupéré d'une erreur) et `node_infiniband_port_transmit_wait_total` (ticks où le port avait des données à émettre sans rien envoyer).
+
+Ce sont des compteurs : `increase(node_infiniband_link_downed_total[10m]) > 0` signale un lien retombé dans les dix dernières minutes. Ce module ne fixe pas de seuil pour les erreurs de symbole ou l'attente d'émission ; leur sens et leur lecture (`perfquery`, `rdma statistic`) sont au [module 7, chapitre 8](../networking/index.html#ch8). **Non vérifié** : le bac à sable n'a pas de carte InfiniBand.
 
 ::: recap
 Points clés — chapitre 7
@@ -824,6 +852,8 @@ Points clés — chapitre 7
 -   La fenêtre de stagnation arbitre fausses alarmes et délai : mesurez vos pauses et placez-la au-dessus de leur queue.
 -   Un traînard se mesure par le temps de calcul local, rapporté à la médiane du job.
 -   Les dérives de quelques pour cent demandent un CUSUM réglé sur votre bruit ; les vérifications de santé se calibrent sur le taux de fausses alarmes.
+-   DCGM a quatre niveaux de diagnostic : le 1 au prologue, le 2 à l'épilogue d'un échec, les 3 et 4 pour l'enquête.
+-   Le réseau se surveille par l'`increase` de ses compteurs de ports (collecteur `infiniband` de `node_exporter`) ; leur sens est au module 7.
 :::
 
 ## 8. Suivi d'expériences et reproductibilité {#ch8}
@@ -891,7 +921,9 @@ Points clés — chapitre 8
 
 ## Labs {#labs}
 
-Les trois labs s'exécutent sans GPU dans une VM Linux (testés sur 4 vCPU, 16 Go). Prérequis communs : `promtool` (`sudo apt-get install prometheus`, version 2.45.3 testée) et un Python avec `prometheus_client`, `pytest`, `pyyaml`, `torch` (version CPU) ; la partie C du lab 14.3 demande aussi `mlflow-skinny`, `sqlalchemy` et `alembic`. Chaque `verify.sh` respecte `${PYTHON:-python3}` et n'affirme rien sur une durée mesurée : la machine peut être partagée.
+Les trois labs s'exécutent sans GPU dans une VM Linux (testés sur 4 vCPU, 16 Go). Prérequis communs : `promtool` (`sudo apt-get install prometheus`, version 2.45.3 testée) et un Python avec `prometheus_client`, `pytest`, `pyyaml`, `torch` (version CPU) ; la partie C du lab 14.3 demande aussi `mlflow-skinny`, `sqlalchemy` et `alembic`, et sa partie D `opentelemetry-sdk` (1.45.1 testée).
+
+Chaque `verify.sh` respecte `${PYTHON:-python3}` et n'affirme rien sur une durée mesurée : la machine peut être partagée. Les labs ont été testés avec `promtool` 2.45.3 (Ubuntu 24.04), alors que la documentation citée est celle de la branche 3.x, dont la page *latest* contient le [guide de migration vers Prometheus 3.0](https://prometheus.io/docs/prometheus/latest/migration/) : vérifiez vos règles avec le `promtool` de la version de votre serveur.
 
 ### Lab 14.1 — Un exportateur de métriques de nœud testé {#lab-14-1}
 
@@ -904,7 +936,7 @@ Les trois labs s'exécutent sans GPU dans une VM Linux (testés sur 4 vCPU, 16 G
 1.  Lisez `labs/observability/gpu-metrics-exporter/exporter.py` : repérez les trois collecteurs, `reason_class`, et le fait qu'une source en échec ne produit **aucune** valeur et `*_scrape_success 0`.
 2.  Lancez `python3 exporter.py --fixtures fixtures --once` et retrouvez les trois pannes plantées dans les métriques `gpu_node_*`.
 3.  Lancez `bash verify.sh` : 14 tests, 6 mutants à tuer, `promtool check metrics`, un scrape HTTP réel.
-4.  Ajoutez un septième mutant à `mutants.py` (par exemple, ne plus dédoublonner les identifiants de job) et vérifiez qu'il est tué ; sinon, écrivez le test qui manque.
+4.  Ajoutez un septième mutant à `mutants.py` (par exemple, classer en `other` les raisons de drainage préfixées par `health:`) et vérifiez qu'il est tué ; sinon, écrivez le test qui manque.
 5.  Avec le Slurm du module 5 démarré (`labs/slurm/slurm-sandbox/setup.sh`), lancez `LIVE_SLURM=1 bash verify.sh` pour la branche en direct, puis `teardown.sh`.
 
 **Critère de réussite.** `bash verify.sh` affiche `OK mutants: 6/6 killed` puis `OK gpu-metrics-exporter` (sortie de l'auteur : `14 passed`, `slurm_job_wait_seconds_count{qos="normal"} 6.0`). La branche en direct a été exécutée une fois par l'auteur : `slurm_scrape_success 1.0` et `slurm_nodes{partition="debug",state="mixed"} 1.0`. **Non vérifié** : la lecture d'un vrai dcgm-exporter sur GPU.
@@ -923,29 +955,32 @@ Les trois labs s'exécutent sans GPU dans une VM Linux (testés sur 4 vCPU, 16 G
 1.  Lisez `labs/observability/alert-rules/rules/platform.rules.yml` et `runbooks/` : chaque alerte a une sévérité, un résumé et un runbook.
 2.  Lancez `python3 gen_rules.py --table` puis `python3 gen_rules.py --check` : les règles et les tests de SLO sont générés par un même modèle.
 3.  Lisez `tests/platform.rules.test.yml` : pour chaque alerte, repérez le cas qui se déclenche et le cas silencieux, avec des instants d'évaluation de part et d'autre de `for`.
-4.  Lancez `bash verify.sh` (environ une minute) : `promtool check rules`, lint de politique (il doit **rejeter** `tests/bad.rules.yml`), deux suites de tests, puis 12 mutants.
+4.  Lancez `bash verify.sh` (environ une minute) : `promtool check rules`, lint de politique (il doit **rejeter** `tests/bad.rules.yml`), trois suites de tests et le corrigé de l'exercice 11 (`exercises/`), puis 12 mutants.
 5.  Changez le SLO de 95 % à 99 % dans `gen_rules.py`, régénérez, et relisez la table : que deviennent les seuils et les minutes de déclenchement ?
 
 **Critère de réussite.** `bash verify.sh` affiche `OK mutants: 12/12 killed` puis `OK alert-rules`. Si un mutant survit, c'est qu'un test manque : écrivez-le.
 
-**Pour aller plus loin.** Écrivez `JobStuckPending` sur `slurm_pending_oldest_age_seconds{reason_class="capacity"}` et testez-la avec ses mutants ; ajoutez au lint une vérification que toute alerte `page` est atteignable depuis un SLO.
+**Pour aller plus loin.** Écrivez `JobStuckPending` sur `slurm_pending_oldest_age_seconds{reason_class="capacity"}` et testez-la avec ses mutants ; ajoutez au lint une vérification que toute alerte `page` est atteignable depuis un SLO. Écrivez `IBLinkDowned` sur `increase(node_infiniband_link_downed_total[10m]) > 0` (§ 7.6) et testez-la sur des séries synthétiques.
 :::
 
 ### Lab 14.3 — Détecteur de job bloqué {#lab-14-3}
 
 ::: lab
 
-**Objectif.** Mesurer le compromis fausses alarmes et délai de plusieurs détecteurs de blocage sur séries simulées, observer un **vrai** blocage de collective sur CPU, puis séparer une régression du système d'une régression du modèle. **Durée.** 3.5 h. **Prérequis matériels.** Un portable CPU avec `torch` ; 2 cœurs libres suffisent.
+**Objectif.** Mesurer le compromis fausses alarmes et délai de plusieurs détecteurs de blocage sur séries simulées, observer un **vrai** blocage de collective sur CPU, séparer une régression du système d'une régression du modèle, puis tracer un pas avec OpenTelemetry. **Durée.** 3.5 h. **Prérequis matériels.** Un portable CPU avec `torch` ; 2 cœurs libres suffisent.
 
-**Ce qui est simulé, ce qui est réel.** Partie A : séries **simulées**, pauses et signature de blocage **supposées** (`sim.py`). Partie B : processus, `gloo`, collective bloquée et piles **réels**, mais sur CPU et avec un blocage injecté ; ce n'est pas NCCL. Partie C : trois runs **simulés** enregistrés par l'API réelle de MLflow.
+**Ce qui est simulé, ce qui est réel.** Partie A : séries **simulées**, pauses et signature de blocage **supposées** (`sim.py`). Partie B : processus, `gloo`, collective bloquée et piles **réels**, mais sur CPU et avec un blocage injecté ; ce n'est pas NCCL. Partie C : trois runs **simulés** enregistrés par l'API réelle de MLflow. Partie D : durées de phases **simulées**, spans réels du SDK OpenTelemetry écrits dans un fichier, sans collecteur.
 
 1.  Partie A : lisez `sim.py` (les hypothèses en tête de fichier) puis `detectors.py`, et lancez `python3 evaluate.py`. Retrouvez le tableau de l'exemple 7.1.
 2.  Modifiez une hypothèse (par exemple, des checkpoints jusqu'à 900 s) et relancez : quels détecteurs cassent ? Quelle fenêtre faut-il ?
 3.  Partie B : lisez `real_hang.py`, puis lancez `python3 real_hang.py`. Identifiez le rang fautif de deux façons : la pile et les journaux.
 4.  Partie C : lancez `python3 regress.py` et relisez les deux verdicts de l'exemple 8.1.
-5.  Lancez `bash verify.sh` (environ 30 secondes de calcul).
+5.  Partie D : lancez `python3 trace_steps.py` et retrouvez le pas lent et sa phase (§ 4.3).
+6.  Lancez `bash verify.sh` (environ 30 secondes de calcul).
 
-**Critère de réussite.** `bash verify.sh` affiche `OK real-hang: localized rank 1 at step 150`, `OK part C: both regressions classified correctly` puis `OK hang-detector`. Aucune assertion ne porte sur une durée mesurée : seule la présence de l'alarme et la désignation du rang comptent.
+**Critère de réussite.** `bash verify.sh` affiche `OK real-hang: localized rank 1 at step 150`, `OK part C: both regressions classified correctly`, `OK part D: step 13 is slow because of data` puis `OK hang-detector`. Aucune assertion ne porte sur une durée mesurée : seule la présence de l'alarme et la désignation du rang comptent.
+
+Sans MLflow ou sans le SDK OpenTelemetry, la partie concernée est sautée et `verify.sh` affiche `PARTIAL hang-detector` : le lab n'est alors validé qu'en partie (`STRICT=1 bash verify.sh` échoue dans ce cas).
 
 **Pour aller plus loin.** Sur un nœud GPU, activez le flight recorder de PyTorch (`TORCH_NCCL_TRACE_BUFFER_SIZE`, `TORCH_NCCL_DUMP_ON_TIMEOUT`) sur un job de test dont vous bloquez un rang, et comparez son verdict à celui de la partie B. Mesurez l'utilisation GPU pendant ce blocage : c'est la validation que ce module n'a pas pu faire.
 :::
@@ -1041,17 +1076,17 @@ Pour les deux jeux, la part sous 600 s est exacte (65 %), car 600 est une borne.
 :::
 
 ::: exo
-[Exercice 7 · ★★ — Le déluge de 3 h 10]{.tag} Chaque nuit à 3 h 10, l'alerte `JobNoProgress` (compteur de pas immobile sur une fenêtre de 10 minutes, `for: 2m`) page l'astreinte pour quatre jobs, puis se résout seule deux minutes plus tard. Un instantané du système de fichiers est lancé à 3 h 00 ; les points de contrôle de ces jobs durent alors 14 minutes. Expliquez le déclenchement par un calcul, proposez deux corrections et leur prix.
+[Exercice 7 · ★★ — Le déluge de 3 h 10]{.tag} Chaque nuit à 3 h 10, l'alerte `JobNoProgress` (compteur de pas immobile sur une fenêtre de 10 minutes, `for: 2m`) page l'astreinte pour quatre jobs, puis se résout seule deux minutes plus tard. Un instantané du système de fichiers est lancé à 3 h 00 ; les checkpoints de ces jobs durent alors 14 minutes. Expliquez le déclenchement par un calcul, proposez deux corrections et leur prix.
 :::
 
 ::: sol
-Quand le pas s'arrête à l'instant $t_0$, la fenêtre de 10 minutes ne contient plus aucun pas à partir de $t_0 + 10$ min ; avec `for: 2m`, l'alerte se déclenche à $t_0 + 12$ min. Les points de contrôle durent 14 minutes : l'alerte est active de $t_0 + 12$ à $t_0 + 14$ min, soit environ **deux minutes**, ce que montre le cas « faux positif connu » de `tests/platform.rules.test.yml` (`promtool test rules`, `SUCCESS` : silence à 21 min, alerte à 33 min pour une pause qui commence à 20 min).
+Quand le pas s'arrête à l'instant $t_0$, la fenêtre de 10 minutes ne contient plus aucun pas à partir de $t_0 + 10$ min ; avec `for: 2m`, l'alerte se déclenche à $t_0 + 12$ min. Les checkpoints durent 14 minutes : l'alerte est active de $t_0 + 12$ à $t_0 + 14$ min, soit environ **deux minutes**, ce que montre le cas « faux positif connu » de `tests/platform.rules.test.yml` (`promtool test rules`, `SUCCESS` : silence à 21 min, alerte à 33 min pour une pause qui commence à 20 min).
 
 **Correction 1 : élargir la fenêtre.** Avec 15 minutes, la même pause de 14 minutes ne déclenche plus rien (vérifié avec `promtool` sur une copie de la règle). Prix : tout vrai blocage est détecté 5 minutes plus tard, soit pour 512 GPU $5/60 \times 512 = 42{,}7$ GPU-heures de plus par incident.
 
-**Correction 2 : déclarer la phase.** L'entraîneur publie `train_phase` ; la règle de stagnation ne s'applique qu'en phase d'entraînement, la phase de point de contrôle a sa propre tolérance (lab 14.3). Prix : un contrat de plus avec l'équipe d'entraînement.
+**Correction 2 : déclarer la phase.** L'entraîneur publie `train_phase` ; la règle de stagnation ne s'applique qu'en phase d'entraînement, la phase de checkpoint a sa propre tolérance (lab 14.3). Prix : un contrat de plus avec l'équipe d'entraînement.
 
-Et surtout, un point de contrôle de 14 minutes est lui-même un problème (l'instantané qui le ralentit) : l'alerte vient de le révéler.
+Et surtout, un checkpoint de 14 minutes est lui-même un problème (l'instantané qui le ralentit) : l'alerte vient de le révéler.
 :::
 
 ::: exo
@@ -1093,7 +1128,7 @@ Les fausses alarmes dominent tout : avec le compteur seul à 120 s, elles coûte
 
 **Jointure.** Pas d'étiquette `job` sur les 51 200 séries GPU : une série d'association `slurm_job_gpu_allocated` (modèle du projet 5), alimentée par un prolog Slurm ou l'option de correspondance de dcgm-exporter (format à relire).
 
-**Alertes de page (cinq).** `JobNoProgress` à phase déclarée ; vitesse de consommation rapide du SLO d'attente ; vitesse rapide du SLO de capacité ; XID critique (79, 95) sur un GPU alloué ; télémétrie GPU absente sur plus de 5 % des nœuds. Tout le reste en ticket : `GPUHot`, `NodeSlow`, vitesses lentes.
+**Alertes de page (six).** `JobNoProgress` à phase déclarée ; vitesses de consommation rapide et lente du SLO d'attente, comme au lab 14.2 ; vitesse rapide du SLO de capacité ; XID critique (79, 95) sur un GPU alloué ; télémétrie GPU absente sur plus de 5 % des nœuds. Tout le reste en ticket : `GPUHot`, `NodeSlow`, les tickets à 3 jours, et la vitesse lente du SLO de capacité, traitée en heures ouvrées pour tenir la limite de six pages.
 
 **SLO.** Capacité utilisable 99,5 % (budget de 3,6 h sur 720 h) ; attente sous 10 min pour 95 % des jobs de QOS normale (hors classes `user` et `admin`) ; goodput suivi, sans engagement tant que vous ne l'avez pas mesuré.
 
@@ -1101,7 +1136,7 @@ Les fausses alarmes dominent tout : avec le compteur seul à 120 s, elles coûte
 :::
 
 ::: exo
-[Exercice 10 · ★★★ — Une courbe qui casse au pas 6 000]{.tag} Un entraînement de 512 GPU, repris depuis un point de contrôle au pas 5 990 après le remplacement d'un nœud, montre à partir du pas 6 000 : débit en baisse de 12 % ; perte à pas égal supérieure de 0,4 à celle d'un run de référence de même configuration ; fréquence SM minimale en baisse de 3 %. Appliquez la règle du chapitre 8, dites ce que la fréquence explique, et proposez une enquête en trois temps avec les preuves attendues.
+[Exercice 10 · ★★★ — Une courbe qui casse au pas 6 000]{.tag} Un entraînement de 512 GPU, repris depuis un checkpoint au pas 5 990 après le remplacement d'un nœud, montre à partir du pas 6 000 : débit en baisse de 12 % ; perte à pas égal supérieure de 0,4 à celle d'un run de référence de même configuration ; fréquence SM minimale en baisse de 3 %. Appliquez la règle du chapitre 8, dites ce que la fréquence explique, et proposez une enquête en trois temps avec les preuves attendues.
 :::
 
 ::: sol
@@ -1113,9 +1148,21 @@ Les fausses alarmes dominent tout : avec le compteur seul à 120 s, elles coûte
 
 1.  *Débit* : comparer le placement avant et après le remplacement (le nouveau nœud est-il sur un autre commutateur ?), le temps de calcul local par rang (`train_compute_seconds`, lab 14.2) et le temps de communication. Preuve : un rang ou un groupe de rangs dont le calcul ou la communication diffère.
 2.  *Perte* : un redémarrage correct restaure l'optimiseur, l'ordonnanceur de taux d'apprentissage, l'état de l'aléa et la position du chargeur de données. Relire dans MLflow le taux d'apprentissage enregistré avant et après le pas 5 990 et vérifier que les données ne sont pas rejouées. Preuve : une courbe de taux d'apprentissage continue, ou la cause trouvée.
-3.  *Contre-épreuve* : relancer depuis le même point de contrôle sur le placement d'origine. Si le débit revient, c'est le placement ; si la perte reste décalée, c'est la reprise.
+3.  *Contre-épreuve* : relancer depuis le même checkpoint sur le placement d'origine. Si le débit revient, c'est le placement ; si la perte reste décalée, c'est la reprise.
 
 Un enregistrement de run qui contient le job Slurm, la liste des nœuds et le commit permet de faire cette enquête en une heure, pas en une semaine.
+:::
+
+::: exo
+[Exercice 11 · ★★ — Une alerte pour une flotte mixte]{.tag} Une flotte ajoute des nœuds AMD supervisés par l'AMD Device Metrics Exporter (§ 2.5). Réécrivez la règle du § 3.2 (activité tensorielle moyenne d'un job sous 0,05) pour qu'elle couvre les deux fournisseurs. Le job `j1` occupe un GPU NVIDIA dont l'activité tensorielle vaut 0 et le GPU 0 du nœud AMD `a01`, qui publie `gpu_prof_tensor_active_percent{hostname="a01", gpu_id="0"} 2`. Que donne la règle avec et sans conversion d'unité ? Quels GPU AMD la règle ne couvre-t-elle pas ?
+:::
+
+::: sol
+Il faut ramener les deux fournisseurs aux mêmes noms, aux mêmes étiquettes et à la même unité avant la jointure. Deux règles d'enregistrement produisent une série commune, `gpu:tensor_active:ratio`. La première recopie `DCGM_FI_PROF_PIPE_TENSOR_ACTIVE`. La seconde divise `gpu_prof_tensor_active_percent` par 100, puis renomme `hostname` en `Hostname` et `gpu_id` en `gpu` par deux `label_replace`. Une étiquette `vendor` les distingue. L'alerte reste celle du § 3.2, appliquée à la série commune.
+
+Pour `j1`, la moyenne vaut $(0 + 0{,}02)/2 = 0{,}01 < 0{,}05$ : l'alerte se déclenche après sa durée `for`. Sans la division par 100, le GPU AMD compterait pour 2, la moyenne vaudrait $(0 + 2)/2 = 1$ et le job bloqué passerait inaperçu.
+
+La règle ne couvre pas les GPU Radeon, où la métrique n'est pas exportée : la série manque, et une série absente ne déclenche rien (§ 3.4). Il leur faut une autre alerte, sur `gpu_gfx_activity` par exemple. Corrigé vérifié par `promtool test rules` sur des séries synthétiques, avec et sans la division : `labs/observability/alert-rules/exercises/`, que lance le `verify.sh` du lab 14.2.
 :::
 
 ## Checkpoint de sortie {#exit}
@@ -1134,22 +1181,22 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 1.  *Un job de 512 GPU affiche 100 % d'utilisation GPU mais n'avance plus. Que regardez-vous ?* Réponse-type : l'utilisation ne prouve rien, car elle indique la présence de noyaux ; je regarde le compteur de pas de l'entraîneur, l'activité tensorielle et la puissance, puis le dernier pas entré et terminé de chaque rang (ou le flight recorder) pour trouver le rang qui n'a pas rejoint la collective, et sa pile. Je vérifie les erreurs XID et le journal du noyau du nœud concerné.
 
-    Le délai NCCL par défaut est de 10 minutes : mon détecteur doit agir plus tôt, avec une phase déclarée pour ne pas confondre un point de contrôle avec un blocage.
+    Le délai NCCL par défaut est de 10 minutes : mon détecteur doit agir plus tôt, avec une phase déclarée pour ne pas confondre un checkpoint avec un blocage.
 2.  *Comment alertez-vous sur la file d'attente sans réveiller l'astreinte pour rien ?* Réponse-type : je définis un SLI d'attente imputable à la plateforme (raisons de capacité, depuis l'éligibilité), un SLO, et des alertes à vitesses de consommation multiples sur deux fenêtres, sans durée `for`, testées par scénarios avec `promtool`. Les attentes dues à l'utilisateur ou à l'administrateur ne comptent pas. Je groupe les alertes par domaine de panne.
 3.  *Votre Prometheus manque de mémoire après l'arrivée d'une nouvelle équipe. Que faites-vous ?* Réponse-type : je soupçonne la cardinalité, typiquement une étiquette à valeurs non bornées (job, pod, utilisateur) ; je cherche la métrique qui compte le plus de séries, je retire ou joins l'étiquette à la requête avec une métrique d'association, et je pose une limite `sample_limit` sur le travail de scrape pour qu'un exportateur fautif échoue au lieu d'étouffer le serveur. Je mesure ensuite le nombre de séries actives avant et après.
 
 ## Lectures et références {#refs}
 
--   Dubey et al. [*The Llama 3 Herd of Models*](https://arxiv.org/abs/2407.21783), 2024, section 3.3.4 : 466 interruptions sur 54 jours, temps d'entraînement effectif supérieur à 90 %, flight recorder et traînards (chapitres 4, 6 et 7).
+-   Dubey et al. [*The Llama 3 Herd of Models*](https://arxiv.org/abs/2407.21783), 2024, section 3.3.4 : 466 interruptions sur 54 jours (tableau 5 : lire les comptes), temps d'entraînement effectif supérieur à 90 %, traînards (chapitres 6 et 7).
 -   Kokolis et al. [*Revisiting Reliability in Large-Scale Machine Learning Research Clusters*](https://arxiv.org/abs/2410.21680), 2024 : définition de l'ETTR, vérifications de santé toutes les cinq minutes (chapitres 6 et 7).
 -   Jiang et al. [*MegaScale*](https://arxiv.org/abs/2402.15627), 2024 : battements de cœur, événements CUDA et diagnostic à plus de 10 000 GPU (chapitres 4 et 7).
 -   Hu et al. [*Characterization of Large Language Model Development in the Datacenter*](https://arxiv.org/abs/2403.07648), 2024 : échantillonnage à 15 s de Prometheus, DCGM et IPMI, utilisation GPU polarisée (chapitre 3).
--   NVIDIA. [*DCGM — Feature Overview*](https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html) : métriques de profil (`SM_ACTIVE`, `PIPE_TENSOR_ACTIVE`) et niveaux de `dcgmi diag` (chapitres 2 et 7).
--   NVIDIA. [*DCGM Exporter*](https://docs.nvidia.com/datacenter/cloud-native/gpu-telemetry/latest/dcgm-exporter.html) et [`default-counters.csv`](https://raw.githubusercontent.com/NVIDIA/dcgm-exporter/main/etc/default-counters.csv) : port, intervalle, liste des métriques (chapitre 2).
+-   NVIDIA. [*DCGM — Feature Overview*](https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/feature-overview.html) et [*DCGM Diagnostics*](https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/dcgm-diagnostics.html) : métriques de profil (`SM_ACTIVE`, `PIPE_TENSOR_ACTIVE`), quatre niveaux de `dcgmi diag`, leurs durées et leurs usages (chapitres 2 et 7).
+-   NVIDIA. [*DCGM Exporter*](https://docs.nvidia.com/datacenter/cloud-native/gpu-telemetry/latest/dcgm-exporter.html) et [`default-counters.csv`](https://raw.githubusercontent.com/NVIDIA/dcgm-exporter/main/etc/default-counters.csv) : port, intervalle, liste des métriques (chapitre 2). AMD, [*Device Metrics Exporter — List of Available Metrics*](https://instinct.docs.amd.com/projects/device-metrics-exporter/en/latest/configuration/metricslist.html) et [*Slurm integration*](https://instinct.docs.amd.com/projects/device-metrics-exporter/en/latest/integrations/slurm-integration.html) : l'équivalent chez AMD (§ 2.5).
 -   NVIDIA. [*nvidia-smi*](https://docs.nvidia.com/deploy/nvidia-smi/index.html) et [*Xid Errors*](https://docs.nvidia.com/deploy/xid-errors/index.html) : définition de l'utilisation GPU, catalogue des codes XID (chapitre 2).
--   Prometheus. [*Storage*](https://prometheus.io/docs/prometheus/latest/storage/), [*Metric and label naming*](https://prometheus.io/docs/practices/naming/), [*Recording rules*](https://prometheus.io/docs/practices/rules/), [*When to use the Pushgateway*](https://prometheus.io/docs/practices/pushing/) : dimensionnement, cardinalité, nommage (chapitre 3).
--   Prometheus. [*Alerting rules*](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) et [*Unit testing for rules*](https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/) : `for`, `keep_firing_for`, format des tests (chapitre 6 et lab 14.2).
+-   Prometheus. [*Storage*](https://prometheus.io/docs/prometheus/latest/storage/), [*Metric and label naming*](https://prometheus.io/docs/practices/naming/), [*Recording rules*](https://prometheus.io/docs/practices/rules/), [*When to use the Pushgateway*](https://prometheus.io/docs/practices/pushing/), [*Alerting rules*](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/), [*Unit testing for rules*](https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/) et le [collecteur `infiniband`](https://raw.githubusercontent.com/prometheus/node_exporter/master/collector/infiniband_linux.go) de `node_exporter` : dimensionnement, cardinalité, nommage, `for`, `keep_firing_for`, format des tests, compteurs de ports (chapitres 3, 6 et 7, lab 14.2).
 -   Beyer et al. [*The Site Reliability Workbook*, « Alerting on SLOs »](https://sre.google/workbook/alerting-on-slos/) : alertes à vitesses de consommation multiples (chapitre 6).
+-   OpenTelemetry. [*Traces*](https://opentelemetry.io/docs/concepts/signals/traces/) : définition du span ; le SDK Python fournit `ConsoleSpanExporter` (chapitre 4, partie D du lab 14.3).
 -   Grafana Labs. [*Loki — Labels*](https://grafana.com/docs/loki/latest/get-started/labels/) et [*bonnes pratiques*](https://grafana.com/docs/loki/latest/get-started/labels/bp-labels/) : étiquettes à faible cardinalité (chapitre 4).
 -   PyTorch. [*Debugging with Flight Recorder*](https://docs.pytorch.org/tutorials/unstable/flight_recorder_tutorial.html) et [*torch.distributed*](https://docs.pytorch.org/docs/2.14/distributed.html) : variables d'environnement et délais par défaut (chapitre 4).
 -   SchedMD. [*squeue*](https://slurm.schedmd.com/squeue.html) et [*sinfo*](https://slurm.schedmd.com/sinfo.html) : raisons d'attente, format JSON, avertissement sur la charge de `slurmctld` (chapitre 5).
@@ -1160,7 +1207,7 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ### Documenté {#documente}
 
-Les faits suivants ont été relus sur leurs sources le 24 octobre 2026. DCGM et dcgm-exporter : définition de l'utilisation GPU (`nvidia-smi`), des métriques de profil et des niveaux de diagnostic, port 9400, intervalle de collecte de 30 000 ms, option `-k`, liste de 25 métriques par défaut, existence de l'option `--hpc-job-mapping-dir` dans le code source, codes XID 79, 94 et 95. Prometheus : 1 à 2 octets par échantillon et la formule de capacité, rétention de 15 jours par défaut, blocs de deux heures, avertissement sur la cardinalité, nommage des règles d'enregistrement, usage de la Pushgateway, collecteur *textfile*, `keep_firing_for`, `sample_limit`, `group_wait`. Workbook SRE : vitesses de consommation, fenêtre courte au douzième, déconseil des durées, quatre critères. Llama 3 : 54 jours, 466, 47, 419, 78 %, 58,7 %, 90 %, variation diurne de 1 à 2 %. Kokolis et al. : définitions de l'ETTR et du goodput, contrôles toutes les cinq minutes, moins de 1 %. Acme : 15 s. MegaScale : battements de cœur et événements CUDA. PyTorch : délais de 10 et 30 minutes, variables du flight recorder. Loki, OpenTelemetry, Kueue, kube-state-metrics, MLflow (variable des métriques système, étiquettes `mlflow.source.git.*` lues dans le code source), W&B (`config`), README du `prometheus-slurm-exporter` de vpenso (JSON, Slurm 23.02 minimum). Les comportements **observés** viennent d'exécutions du 24 octobre 2026 : Slurm 23.11.4, `promtool` 2.45.3, MLflow 3.17.2, PyTorch 2.14 (CPU, `gloo`), `prometheus_client` 0.26.0 ; les sorties citées en proviennent.
+Les faits suivants ont été relus sur leurs sources le 24 octobre 2026. DCGM et dcgm-exporter : définition de l'utilisation GPU (`nvidia-smi`), des métriques de profil, quatre niveaux de diagnostic et leurs durées annoncées sur Hopper (page *DCGM Diagnostics*), port 9400, intervalle de collecte de 30 000 ms, option `-k`, liste de 25 métriques par défaut, existence de l'option `--hpc-job-mapping-dir` dans le code source, codes XID 79, 94 et 95. Prometheus : 1 à 2 octets par échantillon et la formule de capacité, rétention de 15 jours par défaut, blocs de deux heures, avertissement sur la cardinalité, nommage des règles d'enregistrement, usage de la Pushgateway, collecteur *textfile*, `keep_firing_for`, `sample_limit`, `group_wait`. Workbook SRE : vitesses de consommation, fenêtre courte au douzième, déconseil des durées, quatre critères. Llama 3 : 54 jours, 466, 47, 419, 78 %, 268 interruptions de GPU dans les comptes du tableau 5 (le texte dit 58,7 %), 90 %, variation diurne de 1 à 2 %. Kokolis et al. : définitions de l'ETTR et du goodput, contrôles toutes les cinq minutes, moins de 1 %. Acme : 15 s. MegaScale : battements de cœur et événements CUDA. PyTorch : délais de 10 et 30 minutes, variables du flight recorder. Loki, OpenTelemetry, Kueue, kube-state-metrics, MLflow (variable des métriques système, étiquettes `mlflow.source.git.*` lues dans le code source), W&B (`config`), README du `prometheus-slurm-exporter` de vpenso (JSON, Slurm 23.02 minimum). Les comportements **observés** viennent d'exécutions du 24 octobre 2026 : Slurm 23.11.4, `promtool` 2.45.3, MLflow 3.17.2, PyTorch 2.14 (CPU, `gloo`), `prometheus_client` 0.26.0 ; les sorties citées en proviennent. Lus le 25 octobre 2026 : AMD Device Metrics Exporter, documentation de la version 1.5.3 (port 5000, noms et étiquettes, unités, limites sur Radeon et en mode partitionné, étiquettes `job_id` et `job_user` de l'intégration Slurm) ; collecteur `infiniband` de `node_exporter` (actif par défaut, chemin `/sys/class/infiniband`, noms et descriptions des compteurs, lus dans le code source) ; page de migration vers Prometheus 3.0 ; définition du span d'OpenTelemetry ; `ConsoleSpanExporter` (arguments `out` et `formatter`), exécuté avec `opentelemetry-sdk` 1.45.1.
 
 ### Recommandé {#recommande}
 
@@ -1168,8 +1215,8 @@ Les cinq couches, le regroupement des raisons d'attente en classes, les trois SL
 
 ### À vérifier {#a-verifier}
 
-(1) La signature d'un blocage « utilisation haute, tensor nul, battement de cœur actif » n'a pas été mesurée sur GPU : le bac à sable n'a pas de GPU. (2) Le format des fichiers de l'option `--hpc-job-mapping-dir` n'a pas été relu. (3) Les étiquettes exactes de dcgm-exporter varient selon les versions (la présence de `modelName` n'a pas été vérifiée dans la documentation). (4) La requête LogQL, la configuration d'Alertmanager et les métriques de Kubernetes et de Kueue n'ont pas été exécutées : il n'y a pas de Loki, d'Alertmanager ni de cluster Kubernetes dans le bac à sable. (5) Les métriques GPU de MLflow demandent `nvidia-ml-py` et n'ont pas été exercées. (6) Le comportement du chien de garde NCCL n'a pas été observé : la partie B du lab 14.3 utilise `gloo`. (7) Le nombre de séries par nœud (1 000) et la mémoire par série sont à mesurer sur votre serveur. (8) Les champs JSON de `squeue` et de `sinfo` évoluent d'une version de Slurm à l'autre ; relisez la documentation de la vôtre. (9) Le tableau de `kube-state-metrics` marque `kube_pod_status_phase` comme expérimentale à la date de lecture.
+(1) La signature d'un blocage « utilisation haute, tensor nul, battement de cœur actif » n'a pas été mesurée sur GPU : le bac à sable n'a pas de GPU. (2) Le format des fichiers de l'option `--hpc-job-mapping-dir` n'a pas été relu. (3) Les étiquettes exactes de dcgm-exporter varient selon les versions (la présence de `modelName` n'a pas été vérifiée dans la documentation). (4) La requête LogQL, la configuration d'Alertmanager et les métriques de Kubernetes et de Kueue n'ont pas été exécutées : il n'y a pas de Loki, d'Alertmanager ni de cluster Kubernetes dans le bac à sable. (5) Les métriques GPU de MLflow demandent `nvidia-ml-py` et n'ont pas été exercées. (6) Le comportement du chien de garde NCCL n'a pas été observé : la partie B du lab 14.3 utilise `gloo`. (7) Le nombre de séries par nœud (1 000) et la mémoire par série sont à mesurer sur votre serveur. (8) Les champs JSON de `squeue` et de `sinfo` évoluent d'une version de Slurm à l'autre ; relisez la documentation de la vôtre. (9) Le tableau de `kube-state-metrics` marque `kube_pod_status_phase` comme expérimentale à la date de lecture. (10) Les sources lues ne disent pas quand `DCGM_FI_DEV_XID_ERRORS` revient à zéro : à vérifier sur matériel (voir aussi le projet 5). (11) Le tableau 5 de Llama 3 est incohérent avec le texte : nous citons les comptes (module 10). (12) Rien des § 2.5 (AMD, Ascend) et 7.6 (InfiniBand) n'a tourné sur du matériel ; le nom de série `gpu_prof_tensor_active_percent` est déduit de la convention de nommage de l'exportateur d'AMD, et l'exportateur d'Ascend n'a pas été relu. (13) Les labs ont été testés avec `promtool` 2.45.3, alors que la documentation citée est celle de Prometheus 3.x.
 
 ### Hors périmètre {#hors-perimetre}
 
-La configuration complète d'Alertmanager (routage, inhibitions), le stockage de longue durée de Prometheus (écriture distante, Thanos, Mimir), le dimensionnement d'Elasticsearch, le déploiement de collecteurs OpenTelemetry, les compteurs réseau InfiniBand (module 7), la détection de corruption silencieuse de données, le profilage fin de noyaux (module 4), l'énergie et les coûts (module 15) et le déploiement de l'exportateur sur un vrai cluster de GPU.
+La configuration complète d'Alertmanager (routage, inhibitions), le stockage de longue durée de Prometheus (écriture distante, Thanos, Mimir), le dimensionnement d'Elasticsearch, le déploiement de collecteurs OpenTelemetry, la lecture fine des compteurs InfiniBand et des commutateurs (module 7, chapitre 8), la détection de corruption silencieuse de données, le profilage fin de noyaux (module 4), l'énergie et les coûts (module 15) et le déploiement de l'exportateur sur un vrai cluster de GPU.

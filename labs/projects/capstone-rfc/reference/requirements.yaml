@@ -3,7 +3,9 @@
 team: "research group, 40 people, 3 platform engineers, business-hours on-call only"
 hours_per_month: 730
 budget_per_month_u: 450000        # arbitrary units
-gpu_failure_rate_per_gpu_hour: 0.0002   # invented; one failure per 5000 GPU-hours
+# Invented and pessimistic: one failure per 5000 GPU-hours, about 6x the 3.4e-5 per GPU-hour of Kokolis et al. 2024
+# (6.5 failures per 1000 node-days of 8 GPU, https://arxiv.org/abs/2410.21680). Do not quote it as a real rate.
+gpu_failure_rate_per_gpu_hour: 0.0002
 checkpoint_cost_min: 4
 restart_cost_min: 15
 classes:

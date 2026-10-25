@@ -3,7 +3,9 @@
 GPU-hour), availabilities and hazards are invented, the egress rate is a made-up 0.09 u/GB. The checkpoint size is the
 only derived figure: 7e9 parameters x 16 bytes per parameter = 112 GB (the ZeRO rule used in module 2).
 
-Usage: python3 scenarios.py [--impl reference|starter] [--seeds 200] [--lam 40]
+Usage: python3 scenarios.py [--impl reference|starter] [--seeds 200] [--lam 40] [--trace-moves]
+
+--trace-moves prints only where the moves of 'failover' go (0 GB of data), instead of the scan.
 """
 import argparse
 import importlib
@@ -29,15 +31,53 @@ def build(P, data_gb):
     return pools, job, net
 
 
+class Traced:
+    """Wraps a policy and records, at every decision, the provider holding the checkpoint and the chosen pool."""
+
+    def __init__(self, inner):
+        self.inner, self.log = inner, []
+
+    def choose(self, job, pools, net, st, seed, slot_h):
+        pool = self.inner.choose(job, pools, net, st, seed, slot_h)
+        self.log.append((st.ckpt_at, pool))
+        return pool
+
+
+def trace_moves(P, seeds, data_gb=0):
+    """Destination pools of the moves of 'failover'. A move is a change of provider, as counted by the simulator."""
+    pools, job, net = build(P, data_gb)
+    dest, counted = {p.id: 0 for p in pools}, 0
+    for s in seeds:
+        pol = Traced(P.FirstAvailable())
+        counted += P.simulate(job, pools, net, pol, seed=s)["moves"]
+        for ckpt_at, pool in pol.log:
+            if pool.provider != ckpt_at:
+                dest[pool.id] += 1
+    total = sum(dest.values())
+    if total != counted:
+        raise RuntimeError(f"traced moves ({total}) differ from the simulator's count ({counted})")
+    n = len(seeds)
+    print(f"moves of 'failover' with {data_gb} GB of data over {n} seeds: {total} in all, {total / n:.2f} per run")
+    for p in pools:
+        kind = "spot" if p.hazard > 0 else "on-demand"
+        print(f"  to {p.id:7s} provider {p.provider} ({kind:9s}): {dest[p.id]:5d}  ({100 * dest[p.id] / total:5.1f} %)")
+    spot = sum(dest[p.id] for p in pools if p.hazard > 0)
+    print(f"  to a spot pool: {100 * spot / total:.1f} %, to the on-demand pool: {100 * (total - spot) / total:.1f} %")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--impl", default="reference", choices=["reference", "starter"])
     ap.add_argument("--seeds", type=int, default=200)
     ap.add_argument("--lam", type=float, default=40.0, help="value of one hour of delay, u per hour")
+    ap.add_argument("--trace-moves", action="store_true", help="only print where the moves of 'failover' go")
     args = ap.parse_args()
     sys.path.insert(0, str(HERE / args.impl))
     P = importlib.import_module("placement")
     seeds = range(args.seeds)
+    if args.trace_moves:
+        trace_moves(P, seeds)
+        return
     pools, job, _ = build(P, 0)
     print("SYNTHETIC pools (u = arbitrary unit):")
     for p in pools:

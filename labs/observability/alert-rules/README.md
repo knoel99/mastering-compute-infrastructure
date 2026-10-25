@@ -10,6 +10,7 @@ Deux fichiers de règles, leurs tests, un lint de politique et un test de mutati
 | `tests/slo.rules.test.yml` | **Généré** : les minutes d'évaluation viennent d'une simulation des mêmes fenêtres sur des compteurs synthétiques. |
 | `tests/wait_quantile.test.yml` | Ce que `histogram_quantile` répond sur les six délais d'attente réels capturés (médiane 7,5 s contre 6,5 s exact ; 90e centile 24 s contre 14,5 s exact) : l'erreur vient du découpage en seaux. |
 | `lint_rules.py` | Politique : sévérité, résumé, runbook existant, `for` ≥ 2 min (sauf alertes de vitesse de consommation, qui n'en ont pas), et chaque métrique lue est réellement exposée par l'exportateur du lab 14.1, par la fixture dcgm ou par le contrat de l'entraîneur. |
+| `exercises/mixed_fleet.rules.yml`, `exercises/mixed_fleet.test.yml` | Corrigé de l'exercice 11 du cours : la jointure « tensor inactif » du § 3.2 sur une flotte mixte NVIDIA et AMD (ratio de DCGM, pourcentage de l'exportateur d'AMD, étiquettes renommées par `label_replace`). Séries synthétiques : rien n'a tourné sur un GPU AMD. |
 | `mutate.py` | 12 mutants (durée changée, comparaison inversée, fenêtre courte supprimée…) : chacun doit faire échouer `promtool test rules`. |
 
 ## Ce qui est simulé

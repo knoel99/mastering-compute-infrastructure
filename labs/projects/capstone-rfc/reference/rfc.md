@@ -25,7 +25,7 @@ Aujourd'hui il n'existe pas de plateforme commune. Chaque équipe réserve ses m
 | évaluation | attente avant démarrage, 90e centile | 1 h |
 | développement | attente avant démarrage, 90e centile | 5 min |
 
-Contraintes : budget mensuel de 450 000 u ; équipe de trois ingénieurs ; astreinte en heures ouvrées ; une seule région. **Hypothèses inventées** : un GPU tombe en panne tous les 5 000 heures en moyenne, un checkpoint dure 4 minutes, une reprise 15 minutes, l'obtention de capacité à la demande prend 15 minutes, une allocation préemptible est interrompue 0,15 fois par heure de job.
+Contraintes : budget mensuel de 450 000 u ; équipe de trois ingénieurs ; astreinte en heures ouvrées ; une seule région. **Hypothèses inventées** : un GPU tombe en panne tous les 5 000 heures en moyenne (valeur pessimiste : environ six fois les 6,5 pannes pour mille nœuds-jours de 8 GPU publiées par Kokolis et coauteurs en 2024), un checkpoint dure 4 minutes, une reprise 15 minutes, l'obtention de capacité à la demande prend 15 minutes, une allocation préemptible est interrompue 0,15 fois par heure de job.
 
 ## Options considérées
 
@@ -70,9 +70,9 @@ Conception retenue, au format que lit `rfc_lint.py` :
 {"pools": {"pretrain": {"market": "spot"}, "finetune": {"market": "on_demand"}, "eval": {"market": "on_demand"}, "dev": {"market": "reserved", "gpus": 4}}}
 ```
 
-Résultat du modèle pour cette conception :
+Résultat du modèle pour cette conception (le goodput est la part du temps de calcul conservé, voir « Hypothèses et limites ») :
 
-| Classe | Marché | Disponibilité utile | GPU-heures utilisées | Attente p90 | Coût (u) |
+| Classe | Marché | Goodput | GPU-heures utilisées | Attente p90 | Coût (u) |
 |---|---|---|---|---|---|
 | pré-entraînement | préemptible | 0,803 | 57 379 | 0,25 h | 229 515 |
 | réglage fin | à la demande | 0,979 | 4 251 | 0,25 h | 42 512 |
@@ -87,7 +87,7 @@ Le pool de développement de quatre GPU a une utilisation de 26,9 %, une probabi
 
 Seul le coût du pré-entraînement dépend de ce paramètre. Les valeurs ci-dessous sont celles du modèle, pour des taux d'interruption par heure de job autour de la valeur supposée de 0,15.
 
-| Interruptions par heure de job | Disponibilité utile | Coût du pré-entraînement (u) |
+| Interruptions par heure de job | Goodput | Coût du pré-entraînement (u) |
 |---|---|---|
 | 0,05 | 0,881 | 209 288 |
 | 0,15 | 0,803 | 229 515 |
@@ -102,19 +102,19 @@ Seul le coût du pré-entraînement dépend de ce paramètre. Les valeurs ci-des
 - Le modèle suppose des arrivées de Poisson et des durées exponentielles par classe ; il ignore les rafales, les priorités et la fragmentation entre pools : les attentes sont **probablement optimistes** (l'attente croît avec la variabilité des arrivées et des durées), sans être une borne garantie.
 - Il suppose que la capacité à la demande et préemptible est toujours disponible au volume demandé, après 15 minutes. C'est l'hypothèse la plus forte.
 - Prix, taux de panne et taux d'interruption sont inventés. Aucune de ces valeurs n'est une donnée de marché.
-- La disponibilité utile suppose un checkpoint à la période de Young et Daly, sans perte liée à l'écriture sur le stockage partagé. Elle vient du modèle du premier ordre, fiable tant que la période de checkpoint reste petite devant le temps moyen entre incidents (ce rapport vaut 0,15 au taux supposé de 0,15 interruption par heure de job, et 0,37 à 1,0). Le modèle exact du projet 3 donne une disponibilité un peu plus haute au taux supposé et beaucoup plus haute à 1,0.
+- Le goodput (part du temps de calcul conservé) suppose un checkpoint à la période de Young et Daly, sans perte liée à l'écriture sur le stockage partagé. Elle vient du modèle du premier ordre, fiable tant que la période de checkpoint reste petite devant le temps moyen entre incidents (ce rapport vaut 0,15 au taux supposé de 0,15 interruption par heure de job, et 0,37 à 1,0). Le modèle exact du projet 3 donne un goodput un peu plus haut au taux supposé et beaucoup plus haute à 1,0.
 
 ## Fiabilité
 
 Sur capacité préemptible, un job de 128 GPU subit un taux d'incident de 0,1756 par heure (matériel : 128 × 0,0002, plus 0,15 d'interruptions), soit un temps moyen entre incidents de 342 minutes. La période de checkpoint de Young et Daly est d'environ 52 minutes ; sur un job de 240 heures de calcul, la durée réelle est d'environ 299 heures et l'on attend environ 52 incidents, dont environ 45 interruptions de la capacité préemptible.
 
-Chaque interruption doit être absorbée **sans intervention humaine**, l'astreinte étant limitée aux heures ouvrées : écriture atomique des checkpoints avec somme de contrôle et repli sur le précédent, relance automatique avec détection de blocage, reprise à l'identique vérifiée par des tests. Ces mécanismes sont ceux du projet 3 ; l'objectif de disponibilité utile du pré-entraînement est de 80 %.
+Chaque interruption doit être absorbée **sans intervention humaine**, l'astreinte étant limitée aux heures ouvrées : écriture atomique des checkpoints avec somme de contrôle et repli sur le précédent, relance automatique avec détection de blocage, reprise à l'identique vérifiée par des tests. Ces mécanismes sont ceux du projet 3 ; l'objectif de goodput du pré-entraînement est de 80 %.
 
 Règle de bascule : si la capacité préemptible n'est pas obtenue en 30 minutes pour un job de pré-entraînement, il est relancé à la demande, avec une alerte au responsable du budget.
 
 ## Observabilité
 
-Les métriques de GPU sont exposées au format de dcgm-exporter et jointes à l'allocation par job. Deux alertes sont des **pages** (erreur Xid, job bloqué) et deux des **tickets** (GPU qui chauffe, allocation inactive), avec des règles testées par des tests unitaires qui résistent à la mutation (projet 5) ; une cinquième alerte, d'absence de l'exportateur, est ajoutée pour qu'un exportateur muet ne ressemble pas à une plateforme saine. Un tableau de bord par classe affiche attente, coût et disponibilité utile.
+Les métriques de GPU sont exposées au format de dcgm-exporter et jointes à l'allocation par job. Deux alertes sont des **pages** (erreur Xid, job bloqué) et deux des **tickets** (GPU qui chauffe, allocation inactive), avec des règles testées par des tests unitaires qui résistent à la mutation (projet 5) ; une cinquième alerte, d'absence de l'exportateur, est ajoutée pour qu'un exportateur muet ne ressemble pas à une plateforme saine. Un tableau de bord par classe affiche attente, coût et goodput.
 
 Un indicateur de coût par équipe est publié chaque semaine : GPU-heures utilisées, coût, et part du coût perdue en reprises. Sans cet indicateur, le coût d'une heure utile reste invisible.
 
@@ -122,13 +122,15 @@ Un indicateur de coût par équipe est publié chaque semaine : GPU-heures utili
 
 Une seule région et un seul réseau privé ; aucun jeu de données ne quitte la région. Les accès sont attribués par équipe avec le moindre privilège ; les jetons d'accès au stockage ont une durée de vie courte. Les images de conteneur sont construites par l'équipe plateforme, signées et épinglées par empreinte. Aucun secret n'est stocké dans les dépôts ni dans les définitions de jobs.
 
+**Identité.** Chaque job s'exécute sous le compte de la personne qui le lance, rattaché à son équipe ; aucun compte de service partagé, sans quoi la comptabilité et l'audit mentent. **Isolation.** Un compte d'ordonnanceur, un quota et un espace de stockage par équipe ; un job de plusieurs nœuds reçoit ses nœuds en exclusivité, et les disques locaux sont effacés entre deux jobs. **Audit.** La comptabilité de l'ordonnanceur (`sacct`) et les journaux d'accès au stockage sont conservés assez longtemps pour reconstituer un incident, avec l'identité de la personne.
+
 ## Migration
 
 **Phase 0 (semaines 0 à 2).** Réserver les 4 GPU de développement, déployer l'exportateur, les alertes et le tableau de bord. Critère de sortie : les cinq alertes ont été déclenchées volontairement sur un nœud d'essai.
 
 **Phase 1 (semaines 3 à 6).** Basculer le réglage fin et l'évaluation sur capacité à la demande, avec files par équipe. Critère de sortie : attente p90 sous 4 h pour le réglage fin et sous 1 h pour l'évaluation pendant deux semaines.
 
-**Phase 2 (semaines 7 à 12).** Pré-entraînement sur capacité préemptible avec l'entraîneur tolérant aux pannes, d'abord sur un job de 16 GPU puis de 128. Critère de sortie : un job complet de 128 GPU avec une disponibilité utile d'au moins 80 %.
+**Phase 2 (semaines 7 à 12).** Pré-entraînement sur capacité préemptible avec l'entraîneur tolérant aux pannes, d'abord sur un job de 16 GPU puis de 128. Critère de sortie : un job complet de 128 GPU avec un goodput d'au moins 80 %.
 
 Retour arrière : chaque phase peut revenir à la précédente en changeant le marché d'une classe dans la configuration ; les réservations sont limitées aux 4 GPU de développement, donc rien n'est difficile à défaire.
 
@@ -150,3 +152,15 @@ Quelle part du pré-entraînement peut tolérer une interruption sans checkpoint
 ## Annexes
 
 Reproduire les chiffres : `python3 rfc_lint.py rfc.md --requirements requirements.yaml` évalue la conception du bloc JSON de la section « Capacité et coûts » et refuse un coût différent de celui du modèle. Briques utilisées : projet 2 pour la mesure de passage à l'échelle, projet 3 pour la reprise après panne, projet 4 pour la comparaison de politiques de placement, projet 5 pour l'observabilité. Vérification croisée de la formule d'attente : `mmc_sim.py` simule la file et retrouve la formule d'Erlang à moins de 1 % en moyenne sur six graines de 600 000 arrivées (sur une seule graine de 60 000 arrivées, l'écart va de 2 à 22 % selon la graine : les attentes sont corrélées).
+
+### Ordonnanceur
+
+Un seul ordonnanceur, Slurm, pour les quatre classes : trois ingénieurs n'exploitent pas deux plans de contrôle, et un hybride exige une double compétence. Les classes sont des partitions avec leurs QOS. Les nœuds à la demande et préemptibles sont demandés puis rendus au fournisseur par nos scripts `ResumeProgram` et `SuspendProgram`, le mécanisme d'économie d'énergie par lequel Slurm pilote des ressources cloud (*Slurm Power Saving Guide*). Alternative écartée : Kubernetes avec Kueue, car les quatre classes sont des jobs de durée finie, dont un de 16 nœuds, et aucune n'est un service. Signal de révision : l'arrivée de services d'inférence ou de boucles d'apprentissage par renforcement sur Ray.
+
+### Réseau du pré-entraînement
+
+Hypothèse inventée : des nœuds de 8 GPU. Le job de pré-entraînement occupe alors 16 nœuds, le réglage fin 2 et l'évaluation 1. La RFC exige pour les 16 nœuds un réseau RDMA et un placement dans un même bloc sans sur-souscription (1:1). Avec le modèle jouet du module 7, une sur-souscription de 3:1 traversée par tout le trafic entre nœuds ne laisserait qu'un tiers du débit. La recette mesure le débit des collectives sur les 16 nœuds avec nccl-tests avant la phase 2.
+
+### Stockage des checkpoints
+
+Hypothèse inventée : un modèle de 7 milliards de paramètres, soit un état de 98 Go à 14 octets par paramètre (Adam en précision mixte). Pour qu'un checkpoint bloque au plus les 4 minutes supposées par le modèle, le stockage partagé doit absorber 0,41 Go/s en écriture, environ 26 Mo/s par nœud sur 16 nœuds : un débit modeste. Garder les deux derniers checkpoints, pour le repli sur le précédent, occupe 196 Go par job de pré-entraînement.

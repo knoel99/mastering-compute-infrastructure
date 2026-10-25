@@ -8,7 +8,7 @@ module:
   phase: 5
   hours: 30.5
   level: 3
-prerequisites: [slurm, kubernetes-gpu, observability]
+prerequisites: [slurm, kubernetes-gpu, observability, finops-capacity, fault-tolerance]
 status: core
 badges:
   - {label: "Cœur du parcours", class: core}
@@ -36,12 +36,11 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 |---|---|
 | Volume | 30,5 h, dont environ 11 h de lecture, 7,5 h de labs et 12 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
 | Niveau d'entrée | 3 : avoir suivi les phases 2 à 4 du parcours, ou avoir exploité un cluster ou une plateforme de calcul |
-| Prérequis | [Module 5 — Slurm](../slurm/index.html), module 12 — Kubernetes pour l'IA, module 14 — Observabilité |
+| Prérequis | [Module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [Module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [Module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html), [Module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html) |
 | Pour qui | Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage. |
 | Livrable | un ADR vérifié, un post-mortem cohérent avec son journal, un dimensionnement chiffré et défendu à l'oral |
 | Environnement | un portable Linux avec Python, **sans GPU** ; aucun cloud ; les données des labs sont synthétiques ou fictives et étiquetées |
-| Projets qui s'appuient sur ce module | [Projet 6 — RFC et prototype](../../projects/capstone-rfc/index.html) |
-
+| Projets liés | [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 ### Ce que vous saurez vérifier {#acquis}
 
 - Choisir quatre mesures d'adoption d'une plateforme et dire pourquoi une utilisation GPU élevée n'est pas un succès en soi (chapitre 1).
@@ -50,14 +49,14 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 - Calculer un budget d'erreur et la taille d'équipe qu'exige une astreinte, et écrire un post-mortem sans blâme dont les chiffres tiennent (chapitre 4).
 - Planifier une migration par cohortes avec des critères d'entrée, de sortie et de retour arrière (chapitre 5).
 - Fixer un budget de travail d'exploitation pour une petite équipe (chapitre 6).
-- Conduire un exercice de conception d'entretien avec un calcul et ses hypothèses dites (chapitre 8).
+- Conduire un exercice de conception d'entretien avec un calcul et ses hypothèses dites, et préparer une question de négociation (chapitre 8).
 - Calculer la probabilité qu'un cluster de consensus garde son quorum selon le nombre et le placement de ses membres, conduire un exercice de restauration mesuré et livrer un changement d'infrastructure par canaris (chapitre 9).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 5 — Production et leadership** (semaines 42-48) : opérer en production, décider, négocier, diriger et passer l'entretien.
--   **S'appuie sur** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html).
+-   **Phase 5 — Production et leadership** (semaines 45-50) : opérer en production, décider, négocier, diriger et passer l'entretien.
+-   **S'appuie sur** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
 -   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Checkpoint, tolérance aux pannes, Planification de capacité, Sécurité, conformité, Astreinte, fiabilité (SRE), Leadership, management, Systèmes distribués, Slurm, Kubernetes, Conteneurs, Journaux, traces, Expérience d'entraînement ML, CI/CD, automatisation (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
@@ -109,7 +108,7 @@ Trois questions pour situer votre niveau. Répondez sans chercher, puis ouvrez l
 ::: sol
 **Réponses.**
 
-1.  Non. Une utilisation élevée peut venir d'une file d'attente interminable (les chercheurs attendent), de GPU occupés par des jobs bloqués ou inactifs (utilisation affichée mais aucun travail utile) ou d'une capacité mal dimensionnée. Il faut lire en plus l'attente par classe de charge et la disponibilité utile (chapitre 1).
+1.  Non. Une utilisation élevée peut venir d'une file d'attente interminable (les chercheurs attendent), de GPU occupés par des jobs bloqués ou inactifs (utilisation affichée mais aucun travail utile) ou d'une capacité mal dimensionnée. Il faut lire en plus l'attente par classe de charge et le *goodput*, la part du temps de calcul conservé (chapitre 1).
 
 2.  L'alerte d'allocation inactive du projet 5 (utilisation proche de zéro pendant quinze minutes sur une allocation) la détecte ; une expiration automatique des sessions interactives l'évite (chapitre 2).
 
@@ -132,13 +131,13 @@ Quatre mesures suffisent pour piloter, et chacune se calcule à partir des donn�
 
 1.  le **délai avant le premier job** d'un nouveau membre ;
 2.  l'**attente au 90e centile** de chaque classe de charge, comparée à son objectif ;
-3.  la **disponibilité utile** (*goodput*) : la part du temps réservé qui sert à calculer ce qui sera conservé ;
+3.  le ***goodput*** : la part du temps réservé qui sert à calculer ce qui sera conservé, au sens du [module 10, §2.1](../fault-tolerance/index.html#ch2) ;
 4.  le **coût par GPU-heure utile**, et non par GPU-heure facturée.
 
 ::: ex
 [Exemple 1.1 — Mesurer une classe de charge avec la loi de Little]{.tag} Dans le cahier des charges fictif du projet 6, 650 sessions interactives de 1,2 heure de travail arrivent chaque mois de 730 heures. Le taux d'arrivée est de 650 / 730 = 0,890 session par heure.
 
-La loi de Little (le nombre moyen de requêtes en cours est le taux d'arrivée multiplié par la durée moyenne) donne 0,890 × 1,2 = **1,07 session simultanée** en moyenne. Quatre GPU réservés l'absorbent à 26,7 % d'utilisation, avec une attente moyenne de 37 secondes (file M/M/c et formule d'Erlang C : [module 15, chapitre 2](../finops-capacity/index.html#ch2)).
+La loi de Little ([module 1, §7.2](../linux-systems/index.html#mesurer-un-disque-avec-fio-la-loi-de-little) : taux d'arrivée multiplié par durée moyenne) donne 0,890 × 1,2 = **1,07 session simultanée** en moyenne. Quatre GPU réservés l'absorbent à 26,7 % d'utilisation, avec une attente moyenne de 37 secondes (file M/M/c et formule d'Erlang C : [module 15, chapitre 2](../finops-capacity/index.html#ch2)).
 
 Le modèle du projet 6 ajoute le surcoût des pannes et des reprises à la durée de service et publie **26,9 %** et **38 secondes**. À vue d'œil le pool est « sous-utilisé », et pourtant l'attente est justement dans l'objectif.
 
@@ -157,7 +156,7 @@ Les plateformes que l'on adopte ont un « chemin tout tracé » : un modèle de 
 [Points clés]{.tag}
 
 -   Une plateforme est un service : le premier job d'un nouveau membre est le test d'adoption.
--   Quatre mesures : délai avant le premier job, attente au 90e centile par classe, disponibilité utile, coût par GPU-heure utile.
+-   Quatre mesures : délai avant le premier job, attente au 90e centile par classe, goodput, coût par GPU-heure utile.
 -   La loi de Little dimensionne les classes interactives ; une utilisation basse peut être le prix d'une attente basse.
 -   Associez deux mesures opposées pour qu'aucune ne devienne un objectif trompeur.
 -   Un modèle de job testé réduit plus le coût d'adoption que n'importe quelle formation.
@@ -169,11 +168,13 @@ Le développement interactif est la classe qui exige la latence la plus basse et
 
 ### 2.1. Un portail HPC ou un hub multi-utilisateur
 
-*Open OnDemand* se configure pour que des « interactive apps that run on compute nodes » soient lancées depuis un navigateur ([documentation, version 4.2.0](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html)), par des adaptateurs vers Slurm, LSF, PBS Professional, Grid Engine ou Kubernetes, entre autres ([liste des adaptateurs](https://osc.github.io/ood-documentation/latest/installation/resource-manager/slurm.html)) : une session interactive y est donc un job du gestionnaire de ressources. *JupyterHub*, de son côté, est « a multi-user Hub that spawns, manages, and proxies » des serveurs Jupyter mono-utilisateur, lancés par des *spawners* et déployables sur Kubernetes ([documentation](https://jupyterhub.readthedocs.io/en/stable/)).
+*Open OnDemand* se configure pour que des « interactive apps that run on compute nodes » soient lancées depuis un navigateur ([documentation](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html), version 4.2 lue le 2026-10-24), par des adaptateurs vers Slurm, LSF, PBS Professional, Grid Engine ou Kubernetes, entre autres ([liste des adaptateurs](https://osc.github.io/ood-documentation/latest/installation/resource-manager/slurm.html)) : une session interactive y est donc un job du gestionnaire de ressources. *JupyterHub*, de son côté, est « a multi-user Hub that spawns, manages, and proxies » des serveurs Jupyter mono-utilisateur, lancés par des *spawners* et déployables sur Kubernetes ([documentation](https://jupyterhub.readthedocs.io/en/stable/)).
 
 Le choix dépend de l'ordonnanceur de la plateforme : si les sessions doivent entrer dans les files de Slurm, un portail qui lance des jobs est naturel ; si la plateforme est sur Kubernetes, un hub qui lance des pods l'est. Comme Open OnDemand dispose aussi d'un adaptateur Kubernetes, ce n'est pas une impossibilité technique qui tranche, mais le coût d'exploitation d'un composant de plus. Dans les deux cas, la question importante est la même : **qui arrête la session ?**
 
 ### 2.2. Trois façons de partager un GPU
+
+Le [module 6, §9.3](../provisioning/index.html#partager-un-gpu-mig-time-slicing-mps-et-vgpu) est la référence du parcours sur les garanties d'un GPU partagé (MIG, *time-slicing*, MPS, vGPU), et le [module 12, §2.4 et 2.5](../kubernetes-gpu/index.html#ch2) en donne la configuration sous Kubernetes. On n'en retient ici que le choix et le dimensionnement pour des sessions interactives. Pour les machines virtuelles à GPU (passthrough VFIO, vGPU, KubeVirt) et leur recette, voir le [chapitre 9 du module 6](../provisioning/index.html#ch9).
 
 Un GPU entier par session est simple et isolé, mais gaspille : une session de développement en occupe rarement la capacité. Deux mécanismes permettent de le partager.
 
@@ -187,7 +188,7 @@ La *MIG* (*Multi-Instance GPU*, à partir de l'architecture Ampere) partitionne 
 
 ### 2.3. Les règles qui évitent le gaspillage
 
-Trois règles suffisent : une **durée maximale** par session interactive, un **arrêt automatique après inactivité**, et une **alerte d'allocation inactive** pour ce qui échappe aux deux premières, comme l'alerte `GPUIdleAllocated` du [projet 5](../../projects/gpu-observability/index.html). Chacune est un compromis entre le confort de l'utilisateur et le coût : écrivez les valeurs dans une décision (ADR), pas dans un message de messagerie.
+Trois règles suffisent : une **durée maximale** par session interactive, un **arrêt automatique après inactivité**, et une **alerte d'allocation inactive** pour ce qui échappe aux deux premières, comme l'alerte `GPUIdleAllocated` du [projet 5](../../projects/gpu-observability/index.html). Chacune est un compromis entre le confort de l'utilisateur et le coût : écrivez les valeurs dans une décision d'architecture (ADR, section 4.5), pas dans un message de messagerie.
 
 ::: ex
 [Exemple 2.1 — Combien de sessions MIG pour 4 GPU ?]{.tag} Avec jusqu'à 7 instances par GPU, 4 GPU offrent au plus **28 sessions simultanées** (4 × 7). La demande moyenne de l'exemple 1.1 est de 1,07 session : la MIG n'est **pas nécessaire** pour la charge moyenne, qui tient sur 4 GPU entiers avec environ 2,5 % de probabilité d'attente. Elle ne se justifierait que si les pics, et non la moyenne, dépassaient 4 sessions simultanées de façon fréquente, ce que seule une mesure de l'attente réelle peut dire.
@@ -218,6 +219,10 @@ Chaque job doit s'exécuter avec l'identité de la personne ou de l'équipe qui 
 
 Les conteneurs partagent le noyau de la machine : ils isolent la **vue** et limitent la **consommation** (module 1), ils ne constituent pas une barrière de sécurité de même force qu'une machine virtuelle. Kubernetes définit trois profils de sécurité de pods, *Privileged*, *Baseline* et *Restricted* ([Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/)) : partez de *Restricted* pour les jobs des utilisateurs et n'ouvrez que ce qu'un cas précis exige (accès au GPU, réseau d'interconnexion). Pour le GPU lui-même, retenez la distinction du chapitre 2 : MIG isole mémoire et pannes, le partage par tranches de temps ne le fait pas.
 
+Quand la frontière entre locataires est une machine virtuelle, c'est l'IOMMU qui empêche un GPU confié à un invité d'écrire dans la mémoire de l'hôte, et le groupe IOMMU est l'unité que l'on confie à un invité. Le [chapitre 9 du module 6](../provisioning/index.html#ch9) montre comment lire ces groupes et remettre un GPU en état entre deux locataires (§9.5).
+
+Le réseau ne s'isole pas seul non plus : « By default, a pod is non-isolated for ingress; all inbound connections are allowed », et de même en sortie ([Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)). Une `NetworkPolicy` par locataire restreint ce trafic, à condition que le plugin réseau l'applique : « Creating a NetworkPolicy resource without a controller that implements it will have no effect ». Le [module 12, §8.2](../kubernetes-gpu/index.html#ch8) en donne un point de départ pour un entraînement.
+
 ### 3.4. Secrets
 
 « Kubernetes Secrets are, by default, stored unencrypted in the API server's underlying data store » ([documentation des Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)). Un secret n'est donc pas protégé parce qu'il est dans un objet nommé `Secret` : activez le chiffrement au repos, limitez qui peut lire l'objet et ne mettez jamais un secret dans une image ni dans un dépôt.
@@ -247,6 +252,7 @@ Sur Kubernetes, l'audit fournit « a security-relevant, chronological set of rec
 -   Décidez d'abord ce qu'est un locataire : équipe ou utilisateur.
 -   Un job s'exécute avec l'identité de qui l'a lancé : sinon comptabilité, audit et quotas ne valent rien.
 -   Les conteneurs isolent la vue, pas comme une machine virtuelle ; partez du profil Restricted.
+-   Un pod accepte tout trafic tant qu'aucune `NetworkPolicy`, appliquée par le plugin réseau, ne le restreint.
 -   Un Secret n'est pas chiffré par défaut ; base64 n'est pas du chiffrement.
 -   Épinglez les images par empreinte, et gardez l'audit assez longtemps pour reconstituer un incident.
 :::
@@ -257,7 +263,7 @@ Opérer en production, c'est promettre un niveau de service, être joignable qua
 
 ### 4.1. SLO et budget d'erreur
 
-Le SRE Book de Google définit le **budget d'erreur** à partir de l'objectif de niveau de service (*SLO*) : « the two teams jointly define a quarterly error budget based on the service's service level objective, or SLO ». C'est ce qui reste de non-fiabilité autorisée : tant qu'il en reste, on peut déployer ; quand il est épuisé, on ralentit les changements ([Embracing Risk](https://sre.google/sre-book/embracing-risk/)). Son exemple chiffré : un SLO de 99,999 % par trimestre donne un budget de 0,001 % ; un incident qui fait échouer 0,0002 % des requêtes en consomme 20 %.
+Le [module 14, §6.1](../observability/index.html#ch6) a défini SLI, SLO et **budget d'erreur** ; on les applique ici à la plateforme entière. Le SRE Book de Google rattache ce budget à l'objectif de niveau de service (*SLO*) : « the two teams jointly define a quarterly error budget based on the service's service level objective, or SLO » ([Embracing Risk](https://sre.google/sre-book/embracing-risk/)). Son exemple chiffré : un SLO de 99,999 % par trimestre donne un budget de 0,001 % ; un incident qui fait échouer 0,0002 % des requêtes en consomme 20 %.
 
 ::: ex
 [Exemple 4.1 — Ce que coûte une heure d'incident]{.tag} Un SLO de disponibilité de 99,9 % sur 30 jours (43 200 minutes) autorise 0,001 × 43 200 = **43,2 minutes** de défaillance. Un SLO de 99,95 % n'en autorise que 21,6, un SLO de 99,99 % que 4,32. L'incident synthétique du lab 16.2 (un pré-entraînement sans progression pendant 1 h 58) dépasse à lui seul de 2,7 fois le budget de 99,9 % (118 / 43,2). Choisir un SLO, c'est donc choisir ce que l'on est prêt à investir pour ne pas dépasser ces minutes.
@@ -290,13 +296,15 @@ GPU-hours without progress (128 GPUs): 251.7
 ~~~
 
 Une fois l'incident détecté, tout va vite : 4 minutes pour acquitter, 18 pour réparer. Les 100 minutes viennent de la **détection**, assurée par un chercheur parce que la supervision lisait une utilisation GPU rassurante et fausse. L'action utile est donc là, pas dans la vitesse de l'astreinte. Journal **synthétique** : ni système ni personne réels.
+
+Le scénario suppose un délai d'attente des collectives allongé bien au-delà de la valeur par défaut de PyTorch, 10 minutes pour NCCL ([documentation de `torch.distributed`](https://docs.pytorch.org/docs/main/distributed.html)), ce que l'on fait pour ne pas tuer un job pendant une phase lente légitime. Avec la valeur par défaut, le job aurait échoué au bout de 10 minutes, et cet échec aurait servi de détection ([module 10, chapitre 5](../fault-tolerance/index.html#ch5)).
 :::
 
 ### 4.4. Le post-mortem sans blâme
 
 Un post-mortem est le document qui transforme un incident en actions. Le SRE Book pose la règle : il doit « focus on identifying the contributing causes of the incident without indicting any individual or team » ([Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)).
 
-Il le définit comme « a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring ». Ce parcours en tire un plan **recommandé** : résumé, impact chiffré, chronologie, cause racine, facteurs contributifs, ce qui a bien et mal marché, et surtout des **actions** avec un propriétaire, une échéance et une vérification.
+Le [module 10, §8.5](../fault-tolerance/index.html#le-post-mortem-sans-blâme) en a donné la définition du SRE Book et la ligne des GPU-heures perdues ; on en fait ici un processus d'équipe, pratiqué au lab 16.2. Ce parcours en propose un plan **recommandé** : résumé, impact chiffré, chronologie, cause racine, facteurs contributifs, ce qui a bien et mal marché, et surtout des **actions** avec un propriétaire, une échéance et une vérification.
 
 Le lab 16.2 fournit un vérificateur qui contrôle cette structure et, plus important, que **les durées écrites dans le texte égalent celles du journal** (détection, acquittement, atténuation, GPU-heures perdues ; pas chaque horodatage de la chronologie) : un post-mortem dont les chiffres ne tiennent pas est une opinion.
 
@@ -465,14 +473,16 @@ Un découpage utile : cinq minutes de cadrage, dix de calcul, dix de conception 
 
 ### 8.3. Le calcul de tête
 
-Pour un modèle dense de $P$ paramètres entraîné sur $D$ jetons, le calcul d'entraînement vaut environ $6PD$ opérations ([module 2, chapitre 7](../perf-models/index.html#ch7)). La durée sur $N$ GPU de puissance crête $F$ à une utilisation $\text{MFU}$ est :
+Pour un modèle dense de $N$ paramètres entraîné sur $D$ jetons, le calcul d'entraînement vaut environ $6ND$ opérations ([module 2, chapitre 7](../perf-models/index.html#ch7)). La durée sur $n_{\text{GPU}}$ GPU de pic $P_{\text{pic}}$ à une utilisation $\text{MFU}$ est :
 
-$$ \text{jours} = \frac{6\,P\,D}{N \cdot F \cdot \text{MFU} \cdot 86400} $$
+$$ \text{jours} = \frac{6\,N\,D}{n_{\text{GPU}} \cdot P_{\text{pic}} \cdot \text{MFU} \cdot 86400} $$
 
-où la MFU (*model FLOPs utilization*) est la part de la puissance crête réellement obtenue. Pour un délai donné, on inverse la formule pour obtenir $N$, qu'on arrondit **au nœud entier** supérieur.
+où la MFU (*model FLOPs utilization*) est la part de la puissance crête réellement obtenue. Pour un délai donné, on inverse la formule pour obtenir $n_{\text{GPU}}$, qu'on arrondit **au nœud entier** supérieur.
 
 ::: ex
-[Exemple 8.1 — Dimensionner 70 milliards de paramètres sur 2 000 milliards de jetons]{.tag} Les hypothèses sont dites : puissance crête de 989 TFLOP/s par GPU, MFU de 0,40, 14 octets par paramètre pour un checkpoint (poids en bf16, copie maîtresse et deux moments d'Adam en fp32), écriture à 50 Go/s au total, 0,0002 panne par GPU-heure. `sizing.py` donne, pour 256 GPU :
+[Exemple 8.1 — Dimensionner 70 milliards de paramètres sur 2 000 milliards de jetons]{.tag} Le délai est de 100 jours au plus. Les hypothèses sont dites : pic de 989 TFLOP/s par GPU (un H100 SXM en BF16 dense, la moitié des 1 979 TFLOPS « with sparsity » de la [page produit](https://www.nvidia.com/en-us/data-center/h100/), voir le [module 2, chapitre 2](../perf-models/index.html#ch2)), MFU de 0,40, 14 octets par paramètre pour un checkpoint (poids en bf16, copie maîtresse et deux moments d'Adam en fp32), écriture à 50 Go/s au total, reprise de 15 minutes.
+
+Le taux de 0,0002 panne par GPU-heure est une hypothèse **pessimiste** : environ six fois les 6,5 pannes pour mille nœuds-jours que [Kokolis et coauteurs](https://arxiv.org/abs/2410.21680) mesurent sur le cluster RSC-1, soit 3,4·10⁻⁵ par GPU-heure ([module 10, chapitre 1](../fault-tolerance/index.html#ch1)), qui donneraient un MTBF de job de 115 heures. Il est en revanche du même ordre que le MTTF de 7,9 heures que les mêmes auteurs mesurent pour les jobs de 1 024 GPU, soit 1,2·10⁻⁴. `sizing.py` donne, pour 256 GPU :
 
 ~~~text
 training compute         : 8.40e+23 FLOP
@@ -491,16 +501,38 @@ Le délai de 100 jours est tenu avec 0,4 jour de marge : la conclusion honnête 
 
 Après le calcul de durée, trois chiffres montrent que vous pensez en production : le MTBF du job (ici 19,5 heures : un job de 256 GPU est interrompu en moyenne toutes les 19,5 heures), la taille et le temps d'écriture d'un checkpoint (980 Go en 20 secondes, ce qui suppose un stockage capable de 50 Go/s, à mesurer et non à supposer) et la période de checkpoint de Young et Daly, qui vaut ici 28 minutes. Nommez ensuite ce qui limiterait l'entraînement et comment vous le mesureriez *avant* de vous engager : réseau ([module 7](../networking/index.html)), stockage, fiabilité des nœuds.
 
-La période de Young et Daly vaut $T^{\ast} = \sqrt{2CM}$, avec $C$ le temps d'écriture d'un checkpoint et $M$ le temps moyen entre pannes du job ([module 10, chapitre 2](../fault-tolerance/index.html#ch2)). Ici $C = 19{,}6$ s et $M = 70\,300$ s, d'où $T^{\ast} \approx 1\,660$ s, soit 28 minutes.
+La période de Young et Daly vaut $T^{\ast} = \sqrt{2CM}$, avec $C$ le temps d'écriture d'un checkpoint (le $\delta$ du module 10), $T$ la période (son $\tau$) et $M$ le temps moyen entre pannes du job ([module 10, chapitre 2](../fault-tolerance/index.html#ch2)).
+
+Ici $C = 19{,}6$ s et $M = 70\,300$ s, d'où $T^{\ast} \approx 1\,660$ s, soit 28 minutes.
+
+Le goodput s'en déduit au premier ordre, avec $R$ le temps de reprise (module 10, §2.2) :
+
+$$ \text{goodput} \approx 1 - \left(\frac{C}{T} + \frac{T/2 + R}{M}\right) $$
+
+Avec $R = 900$ s, le premier terme vaut 0,0118 et le second 0,0246 : le goodput est de 0,964, et la durée avec pannes de 96,0 / 0,964 = 99,6 jours. C'est le calcul de `sizing.py`, à refaire pour l'exercice 9.
+
+### 8.5. Négocier, et poser vos propres questions
+
+Diriger une plateforme, c'est aussi négocier une capacité ou un budget. Une question à préparer : *un fournisseur propose un engagement de trois ans sur votre capacité GPU ; comment préparez-vous la négociation ?* Réponse attendue : une demande chiffrée avec ses scénarios, le coût par GPU-heure utile, une alternative crédible qui fixe le prix de réserve, des clauses classées par valeur en jeu et deux négociations menées en parallèle. La méthode et ses chiffres sont au [module 15, chapitre 7](../finops-capacity/index.html#ch7).
+
+En fin d'entretien, vos propres questions montrent ce que vous savez d'une plateforme, et leurs réponses disent si le poste est tenable. Cinq questions à poser (liste de ce parcours) :
+
+1.  *Comment mesurez-vous l'adoption et le goodput de la plateforme ?* (chapitre 1)
+2.  *Comment l'astreinte est-elle organisée : combien de personnes, quelles heures, combien d'incidents par garde ?* (chapitre 4)
+3.  *Le dernier post-mortem a-t-il produit des actions avec un propriétaire, et ont-elles été faites ?* (chapitre 4)
+4.  *Quelle part du temps de l'équipe va au travail d'exploitation, et qui décide de ce que l'on automatise ?* (chapitre 6)
+5.  *Qui décide des achats de capacité, et quelle place l'équipe d'infrastructure y tient-elle ?* (module 15, chapitre 7)
 
 ::: recap
 [Points clés]{.tag}
 
 -   Sept critères : cadrage, calcul, hypothèses, fiabilité, goulots, compromis, communication.
 -   Cadrer d'abord, calculer ensuite, dire chaque hypothèse à voix haute.
--   Durée = 6PD divisé par N, F, MFU et 86 400 ; arrondir les GPU au nœud supérieur.
+-   Durée = 6ND divisé par $n_{\text{GPU}}$, $P_{\text{pic}}$, MFU et 86 400 ; arrondir les GPU au nœud supérieur.
+-   Goodput ≈ 1 − (C/T + (T/2 + R)/M) ; la durée avec pannes est la durée idéale divisée par le goodput.
 -   Une hypothèse unique (la MFU) peut renverser la conclusion : chiffrez-en l'effet.
 -   Montrez la fiabilité : MTBF du job, taille et temps du checkpoint, période de Young et Daly.
+-   Préparez une question de négociation (module 15, chapitre 7) et vos propres questions sur l'astreinte, le toil et les post-mortems.
 :::
 
 ## 9. Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue {#ch9}
@@ -812,7 +844,7 @@ Un mois de 30 jours compte 43 200 minutes. (a) Budget = (1 − SLO) × 43 200 : 
 
 (b) Les combinaisons de coût au plus 110 h sont A, B, C, D seules, A + C (110 h) et C + D (70 h) ; A + C donne **153 h** par mois, contre 108 h pour A seule et 60 h pour C + D. A + D (120 h) et B + C (130 h) dépassent le budget : le meilleur choix isolé (A) n'est donc pas la meilleure combinaison.
 
-(c) Il reste 240 − 153 = **87 heures** de toil, soit 87 / 480 = **18,1 %** : l'équipe passe de 50 % (exactement au plafond, sans marge) à moins du quart du temps. Le plafond de 50 % était juste atteint avant l'automatisation.
+(c) Il reste 240 − 153 = **87 heures** de toil, soit 87 / 480 = **18,1 %** : l'équipe passe de 50 % (exactement au plafond, sans marge) à moins du quart du temps. Le plafond de 50 % était juste atteint avant l'automatisation, si l'équipe n'assure pas d'astreinte en plus : sinon ses heures s'ajoutent aux 240 heures, et le plafond était déjà dépassé (exemple 6.1).
 :::
 
 ::: exo
@@ -856,17 +888,19 @@ Un classement défendable, du plus grave au moins grave :
 | Secrets non chiffrés par défaut dans le magasin de l'API | Chiffrement au repos, droits de lecture restreints, aucun secret dans l'image ni le dépôt | Les administrateurs de l'API voient toujours les secrets |
 | Audit désactivé : impossible de reconstituer qui a fait quoi | Audit activé et conservé assez longtemps, avec l'identité de la personne | Coût de stockage des journaux |
 
-Le premier risque domine parce qu'il combine portée (les deux équipes), durée (un an) et facilité (un seul jeton). Sources : documentation Kubernetes (multi-location, Secrets, images, audit) et NVIDIA (MIG, partage de GPU), citées au chapitre 3.
+Le premier risque domine parce qu'il combine portée (les deux équipes), durée (un an) et facilité (un seul jeton). Sources : documentation Kubernetes (multi-location, Secrets, images, audit), citée au chapitre 3, et NVIDIA (MIG, partage de GPU), citée au chapitre 2.
 :::
 
 ::: exo
-[Exercice 9 · ★★★ — Dimensionner un entraînement de 7 milliards de paramètres]{.tag} On veut entraîner un modèle dense de 7 milliards de paramètres sur 1 000 milliards de jetons en 30 jours maximum, sur des GPU de 989 TFLOP/s crête. Hypothèses : MFU de 0,40, checkpoint de 14 octets par paramètre écrit à 20 Go/s au total, 0,0002 panne par GPU-heure, reprise de 15 minutes. (a) Combien de GPU, arrondis au nœud de 8 ? (b) Durée avec et sans pannes, MTBF, taille et temps du checkpoint, période de Young et Daly. (c) Que devient la réponse avec une MFU de 0,30 ? (d) Quelle mesure faites-vous avant de vous engager ?
+[Exercice 9 · ★★★ — Dimensionner un entraînement de 7 milliards de paramètres]{.tag} On veut entraîner un modèle dense de 7 milliards de paramètres sur 1 000 milliards de jetons en 30 jours maximum, sur des GPU de 989 TFLOP/s crête. Hypothèses : MFU de 0,40, checkpoint de 14 octets par paramètre écrit à 20 Go/s au total, 0,0002 panne par GPU-heure (hypothèse pessimiste, voir l'exemple 8.1), reprise de 15 minutes.
+
+(a) Combien de GPU, arrondis au nœud de 8 ? (b) Durée avec et sans pannes, MTBF, taille et temps du checkpoint, période de Young et Daly. (c) Que devient la réponse avec une MFU de 0,30 ? (d) Quelle mesure faites-vous avant de vous engager ?
 :::
 
 ::: sol
 Le calcul d'entraînement est 6 × 7e9 × 1e12 = **4,2e22 FLOP**. (a) Pour 30 jours : 4,2e22 / (30 × 86 400 × 989e12 × 0,40) = 40,96, soit 41 GPU, arrondis à **48 GPU** (6 nœuds).
 
-(b) Sur 48 GPU : durée idéale **25,6 jours** ; checkpoint de 7e9 × 14 = **98 Go**, écrit en **4,9 secondes** à 20 Go/s ; MTBF du job 1 / (48 × 0,0002) = **104,2 heures** ; période de Young et Daly √(2CM) = **32 minutes** (31,95) avec une disponibilité utile de **0,992** ; durée avec pannes **25,8 jours**, soit 4,2 jours de marge sur les 30.
+(b) Sur 48 GPU : durée idéale **25,6 jours** ; checkpoint de 7e9 × 14 = **98 Go**, écrit en **4,9 secondes** à 20 Go/s ; MTBF du job 1 / (48 × 0,0002) = **104,2 heures** ; période de Young et Daly √(2CM) = **32 minutes** (31,95) avec un goodput de **0,992** ; durée avec pannes **25,8 jours**, soit 4,2 jours de marge sur les 30.
 
 (c) À MFU 0,30 : 4,2e22 / (30 × 86 400 × 989e12 × 0,30) = 54,6, soit **56 GPU** ; à 48 GPU la durée idéale monte à **34,1 jours**, hors délai. (d) Avant de s'engager, mesurez la **MFU réelle** d'un nœud sur le modèle et la taille de lot visés, et le **débit d'écriture** du stockage sous charge : ce sont les deux hypothèses dont l'erreur renverse la conclusion.
 :::
@@ -989,7 +1023,7 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
-1.  *Votre plateforme affiche 95 % d'utilisation de GPU. Que répondez-vous au directeur qui veut en acheter moins ?* Réponse-type : l'utilisation seule ne dit rien ; il faut l'attente au 90e centile par classe et la disponibilité utile. Une utilisation haute avec une attente qui dépasse l'objectif signale un manque de capacité ; une utilisation haute faite de jobs bloqués signale un défaut de supervision. Je montre les quatre mesures avant de décider.
+1.  *Votre plateforme affiche 95 % d'utilisation de GPU. Que répondez-vous au directeur qui veut en acheter moins ?* Réponse-type : l'utilisation seule ne dit rien ; il faut l'attente au 90e centile par classe et le goodput. Une utilisation haute avec une attente qui dépasse l'objectif signale un manque de capacité ; une utilisation haute faite de jobs bloqués signale un défaut de supervision. Je montre les quatre mesures avant de décider.
 2.  *Votre équipe compte trois personnes et le service doit être disponible en permanence. Que faites-vous ?* Réponse-type : au plus 25 % du temps d'astreinte par personne, ce qui exige quatre personnes pour une seule personne d'astreinte à la fois et huit pour un titulaire et un second. À trois, je limite l'astreinte aux heures ouvrées, j'automatise les reprises sur panne matérielle pour que l'astreinte n'ait rien à faire la nuit, et je le dis au directeur avec le coût de l'alternative.
 3.  *Un job de 256 GPU a stagné deux heures sans que personne ne le voie. Comment travaillez-vous ?* Réponse-type : je reconstitue les jalons (anomalie, détection, atténuation) dans un post-mortem sans blâme ; la durée de détection est la plus longue, donc l'action principale est une alerte sur l'absence de progrès plutôt que sur l'utilisation du GPU, avec un propriétaire et une échéance. Je vérifie que les chiffres du texte égalent ceux du journal.
 
@@ -1006,8 +1040,8 @@ Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié
 -   Ohio Supercomputer Center. [*Open OnDemand — Setup Interactive Apps*](https://osc.github.io/ood-documentation/latest/how-tos/app-development/interactive/setup.html) : applications interactives sur les nœuds de calcul ; la [liste des adaptateurs](https://osc.github.io/ood-documentation/latest/installation/resource-manager/slurm.html) (Slurm, Kubernetes…) se trouve dans la même documentation (chapitre 2).
 -   NVIDIA. [*MIG User Guide*](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/introduction.html) et [*GPU sharing, GPU Operator*](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html) : MIG et tranches de temps (chapitre 2).
 -   Kubernetes. [*Multi-tenancy*](https://kubernetes.io/docs/concepts/security/multi-tenancy/) et [*Pod Security Standards*](https://kubernetes.io/docs/concepts/security/pod-security-standards/) : locataires et profils de sécurité (chapitre 3).
--   Kubernetes. [*Secrets*](https://kubernetes.io/docs/concepts/configuration/secret/), [*Images*](https://kubernetes.io/docs/concepts/containers/images/) et [*Auditing*](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/) : secrets, empreintes d'images, audit (chapitre 3).
--   NVIDIA. [*XID Errors, Xid catalog*](https://docs.nvidia.com/deploy/xid-errors/analyzing-xid-catalog.html) : sens de l'Xid 79 (« GPU has fallen off the bus ») que montre le journal synthétique du lab 16.2 (chapitre 4).
+-   Kubernetes. [*Secrets*](https://kubernetes.io/docs/concepts/configuration/secret/), [*Images*](https://kubernetes.io/docs/concepts/containers/images/), [*Auditing*](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/) et [*Network Policies*](https://kubernetes.io/docs/concepts/services-networking/network-policies/) : secrets, empreintes d'images, audit, isolation réseau des pods (chapitre 3 ; *Network Policies* lue le 2026-10-25).
+-   NVIDIA. [*XID Errors, Xid catalog*](https://docs.nvidia.com/deploy/xid-errors/analyzing-xid-catalog.html) : sens de l'Xid 79 (« GPU has fallen off the bus ») que montre le journal synthétique du lab 16.2.
 -   Ongaro, D. et Ousterhout, J. [*In Search of an Understandable Consensus Algorithm*](https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro), USENIX ATC, 2014 : lire §5.2 (élection d'un leader) et §5.3 (réplication du journal) pour la majorité et l'unicité du leader par mandat (chapitre 9).
 -   etcd. [*Frequently Asked Questions*](https://etcd.io/docs/v3.7/faq/), documentation v3.7 : taille des majorités, tolérance aux pannes, taille maximale d'un cluster, ordre de remplacement d'un membre (chapitre 9).
 -   Kubernetes. [*Operating etcd clusters for Kubernetes*](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/) et [*Options for Highly Available Topology*](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/) : sauvegarde et restauration d'etcd, cinq membres en production, topologies empilée et externe (chapitre 9).
@@ -1016,20 +1050,20 @@ Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié
 
 ### Documenté {#documente}
 
-Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par `tools/fetch_text.py`).
+Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images, de l'audit et des `NetworkPolicy`, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par `tools/fetch_text.py`). Ont été lus le 2026-10-25 : la page *Network Policies* de Kubernetes, le délai par défaut des collectives NCCL dans la documentation de `torch.distributed`, le pic BF16 de la page produit du H100 et les taux de panne de Kokolis et coauteurs (6,5 pannes pour mille nœuds-jours, MTTF de 7,9 heures à 1 024 GPU).
 
 Pour le chapitre 9 (pages lues le 2026-10-25) : la règle de majorité et l'unicité du leader par mandat viennent de l'article de Raft ; les tailles de majorité, la tolérance aux pannes, la limite de sept membres, l'effet de la taille sur les écritures et l'ordre de remplacement d'un membre, de la FAQ d'etcd v3.7 ; les cinq membres en production, la sauvegarde et la restauration d'etcd, l'arrêt des serveurs d'API avant restauration et les deux topologies, de la documentation de Kubernetes. Le basculement de `slurmctld`, `SlurmctldTimeout`, `StateSaveLocation` et le secours de `slurmdbd` viennent de `slurm.conf`, de `slurmdbd.conf` et du guide d'administration de Slurm 26.05, la liste minimale des sauvegardes, du guide de mise à jour ; la tolérance aux pannes du GCS, de la documentation de Ray ; `mariadb-dump`, de la documentation MariaDB. Les principes GitOps, Argo CD, Flux, `promtool test rules`, l'abandon de kubeval, les limites de kubeconform et la définition du canarying viennent des pages citées. Les deux incidents viennent de leurs post-mortems publics. La part des offres qui citent les systèmes distribués, la CI/CD, GitOps ou les composants de Kubernetes vient du [relevé du marché](../../market/index.html).
 
 ### Recommandé {#recommande}
 
-Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes. Il en va de même, au chapitre 9, de la règle de placement (aucun domaine de panne ne porte plus de membres que le cluster ne tolère de pannes), de l'exercice de restauration à date fixe avec RTO et RPO mesurés, de la liste des contrôles avant fusion, des trois critères de retour arrière et des cinq questions d'entretien.
+Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers, la grille d'entretien et les questions à poser en fin d'entretien sont des choix de ce parcours, pas des normes. Le taux de 0,0002 panne par GPU-heure de l'exemple 8.1 et de l'exercice 9 est une hypothèse d'exercice, volontairement pessimiste. Il en va de même, au chapitre 9, de la règle de placement (aucun domaine de panne ne porte plus de membres que le cluster ne tolère de pannes), de l'exercice de restauration à date fixe avec RTO et RPO mesurés, de la liste des contrôles avant fusion, des trois critères de retour arrière et des cinq questions d'entretien.
 
 ### À vérifier {#a-verifier}
 
-Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
+Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2, lue le 2026-10-24 à une adresse `latest/` qui suivra les versions suivantes. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
 
 Pour le chapitre 9 : les disponibilités de membre et de rack de l'exemple 9.1 et de l'exercice 12 sont des **hypothèses**, et l'indépendance des pannes en est une autre. L'exercice de restauration a tourné avec etcd 3.7.0 sur une seule machine, sans réseau ni base de taille réelle : sa durée n'est pas un RTO. La répartition des commandes entre `etcdctl` et `etcdutl` change d'une version d'etcd à l'autre, et le stockage RocksDB du GCS de Ray est en alpha : relisez la documentation de votre version. La haute disponibilité de Slurm, les topologies de Kubernetes, Argo CD, Flux et kubeconform n'ont pas été exécutés dans le bac à sable.
 
 ### Hors périmètre {#hors-perimetre}
 
-La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand. Pour le chapitre 9 : les preuves formelles de Raft ou de Paxos, les pannes byzantines, la réplication de la base de comptabilité elle-même (MariaDB), l'installation et l'exploitation d'Argo CD ou de Flux, et la livraison progressive des applications servies aux utilisateurs.
+La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée (leviers et calendrier : [module 15, chapitre 7](../finops-capacity/index.html#ch7)), la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand. Pour le chapitre 9 : les preuves formelles de Raft ou de Paxos, les pannes byzantines, la réplication de la base de comptabilité elle-même (MariaDB), l'installation et l'exploitation d'Argo CD ou de Flux, et la livraison progressive des applications servies aux utilisateurs.

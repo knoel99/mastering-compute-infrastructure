@@ -49,7 +49,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#projets">Projets</a></p>
 <header id="title-block-header">
 <h1 class="title">Projet 4 — Placement multi-fournisseurs sensible aux coûts</h1>
-<p class="subtitle">Projet 4 · 24 h · modules : multi-cloud, finops-capacity, kubernetes-gpu</p>
+<p class="subtitle">Projet 4 · 24 h · modules : multi-cloud, finops-capacity, kubernetes-gpu, fault-tolerance</p>
 <p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Code de départ et solution vérifiés (CPU, sans cloud)</span></p>
 </header>
 <section id="sommaire" class="unnumbered toc-inline">
@@ -82,12 +82,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><span class="tag">Toutes les données sont inventées</span> Les prix sont en unités arbitraires, les capacités et les taux d'interruption sont fabriqués pour le projet. <strong>Ne les lisez pas comme le marché.</strong> Aucun prix de fournisseur n'est cité sur cette page : les tarifs changent, varient selon la région et la disponibilité. Pour une étude réelle, relevez vous-même les prix le jour de l'étude, sur les pages des fournisseurs.</p>
 </div>
 <div class="key">
-<p><span class="tag">Idée centrale du projet</span> Le prix par heure n'est pas le coût d'une heure <strong>utile</strong>. Une offre à prix bas qui interrompt souvent fait perdre du travail et en fait refaire : son coût par heure productive peut dépasser celui d'une offre plus chère et plus stable. Le projet vous fait chiffrer cet écart, avec la formule de Young et Daly du <a href="../resilient-trainer/index.html">projet 3</a> pour choisir la fréquence de checkpoint. Sur les données inventées du projet, une ablation (section « Résultats ») montre que la fréquence de checkpoint pèse plus que le choix de l'offre.</p>
+<p><span class="tag">Idée centrale du projet</span> Le prix par heure n'est pas le coût d'une heure <strong>utile</strong>. Une offre à prix bas qui interrompt souvent fait perdre du travail et en fait refaire : son coût par heure productive peut dépasser celui d'une offre plus chère et plus stable. Le projet vous fait chiffrer cet écart, avec la formule de Young et Daly du <a href="../../courses/fault-tolerance/index.html#ch2">module 10</a>, appliquée au <a href="../resilient-trainer/index.html">projet 3</a>, pour choisir la fréquence de checkpoint. Sur les données inventées du projet, une ablation (section « Résultats ») montre que la fréquence de checkpoint pèse plus que le choix de l'offre.</p>
 </div>
 <h3 id="pre">1.1. Prérequis de connaissances</h3>
-<p>Vous devez savoir lire un code Python de deux cents lignes et écrire des tests. Les notions de checkpoint, de reprise et de période optimale viennent du projet 3 : relisez sa section sur Young et Daly. Les modules « multi-cloud », « FinOps et capacité » et « Kubernetes pour les GPU » du parcours approfondissent le contexte ; ils ne sont pas requis pour faire le projet, qui rappelle ce dont il a besoin.</p>
+<p>Ce projet suppose que vous savez lire un code Python de deux cents lignes et écrire des tests. Les notions de checkpoint, de reprise et de période optimale sont établies au <a href="../../courses/fault-tolerance/index.html#ch2">module 10, chapitre 2</a> et appliquées au <a href="../resilient-trainer/index.html">projet 3</a> ; la section « <a href="#formules">Formules du projet</a> » rappelle ce qu'il faut.</p>
+<p>Quatre chapitres approfondissent le contexte : le coût d'une heure utile au <a href="../../courses/multi-cloud/index.html#ch2">module 13, chapitre 2</a>, le placement entre fournisseurs au <a href="../../courses/multi-cloud/index.html#ch5">chapitre 5</a> du même module, les files Kueue au <a href="../../courses/kubernetes-gpu/index.html#ch3">module 12, chapitre 3</a> et le coût de la GPU-heure utile au <a href="../../courses/finops-capacity/index.html#ch4">module 15, chapitre 4</a>. Ils ne sont pas requis pour faire le projet, qui rappelle ce dont il a besoin.</p>
 <h2 id="cahier">2. Cahier des charges</h2>
 <p>Le dossier <code>labs/projects/multi-provider-scheduler/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>tests/</code> (33 tests) et <code>verify.sh</code>. Les données (<code>data.py</code>) sont fournies : quatre offres synthétiques et un générateur de jobs.</p>
+<p>Malgré des noms proches, ces offres diffèrent de celles du <a href="../../courses/multi-cloud/index.html#lab-13-1">lab 13.1</a> : b-spot y est deux fois plus souvent interrompu (0,60 contre 0,30 fois par heure), et la quatrième offre est à la demande (c-od, 12 u), là où le lab a une offre préemptible (c-spot, 3,4 u). Ne transposez pas les conclusions de l'un à l'autre.</p>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -110,7 +112,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="even">
 <td>R2</td>
-<td><strong>Chronologie exacte</strong> : sans interruption, un job de 300 min de travail, avec démarrage de 10 min et checkpoints de 5 min toutes les 60 min, finit 330 min après son arrivée ; avec une interruption forcée à 100 min (coût de reprise nul dans ce test), 365 min après</td>
+<td><strong>Chronologie exacte</strong> : sans interruption, un job de 300 min de travail, avec démarrage de 10 min et checkpoints de 5 min toutes les 60 min (valeurs propres au test, pas celles du scénario), finit 330 min après son arrivée ; avec une interruption forcée à 100 min (coût de reprise nul dans ce test), 365 min après</td>
 <td><code>test_timeline_*</code>, <code>test_forced_interruption_*</code></td>
 </tr>
 <tr class="odd">
@@ -137,6 +139,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Le moteur suit une sémantique précise, donnée dans la docstring de <code>sim.py</code>. Un job en attente est proposé à la politique au début de chaque minute, dans l'ordre d'arrivée. Une allocation est facturée dès sa première minute, démarrage et checkpoints compris. Une interruption fait perdre toute la progression non sauvegardée, et le job est reproposé la même minute. Le dernier segment de calcul n'est pas suivi d'un checkpoint.</p>
+<p>De même, la docstring de <code>Hedged</code> dans <code>starter/policies.py</code> fixe ce que les tests de R4 vérifient. La fraction de gaspillage <span class="math inline">W</span> est plafonnée à 0,9. Une offre préemptible n'est admissible que si l'instant présent, plus son démarrage, plus le travail restant divisé par <span class="math inline">1 - W</span>, plus 60 min de garde, ne dépasse pas l'échéance.</p>
 <h2 id="jalons">3. Jalons</h2>
 <div class="tbl-wrap">
 <table>
@@ -183,7 +186,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>5</td>
 <td>ADR et lecture critique</td>
 <td>4 h</td>
-<td>un ADR d'une page ; une page des limites de l'étude</td>
+<td>un ADR d'une page que <code>adr_lint.py</code> accepte ; une page des limites de l'étude</td>
 </tr>
 </tbody>
 </table>
@@ -199,7 +202,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>le code complété, les tests et la commande unique qui les lance ;</li>
 <li>le tableau comparatif des trois politiques sur 20 graines, avec moyennes, intervalles <strong>et différences appariées</strong> ;</li>
 <li>au moins une tâche SkyPilot et un jeu de manifestes Kueue générés par votre code, avec une phrase disant qu'ils n'ont <strong>pas</strong> été appliqués à un vrai compte ou cluster ;</li>
-<li>un <strong>ADR</strong> (<em>Architecture Decision Record</em>, note qui consigne une décision et l'alternative écartée) d'une page ;</li>
+<li>un <strong>ADR</strong> (<em>Architecture Decision Record</em>, note qui consigne une décision et l'alternative écartée) d'une page, au format de <code>adr_template.md</code> et vérifié par <code>adr_lint.py</code> (voir « <a href="../../lab-setup/index.html#adr-runbook">Écrire un ADR et un runbook</a> ») ;</li>
 <li>une page « lecture critique » : trois choses que votre simulation ne permet pas de conclure.</li>
 </ul>
 <p>L'ADR tranche au moins quatre questions, en nommant l'alternative écartée :</p>
@@ -216,7 +219,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Capacité.</strong> Sur les trois politiques, aucun pic de GPU simultanés ne dépasse la capacité d'une offre. Commande : <code>pytest -k capacity_and_cost</code>.</li>
 <li><strong>Comptabilité.</strong> Le coût total est égal à la somme du grand livre des allocations et à la somme des coûts par job, à l'arrondi flottant près. Commande : <code>pytest -k capacity_and_cost</code>.</li>
 <li><strong>Politique couverte.</strong> Sur 8 graines, elle coûte moins que chacune des deux autres <strong>sur chaque graine</strong> et manque moins d'échéances (différence appariée dont l'intervalle est entièrement négatif). Commande : <code>pytest tests/test_compare.py</code>.</li>
-<li><strong>Le moins cher par heure n'est pas le moins cher.</strong> La politique « moins cher par heure » perd au moins cinq fois plus d'heures de progression que la politique couverte. Mesuré par <code>test_cheapest_per_hour_is_not_cheapest_overall</code>.</li>
+<li><strong>Le moins cher par heure n'est pas le moins cher.</strong> La politique « moins cher par heure », avec son intervalle fixe de 240 min, coûte plus que la couverte (différence appariée dont l'intervalle est entièrement positif) et perd au moins cinq fois plus d'heures de progression. L'ablation des résultats montre que cet intervalle, plus que le prix, explique l'écart. Mesuré par <code>test_cheapest_per_hour_is_not_cheapest_overall</code>.</li>
 <li><strong>Manifestes.</strong> Les huit mutations testées (flavor inconnu, file inconnue, quota en texte, doublon, mauvaise version d'API, quota négatif, quota booléen, ressource absente de <code>coveredResources</code>) sont toutes rejetées. Commande : <code>pytest tests/test_manifests.py</code>.</li>
 <li><strong>Honnêteté.</strong> Votre README dit que les données sont inventées et que les manifestes ne sont validés que structurellement.</li>
 </ul>
@@ -226,7 +229,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Vérifiez aussi que la capacité est restituée <strong>avant</strong> de proposer les jobs en attente, sinon un job attend une minute de trop.</p>
 <p><strong>Tirages communs.</strong> (<code>_fail_after</code>, fournie dans <code>sim.py</code>, applique déjà ce principe ; à vous de l'appeler avec le bon numéro d'allocation.) Tirer les interruptions dans un seul générateur global rend le résultat d'une politique dépendant de l'ordre dans lequel les autres jobs consomment des nombres : deux politiques ne rencontrent plus la même malchance. Un générateur propre à chaque allocation, initialisé par (graine, job, numéro), corrige cela et réduit la variance de la <strong>différence</strong> entre politiques.</p>
 <p><strong>Temps d'interruption.</strong> Cette fonction vous est fournie ; voici pourquoi elle est écrite ainsi. Pour une interruption de taux constant, le temps jusqu'à l'interruption suit une loi exponentielle : à partir d'un tirage uniforme <span class="math inline">u</span>, il vaut <span class="math inline">-\ln(1-u)</span> divisé par le taux par minute. Elle arrondit au-dessus et garde au moins une minute.</p>
-<p><strong>Politique couverte.</strong> Le coût attendu par heure productive est le prix divisé par un moins la fraction de gaspillage, que la formule de Young et Daly de la section « <a href="#formules">Formules du projet</a> », plus bas, fournit. Écrivez-la d'abord à la main pour deux offres, vérifiez qu'une offre moins chère par heure peut perdre (essayez 1,5 interruption par heure ; avec les offres du projet, l'écart est plus fin), puis codez. N'oubliez pas la garde d'échéance : une offre préemptible n'est admissible que s'il reste de la marge.</p>
+<p><strong>Politique couverte.</strong> Le coût attendu par heure productive est le prix divisé par un moins la fraction de gaspillage, que la formule de Young et Daly de la section « <a href="#formules">Formules du projet</a> », plus bas, fournit. Écrivez-la d'abord à la main pour deux offres, vérifiez qu'une offre moins chère par heure peut perdre (essayez 1,5 interruption par heure ; avec les offres du projet, les deux coûts sont presque égaux), puis codez.</p>
+<p>Comme le font les tests, prenez pour R le seul rechargement (<code>job.restart_cost_min</code>), sans le démarrage : c'est une simplification, discutée dans les formules. N'oubliez pas la garde d'échéance : une offre préemptible n'est admissible que s'il reste de la marge.</p>
 <p><strong>Comparaison.</strong> Deux intervalles de moyennes qui se recouvrent ne prouvent pas que deux politiques sont indiscernables : si les mêmes jobs et les mêmes interruptions sont rejoués, la <strong>différence par graine</strong> est bien plus précise. Calculez-la, avec son intervalle et le nombre de graines où chaque politique gagne.</p>
 <p><strong>Manifestes.</strong> Dans Kueue, un travail reçoit « the first flavor in the ClusterQueue's .spec.resourceGroups[*].flavors list that has enough unused nominalQuota » : l'<strong>ordre</strong> des flavors exprime la préférence. Dans SkyPilot, <code>ordered</code> fait basculer dans l'ordre indiqué, alors que pour <code>any_of</code> « the failover order will be decided by the optimizer ». Vérifiez les noms de champs dans la documentation de <strong>votre</strong> version.</p>
 <p>Une tâche SkyPilot peut aussi mélanger spot et à la demande : sa page sur les jobs gérés donne l'exemple <code>any_of: [{use_spot: true}, {use_spot: false}]</code>. Ce projet génère deux tâches, une par marché, pour garder des fichiers simples à valider.</p>
@@ -314,7 +318,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>Lecture.</strong> La politique couverte gagne partout : la politique « moins cher par heure » perd 398 heures de progression, contre 42 pour la couverte. Entre « moins cher » et « à la demande », le coût diffère nettement mais <strong>les échéances ne se départagent pas</strong> (l'intervalle contient zéro) : c'est exactement ce qu'un tableau de moyennes seul aurait caché.</p>
-<p><strong>Mais pas pour la raison que l'énoncé laisse attendre.</strong> Avec C = 3 min et R = 10 min, l'offre préemptible risquée (3 u, 0,60 interruption par heure) n'est <strong>pas</strong> plus chère par heure productive que l'autre (4 u, 0,15 par heure) : 4,58 u contre 4,69 u (formules plus bas).</p>
+<p><strong>Mais pas pour la raison que l'énoncé laisse attendre.</strong> Avec C = 3 min, et une reprise qui compte le démarrage de l'offre et le rechargement de l'état, l'offre préemptible risquée (3 u, 0,60 interruption par heure) n'est <strong>pas</strong> plus chère par heure productive que l'autre (4 u, 0,15 par heure) : environ 4,73 u contre 4,74 u, une égalité (formules plus bas).</p>
 <p>Elle ne devient ruineuse qu'avec l'intervalle fixe de 240 min de la politique « moins cher », pour lequel le modèle du premier ordre donne un gaspillage supérieur à 1 (il sort alors de son domaine : cela dit seulement que cet intervalle est très mauvais pour cette offre). Une ablation (<code>reference/ablation.py</code>, hors tests) sépare les deux leviers, le placement et l'intervalle de checkpoint :</p>
 <div class="tbl-wrap">
 <table>
@@ -361,17 +365,17 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Changer <strong>seulement</strong> l'intervalle retire 23 459 u de coût [−25 721 ; −21 255], soit presque tout l'écart de 23 524 u.</p>
-<p>Le placement par coût attendu et la garde d'échéance n'ajoutent que −64 u [−1 498 ; +1 265], indiscernables de zéro, et −0,5 échéance manquée [−0,9 ; −0,1]. Dans ce scénario inventé, c'est la fréquence de checkpoint qui compte ; l'offre à 0,60 interruption par heure reste à 4,58 u contre 4,69 u.</p>
-<p>Le taux pour lequel les deux coûts attendus s'égalent est d'environ 0,64 interruption par heure : au-delà, l'offre à 3 u devient plus chère par heure utile et le placement par coût attendu devrait peser davantage. Cette simulation ne le teste pas (voir l'extension « Taux de l'offre risquée »).</p>
+<p>Le placement par coût attendu et la garde d'échéance n'ajoutent que −64 u [−1 498 ; +1 265], indiscernables de zéro, et −0,5 échéance manquée [−0,9 ; −0,1]. Dans ce scénario inventé, c'est la fréquence de checkpoint qui compte ; l'offre à 0,60 interruption par heure reste à égalité avec l'autre (4,73 u contre 4,74 u).</p>
+<p>Avec le modèle exact, les deux coûts attendus s'égalent vers 0,60 interruption par heure, le taux même de l'offre à 3 u : au-delà, elle devient plus chère par heure utile et le placement par coût attendu devrait peser davantage. Cette simulation ne le teste pas (voir l'extension « Taux de l'offre risquée »).</p>
 </details>
 <h2 id="extensions">7. Extensions</h2>
 <ul>
 <li><strong>Interruptions corrélées.</strong> Dans la réalité, une interruption préemptible dans une région signale souvent une pénurie dans cette région : la documentation de SkyPilot écrit « preemptions in a region usually indicate a shortage of resources in that region ». Modélisez des pannes simultanées par région et mesurez ce que cela fait à une politique qui se rabat dans la même région.</li>
-<li><strong>Taux de l'offre risquée.</strong> Faites varier le taux d'interruption de l'offre à 3 u de 0,3 à 2 par heure et reprenez l'ablation : à partir de quel taux le placement par coût attendu, et non seulement l'intervalle de checkpoint, change-t-il le coût ? Comparez avec le croisement calculé à la main (environ 0,64).</li>
+<li><strong>Taux de l'offre risquée.</strong> Faites varier le taux d'interruption de l'offre à 3 u de 0,3 à 2 par heure et reprenez l'ablation : à partir de quel taux le placement par coût attendu, et non seulement l'intervalle de checkpoint, change-t-il le coût ? Comparez avec le croisement calculé à la main : environ 0,60 avec le modèle exact, 0,64 avec le calcul de la politique couverte, qui ignore le démarrage.</li>
 <li><strong>Capacité qui varie.</strong> Remplacez les capacités constantes par des capacités qui fluctuent et mesurez l'effet sur les échéances.</li>
 <li><strong>Coûts cachés.</strong> Ajoutez le coût de sortie de données entre régions et le coût du stockage des checkpoints ; qu'est-ce qui change dans le classement ?</li>
 <li><strong>Terraform.</strong> Écrivez le module qui créerait les files de machines correspondantes et validez-le avec <code>terraform validate</code> ; c'est la validation que ce projet ne fait pas.</li>
-<li><strong>Compte réel.</strong> Lancez une tâche SkyPilot sur un compte de test avec une limite de budget <strong>créée avant</strong> (voir la page <a href="../../lab-setup/index.html">environnement de travail</a>) et comparez l'interruption observée à votre modèle.</li>
+<li><strong>Compte réel.</strong> Réduisez une tâche générée à un seul GPU préemptible, du plus petit type que propose votre compte de test, puis lancez-la avec une limite de budget <strong>créée avant</strong>. Chiffrez l'essai avec la méthode de la page <a href="../../lab-setup/index.html#budget">environnement de travail</a>, sans vous fier à un prix recopié, et comparez l'interruption observée à votre modèle.</li>
 <li><strong>Moteur en Rust.</strong> Réécrivez en Rust la seule fonction <code>simulate</code> (offres, jobs et table <code>forced</code> lus en JSON, politique « moins cher par heure » écrite des deux côtés). Les deux chronologies exactes (330 et 365 min, politique jouet <code>Fixed</code> de <code>test_sim.py</code>) deviennent des tests <code>cargo test</code>. Le tirage de <code>random.Random</code>, semé par une chaîne, ne se reproduit pas simplement : Python écrit le tirage uniforme de chaque couple (job, numéro d'allocation), Rust applique la formule de <code>_fail_after</code>. La preuve : coût et fin de chaque job identiques sur 20 graines, puis un banc d'essai qui <strong>mesure</strong> l'accélération.</li>
 </ul>
 <h2 id="portfolio">8. Pour le portfolio</h2>
@@ -389,19 +393,21 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>« Je sais dire ce que ma simulation ne dit pas : les prix et les taux d'interruption y sont inventés, et mes manifestes ne sont validés que structurellement. »</li>
 </ol>
 <h3 id="formules">8.1. Formules du projet</h3>
-<p>Avec C le coût d'un checkpoint, M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le coût d'une reprise et T le temps de calcul entre deux checkpoints, la fraction de gaspillage au premier ordre est :</p>
+<p>Avec C le coût d'un checkpoint, M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le temps facturé sans progrès à chaque reprise (démarrage de l'offre plus rechargement de l'état, ce dernier de 10 min) et T le temps de calcul entre deux checkpoints, la fraction de gaspillage au premier ordre est :</p>
 <p><span class="math display">W(T) = \frac{C}{T} + \frac{T/2 + R}{M}, \qquad T^{*} = \sqrt{2\,C\,M}</span></p>
+<p>Le <a href="../../courses/fault-tolerance/index.html#ch2">module 10</a>, qui dérive ces formules, note <span class="math inline">\delta</span> ce que l'on note ici C, et <span class="math inline">\tau</span> ce que l'on note T.</p>
 <p>Le coût attendu par heure productive d'une offre de prix <span class="math inline">p</span> est alors :</p>
 <p><span class="math display">\text{coût attendu} = \frac{p}{1 - W(T^{*})}</span></p>
 <p>Pour une offre à la demande, <span class="math inline">W</span> vaut zéro et le coût attendu égale le prix.</p>
-<p>Un exemple de lecture, avec deux offres hypothétiques (celles du test <code>test_hedged_prefers_lower_expected_cost_per_productive_hour_over_lower_price</code>) : avec C de 3 min et R de 10 min, une offre à 4 u et 0,15 interruption par heure (M de 400 min) a un <span class="math inline">T^{*}</span> d'environ 49 min, un <span class="math inline">W</span> d'environ 0,15 et un coût attendu d'environ 4,7 u ; une offre à 3 u et 1,5 interruption par heure (M de 40 min) a un <span class="math inline">W</span> d'environ 0,64 et un coût attendu d'environ 8,3 u. La moins chère à l'heure devient la plus chère par heure utile.</p>
-<p>Pour les offres <strong>du projet</strong> (3 u à 0,60 par heure, M de 100 min, <span class="math inline">T^{*}</span> d'environ 24 min, <span class="math inline">W</span> d'environ 0,34) le coût attendu est de 4,58 u, <strong>sous</strong> les 4,69 u de l'offre à 4 u : le croisement se situe vers 0,64 interruption par heure.</p>
+<p>Un exemple de lecture, avec deux offres hypothétiques (celles du test <code>test_hedged_prefers_lower_expected_cost_per_productive_hour_over_lower_price</code>) : avec C de 3 min et R de 10 min (le rechargement seul, comme dans le test), une offre à 4 u et 0,15 interruption par heure (M de 400 min) a un <span class="math inline">T^{*}</span> d'environ 49 min, un <span class="math inline">W</span> d'environ 0,15 et un coût attendu d'environ 4,7 u ; une offre à 3 u et 1,5 interruption par heure (M de 40 min) a un <span class="math inline">W</span> d'environ 0,64 et un coût attendu d'environ 8,3 u. La moins chère à l'heure devient la plus chère par heure utile.</p>
+<p>Pour les offres <strong>du projet</strong>, le démarrage (8 min pour l'offre à 4 u, 10 min pour l'offre à 3 u) s'ajoute au rechargement : R vaut 18 et 20 min. Le premier ordre donne alors 5,41 u pour l'offre à 3 u (0,60 par heure, M de 100 min, <span class="math inline">T^{*}</span> d'environ 24 min, <span class="math inline">W</span> d'environ 0,44), contre 4,80 u pour l'offre à 4 u. Mais il suppose des pertes petites devant M, et n'est plus fiable à ce niveau de gaspillage.</p>
+<p>Le modèle exact du module 10 (§ 2.3), avec les intervalles de la politique (24 et 49 min), donne 4,73 u contre 4,74 u. Le simulateur du projet, sur 16 000 jobs isolés de 48 h, donne environ 4,72 u contre 4,74 u : les deux offres sont à égalité, et le croisement du modèle exact se situe vers 0,60 interruption par heure. La politique couverte, qui ne compte que le rechargement (R = 10 min), calcule 4,58 u contre 4,69 u : même ordre, écart exagéré.</p>
 <h3 id="lectures">8.2. Pour aller plus loin</h3>
 <ul>
 <li>Documentation de SkyPilot, <a href="https://docs.skypilot.co/en/latest/reference/yaml-spec.html">spécification YAML</a> : <code>accelerators</code>, <code>use_spot</code>, <code>any_of</code>, <code>ordered</code>, <code>job_recovery</code> (lue le 2026-10-24).</li>
 <li>Documentation de Kueue, pages <a href="https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/">ClusterQueue</a>, <a href="https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/">ResourceFlavor</a> et <a href="https://kueue.sigs.k8s.io/docs/concepts/local_queue/">LocalQueue</a> : version d'API <code>kueue.x-k8s.io/v1beta2</code> à la date de lecture ; vérifiez la vôtre.</li>
 <li>Documentation de SkyPilot, page <a href="https://docs.skypilot.co/en/latest/examples/managed-jobs.html">jobs gérés</a> : <code>use_spot</code> et <code>any_of</code> combinés (lue le 2026-10-24).</li>
-<li>Le <a href="../resilient-trainer/index.html">projet 3</a> pour la formule de Young et Daly et son contrôle par simulation.</li>
+<li>Le <a href="../../courses/fault-tolerance/index.html#ch2">module 10, chapitre 2</a> pour la dérivation de la formule de Young, le modèle exact et la correction de Daly ; le <a href="../resilient-trainer/index.html">projet 3</a> pour l'application de la formule à un entraînement et son contrôle par simulation.</li>
 </ul>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../projects/resilient-trainer/index.html"><span class="k">← Précédent</span>Projet 3 — Entraîneur tolérant aux pannes</a><a class="next" href="../../projects/gpu-observability/index.html"><span class="k">Suivant →</span>Projet 5 — Observabilité GPU et détection de pannes silencieuses</a></nav>

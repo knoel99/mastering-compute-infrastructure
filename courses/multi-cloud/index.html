@@ -186,7 +186,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Prérequis</td>
-<td><a href="../kubernetes-gpu/index.html">Module 12 — Kubernetes pour les GPU</a>, <a href="../fault-tolerance/index.html">Module 10 — Tolérance aux pannes</a></td>
+<td><a href="../kubernetes-gpu/index.html">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../fault-tolerance/index.html">Module 10 — Pannes, checkpointing et reprise automatique</a></td>
 </tr>
 <tr class="even">
 <td>Pour qui</td>
@@ -202,7 +202,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Projets liés</td>
-<td><a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+<td><a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a></td>
 </tr>
 </tbody>
 </table>
@@ -221,7 +221,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <!-- gen:place -->
 <h3 id="place">Place dans le parcours</h3>
 <ul>
-<li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
+<li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 33-44) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
 <li><strong>S'appuie sur</strong> : <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../fault-tolerance/index.html">module 10 — Pannes, checkpointing et reprise automatique</a>.</li>
 <li><strong>Projets qui s'en servent</strong> : <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>.</li>
 <li><strong>Compétences demandées dans les offres d'emploi et travaillées ici</strong> : Python, Multi-cloud (SkyPilot…), Stockage objet, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Cloud hyperscaler (AWS, GCP, Azure…), FinOps, coûts, Planification de capacité, Sécurité, conformité, Kubernetes, Terraform, infrastructure as code, Collectives (NCCL, RCCL, HCCL), Clouds GPU spécialisés, Achats, relation fournisseurs, Expérience HPC, Réseau (général), Systèmes distribués (voir <a href="../../market/index.html#couverture">l'analyse du marché</a>). <!-- /gen:place --></li>
@@ -394,7 +394,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Quel engagement ?</strong> Aucun, quelques semaines, un à trois ans, ou une durée de projet.</li>
 <li><strong>Quel environnement autour du GPU ?</strong> Interconnexion entre nœuds, stockage, réseau vers l'extérieur, identité, quotas.</li>
 </ul>
-<p>La quatrième question est celle qu'on oublie. Un GPU identique ne donne pas le même entraînement derrière un réseau différent : le chapitre 3 y revient.</p>
+<p>La quatrième question est celle qu'on oublie. Un GPU identique ne donne pas le même entraînement derrière un réseau différent : la section 1.3 et l'exemple 6.1 y reviennent.</p>
 <h3 id="les-familles-doffre">1.2. Les familles d'offre</h3>
 <p>Le tableau classe cinq familles. Il décrit des tendances à vérifier pour chaque fournisseur, pas des propriétés garanties.</p>
 <div class="tbl-wrap">
@@ -616,7 +616,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le préavis sert donc à <strong>vider proprement</strong> (terminer l'étape, signaler la fin), pas à remplacer le checkpoint périodique. C'est ce que montre la répétition du lab 13.2 : un arrêt sans préavis perd les 12 étapes écoulées depuis le dernier checkpoint, un arrêt avec préavis traité par le job n'en perd aucune, et seul le premier cas est garanti partout.</p>
 </div>
 <h3 id="le-coût-dune-heure-utile">2.3. Le coût d'une heure utile</h3>
-<p>Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, avec <span class="math inline">C</span> le coût d'un checkpoint, <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le temps de reprise :</p>
+<p>Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, la formule de Young (fonction <code>young_daly</code> du lab 13.1). On note ici <span class="math inline">C</span> son coût bloquant (<span class="math inline">\delta</span> au module 10), <span class="math inline">T</span> la période (<span class="math inline">\tau</span>), <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le temps de reprise :</p>
 <p><span class="math display">T^* = \sqrt{2CM}, \qquad W(T) = \frac{C}{T} + \frac{T/2 + R}{M}</span></p>
 <p>La fraction <span class="math inline">W</span> est la part du temps alloué qui ne produit pas de progrès. Au point optimal elle se simplifie en <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span>. Le prix d'une heure <strong>utile</strong> est alors le prix catalogue divisé par <span class="math inline">1 - W</span> :</p>
 <p><span class="math display">p_{\text{utile}} = \frac{p}{1 - W(T^*)}</span></p>
@@ -673,7 +673,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <ul>
 <li>Six modèles : à la demande, engagement d'usage, réservation planifiée, capacité à attente, préemptible, contrat de capacité.</li>
 <li>Les préavis de préemption documentés vont de 0 à 120 secondes, au mieux : ils ne remplacent pas le checkpoint périodique.</li>
-<li>Prix d'une heure utile : <span class="math inline">p / (1 - W)</span> avec <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span> ; la remise minimale du spot vaut <span class="math inline">W</span>.</li>
+<li>Prix d'une heure utile : <span class="math inline">p / (1 - W)</span> avec <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span> ; <span class="math inline">1 - W</span> est le goodput <span class="math inline">g</span> du <a href="../finops-capacity/index.html#ch1">module 15</a>. La remise minimale du spot vaut <span class="math inline">W</span>.</li>
 <li>Un job qui ne sait pas reprendre n'a pas sa place sur du préemptible.</li>
 <li>Les modèles se combinent : base réservée, pics à la demande, travaux reprenables en préemptible.</li>
 </ul>
@@ -696,7 +696,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>La stratégie de reprise se choisit dans <code>job_recovery</code>. Avec <code>FAILOVER</code>, le job redémarre dans la même région et passe à la suivante s'il n'y trouve pas de ressources. Avec <code>EAGER_NEXT_REGION</code>, valeur par défaut d'après la documentation, il passe directement à la région suivante. La documentation justifie ce défaut pour le spot : en pratique, une préemption dans une région signale souvent un manque de ressources dans cette région.</p>
 <p>La documentation annonce aussi environ 70 % d'économie sur les coûts GPU avec des instances spot. C'est une affirmation du fournisseur de l'outil, sans conditions publiées sur cette page : traitez-la comme un ordre de grandeur à mesurer chez vous.</p>
 <h3 id="lire-un-job-ligne-à-ligne">3.4. Lire un job, ligne à ligne</h3>
-<p>Le fichier <code>job.yaml</code> du lab 13.2 est l'exemple de ce chapitre. Voici ses ressources et ses montages.</p>
+<p>Le fichier <code>job.yaml</code> du lab 13.2 est l'exemple de ce chapitre. Voici ses ressources, son nombre de nœuds et ses montages ; le reste du fichier déclare le nom du job, les variables, le secret et les commandes <code>setup</code> et <code>run</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">resources</span><span class="kw">:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">accelerators</span><span class="kw">:</span><span class="at"> H100:8</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">use_spot</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
@@ -707,13 +707,24 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">infra</span><span class="kw">:</span><span class="at"> k8s/eu-gpu-cluster</span><span class="co">   # placeholder Kubernetes context</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">job_recovery</span><span class="kw">:</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">strategy</span><span class="kw">:</span><span class="at"> EAGER_NEXT_REGION</span><span class="co">   # after a preemption go straight to another location</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_restarts_on_errors</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">file_mounts</span><span class="kw">:</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">/checkpoint</span><span class="kw">:</span><span class="co">                    # survives the loss of the VM; its location decides where egress is paid</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span><span class="at"> r2://example-ckpt-bucket</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> MOUNT_CACHED</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> MODEL_CHECKPOINT_RW</span></span></code></pre></div>
-<p>Trois lignes portent la politique. <code>any_of</code> donne trois lieux candidats, dont l'ordre de bascule est décidé par l'optimiseur ; <code>ordered</code> fixerait cet ordre. <code>job_recovery</code> choisit la stratégie de reprise. <code>file_mounts</code> place le checkpoint sur un bucket indépendant des trois lieux, ce qui évite qu'une bascule de AWS vers Google ne paie une sortie à chaque lecture (chapitre 4).</p>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_restarts_on_errors</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span><span class="co">     # also retry the job a couple of times on a non-zero exit code</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">labels</span><span class="kw">:</span><span class="co">                         # cost allocation: see policy_check.py</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">team</span><span class="kw">:</span><span class="at"> llm-platform</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">project</span><span class="kw">:</span><span class="at"> pretrain-demo</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">owner</span><span class="kw">:</span><span class="at"> platform-oncall</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">num_nodes</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">file_mounts</span><span class="kw">:</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">/checkpoint</span><span class="kw">:</span><span class="co">                    # survives the loss of the VM; its location decides where egress is paid</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span><span class="at"> r2://example-ckpt-bucket</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> MOUNT_CACHED</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> MODEL_CHECKPOINT_RW</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">/data</span><span class="kw">:</span><span class="co">                          # read-only dataset: `type` is only allowed together with MOUNT_CACHED (SkyPilot 0.14.1)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span><span class="at"> r2://example-dataset-bucket</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mode</span><span class="kw">:</span><span class="at"> MOUNT_CACHED</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> DATASET_RO</span></span></code></pre></div>
+<p>Trois lignes portent la politique. <code>any_of</code> donne trois lieux candidats, dont l'ordre de bascule est décidé par l'optimiseur ; <code>ordered</code> fixerait cet ordre. <code>job_recovery</code> choisit la stratégie de reprise. <code>file_mounts</code> place le checkpoint et le jeu de données sur des buckets indépendants des trois lieux, ce qui évite qu'une bascule de AWS vers Google ne paie une sortie à chaque lecture (chapitre 4). Les étiquettes <code>labels</code> servent à la gouvernance (chapitre 8).</p>
 <div class="ex">
 <p><span class="tag">Exemple 3.1 — Ce que SkyPilot accepte, et ce qu'il laisse passer</span> La branche hors ligne du lab 13.2 charge les fichiers avec le vrai code de SkyPilot 0.14.1 (<code>sky.Task.from_yaml</code>), sans compte cloud. Sortie capturée sur le bac à sable de l'auteur (Linux 6.18, 4 vCPU), le 24 octobre 2026 :</p>
 <pre class="text"><code>skypilot 0.14.1
@@ -896,7 +907,8 @@ Le plan qui déménage les données gagne tant que la sortie reste faible devant
 </div>
 <h3 id="copier-ou-relire-à-distance">4.5. Copier ou relire à distance ?</h3>
 <p>Un entraînement qui lit son jeu de données à chaque époque depuis un bucket d'un autre fournisseur paie la sortie à chaque lecture. Copier une fois coûte la sortie, plus le stockage du côté de l'entraînement.</p>
-<p>Pour 150 Go, avec les tarifs de la carte, le lab 13.3 trouve : copie 6,75 USD (4,50 de sortie et 2,25 de stockage R2 sur un mois), contre 4,50 USD pour la première époque lue à distance (la franchise absorbe 100 Go), puis 13,50 USD par époque supplémentaire. La copie gagne dès la deuxième époque. À 90 époques, la relecture distante coûte 1 190 USD contre 6,75. Un cache local à la lecture (le mode <code>MOUNT_CACHED</code> de SkyPilot en est un) réduit le coût de la relecture, mais ne supprime pas la première lecture.</p>
+<p>Pour 150 Go, avec les tarifs de la carte, le lab 13.3 trouve : copie 6,75 USD (4,50 de sortie et 2,25 de stockage R2 sur un mois), contre 4,50 USD pour la première époque lue à distance (la franchise absorbe 100 Go), puis 13,50 USD par époque supplémentaire. La copie gagne dès la deuxième époque.</p>
+<p>À 90 époques, soit 13 500 Go lus dans le mois, la relecture distante coûte 1 190 USD contre 6,75. C'est un peu moins que <span class="math inline">4{,}50 + 89 \times 13{,}50 = 1\,206</span> USD, car les tranches du mois s'appliquent aussi : au-delà de 10 340 Go (franchise et première tranche), le Go passe à 0,085 USD, dès la 69e époque. Un cache local à la lecture (le mode <code>MOUNT_CACHED</code> de SkyPilot en est un) réduit le coût de la relecture, mais ne supprime pas la première lecture.</p>
 <h3 id="les-sorties-gratuites-ont-des-conditions">4.6. Les sorties « gratuites » ont des conditions</h3>
 <div class="war">
 <p><span class="tag">Une sortie gratuite pour partir, pas pour exploiter</span> AWS offre la sortie gratuite vers Internet aux clients qui déplacent <strong>toutes</strong> leurs données hors d'AWS, ou toutes celles d'un service donné, après demande au support. Google Cloud l'offre aux clients qui ont l'intention de résilier leur contrat pour le service concerné, avec un préavis et des délais documentés. Aucun de ces deux programmes ne couvre l'exploitation courante d'une flotte sur deux fournisseurs. Sources : <a href="https://aws.amazon.com/blogs/aws/free-data-transfer-out-to-internet-when-moving-out-of-aws/">AWS</a>, <a href="https://cloud.google.com/exit-cloud">Google Cloud</a>, lus le 24 octobre 2026.</p>
@@ -936,7 +948,8 @@ Le plan qui déménage les données gagne tant que la sortie reste faible devant
 </ul>
 <p>Dans SkyPilot, <code>ordered</code> fixe l'ordre d'essai et <code>any_of</code> le laisse à l'optimiseur ; <code>FAILOVER</code> et <code>EAGER_NEXT_REGION</code> règlent où repart un job managé après une panne (chapitre 3). Aucun ne calcule à votre place le seuil de la section 5.4.</p>
 <h3 id="ce-que-donne-le-simulateur">5.3. Ce que donne le simulateur</h3>
-<p>Le scénario du lab 13.1 est entièrement <strong>synthétique</strong> : quatre pools de trois fournisseurs, un job de 64 GPU et 120 h de calcul utile, un checkpoint de 112 Go, un tarif de sortie de 0,09 u par Go et <span class="math inline">\lambda = 40</span> u par heure. Les lignes du tableau suivant donnent la moyenne sur 200 graines, les mêmes pour chaque politique.</p>
+<p>Le scénario du lab 13.1 est entièrement <strong>synthétique</strong> : quatre pools de trois fournisseurs, un job de 64 GPU et 120 h de calcul utile, un checkpoint de 112 Go qui bloque le job 0,05 h (<span class="math inline">C</span>), une reprise de 0,17 h (<span class="math inline">R</span>), un tarif de sortie de 0,09 u par Go et <span class="math inline">\lambda = 40</span> u par heure. Les lignes du tableau suivant donnent la moyenne sur 200 graines, les mêmes pour chaque politique.</p>
+<p>L'exemple 2.2 prend une reprise de 10 minutes, soit 0,167 h : c'est pourquoi le pool a-spot vaut 4,695 u par heure utile dans le tableau et 4,69 u dans l'exemple.</p>
 <pre class="text"><code>SYNTHETIC pools (u = arbitrary unit):
   a-od    provider A  price 10.00  hazard 0.00/h  p_avail 0.90  price per useful GPU-hour 10.000
   a-spot  provider A  price  4.00  hazard 0.15/h  p_avail 0.60  price per useful GPU-hour  4.695
@@ -985,7 +998,7 @@ CRITERION (moves of &#39;aware&#39; non-increasing with data size; cost &lt;= 1.
 </div>
 <h3 id="le-piège-du-pool-à-la-demande">5.4. Le piège du pool à la demande</h3>
 <p>La politique <code>failover</code> atterrit chez le pool à la demande chaque fois que les pools spot refusent au moment de la demande. Ce pool n'est jamais préempté : rien ne ramène donc jamais le job sur du spot. Dans le tableau, le coût de 53 967 u contre 36 577 u pour <code>stay</code>, à 0 Go de données, le montre ; le test <code>test_on_demand_trap_costs_more_than_waiting_for_spot</code> reproduit le mécanisme sur un cas minimal.</p>
-<p>Les 6,5 déménagements viennent d'un autre effet : à chaque préemption, <code>failover</code> reprend la décision et saute d'un fournisseur spot à l'autre (observé en journalisant les décisions du simulateur sur les mêmes 200 graines ; <code>scenarios.py</code> ne l'affiche pas).</p>
+<p>Les 6,5 déménagements viennent d'un autre effet : à chaque préemption, <code>failover</code> reprend la décision et saute le plus souvent d'un fournisseur spot à l'autre. La commande <code>python3 scenarios.py --seeds 200 --trace-moves</code> le montre sur les mêmes 200 graines : 89,6 % des déménagements mènent à un pool spot, 10,4 % au pool à la demande.</p>
 <p>Une liste <code>any_of</code> qui mélange spot et à la demande a ce comportement. Les parades sont de ne mettre à la demande dans la liste qu'en dernier recours explicite (<code>ordered</code>), de plafonner la durée d'un job sur du à-la-demande, ou de réévaluer le placement périodiquement. Le simulateur ne réévalue qu'à la préemption : c'est une limite assumée du lab.</p>
 <h3 id="le-seuil-de-bascule">5.5. Le seuil de bascule</h3>
 <p>Pour la politique <code>aware</code>, le seuil de taille de données au-delà duquel on ne bascule plus se calcule directement.</p>
@@ -1027,7 +1040,7 @@ Trois issues après une préemption. Seule la troisième déclenche une sortie d
 <h3 id="un-job-égale-un-site">6.1. Un job égale un site</h3>
 <p>Pourquoi ne pas coupler les GPU de deux fournisseurs pour un seul entraînement ? Parce que chaque étape échange les gradients, et que le lien entre sites est sans commune mesure avec celui d'un site.</p>
 <div class="ex">
-<p><span class="tag">Exemple 6.1 — Un all-reduce entre deux sites</span> Un modèle de 7 milliards de paramètres a des gradients de <span class="math inline">2 \times 7 \cdot 10^9 = 14</span> Go en BF16. Reprenons le modèle du module 2 : chaque rang émet <span class="math inline">2\,\frac{p-1}{p}\,n</span> octets dans un anneau.</p>
+<p><span class="tag">Exemple 6.1 — Un all-reduce entre deux sites</span> Un modèle de 7 milliards de paramètres a des gradients de <span class="math inline">2 \times 7 \cdot 10^9 = 14</span> Go en BF16. Reprenons le modèle du module 2 : dans un anneau de <span class="math inline">p</span> rangs, chaque rang émet <span class="math inline">2\,\frac{p-1}{p}\,n</span> octets pour un message de <span class="math inline">n</span> octets. Ces deux lettres suivent la notation du module 2 ; elles n'ont pas ici leur sens du chapitre 5 (prix et nombre de GPU).</p>
 <p>Dans un site, 64 GPU à 40 Go/s (valeurs de l'exercice 11 du module 2) échangent ces gradients en <span class="math inline">2 \times \frac{63}{64} \times 14/40 = 0{,}69</span> s.</p>
 <p>Entre deux sites reliés à 10 Gbit/s à 80 % d'efficacité, soit 1 Go/s, avec <span class="math inline">p = 2</span> : <span class="math inline">2 \times \frac{1}{2} \times 14/1 = 14</span> s par étape. C'est <strong>20 fois</strong> plus long, avant tout recouvrement et en ignorant la latence de la liaison. Ces bandes passantes sont des hypothèses d'exemple.</p>
 <p>Le job ne se coupe donc pas : il se place entier, et seuls ses checkpoints et ses données traversent la liaison.</p>
@@ -1332,7 +1345,7 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 <li><p><span class="math inline">12 \times 90 = 1080</span> s, soit 0,30 h ; sur 64 GPU : <strong>19,2 GPU-h</strong>.</p></li>
 <li><p>La perte moyenne vaut la moitié de l'intervalle : <span class="math inline">12{,}5</span> étapes, soit $12{,}5 / 3600 = $ <strong>20 GPU-h</strong>.</p></li>
 <li><p>La perte moyenne <span class="math inline">= (K/2) \times 90/3600 \times 64 = 0{,}8\,K</span> GPU-h. Pour rester sous 5, il faut <span class="math inline">K &lt; 6{,}25</span> étapes.</p></li>
-<li><p>Chaque checkpoint coûte du temps de GPU (le terme <span class="math inline">C/T</span> de <span class="math inline">W</span>). La période optimale équilibre ce coût et la perte attendue ; elle se calcule avec Young et Daly, pas avec la seule perte moyenne.</p></li>
+<li><p>Chaque checkpoint coûte du temps de GPU (le terme <span class="math inline">C/T</span> de <span class="math inline">W</span>). La période optimale équilibre ce coût et la perte attendue ; elle se calcule avec la formule de Young du chapitre 2, <span class="math inline">T^* = \sqrt{2CM}</span>, pas avec la seule perte moyenne.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1340,7 +1353,7 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <p><code>failover</code> prend le moins cher <strong>parmi les pools qui répondent maintenant</strong>. Quand les pools spot refusent, il atterrit sur le pool à la demande à 10 u, qui n'est jamais préempté ; rien ne le ramène vers le spot. D'où le coût (+47,5 %) et la fin plus précoce : <code>failover</code> n'attend presque jamais de capacité et le pool à la demande ne subit pas de préemption.</p>
-<p>Les nombreux déménagements ont une autre cause : la décision est reprise à chaque préemption, et le moins cher qui répond est souvent un spot d'un autre fournisseur (observé en journalisant les décisions du simulateur ; <code>scenarios.py</code> ne l'affiche pas).</p>
+<p>Les nombreux déménagements ont une autre cause : la décision est reprise à chaque préemption, et le moins cher qui répond est souvent un spot d'un autre fournisseur ; <code>python3 scenarios.py --seeds 200 --trace-moves</code> compte 89,6 % de déménagements vers un pool spot.</p>
 <p>Corrections : (1) retirer le pool à la demande de <code>any_of</code>, ou le placer en dernier dans une liste <code>ordered</code> ; (2) borner la durée sur le pool à la demande et réévaluer le placement périodiquement, ce que le lab ne fait pas.</p>
 <p>Le test <code>test_on_demand_trap_costs_more_than_waiting_for_spot</code> du lab 13.1 reproduit le mécanisme sur un cas minimal.</p>
 </details>
@@ -1370,7 +1383,7 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 </ol>
 </details>
 <div class="exo">
-<p><span class="tag">Exercice 9 · ★★ — Un all-reduce entre deux sites</span> Un modèle de 13 milliards de paramètres a des gradients de <span class="math inline">2 \times 13 \cdot 10^9 = 26</span> Go. Comparez le temps du all-reduce en anneau, <span class="math inline">2\,\frac{p-1}{p}\,\frac{n}{B}</span>, (a) sur 64 GPU d'un site à 40 Go/s, (b) entre deux sites (<span class="math inline">p = 2</span>) reliés à 5 Gbit/s à 80 % d'efficacité. Quelle part d'une étape de 8 s de calcul la communication occupe-t-elle dans chaque cas, sans recouvrement ?</p>
+<p><span class="tag">Exercice 9 · ★★ — Un all-reduce entre deux sites</span> Un modèle de 13 milliards de paramètres a des gradients de <span class="math inline">2 \times 13 \cdot 10^9 = 26</span> Go. Comparez le temps du all-reduce en anneau, <span class="math inline">2\,\frac{p-1}{p}\,\frac{n}{B}</span> (notation de l'exemple 6.1, <span class="math inline">B</span> la bande passante), (a) sur 64 GPU d'un site à 40 Go/s, (b) entre deux sites (<span class="math inline">p = 2</span>) reliés à 5 Gbit/s à 80 % d'efficacité. Quelle part d'une étape de 8 s de calcul la communication occupe-t-elle dans chaque cas, sans recouvrement ?</p>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <ol type="a">
@@ -1452,7 +1465,7 @@ job-eu.yaml: 0 error(s), 1 warning(s)</code></pre>
 </ul>
 <h2 id="sources">Sources et portée</h2>
 <h3 id="documente">Documenté</h3>
-<p>Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.</p>
+<p>Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et de la page de Cloudflare R2. Le tableau de la section 4.2 ajoute deux tarifs absents de la carte du lab, lus le même jour à la source liée : AWS de us-east-1 vers l'Oregon et Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.</p>
 <h3 id="recommande">Recommandé</h3>
 <p>Le score de placement du chapitre 5, la valeur <span class="math inline">\lambda</span> du temps comme paramètre d'activité, la garde d'échéance, la règle « un job égale un site », le stockage neutre à sortie gratuite pour les checkpoints, les règles E1 à E6 et W1 à W4 de <code>policy_check.py</code> et leur choix d'étiquettes sont des choix de ce parcours, pas des normes. Les trois politiques naïves du lab 13.1 sont des cas d'école volontairement simples.</p>
 <h3 id="a-verifier">À vérifier</h3>

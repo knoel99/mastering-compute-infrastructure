@@ -1,6 +1,6 @@
 # Lab 16.3 — Exercice de conception : de 8 à 256 GPU
 
-`sizing.py` est le calculateur d'un entretien de conception : FLOPs d'entraînement (6 P D), durée selon le nombre de GPU et
+`sizing.py` est le calculateur d'un entretien de conception : FLOPs d'entraînement (6 N D, pour N paramètres et D jetons), durée selon le nombre de GPU et
 le MFU, nombre de GPU pour un délai, taille et temps d'un checkpoint (hypothèse d'octets par paramètre **à énoncer**),
 MTBF du job, période de Young et Daly et durée avec pannes.
 
@@ -12,4 +12,6 @@ PYTHON=python3 bash verify.sh
 
 `rubric.md` donne l'énoncé et la grille ; `answers/` contient trois réponses (insuffisante, solide, excellente), **inventées pour l'exercice**, dont les
 chiffres sont recoupés par les tests (nombre de jours, taille et temps de checkpoint, MTBF, période de Young et Daly, durée avec pannes). Les valeurs d'entrée (MFU de 0,40, 50 Go/s, taux de panne de 0,0002 par GPU-heure) sont
-des **hypothèses d'exercice**, pas des mesures : changez-les et voyez la conclusion bouger.
+des **hypothèses d'exercice**, pas des mesures : changez-les et voyez la conclusion bouger. Le taux de panne est volontairement
+pessimiste : environ six fois les 6,5 pannes pour mille nœuds-jours de Kokolis et coauteurs (3,4e-5 par GPU-heure, module 10).
+La reprise vaut 15 minutes par défaut (`--restart-min`).

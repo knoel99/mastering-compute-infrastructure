@@ -36,11 +36,11 @@ Ce module donne un vocabulaire (données, tenseur, pipeline, experts, séquence)
 |---|---|
 | Volume | 36 h, dont environ 14 h de lecture (chapitres, questions de positionnement, checkpoint de sortie), 13 h de labs et 9 h d'exercices |
 | Niveau d'entrée | 3 : vous savez écrire une boucle d'entraînement PyTorch, lire un MFU et un modèle α-β (module 2), et vous connaissez le rôle de NCCL (module 7) |
-| Prérequis | [Module 2 — Architecture et modèles de performance](../perf-models/index.html), [Module 4 — Programmation GPU](../gpu-programming/index.html), [Module 7 — Réseaux haute performance](../networking/index.html) |
+| Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [Module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [Module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html) |
 | Pour qui | Cœur : DDP, FSDP, parallélisme tensoriel et pipeline ; survol possible si vous entraînez déjà sur plusieurs nœuds, en gardant les chapitres de diagnostic et de mémoire. |
 | Livrable | un planificateur de parallélisme testé, un DDP prouvé équivalent à un entraînement mono-processus, une mesure de mémoire FSDP comparée à sa prédiction, une procédure d'enquête sur un hang |
 | Environnement | un portable CPU avec PyTorch suffit : les quatre labs tournent sur 4 processus `gloo`, sans GPU. Ce que seuls des GPU permettraient (NCCL, recouvrement réel, MFU mesuré) est décrit et sourcé, jamais présenté comme exécuté |
-| Projets liés | [Projet 2 — Étude de passage à l'échelle](../../projects/scaling-study/index.html), [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
+| Projets liés | [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html), [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -56,9 +56,9 @@ Ce module donne un vocabulaire (données, tenseur, pipeline, experts, séquence)
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 3 — Systèmes d'entraînement distribué** (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
+-   **Phase 3 — Systèmes d'entraînement distribué** (semaines 21-32) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html).
--   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](../ray-rl-infra/index.html).
+-   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](../ray-rl-infra/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html), [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Expérience d'entraînement ML, Profilage, bancs d'essai, Journaux, traces, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
@@ -80,7 +80,7 @@ Douze séances de 3 h, soit 36 h. Le niveau 1 correspond aux fondations, le nive
 | 9 | 3 h | 3 | ch. 6 (45 min) ; ch. 7 §7.1 (25 min) | Ex. 10 (55 min), Ex. 11 (55 min) |
 | 10 | 3 h | 3 | ch. 7 (50 min) ; ch. 8 §8.1 à §8.3 (75 min) | Ex. 12 (55 min) |
 | 11 | 3 h | 3 | ch. 8 fin (15 min) ; ch. 9 §9.1 et §9.2 (40 min) | Lab 9.3 partie A (90 min) ; Ex. 9 (35 min) |
-| 12 | 3 h | 3 | ch. 9 fin (20 min) ; checkpoint de sortie (15 min) | Lab 9.3 partie B (90 min) ; Ex. 14 (55 min) |
+| 12 | 3 h | 3 | ch. 9 fin (20 min) ; checkpoint de sortie (15 min) | Lab 9.3 partie B (90 min) ; Ex. 14 (55 min) ; démarrage du Projet 2 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -128,7 +128,7 @@ Ce chapitre fixe le vocabulaire et la grille de lecture du module. Vous n'y appr
 
 ### 1.1. Pourquoi découper un entraînement
 
-Deux raisons, et il faut savoir laquelle est en cause. La **mémoire** : les états d'un entraînement ne tiennent pas dans les 80 Go d'un GPU (chapitre 3). Le **temps** : le calcul total, de l'ordre de $6\Psi D$ FLOP pour $\Psi$ paramètres et $D$ tokens, demande des milliers de GPU pour finir en semaines (module 2, chapitre 7).
+Deux raisons, et il faut savoir laquelle est en cause. La **mémoire** : les états d'un entraînement ne tiennent pas dans les 80 Go d'un GPU (chapitre 3). Le **temps** : le calcul total, de l'ordre de $6\Psi D$ FLOP pour $\Psi$ paramètres ($\Psi$, notation de ZeRO, est le $N$ du module 2) et $D$ tokens, demande des milliers de GPU pour finir en semaines (module 2, chapitre 7).
 
 Un modèle de 1 milliard de paramètres tient sur un GPU mais s'entraîne mieux sur huit ; un modèle de 70 milliards ne tient sur aucun, quel que soit le temps disponible. Les deux problèmes se traitent avec des outils différents.
 
@@ -151,7 +151,7 @@ Le **parallélisme de séquence** (SP) de Megatron-LM et le **parallélisme de c
 
 Un GPU a une coordonnée dans chaque dimension, et le nombre de GPU est le produit des degrés. Pour $t$ en tenseur, $p$ en pipeline et $d$ en données :
 
-$$N = t \times p \times d$$
+$$N_{\text{GPU}} = t \times p \times d$$
 
 C'est la grille « 3D » du papier Megatron-LM de 2021, appelée PTD-P (*pipeline, tensor, data*). Avec contexte et experts, elle passe à quatre ou cinq dimensions ; Megatron Core écrit le produit de tous les degrés, mais le chapitre 9 montre que son tableau d'exemples ne l'applique pas partout.
 
@@ -174,7 +174,7 @@ C'est la grille « 3D » du papier Megatron-LM de 2021, appelée PTD-P (*pipelin
 <g text-anchor="middle" font-size="15" font-weight="700" fill="currentColor"><text x="280" y="108">TP = 8 · NVLink · all-reduce d'activations</text><text x="280" y="216">PP = 4 · un étage par nœud · activations point à point</text></g>
 <g font-size="14" fill="currentColor"><text x="42" y="254">réplique 0 (pipeline complet)</text><text x="42" y="282">réplique 1</text><text x="42" y="310">réplique 2</text><text x="416" y="292">gradients</text></g>
 <text x="416" y="272" font-size="15" font-weight="700" fill="currentColor">DP = 3</text>
-<text x="280" y="346" text-anchor="middle" font-size="15" fill="currentColor">GPU au total : N = TP × PP × DP = 8 × 4 × 3 = 96</text>
+<text x="280" y="346" text-anchor="middle" font-size="15" fill="currentColor">GPU au total : TP × PP × DP = 8 × 4 × 3 = 96</text>
 </svg>
 <figcaption>Une grille 3D de 96 GPU. Le parallélisme tensoriel occupe les huit GPU d'un nœud, le pipeline s'étend sur quatre nœuds, trois répliques de ce pipeline forment le parallélisme de données.</figcaption>
 </figure>
@@ -186,7 +186,7 @@ L'**ordre** des dimensions décide quels GPU sont voisins. Llama 3 range ses gro
 
 Le produit des degrés vaut $8 \times 1 \times 16 \times 64 = 8192$. Le lot global compte $64 \times 32 = 2048$ séquences, soit $2048 \times 8192 = 16\,777\,216$ tokens : les « 16M » de la colonne *Tokens/Batch*. La deuxième ligne double les GPU (DP 128) et divise par deux le lot par groupe (16) : le lot global reste de 2 048 séquences. Les auteurs attribuent la baisse de MFU (*model FLOPs utilization*, module 2) de 43 % à 41 % à ce lot plus petit par groupe.
 
-La colonne *TFLOPs/GPU* est arrondie : 400 TFLOP/s sur 989 donneraient 40,4 %, et l'article annonce 41 %.
+La colonne *TFLOPs/GPU* est arrondie. La première ligne en donne 430, soit 43,5 % de 989 pour 43 % annoncés. La deuxième en donne 400, qui donneraient 40,4 %, alors que l'article annonce 41 %.
 :::
 
 ::: ex
@@ -213,7 +213,7 @@ Pour le GPU 0, le code donne les groupes [0, 1] (tenseur), [0, 2] (contexte), [0
 
 ### 1.4. Les collectives dont vous aurez besoin
 
-Une **collective** est une opération de communication à laquelle tous les membres d'un groupe participent. Le **rang** (*rank*) est le numéro d'un processus dans le groupe ; la **taille du monde** (*world size*) est le nombre de processus. Le tableau suppose l'anneau du module 2 et $n$ octets pour le tenseur complet.
+Une **collective** est une opération de communication à laquelle tous les membres d'un groupe participent. Le **rang** (*rank*) est le numéro d'un processus dans le groupe ; la **taille du monde** (*world size*) est le nombre de processus. Le tableau suppose l'anneau du module 2, un groupe de $p$ rangs et $n$ octets pour le tenseur complet. Dans ce tableau comme dans les formules de DDP et de ZeRO, $p$ est la taille du groupe ; dans celles du pipeline, c'est le nombre d'étages (§1.3).
 
 | Collective | Avant → après, pour chaque rang | Octets émis par rang | Où la rencontre-t-on |
 |---|---|---|---|
@@ -265,12 +265,12 @@ Les deux entraînements ne sont **pas** identiques bit à bit, mais l'écart max
 
 DDP n'attend pas la fin de la passe arrière pour communiquer : il regroupe les gradients en **seaux** (*buckets*) et lance un all-reduce asynchrone dès qu'un seau est complet. D'après la documentation, un crochet *autograd* par paramètre signale que son gradient est prêt ; les paramètres sont rangés dans les seaux dans l'ordre **inverse** de `model.parameters()`, car la passe arrière produit d'abord les gradients des dernières couches ; les all-reduce partent toujours dans l'ordre des indices de seaux, pour que tous les rangs lancent les mêmes dans le même ordre.
 
-Le paramètre `bucket_cap_mb` fixe la taille limite d'un seau, 25 MiB par défaut ([documentation de DDP](https://docs.pytorch.org/docs/2.14/generated/torch.nn.parallel.DistributedDataParallel.html)). Le recouvrement en découle : pendant que les couches du début rétropropagent, les seaux des dernières couches voyagent. Le coût total de communication ne change pas ; ce qui change, c'est la part cachée derrière le calcul.
+Le paramètre `bucket_cap_mb` fixe la taille limite d'un seau, 25 Mio par défaut, avec 1 Mio = $2^{20}$ octets ([documentation de DDP](https://docs.pytorch.org/docs/2.14/generated/torch.nn.parallel.DistributedDataParallel.html)). Le recouvrement en découle : pendant que les couches du début rétropropagent, les seaux des dernières couches voyagent. Le coût total de communication ne change pas ; ce qui change, c'est la part cachée derrière le calcul.
 
 Le code source de la version testée (PyTorch 2.14.1) ajoute deux précisions absentes de la documentation. À la première itération, DDP n'utilise **qu'un seul seau**, car l'ordre réel de disponibilité des gradients est inconnu ; il **reconstruit** ensuite les seaux selon l'ordre observé. Et un seau se ferme dès que sa taille atteint la limite : il peut la dépasser du dernier tenseur ajouté.
 
 ::: ex
-[Exemple 2.2 — Prédire les seaux de DDP]{.tag} Le module `buckets.py` applique cette règle aux tailles des paramètres du MLP, pris du dernier au premier : le premier seau est limité à 1 MiB quand `bucket_cap_mb` n'est pas fourni, et chaque seau se ferme dès qu'il atteint sa limite. Sa sortie, capturée sur la VM de rédaction :
+[Exemple 2.2 — Prédire les seaux de DDP]{.tag} Le module `buckets.py` applique cette règle aux tailles des paramètres du MLP, pris du dernier au premier : le premier seau est limité à 1 Mio quand `bucket_cap_mb` n'est pas fourni, et chaque seau se ferme dès qu'il atteint sa limite. Sa sortie, capturée sur la VM de rédaction :
 
 ~~~text
 $ python3 buckets.py
@@ -279,7 +279,7 @@ $ python3 buckets.py --cap-mb 1
 6 buckets: 1052676, 1050624, 1050624, 1050624, 1050624, 133120 (total 5388292 bytes)
 ~~~
 
-`verify.sh` lance DDP avec ces deux réglages et exige que les tailles journalisées par DDP après reconstruction (`_get_ddp_logging_data()`, API privée) soient exactement celles-là. Avec le cap par défaut, le premier seau est la couche finale et les 4 335 616 octets restants forment un seau unique, très en dessous de 25 MiB. Avec 1 MiB, chaque couche de 1 050 624 octets referme un seau. Un crochet de communication Python compte les appels : `1 + (étapes - 1) × seaux`, soit 23 all-reduce pour 12 étapes et 2 seaux, et exactement `étapes × 5 388 292` octets.
+`verify.sh` lance DDP avec ces deux réglages et exige que les tailles journalisées par DDP après reconstruction (`_get_ddp_logging_data()`, API privée) soient exactement celles-là. Avec le cap par défaut, le premier seau est la couche finale et les 4 335 616 octets restants forment un seau unique, très en dessous de 25 Mio. Avec 1 Mio, chaque couche de 1 050 624 octets referme un seau. Un crochet de communication Python compte les appels : `1 + (étapes - 1) × seaux`, soit 23 all-reduce pour 12 étapes et 2 seaux, et exactement `étapes × 5 388 292` octets.
 :::
 
 ::: note
@@ -336,6 +336,8 @@ rank 0: RuntimeError at step 1
 ~~~
 
 L'erreur n'apparaît qu'à l'étape 1 : l'étape 0 se termine, mais le seau de `a.weight` n'a jamais été complété, et l'itération suivante le détecte. Avec `find_unused_parameters=True`, les trois étapes passent (code de sortie 0). Le coût de ce drapeau est un parcours du graphe autograd à chaque itération.
+
+Une troisième voie est documentée, mais non testée ici : `static_graph=True`, quand l'ensemble des paramètres utilisés et inutilisés ne change jamais pendant l'entraînement. DDP ne cherche alors plus les paramètres inutilisés à chaque itération ([documentation de DDP](https://docs.pytorch.org/docs/2.14/generated/torch.nn.parallel.DistributedDataParallel.html)).
 :::
 
 ::: note
@@ -344,9 +346,9 @@ L'erreur n'apparaît qu'à l'étape 1 : l'étape 0 se termine, mais le seau de `
 
 ### 2.5. Accumuler des gradients
 
-Pour un lot global plus grand que la mémoire ne le permet, on accumule les gradients sur plusieurs micro-lots avant l'optimiseur. Avec DDP, les micro-lots intermédiaires s'exécutent dans `model.no_sync()`, qui supprime l'all-reduce ; le dernier le déclenche. DeepSpeed impose dans sa configuration l'identité qui en résulte :
+Pour un lot global plus grand que la mémoire ne le permet, on accumule les gradients sur plusieurs micro-lots avant l'optimiseur. Avec DDP, les micro-lots intermédiaires s'exécutent dans `model.no_sync()`, qui supprime l'all-reduce ; le dernier le déclenche. DeepSpeed impose dans sa configuration l'identité qui en résulte, avec $d$ rangs de données (en DDP pur, tous les processus) :
 
-$$B_{\text{global}} = b_{\text{micro}} \times a_{\text{accum}} \times p$$
+$$B_{\text{global}} = b_{\text{micro}} \times a_{\text{accum}} \times d$$
 
 L'accumulation réduit la fréquence de communication, pas le volume par étape, et ne remplace pas le parallélisme quand le problème est la mémoire des états.
 
@@ -354,7 +356,7 @@ L'accumulation réduit la fréquence de communication, pas le volume par étape,
 Points clés — chapitre 2
 
 -   DDP réplique le modèle, moyenne les gradients par all-reduce et garde les copies égales ; l'équivalence avec un seul processus exige des parts égales.
--   Les gradients sont regroupés en seaux (25 MiB par défaut) et réduits dès qu'un seau est complet ; la première itération n'a qu'un seau, puis DDP reconstruit les seaux selon l'ordre réel.
+-   Les gradients sont regroupés en seaux (25 Mio par défaut) et réduits dès qu'un seau est complet ; la première itération n'a qu'un seau, puis DDP reconstruit les seaux selon l'ordre réel.
 -   `torchrun` fournit `RANK`, `LOCAL_RANK`, `WORLD_SIZE` et le rendez-vous ; une panne tue tout le groupe et le rang n'est pas stable.
 -   Les erreurs classiques sont des désaccords entre rangs : parts inégales, paramètre sans gradient, collective conditionnelle.
 -   Un lot global est le produit du micro-lot, des étapes d'accumulation et du nombre de rangs.
@@ -424,13 +426,13 @@ OK fsdp-memory: 16802826 parameters; per-rank persistent MiB: DDP 256.4, FSDP [6
    peak unsharded params MiB: DDP 64.1, FSDP reshard 8.0, FSDP no reshard 64.1
 ~~~
 
-DDP détient $16 \times 16\,802\,826$ octets, soit 256,4 MiB, par rang. FSDP2 en détient le quart, 64,1 MiB : le dernier rang a un peu moins, parce que la tête de forme (10, 512) est découpée en lignes de 3, 3, 3 et 1. Le pic de paramètres non partitionnés, relevé à l'entrée de chaque bloc de la passe avant, vaut 8,0 MiB (un bloc plus la tête) avec `reshard_after_forward=True`. Il monte à 64,1 MiB quand les blocs ne sont pas re-partitionnés : tout le modèle est reconstitué.
+DDP détient $16 \times 16\,802\,826$ octets, soit 256,4 Mio, par rang. FSDP2 en détient le quart, 64,1 Mio : le dernier rang a un peu moins, parce que la tête de forme (10, 512) est découpée en lignes de 3, 3, 3 et 1. Le pic de paramètres non partitionnés, relevé à l'entrée de chaque bloc de la passe avant, vaut 8,0 Mio (un bloc plus la tête) avec `reshard_after_forward=True`. Il monte à 64,1 Mio quand les blocs ne sont pas re-partitionnés : tout le modèle est reconstitué.
 
 Les égalités mesuré = prédit sont **exactes** : c'est de l'arithmétique entière sur des tailles de tenseurs.
 :::
 
 ::: ex
-[Exemple 3.3 — Le choix de Llama 3]{.tag} L'[article Llama 3](https://arxiv.org/abs/2407.21783) indique que sa dimension de données est un FSDP qui partitionne optimiseur et gradients mais ne re-partitionne pas les paramètres après la passe avant, afin d'éviter un all-gather supplémentaire en passe arrière : `reshard_after_forward=False`. Le prix est de la mémoire. C'est vraisemblablement supportable parce que le pipeline (PP 16) réduit déjà la taille de chaque étape, mais c'est une interprétation de l'auteur, l'article ne le dit pas. FSDP seul et FSDP dans une grille n'ont pas les mêmes bons réglages.
+[Exemple 3.3 — Le choix de Llama 3]{.tag} L'[article Llama 3](https://arxiv.org/abs/2407.21783) indique que sa dimension de données est un FSDP qui partitionne optimiseur et gradients mais ne re-partitionne pas les paramètres après la passe avant, afin d'éviter un all-gather supplémentaire en passe arrière : `reshard_after_forward=False`. Le prix est de la mémoire. C'est vraisemblablement supportable parce que le pipeline (PP 16) réduit déjà la taille de chaque étage, mais c'est une interprétation de l'auteur, l'article ne le dit pas. FSDP seul et FSDP dans une grille n'ont pas les mêmes bons réglages.
 :::
 
 ### 3.4. Les activations
@@ -453,7 +455,7 @@ où $s$ est la longueur de séquence, $b$ le micro-lot, $h$ la taille cachée et
 Le **recalcul** (*activation checkpointing*) troque du calcul contre de la mémoire : on ne garde que l'entrée de chaque couche et on refait la passe avant pendant la passe arrière. Chen et al. ont montré qu'on peut ainsi descendre à un coût mémoire en $O(\sqrt{n})$ pour $n$ couches avec une passe avant supplémentaire. Le recalcul **sélectif** ne refait que la partie la plus chère en mémoire et la moins chère en calcul, l'attention.
 
 ::: ex
-[Exemple 3.4 — Les activations d'un modèle de 7 milliards de paramètres]{.tag} Prenons une séquence de 4 096 tokens, un micro-lot de 1, une taille cachée de 4 096, 32 têtes et 32 couches. Comme $s = h$, le facteur vaut $34 + 5 \times 32 = 194$ ; la base $s\,b\,h$ vaut 16,8 Mo. Résultats du planificateur (`activation_bytes_per_layer`, en Go de $10^{9}$ octets) :
+[Exemple 3.4 — Les activations d'un modèle de 7 milliards de paramètres]{.tag} Prenons une séquence de 4 096 tokens, un micro-lot de 1, une taille cachée de 4 096, 32 têtes et 32 couches. Comme $s = h$, le facteur vaut $34 + 5 \times 32 = 194$ ; la base $s\,b\,h$ compte 16,8 millions d'éléments, et les coefficients sont des octets par élément. Résultats du planificateur (`activation_bytes_per_layer`, en Go de $10^{9}$ octets) :
 
 | Variante | Par couche | Pour 32 couches |
 |---|---|---|
@@ -465,7 +467,7 @@ Le **recalcul** (*activation checkpointing*) troque du calcul contre de la mémo
 Sans optimisation, **les activations dépassent la mémoire du GPU** avant même les états : le terme d'attention pèse 160 sur 194. Le recalcul sélectif retire ce terme ; le recalcul complet n'en garde que le minimum. Selon le tableau 4 de l'article (une couche d'un modèle de 22 milliards sur A100), le recalcul complet coûte 39 % de temps de calcul en plus et le recalcul sélectif 7 % : ce sont **une** mesure d'un modèle et d'un GPU, à remplacer par les vôtres.
 :::
 
-Deux précisions. Avec un pipeline 1F1B, la première étape garde les activations de $p$ micro-lots pour ses $L/p$ couches, soit **$L$ couches d'activations quel que soit $p$** : le pipeline ne réduit pas ce poste (Korthikanti et al., équation 5). Et des noyaux d'attention qui ne matérialisent pas les scores jouent le rôle du recalcul sélectif sur le terme quadratique : selon l'[Ultra-Scale Playbook](https://nanotron-ultrascale-playbook.static.hf.space/index.html), FlashAttention recalcule les scores dans la passe arrière au lieu de les stocker. Llama 3 a entraîné sur des séquences de 8 000 tokens sans recalcul d'activations grâce à ses améliorations de pipeline.
+Deux précisions. Avec un pipeline 1F1B, le premier étage garde les activations de $p$ micro-lots pour ses $L/p$ couches, soit **$L$ couches d'activations quel que soit $p$** : le pipeline ne réduit pas ce poste (Korthikanti et al., équation 5). Et des noyaux d'attention qui ne matérialisent pas les scores jouent le rôle du recalcul sélectif sur le terme quadratique : selon l'[Ultra-Scale Playbook](https://nanotron-ultrascale-playbook.static.hf.space/index.html), FlashAttention recalcule les scores dans la passe arrière au lieu de les stocker. Llama 3 a entraîné sur des séquences de 8 000 tokens sans recalcul d'activations grâce à ses améliorations de pipeline.
 
 ::: recap
 Points clés — chapitre 3
@@ -474,7 +476,7 @@ Points clés — chapitre 3
 -   ZeRO partitionne l'optimiseur (étape 1), les gradients (étape 2) puis les paramètres (étape 3) ; le volume de communication reste celui de DDP jusqu'à l'étape 2 et monte à 1,5 fois à l'étape 3.
 -   `fully_shard` partitionne chaque paramètre sur sa dimension 0 ; le groupe de communication est le module ; `reshard_after_forward` échange mémoire contre all-gather.
 -   Les activations croissent avec le lot et, par le terme d'attention, avec le carré de la séquence ; recalcul complet, recalcul sélectif et parallélisme tensoriel avec séquence les réduisent, à des prix différents.
--   Un pipeline 1F1B laisse à la première étape les activations de toutes les couches ; seul le parallélisme tensoriel les divise.
+-   Un pipeline 1F1B laisse au premier étage les activations de toutes les couches ; seul le parallélisme tensoriel les divise.
 :::
 
 ## 4. Tenseur, séquence, pipeline et experts {#ch4}
@@ -531,14 +533,14 @@ $$\text{bulle} = \frac{(p-1)\,(t_f + t_b)}{m\,(t_f + t_b)} = \frac{p-1}{m}$$
 Pour une petite bulle, il faut beaucoup plus de micro-lots que d'étages ([Narayanan et al., 2021](https://arxiv.org/abs/2104.04473), section 2.2). L'ordonnancement **1F1B** (une passe avant, une passe arrière) ne réduit pas la bulle mais limite à $p$ les micro-lots en vol, donc la mémoire des activations. L'ordonnancement **entrelacé** donne à chaque GPU $v$ blocs de couches non contigus : bulle divisée par $v$, communication entre étages multipliée par $v$. Llama 3 écrit $(\mathrm{PP}-1)/(V \cdot M)$, avec $V$ étages virtuels par rang.
 
 ::: ex
-[Exemple 4.2 — Dimensionner un pipeline]{.tag} Un pipeline de 8 étages reçoit 64 micro-lots : bulle de $7/64 = 10{,}9\ \%$. Avec 4 blocs entrelacés, $7/256 = 2{,}7\ \%$. Mais les communications entre étages sont multipliées par 4 et la mémoire d'activations de la première étape par $1 + 7/32 = 1{,}22$ (équation de Korthikanti et al. pour le schéma entrelacé).
+[Exemple 4.2 — Dimensionner un pipeline]{.tag} Un pipeline de 8 étages reçoit 64 micro-lots : bulle de $7/64 = 10{,}9\ \%$. Avec 4 blocs entrelacés, $7/256 = 2{,}7\ \%$. Mais les communications entre étages sont multipliées par 4 et la mémoire d'activations du premier étage par $1 + 7/32 = 1{,}22$ (équation de Korthikanti et al. pour le schéma entrelacé).
 
 Pour moins de 5 % sans entrelacement, il faut au moins $7 / 0{,}05 = 140$ micro-lots par pipeline. Avec 4 répliques de données et des micro-lots d'une séquence : un lot global d'au moins $140 \times 4 = 560$ séquences. **Le pipeline impose un lot global minimal** : si l'optimisation fixe le lot (chapitre 5), c'est la disposition qui doit s'y plier.
 
 Dans le tableau 1 de Megatron-LM, le modèle de 1 008 milliards de paramètres utilise TP 8 et PP 64 sur 3 072 GPU : 6 répliques de données, 512 séquences par pipeline pour un lot de 3 072, 163 TFLOP/s par GPU, soit 52 % du pic.
 :::
 
-Le pipeline communique peu : une frontière d'étage ne reçoit qu'un tenseur d'activations par micro-lot et par sens, ce qui lui permet de traverser le réseau entre nœuds. Ses défauts sont le déséquilibre et la mémoire. Llama 3 note que la première étape consomme plus de mémoire (plongements, micro-lots en attente) et que la dernière est le goulot de latence (calcul de la perte) ; ses auteurs ont retiré une couche à chacune.
+Le pipeline communique peu : une frontière d'étage ne reçoit qu'un tenseur d'activations par micro-lot et par sens, ce qui lui permet de traverser le réseau entre nœuds. Ses défauts sont le déséquilibre et la mémoire. Llama 3 note que le premier étage consomme plus de mémoire (plongements, micro-lots en attente) et que le dernier est le goulot de latence (calcul de la perte) ; ses auteurs ont retiré une couche à chacun.
 
 ### 4.4. Parallélisme d'experts
 
@@ -616,7 +618,7 @@ Sous un ordonnanceur topologique ([module Slurm, chapitre 5](../slurm/index.html
 
 Les auteurs de Llama 3 disent avoir développé, pour choisir, un estimateur de consommation mémoire et un outil de projection de performance. Le lab 9.4 est une version pédagogique de cette idée : il combine les formules des chapitres 3 et 4.
 
-Pour une disposition, il calcule la mémoire par GPU (états de ZeRO, activations de Korthikanti sur la première étape d'un pipeline), la bulle du pipeline, et les temps de communication du TP, du pipeline et des données, à partir de bandes passantes **que vous fournissez**. Il y ajoute le coût du recalcul d'activations (39 % ou 7 %, deux valeurs d'une même mesure publiée) et une marge de 10 % de la mémoire.
+Pour une disposition, il calcule la mémoire par GPU (états de ZeRO, activations de Korthikanti sur le premier étage d'un pipeline), la bulle du pipeline, et les temps de communication du TP, du pipeline et des données, à partir de bandes passantes **que vous fournissez**. Il y ajoute le coût du recalcul d'activations (39 % ou 7 %, deux valeurs d'une même mesure publiée) et une marge de 10 % de la mémoire.
 
 ::: ex
 [Exemple 5.2 — 70 milliards de paramètres sur 64 GPU]{.tag} Modèle : 70 milliards de paramètres, 80 couches, taille cachée 8 192, 64 têtes, séquence de 4 096 tokens (la forme d'un Llama 3 70B). Cluster : 8 nœuds de 8 GPU de 80 Go, pic dense de 989 TFLOP/s. Lot global de 512 séquences, micro-lot de 1. **Hypothèses** : 400 Go/s de débit de bus dans le nœud, 25 Go/s entre nœuds, 40 % de MFU pour dimensionner le calcul, soit 34,8 s par étape.
@@ -643,7 +645,7 @@ Lisons ce tableau comme un ingénieur et non comme un classement.
 -   **Les bornes comptent.** « Sans recouvrement » est une borne haute, « données cachées » une borne basse. La ligne TP 2, ZeRO-3, DP 32 passe de 32,9 % à 9,5 % si les 8 secondes de communication de données se cachent derrière 35 secondes de calcul : plausible, pas garanti.
 -   **Le TP de 8 coûte plus que le modèle ne le dit** : 26 à 28 %, auxquels s'ajoute l'efficacité perdue sur des matrices huit fois plus petites par GPU, que le modèle ignore.
 
-Ce que le modèle **ne voit pas** : l'efficacité des noyaux sur de petites matrices, les activations transitoires de la couche en cours de recalcul, le déséquilibre entre étapes de pipeline, les termes de latence, la fragmentation, le recouvrement réel, l'écart entre débit nominal et mesuré. D'où la quatrième étape de la procédure : mesurer.
+Ce que le modèle **ne voit pas** : l'efficacité des noyaux sur de petites matrices, les activations transitoires de la couche en cours de recalcul, le déséquilibre entre étages de pipeline, les termes de latence, la fragmentation, le recouvrement réel, l'écart entre débit nominal et mesuré. D'où la quatrième étape de la procédure : mesurer.
 
 ### 5.4. Le lot global comme contrainte
 
@@ -687,9 +689,11 @@ Rappel de la définition (module 2, chapitre 7), avec le nombre de FLOP par toke
 
 $$\text{MFU} = \frac{\text{tokens/s} \times F_{\text{token}}}{N_{\text{GPU}} \times P_{\text{pic}}} \qquad F_{\text{token}} \approx 6\Psi + 12\,L\,H\,Q\,T$$
 
-où $P_{\text{pic}}$ est le pic **dense** de la précision utilisée. Les sources d'erreur sont dans la mesure du temps et dans le dénominateur.
+où $P_{\text{pic}}$ est le pic **dense** de la précision utilisée. Le second terme suit les notations du module 2 : $L$ couches, $H$ têtes de dimension $Q$ (donc $HQ = h$) et $T$ tokens par séquence.
 
--   **Écartez les premières étapes** (un seul seau à la première itération de DDP, allocateur à chaud) : médiane d'une trentaine d'étapes après échauffement, comme dans le lab 9.1.
+Aux chapitres 3 et 4, $H$ s'écrit $a$ et $T$ s'écrit $s$. Les sources d'erreur sont dans la mesure du temps et dans le dénominateur.
+
+-   **Écartez les premières étapes** (un seul seau à la première itération de DDP, allocateur à chaud) et prenez la médiane des suivantes. Le lab 9.1 écarte les 5 premières de ses 12 étapes ; sur un vrai job, mesurez-en quelques dizaines (§5.1).
 -   **Synchronisez avant de lire l'horloge.** Sur GPU, les noyaux sont asynchrones : sans synchronisation, vous chronométrez leur envoi.
 -   **Comptez des tokens utiles** (pas le remplissage) et pas la recomputation (module 2, exercice 10).
 -   **Prenez le pic dense** de la précision utilisée, jamais le chiffre « avec sparsité ».
@@ -739,14 +743,14 @@ Gardons le même lot global avec 4 fois plus de GPU : il ne reste que 8 192 toke
 | Recalcul sélectif plutôt que complet | calcul refait (7 % contre 39 % dans la mesure de Korthikanti et al.) | dépend de l'implémentation de l'attention |
 | Noyaux fusionnés, `torch.compile` | temps des noyaux liés à la mémoire (module 2, roofline) | temps de compilation, ruptures de graphe |
 | Précision plus basse | temps des noyaux | FP8 était qualifié d'expérimental début 2025 par le Playbook ; stabilité (chapitre 7) |
-| Chasser les retardataires | tout : un GPU lent ralentit tous les autres | détection : chapitre 8 |
+| Chasser les traînards (*stragglers*) | tout : un GPU lent ralentit tous les autres | détection : chapitre 8 |
 | Pipeline de données | attente de lots | stockage et prétraitement (module 8) |
 
 Un seul GPU lent peut ralentir des milliers de GPU, ce qui se voit comme des communications lentes mais fonctionnelles : c'est l'un des constats de l'équipe Llama 3, qui a développé des outils pour repérer les communications suspectes parmi les groupes de processus.
 
-### 6.4. Du MFU au rendement utile
+### 6.4. Du MFU au goodput
 
-Un MFU ne dit rien du temps où le job ne tourne pas. Sur 54 jours de pré-entraînement de [Llama 3 405B](https://arxiv.org/abs/2407.21783), l'équipe rapporte plus de 90 % de temps d'entraînement effectif malgré 466 interruptions. Un MFU de 40 % avec 90 % de temps effectif donne un usage utile de l'ordre de 36 % du pic ($0{,}9 \times 0{,}40$). Interruptions, checkpoints et reprises sont l'objet du [module 10](../fault-tolerance/index.html).
+Un MFU ne dit rien du temps où le job ne tourne pas. La part du temps d'horloge consacrée à du calcul conservé s'appelle le **goodput** ([module 10](../fault-tolerance/index.html#ch2)). Sur 54 jours de pré-entraînement de [Llama 3 405B](https://arxiv.org/abs/2407.21783), l'équipe rapporte plus de 90 % de temps d'entraînement effectif malgré 466 interruptions. Un MFU de 40 % avec 90 % de temps effectif donne un **usage utile du pic** (MFU × goodput, [module 2](../perf-models/index.html#ch7)) de l'ordre de 36 % ($0{,}40 \times 0{,}9$). Interruptions, checkpoints et reprises sont l'objet du [module 10](../fault-tolerance/index.html).
 
 ::: recap
 Points clés — chapitre 6
@@ -787,7 +791,7 @@ Le résultat en BF16 est **0,5**. Quand l'accumulateur atteint 0,5, l'espacement
 
 ### 7.2. Pourquoi un run distribué n'est pas bit-identique
 
-L'addition flottante n'est pas associative : $(a + b) + c$ et $a + (b + c)$ peuvent différer d'un bit. Or l'ordre des additions change dès qu'on change le nombre de processus, le découpage en seaux ou l'algorithme de la collective. Le même script mesure l'effet.
+L'addition flottante n'est pas associative ([module 4, §6.5](../gpu-programming/index.html#lordre-des-sommes-et-le-déterminisme) ; [module 3, §6.1](../parallel-programming/index.html#laddition-nest-pas-associative)) : $(a + b) + c$ et $a + (b + c)$ peuvent différer d'un bit. Or l'ordre des additions change dès qu'on change le nombre de processus, le découpage en seaux ou l'algorithme de la collective. Le même script mesure l'effet.
 
 ::: ex
 [Exemple 7.2 — Ordre des additions, et ce qu'il fait à un entraînement]{.tag} Sortie de `numerics_demo.py` (graines fixes) :
@@ -874,7 +878,7 @@ Un job distribué tombe en panne de trois façons : il plante avec un message, i
 | Tous les rangs sont dans la même collective, un rang est absent | un rang est bloqué **hors** des collectives (chargeur de données, E/S, plantage) | pile Python du rang absent |
 | Les rangs sont dans des collectives différentes | **désaccord** de flot de contrôle : collective conditionnelle, boucle de longueur différente | vérification de cohérence (`DETAIL`), journal des collectives |
 | Erreur de forme ou de type dans une collective | désaccord de tenseurs entre rangs | `DETAIL` (message explicite) |
-| Le job avance mais lentement, sans erreur | retardataire (un GPU, un lien, un rang) | temps par rang, comparaison de rangs |
+| Le job avance mais lentement, sans erreur | traînard (un GPU, un lien, un rang) | temps par rang, comparaison de rangs |
 | Pas d'erreur, mais la perte diffère d'un run mono-processus | bug de distribution ou numérique | test d'équivalence (chapitre 7) |
 
 ### 8.2. Une procédure en cinq temps
@@ -965,7 +969,7 @@ Les causes à écarter, dans l'ordre : parts inégales ; graine de données iden
 ::: war
 [À 16 000 GPU, on lit le flight recorder avant de redémarrer]{.tag} L'article Llama 3 décrit l'outillage de diagnostic de 54 jours de pré-entraînement sur 16 000 GPU. Les auteurs utilisent largement le *flight recorder* NCCL de PyTorch pour diagnostiquer vite les blocages et les problèmes de performance, et déclenchent son vidage automatique sur délai ou absence de battement de cœur.
 
-Ils notent aussi qu'un seul retardataire, un GPU encore fonctionnel mais lent, peut ralentir des milliers d'autres GPU et ressemble alors à des communications lentes. Ils ont développé des outils pour prioriser les communications suspectes. Source : [Dubey et al., 2024](https://arxiv.org/abs/2407.21783), section 3.3.4.
+Ils notent aussi qu'un seul traînard, un GPU encore fonctionnel mais lent, peut ralentir des milliers d'autres GPU et ressemble alors à des communications lentes. Ils ont développé des outils pour prioriser les communications suspectes. Source : [Dubey et al., 2024](https://arxiv.org/abs/2407.21783), section 3.3.4.
 :::
 
 ::: recap
@@ -1101,7 +1105,7 @@ export PYTHON="$(command -v python)" OMP_NUM_THREADS=1 GLOO_SOCKET_IFNAME=lo
 5.  Reliez `hook_calls` à `1 + (étapes - 1) × seaux` ; comparez le pas avec et sans synchronisation à l'all-reduce isolé.
 6.  Lancez DDP avec `--uneven` : l'écart avec `single.json` est-il un arrondi ?
 7.  Lancez `unused_param_demo.py` avec `TORCH_DISTRIBUTED_DEBUG=INFO` sur 2 processus, relevez le nom du paramètre, puis ajoutez `--fix`.
-8.  Lancez `bash verify.sh`. Plus tard, en lisant le §7.2 (séance 9), lancez aussi `numerics_demo.py` (3 s).
+8.  Lancez `bash verify.sh`. Plus tard, en lisant le chapitre 7 (séances 9 et 10), lancez aussi `numerics_demo.py` (3 s).
 
 **Critère de réussite.** `bash verify.sh` se termine par le code 0 et affiche, par exemple, `OK ddp-gloo: DDP(4) vs single process max|dw|=7.5e-09 (rel 6.0e-08); repeat run bitwise equal; buckets [1052676, 4335616] predicted = measured`. Vos derniers chiffres diffèrent.
 
@@ -1231,15 +1235,15 @@ Les états ne doivent pas dépasser $80 - 20 = 60$ Go. L'étape 1 laisse 18,25 G
 :::
 
 ::: exo
-[Exercice 4 · ★★ — Prévoir les seaux de DDP]{.tag} Les gradients deviennent disponibles dans l'ordre suivant, en MiB : 0,5 ; 0,6 ; 12 ; 14 ; 9 ; 30 ; 3.
+[Exercice 4 · ★★ — Prévoir les seaux de DDP]{.tag} Les gradients deviennent disponibles dans l'ordre suivant, en Mio : 0,5 ; 0,6 ; 12 ; 14 ; 9 ; 30 ; 3.
 
-Règle : on ajoute chaque tenseur au seau courant, qui se ferme dès que sa taille atteint la limite. La limite du premier seau est de 1 MiB si `bucket_cap_mb` n'est pas fourni, sinon celle des autres.
+Règle : on ajoute chaque tenseur au seau courant, qui se ferme dès que sa taille atteint la limite. La limite du premier seau est de 1 Mio si `bucket_cap_mb` n'est pas fourni, sinon celle des autres.
 
-(a) Donnez les seaux avec le réglage par défaut (25 MiB). (b) Même question avec `bucket_cap_mb=25` fourni, puis 10. (c) Combien d'all-reduce à la première itération ? (d) Quel est l'intérêt d'un petit premier seau ?
+(a) Donnez les seaux avec le réglage par défaut (25 Mio). (b) Même question avec `bucket_cap_mb=25` fourni, puis 10. (c) Combien d'all-reduce à la première itération ? (d) Quel est l'intérêt d'un petit premier seau ?
 :::
 
 ::: sol
-(a) Le premier seau se ferme à $0{,}5 + 0{,}6 = 1{,}1$ MiB. Puis $12 + 14 = 26$ MiB ferme le deuxième, $9 + 30 = 39$ MiB le troisième, et 3 MiB forment le quatrième : **[1,1 ; 26 ; 39 ; 3]**, soit 4 all-reduce.
+(a) Le premier seau se ferme à $0{,}5 + 0{,}6 = 1{,}1$ Mio. Puis $12 + 14 = 26$ Mio ferme le deuxième, $9 + 30 = 39$ Mio le troisième, et 3 Mio forment le quatrième : **[1,1 ; 26 ; 39 ; 3]**, soit 4 all-reduce.
 
 (b) Avec 25 fourni : **[27,1 ; 39 ; 3]**, 3 all-reduce. Avec 10 : **[13,1 ; 14 ; 39 ; 3]**, 4 all-reduce. `predict_buckets` de `buckets.py` le confirme.
 
@@ -1279,11 +1283,11 @@ Ici $s\,b\,h = 4096 \times 2 \times 5120 = 41\,943\,040$ et $5as/h = 160$.
 
 (a) Facteur 194 : 8,14 Go par couche, **325,5 Go** pour 40 couches. (b) Facteur 34 : 1,43 Go par couche, **57,0 Go**. (c) Facteur 4,25 : 0,178 Go par couche, **7,13 Go**.
 
-(d) Le budget est $0{,}9 \times 80 - 30 = 42$ Go. Le recalcul sélectif seul (57,0 Go) ne tient pas ; TP 8 avec séquence et recalcul sélectif (7,1 Go) tient largement ; le recalcul complet ($2\,s\,b\,h$ par couche, 3,36 Go au total) tient aussi mais coûte 39 % de calcul en plus (mesure de Korthikanti et al.). Un pipeline 1F1B ne change pas ces totaux : la première étape garde les activations de toutes les couches.
+(d) Le budget est $0{,}9 \times 80 - 30 = 42$ Go. Le recalcul sélectif seul (57,0 Go) ne tient pas ; TP 8 avec séquence et recalcul sélectif (7,1 Go) tient largement ; le recalcul complet ($2\,s\,b\,h$ par couche, 3,36 Go au total) tient aussi mais coûte 39 % de calcul en plus (mesure de Korthikanti et al.). Un pipeline 1F1B ne change pas ces totaux : le premier étage garde les activations de toutes les couches.
 :::
 
 ::: exo
-[Exercice 7 · ★★ — Dimensionner un pipeline]{.tag} Un job utilise PP 8 et DP 4, avec un lot global de 256 séquences et des micro-lots d'une séquence. Bulle $= (p-1)/(v\,m)$ ; avec $v > 1$, la mémoire d'activations de la première étape est multipliée par $1 + (p-1)/(p\,v)$. (a) Combien de micro-lots par pipeline, et quelle bulle ? (b) Quelle bulle et quel prix en mémoire avec $v = 2$ et $v = 4$ ? (c) Quel lot global minimal pour une bulle d'au plus 5 % sans entrelacement ? (d) Pourquoi ne pas simplement augmenter le lot ?
+[Exercice 7 · ★★ — Dimensionner un pipeline]{.tag} Un job utilise PP 8 et DP 4, avec un lot global de 256 séquences et des micro-lots d'une séquence. Bulle $= (p-1)/(v\,m)$ ; avec $v > 1$, la mémoire d'activations du premier étage est multipliée par $1 + (p-1)/(p\,v)$. (a) Combien de micro-lots par pipeline, et quelle bulle ? (b) Quelle bulle et quel prix en mémoire avec $v = 2$ et $v = 4$ ? (c) Quel lot global minimal pour une bulle d'au plus 5 % sans entrelacement ? (d) Pourquoi ne pas simplement augmenter le lot ?
 :::
 
 ::: sol
@@ -1309,7 +1313,7 @@ La communication pèse 10,7 % du calcul dans le nœud et **172 %** entre nœuds 
 :::
 
 ::: exo
-[Exercice 9 · ★★ — Diagnostiquer un hang à partir d'un journal]{.tag} Un job à 8 rangs est bloqué depuis 20 minutes. Analyse des journaux (sortie **fictive**) puis pile du rang 5 (extrait **fictif**) :
+[Exercice 9 · ★★ — Diagnostiquer un hang à partir d'un journal]{.tag} Un job NCCL à 8 rangs, dont le délai du groupe a été porté à 60 minutes, est bloqué depuis 20 minutes. Analyse des journaux (sortie **fictive**) puis pile du rang 5 (extrait **fictif**) :
 
 ~~~text
 rank  last_completed  in_flight
@@ -1342,16 +1346,19 @@ findings:
 :::
 
 ::: sol
-(a) Commande : `python3 scenario.py --psi 175e9 --layers 96 --h 12288 --heads 96 --seq 4096 --gpus 128 --batch 1024 --top 10`. Sortie : 54 dispositions évaluées, **24 tiennent** dans 72 Go, pour 87,0 s de calcul par étape. Trois premières lignes :
+(a) Commande : `python3 scenario.py --psi 175e9 --layers 96 --h 12288 --heads 96 --seq 4096 --gpus 128 --batch 1024 --top 10`. Sortie : 54 dispositions évaluées, **24 tiennent** dans 72 Go, pour 87,0 s de calcul par étape. Les trois premières lignes et la sixième :
 
 ~~~text
 tp pp dp zero recompute  m  state_GB  acts_GB  total_GB  bubble  t_tp_s  t_pp_s  t_dp_s  overhead: no-overlap / dp-hidden
  4 16  2    1 selective 512     27.3     41.1     68.4    2.9%    4.64    1.03    0.22     16.7%     16.4%
  4 32  1    1 selective 1024     21.9     41.1     62.9    3.0%    4.64    2.06    0.00     17.7%     17.7%
  8  8  2    1 selective 512     27.3     20.5     47.9    1.4%   10.82    0.52    0.22     21.7%     21.4%
+ 4  1 32    3 selective  32     21.9     41.1     62.9    0.0%    4.64    0.00   10.17     24.0%     12.3%
 ~~~
 
 (b) **A** (4, 16, 2, ZeRO-1) : 16,7 %, mais 68,4 Go, 3,6 Go sous la limite, donc fragile face à la fragmentation. **B** (4, 1, 32, ZeRO-3) : 24,0 % sans recouvrement, 12,3 % si les 10,2 s de communication de données se cachent derrière 87 s de calcul ; 62,9 Go, sans pipeline donc plus simple à exploiter. **C** (8, 8, 2, ZeRO-1) : 21,7 %, 47,9 Go, grande marge mémoire.
+
+La deuxième ligne (4, 32, 1, ZeRO-1 : 17,7 %, 62,9 Go) n'est pas retenue. Elle ne diffère de A que par un pipeline deux fois plus long, sans réplique de données : mesurer A renseigne sur cette famille. Avec 3 couches par étage, le plongement du premier étage et la perte du dernier (§4.3) y pèsent davantage, un déséquilibre que le modèle ignore.
 
 (c) Mesurer 50 étapes de chacune ; médiane de tokens par seconde après échauffement ; retenir la plus rapide dont le pic de mémoire reste sous 72 Go ; à moins de 3 % d'écart, la plus simple (B). Ce seuil est un choix de ce parcours.
 
@@ -1442,8 +1449,8 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
-1.  *Notre job de 70 milliards de paramètres sur 64 GPU fait 25 % de MFU. Où cherchez-vous ?* Réponse-type : vérifier la mesure (échauffement, pic dense, tokens utiles), puis décomposer l'étape en secondes : communication exposée, bulle, recalcul, données, optimiseur, retardataires. Comparer aux repères publiés (38 à 43 % pour Llama 3), vérifier que le TP tient dans le nœud et que les rangs sont bien ordonnés, traiter le premier poste par rapport coût-gain.
-2.  *Un entraînement à 128 GPU ne progresse plus depuis vingt minutes. Que faites-vous ?* Réponse-type : ne pas redémarrer avant d'avoir l'état de chaque rang (piles Python, journal des collectives ou flight recorder). Chercher si un rang est hors des collectives (chargeur, E/S, nœud défaillant) ou si les rangs sont dans des collectives différentes. Puis reprendre du dernier checkpoint et écrire le test qui reproduit le bug.
+1.  *Notre job de 70 milliards de paramètres sur 64 GPU fait 25 % de MFU. Où cherchez-vous ?* Réponse-type : vérifier la mesure (échauffement, pic dense, tokens utiles), puis décomposer l'étape en secondes : communication exposée, bulle, recalcul, données, optimiseur, traînards. Comparer aux repères publiés (38 à 43 % pour Llama 3), vérifier que le TP tient dans le nœud et que les rangs sont bien ordonnés, traiter le premier poste par rapport coût-gain.
+2.  *Un entraînement à 128 GPU, dont le délai NCCL a été relevé à une heure, ne progresse plus depuis vingt minutes. Que faites-vous ?* Réponse-type : ne pas redémarrer avant d'avoir l'état de chaque rang (piles Python, journal des collectives ou flight recorder). Chercher si un rang est hors des collectives (chargeur, E/S, nœud défaillant) ou si les rangs sont dans des collectives différentes. Puis reprendre du dernier checkpoint et écrire le test qui reproduit le bug.
 3.  *Pourquoi FSDP plutôt que DDP, et quand ajouter du parallélisme tensoriel ?* Réponse-type : les états coûtent 16 octets par paramètre, ce qui interdit DDP au-delà de quelques milliards de paramètres sur 80 Go ; FSDP les partitionne pour 1,5 fois le volume de DDP. On ajoute du TP, dans le nœud, quand activations ou matrices par GPU posent problème, sachant qu'il coûte quatre all-reduce par couche et se recouvre mal ; le pipeline prend le relais au-delà du nœud.
 
 ## Lectures et références {#refs}

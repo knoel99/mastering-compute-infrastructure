@@ -615,11 +615,11 @@ Les publications donnent des repères. PaLM 540B atteint 46,2 % de MFU. L'articl
 Le MFU est un rapport de débit. Il ne dit rien du temps perdu quand le job est arrêté. La part du temps d'horloge consacrée à du calcul qui sera conservé s'appelle le **goodput** ([module 10](../fault-tolerance/index.html#ch2)). Le produit MFU × goodput, que ce parcours appelle **usage utile du pic**, donne la part du pic réellement convertie en progrès de l'entraînement.
 
 ::: war
-[À 16 000 GPU, on s'arrête tous les jours]{.tag} Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 466 interruptions de job, dont 47 planifiées et 419 imprévues. Environ 78 % des interruptions imprévues ont été attribuées à des problèmes matériels confirmés ou suspectés. Les GPU représentent 268 des 419 interruptions imprévues : 64 % recalculé à partir des comptes du tableau 5, alors que le texte de l'article dit 58,7 % (voir le [module 10, § 1.3](../fault-tolerance/index.html#ch1)).
+[À 16 000 GPU, on s'arrête tous les jours]{.tag} Sur une période de 54 jours de pré-entraînement de Llama 3 405B, Meta a rapporté 466 interruptions de job, dont 47 planifiées et 419 imprévues. Environ 78 % des interruptions imprévues ont été attribuées à des problèmes matériels confirmés ou suspectés. Les GPU représentent 268 des 419 interruptions imprévues (64 % recalculé à partir des comptes du tableau 5 ; le texte de l'article dit 58,7 %, voir le [module 10, § 1.3](../fault-tolerance/index.html#ch1)).
 
 L'équipe a pourtant atteint plus de 90 % de temps d'entraînement effectif, grâce à l'automatisation : une intervention manuelle significative n'a été nécessaire que trois fois. Source : [article Llama 3](https://arxiv.org/abs/2407.21783), section 3.3.4.
 
-Un MFU de 40 % associé à 90 % de temps effectif donne un usage utile de l'ordre de 36 % du pic ($0{,}9 \times 0{,}40$, goodput × MFU), un ordre de grandeur de calcul à retenir. Le module 10 traite cette perte.
+L'article définit ce temps effectif comme le temps d'entraînement utile rapporté au temps écoulé : c'est un goodput. Avec un MFU de 40 %, un goodput de 90 % donne un usage utile du pic de l'ordre de 36 % ($0{,}40 \times 0{,}9$), un ordre de grandeur de calcul à retenir. Le module 10 traite cette perte.
 :::
 
 ### 7.4. La mémoire d'un entraînement
@@ -634,7 +634,7 @@ Points clés — chapitre 7
 -   Un token coûte environ $6N + 12LHQT$ FLOP à l'entraînement (PaLM, annexe B) ; $D$ tokens coûtent donc environ $6ND$ FLOP.
 -   MFU : tokens/s × FLOP par token divisés par le pic dense agrégé ; HFU compte la recomputation.
 -   De 38 à 46 % de MFU est la fourchette publiée à grande échelle (PaLM, Llama 3).
--   Le goodput est la part du temps où le job produit du calcul conservé ; MFU × goodput est l'usage utile du pic.
+-   Le goodput est la part du temps d'horloge consacrée à du calcul conservé (module 10) ; MFU × goodput est l'usage utile du pic.
 -   Adam en précision mixte coûte 16 octets par paramètre : 112 Go pour 7 milliards de paramètres.
 :::
 

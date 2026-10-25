@@ -1,0 +1,30 @@
+# Exercise 11 of course module 14: the tensor-idle join of section 3.2 on a mixed NVIDIA + AMD fleet.
+# NVIDIA (dcgm-exporter): DCGM_FI_PROF_PIPE_TENSOR_ACTIVE, a ratio in [0, 1], labels Hostname and gpu.
+# AMD (Device Metrics Exporter): gpu_prof_tensor_active_percent, a percentage in [0, 100], labels hostname and gpu_id.
+# Not exercised on real AMD or NVIDIA hardware: the series in the test are synthetic.
+groups:
+  - name: mixed-fleet-recording
+    interval: 30s
+    rules:
+      - record: gpu:tensor_active:ratio
+        expr: DCGM_FI_PROF_PIPE_TENSOR_ACTIVE
+        labels:
+          vendor: nvidia
+      - record: gpu:tensor_active:ratio
+        expr: |
+          label_replace(
+            label_replace(gpu_prof_tensor_active_percent / 100, "Hostname", "$1", "hostname", "(.*)"),
+            "gpu", "$1", "gpu_id", "(.*)")
+        labels:
+          vendor: amd
+
+  - name: mixed-fleet-alerts
+    interval: 30s
+    rules:
+      - alert: JobTensorIdle
+        expr: avg by (job) (gpu:tensor_active:ratio * on (Hostname, gpu) group_left (job) slurm_job_gpu_allocated) < 0.05
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "job {{ $labels.job }}: tensor pipes idle on its GPUs, whatever the vendor"

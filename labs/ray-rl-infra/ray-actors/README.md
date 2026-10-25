@@ -16,7 +16,8 @@ verify.sh       tout ce qui précède, puis « OK ray-actors »
 ```
 
 ```bash
-python3 -m pip install "ray[data,train]" numpy pytest torch   # testé avec ray 2.59.0 (2026-10-25)
+python3 -m pip install "ray[data,train]==2.59.0" numpy pytest pyyaml   # testé le 2026-10-25
+python3 -m pip install "torch==2.14.1" --index-url https://download.pytorch.org/whl/cpu   # PyTorch pour CPU
 export PYTHON=/chemin/vers/python   # Python avec les paquets ci-dessus
 PYTHON=$PYTHON bash verify.sh       # environ 2 minutes
 ```

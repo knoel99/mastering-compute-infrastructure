@@ -35,12 +35,11 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 |---|---|
 | Volume | 28 h, dont 12 h de lecture, 9,5 h de labs et 6,5 h d'exercices (répartition estimée par l'auteur, non mesurée) |
 | Niveau d'entrée | 3 : la tolérance aux pannes (module 10) et Kubernetes pour les GPU (module 12) |
-| Prérequis | [Module 12 — Kubernetes pour les GPU](../kubernetes-gpu/index.html), [Module 10 — Tolérance aux pannes](../fault-tolerance/index.html) |
+| Prérequis | [Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [Module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html) |
 | Pour qui | Cœur : la plateforme de calcul d'une organisation est presque toujours répartie entre plusieurs fournisseurs. |
 | Livrable | un simulateur de placement testé, un calculateur de coût de déménagement de données testé, un job SkyPilot analysé hors ligne avec sa politique de gouvernance |
 | Environnement | un portable CPU suffit pour les labs 13.1 et 13.3 et pour la branche hors ligne du lab 13.2. La branche cloud du lab 13.2 demande un compte cloud et du crédit : lancez de petits jobs de quelques minutes et vérifiez l'arrêt automatique |
-| Projets liés | [Projet 4 — Placement multi-fournisseurs](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
-
+| Projets liés | [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 ### Ce que vous saurez vérifier {#acquis}
 
 -   Situer une offre de calcul (hyperscaler, GPU cloud, centre public, colocation) par ce qu'elle vend, son unité de facturation, son engagement et son réseau (chapitres 1 et 2).
@@ -55,7 +54,7 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
+-   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 33-44) : placer, observer et facturer des charges sur plusieurs fournisseurs.
 -   **S'appuie sur** : [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
 -   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Multi-cloud (SkyPilot…), Stockage objet, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Cloud hyperscaler (AWS, GCP, Azure…), FinOps, coûts, Planification de capacité, Sécurité, conformité, Kubernetes, Terraform, infrastructure as code, Collectives (NCCL, RCCL, HCCL), Clouds GPU spécialisés, Achats, relation fournisseurs, Expérience HPC, Réseau (général), Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
@@ -131,7 +130,7 @@ Toute offre de calcul GPU, quel que soit son nom commercial, se décrit par quat
 -   **Quel engagement ?** Aucun, quelques semaines, un à trois ans, ou une durée de projet.
 -   **Quel environnement autour du GPU ?** Interconnexion entre nœuds, stockage, réseau vers l'extérieur, identité, quotas.
 
-La quatrième question est celle qu'on oublie. Un GPU identique ne donne pas le même entraînement derrière un réseau différent : le chapitre 3 y revient.
+La quatrième question est celle qu'on oublie. Un GPU identique ne donne pas le même entraînement derrière un réseau différent : la section 1.3 et l'exemple 6.1 y reviennent.
 
 ### 1.2. Les familles d'offre
 
@@ -237,7 +236,7 @@ Le préavis sert donc à **vider proprement** (terminer l'étape, signaler la fi
 
 ### 2.3. Le coût d'une heure utile
 
-Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, avec $C$ le coût d'un checkpoint, $M$ le temps moyen entre interruptions et $R$ le temps de reprise :
+Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, la formule de Young (fonction `young_daly` du lab 13.1). On note ici $C$ son coût bloquant ($\delta$ au module 10), $T$ la période ($\tau$), $M$ le temps moyen entre interruptions et $R$ le temps de reprise :
 
 $$T^* = \sqrt{2CM}, \qquad W(T) = \frac{C}{T} + \frac{T/2 + R}{M}$$
 
@@ -275,7 +274,7 @@ Points clés — chapitre 2
 
 -   Six modèles : à la demande, engagement d'usage, réservation planifiée, capacité à attente, préemptible, contrat de capacité.
 -   Les préavis de préemption documentés vont de 0 à 120 secondes, au mieux : ils ne remplacent pas le checkpoint périodique.
--   Prix d'une heure utile : $p / (1 - W)$ avec $W(T^*) = \sqrt{2C/M} + R/M$ ; la remise minimale du spot vaut $W$.
+-   Prix d'une heure utile : $p / (1 - W)$ avec $W(T^*) = \sqrt{2C/M} + R/M$ ; $1 - W$ est le goodput $g$ du [module 15](../finops-capacity/index.html#ch1). La remise minimale du spot vaut $W$.
 -   Un job qui ne sait pas reprendre n'a pas sa place sur du préemptible.
 -   Les modèles se combinent : base réservée, pics à la demande, travaux reprenables en préemptible.
 :::
@@ -310,7 +309,7 @@ La documentation annonce aussi environ 70 % d'économie sur les coûts GPU avec 
 
 ### 3.4. Lire un job, ligne à ligne
 
-Le fichier `job.yaml` du lab 13.2 est l'exemple de ce chapitre. Voici ses ressources et ses montages.
+Le fichier `job.yaml` du lab 13.2 est l'exemple de ce chapitre. Voici ses ressources, son nombre de nœuds et ses montages ; le reste du fichier déclare le nom du job, les variables, le secret et les commandes `setup` et `run`.
 
 ~~~yaml
 resources:
@@ -323,15 +322,26 @@ resources:
     - infra: k8s/eu-gpu-cluster   # placeholder Kubernetes context
   job_recovery:
     strategy: EAGER_NEXT_REGION   # after a preemption go straight to another location
-    max_restarts_on_errors: 2
+    max_restarts_on_errors: 2     # also retry the job a couple of times on a non-zero exit code
+  labels:                         # cost allocation: see policy_check.py
+    team: llm-platform
+    project: pretrain-demo
+    owner: platform-oncall
+
+num_nodes: 2
+
 file_mounts:
   /checkpoint:                    # survives the loss of the VM; its location decides where egress is paid
     source: r2://example-ckpt-bucket
     mode: MOUNT_CACHED
     type: MODEL_CHECKPOINT_RW
+  /data:                          # read-only dataset: `type` is only allowed together with MOUNT_CACHED (SkyPilot 0.14.1)
+    source: r2://example-dataset-bucket
+    mode: MOUNT_CACHED
+    type: DATASET_RO
 ~~~
 
-Trois lignes portent la politique. `any_of` donne trois lieux candidats, dont l'ordre de bascule est décidé par l'optimiseur ; `ordered` fixerait cet ordre. `job_recovery` choisit la stratégie de reprise. `file_mounts` place le checkpoint sur un bucket indépendant des trois lieux, ce qui évite qu'une bascule de AWS vers Google ne paie une sortie à chaque lecture (chapitre 4).
+Trois lignes portent la politique. `any_of` donne trois lieux candidats, dont l'ordre de bascule est décidé par l'optimiseur ; `ordered` fixerait cet ordre. `job_recovery` choisit la stratégie de reprise. `file_mounts` place le checkpoint et le jeu de données sur des buckets indépendants des trois lieux, ce qui évite qu'une bascule de AWS vers Google ne paie une sortie à chaque lecture (chapitre 4). Les étiquettes `labels` servent à la gouvernance (chapitre 8).
 
 ::: ex
 [Exemple 3.1 — Ce que SkyPilot accepte, et ce qu'il laisse passer]{.tag} La branche hors ligne du lab 13.2 charge les fichiers avec le vrai code de SkyPilot 0.14.1 (`sky.Task.from_yaml`), sans compte cloud. Sortie capturée sur le bac à sable de l'auteur (Linux 6.18, 4 vCPU), le 24 octobre 2026 :
@@ -493,7 +503,9 @@ La sortie ne fait que 69 % de la facture : le stockage chevauché pèse 31 %. Po
 
 Un entraînement qui lit son jeu de données à chaque époque depuis un bucket d'un autre fournisseur paie la sortie à chaque lecture. Copier une fois coûte la sortie, plus le stockage du côté de l'entraînement.
 
-Pour 150 Go, avec les tarifs de la carte, le lab 13.3 trouve : copie 6,75 USD (4,50 de sortie et 2,25 de stockage R2 sur un mois), contre 4,50 USD pour la première époque lue à distance (la franchise absorbe 100 Go), puis 13,50 USD par époque supplémentaire. La copie gagne dès la deuxième époque. À 90 époques, la relecture distante coûte 1 190 USD contre 6,75. Un cache local à la lecture (le mode `MOUNT_CACHED` de SkyPilot en est un) réduit le coût de la relecture, mais ne supprime pas la première lecture.
+Pour 150 Go, avec les tarifs de la carte, le lab 13.3 trouve : copie 6,75 USD (4,50 de sortie et 2,25 de stockage R2 sur un mois), contre 4,50 USD pour la première époque lue à distance (la franchise absorbe 100 Go), puis 13,50 USD par époque supplémentaire. La copie gagne dès la deuxième époque.
+
+À 90 époques, soit 13 500 Go lus dans le mois, la relecture distante coûte 1 190 USD contre 6,75. C'est un peu moins que $4{,}50 + 89 \times 13{,}50 = 1\,206$ USD, car les tranches du mois s'appliquent aussi : au-delà de 10 340 Go (franchise et première tranche), le Go passe à 0,085 USD, dès la 69e époque. Un cache local à la lecture (le mode `MOUNT_CACHED` de SkyPilot en est un) réduit le coût de la relecture, mais ne supprime pas la première lecture.
 
 ### 4.6. Les sorties « gratuites » ont des conditions
 
@@ -548,7 +560,9 @@ Dans SkyPilot, `ordered` fixe l'ordre d'essai et `any_of` le laisse à l'optimis
 
 ### 5.3. Ce que donne le simulateur
 
-Le scénario du lab 13.1 est entièrement **synthétique** : quatre pools de trois fournisseurs, un job de 64 GPU et 120 h de calcul utile, un checkpoint de 112 Go, un tarif de sortie de 0,09 u par Go et $\lambda = 40$ u par heure. Les lignes du tableau suivant donnent la moyenne sur 200 graines, les mêmes pour chaque politique.
+Le scénario du lab 13.1 est entièrement **synthétique** : quatre pools de trois fournisseurs, un job de 64 GPU et 120 h de calcul utile, un checkpoint de 112 Go qui bloque le job 0,05 h ($C$), une reprise de 0,17 h ($R$), un tarif de sortie de 0,09 u par Go et $\lambda = 40$ u par heure. Les lignes du tableau suivant donnent la moyenne sur 200 graines, les mêmes pour chaque politique.
+
+L'exemple 2.2 prend une reprise de 10 minutes, soit 0,167 h : c'est pourquoi le pool a-spot vaut 4,695 u par heure utile dans le tableau et 4,69 u dans l'exemple.
 
 ~~~text
 SYNTHETIC pools (u = arbitrary unit):
@@ -606,7 +620,7 @@ Sans donnée à déplacer, `cheapest` (30 285 u) et `aware` (29 785 u) battent `
 
 La politique `failover` atterrit chez le pool à la demande chaque fois que les pools spot refusent au moment de la demande. Ce pool n'est jamais préempté : rien ne ramène donc jamais le job sur du spot. Dans le tableau, le coût de 53 967 u contre 36 577 u pour `stay`, à 0 Go de données, le montre ; le test `test_on_demand_trap_costs_more_than_waiting_for_spot` reproduit le mécanisme sur un cas minimal.
 
-Les 6,5 déménagements viennent d'un autre effet : à chaque préemption, `failover` reprend la décision et saute d'un fournisseur spot à l'autre (observé en journalisant les décisions du simulateur sur les mêmes 200 graines ; `scenarios.py` ne l'affiche pas).
+Les 6,5 déménagements viennent d'un autre effet : à chaque préemption, `failover` reprend la décision et saute le plus souvent d'un fournisseur spot à l'autre. La commande `python3 scenarios.py --seeds 200 --trace-moves` le montre sur les mêmes 200 graines : 89,6 % des déménagements mènent à un pool spot, 10,4 % au pool à la demande.
 
 Une liste `any_of` qui mélange spot et à la demande a ce comportement. Les parades sont de ne mettre à la demande dans la liste qu'en dernier recours explicite (`ordered`), de plafonner la durée d'un job sur du à-la-demande, ou de réévaluer le placement périodiquement. Le simulateur ne réévalue qu'à la préemption : c'est une limite assumée du lab.
 
@@ -688,7 +702,7 @@ Un job placé ailleurs doit pouvoir joindre ses données, s'authentifier et obte
 Pourquoi ne pas coupler les GPU de deux fournisseurs pour un seul entraînement ? Parce que chaque étape échange les gradients, et que le lien entre sites est sans commune mesure avec celui d'un site.
 
 ::: ex
-[Exemple 6.1 — Un all-reduce entre deux sites]{.tag} Un modèle de 7 milliards de paramètres a des gradients de $2 \times 7 \cdot 10^9 = 14$ Go en BF16. Reprenons le modèle du module 2 : chaque rang émet $2\,\frac{p-1}{p}\,n$ octets dans un anneau.
+[Exemple 6.1 — Un all-reduce entre deux sites]{.tag} Un modèle de 7 milliards de paramètres a des gradients de $2 \times 7 \cdot 10^9 = 14$ Go en BF16. Reprenons le modèle du module 2 : dans un anneau de $p$ rangs, chaque rang émet $2\,\frac{p-1}{p}\,n$ octets pour un message de $n$ octets. Ces deux lettres suivent la notation du module 2 ; elles n'ont pas ici leur sens du chapitre 5 (prix et nombre de GPU).
 
 Dans un site, 64 GPU à 40 Go/s (valeurs de l'exercice 11 du module 2) échangent ces gradients en $2 \times \frac{63}{64} \times 14/40 = 0{,}69$ s.
 
@@ -1000,7 +1014,7 @@ Face à 5,0 u, la remise est de 20 % : le spot gagne (4,74 contre 5,0). Face à 
 
 (c) La perte moyenne $= (K/2) \times 90/3600 \times 64 = 0{,}8\,K$ GPU-h. Pour rester sous 5, il faut $K < 6{,}25$ étapes.
 
-(d) Chaque checkpoint coûte du temps de GPU (le terme $C/T$ de $W$). La période optimale équilibre ce coût et la perte attendue ; elle se calcule avec Young et Daly, pas avec la seule perte moyenne.
+(d) Chaque checkpoint coûte du temps de GPU (le terme $C/T$ de $W$). La période optimale équilibre ce coût et la perte attendue ; elle se calcule avec la formule de Young du chapitre 2, $T^* = \sqrt{2CM}$, pas avec la seule perte moyenne.
 :::
 
 ::: exo
@@ -1010,7 +1024,7 @@ Face à 5,0 u, la remise est de 20 % : le spot gagne (4,74 contre 5,0). Face à 
 ::: sol
 `failover` prend le moins cher **parmi les pools qui répondent maintenant**. Quand les pools spot refusent, il atterrit sur le pool à la demande à 10 u, qui n'est jamais préempté ; rien ne le ramène vers le spot. D'où le coût (+47,5 %) et la fin plus précoce : `failover` n'attend presque jamais de capacité et le pool à la demande ne subit pas de préemption.
 
-Les nombreux déménagements ont une autre cause : la décision est reprise à chaque préemption, et le moins cher qui répond est souvent un spot d'un autre fournisseur (observé en journalisant les décisions du simulateur ; `scenarios.py` ne l'affiche pas).
+Les nombreux déménagements ont une autre cause : la décision est reprise à chaque préemption, et le moins cher qui répond est souvent un spot d'un autre fournisseur ; `python3 scenarios.py --seeds 200 --trace-moves` compte 89,6 % de déménagements vers un pool spot.
 
 Corrections : (1) retirer le pool à la demande de `any_of`, ou le placer en dernier dans une liste `ordered` ; (2) borner la durée sur le pool à la demande et réévaluer le placement périodiquement, ce que le lab ne fait pas.
 
@@ -1048,7 +1062,7 @@ En deux mois de 10 000 Go : $2 \times 9\,900 \times 0{,}09 = 1\,782{,}00$. En tr
 :::
 
 ::: exo
-[Exercice 9 · ★★ — Un all-reduce entre deux sites]{.tag} Un modèle de 13 milliards de paramètres a des gradients de $2 \times 13 \cdot 10^9 = 26$ Go. Comparez le temps du all-reduce en anneau, $2\,\frac{p-1}{p}\,\frac{n}{B}$, (a) sur 64 GPU d'un site à 40 Go/s, (b) entre deux sites ($p = 2$) reliés à 5 Gbit/s à 80 % d'efficacité. Quelle part d'une étape de 8 s de calcul la communication occupe-t-elle dans chaque cas, sans recouvrement ?
+[Exercice 9 · ★★ — Un all-reduce entre deux sites]{.tag} Un modèle de 13 milliards de paramètres a des gradients de $2 \times 13 \cdot 10^9 = 26$ Go. Comparez le temps du all-reduce en anneau, $2\,\frac{p-1}{p}\,\frac{n}{B}$ (notation de l'exemple 6.1, $B$ la bande passante), (a) sur 64 GPU d'un site à 40 Go/s, (b) entre deux sites ($p = 2$) reliés à 5 Gbit/s à 80 % d'efficacité. Quelle part d'une étape de 8 s de calcul la communication occupe-t-elle dans chaque cas, sans recouvrement ?
 :::
 
 ::: sol
@@ -1147,7 +1161,7 @@ Sauf mention contraire, les pages ci-dessous ont été lues le 24 octobre 2026 ;
 
 ### Documenté {#documente}
 
-Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.
+Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et de la page de Cloudflare R2. Le tableau de la section 4.2 ajoute deux tarifs absents de la carte du lab, lus le même jour à la source liée : AWS de us-east-1 vers l'Oregon et Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.
 
 ### Recommandé {#recommande}
 

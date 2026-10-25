@@ -30,7 +30,7 @@ bash verify.sh
 
 - La référence passe les 28 tests ; le départ échoue sur 22 tests, tous par `NotImplementedError` (le script refuse toute autre erreur).
 - Les chiffres de la figure 1 de l'article ZeRO (7,5 milliards de paramètres, 64 rangs : 120, 31,4, 16,6 et 1,9 Go) sont retrouvés.
-- Les formules d'activations du tableau 2 de Korthikanti et al. et le fait que la première étape d'un pipeline 1F1B garde « toutes les couches » quel que soit `p` sont testés.
+- Les formules d'activations du tableau 2 de Korthikanti et al. et le fait que le premier étage d'un pipeline 1F1B garde « toutes les couches » quel que soit `p` sont testés.
 - `scenario.py` n'affiche que des dispositions qui tiennent dans 90 % de 80 Go.
 - `mesh.py` retrouve les groupes de `DeviceMesh` de PyTorch, et `placement_demo.py` donne la sortie exacte de l'exemple 5.1 (nœuds traversés par les groupes TP et DP).
 - Un MLP à parallélisme tensoriel sur deux processus (A découpée par colonnes, B par lignes) donne la sortie et les gradients du MLP dense (erreur de l'ordre de 1e-14 en float64) avec **un** all-reduce en passe avant et **un** en passe arrière.

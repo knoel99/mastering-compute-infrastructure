@@ -7,7 +7,7 @@ Chaque critère est noté de 0 à 2 : 0 absent ou faux, 1 partiel, 2 solide. Les
 | Critère | 0 | 1 | 2 |
 |---|---|---|---|
 | ★ Cadrage | part directement vers une solution | pose une ou deux questions | précise l'objectif, le délai ferme ou souple, le budget, les autres utilisateurs, ce qui n'est pas dans le périmètre |
-| ★ Calcul de dimensionnement | aucun calcul, ou un ordre de grandeur faux | calcule la durée mais sans hypothèse dite | part des FLOPs (6 P D), dit l'utilisation visée (MFU) et sa source, obtient la durée et le nombre de nœuds |
+| ★ Calcul de dimensionnement | aucun calcul, ou un ordre de grandeur faux | calcule la durée mais sans hypothèse dite | part des FLOPs (6 N D), dit l'utilisation visée (MFU) et sa source, obtient la durée et le nombre de nœuds |
 | Hypothèses | non dites | dites mais non discutées | dites, discutées, et l'effet d'une erreur chiffré (par exemple MFU de 0,35) |
 | Fiabilité | « on relance à la main » | mentionne les checkpoints | chiffre la taille et le temps d'écriture, le MTBF supposé et la période de checkpoint |
 | Goulots | oublie réseau et stockage | les nomme | dit ce qui limiterait l'entraînement et comment le mesurer avant de s'engager |

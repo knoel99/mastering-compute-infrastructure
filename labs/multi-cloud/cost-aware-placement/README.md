@@ -28,6 +28,7 @@ IMPL=starter $PYTHON -m pytest -q tests       # votre travail : 22 échecs sur 2
 PYTHON=$PYTHON bash verify.sh                 # référence verte (25), départ rouge, balayage
 $PYTHON scenarios.py --seeds 200              # le tableau du cours (chapitre 5)
 $PYTHON scenarios.py --seeds 200 --lam 400    # étape 5 : la grille de tailles est fixe, le seuil se lit entre deux points
+$PYTHON scenarios.py --seeds 200 --trace-moves   # où vont les déménagements de `failover` (cours, section 5.4)
 $PYTHON threshold.py                          # seuils exacts pour lam = 0, 40, 400 (exemple 5.2)
 ```
 

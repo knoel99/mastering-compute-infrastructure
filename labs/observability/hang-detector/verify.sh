@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Lab 14.3 check (about 30 s, no GPU): unit tests, simulated comparison/sweep, and a real CPU hang caught live.
+# Lab 14.3 check (about 30 s, no GPU): unit tests, simulated comparison/sweep, a real CPU hang caught live,
+# MLflow join (part C) and OpenTelemetry spans (part D). A skipped part prints PARTIAL; STRICT=1 makes it fail.
 # Never asserts on a duration: the real-hang part waits on events with generous bounds.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -18,5 +19,20 @@ echo "--- 4. drift: CUSUM against a fixed threshold (simulated series)"
 "$PY" drift.py
 
 echo "--- 5. system or model? the same metrics joined through the MLflow tracking API (SQLite backend)"
-MLFLOW_DISABLE_AGENT_HINT=1 "$PY" regress.py 2>&1 | grep -v -E "INFO mlflow"
+out_c="$(MLFLOW_DISABLE_AGENT_HINT=1 "$PY" regress.py 2>&1 | grep -v -E "INFO mlflow")"
+echo "$out_c"
+
+echo "--- 6. traces: one OpenTelemetry span per step, written to a file (no collector, simulated timings)"
+out_d="$("$PY" trace_steps.py)"
+echo "$out_d"
+
+# A skipped part is not a pass: say PARTIAL, and fail under STRICT=1.
+skipped=""
+case "$out_c" in *"SKIPPED part C"*) skipped="part C: pip install mlflow-skinny sqlalchemy alembic" ;; esac
+case "$out_d" in *"SKIPPED part D"*) skipped="${skipped:+$skipped; }part D: pip install opentelemetry-sdk" ;; esac
+if [ -n "$skipped" ]; then
+  echo "PARTIAL hang-detector ($skipped)"
+  [ "${STRICT:-0}" = "1" ] && exit 1
+  exit 0
+fi
 echo "OK hang-detector"

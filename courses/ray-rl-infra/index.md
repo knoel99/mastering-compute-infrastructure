@@ -1,5 +1,5 @@
 ---
-title: "Ray, apprentissage par renforcement et boucles en ligne"
+title: "Ray, infrastructure d'apprentissage par renforcement et boucles en ligne"
 subtitle: "Module 11 · Phase 3 · 30,5 h"
 description: "Les charges qui ne sont pas un simple gros job : tâches et acteurs Ray, boucles acteurs-apprenant, obsolescence des politiques, contre-pression, pools hétérogènes et moteurs d'inférence."
 module:
@@ -37,12 +37,12 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 | Clé | Valeur |
 |---|---|
 | Volume | 30,5 h, dont 11,25 h de lecture, 13,5 h de labs et 5,75 h d'exercices |
-| Niveau d'entrée | 3 : à l'aise avec l'entraînement distribué (module 9). Les points de reprise du module 10 sont un plus : le chapitre 2 en rappelle l'essentiel |
-| Prérequis | [Module 9 — Entraînement distribué](../distributed-training/index.html) |
+| Niveau d'entrée | 3 : à l'aise avec l'entraînement distribué (module 9). Les *checkpoints* (points de reprise) du module 10 sont un plus : le chapitre 2 en rappelle l'essentiel |
+| Prérequis | [Module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html) |
 | Pour qui | Cœur : les charges de post-entraînement par renforcement sont l'une des raisons d'être d'une plateforme GPU. |
 | Livrable | un modèle de débit validé par simulation, une boucle acteur-apprenant mesurée sur des acteurs Ray réels, une note de dimensionnement d'une boucle en ligne et le dimensionnement d'un moteur d'inférence (cache KV, goodput sous SLO) |
 | Environnement | un portable CPU suffit (4 cœurs ; 8 Go recommandés, les labs ont été exécutés avec 16 Go) ; aucun GPU. Les GPU sont des **ressources logiques** simulées, et c'est écrit chaque fois |
-| Projets liés | [Projet 6 — RFC et prototype d'une plateforme de calcul](../../projects/capstone-rfc/index.html) (ce module figure parmi ses modules requis) |
+| Projets liés | [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
@@ -58,7 +58,7 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 3 — Systèmes d'entraînement distribué** (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
+-   **Phase 3 — Systèmes d'entraînement distribué** (semaines 21-32) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
 -   **S'appuie sur** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
 -   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Ray, Checkpoint, tolérance aux pannes, FinOps, coûts, Planification de capacité, Infrastructure de RL, Chaînes de données, Service d'inférence, Systèmes distribués, Slurm, Kubernetes, Prometheus, Grafana, Conception d'ordonnanceur, Expérience d'entraînement ML, Réseau (général), Profilage, bancs d'essai (voir [l'analyse du marché](../../market/index.html#couverture)).
@@ -66,7 +66,7 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 
 ### Plan de séances {#seances}
 
-Onze séances, soit 30,5 h : cinq de 3 h, deux de 3,5 h, deux de 2,5 h, une de 2 h et une de 1,5 h. Chaque séance tient dans sa durée avec ses chapitres, sa part de lab et ses exercices, et un exercice n'apparaît qu'après la séance qui enseigne ce qu'il demande. Le niveau ne diminue jamais.
+Onze séances, soit 30,5 h : sept de 3 h, trois de 2,5 h et une de 2 h. Chaque séance tient dans sa durée avec ses chapitres, sa part de lab et ses exercices, et un exercice n'apparaît qu'après la séance qui enseigne ce qu'il demande. Le niveau ne diminue jamais.
 
 | Séance | Durée | Niveau | Contenu | Pratique |
 |---|---|---|---|---|
@@ -74,13 +74,13 @@ Onze séances, soit 30,5 h : cinq de 3 h, deux de 3,5 h, deux de 2,5 h, une de 2
 | 2 | 3 h | 2 | ch. 2 Ray en pratique : objets, placement, pannes, autoscaling (1,5 h) | Lab 11.1 partie B, pannes (1,25 h) ; Ex. 2 (0,25 h) |
 | 3 | 2.5 h | 2 | ch. 3 Ray Train et Ray Data (1 h) | Lab 11.1 partie B, suite et démonstrations (1,25 h) ; Ex. 3 (0,25 h) |
 | 4 | 2 h | 2 | ch. 4 Le renforcement vu de l'infrastructure (1,25 h) | Ex. 4, 5 (0,75 h) |
-| 5 | 3.5 h | 3 | ch. 5 Architectures acteur-apprenant (1,5 h) | Lab 11.2 partie A, obsolescence contrôlée (2 h) |
+| 5 | 3 h | 3 | ch. 5 Architectures acteur-apprenant (1,5 h) | Lab 11.2 partie A, obsolescence contrôlée (1,5 h) |
 | 6 | 3 h | 3 | ch. 6 Boucles en ligne, files et contre-pression (1,5 h) | Lab 11.3 partie 1, formules (1 h) ; Ex. 6 (0,5 h) |
 | 7 | 3 h | 3 | Lab 11.3 partie 2 | Simulation à événements discrets et tests (2 h) ; Ex. 7, 8 (1 h) |
-| 8 | 3 h | 3 | ch. 7 Hétérogénéité (0,75 h) | Lab 11.2 partie B, acteurs Ray réels (1,75 h) ; Ex. 9 (0,5 h) |
-| 9 | 3.5 h | 3 | ch. 8 Kubernetes, Slurm, observabilité, alternatives (0,75 h) | Lab 11.2 partie B, suite (2,25 h) ; Ex. 10 (0,5 h) |
+| 8 | 3 h | 3 | ch. 7 Hétérogénéité (0,75 h) | Lab 11.2 partie A, fin (0,5 h), puis partie B, acteurs Ray réels (1,75 h) |
+| 9 | 3 h | 3 | ch. 8 Kubernetes, Slurm, observabilité, alternatives (0,75 h) | Lab 11.2 partie B, suite (2,25 h) |
 | 10 | 2.5 h | 3 | ch. 9 Inférence : moteurs, cache KV, batching continu (1,25 h) | Lab 11.4, batching simulé (0,5 h) ; Ex. 13, 14 (0,75 h) |
-| 11 | 1.5 h | 3 | Checkpoint de sortie (0,5 h) | Ex. 11, 12 (1 h) |
+| 11 | 2.5 h | 3 | Checkpoint de sortie (0,5 h) | Ex. 9, 10 (1 h) ; Ex. 11, 12 (1 h) |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -144,7 +144,7 @@ Chaque nœud exécute un démon Ray, le *raylet*, qui héberge entre autres le m
 | Reprise après panne | simple : on rejoue la fonction | il faut restaurer l'état | reconstruit par rejeu si possible |
 | Pour quoi faire | simulations courtes, prétraitement | modèle chargé, environnement, apprenant | poids, lots, trajectoires |
 
-Cette comparaison reprend le tableau 2 de l'article de Ray, qui oppose le bon équilibrage de charge et la reprise peu coûteuse des tâches aux mises à jour fines efficaces des acteurs, au prix d'un coût de point de reprise.
+Cette comparaison reprend le tableau 2 de l'article de Ray, qui oppose le bon équilibrage de charge et la reprise peu coûteuse des tâches aux mises à jour fines efficaces des acteurs, au prix d'un coût de checkpoint.
 
 <figure class="fig">
 <svg viewBox="0 0 560 300" role="img" aria-labelledby="f1-t f1-d" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit">
@@ -272,7 +272,7 @@ Règle d'usage : `PACK` pour un apprenant dont les travailleurs communiquent bea
 
 ### 2.3. La mémoire qui manque
 
-Quand la mémoire d'un nœud approche de la saturation, le noyau Linux tue au hasard. Ray préfère décider lui-même : un moniteur de mémoire, dans le *raylet* de chaque nœud, compare l'utilisation totale (tas des travailleurs, magasin d'objets, raylet) à un seuil. Par défaut, il vérifie toutes les 250 ms (`RAY_memory_monitor_refresh_ms`) et agit au-delà de 95 % (`RAY_memory_usage_threshold`). Il tue alors un travailleur à la fois, en préférant les tâches qui peuvent être rejouées et les plus récentes.
+Quand la mémoire d'un nœud est épuisée, l'OOM killer du noyau choisit une victime selon son score (`oom_score`, que `oom_score_adj` pondère, [module 1](../linux-systems/index.html#cache-de-pages-et-mise-à-mort-par-manque-de-mémoire)), sans rien savoir de vos tâches. Ray préfère décider lui-même, avant lui : un moniteur de mémoire, dans le *raylet* de chaque nœud, compare l'utilisation totale (tas des travailleurs, magasin d'objets, raylet) à un seuil. Par défaut, il vérifie toutes les 250 ms (`RAY_memory_monitor_refresh_ms`) et agit au-delà de 95 % (`RAY_memory_usage_threshold`). Il tue alors un travailleur à la fois, en préférant les tâches qui peuvent être rejouées et les plus récentes.
 
 ::: war
 [Une tâche tuée par le moniteur ignore max_retries]{.tag} D'après la [documentation de Ray](https://docs.ray.io/en/latest/ray-core/scheduling/ray-oom-prevention.html), une tâche tuée par le moniteur de mémoire est rejouée avec un délai exponentiel plafonné à 60 s, et sans respecter `max_retries` (rejeu infini), sauf si `max_retries=0`. Un acteur tué respecte en revanche `max_restarts`, qui vaut 0 par défaut. Le moniteur garantit qu'au moins une tâche par appelant et par nœud peut s'exécuter, faute de quoi la charge échoue avec une erreur de mémoire. Une tâche trop gourmande peut donc rebondir longtemps avant d'échouer ; déclarez sa mémoire (`memory=`) pour que l'ordonnanceur la place correctement.
@@ -287,7 +287,7 @@ Enfin, un **objet** perdu est reconstruit en rejouant la tâche qui l'a produit,
 | Réglage | Défaut | Effet à la panne |
 |---|---|---|
 | `max_retries` (tâche) | 3 | la tâche est rejouée ; `-1` sans limite, `0` jamais |
-| `max_restarts` (acteur) | 0 | l'acteur redémarre, son état est reconstruit en rejouant le constructeur |
+| `max_restarts` (acteur) | 0 | 0 : l'acteur reste mort ; positif ou `-1` : il redémarre en rejouant son constructeur, sans l'état accumulé depuis |
 | `max_task_retries` (acteur) | 0 | 0 : au plus une fois ; `-1` : au moins une fois |
 | reconstruction d'un objet | active pour les tâches | par rejeu de la tâche qui l'a produit, si son propriétaire vit encore ; pas pour les résultats d'appels d'acteur par défaut |
 
@@ -302,7 +302,7 @@ max_task_retries= 0: result=RayActorError  side effects of call 7: ['7']
 max_task_retries=-1: result=7              side effects of call 7: ['7', '7']
 ~~~
 
-Trois leçons. Sans `max_restarts`, l'acteur est perdu. Avec `max_restarts=1`, il revient mais **sans son état** (le compteur repart de 1) tant qu'on ne l'a pas écrit dans un point de reprise (*checkpoint* : un état sauvegardé hors du processus, d'où l'on peut repartir) : c'est le sujet du [module 10](../fault-tolerance/index.html). Avec `max_task_retries=-1`, l'appel interrompu est rejoué et son effet de bord (une ligne écrite dans un journal) apparaît **deux fois**.
+Trois leçons. Sans `max_restarts`, l'acteur est perdu. Avec `max_restarts=1`, il revient mais **sans son état** (le compteur repart de 1) tant qu'on ne l'a pas écrit dans un checkpoint (un état sauvegardé hors du processus, d'où l'on peut repartir) : c'est le sujet du [module 10](../fault-tolerance/index.html). Avec `max_task_retries=-1`, l'appel interrompu est rejoué et son effet de bord (une ligne écrite dans un journal) apparaît **deux fois**.
 :::
 
 La conséquence est une règle de conception : tout appel d'acteur rejouable doit être **idempotent**, c'est-à-dire pouvoir s'exécuter deux fois sans changer le résultat. L'écriture d'un résultat sous une clé déterministe (l'identifiant de la trajectoire, pas un compteur) le garantit.
@@ -324,7 +324,7 @@ Points clés — chapitre 2
 -   Un placement group est atomique : tout est réservé, ou rien.
 -   Le moniteur de mémoire ne respecte pas `max_retries` pour une tâche qu'il tue (rejeu infini), sauf `max_retries=0`.
 -   Défauts : `max_retries=3` pour une tâche, `max_restarts=0` et `max_task_retries=0` pour un acteur.
--   Un acteur redémarré perd son état ; un appel rejoué peut s'exécuter deux fois. Écrivez des appels idempotents et des points de reprise.
+-   Un acteur redémarré perd son état ; un appel rejoué peut s'exécuter deux fois. Écrivez des appels idempotents et des checkpoints.
 -   L'autoscaler suit les demandes logiques ; une forme de demande introuvable reste en attente.
 :::
 
@@ -334,7 +334,7 @@ Ray n'est pas qu'un modèle d'acteurs : il vient avec des bibliothèques qui enc
 
 ### 3.1. Ray Train : un groupe de travailleurs
 
-Ray Train lance un **groupe de travailleurs**, des acteurs Ray placés par un placement group, qui exécutent chacun la même fonction d'entraînement. Le `ScalingConfig` fixe le nombre de travailleurs, la présence de GPU, les ressources par travailleur et la stratégie de placement (`PACK` par défaut). `FailureConfig(max_failures=n)` autorise `n` reprises : chaque récupération après une panne de processus ou de nœud en consomme une, et les travailleurs relancés reprennent au dernier point de reprise.
+Ray Train lance un **groupe de travailleurs**, des acteurs Ray placés par un placement group, qui exécutent chacun la même fonction d'entraînement. Le `ScalingConfig` fixe le nombre de travailleurs, la présence de GPU, les ressources par travailleur et la stratégie de placement (`PACK` par défaut). `FailureConfig(max_failures=n)` autorise `n` reprises : chaque récupération après une panne de processus ou de nœud en consomme une, et les travailleurs relancés reprennent au dernier checkpoint.
 
 Pour un ingénieur d'infrastructure, c'est un second chemin vers l'entraînement distribué, à côté de `torchrun` sous Slurm (module 9). Il est utile quand l'entraînement est une étape d'un pipeline Ray plus large. Il n'apporte pas de collectives plus rapides : dans la démonstration ci-dessous, les gradients passent par le `DistributedDataParallel` de PyTorch.
 
@@ -345,7 +345,7 @@ Pour un ingénieur d'infrastructure, c'est un second chemin vers l'entraînement
 final metrics: {'epoch': 5, 'start': 2} error: None
 ~~~
 
-L'entraînement va au bout (époque 5), sans erreur. `start: 2` signifie que la boucle relancée a repris à l'époque 2, donc depuis le point de reprise de l'époque 1 : celui de l'époque 2 n'était pas encore écrit quand le rang 1 est mort. La valeur exacte dépend de l'instant de la panne ; le test n'exige que la reprise (`start ≥ 1`). Un point de reprise rare coûte du travail rejoué.
+L'entraînement va au bout (époque 5), sans erreur. `start: 2` signifie que la boucle relancée a repris à l'époque 2, donc depuis le checkpoint de l'époque 1 : celui de l'époque 2 n'était pas encore écrit quand le rang 1 est mort. La valeur exacte dépend de l'instant de la panne ; le test n'exige que la reprise (`start ≥ 1`). Un checkpoint rare coûte du travail rejoué.
 :::
 
 ### 3.2. Ray Data : un flux de blocs
@@ -374,7 +374,7 @@ Dans `data_demo.py` (étage GPU **simulé** par un `sleep` de 20 ms), le premier
 ::: recap
 Points clés — chapitre 3
 
--   Ray Train = groupe de travailleurs (acteurs) en placement group ; `FailureConfig` autorise les reprises, au dernier point de reprise.
+-   Ray Train = groupe de travailleurs (acteurs) en placement group ; `FailureConfig` autorise les reprises, au dernier checkpoint.
 -   Ray Train orchestre l'entraînement ; les gradients restent échangés par `torch.distributed`.
 -   Ray Data traite des blocs de 1 à 128 Mio en flux, avec contre-pression par budget de ressources.
 -   `map_batches` avec une fonction lance des tâches, avec une classe un pool d'acteurs.
@@ -393,11 +393,11 @@ La méthode du gradient de politique pousse la probabilité d'une action vers le
 
 ### 4.2. PPO en une page
 
-PPO (*proximal policy optimization*, Schulman et al., 2017) alterne deux phases. Chaque itération, « each of N (parallel) actors collect T timesteps of data » ; l'apprenant optimise ensuite un objectif de substitution sur ces $NT$ pas, pendant $K$ époques de descente par mini-lots. Le rapport $r_t(\theta) = \pi_\theta / \pi_{\text{old}}$ compare la politique courante à celle qui a produit les données, et l'objectif écrête ce rapport hors de l'intervalle $[1-\varepsilon,\ 1+\varepsilon]$, où $\varepsilon$ est un petit seuil fixé :
+PPO (*proximal policy optimization*, Schulman et al., 2017) alterne deux phases. Chaque itération, « each of N (parallel) actors collect T timesteps of data » ; l'apprenant optimise ensuite un objectif de substitution sur ces $NT$ pas, pendant quelques époques de descente par mini-lots (notées $K$ dans l'article ; ici, $K$ désigne les crédits du chapitre 6). Le rapport $r_t(\theta) = \pi_\theta / \pi_{\text{old}}$ compare la politique courante à celle qui a produit les données, et l'objectif écrête ce rapport hors de l'intervalle $[1-\varepsilon,\ 1+\varepsilon]$, où $\varepsilon$ est un petit seuil fixé :
 
 $$L^{\text{CLIP}}(\theta) = \hat{\mathbb{E}}_t\bigl[\min\bigl(r_t\,\hat A_t,\ \text{clip}(r_t,\, 1-\varepsilon,\, 1+\varepsilon)\,\hat A_t\bigr)\bigr]$$
 
-Lecture d'infrastructure : le rapport $r_t$ n'a de sens que si les données viennent d'une politique proche de la courante. PPO tolère donc une obsolescence **bornée** (les $K$ époques) mais pas une obsolescence qui grandit. Et l'avantage vient en général d'un **critique** $V_\psi$ appris, un modèle de la taille de la politique.
+Lecture d'infrastructure : le rapport $r_t$ n'a de sens que si les données viennent d'une politique proche de la courante. PPO tolère donc une obsolescence **bornée** (celle de ces quelques époques) mais pas une obsolescence qui grandit. Et l'avantage vient en général d'un **critique** $V_\psi$ appris, un modèle de la taille de la politique.
 
 ### 4.3. GRPO : supprimer le critique
 
@@ -423,24 +423,24 @@ Deux architectures publiques illustrent les choix. OpenRLHF, bâti sur Ray, vLLM
 :::
 
 ::: ex
-[Exemple 4.1 — La mémoire de quatre modèles, puis de trois]{.tag} Prenons quatre modèles de 7 milliards de paramètres. Un modèle entraîné occupe 16 octets par paramètre (poids et gradients en BF16 à 2 octets chacun, plus 12 octets d'état d'Adam en FP32, règle du module 9) ; un modèle seulement évalué en occupe 2. Pour PPO, la politique et le critique sont entraînés, la référence et le modèle de récompense évalués :
+[Exemple 4.1 — La mémoire de quatre modèles, puis de trois]{.tag} Prenons quatre modèles de 7 milliards de paramètres. Un modèle entraîné occupe 16 octets par paramètre (poids et gradients en BF16 à 2 octets chacun, plus 12 octets d'états d'optimiseur en FP32 : une copie des poids et les deux moments d'Adam, règle du module 9) ; un modèle seulement évalué en occupe 2. Pour PPO, la politique et le critique sont entraînés, la référence et le modèle de récompense évalués :
 
 $$7 \cdot 10^{9} \times (16 + 16 + 2 + 2) = 252\ \text{Go}$$
 
-Avec GRPO sans critique, le total passe à $7 \cdot 10^{9} \times (16 + 2 + 2) = 140$ Go : 112 Go libérés, soit 44 %. Si la récompense vient d'un vérificateur à règles et non d'un modèle, le total tombe à 126 Go. Ces chiffres sont l'**agrégat** sur tous les GPU, hors activations et hors cache d'attention, et ils supposent que l'état est partagé (ZeRO) : un ordre de grandeur de placement, pas un plan.
+Avec GRPO sans critique, le total passe à $7 \cdot 10^{9} \times (16 + 2 + 2) = 140$ Go : 112 Go libérés, soit 44 %. Si la récompense vient d'un vérificateur à règles et non d'un modèle, le total tombe à 126 Go. Ces chiffres sont l'**agrégat** sur tous les GPU, hors activations et hors cache KV (chapitre 9), et ils supposent que l'état est réparti entre les GPU (ZeRO) : un ordre de grandeur de placement, pas un plan.
 :::
 
 ::: ex
-[Exemple 4.2 — Avantages d'un groupe, et part de la génération]{.tag} Un groupe de $G = 8$ sorties reçoit les récompenses 1, 0, 0, 1, 1, 0, 0, 0. La moyenne vaut 0,375 et l'écart-type (population) 0,484. Les sorties réussies reçoivent l'avantage $+1{,}29$, les échouées $-0{,}78$. Si les huit récompenses valent 0, l'écart-type est nul : il n'y a pas d'avantage, et huit générations ont été payées pour rien.
+[Exemple 4.2 — Avantages d'un groupe, et part de la génération]{.tag} Un groupe de $G = 8$ sorties reçoit les récompenses 1, 0, 0, 1, 1, 0, 0, 0. La moyenne vaut 0,375 et l'écart-type (population) 0,484. Les sorties réussies reçoivent l'avantage $+1{,}29$, les échouées $-0{,}77$. Si les huit récompenses valent 0, l'écart-type est nul : il n'y a pas d'avantage, et huit générations ont été payées pour rien.
 
-Si la génération occupe 70 % d'une itération, l'évaluation 5 % et l'entraînement 25 % (hypothèse d'exemple), doubler le débit de génération ramène l'itération à $0{,}35 + 0{,}05 + 0{,}25 = 0{,}65$ de sa durée : un gain de $1/0{,}65 = 1{,}54$. Même une génération instantanée plafonnerait à $1/0{,}30 = 3{,}3$. Mesurez la part de chaque étage avant d'optimiser l'un d'eux.
+Si la génération occupe 70 % d'une itération, l'évaluation 5 % et l'entraînement 25 % (hypothèse d'exemple), doubler le débit de génération ramène l'itération à $0{,}35 + 0{,}05 + 0{,}25 = 0{,}65$ de sa durée : un gain de $1/0{,}65 = 1{,}54$. Même une génération instantanée plafonnerait à $1/0{,}30 = 3{,}3$ : c'est la loi d'Amdahl ([module 2, §5.1](../perf-models/index.html#la-loi-damdahl)). Mesurez la part de chaque étage avant d'optimiser l'un d'eux.
 :::
 
 ::: recap
 Points clés — chapitre 4
 
 -   Une trajectoire est une réponse complète ; l'avantage est un retour moins une ligne de base.
--   PPO : $N$ acteurs, $T$ pas, $K$ époques ; l'objectif borné suppose des données proches de la politique courante ; un critique de la taille de la politique.
+-   PPO : $N$ acteurs, $T$ pas, quelques époques par itération ; l'objectif borné suppose des données proches de la politique courante ; un critique de la taille de la politique.
 -   GRPO supprime le critique et normalise par groupe ; il multiplie la génération par $G$.
 -   Quatre étages : génération, évaluation, entraînement, synchronisation. La génération longue peut dominer.
 -   Mesurez la part de chaque étage : la loi d'Amdahl borne le gain d'une accélération locale.
@@ -505,7 +505,7 @@ où $b$ est le nombre de trajectoires par mise à jour et $R$ le **taux de rejeu
 
 ### 5.4. Synchroniser les poids
 
-Publier une version coûte au moins $\alpha + n/B$ (module 2). Pour des poids de 14 Go (7 milliards de paramètres en BF16) sur un lien de 25 Go/s, un transfert prend 0,56 s. Le coût de la diffusion vers $r$ nœuds dépend de la topologie : en étoile, la source envoie $r$ fois (modèle $\alpha + r\,n/B$) ; en arbre binaire, $\lceil \log_2(r+1) \rceil$ tours de $\alpha + n/B$.
+Publier une version coûte au moins $\alpha + n/B$ (module 2). Pour des poids de 14 Go (7 milliards de paramètres en BF16) sur un lien de 25 Go/s, un transfert prend 0,56 s. Le coût de la diffusion vers $r$ nœuds dépend de la topologie : en étoile, la source envoie $r$ fois (modèle $\alpha + r\,n/B$) ; en arbre binomial (chaque nœud qui a reçu les poids les renvoie à un autre à chaque tour, comme le doublement récursif du [module 3](../parallel-programming/index.html#ch4)), $\lceil \log_2(r+1) \rceil$ tours de $\alpha + n/B$.
 
 ::: ex
 [Exemple 5.1 — Diffuser 14 Go à 8 nœuds]{.tag} Avec $\alpha = 1$ ms, $n = 14$ Go et $B = 25$ Go/s (hypothèses d'exemple), `model.broadcast_time` (lab 11.3) donne 4,48 s en étoile et 2,24 s en arbre pour 8 nœuds : quatre tours de 0,56 s. Si l'apprenant fait une mise à jour par minute, l'étoile occupe 7,5 % du temps de la source, l'arbre 3,7 %. Ce calcul ne dit rien de l'algorithme réel de Ray pour les gros objets : mesurez-le sur votre réseau.
@@ -569,7 +569,7 @@ Sous $N^\star$, la boucle est **limitée par les acteurs** : l'apprenant attend 
 
 ### 6.3. La loi de Little et l'obsolescence
 
-La loi de Little relie trois grandeurs d'un système stable : le nombre moyen d'éléments présents $L$, le débit d'arrivée $\lambda$ et le temps moyen de séjour $W$, par $L = \lambda W$. Appliquée à la boucle, elle donne une lecture simple de l'obsolescence : une trajectoire a l'âge de **tout ce qui circule devant elle**, divisé par ce qu'une mise à jour consomme.
+La loi de Little ([module 1, §7.2](../linux-systems/index.html#mesurer-un-disque-avec-fio-la-loi-de-little)) s'écrit $L = \lambda W$ pour un système stable : $L$ éléments présents en moyenne, un débit d'arrivée $\lambda$, un temps moyen de séjour $W$. Appliquée à la boucle, elle donne une lecture simple de l'obsolescence : une trajectoire a l'âge de **tout ce qui circule devant elle**, divisé par ce qu'une mise à jour consomme.
 
 $$\text{obsolescence} \approx \frac{\text{trajectoires en circulation}}{b}$$
 
@@ -670,7 +670,7 @@ None     2418      3.72   10   nan
    4     1883      0.99    1   1.0
 ~~~
 
-Dans ce tableau, « learner wait » est la fraction du temps que le pilote passe à attendre un résultat.
+Dans ce tableau, « learner wait » est la fraction du temps que le pilote passe à attendre un résultat. Sans crédit, chaque acteur y a toujours une trajectoire en cours, et le pilote prend chaque lot dès qu'il est complet : à chaque mise à jour, $N$ trajectoires circulent et aucune n'attend dans la file. La lecture de la section 6.3 donne donc une obsolescence proche de $N/b$ ; avec des crédits, il en circule au plus $K$, d'où $K/b$.
 
 Sur la VM de test (Ray 2.59.0, 2026-10-25), l'obsolescence moyenne est proche de $N/b$ : 1,95 pour 8 acteurs ($N/b = 2$), 3,72 pour 16 acteurs sans crédit ($N/b = 4$). Deux autres exécutions ont donné 1,94 et 3,61 : les valeurs bougent un peu d'une fois à l'autre. Avec des crédits, l'obsolescence vaut environ $K/b$ : 1,89 et 0,99. Le débit n'est pas monotone en $K$ (1 578 puis 1 883) : c'est du bruit d'une machine partagée, pas une propriété, et les tests n'affirment rien là-dessus. Le point à retenir est l'ordre de grandeur de l'obsolescence, et il est stable.
 
@@ -694,7 +694,7 @@ Une flotte réelle mélange des GPU chers pour l'apprenant, des GPU moins chers 
 
 ### 7.1. Un pool par rôle et par type
 
-Chaque rôle de la boucle a son profil. Le simulateur d'environnement est souvent limité par le CPU. La génération est limitée par la bande passante mémoire du GPU et par la taille du cache d'attention. L'évaluation par un modèle de récompense est un calcul d'inférence plus régulier. L'apprentissage est limité par le calcul et par les collectives. Ces profils ne demandent pas le même matériel.
+Chaque rôle de la boucle a son profil. Le simulateur d'environnement est souvent limité par le CPU. La génération est limitée par la bande passante mémoire du GPU et par la taille du cache KV (chapitre 9). L'évaluation par un modèle de récompense est un calcul d'inférence plus régulier. L'apprentissage est limité par le calcul et par les collectives. Ces profils ne demandent pas le même matériel.
 
 Dans Ray, on exprime la contrainte par des **ressources personnalisées** déclarées sur les nœuds (`resources={"eval_gpu": 1}`), par les ressources standard (`num_gpus`), ou par des étiquettes de nœud et par le type d'accélérateur (`accelerator_type`) quand la distinction existe dans l'inventaire. Le gestionnaire de cluster fournit les types de nœuds : groupes de travailleurs de KubeRay, partitions et GRES de Slurm.
 
@@ -719,11 +719,11 @@ Quand un seul pool alimente un seul apprenant, une file suffit. Avec plusieurs p
 
 ### 7.3. Le coût par million de pas
 
-Un type de nœud est meilleur s'il produit un million de pas pour moins d'argent, pas s'il est plus rapide ou moins cher pris isolément. Avec $n$ acteurs au prix horaire $p$ chacun et un apprenant au prix horaire $p_L$, pour un débit $X$ en pas par seconde :
+Un type de nœud est meilleur s'il produit un million de pas pour moins d'argent, pas s'il est plus rapide ou moins cher pris isolément. Avec $N$ acteurs au prix horaire $p$ chacun et un apprenant au prix horaire $p_L$, pour un débit $X$ en pas par seconde :
 
-$$\text{coût par million de pas} = \frac{n\,p + p_L}{3600\,X} \times 10^{6}$$
+$$\text{coût par million de pas} = \frac{N\,p + p_L}{3600\,X} \times 10^{6}$$
 
-Comme le débit est plafonné par l'apprenant ($X = C$ dès que $n \ge N^\star$), comparer deux types d'acteurs revient à comparer $n_i\,p_i$, avec $n_i$ proportionnel à $t_i + t_{\text{sync}}$. Un type B moins rapide l'emporte donc quand
+Comme le débit est plafonné par l'apprenant ($X = C$ dès que $N \ge N^\star$), comparer deux types d'acteurs revient à comparer $N_i\,p_i$, avec $N_i$ proportionnel à $t_i + t_{\text{sync}}$. Un type B moins rapide l'emporte donc quand
 
 $$p_B\,(t_B + t_{\text{sync}}) < p_A\,(t_A + t_{\text{sync}})$$
 
@@ -750,7 +750,7 @@ Points clés — chapitre 7
 -   Un pool par rôle (simulateur, génération, évaluation, apprentissage), exprimé par des ressources logiques, personnalisées ou standard.
 -   `ray status` affiche l'usage par ressource et les demandes en attente : c'est le premier outil de diagnostic.
 -   Étiquetez les trajectoires par pool, suivez l'obsolescence par pool, bornez chaque pool.
--   Coût par million de pas $= (np + p_L)/(3600X) \times 10^6$ ; comparez des types à débit égal.
+-   Coût par million de pas $= (Np + p_L)/(3600X) \times 10^6$ ; comparez des types à débit égal.
 -   Un type moins cher et plus lent peut perdre : le calcul décide, avec des prix lus le jour même.
 :::
 
@@ -759,6 +759,8 @@ Points clés — chapitre 7
 Ray ne remplace pas votre ordonnanceur de cluster : il s'installe dessus. Ce chapitre montre les deux installations courantes, ce qu'il faut observer, et les situations où un autre outil est un meilleur choix.
 
 ### 8.1. Ray sur Kubernetes avec KubeRay
+
+Les objets Kubernetes employés ici (pod, opérateur, ressource personnalisée, Kueue) sont présentés au [module 12](../kubernetes-gpu/index.html#ch1) ; si vous ne les connaissez pas, lisez cette section après lui.
 
 KubeRay est un opérateur Kubernetes qui fournit trois ressources personnalisées : `RayCluster`, qui gère le cycle de vie d'un cluster (création, suppression, autoscaling, tolérance aux pannes), `RayJob`, qui crée un cluster, y soumet un job et peut le supprimer à la fin, et `RayService`, qui ajoute un déploiement Ray Serve avec mises à jour sans interruption (README de KubeRay).
 
@@ -920,7 +922,7 @@ PagedAttention partage déjà le prompt entre les échantillons d'une même requ
 [TTFT, TPOT et goodput]{.tag} Le **TTFT** (*time to first token*) est le délai entre l'arrivée d'une requête et son premier jeton : attente plus prefill. Le **TPOT** (*time per output token*) est la durée moyenne entre deux jetons suivants : le rythme du decode. Une réponse de $n$ jetons dure environ $\text{TTFT} + (n-1)\,\text{TPOT}$. Le **goodput** par GPU, au sens de DistServe ([Zhong et al., OSDI 2024](https://arxiv.org/abs/2401.09670)), est le plus grand taux de requêtes qu'un GPU sert en tenant à la fois les objectifs de TTFT et de TPOT pour une part fixée des requêtes, par exemple 90 %.
 :::
 
-Au [module 15](../finops-capacity/index.html#ch2), *goodput* compte les GPU-heures qui produisent un progrès conservé : précisez toujours lequel. Le débit seul ne suffit pas, car un moteur saturé produit beaucoup de jetons par seconde avec des TTFT de plusieurs secondes. vLLM exporte pour Prometheus ([métriques](https://docs.vllm.ai/en/latest/usage/metrics.html), lues le 2026-10-25) les histogrammes `vllm:time_to_first_token_seconds` et `vllm:inter_token_latency_seconds`, et les jauges `vllm:num_requests_waiting` et `vllm:kv_cache_usage_perc`.
+Au [module 10](../fault-tolerance/index.html#ch2), le *goodput* d'un entraînement est la part du temps d'horloge consacrée à du calcul conservé : précisez toujours lequel des deux sens vous employez. Le débit seul ne suffit pas, car un moteur saturé produit beaucoup de jetons par seconde avec des TTFT de plusieurs secondes. vLLM exporte pour Prometheus ([métriques](https://docs.vllm.ai/en/latest/usage/metrics.html), lues le 2026-10-25) les histogrammes `vllm:time_to_first_token_seconds` et `vllm:inter_token_latency_seconds`, et les jauges `vllm:num_requests_waiting` et `vllm:kv_cache_usage_perc`.
 
 ::: ex
 [Exemple 9.5 — Le goodput d'un GPU simulé]{.tag} `sim.py --sweep` (lab 11.4) envoie 400 requêtes à des taux croissants, arrivées de Poisson, et compte la part qui tient un TTFT de 500 ms et un TPOT de 20 ms. Extrait, en temps simulé :
@@ -945,7 +947,7 @@ Un service suit sa charge en ajoutant des réplicas, et le signal compte. L'util
 
 Un réplica neuf lit ses poids, puis initialise le moteur. Pour 16,4 Go, la lecture prend 16,4 s à 1 Go/s et 3,3 s à 5 Go/s (débits d'hypothèse, à mesurer sur votre stockage, [module 8](../storage/index.html)) ; l'initialisation s'y ajoute, et ce cours ne l'a pas mesurée. Gardez assez de réplicas chauds pour absorber la croissance du trafic pendant un démarrage (exercice 14). Le mode veille raccourcit ce délai, car le moteur reste initialisé.
 
-Sur une flotte partagée, les coûts de préemption diffèrent. Le service a un SLO : il passe en premier. Un rollout préempté perd sa génération en cours ; avec des crédits (section 6.4), le nombre de trajectoires en vol borne cette perte. Un apprenant préempté repart de son dernier point de reprise ([module 10](../fault-tolerance/index.html)). Kueue exprime ces priorités entre charges ([module 12, chapitre 3](../kubernetes-gpu/index.html#ch3)) ; dans un moteur, vLLM sert par arrivée ou par priorité (`--scheduling-policy`) et compte dans `vllm:num_preemptions` les séquences évincées faute de cache KV.
+Sur une flotte partagée, les coûts de préemption diffèrent. Le service a un SLO : il passe en premier. Un rollout préempté perd sa génération en cours ; avec des crédits (section 6.4), le nombre de trajectoires en vol borne cette perte. Un apprenant préempté repart de son dernier checkpoint ([module 10](../fault-tolerance/index.html)). Kueue exprime ces priorités entre charges ([module 12, chapitre 3](../kubernetes-gpu/index.html#ch3)) ; dans un moteur, vLLM sert par arrivée ou par priorité (`--scheduling-policy`) et compte dans `vllm:num_preemptions` les séquences évincées faute de cache KV.
 
 Enfin, le coût par jeton suit l'utilisation (exemple 1.2 du [module 15](../finops-capacity/index.html#ch1)) : les réplicas chauds gardés pour le SLO coûtent sans servir. Prêter leurs GPU aux rollouts pendant les creux, par le mode veille ou par une préemption au bord d'une trajectoire, récupère une partie de ce coût ; l'exercice 14 chiffre cet arbitrage.
 
@@ -962,13 +964,14 @@ Points clés — chapitre 9
 
 ## Labs {#labs}
 
-Les labs 11.1 à 11.3 tournent sur un **Ray réel, local, sans GPU** (testé avec Ray 2.59.0, Python 3.13, le 2026-10-25) ; le lab 11.4 est un simulateur en Python standard, sans Ray. Installation préalable :
+Les labs 11.1 à 11.3 tournent sur un **Ray réel, local, sans GPU** (testé avec Ray 2.59.0, PyTorch 2.14.1 pour CPU et Python 3.13, le 2026-10-25) ; le lab 11.4 est un simulateur en Python standard, sans Ray. Installation préalable, dans l'environnement virtuel de la [page d'installation](../../lab-setup/index.html) :
 
 ~~~bash
-python3 -m pip install "ray[data,train]" numpy pytest torch pyyaml
+python3 -m pip install "ray[data,train]==2.59.0" numpy pytest pyyaml
+python3 -m pip install "torch==2.14.1" --index-url https://download.pytorch.org/whl/cpu   # PyTorch for CPU
 ~~~
 
-Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » sont des ressources logiques ; les durées de simulateur et de mise à jour du lab 11.2 sont des `sleep` ; le temps des labs 11.3 et 11.4 est simulé, et le moteur d'inférence du lab 11.4 aussi. Ce qu'ils exécutent pour de vrai : le scheduler, les acteurs, le magasin d'objets, les pannes (processus tués), Ray Data et Ray Train. Les fichiers `deploy/` du lab 11.1 (Slurm, KubeRay) sont **lintés seulement** : ils demandent un cluster.
+Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » sont des ressources logiques ; les durées de simulateur et de mise à jour du lab 11.2 sont des `sleep` ; le temps des labs 11.3 et 11.4 est simulé, et le moteur d'inférence du lab 11.4 aussi. Ce qu'ils exécutent pour de vrai : l'ordonnanceur, les acteurs, le magasin d'objets, les pannes (processus tués), Ray Data et Ray Train. Les fichiers `deploy/` du lab 11.1 (Slurm, KubeRay) sont **lintés seulement** : ils demandent un cluster.
 
 ### Lab 11.1 — Tâches, acteurs, ressources et pannes {#lab-11-1}
 
@@ -981,11 +984,10 @@ Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » s
 3.  Partie A : avec `granularity.efficiency(d)` (appelée par `run_demo.py`), mesurez $o$ avec $d = 1$ ms, prédisez $E(10\ \text{ms})$ par $d/(d+o)$, puis mesurez ; regroupez par 100 et expliquez l'écart au modèle.
 4.  Partie B : dans `fault.py` (appelé par `run_demo.py`), retrouvez les cinq lignes de l'exemple 2.3 ; ajoutez un test où l'on tue un acteur du `ActorPool` en plein pipeline et où l'on rend l'appel idempotent.
 5.  Lancez `resources_demo.py`, `data_demo.py` et `train_demo.py` ; changez `concurrency`, `max_failures` et l'instant de la panne, et expliquez chaque changement de sortie.
-6.  Lisez `deploy/ray_slurm.sbatch` et `deploy/raycluster.yaml` à côté de la documentation de Ray (le chapitre 8 les explique : parcourez-le d'abord si vous êtes avant la séance 9), puis passez-les à `shellcheck` et `yamllint`.
 
 **Critère de réussite.** `verify.sh` s'arrête avec le code 0 et affiche « OK ray-actors » : 8 tests passent, `data_demo.py` compte 2 processus de notation, `train_demo.py` finit sans erreur. Votre $o$ mesuré est positif et votre prédiction de $E(10\ \text{ms})$ est à 0,15 près de la mesure. Sur la VM de l'auteur : $o \approx 1{,}85$ ms et 40 chargements de modèle en mode tâches contre 4 en mode acteurs ; vos valeurs seront différentes.
 
-**Pour aller plus loin.** Démarrez un cluster Ray à deux machines (`ray start --head`, puis `--address`) et refaites la partie B en tuant un nœud ; limitez les CPU d'un travailleur avec un cgroup et constatez que Ray ne le fait pas à votre place.
+**Pour aller plus loin.** Démarrez un cluster Ray à deux machines (`ray start --head`, puis `--address`) et refaites la partie B en tuant un nœud ; limitez les CPU d'un travailleur avec un cgroup et constatez que Ray ne le fait pas à votre place. Après le chapitre 8 (séance 9), lisez `deploy/ray_slurm.sbatch` et `deploy/raycluster.yaml` à côté de la documentation de Ray, puis passez-les à `shellcheck` et `yamllint`.
 :::
 
 ### Lab 11.2 — Boucle acteur-apprenant minimale {#lab-11-2}
@@ -1098,7 +1100,7 @@ Il faut donc $\lceil 360/80 \rceil = 5$ GPU.
 
 GRPO supprime le critique (112 Go) : 248 Go, soit 4 GPU. Avec un vérificateur à règles, le modèle de récompense disparaît aussi : 234 Go, soit 3 GPU. Le gain du critique est de 31 %.
 
-Ces totaux excluent les activations et le cache d'attention, et supposent l'état réparti entre GPU : ils donnent un plancher, pas un plan.
+Ces totaux excluent les activations et le cache KV, et supposent l'état réparti entre GPU : ils donnent un plancher, pas un plan.
 :::
 
 ::: exo
@@ -1179,11 +1181,13 @@ Test : reprendre `fault.Counter.work`, tuer le processus une fois, et vérifier 
 :::
 
 ::: exo
-[Exercice 11 · ★★★ — Concevoir la boucle d'un post-entraînement]{.tag} Un post-entraînement génère des trajectoires de $m = 4096$ jetons en 120 s en moyenne par réplica de génération. L'apprenant traite $b = 64$ trajectoires en 90 s. Les poids (14 Go) sont diffusés en arbre binaire vers 4 nœuds de génération sur un lien de 25 Go/s, $\alpha = 1$ ms. Cible : obsolescence moyenne d'au plus 3,2 mises à jour, perte de débit d'au plus 3 %. Dimensionnez $N$ et $K$ avec le simulateur (durées lognormales, coefficient de variation 0,3, file de 128) et justifiez. La topologie de diffusion change-t-elle $N^\star$ ?
+[Exercice 11 · ★★★ — Concevoir la boucle d'un post-entraînement]{.tag} Un post-entraînement génère des trajectoires de $m = 4096$ jetons en 120 s en moyenne par réplica de génération, qui produit une séquence à la fois : un réplica est un acteur du modèle du chapitre 6. L'apprenant traite $b = 64$ trajectoires en 90 s. Les poids (14 Go) sont diffusés en arbre binomial vers 4 nœuds de génération sur un lien de 25 Go/s, $\alpha = 1$ ms.
+
+Cible : obsolescence moyenne d'au plus 3,2 mises à jour, perte de débit d'au plus 3 %. Dimensionnez $N$ et $K$ avec le simulateur (durées lognormales, coefficient de variation 0,3, file de 128) et justifiez. La topologie de diffusion change-t-elle $N^\star$ ?
 :::
 
 ::: sol
-Diffusion : un arbre sur 4 nœuds fait $\lceil \log_2 5 \rceil = 3$ tours de $0{,}001 + 14/25 = 0{,}561$ s, soit $t_{\text{sync}} = 1{,}683$ s (2,241 s en étoile). Capacité : $C = 64 \times 4096/90 = 2\,913$ jetons/s. $N^\star = 2\,913 \times 121{,}68/4096 = 86{,}5$ ; avec l'étoile, 86,9 : 87 dans les deux cas, la topologie ne change rien, car 2 s pèsent peu devant 120 s.
+Diffusion : un arbre binomial sur 4 nœuds fait $\lceil \log_2 5 \rceil = 3$ tours de $0{,}001 + 14/25 = 0{,}561$ s, soit $t_{\text{sync}} = 1{,}683$ s (2,241 s en étoile). C'est la durée de la diffusion entière, celle que voit le dernier nœud servi : la prendre pour chaque acteur est une borne haute. Capacité : $C = 64 \times 4096/90 = 2\,913$ jetons/s. $N^\star = 2\,913 \times 121{,}68/4096 = 86{,}5$ ; avec l'étoile, 86,9 : 87 dans les deux cas, la topologie ne change rien, car 2 s pèsent peu devant 120 s.
 
 Au plus juste (87 acteurs), le bruit des durées fait perdre du débit. Le balayage ci-dessous (graine 2) donne :
 
@@ -1197,7 +1201,7 @@ python3 sweep.py --m 4096 --t-roll 120 --t-sync 1.683 --b 64 --s-l 90 \
 
 Avec 87 acteurs et $K = 192$, les deux cibles tiennent sur cette graine, de justesse : sur les graines 1 à 5, le débit varie de 0,960 à 0,975 et la perte dépasse 3 % dans trois cas sur cinq. Avec 104 acteurs et $K = 192$, il varie de 0,978 à 1,015 (perte d'au plus 2,2 %) et l'obsolescence reste à 2,99. Sans crédit, 104 acteurs dépassent la cible d'obsolescence (3,61).
 
-Choix : $N = 104$ et $K = 192 = 3\,b$. $K = 128$ perdrait 8 %. Le prix est 17 acteurs de plus que le minimum : si leur coût compte, simulez davantage de graines avant de descendre vers 90 ou 95 acteurs. Pour cette boucle, la règle est de l'ordre de $2{,}2\,N^\star$ crédits, plus que les $1{,}6\,N^\star$ de l'exemple 6.2 : le facteur dépend de $b$.
+Choix : $N = 104$ et $K = 192 = 3\,b$. $K = 128$ perdrait 8 %. Sur 4 nœuds, 104 réplicas font 26 séquences simultanées par nœud, qu'un moteur en batching continu sert ensemble (chapitre 9). Le prix est 17 acteurs de plus que le minimum : si leur coût compte, simulez davantage de graines avant de descendre vers 90 ou 95 acteurs. Pour cette boucle, la règle est de l'ordre de $2{,}2\,N^\star$ crédits, plus que les $1{,}6\,N^\star$ de l'exemple 6.2 : le facteur dépend de $b$.
 :::
 
 ::: exo
@@ -1260,7 +1264,7 @@ Augmenter `--max-num-seqs` n'aide pas : la limite est le cache, pas le nombre de
 
 (c) Avec l'autoscaling, les rollouts reçoivent $(32 - 16) \times 10 + (32 - 6) \times 14 = 160 + 364 = 524$ GPU-heures par jour. Une allocation fixe pour le pic n'a pas besoin de réserve de démarrage : 13 réplicas, qui laissent $19 \times 24 = 456$ GPU-heures aux rollouts. L'autoscaling leur en rend 68 de plus par jour (15 %). Les GPU du service servent alors en moyenne 66 % de leur goodput, contre 51 % en allocation fixe ; l'écart avec 100 % est le prix des réplicas chauds et des creux.
 
-(d) Le service passe en premier : il a un SLO, et Kueue l'exprime par une priorité de charge (module 12). Viennent ensuite les rollouts, qu'on préempte au bord d'une trajectoire. Avec, par hypothèse, $K = 64$ crédits et des trajectoires de 120 s par réplica (comme à l'exercice 11), une préemption perd au plus 64 trajectoires, soit 2,1 heures-réplica de génération. L'apprenant passe en dernier : préempté, il repart d'un point de reprise et bloque toute la boucle (module 10).
+(d) Le service passe en premier : il a un SLO, et Kueue l'exprime par une priorité de charge (module 12). Viennent ensuite les rollouts, qu'on préempte au bord d'une trajectoire. Avec, par hypothèse, $K = 64$ crédits et des trajectoires de 120 s par réplica (comme à l'exercice 11), une préemption perd au plus 64 trajectoires, soit 2,1 heures-réplica de génération. L'apprenant passe en dernier : préempté, il repart d'un checkpoint et bloque toute la boucle (module 10).
 
 Mettez le moteur de rollouts en veille de niveau 1 plutôt que de le détruire. À son retour, il recopie ses poids depuis la mémoire CPU, 0,66 s à 25 Go/s (hypothèse), au lieu des 68 s d'un démarrage à froid. Toutes les valeurs de trafic et de durée sont des hypothèses d'exemple.
 :::
@@ -1273,14 +1277,14 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 -   **Je peux prédire l'efficacité d'une tâche et choisir sa granularité.** Preuve : le $o$ mesuré au lab 11.1 et la prédiction de $E(d)$ à trois tailles.
 -   **Je peux dire ce qui survit à une panne.** Preuve : le tableau de l'exemple 2.3 refait avec vos réglages, et un appel d'acteur rendu idempotent (exercice 10).
 -   **Je peux mesurer l'obsolescence d'une boucle.** Preuve : la table A du lab 11.2, identique à chaque exécution, et la partie B comparée à $N/b$.
--   **Je peux dimensionner acteurs et crédits.** Preuve : `plan.py` et `sweep.py` sur votre boucle, avec l'arbitrage entre obsolescence et débit chiffré (exercices 6, 8, 11).
+-   **Je peux dimensionner acteurs et crédits.** Preuve : une note de dimensionnement d'une boucle en ligne, qui donne `plan.py` et `sweep.py` sur votre boucle et l'arbitrage chiffré entre obsolescence et débit (exercices 6, 8, 11).
 -   **Je peux comparer deux types de nœuds au coût par million de pas.** Preuve : l'exercice 9 refait avec les prix lus sur une page fournisseur le jour même.
 -   **Je peux dimensionner un moteur d'inférence.** Preuve : le cache KV d'un modèle dont vous avez lu le `config.json`, le nombre de séquences qui tiennent sur un GPU, et un goodput sous SLO tiré du lab 11.4 (exemples 9.1 et 9.5, exercices 13 et 14).
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
 1.  *Nos acteurs de rollout sont à 40 % d'utilisation et l'apprenant à 100 %. Que faites-vous ?* Réponse-type : la boucle est limitée par l'apprenant, donc ajouter des acteurs ne sert à rien ; calculer $N^\star$ et retirer l'excédent ; borner ce qui circule par des crédits pour limiter l'obsolescence ; accélérer l'apprenant seulement si la mesure montre qu'il est le goulot.
-2.  *Un acteur Ray redémarre et le job continue, mais les résultats sont faux. Où cherchez-vous ?* Réponse-type : l'état de l'acteur est perdu au redémarrage (`max_restarts` ne restaure rien) ; un appel rejoué (`max_task_retries`) peut dupliquer un effet de bord ; vérifier les points de reprise et l'idempotence, et comparer les compteurs avant et après la panne.
+2.  *Un acteur Ray redémarre et le job continue, mais les résultats sont faux. Où cherchez-vous ?* Réponse-type : l'état de l'acteur est perdu au redémarrage (`max_restarts` ne restaure rien) ; un appel rejoué (`max_task_retries`) peut dupliquer un effet de bord ; vérifier les checkpoints et l'idempotence, et comparer les compteurs avant et après la panne.
 3.  *Pourquoi ne pas lancer toute la boucle de renforcement comme un gros job Slurm ?* Réponse-type : on le peut (`ray symmetric-run`), au prix d'une allocation statique sans autoscaling et d'un cluster Ray lié à la durée du job ; Kubernetes avec KubeRay apporte l'autoscaling et, avec un Redis externe, la tolérance aux pannes de la tête, au prix d'un autre opérateur à exploiter ; le choix dépend de l'existant et de la forme de la charge.
 
 ## Lectures et références {#refs}
@@ -1313,7 +1317,7 @@ L'ordre des chapitres, le critère « forme de la charge » du chapitre 1 et du 
 
 ### À vérifier {#a-verifier}
 
-(1) L'article de Ray décrit un ordonnanceur global et des ordonnanceurs locaux (2018) ; l'architecture actuelle a évolué et sa description n'a pas été relue pour ce module. (2) La documentation affiche, sur Ray 2.59, un bandeau annonçant l'authentification par jeton activée par défaut pour les clusters locaux et étendue à tous les clusters en 2.61 ; les labs tournent sans changement sur 2.59.0, mais ce changement n'a pas été étudié. (3) `deploy/raycluster.yaml` n'est pas validé contre le schéma de la CRD KubeRay, ni appliqué ; `deploy/ray_slurm.sbatch` est linté, pas exécuté. (4) Le guide Ray « Gang Scheduling with RayJob and Kueue » et la section « SLURM networking caveats » sont listés dans la documentation et n'ont pas été relus. (5) La correction du lab 11.2 n'est pas V-trace : c'est un poids d'importance tronqué sur des retours de Monte-Carlo, et l'effet observé vaut pour ce jouet seulement. (6) Le modèle d'obsolescence est une estimation de champ moyen, sous-estimée près de la saturation. (7) Les chiffres de débit annoncés par IMPALA, OpenRLHF et HybridFlow n'ont pas été reproduits. (8) Les ressources que le coordinateur de Ray Train retient par défaut ne sont pas établies par la page de `ScalingConfig` lue : l'exercice 3 suppose qu'il n'en retient aucune. (9) Le rejeu infini d'une tâche tuée par le moniteur de mémoire est documenté, mais son interaction avec la garantie « au moins une tâche par appelant et par nœud » n'a pas été observée. (10) Les défauts de vLLM changent d'une version à l'autre : relisez `--gpu-memory-utilization` pour la vôtre. (11) Les nombres de séquences des exemples 9.1 et de l'exercice 13 ignorent activations, graphes CUDA et tampons ; la durée d'initialisation d'un moteur n'a pas été mesurée ; le partage des têtes de clés-valeurs entre deux GPU en parallélisme tensoriel n'a pas été vérifié sur vLLM. (12) Les gains annoncés par PagedAttention, Orca, DistServe et SGLang n'ont pas été reproduits ; aucun moteur n'a tourné sur GPU, et le lab 11.4 donne des bornes, pas des mesures.
+(1) L'article de Ray décrit un ordonnanceur global et des ordonnanceurs locaux (2018) ; l'architecture actuelle a évolué et sa description n'a pas été relue pour ce module. (2) La documentation affiche, sur Ray 2.59, un bandeau annonçant l'authentification par jeton activée par défaut pour les clusters locaux et étendue à tous les clusters en 2.61 ; les labs tournent sans changement sur 2.59.0, mais ce changement n'a pas été étudié. (3) `deploy/raycluster.yaml` n'est pas validé contre le schéma de la CRD KubeRay, ni appliqué ; `deploy/ray_slurm.sbatch` est linté, pas exécuté. (4) Le guide Ray « Gang Scheduling with RayJob and Kueue » et la section « SLURM networking caveats » sont listés dans la documentation et n'ont pas été relus. (5) La correction du lab 11.2 n'est pas V-trace : c'est un poids d'importance tronqué sur des retours de Monte-Carlo, et l'effet observé vaut pour ce jouet seulement. (6) Le modèle d'obsolescence est une estimation de champ moyen, qui sous-estime l'obsolescence près de la saturation et la surestime loin d'elle (section 6.5). (7) Les chiffres de débit annoncés par IMPALA, OpenRLHF et HybridFlow n'ont pas été reproduits. (8) Les ressources que le coordinateur de Ray Train retient par défaut ne sont pas établies par la page de `ScalingConfig` lue : l'exercice 3 suppose qu'il n'en retient aucune. (9) Le rejeu infini d'une tâche tuée par le moniteur de mémoire est documenté, mais son interaction avec la garantie « au moins une tâche par appelant et par nœud » n'a pas été observée. (10) Les défauts de vLLM changent d'une version à l'autre : relisez `--gpu-memory-utilization` pour la vôtre. (11) Les nombres de séquences des exemples 9.1 et de l'exercice 13 ignorent activations, graphes CUDA et tampons ; la durée d'initialisation d'un moteur n'a pas été mesurée ; le partage des têtes de clés-valeurs entre deux GPU en parallélisme tensoriel n'a pas été vérifié sur vLLM. (12) Les gains annoncés par PagedAttention, Orca, DistServe et SGLang n'ont pas été reproduits ; aucun moteur n'a tourné sur GPU, et le lab 11.4 donne des bornes, pas des mesures.
 
 ### Hors périmètre {#hors-perimetre}
 

@@ -1122,7 +1122,7 @@ Chaque fournisseur expose les mêmes rôles que NVIDIA, sous d'autres noms (tabl
 |---|---|---|---|---|---|
 | Pilote / runtime | CUDA | ROCm (HIP) | libTPU / XLA | Neuron (`neuronx-cc`) | CANN |
 | Ressource Kubernetes | `nvidia.com/gpu`, DRA | `amd.com/gpu`, DRA | plugin GKE* | `aws.amazon.com/neuron`, DRA | plugin Ascend* |
-| Santé / télémétrie | `nvidia-smi`, DCGM | `rocm-smi` / `amd-smi` | `tpu-info` | `neuron-monitor` | `npu-smi` |
+| Santé / télémétrie ([module 14, § 2.5](../observability/index.html#ch2)) | `nvidia-smi`, DCGM | `rocm-smi` / `amd-smi` | `tpu-info` | `neuron-monitor` | `npu-smi` |
 | Collectives | NCCL | RCCL | collectives XLA (ICI) | collectives Neuron | HCCL |
 | Profileur | Nsight | ROCm Compute Profiler | profileur XLA | Neuron Explorer | profileur CANN* |
 | Image conteneur | image CUDA | image ROCm | image TPU | image Neuron | image CANN |

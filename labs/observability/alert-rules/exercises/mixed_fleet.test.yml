@@ -1,0 +1,38 @@
+# Synthetic series: job j1 spans one NVIDIA GPU (tensor 0.0) and one AMD GPU (2 %), job j2 one AMD GPU at 60 %.
+# Without the division by 100, the AMD GPU of j1 would read 2.0 and j1 would average 1.0: the alert would stay silent.
+rule_files:
+  - mixed_fleet.rules.yml
+evaluation_interval: 30s
+tests:
+  - interval: 30s
+    input_series:
+      - series: 'DCGM_FI_PROF_PIPE_TENSOR_ACTIVE{Hostname="n01", gpu="0", UUID="GPU-sim-0"}'
+        values: '0x30'
+      - series: 'gpu_prof_tensor_active_percent{hostname="a01", gpu_id="0", serial_number="sim-a01-0"}'
+        values: '2x30'
+      - series: 'gpu_prof_tensor_active_percent{hostname="a02", gpu_id="0", serial_number="sim-a02-0"}'
+        values: '60x30'
+      - series: 'slurm_job_gpu_allocated{Hostname="n01", gpu="0", job="j1"}'
+        values: '1x30'
+      - series: 'slurm_job_gpu_allocated{Hostname="a01", gpu="0", job="j1"}'
+        values: '1x30'
+      - series: 'slurm_job_gpu_allocated{Hostname="a02", gpu="0", job="j2"}'
+        values: '1x30'
+    promql_expr_test:
+      - expr: gpu:tensor_active:ratio{vendor="amd", Hostname="a01"}
+        eval_time: 1m
+        exp_samples:
+          - labels: 'gpu:tensor_active:ratio{vendor="amd", Hostname="a01", hostname="a01", gpu="0", gpu_id="0", serial_number="sim-a01-0"}'
+            value: 0.02
+    alert_rule_test:
+      - alertname: JobTensorIdle
+        eval_time: 4m
+        exp_alerts: []
+      - alertname: JobTensorIdle
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              job: j1
+              severity: page
+            exp_annotations:
+              summary: "job j1: tensor pipes idle on its GPUs, whatever the vendor"

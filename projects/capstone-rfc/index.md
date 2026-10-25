@@ -1,12 +1,12 @@
 ---
 title: "Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU"
-subtitle: "Projet 6 · 40 h · projet de synthèse, tous les modules d'infrastructure"
+subtitle: "Projet 6 · 40 h · projet de synthèse, modules 2 et 5 à 16"
 description: "Un document de conception complet pour une plateforme de calcul, un modèle de capacité et de coût exécutable dont les chiffres sont recoupés par le texte, une revue contradictoire par grille et une soutenance de vingt minutes."
 project:
   id: capstone-rfc
   number: 6
   hours: 40
-  modules: [slurm, provisioning, networking, storage, distributed-training, fault-tolerance, ray-rl-infra, kubernetes-gpu, multi-cloud, observability, finops-capacity, platform-leadership]
+  modules: [perf-models, slurm, provisioning, networking, storage, distributed-training, fault-tolerance, ray-rl-infra, kubernetes-gpu, multi-cloud, observability, finops-capacity, platform-leadership]
 badges:
   - {label: "Projet de synthèse", class: core}
   - {label: "Modèle et vérificateur vérifiés (CPU) ; RFC jugée par grille humaine", class: verified}
@@ -23,17 +23,33 @@ Ce projet de synthèse vous fait écrire une telle RFC pour une plateforme de 8 
 [Objectif du projet]{.tag} Produire un document qu'un lecteur sceptique peut vérifier : chaque chiffre vient d'un modèle exécutable que l'on peut relancer, chaque option a des inconvénients écrits, chaque risque a une mitigation, et les limites du modèle sont dites avant que quelqu'un ne les découvre.
 :::
 
-::: war
+::: note
 [Tout est fictif]{.tag} Le cahier des charges, les prix (en unités arbitraires), les taux de panne et d'interruption sont **inventés** pour l'exercice. La RFC de référence en tire des conclusions qui ne valent que pour ces données. Pour un usage réel, remplacez-les par vos mesures et par des prix relevés le jour de la décision.
+
+Le taux de panne supposé, 0,0002 par GPU-heure, est **pessimiste** : environ six fois les 6,5 pannes pour mille nœuds-jours de 8 GPU mesurées par [Kokolis et coauteurs](https://arxiv.org/abs/2410.21680) (3,4·10⁻⁵ par GPU-heure, [module 10, chapitre 1](../../courses/fault-tolerance/index.html#ch1)). Ne le citez pas comme un ordre de grandeur réel.
 :::
 
 Le projet s'appuie sur tout le parcours : la politique d'ordonnancement (module Slurm), le réseau et le stockage, la reprise après panne (projet 3), la mesure du passage à l'échelle (projet 2), la comparaison de politiques de placement (projet 4), l'observabilité (projet 5) et les arbitrages de coût. Il ne demande pas de tout refaire : il demande de **choisir, chiffrer et justifier**.
 
-Le code ne chiffre que deux choses, l'attente (files d'attente) et le coût (marché d'achat, pannes) ; le réseau, le stockage, l'orchestrateur et la topologie se défendent dans le texte de la RFC et ne sont pas modélisés, ce que la page « ce que ce modèle ne dit pas » doit écrire.
+Le code ne chiffre que deux choses, l'attente (files d'attente) et le coût (marché d'achat, pannes) ; le réseau, le stockage, l'orchestrateur et la topologie se défendent dans le texte de la RFC (exigence R7) et ne sont pas modélisés, ce que la page « ce que ce modèle ne dit pas » doit écrire.
 
 ### Prérequis de connaissances {#pre}
 
-Les projets 2 à 5 en sont les briques : relisez-les si besoin. Ce projet ajoute deux outils, la théorie des files d'attente pour estimer l'attente, et l'écriture technique. La théorie des files est rappelée dans les formules en fin de page ; l'écriture se travaille avec la grille de revue.
+Les projets 2 à 5 en sont les briques : relisez-les si besoin. La théorie des files d'attente (M/M/c, Erlang C) vient du [module 15, chapitre 2](../../courses/finops-capacity/index.html#ch2), la période de checkpoint de Young et Daly du [module 10, chapitre 2](../../courses/fault-tolerance/index.html#ch2), l'écriture d'une RFC et d'un ADR du [module 16, § 4.5](../../courses/platform-leadership/index.html#ch4). Ce projet les réinvestit : les formules sont rappelées en fin de page, et l'écriture se travaille avec la grille de revue.
+
+Le tableau indique, pour chacune des treize sections que le vérificateur exige, les modules à relire.
+
+| Section de la RFC | À relire |
+|---|---|
+| Contexte ; Objectifs et non-objectifs ; Exigences | le cahier des charges fourni ; le [module 16, § 4.5](../../courses/platform-leadership/index.html#ch4) pour la forme d'une RFC |
+| Options considérées ; Décision | modules [5](../../courses/slurm/index.html) et [12, chapitre 7](../../courses/kubernetes-gpu/index.html#ch7) pour l'ordonnanceur, [13, chapitre 2](../../courses/multi-cloud/index.html#ch2) pour les modèles de capacité, [11](../../courses/ray-rl-infra/index.html) si des charges Ray ou d'apprentissage par renforcement s'ajoutent |
+| Capacité et coûts | modules [2, chapitre 7](../../courses/perf-models/index.html#ch7) et [9, chapitre 5](../../courses/distributed-training/index.html#ch5) pour dimensionner un entraînement, [15, chapitres 2 et 4](../../courses/finops-capacity/index.html#ch2) pour l'attente et le coût |
+| Fiabilité | [module 10](../../courses/fault-tolerance/index.html) |
+| Observabilité | [module 14](../../courses/observability/index.html) |
+| Sécurité | [module 16, chapitre 3](../../courses/platform-leadership/index.html#ch3) |
+| Migration | [module 16, chapitre 5](../../courses/platform-leadership/index.html#ch5) |
+| Risques ; Questions ouvertes | les hypothèses fragiles relevées dans les autres sections |
+| Annexes (nœuds, réseau, stockage) | modules [6](../../courses/provisioning/index.html), [7, chapitre 5](../../courses/networking/index.html#ch5) et [8, chapitre 6](../../courses/storage/index.html#ch6) |
 
 ## Cahier des charges {#cahier}
 
@@ -43,12 +59,13 @@ Le dossier `labs/projects/capstone-rfc/` contient `starter/` (à compléter), `r
 |---|---|---|
 | R1 | **Formule d'Erlang C** et statistiques d'attente d'une file M/M/c (probabilité d'attente, attente moyenne, 90e centile). Une file M/M/c a des arrivées de Poisson, des durées de service exponentielles et c serveurs identiques (voir les formules) | `test_erlang_c_exact_cases`, `test_wait_stats_mm1_closed_forms` |
 | R2 | **Recoupement par simulation** : la formule et une simulation indépendante s'accordent à 5 % près (3 % pour la probabilité d'attente) | `test_formulas_agree_with_an_independent_simulation` |
-| R3 | **Disponibilité utile** (part du temps passée en calcul conservé, notée $g$ dans les formules) à la période de Young et Daly (période de checkpoint optimale du projet 3), avec une charge préemptible en plus | `test_goodput_closed_form_and_monotonicity` |
+| R3 | **Goodput** (part du temps passée en calcul conservé, notée $g$ dans les formules) à la période de Young et Daly (période de checkpoint optimale du [module 10, chapitre 2](../../courses/fault-tolerance/index.html#ch2), mesurée au projet 3), avec, sur capacité préemptible, un taux d'interruption qui s'ajoute à celui des pannes | `test_goodput_closed_form_and_monotonicity` |
 | R4 | **Évaluation d'une conception** : pools réservés (file, coût de la capacité), élastiques (coût à l'usage), verdict budget et SLO | `test_cost_accounting_*`, `test_candidate_designs_*` |
 | R5 | **Vérificateur de RFC** : sections, options, tableau de décision, risques, bloc de conception, **coût du texte égal au coût du modèle** | `tests/test_rfc_lint.py` (28 tests) |
 | R6 | **Votre RFC** passe le vérificateur | `test_my_rfc_passes_the_linter` |
+| R7 | **Ordonnanceur, réseau et stockage** : la RFC justifie le choix de l'ordonnanceur et chiffre au moins la sur-souscription réseau acceptée pour le pré-entraînement et le débit d'écriture des checkpoints (modules 7, 8 et 12) | aucun test : grille de revue |
 
-Le vérificateur ne juge pas la qualité du raisonnement : il garantit la **cohérence mécanique** (le texte dit le coût total que le modèle calcule) et la **présence** des sections, des options, du tableau de décision, des risques et d'une partie « Hypothèses et limites ». Il ne contrôle ni les autres chiffres du texte (disponibilités, GPU-heures, sensibilité), ni la présence d'un signal de révision : c'est le rôle des critères ★ de la grille ci-dessous, où la qualité se juge.
+Le vérificateur ne juge pas la qualité du raisonnement : il garantit la **cohérence mécanique** (le texte dit le coût total que le modèle calcule) et la **présence** des sections, des options, du tableau de décision, des risques et d'une partie « Hypothèses et limites ». Il ne contrôle ni les autres chiffres du texte (goodput, GPU-heures, sensibilité, réseau, stockage), ni la présence d'un signal de révision : c'est le rôle des critères ★ de la grille ci-dessous, où la qualité se juge.
 
 ## Jalons {#jalons}
 
@@ -56,7 +73,7 @@ Le vérificateur ne juge pas la qualité du raisonnement : il garantit la **coh�
 |---|---|---|---|
 | 1 | Modèle de capacité et de coût (`capacity.py`) | 8 h | les 9 tests de `test_capacity.py` passent, dont l'accord formule et simulation |
 | 2 | Options et décision : au moins trois conceptions évaluées par le modèle | 6 h | un tableau d'options avec coût et verdict de SLO pour chacune, et l'ADR d'une page (voir les livrables) |
-| 3 | Rédaction de la RFC complète | 12 h | `rfc.md` de 1 500 mots au moins (le vérificateur compte les mots de deux lettres ou plus), toutes les sections ; contrôlé à la main, le vérificateur vient au jalon 4 |
+| 3 | Rédaction de la RFC complète | 12 h | `rfc.md` de 1 500 à 8 000 mots (le vérificateur compte les mots de deux lettres ou plus), toutes les sections ; contrôlé à la main, le vérificateur vient au jalon 4 |
 | 4 | Vérificateur de RFC (`rfc_lint.py`) | 4 h | les 28 tests de `test_rfc_lint.py` passent et votre RFC passe |
 | 5 | Revue contradictoire par grille | 4 h | la grille remplie par un relecteur autre que vous, et vos corrections |
 | 6 | Soutenance de vingt minutes | 6 h | un support, la liste des questions préparées et leurs réponses |
@@ -93,7 +110,7 @@ Chaque critère est mesurable ; la commande qui le montre est indiquée.
 
 - **Modèle exact.** `erlang_c(2, 1.0)` vaut un tiers ; pour une file M/M/1 de charge 0,5 et de service 1, l'attente moyenne vaut 1,0 et le 90e centile $\ln 5 / 0{,}5 \approx 3{,}22$. Commande : `pytest tests/test_capacity.py -k "exact or closed_forms"`.
 - **Modèle recoupé.** Formule et simulation s'accordent à 5 % près sur l'attente moyenne et le 90e centile, pour deux files (charges 0,75 et 0,8), avec trois graines de 300 000 arrivées. Commande : `pytest -k independent_simulation` (depuis `labs/projects/capstone-rfc`, où `IMPL=starter` est la valeur par défaut).
-- **Verdicts.** Votre modèle donne, pour le cahier des charges fourni, les mêmes verdicts de budget et d'objectif que la solution de référence sur les cinq conceptions testées. Commande : `pytest -k candidate_designs`.
+- **Verdicts.** Votre modèle donne, pour le cahier des charges fourni, les mêmes verdicts de budget et d'objectif que la solution de référence sur les cinq conceptions testées (les options A à D et la variante de C à deux GPU de développement). Commande : `pytest -k candidate_designs`.
 - **Vérificateur.** Chacune des treize sections manquantes, et chaque mutation (poids de somme différente de 100, total faux, note hors de 1 à 5, risque sans mitigation, coût du texte différent du modèle, conception hors budget, conception hors objectif, marqueur inachevé) est détectée. Commande : `pytest tests/test_rfc_lint.py`.
 - **Cohérence texte et modèle.** `python3 rfc_lint.py rfc.md`, lancé depuis le dossier de la RFC, affiche `rfc: ok` : le coût mensuel écrit dans votre RFC égale celui du modèle appliqué à **votre** bloc de conception, à 0,5 % près.
 - **Revue.** La grille remplie par un autre relecteur ne contient aucune case « 0 » sur les critères éliminatoires, et chaque remarque est suivie d'une correction ou d'une réponse écrite.
@@ -117,6 +134,8 @@ Ce modèle ignore les rafales, les priorités entre classes et la fragmentation 
 
 **La décision.** Un tableau de critères pondérés n'est pas une mesure : les notes sont des jugements. Écrivez ce qui fonde chaque note avec un chiffre du modèle, faites relire les poids par quelqu'un d'autre, et vérifiez qu'un changement raisonnable des poids ne renverse pas le classement.
 
+Le vérificateur attend des notes de 1 à 5, comme la grille du [module 12, § 7.4](../../courses/kubernetes-gpu/index.html#ch7), et des poids normalisés à 100. Le module 12 note les poids de 0 à 5, mais son score divise par leur somme : seule leur proportion compte, et le classement est le même.
+
 ### Résultats de la solution de référence {#reference-results}
 
 À lire **après** votre propre travail. Tout dépend des données inventées du cahier des charges.
@@ -129,7 +148,7 @@ Ce modèle ignore les rafales, les priorités entre classes et la fragmentation 
 | Option | Description | Coût | Budget (450 000) | Objectifs |
 |---|---|---|---|---|
 | A | tout à la demande | 570 709 | dépassé | développement non tenu (15 min contre 5 min) |
-| B | tout réservé, un pool par classe (256, 32, 16, 4 GPU, soit 308 GPU) | 1 349 040 | dépassé | tous tenus |
+| B | tout réservé, un pool par classe (256, 32, 16, 4 GPU, soit 308 GPU, au-delà du plafond de 256) | 1 349 040 | dépassé | tous tenus |
 | C | développement réservé (4 GPU), reste élastique, pré-entraînement préemptible | 317 161 | tenu, marge de 29,5 % | tous tenus |
 | D | comme C, mais pré-entraînement à la demande | 580 388 | dépassé | tous tenus |
 
@@ -137,16 +156,16 @@ Ce modèle ignore les rafales, les priorités entre classes et la fragmentation 
 
 **Sensibilité.** Le pré-entraînement préemptible coûte autant que le pré-entraînement à la demande vers **1,0 interruption par heure de job** dans le modèle (valeur supposée : 0,15). À 0,60 le coût du pré-entraînement passe de 229 515 à 332 236 : la décision tient tant que le taux réel reste très en dessous de 1.
 
-Ce seuil est **prudent** : la formule de disponibilité utile du modèle est du premier ordre, fiable quand la période de checkpoint est petite devant le temps moyen entre incidents (rapport 0,15 au taux supposé, 0,37 à 1,0). Avec la formule exacte du projet 3 (calcul fait hors du code fourni), la disponibilité à 1,0 est d'environ 0,54 au lieu de 0,37 et le seuil se déplace vers 2 environ.
+Ce seuil est **prudent** : la formule de goodput du modèle est du premier ordre, fiable quand la période de checkpoint est petite devant le temps moyen entre pannes du job ($M$, interruptions comprises ; rapport 0,15 au taux supposé, 0,37 à 1,0). Avec la formule exacte du projet 3 (calcul fait hors du code fourni), le goodput à 1,0 est d'environ 0,54 au lieu de 0,37 et le seuil se déplace vers 2 environ.
 
 Avec deux GPU réservés pour le développement au lieu de quatre, l'attente au 90e centile monte à 1,72 heure : quatre est le minimum.
 
-**Ce que la référence dit mal ou ne dit pas.** Les notes de la décision sont des jugements ; les attentes sont probablement optimistes, sans être une borne garantie ; le classement dépend des poids (à poids égaux, C et D sont à égalité) ; la capacité préemptible est supposée toujours disponible au volume demandé. La RFC les écrit dans « Décision » et dans « Hypothèses et limites ».
+**Ce que la référence dit mal ou ne dit pas.** Les notes de la décision sont des jugements ; les attentes sont probablement optimistes, sans être une borne garantie ; le classement dépend des poids (à poids égaux, C et D sont à égalité) ; la capacité préemptible est supposée toujours disponible au volume demandé ; le réseau et le stockage des annexes reposent sur deux hypothèses inventées (nœuds de 8 GPU, état de 98 Go). La RFC les écrit dans « Décision », « Hypothèses et limites » et « Annexes ».
 :::
 
 ## Extensions {#extensions}
 
-- **Simulation de bout en bout.** Remplacez le modèle M/M/c par une simulation à événements discrets d'un pool partagé avec priorités entre classes (réutilisez le simulateur du projet 4) et mesurez de combien les attentes réelles dépassent celles du modèle M/M/c.
+- **Simulation de bout en bout.** Remplacez le modèle M/M/c par une simulation à événements discrets d'un pool partagé avec priorités entre classes (partez de `starter/mmc_sim.py`, qui avance d'arrivée en arrivée et non par pas de temps : remplacez son raccourci FIFO, un tas des instants où les serveurs se libèrent, par une liste d'événements, arrivées et fins, et une file par classe servie par priorité) et mesurez de combien les attentes réelles dépassent celles du modèle M/M/c.
 - **Réservation partagée.** Au lieu d'un pool réservé par classe, un pool commun avec files par équipe et préemption (module Slurm) : refaites l'évaluation et comparez.
 - **Capacité qui fluctue.** Faites varier la disponibilité préemptible dans le temps et estimez la fréquence de bascule vers la demande qui ferait renverser la décision.
 - **Données réelles.** Remplacez le cahier des charges fictif par les mesures de votre propre équipe (profil de charge, temps de service, taux de panne mesuré) et relancez tout. Les tests de `test_capacity.py` figent les chiffres du cahier fictif (317 161 u, 1,72 h) : travaillez sur une copie du dossier et adaptez ces valeurs attendues.
@@ -175,7 +194,11 @@ Un relecteur autre que l'auteur note chaque critère de 0 à 2 (0 absent ou faux
 | ★ Chiffres vérifiables | Chaque chiffre vient-il du modèle, et le modèle se relance-t-il ? |
 | ★ Options réelles | Les options sont-elles des alternatives sérieuses, avec des inconvénients écrits ? |
 | ★ Décision et signal de révision | La décision est-elle claire, et le texte dit-il à quel seuil on la révise ? |
+| ★ Sécurité | Identité, isolation entre équipes, secrets et audit sont-ils décrits, avec un mécanisme concret pour chacun (module 16, chapitre 3) ? |
 | Hypothèses | Les plus fragiles sont-elles nommées et leur effet chiffré ? |
+| Ordonnancement | Le choix entre Slurm, Kubernetes ou les deux est-il justifié par les classes de charge (module 12, chapitre 7) ? |
+| Réseau et topologie | La sur-souscription et le placement du job de pré-entraînement de 128 GPU sont-ils chiffrés (module 7, chapitre 5) ? |
+| Stockage | Le débit d'écriture des checkpoints et la place qu'ils occupent sont-ils chiffrés (module 8, § 1.4 et chapitre 6) ? |
 | Fiabilité | Les pannes sont-elles absorbées sans intervention humaine hors heures ouvrées ? |
 | Observabilité | Détecte-t-on un job bloqué ou un exportateur muet, et en combien de temps ? |
 | Migration | Chaque phase a-t-elle un critère de sortie et un retour arrière ? |
@@ -205,13 +228,13 @@ La queue de l'attente est exponentielle, d'où l'attente moyenne et le 90e centi
 
 $$W_q = \frac{P_{\text{attente}}}{c\mu - \lambda}, \qquad t_{90} = \frac{\ln\bigl(P_{\text{attente}}/0{,}1\bigr)}{c\mu - \lambda} \ \text{si } P_{\text{attente}} > 0{,}1, \text{ sinon } 0$$
 
-Le coût d'un pool réservé de $N$ GPU est $N \times 730 \times p_{\text{réservé}}$ par mois. Celui d'un pool élastique est le nombre de GPU-heures de travail, divisé par la disponibilité utile $g$, multiplié par le prix. La disponibilité utile reprend le projet 3 :
+Le coût d'un pool réservé de $N$ GPU est $N \times 730 \times p_{\text{réservé}}$ par mois. Celui d'un pool élastique est le nombre de GPU-heures de travail, divisé par le goodput $g$, multiplié par le prix. Le goodput reprend le modèle du premier ordre du [module 10, § 2.2](../../courses/fault-tolerance/index.html#ch2), appliqué au projet 3 :
 
 $$g = 1 - \left(\frac{C}{T^{*}} + \frac{T^{*}/2 + R}{M}\right), \qquad T^{*} = \sqrt{2\,C\,M}$$
 
-où $C$ est le coût d'un checkpoint, $R$ celui d'une reprise et $M$ le temps moyen entre incidents du job, dans la même unité (le code les prend en minutes). C'est un modèle du premier ordre : il est fiable tant que $T^{*} \ll M$ et devient pessimiste quand les pannes sont fréquentes.
+où $C$ est le coût bloquant d'un checkpoint (noté $\delta$ au module 10, qui note $\tau$ la période), $R$ le coût d'une reprise et $M$ le temps moyen entre pannes du job, interruptions préemptibles comprises, dans la même unité (le code les prend en minutes). C'est un modèle du premier ordre : il est fiable tant que $T^{*} \ll M$ et devient pessimiste quand les pannes sont fréquentes.
 
 ### Pour aller plus loin {#lectures}
 
-- Le [projet 3](../resilient-trainer/index.html) pour la période de Young et Daly, le [projet 4](../multi-provider-scheduler/index.html) pour la comparaison de politiques de placement, le [projet 5](../gpu-observability/index.html) pour l'observabilité.
+- Le [module 10, chapitre 2](../../courses/fault-tolerance/index.html#ch2) pour la période de Young et Daly, que le [projet 3](../resilient-trainer/index.html) mesure ; le [projet 4](../multi-provider-scheduler/index.html) pour la comparaison de politiques de placement, le [projet 5](../gpu-observability/index.html) pour l'observabilité.
 - Une RFC d'ingénierie lue en entier vaut dix conseils d'écriture : cherchez celles que publient des projets ouverts de votre domaine, et lisez-en une avec la grille ci-dessus.

@@ -13,3 +13,7 @@ PYTHON=python3 bash verify.sh
 
 Exercice : lisez le journal **avant** `postmortem_example.md`, trouvez la cause et rédigez votre propre post-mortem, puis
 comparez. Le vérificateur de vocabulaire de blâme est un indice, pas un verdict.
+
+Hypothèse du scénario : le job a allongé le délai d'attente de ses collectives bien au-delà de la valeur par défaut de
+PyTorch pour NCCL (10 minutes). Avec cette valeur par défaut, le job aurait échoué au bout de 10 minutes au lieu de
+rester bloqué 1 h 58 (module 10, chapitre 5).

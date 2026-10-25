@@ -7,7 +7,7 @@ owned:                          # you buy the nodes and pay for the facility
   node_price_u: 280000          # example: price of one 8-GPU node
   fabric_storage_frac: 0.25     # example: network + storage capex as a fraction of node price
   life_years: 4                 # example: accounting/economic life, to be agreed with finance
-  residual_frac: 0.10           # example: resale value at end of life, fraction of node price
+  residual_frac: 0.10           # example: resale value at end of life, fraction of capex (node + network + storage)
   cost_of_capital: 0.08         # example: yearly
   support_frac_per_year: 0.06   # example: spares + extended warranty, fraction of node price per year
   staff_u_per_year_per_100_gpus: 30000   # example: operations staff

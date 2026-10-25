@@ -116,6 +116,6 @@ def test_limits_part_unfinished_marker_and_length():
     for marker in ("TODO", "TBD", "À compléter"):
         assert any("unfinished marker" in e for e in errs_for("## Questions ouvertes\n", f"## Questions ouvertes\n\n{marker}\n"))
     assert any("words" in e for e in rfc_lint.lint("## Contexte\nbref\n", REQ))
-    assert any("words" in e for e in rfc_lint.lint(" ".join(GOOD.split()[:1300]), REQ))  # 1500 words minimum (the reference has about 1700)
+    assert any("words" in e for e in rfc_lint.lint(" ".join(GOOD.split()[:1300]), REQ))  # 1500 words minimum (the reference has about 2300)
     assert any("words" in e for e in rfc_lint.lint(GOOD * 6, REQ))  # 8000 words maximum
     assert not any("words" in e for e in rfc_lint.lint(GOOD, REQ))

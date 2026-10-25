@@ -22,7 +22,7 @@ def broadcast_time(alpha_s, weight_bytes, bandwidth_Bps, receivers, topology="st
     """Time for one source to deliver the weights to `receivers` nodes.
 
     star: the source sends to each receiver in turn on one link -> alpha + r n / B
-    tree: binary relay, ceil(log2(r + 1)) rounds of (alpha + n / B)
+    tree: binomial relay (every holder forwards each round), ceil(log2(r + 1)) rounds of (alpha + n / B)
     """
     if topology == "star":
         return alpha_s + receivers * weight_bytes / bandwidth_Bps
