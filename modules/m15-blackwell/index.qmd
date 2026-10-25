@@ -27,7 +27,7 @@ Il sait ce qu'est un gigaoctet de mémoire GPU et une bande passante en gigaocte
 
 La grille date du 23 octobre 2026. Le change retenu dans `rapport-blackwell-prix-20261023.md` est 1 dollar pour 0,893 euro. Les prix américains sans TVA séparée sont traités comme hors taxe après conversion. Une ligne marquée estimation n'est pas un prix NVIDIA affiché.
 
-Les graphiques sont produits par `analyses/blackwell/make_charts.py`, `make_charts_regimes.py` et `make_charts_trends.py`. Plusieurs fits sont en dollars, parce que ces scripts convertissent le prix euro avant la régression. Le fichier le dit. Il ne faut pas lire un coefficient en dollars comme un coefficient en euros.
+Les graphiques publiés sont ceux du dossier du 23 octobre 2026. `analyses/blackwell/make_charts.py`, `make_charts_regimes.py` et `make_charts_trends.py` retracent la même table. Une exécution nouvelle peut changer les pixels, selon la version de matplotlib, sans changer les données. Plusieurs fits sont en dollars, parce que ces scripts convertissent le prix euro avant la régression. Le fichier le dit. Il ne faut pas lire un coefficient en dollars comme un coefficient en euros. Le point Station de ces graphiques est l'estimation 91 532 euros du rapport. Il n'efface pas les deux autres prix, réunis dans [Machines d'inférence locale](../m16-machines/).
 
 ## Grille de prix
 
