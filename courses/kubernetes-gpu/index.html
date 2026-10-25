@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,108 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 12 · Phase 4 · 28 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs non tous vérifiés : le lab 12.2 exige un cluster GPU</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Ce que Kubernetes apporte et ce qui change avec les GPU</a>
+<ul>
+<li><a href="#ce-qui-est-acquis">1.1. Ce qui est acquis</a></li>
+<li><a href="#lunité-dordonnancement-est-le-pod">1.2. L'unité d'ordonnancement est le pod</a></li>
+<li><a href="#les-gpu-sont-des-entiers-pas-du-cpu">1.3. Les GPU sont des entiers, pas du CPU</a></li>
+<li><a href="#correspondance-avec-slurm">1.4. Correspondance avec Slurm</a></li>
+<li><a href="#trois-niveaux-datomicité">1.5. Trois niveaux d'atomicité</a></li>
+<li><a href="#léchelle-du-plan-de-contrôle-nest-pas-le-problème">1.6. L'échelle du plan de contrôle n'est pas le problème</a></li>
+</ul></li>
+<li><a href="#ch2">2. Exposer des GPU : plugin, opérateur, MIG, time-slicing, DRA</a>
+<ul>
+<li><a href="#le-plugin-de-périphériques">2.1. Le plugin de périphériques</a></li>
+<li><a href="#lopérateur-gpu">2.2. L'opérateur GPU</a></li>
+<li><a href="#le-runtime-et-cdi">2.3. Le runtime et CDI</a></li>
+<li><a href="#mig-des-partitions-matérielles">2.4. MIG : des partitions matérielles</a></li>
+<li><a href="#time-slicing-du-partage-sans-isolation">2.5. Time-slicing : du partage sans isolation</a></li>
+<li><a href="#dra-décrire-plutôt-que-compter">2.6. DRA : décrire plutôt que compter</a></li>
+</ul></li>
+<li><a href="#ch3">3. Files d'attente et ordonnancement de groupe : Kueue, Volcano, natif</a>
+<ul>
+<li><a href="#une-couche-de-file-au-dessus-de-lordonnanceur">3.1. Une couche de file au-dessus de l'ordonnanceur</a></li>
+<li><a href="#les-objets-de-kueue">3.2. Les objets de Kueue</a></li>
+<li><a href="#quotas-emprunt-et-prêt">3.3. Quotas, emprunt et prêt</a></li>
+<li><a href="#ordre-et-stratégie-de-file">3.4. Ordre et stratégie de file</a></li>
+<li><a href="#préempter-trois-leviers">3.5. Préempter : trois leviers</a></li>
+<li><a href="#admis-ne-veut-pas-dire-placé">3.6. Admis ne veut pas dire placé</a></li>
+<li><a href="#volcano-kai-scheduler-et-lordonnancement-de-groupe-natif">3.7. Volcano, KAI Scheduler et l'ordonnancement de groupe natif</a></li>
+</ul></li>
+<li><a href="#ch4">4. Charges d'entraînement : Jobs indexés, JobSet, Trainer, KubeRay, réseau</a>
+<ul>
+<li><a href="#le-job-indexé-et-le-rendez-vous">4.1. Le Job indexé et le rendez-vous</a></li>
+<li><a href="#jobset-un-groupe-de-jobs-comme-une-unité">4.2. JobSet : un groupe de Jobs comme une unité</a></li>
+<li><a href="#kubeflow-trainer-v2">4.3. Kubeflow Trainer v2</a></li>
+<li><a href="#kuberay">4.4. KubeRay</a></li>
+<li><a href="#réseau-haute-performance">4.5. Réseau haute performance</a></li>
+<li><a href="#le-coût-dun-redémarrage">4.6. Le coût d'un redémarrage</a></li>
+</ul></li>
+<li><a href="#ch5">5. Topologie, placement et pannes de nœud</a>
+<ul>
+<li><a href="#pourquoi-la-topologie-compte">5.1. Pourquoi la topologie compte</a></li>
+<li><a href="#les-outils-de-placement">5.2. Les outils de placement</a></li>
+<li><a href="#étiquettes-et-taints-des-nœuds-gpu">5.3. Étiquettes et taints des nœuds GPU</a></li>
+<li><a href="#la-fragmentation-des-gpu">5.4. La fragmentation des GPU</a></li>
+<li><a href="#quand-un-nœud-disparaît">5.5. Quand un nœud disparaît</a></li>
+</ul></li>
+<li><a href="#ch6">6. Stockage et données</a>
+<ul>
+<li><a href="#quatre-usages-quatre-profils">6.1. Quatre usages, quatre profils</a></li>
+<li><a href="#les-volumes-kubernetes">6.2. Les volumes Kubernetes</a></li>
+<li><a href="#les-données-dentraînement">6.3. Les données d'entraînement</a></li>
+<li><a href="#les-points-de-contrôle">6.4. Les points de contrôle</a></li>
+<li><a href="#le-démarrage-en-rafale">6.5. Le démarrage en rafale</a></li>
+</ul></li>
+<li><a href="#ch7">7. Slurm ou Kubernetes ?</a>
+<ul>
+<li><a href="#ce-que-disent-les-deux-projets">7.1. Ce que disent les deux projets</a></li>
+<li><a href="#ce-que-montrent-les-retours-publics">7.2. Ce que montrent les retours publics</a></li>
+<li><a href="#les-modèles-hybrides">7.3. Les modèles hybrides</a></li>
+<li><a href="#une-grille-de-décision-défendable">7.4. Une grille de décision défendable</a></li>
+<li><a href="#ce-que-le-choix-coûte">7.5. Ce que le choix coûte</a></li>
+</ul></li>
+<li><a href="#ch8">8. Exploitation : mises à jour, sécurité, multi-tenance, coûts</a>
+<ul>
+<li><a href="#les-mises-à-jour">8.1. Les mises à jour</a></li>
+<li><a href="#la-sécurité">8.2. La sécurité</a></li>
+<li><a href="#la-multi-tenance">8.3. La multi-tenance</a></li>
+<li><a href="#les-coûts">8.4. Les coûts</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-12-1">Lab 12.1 — Kueue : files, quotas, préemption</a></li>
+<li><a href="#lab-12-2">Lab 12.2 — JobSet : un entraînement multi-nœuds</a></li>
+<li><a href="#lab-12-3">Lab 12.3 — Matrice de décision Slurm / Kubernetes</a></li>
+<li><a href="#lab-12-4">Lab 12.4 — Un plan de contrôle Kubernetes 1.37 sans kubelet</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> votre cluster Kubernetes sait lancer des milliers de pods ; sait-il lancer un entraînement qui exige 128 GPU <em>ensemble ou pas du tout</em>, le mettre en file derrière d'autres équipes, le préempter proprement, et le replacer si un nœud meurt ? Et si oui, à quel prix d'exploitation par rapport à Slurm ?</p>
 <p>Vous connaissez déjà Kubernetes. Ce module ne le réexplique donc pas : il se concentre sur ce qui change quand la ressource rare est un GPU et que la charge est un travail fini, parallèle et fragile. Les versions sont celles lues sur les sources officielles le 24 octobre 2026 ; les comportements annoncés comme « observés » viennent d'un vrai plan de contrôle Kubernetes 1.37.1 démarré dans le bac à sable du module.</p>
@@ -85,8 +187,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a>, <a href="../slurm/index.html">Module 5 — Slurm</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : Kubernetes est acquis, la couche GPU, la mise en file et le placement d'entraînements ne le sont pas</td>
+<td>Pour qui</td>
+<td>Cœur : la couche GPU de Kubernetes, la mise en file et le placement des entraînements ; si vous exploitez déjà Kubernetes, survolez les rappels et travaillez les chapitres sur les GPU, les files d'attente et le gang scheduling.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -113,6 +215,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Dimensionner les volumes de points de contrôle et l'effet d'un démarrage massif d'images (chapitre 6).</li>
 <li>Choisir entre Slurm, Kubernetes et Slurm sur Kubernetes avec une grille explicite et sa robustesse (chapitre 7).</li>
 <li>Planifier une mise à jour, un cloisonnement et un suivi de coût pour une flotte GPU sous Kubernetes (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
+<li><strong>S'appuie sur</strong> : <a href="../linux-systems/index.html">module 1 — Linux, systèmes et diagnostic de performance</a>, <a href="../slurm/index.html">module 5 — Slurm et exploitation d'un cluster HPC</a>.</li>
+<li><strong>Prépare</strong> : <a href="../multi-cloud/index.html">module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a>, <a href="../platform-leadership/index.html">module 16 — Plateforme interne, sécurité, production et leadership</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Onze séances, soit 28 h : cinq de 3 h, deux de 2,5 h et quatre de 2 h. Le niveau ne diminue jamais d'une séance à la suivante.</p>
@@ -215,7 +325,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Les files d'attente (Kueue), le gang scheduling et le partage des GPU sont ce qui distingue Kubernetes pour l'IA de Kubernetes pour des services.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, lisez le chapitre 3 et le chapitre 7, puis passez aux exercices ★★★.</p>
 <ol type="1">
 <li><p><strong>Pod par pod.</strong> Un Job crée 8 pods qui demandent chacun un nœud entier de 8 GPU. Le cluster a 6 nœuds libres. Que fait l'ordonnanceur par défaut ?</p></li>
@@ -943,8 +1102,8 @@ gpu-cloud-provider         70.0   77.0   81.7  hybrid      4.8  hybrid 86%, k8s 
 <h2 id="labs">Labs</h2>
 <p>Quatre labs, dans <code>labs/kubernetes-gpu/</code>. Trois sont de type <strong>sandbox</strong> : leur <code>verify.sh</code> a été exécuté deux fois avec succès dans le bac à sable du module (Linux 6.18, 4 vCPU, 16 Go, sans GPU) le 24 octobre 2026. Le lab 12.2 est de type <strong>cluster</strong> : sa partie hors cluster a été exécutée, sa partie cluster <strong>ne l'a pas été</strong>, d'où le badge « non vérifié ». Installation commune :</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> pip install pytest pyyaml jsonschema kubernetes-validate torch</span></code></pre></div>
+<h3 id="lab-12-1">Lab 12.1 — Kueue : files, quotas, préemption</h3>
 <div class="lab">
-<p><span class="tag">Lab 12.1 — Kueue : files, quotas, préemption</span></p>
 <p><strong>Objectif.</strong> Valider hors ligne un jeu de manifestes Kueue (64 GPU, trois équipes), écrire le modèle d'admission qui prédit qui est admis et préempté, puis le confronter à des scénarios. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable Linux sans GPU, ni cluster, ni réseau une fois les paquets installés.</p>
 <p>Les manifestes sont validés contre le schéma des CRD de Kueue v0.20.3 (copie élaguée, régénérable) et les schémas de Kubernetes 1.37. Le modèle d'admission est une <strong>simulation écrite d'après la documentation</strong>, pas le code de Kueue : il ignore le <em>fair sharing</em>, la fongibilité des <em>flavors</em> et la durée réelle d'une éviction.</p>
 <ol type="1">
@@ -956,8 +1115,8 @@ gpu-cloud-provider         70.0   77.0   81.7  hybrid      4.8  hybrid 86%, k8s 
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> se termine par <code>OK kueue-manifests</code>, après <code>16/16 documents valid</code>, <code>36 passed</code> pour la référence et <code>11 failed, 25 passed</code> pour le départ (sortie réelle, deux exécutions, environ 10 s).</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez le <em>fair sharing</em> au modèle, ou installez Kueue sur un cluster de test et comparez <code>kubectl get workloads</code> à la trace du modèle.</p>
 </div>
+<h3 id="lab-12-2">Lab 12.2 — JobSet : un entraînement multi-nœuds</h3>
 <div class="lab">
-<p><span class="tag">Lab 12.2 — JobSet : un entraînement multi-nœuds</span></p>
 <p><strong>Objectif.</strong> Lancer un entraînement <code>torchrun</code> sur 16 nœuds de 8 GPU, sous file Kueue, redémarré en bloc par JobSet, puis par Kubeflow Trainer. <strong>Durée.</strong> 2,5 h hors cluster, 2 h de plus sur un cluster. <strong>Prérequis matériels.</strong> Hors cluster : un portable Linux (PyTorch CPU suffit). Branche cluster : Kubernetes avec GPU, JobSet, Kueue et l'opérateur GPU ; le coût dépend du fournisseur, lisez sa page de prix le jour même.</p>
 <p><em>Exécuté :</em> lint, validation de schéma du JobSet (v0.13.0) et du TrainJob (Trainer v2.1.0) contre les CRD upstream avec rejet de quatre JobSet mutés, répétition locale du redémarrage avec deux processus <code>torchrun</code> (une simulation de l'orchestration), acceptation des manifestes par un <code>kube-apiserver</code> v1.37.1 réel (lab 12.4). <em>Non exécuté :</em> tout ce qui touche des pods, des GPU, NCCL, Kueue ou un redémarrage réel.</p>
 <ol type="1">
@@ -969,8 +1128,8 @@ gpu-cloud-provider         70.0   77.0   81.7  hybrid      4.8  hybrid 86%, k8s 
 <p><strong>Critère de réussite.</strong> Hors cluster : <code>OK jobset-training (offline branch): manifests valid, 1 restart, resumed from step 20, finished at step 60; cluster branch NOT executed</code> (sortie réelle, deux exécutions, environ 20 s). Sur cluster : après suppression d'un pod, tous les pods sont recréés et le journal du rang 0 affiche <code>resuming_from_step=</code> avec un pas non nul.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez un meneur (second <code>replicatedJob</code>) et comparez le temps de redémarrage réel au terme <span class="math inline">R</span> de l'exemple 4.2.</p>
 </div>
+<h3 id="lab-12-3">Lab 12.3 — Matrice de décision Slurm / Kubernetes</h3>
 <div class="lab">
-<p><span class="tag">Lab 12.3 — Matrice de décision Slurm / Kubernetes</span></p>
 <p><strong>Objectif.</strong> Défendre par écrit un choix Slurm, Kubernetes ou hybride avec une grille pondérée dont chaque score est justifié et dont la robustesse est mesurée. <strong>Durée.</strong> 1,5 h. <strong>Prérequis matériels.</strong> Un portable Linux sans GPU.</p>
 <ol type="1">
 <li>Lisez <code>criteria.yaml</code> : pour trois critères, dites si vous changeriez le score, et pourquoi.</li>
@@ -981,8 +1140,8 @@ gpu-cloud-provider         70.0   77.0   81.7  hybrid      4.8  hybrid 86%, k8s 
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> se termine par <code>OK slurm-vs-k8s: matrix well formed, tests green</code> après <code>9 passed</code> (sortie réelle, deux exécutions, moins de 5 s), et votre note cite une marge et une stabilité.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez un critère « taille de l'équipe d'exploitation » et une option « cloud géré ».</p>
 </div>
+<h3 id="lab-12-4">Lab 12.4 — Un plan de contrôle Kubernetes 1.37 sans kubelet</h3>
 <div class="lab">
-<p><span class="tag">Lab 12.4 — Un plan de contrôle Kubernetes 1.37 sans kubelet</span></p>
 <p><strong>Objectif.</strong> Démarrer un vrai plan de contrôle (etcd, kube-apiserver, kube-controller-manager, kube-scheduler en v1.37.1) avec des nœuds GPU factices, observer l'ordonnancement de groupe natif et la fragmentation, et faire valider les manifestes du module par le serveur d'API. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Linux x86_64, accès HTTPS vers <code>dl.k8s.io</code>, <code>registry.k8s.io</code> et <code>raw.githubusercontent.com</code> ; environ 350 Mo téléchargés au premier lancement ; ni Docker ni GPU.</p>
 <p>Les nœuds sont des objets créés par le script, avec une capacité déclarée ; les pods sont liés par le vrai ordonnanceur mais ne s'exécutent jamais. On observe donc l'ordonnancement et la validation d'API, pas l'exécution, ni Kueue, ni JobSet, ni l'opérateur GPU (seules leurs CRD sont installées). Les binaires sont vérifiés contre leur <code>.sha256</code> et <code>etcd</code> contre les résumés des couches de l'image <code>registry.k8s.io/etcd</code>.</p>
 <ol type="1">
@@ -1170,10 +1329,16 @@ PodGroup message: minCount (8) cannot be satisfied: 6 scheduled, 1 remaining, po
 <li>CNCF. <a href="https://www.cncf.io/announcements/2025/11/11/cncf-launches-certified-kubernetes-ai-conformance-program-to-standardize-ai-workloads-on-kubernetes/"><em>Certified Kubernetes AI Conformance Program</em></a>, 2025 : annonce du programme (chapitre 7).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les faits attribués à une page officielle ont été relus à la source le 24 octobre 2026 : plugin de périphériques, DRA stable en v1.35 et ses limites, gang et API <code>Workload</code> en bêta en v1.37, intégration au Job en alpha en v1.36, TAS natif alpha, règles de <code>ResourceQuota</code>, tolérations par défaut de 300 s, politique de décalage de version, dates de fin de vie, profils MIG du H100, <em>time-slicing</em>, CDI, mises à jour de pilote, champs et règles de préemption de Kueue, ses intégrations et son TAS, l'interblocage et <code>waitForPodsReady</code>, PodGroup et Queue de Volcano, JobSet, Trainer v2, KubeRay, Slinky, SUNK, les études de Hu et al. et de Kokolis et al., le programme de conformité du CNCF. Versions : Kubernetes v1.37.1, GPU Operator 26.7.2, pilote DRA NVIDIA 0.5.1, Kueue v0.20.3, JobSet v0.13.0, Kubeflow Trainer v2.1.0, Slinky 1.2.0. <strong>Observé</strong> dans le bac à sable : les sorties des exemples 1.1, 3.4, 4.1, 5.2 et 5.3 et des exercices 1, 5 et 8 viennent de vraies exécutions (plan de contrôle v1.37.1 sans kubelet ; PyTorch CPU) ; les exemples 3.2, 3.3, 5.1 et 7.1 viennent des modèles et simulateurs des labs, décrits comme tels.</p>
-<p><strong>Recommandé.</strong> Le découpage en trois atomicités, la correspondance Slurm / Kubernetes du chapitre 1, la réservation des nœuds GPU par taint, le montage « une ClusterQueue par équipe dans une cohorte plus un <code>ResourceQuota</code> large », le calcul du coût par heure utile, la méthode de la grille de décision et tous ses scores, le plan de mise à jour par rotation, et les hypothèses chiffrées des exemples (6 s par pas, 40 % de MFU, 15 minutes par nœud, 20 Go d'image, débits de 2 à 10 Go/s, MTBF de 40 h, 14 octets par paramètre) sont des choix de ce parcours ou des valeurs d'exemple : remplacez-les par vos mesures.</p>
-<p><strong>À vérifier.</strong> (1) Le modèle d'admission du lab 12.1 est une <strong>simulation</strong> d'après la documentation de Kueue v0.20 ; son comportement exact (ordre des têtes de file, sort d'une ressource non couverte par la file, étiquettes de raison de préemption hors <code>InClusterQueue</code>) n'a pas été comparé à un Kueue réel. (2) Les noms de portes (<code>GenericWorkload</code>, <code>WorkloadWithJob</code>, <code>TopologyAwareWorkloadScheduling</code>), les versions d'API et l'état bêta ou alpha de l'ordonnancement de groupe natif changent d'une version à l'autre : relisez la page de votre version. (3) Le pilote DRA de NVIDIA a des fonctions alpha. (4) La version de Kueue vient du fichier <code>CHANGELOG/CHANGELOG-0.20.md</code> de la branche principale, dont v0.20.3 est la dernière entrée, sans <code>CHANGELOG-0.21.md</code> (l'API GitHub des versions n'était pas joignable) ; Volcano affiche v1.16.0 comme dernière version de sa documentation, non testée ici. (5) Le délai de détection de 50 s de <code>kube-controller-manager</code> vient de l'aide du binaire v1.37.1, pas d'une page de documentation. (6) Les règles de sécurité des pods de RDMA (capacités, mémoire verrouillée) n'ont pas été testées. (7) Le contenu précis des exigences de la conformité IA du CNCF n'a pas été lu (le dépôt n'était pas accessible). (8) Le lab 12.2 n'a pas été exécuté sur un cluster GPU : comportement des pods, des volumes RWX, de NCCL et de Kueue non prouvé. (9) L'affirmation « 290 pods par seconde à 15 000 nœuds » est une mesure du projet JobSet, non reproduite. (10) Les binaires Kubernetes sont vérifiés contre un fichier <code>.sha256</code> publié au même endroit : la vérification détecte une corruption, pas une source compromise.</p>
-<p><strong>Hors périmètre.</strong> L'installation d'un cluster avec kubelets et GPU réels, MultiKueue et les clusters multiples, l'autoscaling de nœuds (Karpenter, cluster-autoscaler), le service d'inférence (KServe, vLLM, LeaderWorkerSet), les accélérateurs non NVIDIA, les offres commerciales de gestion de flotte GPU, les maillages de services et le chiffrement des communications, et l'administration d'une base de comptabilité d'usage (voir le module 15).</p>
+<h3 id="documente">Documenté</h3>
+<p>Les faits attribués à une page officielle ont été relus à la source le 24 octobre 2026 : plugin de périphériques, DRA stable en v1.35 et ses limites, gang et API <code>Workload</code> en bêta en v1.37, intégration au Job en alpha en v1.36, TAS natif alpha, règles de <code>ResourceQuota</code>, tolérations par défaut de 300 s, politique de décalage de version, dates de fin de vie, profils MIG du H100, <em>time-slicing</em>, CDI, mises à jour de pilote, champs et règles de préemption de Kueue, ses intégrations et son TAS, l'interblocage et <code>waitForPodsReady</code>, PodGroup et Queue de Volcano, JobSet, Trainer v2, KubeRay, Slinky, SUNK, les études de Hu et al. et de Kokolis et al., le programme de conformité du CNCF. Versions : Kubernetes v1.37.1, GPU Operator 26.7.2, pilote DRA NVIDIA 0.5.1, Kueue v0.20.3, JobSet v0.13.0, Kubeflow Trainer v2.1.0, Slinky 1.2.0. <strong>Observé</strong> dans le bac à sable : les sorties des exemples 1.1, 3.4, 4.1, 5.2 et 5.3 et des exercices 1, 5 et 8 viennent de vraies exécutions (plan de contrôle v1.37.1 sans kubelet ; PyTorch CPU) ; les exemples 3.2, 3.3, 5.1 et 7.1 viennent des modèles et simulateurs des labs, décrits comme tels.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>Le découpage en trois atomicités, la correspondance Slurm / Kubernetes du chapitre 1, la réservation des nœuds GPU par taint, le montage « une ClusterQueue par équipe dans une cohorte plus un <code>ResourceQuota</code> large », le calcul du coût par heure utile, la méthode de la grille de décision et tous ses scores, le plan de mise à jour par rotation, et les hypothèses chiffrées des exemples (6 s par pas, 40 % de MFU, 15 minutes par nœud, 20 Go d'image, débits de 2 à 10 Go/s, MTBF de 40 h, 14 octets par paramètre) sont des choix de ce parcours ou des valeurs d'exemple : remplacez-les par vos mesures.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<ol type="1">
+<li>Le modèle d'admission du lab 12.1 est une <strong>simulation</strong> d'après la documentation de Kueue v0.20 ; son comportement exact (ordre des têtes de file, sort d'une ressource non couverte par la file, étiquettes de raison de préemption hors <code>InClusterQueue</code>) n'a pas été comparé à un Kueue réel. (2) Les noms de portes (<code>GenericWorkload</code>, <code>WorkloadWithJob</code>, <code>TopologyAwareWorkloadScheduling</code>), les versions d'API et l'état bêta ou alpha de l'ordonnancement de groupe natif changent d'une version à l'autre : relisez la page de votre version. (3) Le pilote DRA de NVIDIA a des fonctions alpha. (4) La version de Kueue vient du fichier <code>CHANGELOG/CHANGELOG-0.20.md</code> de la branche principale, dont v0.20.3 est la dernière entrée, sans <code>CHANGELOG-0.21.md</code> (l'API GitHub des versions n'était pas joignable) ; Volcano affiche v1.16.0 comme dernière version de sa documentation, non testée ici. (5) Le délai de détection de 50 s de <code>kube-controller-manager</code> vient de l'aide du binaire v1.37.1, pas d'une page de documentation. (6) Les règles de sécurité des pods de RDMA (capacités, mémoire verrouillée) n'ont pas été testées. (7) Le contenu précis des exigences de la conformité IA du CNCF n'a pas été lu (le dépôt n'était pas accessible). (8) Le lab 12.2 n'a pas été exécuté sur un cluster GPU : comportement des pods, des volumes RWX, de NCCL et de Kueue non prouvé. (9) L'affirmation « 290 pods par seconde à 15 000 nœuds » est une mesure du projet JobSet, non reproduite. (10) Les binaires Kubernetes sont vérifiés contre un fichier <code>.sha256</code> publié au même endroit : la vérification détecte une corruption, pas une source compromise.</li>
+</ol>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>L'installation d'un cluster avec kubelets et GPU réels, MultiKueue et les clusters multiples, l'autoscaling de nœuds (Karpenter, cluster-autoscaler), le service d'inférence (KServe, vLLM, LeaderWorkerSet), les accélérateurs non NVIDIA, les offres commerciales de gestion de flotte GPU, les maillages de services et le chiffrement des communications, et l'administration d'une base de comptabilité d'usage (voir le module 15).</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/ray-rl-infra/index.html"><span class="k">← Précédent</span>Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a><a class="next" href="../../courses/multi-cloud/index.html"><span class="k">Suivant →</span>Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a></nav>
 </main>

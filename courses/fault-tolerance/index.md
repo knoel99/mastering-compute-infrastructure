@@ -36,7 +36,7 @@ Ce module répond en six temps. Il **chiffre** la panne (taxonomie, données pub
 | Volume | 28 h, dont environ 10 h de lecture, 10 h de labs et 8 h d'exercices |
 | Niveau d'entrée | 3 : vous savez lancer un entraînement distribué avec `torchrun` et écrire un `state_dict` sur disque |
 | Prérequis | [Module 9 — Entraînement distribué](../distributed-training/index.html), [Module 8 — Stockage](../storage/index.html) |
-| Statut pour le lecteur de référence | cœur : aucune expérience de reprise après panne à grande échelle dans le profil |
+| Pour qui | Cœur : reprise après panne à grande échelle, coût des checkpoints et procédures d'exploitation. |
 | Livrable | un entraîneur dont la reprise est prouvée identique à une exécution sans panne, son superviseur, et un tableau chiffré du coût des pannes |
 | Environnement | un portable CPU suffit pour les trois labs ; aucun GPU. Les scripts Slurm et Kubernetes du chapitre 6 sont linté seulement |
 | Projets liés | [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 5 — Observabilité GPU](../../projects/gpu-observability/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
@@ -51,6 +51,15 @@ Ce module répond en six temps. Il **chiffre** la panne (taxonomie, données pub
 -   Concevoir une boucle de reprise qui isole le nœud fautif et ne boucle pas indéfiniment (chapitre 6, lab 10.3).
 -   Lire un journal d'erreurs GPU (Xid, ECC) et décider : relancer le job, drainer le nœud ou ouvrir un dossier fournisseur (chapitre 7).
 -   Préparer un test de chaos, un runbook et un post-mortem sans blâme (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 3 — Systèmes d'entraînement distribué** (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
+-   **S'appuie sur** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html), [module 8 — Stockage et E/S pour l'entraînement](../storage/index.html).
+-   **Prépare** : [module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](../multi-cloud/index.html).
+-   **Projets qui s'en servent** : [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -69,7 +78,27 @@ Dix séances, soit 28 h : six de 3 h et quatre de 2,5 h. Le niveau ne diminue ja
 | 9 | 3 h | 3 | ch. 7 Erreurs GPU courantes | Ex. 8, 9 |
 | 10 | 2.5 h | 3 | ch. 8 Chaos et procédures, synthèse | Ex. 11 ; checkpoint de sortie |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Administrateur ou ingénieur HPC | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Ingénieur ML ou chercheur | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** Le modèle de Young et Daly et la détection des blocages reviennent dans les projets 3, 4 et 5.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, lisez le chapitre 2 puis passez directement aux exercices ★★★.
 
@@ -929,8 +958,9 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 export PYTHON="$(command -v python)"
 ~~~
 
+### Lab 10.1 — Intervalle de checkpoint optimal {#lab-10-1}
+
 ::: lab
-[Lab 10.1 — Intervalle de checkpoint optimal]{.tag}
 
 **Objectif.** Comparer l'intervalle de Young, l'estimation de Daly et le minimum du modèle exact à une simulation de Monte-Carlo, et voir où le premier ordre cesse de valoir. **Durée.** 3 h. **Prérequis matériels.** Un portable, 1 cœur, quelques secondes de calcul ; aucun GPU.
 
@@ -945,8 +975,9 @@ export PYTHON="$(command -v python)"
 **Pour aller plus loin.** Remplacez les pannes de Weibull par une trace de pannes réelle de votre cluster (rejouée), et ajoutez un second niveau de checkpoint au simulateur (exemple 4.1).
 :::
 
+### Lab 10.2 — Checkpoint atomique et reprise exacte {#lab-10-2}
+
 ::: lab
-[Lab 10.2 — Checkpoint atomique et reprise exacte]{.tag}
 
 **Objectif.** Écrire et casser un checkpoint par répertoire, prouver qu'une reprise complète est identique à l'exécution continue, mesurer ce que chaque partie de l'état protège, et survivre à une campagne de `kill -9`. **Durée.** 4 h. **Prérequis matériels.** Un portable avec PyTorch CPU ; environ 50 secondes pour `verify.sh`.
 
@@ -961,8 +992,9 @@ export PYTHON="$(command -v python)"
 **Pour aller plus loin.** Ajoutez la reprise sur un nombre de rangs différent avec DCP, ou une persistance asynchrone dans un fil, avec une seule écriture en vol. **Limites.** Le `kill -9` n'efface pas le cache du noyau : il ne prouve pas la durabilité après une coupure de courant. Les délais (`--sleep-ms`, `--slow-ckpt-ms`) sont simulés.
 :::
 
+### Lab 10.3 — Superviseur de relance {#lab-10-3}
+
 ::: lab
-[Lab 10.3 — Superviseur de relance]{.tag}
 
 **Objectif.** Écrire un superviseur qui détecte plantage et blocage, tue le groupe de processus, exclut un nœud fautif et s'arrête quand il ne progresse plus, et lire un journal d'erreurs GPU. **Durée.** 4 h. **Prérequis matériels.** Un portable ; aucun GPU, aucun Slurm requis pour la partie A.
 
@@ -1243,10 +1275,18 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les chiffres de Llama 3 (466, 47, 419 interruptions, tableau 5, « plus de 90 % », trois interventions), de Kokolis et coauteurs (6,50 et 2,34 pannes pour mille nœuds-jours, projections de 1,8 h et 0,23 h, formule de l'ETTR, 0,7 et 0,93, 548 préemptions pour 35 remises en file), d'Acme (11 % et 82 %, thermique, checkpoint asynchrone), d'OPT-175B et de BLOOM ont été lus le 24 octobre 2026 dans le texte des articles. Les faits sur CheckFreq, Gemini (résumé et première page) et MegaScale (sections 4 et 6.3) viennent des articles ; les métadonnées de Young et de Daly ont été vérifiées auprès de Crossref. Les comportements de DCP et de `torchrun` viennent de la documentation de PyTorch 2.14 ; les valeurs par défaut des délais ont aussi été relues dans le code de PyTorch 2.14.1. Le catalogue des Xid (mis à jour le 9 septembre 2026), la gestion des erreurs mémoire, `NCCL_IB_TIMEOUT`, `sbatch`, les Jobs Kubernetes, les principes du chaos et le chapitre « Postmortem Culture » ont été relus sur leurs pages officielles. Les sorties « réelles » viennent du bac à sable (Linux 6.18, 4 vCPU, sans GPU, PyTorch 2.14.1 CPU, Slurm 23.11.4), et tous les calculs « faits ici » ont été refaits en Python.
+### Documenté {#documente}
 
-**Recommandé.** Les niveaux de triage Xid (surveiller, relancer, drainer), la règle « le délai de détection est plus long que la plus longue phase silencieuse », la garde « aucun progrès », l'exclusion après deux échecs, les cinq règles du checkpoint asynchrone, le modèle à deux niveaux du premier ordre (dérivé ici, vérifié par minimisation numérique), le calcul de rechanges par la loi de Poisson, la distinction reprise identique et reprise équivalente, le budget de temps d'une expérience de chaos : ce sont des choix de ce parcours, pas des règles de PyTorch, de NVIDIA, de Slurm ou de Kubernetes.
+Les chiffres de Llama 3 (466, 47, 419 interruptions, tableau 5, « plus de 90 % », trois interventions), de Kokolis et coauteurs (6,50 et 2,34 pannes pour mille nœuds-jours, projections de 1,8 h et 0,23 h, formule de l'ETTR, 0,7 et 0,93, 548 préemptions pour 35 remises en file), d'Acme (11 % et 82 %, thermique, checkpoint asynchrone), d'OPT-175B et de BLOOM ont été lus le 24 octobre 2026 dans le texte des articles. Les faits sur CheckFreq, Gemini (résumé et première page) et MegaScale (sections 4 et 6.3) viennent des articles ; les métadonnées de Young et de Daly ont été vérifiées auprès de Crossref. Les comportements de DCP et de `torchrun` viennent de la documentation de PyTorch 2.14 ; les valeurs par défaut des délais ont aussi été relues dans le code de PyTorch 2.14.1. Le catalogue des Xid (mis à jour le 9 septembre 2026), la gestion des erreurs mémoire, `NCCL_IB_TIMEOUT`, `sbatch`, les Jobs Kubernetes, les principes du chaos et le chapitre « Postmortem Culture » ont été relus sur leurs pages officielles. Les sorties « réelles » viennent du bac à sable (Linux 6.18, 4 vCPU, sans GPU, PyTorch 2.14.1 CPU, Slurm 23.11.4), et tous les calculs « faits ici » ont été refaits en Python.
 
-**À vérifier.** (1) La formule d'ordre supérieur de Daly n'a pas été relue dans l'article (accès payant) ; elle est vérifiée numériquement contre le modèle exact. (2) Le tableau 5 de Llama 3 est incohérent dans le texte récupéré (148 sur 419 ne fait pas 30,1 %, et 268 sur 419 ne fait pas 58,7 %) : nous citons les comptes, pas les pourcentages. (3) Le texte de Kokolis et coauteurs cite un MTTF de 7,9 h pour des jobs de 1 024 GPU ; avec le taux de 6,50 pour mille nœuds-jours, nous obtenons 28,8 h : nous n'avons pas pu réconcilier les deux et n'utilisons que les projections à 16 384 et 131 072 GPU, que nous reproduisons. (4) Le délai de 121 secondes avant éligibilité d'un job remis en file a été observé sur Slurm 23.11.4 par défaut ; nous n'avons pas identifié le paramètre en cause. (5) Les libellés d'action du catalogue Xid (`RESTART_APP`, `RESET_GPU`, `RESTART_BM`, `WORKFLOW_*`) ne sont pas définis dans la page lue ; les Xid et leurs libellés évoluent avec les pilotes, relisez le catalogue de votre version. (6) Le comportement par défaut de `dedup_replicated_tensors` et la signature de `async_save` changent selon la version de PyTorch : seul `save`/`load` a été exécuté. (7) Les injections de pannes réseau, GPU (DCGM) et de nœud lent du chapitre 8 n'ont pas été testées. (8) Les garanties de cohérence d'un stockage objet pour le motif « manifeste en dernier » dépendent du fournisseur. (9) Les scripts `train.sbatch` et `job.yaml` sont linté, pas exécutés, faute de GPU et de cluster.
+### Recommandé {#recommande}
 
-**Hors périmètre.** Les bibliothèques de checkpoint multiniveau d'autres écosystèmes, le checkpoint/restauration au niveau du pilote GPU, les accélérateurs non NVIDIA, les stratégies de redimensionnement élastique qui préservent le lot global et la reproductibilité, l'orchestration de gang sous Kubernetes (JobSet et similaires), la détection matérielle de la corruption silencieuse, la résilience de l'inférence servie, et le dimensionnement financier des rechanges (module 15).
+Les niveaux de triage Xid (surveiller, relancer, drainer), la règle « le délai de détection est plus long que la plus longue phase silencieuse », la garde « aucun progrès », l'exclusion après deux échecs, les cinq règles du checkpoint asynchrone, le modèle à deux niveaux du premier ordre (dérivé ici, vérifié par minimisation numérique), le calcul de rechanges par la loi de Poisson, la distinction reprise identique et reprise équivalente, le budget de temps d'une expérience de chaos : ce sont des choix de ce parcours, pas des règles de PyTorch, de NVIDIA, de Slurm ou de Kubernetes.
+
+### À vérifier {#a-verifier}
+
+(1) La formule d'ordre supérieur de Daly n'a pas été relue dans l'article (accès payant) ; elle est vérifiée numériquement contre le modèle exact. (2) Le tableau 5 de Llama 3 est incohérent dans le texte récupéré (148 sur 419 ne fait pas 30,1 %, et 268 sur 419 ne fait pas 58,7 %) : nous citons les comptes, pas les pourcentages. (3) Le texte de Kokolis et coauteurs cite un MTTF de 7,9 h pour des jobs de 1 024 GPU ; avec le taux de 6,50 pour mille nœuds-jours, nous obtenons 28,8 h : nous n'avons pas pu réconcilier les deux et n'utilisons que les projections à 16 384 et 131 072 GPU, que nous reproduisons. (4) Le délai de 121 secondes avant éligibilité d'un job remis en file a été observé sur Slurm 23.11.4 par défaut ; nous n'avons pas identifié le paramètre en cause. (5) Les libellés d'action du catalogue Xid (`RESTART_APP`, `RESET_GPU`, `RESTART_BM`, `WORKFLOW_*`) ne sont pas définis dans la page lue ; les Xid et leurs libellés évoluent avec les pilotes, relisez le catalogue de votre version. (6) Le comportement par défaut de `dedup_replicated_tensors` et la signature de `async_save` changent selon la version de PyTorch : seul `save`/`load` a été exécuté. (7) Les injections de pannes réseau, GPU (DCGM) et de nœud lent du chapitre 8 n'ont pas été testées. (8) Les garanties de cohérence d'un stockage objet pour le motif « manifeste en dernier » dépendent du fournisseur. (9) Les scripts `train.sbatch` et `job.yaml` sont linté, pas exécutés, faute de GPU et de cluster.
+
+### Hors périmètre {#hors-perimetre}
+
+Les bibliothèques de checkpoint multiniveau d'autres écosystèmes, le checkpoint/restauration au niveau du pilote GPU, les accélérateurs non NVIDIA, les stratégies de redimensionnement élastique qui préservent le lot global et la reproductibilité, l'orchestration de gang sous Kubernetes (JobSet et similaires), la détection matérielle de la corruption silencieuse, la résilience de l'inférence servie, et le dimensionnement financier des rechanges (module 15).

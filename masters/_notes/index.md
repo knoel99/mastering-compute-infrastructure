@@ -2,26 +2,27 @@
 title: "Enquête sur les masters HPC"
 subtitle: "{{N_PROG}} programmes en France, aux États-Unis, en Chine et dans le monde, comparés à {{N_POST}} offres d'emploi"
 description: "Ce que les masters de calcul haute performance enseignent, ce qu'ils n'enseignent presque pas, et ce que demandent les offres d'ingénieur d'infrastructure de calcul."
+numbered: true
 ---
 
 ## Résumé {#resume}
 
 -   **Les masters forment des programmeurs de calcul parallèle et de simulation, pas des opérateurs de plateformes.** MPI, GPU, architecture et numérique y ont souvent un cours dédié ; l'ordonnancement, le réseau d'interconnexion, la résilience et l'observabilité presque jamais.
--   **L'écart se chiffre.** Un cours dédié à l'interconnexion existe dans 1 programme sur 21 dont le syllabus est connu, alors que 7 offres sur 12 demandent InfiniBand ou RoCE. L'ordonnancement : 1 programme sur 8 contre 5 offres sur 12 pour Slurm.
+-   **L'écart se chiffre.** Un cours dédié à l'interconnexion existe dans 1 programme sur 21 dont le syllabus est connu, alors que {{JOB:infiniband-roce}} demandent InfiniBand ou RoCE. L'ordonnancement : 1 programme sur 8 contre {{JOB:slurm}} pour Slurm et {{JOB:kubernetes}} pour Kubernetes.
 -   **Les programmes qui s'en approchent sont rares et orientés exploitation** : le diplôme d'administration de systèmes HPC du C-DAC (Inde), le master HPC de l'ICTP-SISSA (Italie) et certaines spécialisations d'EUMaster4HPC.
 -   **En France, un réseau de masters dédiés** (CHPS) donne une base solide en parallélisme ; **aux États-Unis, le HPC vit dans des cours** plus que dans des diplômes ; **en Chine, il vit dans des centres de supercalcul et des compétitions** plus que dans les maquettes de master.
 -   **Conséquence pour le parcours** : MPI, GPU et performance sont des fondations communes, que les masters enseignent bien ; l'essentiel de l'effort va aux sujets que les masters traitent peu et que les offres demandent.
 
 ## Méthode et limites {#methode}
 
-L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; **un contrôle mécanique a vérifié mot pour mot 592 citations sur 593** (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier `data/` du dépôt.
+L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; **un contrôle mécanique a vérifié mot pour mot {{Q_OK}} citations sur {{Q_ALL}}** (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier `data/` du dépôt.
 
 Cinq limites à garder en tête.
 
 -   **Échantillon non exhaustif.** Plusieurs programmes notables n'ont pas été étudiés faute de budget de recherche : en Europe, TUM, FAU, Stuttgart, RWTH, USI et Cambridge ; en France, Sorbonne et Ensimag ; à l'international, Tsukuba, KAIST et NUS (aucun programme lisible trouvé pour ces trois derniers).
 -   **Inconnu n'est pas absent.** Quand un syllabus n'était pas lisible, le thème est marqué *inconnu*. Les proportions ci-dessous sont calculées sur les seuls programmes dont la valeur est connue, et leur effectif est toujours indiqué.
 -   **Un cours dédié n'est pas un cours bien fait.** Le critère « cours dédié » signifie qu'un intitulé de cours ou de module nomme le thème ; il ne dit rien de la qualité ni de la profondeur.
--   **Peu d'offres d'emploi.** Douze offres, dont six chez des fournisseurs de GPU, trois dans des laboratoires d'IA, une dans un centre HPC et deux d'une start-up de robotique (anonymisées). Les années d'expérience demandées vont de 3 à 15, médiane de 8, sur les sept offres qui en donnent.
+-   **Les offres d'emploi ont leur propre page.** {{N_POST}} offres publiques des États-Unis, d'Europe et de Chine sont analysées dans [Ce que demande le marché](../market/index.html) ; cette page n'en reprend que les compétences qui correspondent à un thème de master.
 -   **Des informations changent.** Les programmes évoluent chaque année : consultez la page officielle avant toute décision.
 
 ## Ce que l'échantillon couvre {#echantillon}
@@ -44,15 +45,15 @@ Trois lectures.
 
 ## Ce que demandent les offres {#demande}
 
-Sur les douze offres de postes d'infrastructure de calcul relevées, voici les compétences les plus citées, mises en regard du nombre de programmes qui leur consacrent un cours.
+Sur les {{N_POST}} offres de postes d'infrastructure de calcul relevées (détail dans [Ce que demande le marché](../market/index.html)), voici les compétences les plus citées, mises en regard du nombre de programmes qui leur consacrent un cours.
 
 {{SUPPLY_DEMAND}}
 
-Les nombres sont à lire comme des ordres de grandeur sur de petits échantillons. Trois constats tiennent néanmoins :
+Les nombres de programmes sont petits : lisez-les comme des ordres de grandeur. Trois constats tiennent néanmoins :
 
--   **Kubernetes** est la compétence la plus citée (10 offres sur 12, dont 8 l'exigent), loin devant Slurm (5 sur 12, dont 2 l'exigent). Les offres lues viennent beaucoup de fournisseurs de GPU, où l'infrastructure ressemble à celle du cloud.
--   **L'astreinte et la fiabilité** figurent dans 9 offres sur 12, toutes en exigence, alors que l'observabilité n'a aucun cours dédié dans les programmes dont le contenu est connu.
--   **La planification de capacité** est exigée par 6 offres sur 12. Elle relève d'un métier que les masters n'enseignent pas : les thèmes de cloud qu'ils proposent portent sur la technique, pas sur l'achat ni la prévision.
+-   **Kubernetes** est cité par {{JOB:kubernetes}} (dont {{JOBREQ:kubernetes}} l'exigent), loin devant Slurm ({{JOB:slurm}}, dont {{JOBREQ:slurm}} l'exigent), que demandent surtout les centres HPC. Les masters, eux, n'enseignent presque ni l'un ni l'autre.
+-   **L'astreinte et la fiabilité** figurent dans {{JOB:sre-oncall}} (dont {{JOBREQ:sre-oncall}} en exigence), alors que l'observabilité n'a aucun cours dédié dans les programmes dont le contenu est connu.
+-   **La planification de capacité** est citée par {{JOB:capacity-planning}}. Elle relève d'un métier que les masters n'enseignent pas : les thèmes de cloud qu'ils proposent portent sur la technique, pas sur l'achat ni la prévision.
 
 ## Les programmes les plus proches du métier {#proches}
 
@@ -67,13 +68,13 @@ Aucun programme ne couvre à lui seul le métier. Quatre s'en rapprochent par le
 
 | Constat de l'enquête | Module du parcours | Décision |
 |---|---|---|
-| Interconnexion : 1 programme sur 21, 7 offres sur 12 | Module 7 | module long (28 h) et labs de dimensionnement |
-| Ordonnancement : 1 programme sur 8, 5 offres sur 12 | Module 5 | 32 h, labs sur un vrai Slurm |
-| Résilience : 0 sur 12, 4 offres sur 12 | Modules 9 et 10 | 28 h et un projet dédié |
-| Observabilité et astreinte : 0 sur 4, 9 offres sur 12 | Modules 14 et 16 | 24 h, plus les pratiques de production |
-| Kubernetes : 5 sur 13, 10 offres sur 12 | Module 12 | 28 h, en s'appuyant sur l'expérience existante |
+| Interconnexion : 1 programme sur 21, {{JOB:infiniband-roce}} | Module 7 | module long (28 h) et labs de dimensionnement |
+| Ordonnancement : 1 programme sur 8 ; Slurm {{JOB:slurm}} | Module 5 | 32 h, labs sur un vrai Slurm |
+| Résilience : 0 sur 12, {{JOB:checkpoint-fault-tolerance}} | Modules 9 et 10 | 28 h et un projet dédié |
+| Observabilité et astreinte : 0 sur 4, {{JOB:sre-oncall}} | Modules 14 et 16 | 24 h, plus les pratiques de production |
+| Kubernetes : 5 sur 13, {{JOB:kubernetes}} | Module 12 | 28 h, centrés sur les GPU, les files d'attente et le placement |
 | MPI : 10 sur 21 ; GPU : 12 sur 21 | Modules 3 et 4 | fondations communes, volume standard |
-| Capacité et achats : 6 offres sur 12 | Module 15 | 24 h, avec l'énergie et les contrats |
+| Capacité et achats : {{JOB:capacity-planning}} | Module 15 | 24 h, avec l'énergie et les contrats |
 | Méthodes numériques : 20 sur 26, aucune offre | aucun | hors parcours, avec des renvois |
 
 L'enquête **confirme** le plan initial plutôt qu'elle ne le modifie : **les modules les plus longs du parcours portent sur les thèmes que les masters traitent le moins**, à savoir l'ordonnancement, le réseau, le stockage (phase 2) et la résilience (phase 3).

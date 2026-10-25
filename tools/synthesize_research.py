@@ -46,7 +46,7 @@ def load():
             progs.append(p)
     for f in sorted((ROOT / "data" / "jobs").glob("*.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
-        posts += d.get("postings", [])
+        posts += [p for p in d.get("postings", []) if p.get("url")]   # public postings only, as in tools/market_analysis.py
     for f in sorted((ROOT / "data" / "resources").glob("*.json")):
         resources += json.loads(f.read_text(encoding="utf-8")).get("items", [])
     if not include_low:

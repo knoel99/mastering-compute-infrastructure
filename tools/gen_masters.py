@@ -8,6 +8,7 @@ the programme record when a "<field>_fr" key exists, otherwise the original (Eng
     python3 tools/gen_masters.py && python3 tools/build.py
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -123,6 +124,7 @@ def region_page(reg, title, label, progs, eco):
 title: "{title}"
 subtitle: "{n} programme(s) étudié(s), données sourcées et vérifiées"
 description: "Fiches de programmes HPC : durée, crédits, cours, accès aux machines, couverture des thèmes utiles à un ingénieur d'infrastructure de calcul."
+numbered: true
 ---
 
 ## Vue d'ensemble {{#vue}}
@@ -194,6 +196,21 @@ def index_page(byreg):
     note = (ROOT / "masters" / "_notes" / "index.md").read_text(encoding="utf-8")
     note = note.replace("{{REGION_TABLE}}", region_table(byreg)).replace("{{TOPIC_BARS}}", topic_bars(syn)).replace("{{SUPPLY_DEMAND}}", supply_demand(syn))
     note = note.replace("{{N_PROG}}", str(syn["programmes_total"])).replace("{{N_POST}}", str(syn["postings_total"]))
+    n = syn["postings_total"]
+    note = re.sub(r"\{\{JOB:([a-z-]+)\}\}", lambda m: f"{syn['skills'][m.group(1)]['required'] + syn['skills'][m.group(1)]['bonus']} offres sur {n}", note)
+    note = re.sub(r"\{\{JOBREQ:([a-z-]+)\}\}", lambda m: str(syn["skills"][m.group(1)]["required"]), note)
+    ok = tot = 0
+    for f in sorted((ROOT / "data").glob("*/*.json")):
+        if f.parent.name not in ("masters", "jobs", "resources") or f.name == "synthesis.json":
+            continue
+        d = json.loads(f.read_text(encoding="utf-8"))
+        for owner in d.get("programmes", []) + d.get("postings", []) + d.get("ecosystem", []) + d.get("items", []):
+            ev = owner.get("evidence")
+            for e in ([ev] if isinstance(ev, dict) else (ev or [])):
+                if e.get("source", "web") == "web":
+                    tot += 1
+                    ok += bool(e.get("verified"))
+    note = note.replace("{{Q_OK}}", str(ok)).replace("{{Q_ALL}}", str(tot))
     return note
 
 

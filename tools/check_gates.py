@@ -31,7 +31,8 @@ H_RE = re.compile(r"^(#{2,3}) (.+?)\s*\{#([\w-]+)[^}]*\}\s*$", re.M)
 CH_RE = re.compile(r"^## (\d+)\. .*\{#ch(\d+)\}\s*$", re.M)
 EXO_RE = re.compile(r"^::: exo\s*\n(.*?)^:::\s*$", re.S | re.M)
 SOL_RE = re.compile(r"^::: sol[^\n]*\n(.*?)^:::\s*$", re.S | re.M)
-LAB_RE = re.compile(r"^::: lab\s*\n\[(Lab \d+\.\d+ — [^\]]+)\]\{\.tag\}", re.M)
+# a lab is a "### Lab N.M — title {#lab-N-M}" sub-section followed by a ::: lab box (or, in older pages, a box whose tag carries the title)
+LAB_RE = re.compile(r"^### (Lab \d+\.\d+ — .+?) \{#lab-[\w-]+\}\s*\n+::: lab\s*$|^::: lab\s*\n\[(Lab \d+\.\d+ — [^\]]+)\]\{\.tag\}", re.M)
 FENCE_RE = re.compile(r"^(```|~~~)(.*)$", re.M)
 LINK_RE = re.compile(r"\]\(([^)\s]+)\)")
 DUR_RE = re.compile(r"^(\d+(?:[.,]\d+)?)\s*h$")
@@ -46,7 +47,8 @@ def split(path: Path):
 
 
 def prose_words(body: str) -> int:
-    t = re.sub(r"^(```|~~~).*?^\1\s*$", "", body, flags=re.S | re.M)
+    t = re.sub(r"<!-- gen:(\w+) -->.*?<!-- /gen:\1 -->", "", body, flags=re.S)   # parts generated from data/curriculum.json
+    t = re.sub(r"^(```|~~~).*?^\1\s*$", "", t, flags=re.S | re.M)
     t = re.sub(r"\$\$.*?\$\$", "", t, flags=re.S)
     t = re.sub(r"\$[^$\n]*\$", "", t)
     return len(re.findall(r"[A-Za-zÀ-ÿ]{2,}", t))
@@ -61,10 +63,11 @@ def table_rows(section: str):
 
 
 def section_text(body: str, anchor: str) -> str:
-    m = re.search(r"^#{2,3} .*\{#" + re.escape(anchor) + r"[^}]*\}\s*$", body, re.M)
+    """Text of a section, sub-sections included (up to the next heading of the same or a higher level)."""
+    m = re.search(r"^(#{2,3}) .*\{#" + re.escape(anchor) + r"[^}]*\}\s*$", body, re.M)
     if not m:
         return ""
-    nxt = re.compile(r"^#{2,3} ", re.M).search(body, m.end())
+    nxt = re.compile(r"^#{2,%d} " % len(m.group(1)), re.M).search(body, m.end())
     return body[m.end(): nxt.start() if nxt else len(body)]
 
 

@@ -2,6 +2,7 @@
 title: "Masters et formations HPC en Chine"
 subtitle: "6 programme(s) étudié(s), données sourcées et vérifiées"
 description: "Fiches de programmes HPC : durée, crédits, cours, accès aux machines, couverture des thèmes utiles à un ingénieur d'infrastructure de calcul."
+numbered: true
 ---
 
 ## Vue d'ensemble {#vue}

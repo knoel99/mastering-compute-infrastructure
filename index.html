@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -39,16 +39,16 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesquelles on entraîne les modèles d'IA : clusters GPU, ordonnanceurs, réseaux, stockage, fiabilité, coût. Ce site rassemble de quoi apprendre ce métier de manière structurée : 16 modules en 6 phases, 6 projets de portfolio, des labs exécutables et une enquête sourcée sur les masters HPC en France, aux États-Unis, en Chine et dans le monde.
 </p>
 <div class="hero-actions">
-<p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a> <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a></p>
+<p><a class="cta" href="#cours">Voir les cours</a> <a class="cta cta-ghost" href="path/index.html">Feuille de route</a> <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a> <a class="cta cta-ghost" href="profile/index.html">Point de départ</a> <a class="cta cta-ghost" href="market/index.html">Analyse du marché</a> <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a></p>
 </div>
-<h2 id="etat">État du chantier</h2>
+<h2 id="etat">1. État du chantier</h2>
 <p>Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. <strong>16 module(s) sur 16 et 6 projet(s) sur 6 sont publiés</strong>.</p>
 <ul>
 <li><strong>Documenté</strong> : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.</li>
 <li><strong>Vérifié</strong> : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (<code>verify.sh</code>), les pages passent des contrôles mécaniques (<code>tools/check_gates.py</code>).</li>
 <li><strong>Honnête</strong> : un lab non exécuté porte le badge « non vérifié » ; une valeur incertaine est signalée « à vérifier ».</li>
 </ul>
-<h2 id="parcours">Le parcours en un coup d'œil</h2>
+<h2 id="parcours">2. Le parcours en un coup d'œil</h2>
 <p>Volume total : <strong>440 h de modules et 152 h de projets</strong>, soit environ 49 semaines à 12 h par semaine. Le détail, les jalons et les parcours courts sont dans la <a href="path/index.html">feuille de route</a>.</p>
 <div class="tbl-wrap">
 <table>
@@ -98,11 +98,9 @@ Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesque
 </tbody>
 </table>
 </div>
-<h2 id="cours">Cours</h2>
-<p>Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge <strong>Cœur</strong> signale un module indispensable ; <strong>À survoler</strong> un module que le lecteur de référence peut parcourir rapidement.</p>
-<h3 class="phase" id="phase0">
-Phase 0 — Fondations : machines et performance
-</h3>
+<h2 id="cours">3. Cours</h2>
+<p>Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge <strong>Cœur</strong> signale un module indispensable à tous ; <strong>Fondation</strong> un module de base que vous pouvez survoler si vous le pratiquez déjà. La section « Comment travailler ce module » de chaque cours donne la priorité selon votre profil d'entrée.</p>
+<h3 class="phase unnumbered" id="phase0">Phase 0 — Fondations : machines et performance</h3>
 <p class="sub-line">
 Lire une machine et prédire sa performance avant de la mesurer.
 </p>
@@ -112,7 +110,7 @@ Lire une machine et prédire sa performance avant de la mesurer.
 Linux, systèmes et diagnostic de performance
 </h4>
 <p class="meta">
-Module 01 · 24 h · À survoler
+Module 01 · 24 h · Fondation
 </p>
 <p>
 Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.
@@ -129,9 +127,7 @@ Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, mo
 </p>
 <p></a></p>
 </div>
-<h3 class="phase" id="phase1">
-Phase 1 — Calcul parallèle et GPU
-</h3>
+<h3 class="phase unnumbered" id="phase1">Phase 1 — Calcul parallèle et GPU</h3>
 <p class="sub-line">
 Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
 </p>
@@ -158,9 +154,7 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 </p>
 <p></a></p>
 </div>
-<h3 class="phase" id="phase2">
-Phase 2 — Exploiter un cluster
-</h3>
+<h3 class="phase unnumbered" id="phase2">Phase 2 — Exploiter un cluster</h3>
 <p class="sub-line">
 Provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
 </p>
@@ -207,9 +201,7 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 </p>
 <p></a></p>
 </div>
-<h3 class="phase" id="phase3">
-Phase 3 — Systèmes d'entraînement distribué
-</h3>
+<h3 class="phase unnumbered" id="phase3">Phase 3 — Systèmes d'entraînement distribué</h3>
 <p class="sub-line">
 Faire tourner un entraînement multi-nœuds qui survit aux pannes.
 </p>
@@ -246,9 +238,7 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 </p>
 <p></a></p>
 </div>
-<h3 class="phase" id="phase4">
-Phase 4 — Plateforme cloud-native et multi-fournisseurs
-</h3>
+<h3 class="phase unnumbered" id="phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</h3>
 <p class="sub-line">
 Placer, observer et facturer des charges sur plusieurs fournisseurs.
 </p>
@@ -295,9 +285,7 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 </p>
 <p></a></p>
 </div>
-<h3 class="phase" id="phase5">
-Phase 5 — Production et leadership
-</h3>
+<h3 class="phase unnumbered" id="phase5">Phase 5 — Production et leadership</h3>
 <p class="sub-line">
 Opérer en production, décider, négocier, diriger et passer l'entretien.
 </p>
@@ -314,7 +302,7 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 </p>
 <p></a></p>
 </div>
-<h2 id="projets">Projets de portfolio</h2>
+<h2 id="projets">4. Projets de portfolio</h2>
 <p>Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez publier et présenter en entretien. Ils sont réalisables sans GPU dans leur version de base.</p>
 <div class="cards">
 <a class="card" href="projects/homelab-slurm/index.html">
@@ -379,17 +367,19 @@ Le projet de synthèse : un document de conception complet, un modèle de capaci
 </p>
 <p></a></p>
 </div>
-<h2 id="masters">Enquête sur les masters HPC</h2>
+<h2 id="marche">5. Ce que demande le marché</h2>
+<p>Une analyse sourcée d'offres d'emploi d'infrastructure de calcul publiées aux États-Unis, en Europe et en Chine, dans les laboratoires d'IA, les grands groupes, les clouds GPU et les centres HPC : les compétences demandées, ce qui change d'une région à l'autre, et ce que le parcours couvre. <a href="market/index.html">Lire l'analyse</a>.</p>
+<h2 id="masters">6. Enquête sur les masters HPC</h2>
 <p>Une analyse sourcée des masters orientés calcul haute performance en France, aux États-Unis, en Chine et dans le reste du monde, croisée avec les offres d'emploi de compute infrastructure : ce que les masters enseignent, ce qu'ils n'enseignent presque pas, et ce que ce parcours ajoute. <a href="masters/index.html">Lire l'enquête</a>.</p>
-<h2 id="usage">Comment utiliser ce site</h2>
+<h2 id="usage">7. Comment utiliser ce site</h2>
 <ol type="1">
-<li>Lisez le <a href="profile/index.html">point de départ</a> : il compare un profil de référence au métier visé et dit quels modules survoler et lesquels travailler à fond.</li>
+<li>Lisez le <a href="profile/index.html">point de départ</a> : il décrit le métier et cinq profils d'entrée, et propose une grille d'autodiagnostic pour choisir quels modules travailler à fond et lesquels survoler.</li>
 <li>Préparez votre <a href="lab-setup/index.html">environnement de travail</a> si la page est publiée : un portable CPU suffit pour la base.</li>
 <li>Suivez les phases dans l'ordre. Dans chaque module, faites les trois questions de positionnement avant de lire.</li>
 <li>Faites les labs et lancez leur <code>verify.sh</code> : un lab compte quand sa vérification passe.</li>
 <li>Terminez chaque phase par son jalon (voir la feuille de route), puis par le projet associé.</li>
 </ol>
-<h2 id="sources">Sources et portée</h2>
+<h2 id="sources">8. Sources et portée</h2>
 <p>Ce site est un ensemble de notes d'étude indépendantes, rédigées à partir de documentations officielles, d'articles publiés et de fiches de formation publiques. Il n'est affilié à aucun établissement, éditeur ou employeur et ne remplace ni un diplôme ni une certification. Les contrats de contenu et les contrôles qui encadrent chaque page sont dans le dossier <code>specs/</code> et <code>tools/</code> du dépôt.</p>
 </main>
 </div>

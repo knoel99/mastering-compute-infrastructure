@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,97 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 05 · Phase 2 · 32 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés sur un vrai Slurm 23.11</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Architecture et vie d'un job</a>
+<ul>
+<li><a href="#les-démons">1.1. Les démons</a></li>
+<li><a href="#les-entités">1.2. Les entités</a></li>
+<li><a href="#le-cycle-de-vie-dun-job">1.3. Le cycle de vie d'un job</a></li>
+</ul></li>
+<li><a href="#ch2">2. Soumettre des jobs</a>
+<ul>
+<li><a href="#les-trois-commandes">2.1. Les trois commandes</a></li>
+<li><a href="#demander-des-ressources">2.2. Demander des ressources</a></li>
+<li><a href="#tableaux-et-dépendances">2.3. Tableaux et dépendances</a></li>
+<li><a href="#écrire-un-script-qui-survit-à-slurm">2.4. Écrire un script qui survit à Slurm</a></li>
+</ul></li>
+<li><a href="#ch3">3. Partitions, comptes, QOS et priorité</a>
+<ul>
+<li><a href="#partitions">3.1. Partitions</a></li>
+<li><a href="#associations-lorganigramme-dans-la-base">3.2. Associations : l'organigramme dans la base</a></li>
+<li><a href="#qos-un-jeu-de-règles-nommé">3.3. QOS : un jeu de règles nommé</a></li>
+<li><a href="#la-priorité-multifactorielle">3.4. La priorité multifactorielle</a></li>
+<li><a href="#léquité-fair-tree">3.5. L'équité : Fair Tree</a></li>
+<li><a href="#le-backfill">3.6. Le backfill</a></li>
+</ul></li>
+<li><a href="#ch4">4. Préemption, réservations et limites</a>
+<ul>
+<li><a href="#la-préemption-par-qos">4.1. La préemption par QOS</a></li>
+<li><a href="#les-réservations">4.2. Les réservations</a></li>
+<li><a href="#les-limites">4.3. Les limites</a></li>
+<li><a href="#gros-jobs-et-fragmentation">4.4. Gros jobs et fragmentation</a></li>
+<li><a href="#une-politique-pour-trois-équipes">4.5. Une politique pour trois équipes</a></li>
+</ul></li>
+<li><a href="#ch5">5. GPU et topologie</a>
+<ul>
+<li><a href="#déclarer-les-gpu-à-slurm">5.1. Déclarer les GPU à Slurm</a></li>
+<li><a href="#demander-des-gpu-et-les-lier-correctement">5.2. Demander des GPU et les lier correctement</a></li>
+<li><a href="#partager-un-gpu">5.3. Partager un GPU</a></li>
+<li><a href="#topologie-du-réseau">5.4. Topologie du réseau</a></li>
+</ul></li>
+<li><a href="#ch6">6. Comptabilité et reporting</a>
+<ul>
+<li><a href="#ce-que-la-comptabilité-enregistre">6.1. Ce que la comptabilité enregistre</a></li>
+<li><a href="#sreport-et-ses-agrégats">6.2. sreport et ses agrégats</a></li>
+<li><a href="#les-trois-indicateurs-à-suivre">6.3. Les trois indicateurs à suivre</a></li>
+<li><a href="#du-rapport-au-pilotage">6.4. Du rapport au pilotage</a></li>
+</ul></li>
+<li><a href="#ch7">7. Santé des nœuds</a>
+<ul>
+<li><a href="#les-états-dun-nœud">7.1. Les états d'un nœud</a></li>
+<li><a href="#le-contrôle-de-santé-périodique">7.2. Le contrôle de santé périodique</a></li>
+<li><a href="#prolog-et-epilog">7.3. Prolog et epilog</a></li>
+<li><a href="#remettre-un-nœud-en-service">7.4. Remettre un nœud en service</a></li>
+</ul></li>
+<li><a href="#ch8">8. Conteneurs, environnements et Slurm sur Kubernetes</a>
+<ul>
+<li><a href="#environnements-logiciels">8.1. Environnements logiciels</a></li>
+<li><a href="#conteneurs-sous-slurm">8.2. Conteneurs sous Slurm</a></li>
+<li><a href="#slurm-sur-kubernetes">8.3. Slurm sur Kubernetes</a></li>
+<li><a href="#slurm-kubernetes-ou-les-deux">8.4. Slurm, Kubernetes ou les deux ?</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-5-1">Lab 5.1 — Un Slurm réel dans le bac à sable</a></li>
+<li><a href="#lab-5-2">Lab 5.2 — Fairshare, QOS et préemption</a></li>
+<li><a href="#lab-5-3">Lab 5.3 — Drain, prolog et vérification de santé</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> comment partager équitablement et efficacement quelques centaines de GPU entre des équipes qui ne s'entendent pas toujours, sans qu'un job oublié ne bloque un entraînement de deux semaines ? Slurm est la réponse la plus répandue dans les centres de calcul et chez de nombreux fournisseurs de GPU.</p>
 <p>Ce module vous apprend à <strong>lire</strong> un cluster Slurm (états, raisons d'attente, comptabilité), à <strong>écrire</strong> des jobs corrects, à <strong>configurer</strong> une politique (partitions, équité, préemption) et à <strong>exploiter</strong> les nœuds (GPU, santé, conteneurs). Tout est vérifié sur un vrai Slurm 23.11 lancé dans un bac à sable, pas sur des exemples écrits de mémoire.</p>
@@ -85,8 +176,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : aucune expérience de Slurm dans le profil, écart de 3 sur 4</td>
+<td>Pour qui</td>
+<td>Cœur pour tous, sauf si vous administrez déjà Slurm en production : survolez alors les premiers chapitres et faites les labs de politique d'équité et de santé des nœuds.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -112,6 +203,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Mesurer l'utilisation d'un cluster avec <code>sacct</code> et <code>sreport</code> (chapitre 6), et lire l'équité avec <code>sshare</code> (chapitre 3).</li>
 <li>Diagnostiquer et mettre en quarantaine un nœud défaillant, automatiquement (chapitre 7).</li>
 <li>Situer Slurm face aux conteneurs et à Kubernetes (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 2 — Exploiter un cluster</strong> (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.</li>
+<li><strong>S'appuie sur</strong> : <a href="../linux-systems/index.html">module 1 — Linux, systèmes et diagnostic de performance</a>.</li>
+<li><strong>Prépare</strong> : <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../observability/index.html">module 14 — Observabilité et fiabilité d'une flotte GPU</a>, <a href="../platform-leadership/index.html">module 16 — Plateforme interne, sécurité, production et leadership</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/homelab-slurm/index.html">Projet 1 — Mini-cluster Slurm instrumenté</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et détection de pannes silencieuses</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Douze séances, soit 32 h : huit de 3 h et quatre de 2 h. Le niveau ne diminue jamais d'une séance à la suivante.</p>
@@ -221,7 +320,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>survol guidé</td>
+<td>les questions de positionnement, les chapitres signalés ci-dessous, un lab et le checkpoint</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> La politique d'équité, la préemption et la santé des nœuds sont ce que les offres d'exploitation demandent au-delà de l'usage de sbatch.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module 6.</p>
 <ol type="1">
 <li><p><strong>Trois commandes.</strong> Quelle différence entre <code>sbatch</code>, <code>srun</code> et <code>salloc</code> ?</p></li>
@@ -925,8 +1073,8 @@ Prolog error | vm</code></pre>
 <h2 id="labs">Labs</h2>
 <p>Les trois labs s'exécutent sur un <strong>vrai Slurm 23.11</strong> (paquets Ubuntu 24.04) dans une machine ou un conteneur Linux <strong>jetable</strong> avec accès root : les scripts écrivent dans <code>/etc/slurm</code> et démarrent des démons en <code>root</code>. Aucun GPU n'est requis. Installation préalable :</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> DEBIAN_FRONTEND=noninteractive apt-get install <span class="at">-y</span> munge slurm-wlm slurmdbd mariadb-server</span></code></pre></div>
+<h3 id="lab-5-1">Lab 5.1 — Un Slurm réel dans le bac à sable</h3>
 <div class="lab">
-<p><span class="tag">Lab 5.1 — Un Slurm réel dans le bac à sable</span></p>
 <p><strong>Objectif.</strong> Démarrer un Slurm mono-nœud avec comptabilité, soumettre un tableau et une dépendance, puis faire sauvegarder et reprendre un entraîneur sur signal. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Une VM ou un conteneur Linux jetable, 2 processeurs et 4 Go de mémoire au minimum, accès root.</p>
 <ol type="1">
 <li>Lisez <code>labs/slurm/slurm-sandbox/setup.sh</code> : repérez la clé <code>munge</code>, la base MariaDB, <code>slurmdbd.conf</code>, <code>slurm.conf</code> et la création du compte <code>research</code>.</li>
@@ -938,8 +1086,8 @@ Prolog error | vm</code></pre>
 <p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « OK part A », la ligne <code>start at step N</code> de la reprise (où <code>N</code> est l'étape sauvegardée), « OK failure propagation » puis « OK slurm-sandbox: parts A and B ». Temps d'exécution : de 40 à 50 secondes mesurées.</p>
 <p><strong>Pour aller plus loin.</strong> Supprimez l'association de <code>root</code> (<code>sacctmgr -i remove user root</code>) et constatez le refus de <code>sbatch</code> du chapitre 1, puis essayez <code>AccountingStorageType=accounting_storage/none</code> sans <code>AccountingStorageEnforce</code> pour voir un job s'exécuter sans comptabilité. Ajouter un deuxième nœud simulé (plusieurs <code>slurmd</code> sur une machine) n'a pas été essayé ici.</p>
 </div>
+<h3 id="lab-5-2">Lab 5.2 — Fairshare, QOS et préemption</h3>
 <div class="lab">
-<p><span class="tag">Lab 5.2 — Fairshare, QOS et préemption</span></p>
 <p><strong>Objectif.</strong> Constater qu'un compte peu actif passe devant un compte gros consommateur, et qu'une QOS urgente préempte une QOS normale. <strong>Durée.</strong> 4 h. <strong>Prérequis matériels.</strong> Ceux du lab 5.1.</p>
 <ol type="1">
 <li>Lisez <code>labs/slurm/fairshare-qos/configure.sh</code> : <code>PriorityCalcPeriod=1</code>, <code>PreemptType=preempt/qos</code>, <code>PreemptMode=REQUEUE</code>, comptes, QOS <code>urgent</code>.</li>
@@ -951,8 +1099,8 @@ Prolog error | vm</code></pre>
 <p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « OK part A » et « OK part B ». Comptez un peu plus de deux minutes (123 s mesurées) : le facteur d'équité n'est recalculé qu'à chaque <code>PriorityCalcPeriod</code>, réglé ici à une minute.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez un <code>GraceTime</code> à la QOS <code>normal</code> et vérifiez que le job reçoit un signal avant d'être préempté.</p>
 </div>
+<h3 id="lab-5-3">Lab 5.3 — Drain, prolog et vérification de santé</h3>
 <div class="lab">
-<p><span class="tag">Lab 5.3 — Drain, prolog et vérification de santé</span></p>
 <p><strong>Objectif.</strong> Automatiser la mise en quarantaine d'un nœud défaillant et observer le comportement d'un prolog qui échoue. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Ceux du lab 5.1.</p>
 <ol type="1">
 <li>Lisez <code>labs/slurm/node-health/node_check.sh</code> : repérez les trois contrôles, le préfixe <code>health:</code> et la règle de remise en service.</li>
@@ -1083,10 +1231,14 @@ Prolog error | vm</code></pre>
 <li>Grattafiori et al. (Meta). <a href="https://arxiv.org/abs/2407.21783"><em>The Llama 3 Herd of Models</em></a>, section 3.3.4 : interruptions et automatisation à 16 000 GPU (chapitre 7).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, <code>sbatch</code>, <code>sinfo</code>, <code>squeue</code>) ont été relus sur les pages officielles de SchedMD, qui affichent la documentation de la version 26.05, lors de la relecture du 25 octobre 2026. Les faits sur Pyxis, NHC et Slinky ont été relus sur leurs pages. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent, parfois abrégées ; les numéros de job, les durées et les décomptes de CPU-secondes varient d'une exécution à l'autre.</p>
-<p><strong>Recommandé.</strong> L'ordre des chapitres, la règle « peu de partitions, plusieurs QOS », le seuil de trois drains en sept jours, la marge de 20 à 30 % sur les durées et le tableau comparatif Slurm, Kubernetes et hybride sont des choix de ce parcours, pas des règles de Slurm.</p>
-<p><strong>À vérifier.</strong> La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (<code>topology/block</code>) et la préemption ; lisez la documentation de votre version. La raison d'attente <code>InvalidAccount</code> n'a pas été reproduite sur ce bac à sable (voir le chapitre 1), et le refus d'une réservation avant ses jobs trop longs (chapitre 4) n'a pas été relu sur la page « Reservations ». Les extraits de <code>slurm.conf</code>, <code>gres.conf</code> et les scripts GPU des chapitres 2 et 5 n'ont <strong>pas</strong> été exécutés (ils demandent des GPU) ; les scripts ont seulement passé <code>shellcheck</code>.</p>
-<p><strong>Hors périmètre.</strong> L'installation d'un cluster multi-nœuds réel et du réseau d'interconnexion (modules 6 et 7), Slurm en mode cloud avec nœuds éphémères, l'API REST <code>slurmrestd</code>, les accélérateurs non NVIDIA, et l'administration de la base de comptabilité en production (sauvegardes, purge).</p>
+<h3 id="documente">Documenté</h3>
+<p>Les formules, paramètres, options et comportements attribués à la documentation de Slurm (priorité multifactorielle, Fair Tree, backfill, préemption, réservations, limites, GRES, cgroup, topologie, prologues, <code>sbatch</code>, <code>sinfo</code>, <code>squeue</code>) ont été relus sur les pages officielles de SchedMD, qui affichent la documentation de la version 26.05, lors de la relecture du 25 octobre 2026. Les faits sur Pyxis, NHC et Slinky ont été relus sur leurs pages. Tous les comportements décrits comme « observés » ont été reproduits sur Slurm 23.11.4 dans le bac à sable ; les sorties citées en viennent, parfois abrégées ; les numéros de job, les durées et les décomptes de CPU-secondes varient d'une exécution à l'autre.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>L'ordre des chapitres, la règle « peu de partitions, plusieurs QOS », le seuil de trois drains en sept jours, la marge de 20 à 30 % sur les durées et le tableau comparatif Slurm, Kubernetes et hybride sont des choix de ce parcours, pas des règles de Slurm.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<p>La version testée est la 23.11.4 des paquets Ubuntu 24.04 : le comportement et les noms de paramètres évoluent, notamment pour les topologies (<code>topology/block</code>) et la préemption ; lisez la documentation de votre version. La raison d'attente <code>InvalidAccount</code> n'a pas été reproduite sur ce bac à sable (voir le chapitre 1), et le refus d'une réservation avant ses jobs trop longs (chapitre 4) n'a pas été relu sur la page « Reservations ». Les extraits de <code>slurm.conf</code>, <code>gres.conf</code> et les scripts GPU des chapitres 2 et 5 n'ont <strong>pas</strong> été exécutés (ils demandent des GPU) ; les scripts ont seulement passé <code>shellcheck</code>.</p>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>L'installation d'un cluster multi-nœuds réel et du réseau d'interconnexion (modules 6 et 7), Slurm en mode cloud avec nœuds éphémères, l'API REST <code>slurmrestd</code>, les accélérateurs non NVIDIA, et l'administration de la base de comptabilité en production (sauvegardes, purge).</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/gpu-programming/index.html"><span class="k">← Précédent</span>Module 04 — Programmation GPU : CUDA, Triton et profilage</a><a class="next" href="../../courses/provisioning/index.html"><span class="k">Suivant →</span>Module 06 — Provisioning, images et santé des nœuds GPU</a></nav>
 </main>

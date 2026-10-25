@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>Point de départ : un profil de référence face au métier — Mastering Compute Infrastructure</title>
-<meta name="description" content="Comparaison d'un profil de référence (CAREER.md) au métier de compute infrastructure engineer, domaine par domaine, avec le parcours ajusté qui en découle.">
+<title>Point de départ : profils d'entrée et autodiagnostic — Mastering Compute Infrastructure</title>
+<meta name="description" content="Ce que fait un ingénieur d'infrastructure de calcul, les profils d'entrée les plus fréquents, leurs atouts et leurs écarts, et une grille d'autodiagnostic pour choisir quoi travailler à fond.">
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 
@@ -26,27 +26,258 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
 <main class="paper" id="main">
 <p class="crumb"><a href="../index.html">Accueil</a></p>
 <header id="title-block-header">
-<h1 class="title">Point de départ : un profil de référence face au métier</h1>
-<p class="subtitle">Écart par domaine, priorités de travail et lecture honnête des limites d'un parcours</p>
+<h1 class="title">Point de départ : profils d'entrée et autodiagnostic</h1>
+<p class="subtitle">Le métier visé, cinq profils d'entrée typiques, une grille pour situer votre niveau et le parcours qui en découle</p>
 </header>
-<h2 id="objet">Ce que fait cette page</h2>
-<p>Cette page part d'un document réel : le <code>CAREER.md</code> du dépôt <a href="https://github.com/knoel99/Certifications">Certifications</a>, un résumé de carrière structuré pour être lu par des humains et par des assistants. Elle le compare à ce que demande le métier de <em>compute infrastructure engineer</em> et en déduit <strong>où travailler à fond, où survoler</strong>.</p>
-<p>Le profil de référence est celui d'un ingénieur IA et LLM de douze ans d'expérience, venu des géosciences et de la simulation numérique, devenu consultant en données massives puis en IA générative. Les noms de clients n'apparaissent pas ici ; seules les compétences comptent.</p>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#objet">1. Ce que fait cette page</a></li>
+<li><a href="#metier">2. Le métier visé</a>
+<ul>
+<li><a href="#role">2.1. Ce que fait un ingénieur d'infrastructure de calcul</a></li>
+<li><a href="#familles">2.2. Les familles de postes</a></li>
+<li><a href="#regions">2.3. Ce qui change d'une région à l'autre</a></li>
+</ul></li>
+<li><a href="#profils">3. Cinq profils d'entrée</a>
+<ul>
+<li><a href="#p-plateforme">3.1. Ingénieur plateforme, SRE ou DevOps</a></li>
+<li><a href="#p-hpc">3.2. Administrateur ou ingénieur HPC</a></li>
+<li><a href="#p-ml">3.3. Ingénieur ML ou chercheur</a></li>
+<li><a href="#p-logiciel">3.4. Développeur logiciel ou systèmes</a></li>
+<li><a href="#p-etudiant">3.5. Étudiant ou personne en reconversion</a></li>
+</ul></li>
+<li><a href="#priorites">4. Priorités par module</a></li>
+<li><a href="#diagnostic">5. Autodiagnostic</a>
+<ul>
+<li><a href="#echelle">5.1. Échelle</a></li>
+<li><a href="#grille">5.2. Grille par domaine</a></li>
+<li><a href="#lecture">5.3. Lire le résultat</a></li>
+</ul></li>
+<li><a href="#limites">6. Ce qu'un parcours peut changer, et ce qu'il ne peut pas changer</a></li>
+<li><a href="#usage">7. Comment utiliser ce diagnostic</a></li>
+<li><a href="#sources">8. Sources et portée</a>
+<ul>
+<li><a href="#documente">8.1. Documenté</a></li>
+<li><a href="#recommande">8.2. Recommandé</a></li>
+<li><a href="#hors-perimetre">8.3. Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="objet">1. Ce que fait cette page</h2>
+<p>Ce parcours s'adresse à toute personne qui veut devenir <em>compute infrastructure engineer</em>, quel que soit son point de départ. Cette page décrit le métier, puis cinq profils d'entrée typiques, avec leurs atouts et leurs écarts. Elle vous donne enfin une grille pour situer votre propre niveau et choisir <strong>quoi travailler à fond et quoi survoler</strong>.</p>
+<p>Le niveau visé ne vient pas d'une impression : il s'appuie sur l'<a href="../market/index.html">analyse des offres d'emploi</a>, qui porte sur des postes publiés aux États-Unis, en Europe et en Chine.</p>
 <div class="note">
-<p><span class="tag">Une estimation, pas un verdict</span> Les niveaux ci-dessous sont déduits d'un document écrit. Une compétence absente du document peut exister ; une compétence présente peut être superficielle. Les questions de positionnement de chaque module servent à corriger cette estimation : faites-les honnêtement avant de décider de survoler un module.</p>
+<p><span class="tag">Une estimation, pas un verdict</span> Un profil d'entrée est une moyenne : le vôtre mélange souvent deux colonnes. Les questions de positionnement de chaque module (section 0.1) servent à corriger l'estimation. Faites-les honnêtement avant de décider de survoler un module.</p>
 </div>
-<h2 id="metier">Le métier visé en une page</h2>
-<p>Un <em>compute infrastructure engineer</em> possède la plateforme de calcul d'une organisation qui entraîne des modèles : il provisionne la capacité GPU, ordonnance les jobs, relie les machines, nourrit les GPU en données, garde les entraînements en vie malgré les pannes, observe, facture, et négocie avec les fournisseurs. La version « lead » ajoute la responsabilité d'une équipe et des relations avec les fournisseurs.</p>
-<p>Le métier se distingue de deux voisins. L'<strong>ingénieur d'entraînement à grande échelle</strong> travaille <em>dans</em> le job : parallélisme, MFU, numérique. L'<strong>ingénieur plateforme classique</strong> exploite des services, rarement des machines dont la performance dépend du réseau et de la mémoire. L'ingénieur de calcul fait le pont : il doit comprendre assez le job pour diagnostiquer, et assez la machine pour la faire tenir.</p>
-<p>Les deux premiers modules (performance, systèmes) donnent le langage commun ; les phases suivantes construisent chacune une couche.</p>
-<h2 id="echelle">Échelle d'évaluation</h2>
+<h2 id="metier">2. Le métier visé</h2>
+<h3 id="role">2.1. Ce que fait un ingénieur d'infrastructure de calcul</h3>
+<p>Un <em>compute infrastructure engineer</em> possède la plateforme de calcul d'une organisation qui entraîne des modèles ou qui exploite un supercalculateur. Il provisionne la capacité GPU, ordonnance les jobs, relie les machines, nourrit les GPU en données et garde les entraînements en vie malgré les pannes. Il observe aussi la flotte, en suit le coût et négocie avec les fournisseurs.</p>
+<p>Le métier se distingue de deux voisins. L'<strong>ingénieur d'entraînement à grande échelle</strong> travaille <em>dans</em> le job : parallélisme, MFU, numérique. L'<strong>ingénieur plateforme classique</strong> exploite des services, rarement des machines dont la performance dépend du réseau et de la mémoire. L'ingénieur de calcul fait le pont : il comprend assez le job pour le diagnostiquer, et assez la machine pour la faire tenir.</p>
+<h3 id="familles">2.2. Les familles de postes</h3>
+<p>Les offres se rangent en quelques familles, que l'<a href="../market/index.html#echantillon">analyse du marché</a> compte région par région.</p>
+<ul>
+<li><strong>Clusters GPU et flotte</strong> : provisionner, valider, réparer et retirer des milliers de nœuds ; santé matérielle, automatisation, astreinte.</li>
+<li><strong>Plateforme d'entraînement</strong> : ordonnanceur, files d'attente, reprise des jobs, outillage des chercheurs.</li>
+<li><strong>Exploitation HPC</strong> : centres de calcul nationaux et industriels, Slurm ou PBS, stockage parallèle, InfiniBand, sécurité.</li>
+<li><strong>Performance des systèmes ML</strong> : profilage, collectives, MFU, accélérateurs de plusieurs fabricants.</li>
+<li><strong>Réseau et stockage pour l'IA</strong> : fabrics RoCE et InfiniBand, systèmes de fichiers parallèles, stockage objet.</li>
+<li><strong>Capacité, coûts et direction d'équipe</strong> : prévision de la demande, contrats, fournisseurs, organisation.</li>
+</ul>
+<h3 id="regions">2.3. Ce qui change d'une région à l'autre</h3>
+<p>Les compétences de fond sont les mêmes partout, mais leur poids varie. L'<a href="../market/index.html#regions">analyse du marché</a> le détaille ; retenez-en trois tendances pour orienter votre travail.</p>
+<ul>
+<li><strong>États-Unis</strong> : flottes géantes, santé matérielle et automatisation de la réparation, réseaux RoCE à grande échelle, accélérateurs de plusieurs fabricants.</li>
+<li><strong>Europe</strong> : centres HPC et clouds souverains, Linux et exploitation bare-metal, conformité et sécurité, virtualisation.</li>
+<li><strong>Chine</strong> : savoir-faire d'entraînement de grands modèles demandé jusque dans les postes d'exploitation, collectives et RDMA, accélérateurs chinois (Ascend, GPU nationaux), ordonnancement sur Kubernetes plutôt que Slurm.</li>
+</ul>
+<h2 id="profils">3. Cinq profils d'entrée</h2>
+<p>Chaque profil a des appuis qui raccourcissent certains modules et des écarts qui en allongent d'autres. Le tableau de la section <a href="#priorites">« Priorités par module »</a> les résume.</p>
+<h3 id="p-plateforme">3.1. Ingénieur plateforme, SRE ou DevOps</h3>
+<p><strong>Appuis.</strong> Kubernetes en production, cloud, infrastructure as code, observabilité et astreinte : c'est la moitié du métier pour les clouds GPU et les laboratoires d'IA.</p>
+<p><strong>Écarts typiques.</strong> Ordonnanceurs HPC, réseau d'interconnexion et NCCL, entraînement distribué, pannes propres aux GPU, achats de capacité. Les services que vous exploitez tombent rarement à cause de la mémoire ou du réseau ; un entraînement, presque toujours.</p>
+<p><strong>Conseil.</strong> Travaillez à fond les modules 2 à 5, 7 à 9 et 11. Pour les modules 12, 14 et 16, suivez la section « Comment travailler ce module » : elle dit quels chapitres restent nouveaux pour vous.</p>
+<h3 id="p-hpc">3.2. Administrateur ou ingénieur HPC</h3>
+<p><strong>Appuis.</strong> Linux, Slurm ou PBS, stockage parallèle, InfiniBand, MPI : le cœur de l'exploitation d'un supercalculateur.</p>
+<p><strong>Écarts typiques.</strong> Kubernetes et cloud, entraînement distribué et NCCL, multi-fournisseurs, coûts. Les offres des laboratoires d'IA et des clouds GPU demandent Kubernetes plus souvent que Slurm.</p>
+<p><strong>Conseil.</strong> Survolez les modules 1, 3, 5 et 6 avec leurs questions de positionnement. Gardez votre effort pour les modules 9 à 13 et 15, et pour le projet 4.</p>
+<h3 id="p-ml">3.3. Ingénieur ML ou chercheur</h3>
+<p><strong>Appuis.</strong> PyTorch, entraînement, usage des GPU côté utilisateur, suivi d'expériences : vous connaissez la charge que la plateforme doit servir.</p>
+<p><strong>Écarts typiques.</strong> Exploitation de machines, réseau, stockage, ordonnancement, fiabilité de production, coûts. L'infrastructure vous est apparue comme une boîte noire qui marche ou ne marche pas.</p>
+<p><strong>Conseil.</strong> Le module 9 vous sera familier : parcours normal, en gardant ses chapitres de diagnostic et de mémoire. Travaillez à fond les modules 6 et 7 (machines et réseau), puis 10 et 12 à 16 (production).</p>
+<h3 id="p-logiciel">3.4. Développeur logiciel ou systèmes</h3>
+<p><strong>Appuis.</strong> C++, Go ou Rust, systèmes distribués, tests et intégration continue : les clouds GPU recrutent beaucoup d'ingénieurs « logiciel d'abord » pour automatiser leur flotte.</p>
+<p><strong>Écarts typiques.</strong> Matériel GPU, réseau haute performance, ordonnanceurs, entraînement, exploitation en astreinte.</p>
+<p><strong>Conseil.</strong> Suivez le parcours dans l'ordre. Vos appuis rendent les projets plus rapides : visez des extensions qui produisent du code réutilisable (exportateur, contrôleur, simulateur).</p>
+<h3 id="p-etudiant">3.5. Étudiant ou personne en reconversion</h3>
+<p><strong>Appuis.</strong> Bases de Linux, de Python et d'algorithmique ; parfois un master en informatique ou en calcul scientifique.</p>
+<p><strong>Écarts typiques.</strong> Presque tout le métier, et surtout l'expérience de production, que les offres comptent en années.</p>
+<p><strong>Conseil.</strong> Suivez le parcours complet dans l'ordre, sans survol. Cherchez tôt une exposition à de vraies machines : stage dans un centre de calcul, compétition de clusters étudiants, projet de recherche. L'<a href="../masters/index.html">enquête sur les masters</a> recense ces voies.</p>
+<h2 id="priorites">4. Priorités par module</h2>
+<p>Le tableau croise les cinq profils et les seize modules. <strong>A</strong> : à fond, tous les chapitres, tous les labs, les exercices ★★★. <strong>B</strong> : parcours normal. <strong>C</strong> : survol guidé par les questions de positionnement et les chapitres signalés dans la section « Comment travailler ce module » du module.</p>
+<!-- gen:priorities -->
+<div class="tbl-wrap">
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Module</th>
+<th>Ingénieur plateforme, SRE ou DevOps</th>
+<th>Administrateur ou ingénieur HPC</th>
+<th>Ingénieur ML ou chercheur</th>
+<th>Développeur logiciel ou systèmes</th>
+<th>Étudiant ou personne en reconversion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../courses/linux-systems/index.html">1. Linux, systèmes et diagnostic de performance</a></td>
+<td>B</td>
+<td>C</td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/perf-models/index.html">2. Architecture matérielle et modèles de performance</a></td>
+<td>A</td>
+<td>B</td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/parallel-programming/index.html">3. Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a></td>
+<td>A</td>
+<td>C</td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/gpu-programming/index.html">4. Programmation GPU : CUDA, Triton et profilage</a></td>
+<td>A</td>
+<td>B</td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/slurm/index.html">5. Slurm et exploitation d'un cluster HPC</a></td>
+<td>A</td>
+<td>C</td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/provisioning/index.html">6. Provisioning, images et santé des nœuds GPU</a></td>
+<td>B</td>
+<td>C</td>
+<td>A</td>
+<td>A</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/networking/index.html">7. Réseaux haute performance : InfiniBand, RoCE et NCCL</a></td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/storage/index.html">8. Stockage et E/S pour l'entraînement</a></td>
+<td>A</td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/distributed-training/index.html">9. Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a></td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/fault-tolerance/index.html">10. Pannes, checkpointing et reprise automatique</a></td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/ray-rl-infra/index.html">11. Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a></td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/kubernetes-gpu/index.html">12. Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a></td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/multi-cloud/index.html">13. Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a></td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/observability/index.html">14. Observabilité et fiabilité d'une flotte GPU</a></td>
+<td>C</td>
+<td>B</td>
+<td>A</td>
+<td>B</td>
+<td>A</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/finops-capacity/index.html">15. FinOps, capacité, énergie et achats de calcul</a></td>
+<td>B</td>
+<td>A</td>
+<td>A</td>
+<td>A</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/platform-leadership/index.html">16. Plateforme interne, sécurité, production et leadership</a></td>
+<td>B</td>
+<td>B</td>
+<td>A</td>
+<td>B</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- /gen:priorities -->
+<h2 id="diagnostic">5. Autodiagnostic</h2>
+<h3 id="echelle">5.1. Échelle</h3>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -62,7 +293,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>Aucune trace dans le profil</td>
+<td>Aucune pratique</td>
 </tr>
 <tr class="even">
 <td>1</td>
@@ -83,24 +314,22 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="ecart">L'écart, domaine par domaine</h2>
-<p>Le niveau visé est celui que décrit une offre de <em>lead</em> en infrastructure de calcul pour l'entraînement (relevé d'octobre 2026, voir <a href="#offres">Ce que demandent les offres</a>). Il est de 3 presque partout, car un lead doit pouvoir opérer lui-même ce qu'il dirige.</p>
+<h3 id="grille">5.2. Grille par domaine</h3>
+<p>Le niveau visé est celui d'un ingénieur confirmé d'infrastructure de calcul. Il vaut 3 sur les domaines que la plupart des offres exigent, et 2 sur ceux où une bonne culture suffit souvent. Recopiez la grille, remplissez la colonne « Votre niveau », puis calculez l'écart.</p>
 <div class="tbl-wrap">
-<table style="width:100%;">
+<table>
 <colgroup>
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Domaine</th>
-<th>Ce que le profil documente</th>
-<th>Estimé</th>
 <th>Visé</th>
+<th>Votre niveau</th>
 <th>Écart</th>
 <th>Module</th>
 </tr>
@@ -108,319 +337,160 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Linux et exploitation</td>
-<td>Bash, certificats d'administration système, serveurs GPU gérés en interne, réglage de JVM</td>
-<td>2</td>
 <td>3</td>
-<td>1</td>
+<td></td>
+<td></td>
 <td><a href="../courses/linux-systems/index.html">1</a></td>
 </tr>
 <tr class="even">
 <td>Modèles de performance</td>
-<td>Simulation numérique, benchmark de GPU ; pas de trace de roofline ni de MFU</td>
-<td>1</td>
 <td>3</td>
-<td>2</td>
+<td></td>
+<td></td>
 <td><a href="../courses/perf-models/index.html">2</a></td>
 </tr>
 <tr class="odd">
 <td>Programmation parallèle (MPI, OpenMP)</td>
-<td>Aucune trace</td>
-<td>1</td>
 <td>2</td>
-<td>1</td>
-<td>3</td>
+<td></td>
+<td></td>
+<td><a href="../courses/parallel-programming/index.html">3</a></td>
 </tr>
 <tr class="even">
-<td>Programmation GPU</td>
-<td>Utilisation de GPU pour l'inférence ; pas de noyaux</td>
-<td>1</td>
+<td>Programmation et profilage GPU</td>
 <td>2</td>
-<td>1</td>
-<td>4</td>
+<td></td>
+<td></td>
+<td><a href="../courses/gpu-programming/index.html">4</a></td>
 </tr>
 <tr class="odd">
 <td>Ordonnanceurs HPC (Slurm)</td>
-<td>Aucune trace</td>
-<td>0</td>
 <td>3</td>
-<td>3</td>
-<td>5</td>
+<td></td>
+<td></td>
+<td><a href="../courses/slurm/index.html">5</a></td>
 </tr>
 <tr class="even">
 <td>Provisioning et santé des nœuds</td>
-<td>Benchmark GPU (DCGM, gpu-burn), Terraform côté cloud</td>
-<td>2</td>
 <td>3</td>
-<td>1</td>
-<td>6</td>
+<td></td>
+<td></td>
+<td><a href="../courses/provisioning/index.html">6</a></td>
 </tr>
 <tr class="odd">
 <td>Réseaux haute performance et NCCL</td>
-<td>Aucune trace</td>
-<td>0</td>
 <td>3</td>
-<td>3</td>
-<td>7</td>
+<td></td>
+<td></td>
+<td><a href="../courses/networking/index.html">7</a></td>
 </tr>
 <tr class="even">
 <td>Stockage pour l'entraînement</td>
-<td>HDFS, Cassandra, Elasticsearch (autre contexte)</td>
-<td>1</td>
 <td>3</td>
-<td>2</td>
-<td>8</td>
+<td></td>
+<td></td>
+<td><a href="../courses/storage/index.html">8</a></td>
 </tr>
 <tr class="odd">
 <td>Entraînement distribué</td>
-<td>Cours sur les réseaux de neurones et le matériel d'inférence ; pas de DDP ni FSDP</td>
-<td>1</td>
 <td>3</td>
-<td>2</td>
-<td>9</td>
+<td></td>
+<td></td>
+<td><a href="../courses/distributed-training/index.html">9</a></td>
 </tr>
 <tr class="even">
-<td>Pannes et checkpointing d'entraînement</td>
-<td>Réduction de 94 % des incidents critiques sur une plateforme d'événements ; pas d'entraînement</td>
-<td>1</td>
+<td>Pannes et checkpointing</td>
 <td>3</td>
-<td>2</td>
-<td>10</td>
+<td></td>
+<td></td>
+<td><a href="../courses/fault-tolerance/index.html">10</a></td>
 </tr>
 <tr class="odd">
 <td>Ray et infrastructure d'apprentissage par renforcement</td>
-<td>Aucune trace</td>
-<td>0</td>
 <td>2</td>
-<td>2</td>
-<td>11</td>
+<td></td>
+<td></td>
+<td><a href="../courses/ray-rl-infra/index.html">11</a></td>
 </tr>
 <tr class="even">
-<td>Langages de systèmes (Go, Rust, C++)</td>
-<td>Python, Java, Bash, Fortran ; ni Go, ni Rust, ni C++</td>
-<td>1</td>
-<td>2</td>
-<td>1</td>
-<td>aucun module dédié : C++ et Python dans les modules 3 et 4</td>
-</tr>
-<tr class="odd">
 <td>Kubernetes pour l'IA</td>
-<td>Kubernetes, OpenShift, Helm en production ; inférence GPU ; pas d'ordonnancement d'entraînement</td>
-<td>2</td>
 <td>3</td>
-<td>1</td>
-<td>12</td>
+<td></td>
+<td></td>
+<td><a href="../courses/kubernetes-gpu/index.html">12</a></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Multi-cloud et fournisseurs GPU</td>
-<td>Déploiements sur trois hyperscalers, Terraform ; pas de capacité GPU négociée</td>
-<td>2</td>
 <td>3</td>
-<td>1</td>
-<td>13</td>
+<td></td>
+<td></td>
+<td><a href="../courses/multi-cloud/index.html">13</a></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Observabilité et fiabilité</td>
-<td>Prometheus, Grafana, Loki, SLI/SLO, astreinte, gestion d'incident</td>
 <td>3</td>
-<td>3</td>
-<td>0</td>
-<td>14</td>
+<td></td>
+<td></td>
+<td><a href="../courses/observability/index.html">14</a></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>FinOps, capacité, achats</td>
-<td>Certification FinOps pour l'IA, suivi de coûts GPU et de jetons ; pas d'achat de capacité</td>
-<td>2</td>
 <td>3</td>
-<td>1</td>
-<td>15</td>
+<td></td>
+<td></td>
+<td><a href="../courses/finops-capacity/index.html">15</a></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Plateforme, sécurité, leadership</td>
-<td>Rôles de lead, atelier avec les métiers, sécurité (Zero Trust, Kerberos), prise de parole</td>
 <td>3</td>
-<td>3</td>
-<td>0</td>
-<td>16</td>
-</tr>
-</tbody>
-</table>
-</div>
-<h2 id="offres">Ce que demandent les offres</h2>
-<p>Pour fonder le niveau visé sur autre chose qu'une impression, douze offres publiques de postes d'infrastructure de calcul ont été lues en octobre 2026 : six chez des fournisseurs de GPU, trois dans des laboratoires d'IA, une dans un centre de calcul et deux d'une même start-up. Chaque compétence relevée est appuyée par une citation vérifiée dans le texte de l'offre. L'échantillon est petit : lisez les nombres comme des ordres de grandeur.</p>
-<div class="tbl-wrap">
-<table>
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Compétence</th>
-<th>Offres qui la citent (sur 12)</th>
-<th>Dont exigées</th>
-<th>Niveau estimé du profil</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Kubernetes</td>
-<td>10</td>
-<td>8</td>
-<td>2 à 3 : un atout</td>
-</tr>
-<tr class="even">
-<td>Python</td>
-<td>9</td>
-<td>9</td>
-<td>3 : un atout</td>
+<td></td>
+<td></td>
+<td><a href="../courses/platform-leadership/index.html">16</a></td>
 </tr>
 <tr class="odd">
-<td>Astreinte et fiabilité (SRE)</td>
-<td>9</td>
-<td>9</td>
-<td>3 : un atout</td>
-</tr>
-<tr class="even">
 <td>Langages de systèmes (Go, Rust, C++)</td>
-<td>8</td>
-<td>7</td>
-<td>1 : un écart</td>
-</tr>
-<tr class="odd">
-<td>Expérience HPC</td>
-<td>8</td>
-<td>6</td>
-<td>1 : un écart</td>
-</tr>
-<tr class="even">
-<td>Administration Linux</td>
-<td>7</td>
-<td>7</td>
 <td>2</td>
-</tr>
-<tr class="odd">
-<td>InfiniBand et RoCE</td>
-<td>7</td>
-<td>4</td>
-<td>0 : un écart</td>
-</tr>
-<tr class="even">
-<td>Planification de capacité</td>
-<td>6</td>
-<td>6</td>
-<td>2</td>
-</tr>
-<tr class="odd">
-<td>Slurm</td>
-<td>5</td>
-<td>2</td>
-<td>0 : un écart</td>
-</tr>
-<tr class="even">
-<td>Prometheus et Grafana</td>
-<td>5</td>
-<td>4</td>
-<td>3 : un atout</td>
-</tr>
-<tr class="odd">
-<td>Conception d'ordonnanceur</td>
-<td>5</td>
-<td>4</td>
-<td>0 à 1 : un écart</td>
-</tr>
-<tr class="even">
-<td>Provisioning bare-metal</td>
-<td>5</td>
-<td>4</td>
-<td>2</td>
+<td></td>
+<td></td>
+<td>aucun module dédié : C++ et Python dans les modules 3 et 4, Go dans les ressources</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Deux lectures. D'abord, <strong>les compétences les plus citées (Kubernetes, Python, fiabilité) sont celles où le profil est déjà fort</strong> : il est proche des postes de fournisseurs de GPU, où l'infrastructure ressemble à celle du cloud. Ensuite, <strong>les compétences propres au calcul haute performance (HPC, InfiniBand, Slurm, ordonnanceurs) sont celles où le profil est vide</strong>, et ce sont aussi celles que les masters enseignent le moins (voir l'<a href="../masters/index.html">enquête</a>).</p>
-<p>Sept offres indiquent un nombre d'années d'expérience : de 3 à 15 ans, avec une médiane de 8. Aucune de ces années ne se remplace par un parcours d'apprentissage ; elles se remplacent en partie par des preuves publiques (voir plus bas).</p>
-<h2 id="lecture">Ce que cet écart dit</h2>
-<p><strong>Le cœur du parcours est exactement là où le profil est le plus vide.</strong> Les écarts de 2 ou 3 se concentrent sur l'ordonnancement HPC, le réseau d'entraînement, l'entraînement distribué, les pannes d'entraînement, le stockage, les modèles de performance et Ray : c'est le noyau technique qu'aucune expérience de plateforme classique ne remplace.</p>
-<p><strong>Les appuis sont réels.</strong> Kubernetes en production, observabilité, FinOps, certifications cloud, expérience de lead et goût de la communication sont des atouts rares chez les candidats venus du calcul scientifique. Ils réduisent le temps nécessaire sur les modules 12, 14, 15 et 16, mais ne les rendent pas superflus : ils portent surtout sur les services, pas sur les machines.</p>
-<p><strong>Le parcours ajusté.</strong> Priorité A (écart de 2 ou 3, à travailler à fond avec tous les labs) : modules 2, 5, 7, 8, 9, 10 et 11. Priorité B (écart de 1, parcours normal, en s'appuyant sur l'existant) : modules 3, 4, 6, 12, 13 et 15. Priorité C (écart de 0, survol guidé par les questions de positionnement) : modules 14 et 16, hors parties propres au GPU et à la sécurité. Le module 1, déjà proche du profil, se parcourt en survol.</p>
-<h2 id="limites">Ce qu'un parcours peut changer, et ce qu'il ne peut pas changer</h2>
-<p>Les offres de <em>lead</em> en infrastructure de calcul demandent de l'<strong>expérience prouvée</strong> sur l'entraînement à grande échelle, de l'ordre de huit ans dans le domaine. Un parcours d'apprentissage donne des compétences, des projets publics et un vocabulaire ; il ne crée pas des années d'exploitation de clusters en production.</p>
+<h3 id="lecture">5.3. Lire le résultat</h3>
+<ul>
+<li><strong>Écart de 2 ou plus</strong> : travaillez le module à fond, avec tous ses labs. C'est là que le parcours vous apporte le plus.</li>
+<li><strong>Écart de 1</strong> : parcours normal, en vous appuyant sur l'existant ; les exemples chiffrés et les labs comblent l'écart.</li>
+<li><strong>Écart nul</strong> : survol guidé par les questions de positionnement ; gardez le checkpoint de sortie comme preuve.</li>
+</ul>
+<p>Refaites la grille à la fin de chaque phase. L'écart doit diminuer là où vous avez travaillé ; sinon, refaites les labs.</p>
+<h2 id="limites">6. Ce qu'un parcours peut changer, et ce qu'il ne peut pas changer</h2>
+<p>Les offres de niveau confirmé ou <em>lead</em> demandent de l'<strong>expérience prouvée</strong> sur de vraies machines, souvent plusieurs années (l'<a href="../market/index.html#methode">analyse du marché</a> donne les fourchettes relevées). Un parcours d'apprentissage donne des compétences, des projets publics et un vocabulaire ; il ne crée pas des années d'exploitation de clusters en production.</p>
 <p>Trois conséquences pratiques.</p>
 <ul>
-<li><strong>Viser une marche réaliste d'abord.</strong> Un poste d'ingénieur senior en plateforme d'IA ou en infrastructure d'entraînement valorise déjà fortement Kubernetes en production, l'observabilité et le FinOps. Le poste de lead vient ensuite, avec l'expérience.</li>
+<li><strong>Viser une marche réaliste d'abord.</strong> Un poste d'ingénieur de flotte GPU, de plateforme d'IA ou d'exploitation HPC valorise déjà ce que le parcours enseigne. Les postes de <em>lead</em> viennent ensuite, avec l'expérience.</li>
 <li><strong>Fabriquer des preuves publiques.</strong> Les six projets du parcours, un journal d'apprentissage, des contributions à des outils ouverts (ordonnanceurs, files d'attente, exportateurs) et des post-mortems écrits remplacent en partie ce qu'on ne peut pas citer d'un employeur.</li>
-<li><strong>Chercher l'exposition réelle.</strong> Un stage de courte durée dans un centre de calcul, la participation à une compétition de clusters étudiants ou à un projet de recherche donnent un accès à de vraies machines. L'enquête sur les masters recense ces voies.</li>
+<li><strong>Chercher l'exposition réelle.</strong> Un stage dans un centre de calcul, une compétition de clusters étudiants ou un projet de recherche donnent accès à de vraies machines.</li>
 </ul>
 <div class="key">
 <p><span class="tag">Règle d'honnêteté</span> Ne présentez jamais un projet de portfolio comme une expérience de production, et dites toujours ce qui a été exécuté sur quelle machine. Un recruteur compétent vérifie, et la franchise est un signal de fiabilité, qualité centrale du métier.</p>
 </div>
-<h2 id="postes">Deux postes voisins, 30 à 40 % de recouvrement</h2>
-<p>Deux annonces publiées en septembre et octobre 2026 par une même start-up parisienne de robotique illustrent la différence entre les deux métiers voisins. Leur comparaison, requis par requis, donne un recouvrement estimé au jugé à 30 à 40 %.</p>
-<div class="tbl-wrap">
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th></th>
-<th>Ingénieur d'entraînement à grande échelle</th>
-<th>Lead de l'infrastructure de calcul</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Couche</td>
-<td>Ce qui tourne dans le job d'entraînement</td>
-<td>La plateforme sur laquelle tournent les jobs</td>
-</tr>
-<tr class="even">
-<td>Cœur</td>
-<td>Parallélisme (DDP, FSDP, tensoriel, pipeline, experts), MFU, noyaux, débogage numérique, déterminisme</td>
-<td>Capacité GPU multi-fournisseurs, ordonnanceur, Ray, traitement de données orchestré, observabilité</td>
-</tr>
-<tr class="odd">
-<td>Infrastructure d'apprentissage par renforcement</td>
-<td>Rollouts distribués, acteur-apprenant, tampons de rejeu</td>
-<td>Boucle d'apprentissage en ligne vue sous l'angle de la capacité</td>
-</tr>
-<tr class="even">
-<td>Aspect commercial</td>
-<td>Aucun</td>
-<td>Coûts, prévision de capacité, négociation avec les fournisseurs</td>
-</tr>
-<tr class="odd">
-<td>Séniorité demandée</td>
-<td>Pas d'années exigées</td>
-<td>Huit ans et plus, niveau senior, lead ou staff</td>
-</tr>
-<tr class="even">
-<td>Modules les plus proches</td>
-<td>2, 3, 4, 9, 10, 11</td>
-<td>5, 6, 7, 8, 12, 13, 14, 15, 16</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Les deux postes partagent Python, PyTorch distribué, NCCL, la reprise des jobs longs et le diagnostic. Ce parcours couvre les deux : les phases 0 à 3 servent surtout le premier, les phases 2, 4 et 5 le second.</p>
-<h2 id="usage">Comment utiliser ce diagnostic</h2>
+<h2 id="usage">7. Comment utiliser ce diagnostic</h2>
 <ol type="1">
-<li>Refaites ce tableau vous-même, avec vos propres niveaux, avant de commencer.</li>
+<li>Choisissez le profil d'entrée le plus proche du vôtre, ou les deux entre lesquels vous hésitez.</li>
+<li>Remplissez la grille d'autodiagnostic, puis comparez avec le tableau des priorités.</li>
 <li>Pour chaque module, faites les questions de positionnement : elles confirment ou corrigent votre estimation.</li>
-<li>Refaites le tableau à la fin de chaque phase. L'écart doit diminuer là où vous avez travaillé ; sinon, refaites les labs.</li>
-<li>Gardez le tableau dans votre journal d'apprentissage : il documente votre progression de façon vérifiable.</li>
+<li>Refaites la grille à la fin de chaque phase et gardez-la dans votre journal d'apprentissage : elle documente votre progression de façon vérifiable.</li>
 </ol>
-<h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les compétences listées dans la colonne « profil » proviennent du <code>CAREER.md</code> du dépôt Certifications (version d'octobre 2026) ; les fréquences de compétences viennent de douze offres publiques, relevées le 22 octobre 2026 et citées dans le dossier <code>data/jobs/</code>.</p>
-<p><strong>Recommandé.</strong> Les niveaux estimés et visés, les priorités A, B et C, et l'ordre de travail sont des choix de ce parcours. Ils ne sont ni mesurés, ni validés par un tiers.</p>
-<p><strong>À vérifier.</strong> Les niveaux de chaque domaine pour une autre personne que le profil de référence : refaites le diagnostic.</p>
-<p><strong>Hors périmètre.</strong> Les aspects contractuels d'un recrutement, les salaires et toute promesse d'embauche.</p>
+<h2 id="sources">8. Sources et portée</h2>
+<h3 id="documente">8.1. Documenté</h3>
+<p>Les familles de postes et les tendances régionales résument l'<a href="../market/index.html">analyse des offres d'emploi</a>, dont chaque compétence relevée est appuyée par une citation vérifiée mot pour mot dans le texte de l'offre.</p>
+<h3 id="recommande">8.2. Recommandé</h3>
+<p>Les cinq profils d'entrée, les niveaux visés, les priorités A, B et C et l'ordre de travail sont des choix de ce parcours. Ils ne sont ni mesurés, ni validés par un tiers.</p>
+<h3 id="hors-perimetre">8.3. Hors périmètre</h3>
+<p>Les salaires, les aspects contractuels d'un recrutement et toute promesse d'embauche.</p>
 <nav class="pager" aria-label="Navigation">
-<a class="next" href="../masters/index.html"><span class="k">Suivant →</span>Enquête sur les masters HPC</a>
+<a class="next" href="../market/index.html"><span class="k">Suivant →</span>Ce que demande le marché</a>
 </nav>
 </main>
 </div>

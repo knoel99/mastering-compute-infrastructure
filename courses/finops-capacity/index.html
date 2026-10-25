@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,102 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 15 · Phase 4 · 24 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. FinOps pour l'IA : cadre, unités, allocation</a>
+<ul>
+<li><a href="#ce-que-la-finops-apporte">1.1. Ce que la FinOps apporte</a></li>
+<li><a href="#ce-que-lia-change">1.2. Ce que l'IA change</a></li>
+<li><a href="#trois-gpu-heures-et-leurs-coûts">1.3. Trois GPU-heures et leurs coûts</a></li>
+<li><a href="#allocation-et-responsabilité">1.4. Allocation et responsabilité</a></li>
+</ul></li>
+<li><a href="#ch2">2. Utilisation réelle : occupation, goodput, gaspillage et files d'attente</a>
+<ul>
+<li><a href="#une-chaîne-de-rendements">2.1. Une chaîne de rendements</a></li>
+<li><a href="#ce-que-des-publications-mesurent">2.2. Ce que des publications mesurent</a></li>
+<li><a href="#mesurer-depuis-lordonnanceur">2.3. Mesurer depuis l'ordonnanceur</a></li>
+<li><a href="#files-dattente-et-coût-de-linactivité">2.4. Files d'attente et coût de l'inactivité</a></li>
+</ul></li>
+<li><a href="#ch3">3. Prévoir la demande et choisir la capacité à engager</a>
+<ul>
+<li><a href="#la-demande-nest-pas-la-consommation">3.1. La demande n'est pas la consommation</a></li>
+<li><a href="#un-modèle-de-départ">3.2. Un modèle de départ</a></li>
+<li><a href="#tester-la-prévision-sur-le-passé">3.3. Tester la prévision sur le passé</a></li>
+<li><a href="#de-la-prévision-à-la-capacité-à-engager">3.4. De la prévision à la capacité à engager</a></li>
+<li><a href="#un-plan-de-capacité">3.5. Un plan de capacité</a></li>
+</ul></li>
+<li><a href="#ch4">4. Modèle de coût total : acheter, louer, réserver, payer à la demande</a>
+<ul>
+<li><a href="#les-postes-dun-parc-possédé">4.1. Les postes d'un parc possédé</a></li>
+<li><a href="#le-coût-de-la-gpu-heure-utile">4.2. Le coût de la GPU-heure utile</a></li>
+<li><a href="#les-régimes-réels-et-leurs-conditions">4.3. Les régimes réels et leurs conditions</a></li>
+<li><a href="#sensibilité-ce-qui-fait-basculer-la-décision">4.4. Sensibilité : ce qui fait basculer la décision</a></li>
+<li><a href="#ce-que-le-modèle-ne-dit-pas">4.5. Ce que le modèle ne dit pas</a></li>
+</ul></li>
+<li><a href="#ch5">5. Énergie et datacenter : puissance, refroidissement, PUE, délais</a>
+<ul>
+<li><a href="#puissance-dun-gpu-dun-nœud-dune-baie">5.1. Puissance d'un GPU, d'un nœud, d'une baie</a></li>
+<li><a href="#densité-par-baie-et-refroidissement">5.2. Densité par baie et refroidissement</a></li>
+<li><a href="#le-pue-et-le-coût-de-lénergie">5.3. Le PUE et le coût de l'énergie</a></li>
+<li><a href="#de-la-puissance-disponible-au-nombre-de-gpu">5.4. De la puissance disponible au nombre de GPU</a></li>
+<li><a href="#délais-et-calendrier">5.5. Délais et calendrier</a></li>
+</ul></li>
+<li><a href="#ch6">6. Lire un contrat de capacité GPU</a>
+<ul>
+<li><a href="#anatomie-dun-contrat-de-capacité">6.1. Anatomie d'un contrat de capacité</a></li>
+<li><a href="#lire-un-sla-publié">6.2. Lire un SLA publié</a></li>
+<li><a href="#pourquoi-un-crédit-nest-pas-une-compensation">6.3. Pourquoi un crédit n'est pas une compensation</a></li>
+<li><a href="#les-clauses-propres-aux-gpu">6.4. Les clauses propres aux GPU</a></li>
+<li><a href="#engagement-prix-et-sortie">6.5. Engagement, prix et sortie</a></li>
+<li><a href="#une-grille-de-revue-appliquée-par-un-script">6.6. Une grille de revue, appliquée par un script</a></li>
+</ul></li>
+<li><a href="#ch7">7. Négocier : leviers, alternatives, calendrier</a>
+<ul>
+<li><a href="#le-rôle-de-lingénieur">7.1. Le rôle de l'ingénieur</a></li>
+<li><a href="#mettre-un-prix-sur-chaque-clause">7.2. Mettre un prix sur chaque clause</a></li>
+<li><a href="#une-alternative-crédible">7.3. Une alternative crédible</a></li>
+<li><a href="#calendrier-et-processus">7.4. Calendrier et processus</a></li>
+<li><a href="#bonnes-et-mauvaises-pratiques">7.5. Bonnes et mauvaises pratiques</a></li>
+</ul></li>
+<li><a href="#ch8">8. Matrices de décision, appels d'offres techniques et pilotage trimestriel</a>
+<ul>
+<li><a href="#la-matrice-de-décision-pondérée">8.1. La matrice de décision pondérée</a></li>
+<li><a href="#lappel-doffres-technique">8.2. L'appel d'offres technique</a></li>
+<li><a href="#indicateurs-de-pilotage-trimestriels">8.3. Indicateurs de pilotage trimestriels</a></li>
+<li><a href="#la-revue-trimestrielle">8.4. La revue trimestrielle</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-15-1">Lab 15.1 — Du sacct au rapport de showback</a></li>
+<li><a href="#lab-15-2">Lab 15.2 — Prévision de la demande et capacité à engager</a></li>
+<li><a href="#lab-15-3">Lab 15.3 — Modèle de coût total paramétrable</a></li>
+<li><a href="#lab-15-4">Lab 15.4 — Revue d'un contrat de capacité fictif</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> de combien de GPU votre équipe a-t-elle besoin l'an prochain, sous quelle forme (achat, location, réservation, à la demande), à quel coût par unité de travail <em>utile</em>, et comment le démontrer à une direction financière ou à un fournisseur ? Un ingénieur d'infrastructure qui ne sait pas chiffrer son cluster laisse d'autres décider à sa place, avec des hypothèses qu'il n'a pas vues.</p>
 <p>Ce module est le volet technique de l'achat de calcul. Il part de l'utilisation réelle d'une flotte, construit une prévision de la demande avec ses incertitudes, en déduit une capacité à engager, la compare à d'autres régimes par un modèle de coût total, puis aborde ce que les fiches de prix cachent : la puissance et le refroidissement, les clauses d'un contrat de capacité et la façon de négocier.</p>
@@ -85,8 +181,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../perf-models/index.html">Module 2 — Architecture matérielle et modèles de performance</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : FinOps cloud connu, mais ni contrats de capacité, ni énergie, ni prévision de demande pour des GPU</td>
+<td>Pour qui</td>
+<td>Cœur : contrats de capacité, énergie et prévision de la demande en GPU ; le FinOps cloud classique n'en couvre qu'une partie.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -112,6 +208,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Estimer puissance, densité par baie et refroidissement d'un parc de GPU, et leur effet sur le calendrier (chapitre 5).</li>
 <li>Lire un contrat de capacité GPU, repérer les clauses qui comptent pour un entraînement et chiffrer ce qu'elles valent (chapitres 6 et 7).</li>
 <li>Construire une matrice de décision robuste, un appel d'offres technique et un tableau de pilotage trimestriel (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
+<li><strong>S'appuie sur</strong> : <a href="../perf-models/index.html">module 2 — Architecture matérielle et modèles de performance</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Neuf séances, soit 24 h : six de 2,5 h et trois de 3 h. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé. Il ne diminue jamais d'une séance à la suivante.</p>
@@ -200,7 +303,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> La prévision de demande et le coût par GPU-heure productive sont demandés par les offres de capacité et de direction.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Les prix sont fictifs, en unités arbitraires (u). Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au chapitre 5.</p>
 <ol type="1">
 <li><p><strong>Coût utile.</strong> Une flotte de 64 GPU coûte, tout compris, 2,08 u par GPU-heure disponible. Elle est allouée 55 % du temps, et 90 % des heures allouées produisent un progrès utile. Combien coûte une GPU-heure utile ?</p></li>
@@ -1463,8 +1615,8 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> .venv/bin/activate</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pytest numpy pyyaml</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="bu">command</span> <span class="at">-v</span> python<span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
+<h3 id="lab-15-1">Lab 15.1 — Du sacct au rapport de showback</h3>
 <div class="lab">
-<p><span class="tag">Lab 15.1 — Du sacct au rapport de showback</span></p>
 <p><strong>Objectif.</strong> Écrire l'outil qui transforme l'export de l'ordonnanceur en heures allouées par équipe, utilisation, heures perdues candidates, attentes et allocation du coût plein. <strong>Durée.</strong> 2,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3 et <code>pytest</code>. Pour la branche « live » : une machine Linux jetable avec accès root et le Slurm du module 5.</p>
 <ol type="1">
 <li>Ouvrez <code>labs/finops-capacity/usage-showback/</code> et lisez <code>gen_trace.py</code> : ordonnancement FIFO strict, probabilités d'états finaux, en-tête <code># SYNTHETIC</code> du fichier produit.</li>
@@ -1477,8 +1629,8 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <p><strong>Statut de vérification.</strong> <code>verify.sh</code> a été exécuté deux fois avec succès (traces synthétique et réelle). <code>verify-live.sh</code> a été exécuté deux fois sur Slurm 23.11.4 le 24 octobre 2026 et la capture réelle est dans <code>fixtures/real_sandbox_sacct.txt</code>. Les CPU tiennent lieu de GPU : le format <code>gres/gpu</code> n'est testé que sur la trace synthétique.</p>
 <p><strong>Pour aller plus loin.</strong> Remplacez la trace synthétique par l'export de votre cluster. Ajoutez la lecture de <code>AllocTRES</code> avec plusieurs types de GPU et un coût par type.</p>
 </div>
+<h3 id="lab-15-2">Lab 15.2 — Prévision de la demande et capacité à engager</h3>
 <div class="lab">
-<p><span class="tag">Lab 15.2 — Prévision de la demande et capacité à engager</span></p>
 <p><strong>Objectif.</strong> Produire des scénarios de demande, en déduire la capacité à engager par la règle du quantile, mesurer le risque, et tester la prévision sur le passé. <strong>Durée.</strong> 2,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3, <code>numpy</code> et <code>pytest</code>.</p>
 <ol type="1">
 <li>Ouvrez <code>labs/finops-capacity/demand-forecast/</code> et lisez <code>starter/forecast.py</code> (fourni) : générateur synthétique, ajustement tendance plus saison, scénarios par blocs, test sur le passé.</li>
@@ -1491,8 +1643,8 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <p><strong>Statut de vérification.</strong> Deux exécutions réussies de <code>verify.sh</code> (17 tests verts pour la référence, 10 rouges au départ). Données entièrement synthétiques : seuls la méthode et les ordres de grandeur se transposent.</p>
 <p><strong>Pour aller plus loin.</strong> Branchez la sortie de <code>sacct</code> du lab 15.1 comme historique, ajoutez un engagement par paliers (deux niveaux, deux durées) et comparez-le au niveau unique.</p>
 </div>
+<h3 id="lab-15-3">Lab 15.3 — Modèle de coût total paramétrable</h3>
 <div class="lab">
-<p><span class="tag">Lab 15.3 — Modèle de coût total paramétrable</span></p>
 <p><strong>Objectif.</strong> Construire l'outil qui compare achat, location, réservation, demande et spot en coût par GPU-heure utile, trouve les points morts et classe les hypothèses par influence. <strong>Durée.</strong> 2,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3, <code>pyyaml</code> et <code>pytest</code>.</p>
 <ol type="1">
 <li>Lisez <code>labs/finops-capacity/tco-model/assumptions.yaml</code> et classez chaque valeur : publiée (une seule : 10,2 kW) ou exemple.</li>
@@ -1506,8 +1658,8 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <p><strong>Statut de vérification.</strong> Deux exécutions réussies de <code>verify.sh</code> (24 tests verts pour la référence, 18 rouges au départ). Les prix sont fictifs ; le modèle ignore taxes, inflation, remises de volume, limites de capacité et délais.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez une capacité maximale au spot, un délai de livraison par option, ou un scénario où la revente est nulle.</p>
 </div>
+<h3 id="lab-15-4">Lab 15.4 — Revue d'un contrat de capacité fictif</h3>
 <div class="lab">
-<p><span class="tag">Lab 15.4 — Revue d'un contrat de capacité fictif</span></p>
 <p><strong>Objectif.</strong> Appliquer une grille de revue à un contrat de capacité fictif, comprendre chaque clause rouge et chiffrer ce que vaut sa négociation. <strong>Durée.</strong> 1,5 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3, <code>pyyaml</code> et <code>pytest</code>.</p>
 <ol type="1">
 <li>Lisez <code>labs/finops-capacity/contract-checklist/fictional_contract.md</code> <strong>sans</strong> lancer le script, et écrivez la liste des cinq clauses que vous refuseriez de signer.</li>
@@ -1718,10 +1870,14 @@ deal-breakers red: take_or_pay, delivery_remedy, availability_scope, provider_ex
 <li>Fisher, Ury. <em>Getting to Yes: Negotiating Agreement Without Giving In</em>. Houghton Mifflin, 1981. <a href="https://en.wikipedia.org/wiki/Getting_to_Yes">notice</a> : la notion de BATNA (chapitre 7).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les faits suivants ont été relus à la source le 24 octobre 2026 : les principes, personas, domaines, capacités et périmètres de la FinOps Foundation ; les indicateurs et les recommandations de showback du document « FinOps for AI » ; la puissance maximale de 10,2 kW du DGX H100, de 14,3 kW du DGX B200, les alimentations de 3,3 kW, le débit d'air, la température de fonctionnement et la chaleur dégagée de 38 557 BTU/h ; le TDP du H100 (page produit) et les 120 kW du rack GB200 NVL72 ; le PUE de Google et la moyenne de l'Uptime Institute citée par Google ; les densités de baie de l'enquête 2020 ; les 176 TWh du rapport du LBNL ; la structure et les crédits du SLA d'Amazon EC2 (page datée du 25 mai 2022) et de Google Compute Engine ; les conditions des Capacity Blocks et le préavis Spot d'AWS ; la dérogation aux frais de sortie d'AWS et sa mise à jour du 8 octobre 2026 ; les chiffres de Kokolis et al., Dubey et al. et Hu et al. ; les champs de <code>sacct</code> et le défaut de <code>DefMemPerCPU</code>. Tous les calculs des exemples et des corrigés ont été refaits en Python, les observations de Slurm ont été faites sur Slurm 23.11.4 (paquets Ubuntu 24.04) le 24 octobre 2026, et les quatre <code>verify.sh</code> ainsi que <code>verify-live.sh</code> ont été exécutés deux fois avec succès.</p>
-<p><strong>Recommandé.</strong> Les politiques d'allocation de l'inactivité, la règle de dimensionner sur la puissance maximale, la grille de revue de contrat (poids et seuils), les seuils du tableau de pilotage, la marge de souplesse de 10 à 20 % sur un engagement, l'ordre des demandes de négociation, la matrice de décision et la plage de ±20 % de l'analyse de sensibilité sont des choix de ce parcours, pas des normes. La règle du quantile pour l'engagement est un résultat classique, présenté ici comme outil pédagogique.</p>
-<p><strong>À vérifier.</strong> Tous les prix, remises, durées de vie, tarifs d'énergie, taux d'interruption et notes de la matrice de décision sont des valeurs d'exemple fictives. Les résultats d'Erlang C et du vendeur de journaux sont classiques et n'ont pas été rouverts dans un manuel : le premier a été confronté à la simulation à événements discrets du projet 6 (200 000 jobs, trois graines), le second à une minimisation numérique du coût (test <code>test_closed_form_matches_the_grid_minimizer</code> du lab 15.2). Le texte du règlement européen sur les données n'a pas pu être lu (le site officiel refuse l'accès automatisé depuis le bac à sable) : seule la mention qu'en fait AWS est citée. Aucun délai de raccordement ou de livraison n'est donné, faute de source primaire lue. Les chiffres de l'Uptime Institute sont ceux de 2020 pour les densités ; la moyenne de 2025 est citée d'après la note de Google, sans lecture de l'enquête. L'écart entre 38 557 BTU/h et 10,2 kW n'est pas expliqué par la documentation. L'effet de <code>DefMemPerCPU</code> sur la capture est cohérent avec la documentation mais n'a pas fait l'objet d'un essai contraire. Les SLA des fournisseurs changent et peuvent différer pour les instances GPU et les réservations : relisez le texte en vigueur. L'existence du livre de Fisher et Ury et le sens de BATNA ont été confirmés par une notice encyclopédique, le livre n'a pas été relu. Aucun lab n'utilise de GPU : le format <code>gres/gpu</code> n'est testé que sur la trace synthétique, la branche « live » utilise des CPU.</p>
-<p><strong>Hors périmètre.</strong> Les contrats de colocation détaillés (alimentation, redondance, accès), le droit des contrats et de la souveraineté des données, la fiscalité et la comptabilité (amortissement fiscal, crédit-bail), l'empreinte carbone et la mesure des émissions, la conception des circuits de refroidissement, le marché secondaire des GPU, l'achat de réseau et de stockage, et la FinOps de l'inférence à grande échelle en production.</p>
+<h3 id="documente">Documenté</h3>
+<p>Les faits suivants ont été relus à la source le 24 octobre 2026 : les principes, personas, domaines, capacités et périmètres de la FinOps Foundation ; les indicateurs et les recommandations de showback du document « FinOps for AI » ; la puissance maximale de 10,2 kW du DGX H100, de 14,3 kW du DGX B200, les alimentations de 3,3 kW, le débit d'air, la température de fonctionnement et la chaleur dégagée de 38 557 BTU/h ; le TDP du H100 (page produit) et les 120 kW du rack GB200 NVL72 ; le PUE de Google et la moyenne de l'Uptime Institute citée par Google ; les densités de baie de l'enquête 2020 ; les 176 TWh du rapport du LBNL ; la structure et les crédits du SLA d'Amazon EC2 (page datée du 25 mai 2022) et de Google Compute Engine ; les conditions des Capacity Blocks et le préavis Spot d'AWS ; la dérogation aux frais de sortie d'AWS et sa mise à jour du 8 octobre 2026 ; les chiffres de Kokolis et al., Dubey et al. et Hu et al. ; les champs de <code>sacct</code> et le défaut de <code>DefMemPerCPU</code>. Tous les calculs des exemples et des corrigés ont été refaits en Python, les observations de Slurm ont été faites sur Slurm 23.11.4 (paquets Ubuntu 24.04) le 24 octobre 2026, et les quatre <code>verify.sh</code> ainsi que <code>verify-live.sh</code> ont été exécutés deux fois avec succès.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>Les politiques d'allocation de l'inactivité, la règle de dimensionner sur la puissance maximale, la grille de revue de contrat (poids et seuils), les seuils du tableau de pilotage, la marge de souplesse de 10 à 20 % sur un engagement, l'ordre des demandes de négociation, la matrice de décision et la plage de ±20 % de l'analyse de sensibilité sont des choix de ce parcours, pas des normes. La règle du quantile pour l'engagement est un résultat classique, présenté ici comme outil pédagogique.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<p>Tous les prix, remises, durées de vie, tarifs d'énergie, taux d'interruption et notes de la matrice de décision sont des valeurs d'exemple fictives. Les résultats d'Erlang C et du vendeur de journaux sont classiques et n'ont pas été rouverts dans un manuel : le premier a été confronté à la simulation à événements discrets du projet 6 (200 000 jobs, trois graines), le second à une minimisation numérique du coût (test <code>test_closed_form_matches_the_grid_minimizer</code> du lab 15.2). Le texte du règlement européen sur les données n'a pas pu être lu (le site officiel refuse l'accès automatisé depuis le bac à sable) : seule la mention qu'en fait AWS est citée. Aucun délai de raccordement ou de livraison n'est donné, faute de source primaire lue. Les chiffres de l'Uptime Institute sont ceux de 2020 pour les densités ; la moyenne de 2025 est citée d'après la note de Google, sans lecture de l'enquête. L'écart entre 38 557 BTU/h et 10,2 kW n'est pas expliqué par la documentation. L'effet de <code>DefMemPerCPU</code> sur la capture est cohérent avec la documentation mais n'a pas fait l'objet d'un essai contraire. Les SLA des fournisseurs changent et peuvent différer pour les instances GPU et les réservations : relisez le texte en vigueur. L'existence du livre de Fisher et Ury et le sens de BATNA ont été confirmés par une notice encyclopédique, le livre n'a pas été relu. Aucun lab n'utilise de GPU : le format <code>gres/gpu</code> n'est testé que sur la trace synthétique, la branche « live » utilise des CPU.</p>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>Les contrats de colocation détaillés (alimentation, redondance, accès), le droit des contrats et de la souveraineté des données, la fiscalité et la comptabilité (amortissement fiscal, crédit-bail), l'empreinte carbone et la mesure des émissions, la conception des circuits de refroidissement, le marché secondaire des GPU, l'achat de réseau et de stockage, et la FinOps de l'inférence à grande échelle en production.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/observability/index.html"><span class="k">← Précédent</span>Module 14 — Observabilité et fiabilité d'une flotte GPU</a><a class="next" href="../../courses/platform-leadership/index.html"><span class="k">Suivant →</span>Module 16 — Plateforme interne, sécurité, production et leadership</a></nav>
 </main>

@@ -103,7 +103,16 @@
    ],
    "feeds": [
     "homelab-slurm"
-   ]
+   ],
+   "audience": "Fondation pour tous ; survol possible si vous administrez déjà des serveurs Linux en production.",
+   "focus": "Même en survol, lisez les chapitres sur les cgroups, la topologie (NUMA, PCIe) et la méthode de mesure : tout le parcours s'appuie dessus.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "C",
+    "ml": "B",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "perf-models",
@@ -160,7 +169,16 @@
    "feeds": [
     "scaling-study",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur pour tous : c'est la grammaire commune du parcours (roofline, modèle α-β, MFU).",
+   "focus": "Le roofline, le modèle α-β et le MFU reviennent dans les modules 3, 4, 7, 9 et 15 : ne les survolez pas, même si les formules vous sont familières.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "B",
+    "ml": "B",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "parallel-programming",
@@ -217,7 +235,16 @@
    ],
    "feeds": [
     "scaling-study"
-   ]
+   ],
+   "audience": "Cœur : rang, communicateur, collective et liaison aux cœurs reviennent dans NCCL, dans PyTorch distribué et dans les journaux de Slurm ; survol possible si vous pratiquez déjà MPI.",
+   "focus": "Si vous survolez, gardez l'étude de passage à l'échelle et la lecture des courbes : le projet 2 la reprend.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "C",
+    "ml": "B",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "gpu-programming",
@@ -281,7 +308,16 @@
    ],
    "feeds": [
     "scaling-study"
-   ]
+   ],
+   "audience": "Cœur : la grammaire des échanges entre l'infrastructure et la recherche sur la performance ; survol possible si vous écrivez déjà des noyaux CUDA ou Triton.",
+   "focus": "Le profilage et la lecture de traces servent à tous les profils, y compris si vous n'écrirez jamais de noyau.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "B",
+    "ml": "B",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "slurm",
@@ -339,7 +375,16 @@
    "feeds": [
     "homelab-slurm",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur pour tous, sauf si vous administrez déjà Slurm en production : survolez alors les premiers chapitres et faites les labs de politique d'équité et de santé des nœuds.",
+   "focus": "La politique d'équité, la préemption et la santé des nœuds sont ce que les offres d'exploitation demandent au-delà de l'usage de sbatch.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "C",
+    "ml": "B",
+    "logiciel": "A",
+    "etudiant": "A"
+   }
   },
   {
    "id": "provisioning",
@@ -403,7 +448,16 @@
    "feeds": [
     "homelab-slurm",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : démarrage réseau, images, recette des nœuds GPU et contrôleurs de carte mère (BMC) ; survol possible si vous déployez déjà des nœuds bare-metal.",
+   "focus": "La recette des nœuds et les contrôles de santé matérielle sont demandés par la plupart des offres de flotte GPU : faites-en les labs même en survol.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "C",
+    "ml": "A",
+    "logiciel": "A",
+    "etudiant": "A"
+   }
   },
   {
    "id": "networking",
@@ -462,7 +516,16 @@
    "feeds": [
     "scaling-study",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur pour tous : InfiniBand, RoCE et NCCL ; un administrateur HPC qui connaît InfiniBand y trouvera NCCL et le dimensionnement pour l'entraînement.",
+   "focus": "Le diagnostic NCCL et le modèle de coût des collectives sont ce qui manque le plus souvent, quel que soit le profil d'entrée.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "B",
+    "ml": "A",
+    "logiciel": "A",
+    "etudiant": "A"
+   }
   },
   {
    "id": "storage",
@@ -526,7 +589,16 @@
    "feeds": [
     "resilient-trainer",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : systèmes de fichiers parallèles, chargement des données et E/S des checkpoints à grande échelle.",
+   "focus": "Le dimensionnement des E/S de checkpoint relie ce module aux modules 9 et 10 : ne le sautez pas.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "B",
+    "ml": "B",
+    "logiciel": "A",
+    "etudiant": "A"
+   }
   },
   {
    "id": "distributed-training",
@@ -596,7 +668,16 @@
     "scaling-study",
     "resilient-trainer",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : DDP, FSDP, parallélisme tensoriel et pipeline ; survol possible si vous entraînez déjà sur plusieurs nœuds, en gardant les chapitres de diagnostic et de mémoire.",
+   "focus": "Le calcul de la mémoire et du trafic par stratégie de parallélisme sert ensuite au dimensionnement (modules 7, 13 et 15).",
+   "study": {
+    "plateforme": "A",
+    "hpc": "A",
+    "ml": "B",
+    "logiciel": "A",
+    "etudiant": "A"
+   }
   },
   {
    "id": "fault-tolerance",
@@ -656,7 +737,16 @@
    "feeds": [
     "resilient-trainer",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : reprise après panne à grande échelle, coût des checkpoints et procédures d'exploitation.",
+   "focus": "Le modèle de Young et Daly et la détection des blocages reviennent dans les projets 3, 4 et 5.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "A",
+    "ml": "A",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "ray-rl-infra",
@@ -714,7 +804,16 @@
    ],
    "feeds": [
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : les charges de post-entraînement par renforcement sont l'une des raisons d'être d'une plateforme GPU.",
+   "focus": "Les boucles acteur-apprenant et leur dimensionnement sont nouveaux pour presque tous les profils.",
+   "study": {
+    "plateforme": "A",
+    "hpc": "A",
+    "ml": "B",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "kubernetes-gpu",
@@ -778,7 +877,16 @@
    ],
    "feeds": [
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : la couche GPU de Kubernetes, la mise en file et le placement des entraînements ; si vous exploitez déjà Kubernetes, survolez les rappels et travaillez les chapitres sur les GPU, les files d'attente et le gang scheduling.",
+   "focus": "Les files d'attente (Kueue), le gang scheduling et le partage des GPU sont ce qui distingue Kubernetes pour l'IA de Kubernetes pour des services.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "A",
+    "ml": "A",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "multi-cloud",
@@ -838,7 +946,16 @@
    "feeds": [
     "multi-provider-scheduler",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : la plateforme de calcul d'une organisation est presque toujours répartie entre plusieurs fournisseurs.",
+   "focus": "La comparaison chiffrée d'offres de capacité et la reprise d'un job d'un fournisseur à l'autre servent au projet 4.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "A",
+    "ml": "A",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "observability",
@@ -898,7 +1015,16 @@
     "gpu-observability",
     "homelab-slurm",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : sémantique des métriques GPU, détection des blocages et objectifs de service (SLO) du calcul ; si vous maîtrisez déjà Prometheus, concentrez-vous sur ces trois points.",
+   "focus": "Les pannes silencieuses des GPU et les SLO de calcul sont nouveaux même pour une équipe d'observabilité expérimentée.",
+   "study": {
+    "plateforme": "C",
+    "hpc": "B",
+    "ml": "A",
+    "logiciel": "B",
+    "etudiant": "A"
+   }
   },
   {
    "id": "finops-capacity",
@@ -962,7 +1088,16 @@
    "feeds": [
     "multi-provider-scheduler",
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : contrats de capacité, énergie et prévision de la demande en GPU ; le FinOps cloud classique n'en couvre qu'une partie.",
+   "focus": "La prévision de demande et le coût par GPU-heure productive sont demandés par les offres de capacité et de direction.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "A",
+    "ml": "A",
+    "logiciel": "A",
+    "etudiant": "A"
+   }
   },
   {
    "id": "platform-leadership",
@@ -1021,7 +1156,16 @@
    ],
    "feeds": [
     "capstone-rfc"
-   ]
+   ],
+   "audience": "Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage.",
+   "focus": "Le RFC et la revue d'incident servent au projet 6, quel que soit votre profil.",
+   "study": {
+    "plateforme": "B",
+    "hpc": "B",
+    "ml": "A",
+    "logiciel": "B",
+    "etudiant": "B"
+   }
   }
  ],
  "projects": [
@@ -1114,6 +1258,38 @@
    "title": "Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU",
    "summary": "Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.",
    "idea": "RFC d'une plateforme de calcul pour une équipe de recherche en IA (cahier des charges fictif fourni), modèle de capacité et de coût testé, choix du marché par classe de charge, plan de fiabilité et d'observabilité, plan de migration par phases, revue contradictoire par grille ; soutenance orale de 20 minutes avec questions types."
+  }
+ ],
+ "profiles": [
+  {
+   "id": "plateforme",
+   "name": "Ingénieur plateforme, SRE ou DevOps",
+   "has": "Kubernetes, cloud, infrastructure as code, observabilité, astreinte",
+   "lacks": "ordonnanceurs HPC, réseaux d'interconnexion, entraînement distribué, pannes propres aux GPU"
+  },
+  {
+   "id": "hpc",
+   "name": "Administrateur ou ingénieur HPC",
+   "has": "Linux, Slurm ou PBS, stockage parallèle, InfiniBand, MPI",
+   "lacks": "Kubernetes et cloud, entraînement distribué, NCCL, capacité multi-fournisseurs"
+  },
+  {
+   "id": "ml",
+   "name": "Ingénieur ML ou chercheur",
+   "has": "PyTorch, entraînement, usage des GPU côté utilisateur, suivi d'expériences",
+   "lacks": "exploitation de machines, réseau, stockage, ordonnancement, fiabilité de production"
+  },
+  {
+   "id": "logiciel",
+   "name": "Développeur logiciel ou systèmes",
+   "has": "C++, Go ou Rust, systèmes distribués, tests et CI",
+   "lacks": "matériel GPU, réseau haute performance, ordonnanceurs, entraînement"
+  },
+  {
+   "id": "etudiant",
+   "name": "Étudiant ou personne en reconversion",
+   "has": "bases de Linux, de Python et d'algorithmique",
+   "lacks": "presque tout le métier : suivez le parcours complet dans l'ordre"
   }
  ]
 }

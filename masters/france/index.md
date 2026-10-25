@@ -2,6 +2,7 @@
 title: "Masters et formations HPC en France"
 subtitle: "13 programme(s) étudié(s), données sourcées et vérifiées"
 description: "Fiches de programmes HPC : durée, crédits, cours, accès aux machines, couverture des thèmes utiles à un ingénieur d'infrastructure de calcul."
+numbered: true
 ---
 
 ## Vue d'ensemble {#vue}
@@ -435,7 +436,7 @@ Cette page présente 13 programme(s) pour la zone « France ». Chaque fait vien
 
 ### Master Informatique, parcours Cloud and Network Infrastructures (CNI) {#fr-rennes-cni}
 
-<p class="badges"><span class="badge verified">Confiance élevée</span><span class="badge">Cloud et distribué</span><span class="badge">FR</span></p>
+<p class="badges"><span class="badge skim">Confiance moyenne</span><span class="badge">Cloud et distribué</span><span class="badge">FR</span></p>
 
 | | |
 |---|---|
@@ -451,7 +452,7 @@ Cette page présente 13 programme(s) pour la zone « France ». Chaque fait vien
 
 **Mémoire ou stage.** Non lu
 
-**Limites de la fiche.** La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification.
+**Limites de la fiche.** La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification. Confidence capped at medium: part of the evidence comes from memory.
 
 **Sources.** [1](https://formations.univ-rennes.fr/en/parcours/masters-degree-computer-science-pathway-cloud-and-network-infrastructures-cni) · [2](https://www.eitdeeptechtalent.eu/courses/cloud-and-network-infrastructures-master-programme). Citations vérifiées mot pour mot : 1/1.
 

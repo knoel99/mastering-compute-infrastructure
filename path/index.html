@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -36,10 +36,21 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h1 class="title">Feuille de route</h1>
 <p class="subtitle">6 phases, 592 h au total, jalons et parcours courts</p>
 </header>
-<h2 id="lecture">Comment lire cette feuille de route</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#lecture">1. Comment lire cette feuille de route</a></li>
+<li><a href="#phases">2. Les six phases</a></li>
+<li><a href="#ordre">3. Pourquoi cet ordre</a></li>
+<li><a href="#court">4. Parcours court : l'essentiel en 192 h</a></li>
+<li><a href="#profils">5. Parcours selon votre profil d'entrée</a></li>
+<li><a href="#suivi">6. Suivre sa progression</a></li>
+</ul>
+</section>
+<h2 id="lecture">1. Comment lire cette feuille de route</h2>
 <p>Le volume total est de <strong>440 h de modules et 152 h de projets</strong>, soit <strong>592 h</strong>. À titre de repère, 12 h par semaine donnent environ 49 semaines ; 25 h par semaine, environ 24 semaines ; un temps plein de 35 h, environ 17 semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.</p>
 <p>Un rythme hebdomadaire type de 12 h : deux séances de lecture de 3 h, une séance de lab de 3 h, et 3 h d'exercices et de relecture. Tenez un journal d'apprentissage dans un dépôt public : c'est aussi une pièce de portfolio.</p>
-<h2 id="phases">Les six phases</h2>
+<h2 id="phases">2. Les six phases</h2>
 <div class="tbl-wrap">
 <table style="width:100%;">
 <colgroup>
@@ -113,7 +124,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que ses vérifications ne passent pas, la phase n'est pas terminée, quel que soit le temps passé.</p>
-<h2 id="ordre">Pourquoi cet ordre</h2>
+<h2 id="ordre">3. Pourquoi cet ordre</h2>
 <ul>
 <li><strong>Phase 0 d'abord</strong>, parce que tout le reste consiste à poser un modèle de performance, à le mesurer et à expliquer l'écart.</li>
 <li><strong>Calcul parallèle et GPU avant l'ordonnancement</strong>, parce qu'on ne règle pas un ordonnanceur pour des charges qu'on ne sait pas décrire.</li>
@@ -121,11 +132,61 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Le multi-fournisseurs en phase 4</strong>, parce qu'il suppose de savoir reprendre un job après une panne (phase 3).</li>
 <li><strong>Le leadership en dernier</strong>, parce qu'on dirige mieux ce qu'on a opéré soi-même.</li>
 </ul>
-<h2 id="court">Parcours court : l'essentiel en 192 h</h2>
+<h2 id="court">4. Parcours court : l'essentiel en 192 h</h2>
 <p>Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : Architecture matérielle et modèles de performance, Slurm et exploitation d'un cluster HPC, Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline, Pannes, checkpointing et reprise automatique, Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC, plus les projets Projet 2, Projet 3. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.</p>
-<h2 id="reference">Parcours pour le lecteur de référence</h2>
-<p>Le <a href="../profile/index.html">point de départ</a> compare un profil de référence au métier visé. Il en déduit un parcours ajusté : survol des modules proches de l'expérience existante, travail à fond sur ceux où aucun appui n'existe.</p>
-<h2 id="suivi">Suivre sa progression</h2>
+<h2 id="profils">5. Parcours selon votre profil d'entrée</h2>
+<p>Le <a href="../profile/index.html">point de départ</a> décrit cinq profils d'entrée et leurs priorités module par module. Le tableau en déduit un volume d'étude indicatif : les modules à fond et normaux comptent pour leur volume, les modules survolés pour un quart, les projets pour leur volume. C'est un ordre de grandeur, à corriger avec les questions de positionnement.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>À fond (A)</th>
+<th>Survol guidé (C)</th>
+<th>Volume indicatif</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>2, 3, 4, 5, 7, 8, 9, 11</td>
+<td>14</td>
+<td>570 h</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>9, 10, 11, 12, 13, 15</td>
+<td>1, 3, 5, 6</td>
+<td>510 h</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>6, 7, 10, 12, 13, 14, 15, 16</td>
+<td>—</td>
+<td>590 h</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>5, 6, 7, 8, 9, 15</td>
+<td>—</td>
+<td>590 h</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15</td>
+<td>—</td>
+<td>590 h</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="suivi">6. Suivre sa progression</h2>
 <ul>
 <li>Après chaque module : cochez son checkpoint de sortie, produit pour chaque capacité la preuve demandée.</li>
 <li>Après chaque phase : publiez le livrable du jalon dans un dépôt, avec un fichier <code>README.md</code> et une décision d'architecture d'une page.</li>

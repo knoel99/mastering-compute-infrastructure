@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -36,10 +36,22 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h1 class="title">Ressources</h1>
 <p class="subtitle">47 ressources vérifiées : lectures, cours ouverts, certifications, documentations, communautés</p>
 </header>
-<h2 id="usage">Comment utiliser cette page</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#usage">1. Comment utiliser cette page</a></li>
+<li><a href="#paper">2. Articles et rapports à lire</a></li>
+<li><a href="#course">3. Cours ouverts</a></li>
+<li><a href="#docs">4. Documentations de référence</a></li>
+<li><a href="#community">5. Communautés et conférences</a></li>
+<li><a href="#tool">6. Outils</a></li>
+<li><a href="#sources">7. Sources et portée</a></li>
+</ul>
+</section>
+<h2 id="usage">1. Comment utiliser cette page</h2>
 <p>Chaque ressource listée ici a été ouverte à sa source : le titre, les auteurs ou le fournisseur et l'adresse correspondent à la page cible, et une citation de cette page a été vérifiée mot pour mot. Les modules renvoient vers ces ressources avec l'usage précis (« lire la section 3 pour… »).</p>
 <p>Les certifications évoluent vite : relisez la page officielle de l'examen avant de vous inscrire. Cette page ne donne ni prix ni format qui ne figurent pas sur la page officielle.</p>
-<h2 id="paper">Articles et rapports à lire</h2>
+<h2 id="paper">2. Articles et rapports à lire</h2>
 <ul>
 <li><strong><a href="https://www.cs.fsu.edu/~xyuan/paper/09jpdc.pdf">Bandwidth optimal all-reduce algorithms for clusters of workstations</a></strong> · Patarasuk, Yuan, 2009 (avancé, gratuit). Borne inférieure de données émises par un all-reduce et algorithme en anneau optimal.</li>
 <li><strong><a href="https://arxiv.org/abs/2403.07648">Characterization of Large Language Model Development in the Datacenter</a></strong> · Hu et al., 2024 (avancé, gratuit). Caractérisation de charges de développement de LLM et de leurs pannes dans un centre de calcul.</li>
@@ -55,7 +67,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.html">Roofline: An Insightful Visual Performance Model for Floating-Point Programs and Multicore Architectures</a></strong> · Williams, Waterman, Patterson, 2008 (intermédiaire, gratuit). Version rapport technique de l'article du modèle roofline (version CACM 2009 : doi:10.1145/1498765.1498785).</li>
 <li><strong><a href="https://evaluate.inf.usi.ch/node/366">Scientific Benchmarking of Parallel Computing Systems: Twelve Ways to Tell the Masses when Reporting Performance Results</a></strong> · Hoefler, Belli, 2015 (intermédiaire, gratuit). Règles de mesure et de rapport statistique ; base des chapitres 3 et 8 du module 2.</li>
 </ul>
-<h2 id="course">Cours ouverts</h2>
+<h2 id="course">3. Cours ouverts</h2>
 <ul>
 <li><strong><a href="https://www.cs.cmu.edu/~418/">CMU 15-418/15-618 Parallel Computer Architecture and Programming</a></strong> · 2026 (intermédiaire, coût non précisé). Public syllabus and assignments for parallel hardware and programming (multicore, GPUs, 'C-like' parallel languages); sister course of Stanford CS149 with a systems-programming flavour.</li>
 <li><strong><a href="https://mlsyscourse.org/">CMU 15-442/15-642 Machine Learning Systems</a></strong> · 2026 (intermédiaire, coût non précisé). Public schedule covering data/ZeRO, model and pipeline parallelism, GPU architecture and CUDA, GEMM on modern GPUs and LLM serving: the most direct ML-systems syllabus found for a training/inference platform engineer.</li>
@@ -67,7 +79,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://cs336.stanford.edu/">Stanford CS336 Language Modeling from Scratch</a></strong> · 2026 (intermédiaire, coût non précisé). A public course where one assignment is explicitly systems: profile, write a Triton FlashAttention2 kernel and build a memory-efficient distributed training loop, which is the user-level view of what a GPU-cluster platform must serve.</li>
 <li><strong><a href="https://sites.google.com/lbl.gov/cs267-spr2025">UC Berkeley CS267 Applications of Parallel Computers</a></strong> · 2026 (intermédiaire, coût non précisé). Long-running reference course (Demmel, Yelick and others) on programming parallel computers for science and engineering; public site with syllabus; part of the Berkeley Designated Emphasis in Computational Science and Engineering.</li>
 </ul>
-<h2 id="docs">Documentations de référence</h2>
+<h2 id="docs">4. Documentations de référence</h2>
 <ul>
 <li><strong><a href="https://slurm.schedmd.com/topology.html">Slurm — Topology Guide</a></strong> · SchedMD, 2026 (avancé, gratuit). topology/tree, topology/block et --switches (module 5, chapitre 5).</li>
 <li><strong><a href="https://slurm.schedmd.com/fair_tree.html">Slurm — Fair Tree Fairshare Algorithm</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). Algorithme d'équité par défaut depuis 19.05 (module 5, chapitre 3).</li>
@@ -81,7 +93,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://slurm.schedmd.com/sinfo.html">Slurm — sinfo</a></strong> · SchedMD, 2026 (introduction, gratuit). États de nœuds et sorties de sinfo.</li>
 <li><strong><a href="https://slurm.schedmd.com/squeue.html">Slurm — squeue</a></strong> · SchedMD, 2026 (introduction, gratuit). Codes de raison d'attente d'un job.</li>
 </ul>
-<h2 id="community">Communautés et conférences</h2>
+<h2 id="community">5. Communautés et conférences</h2>
 <ul>
 <li><strong><a href="https://m.tech.china.com/article/20260521/202605211874155.html">ASC 世界大学生超级计算机竞赛</a></strong> · 2026 (intermédiaire, coût non précisé). Teams build and tune a small cluster under a 5000 W power cap and run HPL, HPCG and scientific/AI applications: the closest hands-on training to cluster operations available to students of these universities; PKU, Tsinghua and ZJU teams appear in the 2026 results.</li>
 <li><strong><a href="https://romeo.univ-reims.fr/16_cc-fr.html">CC-FR</a></strong> · 2026 (intermédiaire, coût non précisé). Point d'entrée français du programme EuroCC : formations de prise en main d'un supercalculateur et formations avancées (containers, LLM) sur le réseau des mésocentres MesoNET, utile pour pratiquer sur de vraies machines hors université.</li>
@@ -95,13 +107,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm">国防科技大学</a></strong> · 2026 (intermédiaire, coût non précisé). NUDT is the builder of the TianHe supercomputers; its computer college is therefore a major HPC training site in China, but no NUDT graduate curriculum page was reachable (see blocked_sources), so no programme entry is given.</li>
 <li><strong><a href="https://www.tsinghua.edu.cn/info/1175/111550.htm">清华大学学生超算团队</a></strong> · 2026 (intermédiaire, coût non précisé). Student team organised with the HPC group of the CS department (coached by HPC faculty and supported by HPC-institute PhD students); wins in the three international student cluster competitions, including cluster power control, a core cluster-operations skill.</li>
 </ul>
-<h2 id="tool">Outils</h2>
+<h2 id="tool">6. Outils</h2>
 <ul>
 <li><strong><a href="https://raw.githubusercontent.com/mej/nhc/master/README.md">LBNL Node Health Check (NHC)</a></strong> · Lawrence Berkeley National Laboratory, 2026 (intermédiaire, gratuit). Implémentation de référence d'un contrôle de santé de nœud pour Slurm et d'autres ordonnanceurs.</li>
 <li><strong><a href="https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md">Pyxis — Slurm container plugin</a></strong> · NVIDIA, 2026 (intermédiaire, gratuit). Plugin SPANK qui ajoute --container-image à srun.</li>
 <li><strong><a href="https://www.nvidia.com/en-us/software/slinky/">Slinky — Slurm and Kubernetes</a></strong> · SchedMD / NVIDIA, 2026 (intermédiaire, gratuit). Projet ouvert pour exécuter des clusters Slurm dans Kubernetes (module 5, chapitre 8 ; module 12).</li>
 </ul>
-<h2 id="sources">Sources et portée</h2>
+<h2 id="sources">7. Sources et portée</h2>
 <p><strong>Documenté.</strong> Ressources relues à leur source le 22 octobre 2026 (outil <code>tools/verify_quotes.py</code>).</p>
 <p><strong>Recommandé.</strong> Le tri par type et le commentaire d'usage sont des choix de ce parcours.</p>
 <p><strong>À vérifier.</strong> Les offres de formation et de certification changent : confirmez sur la page officielle.</p>

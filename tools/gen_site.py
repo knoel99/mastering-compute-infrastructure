@@ -30,7 +30,7 @@ def has_page(rel):
 
 
 def status_label(m):
-    return {"core": "Cœur", "skim": "À survoler", "bonus": "Bonus"}[m["status"]]
+    return {"core": "Cœur", "skim": "Fondation", "bonus": "Bonus"}[m["status"]]
 
 
 def card_course(m):
@@ -55,7 +55,7 @@ def phase_blocks(card_fn):
     out = []
     for n in sorted(PHASES):
         ms = [m for m in C["modules"] if m["phase"] == n]
-        out.append(f'<h3 class="phase" id="phase{n}">Phase {n} — {PHASES[n]["title"]}</h3>')
+        out.append(f'### Phase {n} — {PHASES[n]["title"]} {{#phase{n} .phase .unnumbered}}\n')
         out.append(f'<p class="sub-line">{PHASES[n]["goal"]}</p>')
         out.append('<div class="cards">\n' + "\n".join(card_fn(m) for m in ms) + "\n</div>")
     return "\n\n".join(out)
@@ -84,6 +84,8 @@ def home():
 title: "Mastering Compute Infrastructure"
 subtitle: "Un parcours pour devenir compute infrastructure engineer : cours, labs vérifiés, projets de portfolio et enquête sur les masters HPC"
 description: "Parcours d'apprentissage en français pour opérer des clusters GPU, ordonnancer, entraîner à grande échelle et piloter la capacité multi-fournisseurs."
+numbered: true
+toc-inline: false
 ---
 
 <p class="lead">Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesquelles on entraîne les modèles d'IA : clusters GPU, ordonnanceurs, réseaux, stockage, fiabilité, coût. Ce site rassemble de quoi apprendre ce métier de manière structurée : {len(C['modules'])} modules en {len(PHASES)} phases, {len(C['projects'])} projets de portfolio, des labs exécutables et une enquête sourcée sur les masters HPC en France, aux États-Unis, en Chine et dans le monde.</p>
@@ -93,6 +95,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 <a class="cta cta-ghost" href="path/index.html">Feuille de route</a>
 <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
+{'<a class="cta cta-ghost" href="market/index.html">Analyse du marché</a>' if has_page("market") else ''}
 {'<a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>' if masters_ready else ''}
 </div>
 
@@ -116,7 +119,7 @@ Volume total : **{mh} h de modules et {ph} h de projets**, soit environ {round((
 
 ## Cours {{#cours}}
 
-Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge **Cœur** signale un module indispensable ; **À survoler** un module que le lecteur de référence peut parcourir rapidement.
+Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge **Cœur** signale un module indispensable à tous ; **Fondation** un module de base que vous pouvez survoler si vous le pratiquez déjà. La section « Comment travailler ce module » de chaque cours donne la priorité selon votre profil d'entrée.
 
 {phase_blocks(card_course)}
 
@@ -128,13 +131,17 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 """ + "\n".join(card_project(p) for p in C["projects"]) + f"""
 </div>
 
+## Ce que demande le marché {{#marche}}
+
+{"Une analyse sourcée d'offres d'emploi d'infrastructure de calcul publiées aux États-Unis, en Europe et en Chine, dans les laboratoires d'IA, les grands groupes, les clouds GPU et les centres HPC : les compétences demandées, ce qui change d'une région à l'autre, et ce que le parcours couvre. <a href=\"market/index.html\">Lire l'analyse</a>." if has_page("market") else "L'analyse des offres d'emploi est en cours de rédaction."}
+
 ## Enquête sur les masters HPC {{#masters}}
 
 {"Une analyse sourcée des masters orientés calcul haute performance en France, aux États-Unis, en Chine et dans le reste du monde, croisée avec les offres d'emploi de compute infrastructure : ce que les masters enseignent, ce qu'ils n'enseignent presque pas, et ce que ce parcours ajoute. <a href=\"masters/index.html\">Lire l'enquête</a>." if masters_ready else "L'enquête sur les masters HPC (France, États-Unis, Chine, monde) est en cours de rédaction."}
 
 ## Comment utiliser ce site {{#usage}}
 
-1.  Lisez le [point de départ](profile/index.html) : il compare un profil de référence au métier visé et dit quels modules survoler et lesquels travailler à fond.
+1.  Lisez le [point de départ](profile/index.html) : il décrit le métier et cinq profils d'entrée, et propose une grille d'autodiagnostic pour choisir quels modules travailler à fond et lesquels survoler.
 2.  Préparez votre [environnement de travail](lab-setup/index.html) si la page est publiée : un portable CPU suffit pour la base.
 3.  Suivez les phases dans l'ordre. Dans chaque module, faites les trois questions de positionnement avant de lire.
 4.  Faites les labs et lancez leur `verify.sh` : un lab compte quand sa vérification passe.
@@ -145,6 +152,36 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 Ce site est un ensemble de notes d'étude indépendantes, rédigées à partir de documentations officielles, d'articles publiés et de fiches de formation publiques. Il n'est affilié à aucun établissement, éditeur ou employeur et ne remplace ni un diplôme ni une certification. Les contrats de contenu et les contrôles qui encadrent chaque page sont dans le dossier `specs/` et `tools/` du dépôt.
 """
     write("index.md", txt)
+
+
+def profile_paths():
+    rows = ["| Profil d'entrée | À fond (A) | Survol guidé (C) | Volume indicatif |", "|---|---|---|---|"]
+    ph = sum(p["hours"] for p in C["projects"])
+    for pr in C["profiles"]:
+        a = [m for m in C["modules"] if m["study"][pr["id"]] == "A"]
+        c = [m for m in C["modules"] if m["study"][pr["id"]] == "C"]
+        h = sum(m["hours"] * (0.25 if m["study"][pr["id"]] == "C" else 1) for m in C["modules"]) + ph
+        rows.append(f"| {pr['name']} | {', '.join(str(m['number']) for m in a) or '—'} | {', '.join(str(m['number']) for m in c) or '—'} | {round(h / 10) * 10} h |")
+    return "\n".join(rows)
+
+
+def priorities():
+    head = "| Module | " + " | ".join(p["name"] for p in C["profiles"]) + " |"
+    rows = [head, "|---|" + "---|" * len(C["profiles"])]
+    for m in C["modules"]:
+        rows.append(f"| [{m['number']}. {m['title']}](../courses/{m['id']}/index.html) | " + " | ".join(m["study"][p["id"]] for p in C["profiles"]) + " |")
+    return "\n".join(rows)
+
+
+def profile_page():
+    f = ROOT / "profile" / "index.md"
+    if not f.exists():
+        return
+    t = f.read_text(encoding="utf-8")
+    beg, end = "<!-- gen:priorities -->", "<!-- /gen:priorities -->"
+    if beg in t:
+        t = t[:t.index(beg)] + beg + "\n" + priorities() + "\n" + end + t[t.index(end) + len(end):]
+        f.write_text(t, encoding="utf-8")
 
 
 def roadmap():
@@ -170,6 +207,7 @@ def roadmap():
 title: "Feuille de route"
 subtitle: "{len(PHASES)} phases, {tot} h au total, jalons et parcours courts"
 description: "Séquence des phases, volumes horaires, jalons de validation et parcours accélérés."
+numbered: true
 ---
 
 ## Comment lire cette feuille de route {{#lecture}}
@@ -198,9 +236,11 @@ Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que
 
 Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : {', '.join(f"{MODS[i]['title']}" for i in short)}, plus les projets {', '.join(PROJ[i]['title'].split(' — ')[0] for i in short_p)}. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.
 
-## Parcours pour le lecteur de référence {{#reference}}
+## Parcours selon votre profil d'entrée {{#profils}}
 
-Le [point de départ](../profile/index.html) compare un profil de référence au métier visé. Il en déduit un parcours ajusté : survol des modules proches de l'expérience existante, travail à fond sur ceux où aucun appui n'existe.
+Le [point de départ](../profile/index.html) décrit cinq profils d'entrée et leurs priorités module par module. Le tableau en déduit un volume d'étude indicatif : les modules à fond et normaux comptent pour leur volume, les modules survolés pour un quart, les projets pour leur volume. C'est un ordre de grandeur, à corriger avec les questions de positionnement.
+
+{profile_paths()}
 
 ## Suivre sa progression {{#suivi}}
 
@@ -263,6 +303,7 @@ def nav():
         if (ROOT / rel / "index.md").exists():
             seq.append({"href": f"{rel}/index.html", "label": label})
     add("profile", "Point de départ")
+    add("market", "Ce que demande le marché")
     for rel, label in (("masters", "Enquête sur les masters HPC"), ("masters/france", "Masters en France"),
                        ("masters/usa", "Masters aux États-Unis"), ("masters/china", "Masters en Chine"),
                        ("masters/world", "Masters dans le monde")):
@@ -283,5 +324,6 @@ if __name__ == "__main__":
     home()
     roadmap()
     syllabus()
+    profile_page()
     nav()
     print("generated index.md, path/index.md, data/nav.json")

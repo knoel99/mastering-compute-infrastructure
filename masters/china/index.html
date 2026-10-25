@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -36,7 +36,27 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h1 class="title">Masters et formations HPC en Chine</h1>
 <p class="subtitle">6 programme(s) étudié(s), données sourcées et vérifiées</p>
 </header>
-<h2 id="vue">Vue d'ensemble</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#vue">1. Vue d'ensemble</a>
+<ul>
+<li><a href="#retenir">1.1. Ce qu'on retient de la Chine</a></li>
+</ul></li>
+<li><a href="#programmes">2. Les programmes</a>
+<ul>
+<li><a href="#cn-tsinghua-cs-ms">2.1. 计算机科学与技术系硕士研究生培养方案 [081200] 计算机科学与技术 — 二级学科 计算机系统结构 (Computer Architecture / systems track, hosted by the 高性能计算研究所 HPC Institute) — academic master's, not an HPC-branded degree</a></li>
+<li><a href="#cn-ustc-cs-ms">2.2. 计算机科学与技术 (081200) 硕士培养方案 — 二级学科 计算机系统结构 (081201) includes 高性能计算, 云计算 research directions; academic master's, not an HPC-branded degree</a></li>
+<li><a href="#cn-zju-cs-ms">2.3. 计算机科学与技术 硕士 (computer systems architecture and parallel computing direction) — legacy academic master's; from the 2027 intake the college recruits only 085400 电子信息 (计算机技术、网络与信息安全), a professional degree</a></li>
+<li><a href="#cn-sysu-cs-ms">2.4. 计算机科学与技术(一级学科、工学)(081200)硕士生培养方案 (全日制学术硕士) — second-level discipline 计算机系统结构 (network technology and high-performance computing); academic master's, not an HPC-branded degree</a></li>
+<li><a href="#cn-ucas-cs-ms">2.5. 计算机科学与技术一级学科研究生培养方案 (081200), 学术硕士 — 二级学科 计算机系统结构 (081201); academic master's, not an HPC-branded degree, but with an unusually rich HPC/parallel course catalogue and public syllabi</a></li>
+<li><a href="#cn-sustech-cs-ms">2.6. 计算机科学与技术 (0812) 学术学位硕士生培养方案 (2025, 南方科技大学研究生院制, 2025-05-09) — academic master's, generic CS; HPC only via the campus supercomputing centre and the student supercomputing team</a></li>
+</ul></li>
+<li><a href="#ecosysteme">3. Autour des diplômes : centres, écoles, compétitions</a></li>
+<li><a href="#sources">4. Sources et portée</a></li>
+</ul>
+</section>
+<h2 id="vue">1. Vue d'ensemble</h2>
 <p>Cette page présente 6 programme(s) pour la zone « Chine ». Chaque fait vient d'une page consultée le 22 octobre 2026 ; les citations ont été vérifiées mot pour mot contre le texte des pages. Un thème dont le syllabus n'a pas pu être lu est marqué <em>inconnu</em>, jamais <em>absent</em>.</p>
 <div class="tbl-wrap">
 <table style="width:100%;">
@@ -183,15 +203,15 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>2</strong> cours dédié · <strong>1</strong> mentionné dans un cours · <strong>0</strong> absent d'un syllabus consulté · <strong>·</strong> inconnu (syllabus non accessible).</p>
-<h3 id="retenir">Ce qu'on retient de la Chine</h3>
+<h3 id="retenir">1.1. Ce qu'on retient de la Chine</h3>
 <ul>
 <li><strong>Pas de master HPC autonome dans l'échantillon.</strong> Les six programmes étudiés (Tsinghua, USTC, Zhejiang, Sun Yat-sen, UCAS, SUSTech) sont des masters d'informatique généralistes dont une direction (architecture des ordinateurs) comprend du calcul parallèle ou du calcul haute performance, avec une grande part d'options.</li>
 <li><strong>Le HPC vit dans les centres de supercalcul et les compétitions.</strong> Sun Yat-sen s'appuie sur la plateforme Tianhe-2 du centre de supercalcul de Canton ; l'université de Science et Technologie de Chine dispose de son propre centre de supercalcul ; l'université de défense (NUDT) développe la série Tianhe ; SUSTech cite le cluster du campus et une équipe étudiante de supercalcul, troisième premier prix consécutif à l'ASC en 2023.</li>
 <li><strong>Des syllabi plus lisibles à l'UCAS.</strong> Le système de cours de l'UCAS publie des programmes complets de cours HPC (OpenMP, MPI, CUDA, roofline, verbes RDMA et InfiniBand, systèmes de fichiers parallèles).</li>
 <li><strong>Limite de la lecture.</strong> Les sources sont en chinois et plusieurs listes de cours n'étaient pas accessibles : la couverture de nombreux thèmes est inconnue, et le programme de Zhejiang est le moins bien documenté de l'échantillon.</li>
 </ul>
-<h2 id="programmes">Les programmes</h2>
-<h3 id="cn-tsinghua-cs-ms">计算机科学与技术系硕士研究生培养方案 [081200] 计算机科学与技术 — 二级学科 计算机系统结构 (Computer Architecture / systems track, hosted by the 高性能计算研究所 HPC Institute) — academic master's, not an HPC-branded degree</h3>
+<h2 id="programmes">2. Les programmes</h2>
+<h3 id="cn-tsinghua-cs-ms">2.1. 计算机科学与技术系硕士研究生培养方案 [081200] 计算机科学与技术 — 二级学科 计算机系统结构 (Computer Architecture / systems track, hosted by the 高性能计算研究所 HPC Institute) — academic master's, not an HPC-branded degree</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">CN</span>
 </p>
@@ -246,7 +266,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Research-level only: the HPC Institute page reports scalability tests of an atmosphere-model algorithm on the Tianhe-2 supercomputer (not stated as student access). Student supercomputing team coached by HPC-group faculty, winner of ISC24 (see ecosystem).</p>
 <p><strong>Limites de la fiche.</strong> Programme PDF is undated in its text (it mentions students from the 2021 cohort onward) and is hosted on a department page stamped 2024.03.21; the 2026-2027 version may differ. Only course titles/codes/credits were readable: no syllabi, so topics such as MPI, OpenMP, GPU, scheduling, containers were left null (unknown), not 0. No Tsinghua page read states access of master's students to a named cluster. Separate English-taught 'Advanced Computing' MSc (https://ac.cs.tsinghua.edu.cn/curriculum.html, 26 credits for the master) is general CS (ML, distributed systems, big data, networks): no parallel/HPC course in its listing, so not made a separate entry.</p>
 <p><strong>Sources.</strong> <a href="https://www.cs.tsinghua.edu.cn/info/1044/5993.htm">1</a> · <a href="https://www.cs.tsinghua.edu.cn/__local/6/2B/74/43E402B80F178897CFE6FCED2AD_09F6E122_6157F.pdf">2</a> · <a href="https://hpc.cs.tsinghua.edu.cn/">3</a> · <a href="https://www.cs.tsinghua.edu.cn/jwjx/yjs.htm">4</a> · <a href="https://www.tsinghua.edu.cn/info/1175/111550.htm">5</a>. Citations vérifiées mot pour mot : 11/11.</p>
-<h3 id="cn-ustc-cs-ms">计算机科学与技术 (081200) 硕士培养方案 — 二级学科 计算机系统结构 (081201) includes 高性能计算, 云计算 research directions; academic master's, not an HPC-branded degree</h3>
+<h3 id="cn-ustc-cs-ms">2.2. 计算机科学与技术 (081200) 硕士培养方案 — 二级学科 计算机系统结构 (081201) includes 高性能计算, 云计算 research directions; academic master's, not an HPC-branded degree</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">CN</span>
 </p>
@@ -304,7 +324,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> No industry links stated in the programme document. Campus supercomputing centre (超级计算中心, attached to the Network Information Center) offers HPC, intelligent-computing and cloud services.</p>
 <p><strong>Limites de la fiche.</strong> Programme applies from the 2023 intake (latest version found, not necessarily the 2026-2027 version). Only titles/credits are listed, no syllabi: MPI, OpenMP, GPU, scheduling, sysadmin topics are null (unknown), not 0. 'High Performance Computing' is a doctoral course only. Machine access not stated in this document. Machine access evidence comes from the university supercomputing centre (scc.ustc.edu.cn), a campus-wide service.</p>
 <p><strong>Sources.</strong> <a href="https://gradschool.ustc.edu.cn/static/upload/article/ueditor/c5ebb6dce1904d0bab2a08dd377cd15a.pdf">1</a> · <a href="https://gradschool.ustc.edu.cn/">2</a> · <a href="http://scc.ustc.edu.cn/40970/list.htm">3</a> · <a href="http://scc.ustc.edu.cn/40974/list.htm">4</a> · <a href="http://scc.ustc.edu.cn/41069/list.htm">5</a>. Citations vérifiées mot pour mot : 15/15.</p>
-<h3 id="cn-zju-cs-ms">计算机科学与技术 硕士 (computer systems architecture and parallel computing direction) — legacy academic master's; from the 2027 intake the college recruits only 085400 电子信息 (计算机技术、网络与信息安全), a professional degree</h3>
+<h3 id="cn-zju-cs-ms">2.3. 计算机科学与技术 硕士 (computer systems architecture and parallel computing direction) — legacy academic master's; from the 2027 intake the college recruits only 085400 电子信息 (计算机技术、网络与信息安全), a professional degree</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">CN</span>
 </p>
@@ -354,7 +374,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Mémoire ou stage.</strong> Not stated on the pages read.</p>
 <p><strong>Limites de la fiche.</strong> Evidence is dated (programme intro 2019, syllabi 2003 and 2009) and shows the college's earlier offer, not the 2026-2027 curriculum. The 2023 graduate programme page (http://cspo.zju.edu.cn/2023/1008/c27172a2809779/page.htm) could not be fetched (DNS failure). No HPC-branded course (MPI/OpenMP/GPU, scheduling) found; those topics are null (unknown), not 0. Kept as a low-confidence entry because ZJU students and teams participate in ASC competitions (see ecosystem) but no ZJU page read documents HPC training.</p>
 <p><strong>Sources.</strong> <a href="http://www.cs.zju.edu.cn/csen/2019/0304/c26993a1026381/page.htm">1</a> · <a href="http://www.cs.zju.edu.cn/csen/2003/0630/c26995a1202774/page.htm">2</a> · <a href="http://www.cs.zju.edu.cn/csen/2009/1224/c26995a1202793/page.htm">3</a> · <a href="http://www.cs.zju.edu.cn/csen/2026/0615/c27010a3178920/page.htm">4</a> · <a href="http://www.cs.zju.edu.cn/csen/26995/list.htm">5</a>. Citations vérifiées mot pour mot : 8/8.</p>
-<h3 id="cn-sysu-cs-ms">计算机科学与技术(一级学科、工学)(081200)硕士生培养方案 (全日制学术硕士) — second-level discipline 计算机系统结构 (network technology and high-performance computing); academic master's, not an HPC-branded degree</h3>
+<h3 id="cn-sysu-cs-ms">2.4. 计算机科学与技术(一级学科、工学)(081200)硕士生培养方案 (全日制学术硕士) — second-level discipline 计算机系统结构 (network technology and high-performance computing); academic master's, not an HPC-branded degree</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">CN</span>
 </p>
@@ -414,7 +434,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Document states graduates mainly work in government, universities and well-known IT companies (研究生主要就职于政府部门、高校和著名 IT 企业); no named industry partners.</p>
 <p><strong>Limites de la fiche.</strong> Plan revision date 2020-07-15 (the file is the '2020级' plan, uploaded to the school site in 2025-01); not necessarily the 2026-2027 version. Only course titles, hours and credits are listed, no syllabi: MPI, OpenMP, GPU, scheduling, storage, containers, cloud are null (unknown), not 0. Titles that only suggest a theme (Computer Simulation, High Performance Communication Network) are rated 1 and sysadmin/hpc-software-eng elective titles (Linux Application and Development, Software Tools and Environment) left null. Elective list mixes many non-HPC courses (software engineering, CV, NLP, graphics). Not a good fit for GPU-cluster/Slurm skills on its own: research-group work on Tianhe-2 would have to supply that.</p>
 <p><strong>Sources.</strong> <a href="https://cse.sysu.edu.cn/sites/default/files/2025-01/2020%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E6%9C%AF%E5%AD%A6%E4%BD%8D%EF%BC%88%E4%B8%80%E7%BA%A7%E5%AD%A6%E7%A7%91%E3%80%81%E5%B7%A5%E5%AD%A6%EF%BC%8C%E5%AD%A6%E7%A7%91%E4%BB%A3%E7%A0%81%EF%BC%9A081200%EF%BC%89%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88.pdf">1</a> · <a href="https://cse.sysu.edu.cn/">2</a>. Citations vérifiées mot pour mot : 7/7.</p>
-<h3 id="cn-ucas-cs-ms">计算机科学与技术一级学科研究生培养方案 (081200), 学术硕士 — 二级学科 计算机系统结构 (081201); academic master's, not an HPC-branded degree, but with an unusually rich HPC/parallel course catalogue and public syllabi</h3>
+<h3 id="cn-ucas-cs-ms">2.5. 计算机科学与技术一级学科研究生培养方案 (081200), 学术硕士 — 二级学科 计算机系统结构 (081201); academic master's, not an HPC-branded degree, but with an unusually rich HPC/parallel course catalogue and public syllabi</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">CN</span>
 </p>
@@ -467,7 +487,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Course teachers come from ICT-CAS (e.g. head of the High Performance Computer Research Center's interconnect group, who took part in building the Dawning 6000/7000 systems) and ISCAS; no named industry partner or student cluster quota is stated on the pages read.</p>
 <p><strong>Limites de la fiche.</strong> Programme-level rules come from the UCAS CS first-level discipline plan (file hosted by the UCAS AI school, undated, 2024 upload); individual training units (e.g. ICT-CAS) may apply different durations. Syllabi were read for 5 courses on jwba.ucas.ac.cn; 'High Performance Computing Systems' syllabus (code 180086081201P3004H) was not retrieved, so sysadmin, scheduling, containers-k8s, hpc-software-eng and observability-sre stay null (unknown), not 0. Course attribute of Advanced Computer Architecture differs between the syllabus (core, 60 h, 3 credits) and the plan table (popularisation, 40 h, 2 credits). Topic scores: MPI/OpenMP/CUDA rated by syllabus chapters inside elective courses; dedicated-course score 2 only for GPU programming, multicore concurrency, architecture, cloud, big data, ML. No Slurm/Kubernetes content visible: fills the 'GPU programming + MPI + architecture' gap of the course but not scheduling or cluster operations.</p>
 <p><strong>Sources.</strong> <a href="https://ai.ucas.ac.cn/index.php/zh-cn/jxjy/fzpy1/7287-2024-05-11-06-19-14?task=down&amp;fid=sRQMg1wYBbvrEX%2F0JU6DZw%3D%3D">1</a> · <a href="https://jwba.ucas.ac.cn/sc/course/courseplan/256562">2</a> · <a href="https://jwba.ucas.ac.cn/sc/course/courseplan/278713">3</a> · <a href="https://jwba.ucas.ac.cn/sc/course/courseplan/267669">4</a> · <a href="https://jwba.ucas.ac.cn/sc/course/courseplan/288408">5</a> · <a href="https://jwba.ucas.ac.cn/sc/course/courseplan/278711">6</a>. Citations vérifiées mot pour mot : 14/14.</p>
-<h3 id="cn-sustech-cs-ms">计算机科学与技术 (0812) 学术学位硕士生培养方案 (2025, 南方科技大学研究生院制, 2025-05-09) — academic master's, generic CS; HPC only via the campus supercomputing centre and the student supercomputing team</h3>
+<h3 id="cn-sustech-cs-ms">2.6. 计算机科学与技术 (0812) 学术学位硕士生培养方案 (2025, 南方科技大学研究生院制, 2025-05-09) — academic master's, generic CS; HPC only via the campus supercomputing centre and the student supercomputing team</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">CN</span>
 </p>
@@ -526,14 +546,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> No industry links stated in the programme plan. Student supercomputing team tutored by CSE faculty and the CCSE chief engineer (see ecosystem).</p>
 <p><strong>Limites de la fiche.</strong> Plan dated 2025-05-09, hosted 2026-02 on the department site. It lists course titles only: MPI/OpenMP/GPU/scheduling/storage/containers/cloud are null (unknown), not 0, even though no course title names them. Low HPC relevance as a degree; the value for the learner is the cluster (Taiyi uses LSF, not Slurm, and Omni-Path, not InfiniBand) and the competition team. The Taiyi user manual is undated and describes an early configuration. A search-result snippet (not opened) mentions a university-wide course 'High Performance Computing: Methods and Practice' (MAE5032) in SUSTech mechanics programmes: unverified lead only. The department programme page https://cse.sustech.edu.cn/graduate/program/ itself renders no text in the cache; the PDF was reached through its attachment link.</p>
 <p><strong>Sources.</strong> <a href="https://cse.sustech.edu.cn/graduate/program/">1</a> · <a href="https://cse.sustech.edu.cn/uploads/202602/4.%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%B8%8E%E6%8A%80%E6%9C%AF%E5%AD%A6%E7%A7%91%E7%A1%95%E5%A3%AB%E7%94%9F%E5%9F%B9%E5%85%BB%E6%96%B9%E6%A1%88-20251212%5B-%5D02094146_26733_55866088">2</a> · <a href="https://cse.sustech.edu.cn/graduate/program/academic-postgraduate-/">3</a> · <a href="https://newshub.sustech.edu.cn/en/?p=39584">4</a>. Citations vérifiées mot pour mot : 8/8.</p>
-<h2 id="ecosysteme">Autour des diplômes : centres, écoles, compétitions</h2>
+<h2 id="ecosysteme">3. Autour des diplômes : centres, écoles, compétitions</h2>
 <ul>
 <li><strong><a href="https://m.tech.china.com/article/20260521/202605211874155.html">ASC 世界大学生超级计算机竞赛 (ASC Student Supercomputer Challenge), final ASC26 in Wuxi (Peking Univ. 1st, Tsinghua 2nd, Zhejiang Univ. application-innovation award)</a></strong> (compétition) : Teams build and tune a small cluster under a 5000 W power cap and run HPL, HPCG and scientific/AI applications: the closest hands-on training to cluster operations available to students of these universities; PKU, Tsinghua and ZJU teams appear in the 2026 results.</li>
 <li><strong><a href="https://www.tsinghua.edu.cn/info/1175/111550.htm">清华大学学生超算团队 (Tsinghua student supercomputing team), ISC24 overall champion</a></strong> (compétition) : Student team organised with the HPC group of the CS department (coached by HPC faculty and supported by HPC-institute PhD students); wins in the three international student cluster competitions, including cluster power control, a core cluster-operations skill.</li>
 <li><strong><a href="http://scc.ustc.edu.cn/40970/list.htm">中国科学技术大学超级计算中心 (USTC Supercomputing Center): Hanhai20/22/25 systems</a></strong> (centre) : A production university cluster documented in detail (A100 GPU nodes, GPFS, HDR InfiniBand, Slurm 24.11, module environment): a realistic reference of a campus HPC/AI cluster and a place where USTC students can get accounts via their supervisor.</li>
 <li><strong><a href="https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm">国防科技大学 (NUDT) TianHe supercomputer series</a></strong> (centre) : NUDT is the builder of the TianHe supercomputers; its computer college is therefore a major HPC training site in China, but no NUDT graduate curriculum page was reachable (see blocked_sources), so no programme entry is given.</li>
 </ul>
-<h2 id="sources">Sources et portée</h2>
+<h2 id="sources">4. Sources et portée</h2>
 <p><strong>Documenté.</strong> Les pages officielles des programmes et des catalogues de cours, lues le 22 octobre 2026 ; chaque fiche cite ses liens.</p>
 <p><strong>Recommandé.</strong> L'attribution des thèmes de la taxonomie aux intitulés de cours est un jugement de lecture, signalé par des symboles ; elle n'est pas une mesure.</p>
 <p><strong>À vérifier.</strong> Les programmes changent chaque année : consultez la page officielle avant toute décision. Les pages chargées par JavaScript n'ont pas toujours pu être lues.</p>

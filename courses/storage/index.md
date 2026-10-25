@@ -39,7 +39,7 @@ Ce module ne remplace pas le module 10 sur les pannes : le protocole d'un checkp
 | Volume | 24 h : environ 9,5 h de lecture, 9,25 h de labs, 3,5 h d'exercices et 0,5 h de bilan de sortie, soit 22,75 h, plus une marge d'environ 1 h répartie sur les séances |
 | Niveau d'entrée | 2 : à l'aise avec Linux en ligne de commande (module 1) et avec PyTorch |
 | Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), en particulier le chapitre 7 sur le cache de pages et `fio` |
-| Statut pour le lecteur de référence | cœur : vous connaissez les chargeurs PyTorch, mais pas les systèmes de fichiers parallèles ni la dimension E/S d'un checkpoint à grande échelle |
+| Pour qui | Cœur : systèmes de fichiers parallèles, chargement des données et E/S des checkpoints à grande échelle. |
 | Livrable | un rapport de dimensionnement E/S d'un entraînement (lecture, checkpoint, cache, capacité) et la table de décision du chargeur appliquée à une mesure |
 | Environnement | un portable ou une VM Linux sans GPU ; `fio`, PyTorch CPU et `pytest` ; `pyarrow` et `webdataset` en option. Les parties qui demandent un GPU (`pin_memory`, GPUDirect Storage) ou un vrai système de fichiers parallèle sont décrites, **pas exécutées** |
 | Projets liés | [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
@@ -54,6 +54,15 @@ Ce module ne remplace pas le module 10 sur les pannes : le protocole d'un checkp
 -   Modéliser le coût bloquant d'un checkpoint synchrone et asynchrone, et dimensionner son débit (chapitre 6, lab 8.3).
 -   Prévoir le taux de succès d'un cache et concevoir un cache à plusieurs niveaux (chapitre 7).
 -   Planifier capacité, rétention, quotas et sauvegardes d'un programme d'entraînement (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 2 — Exploiter un cluster** (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
+-   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
+-   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
+-   **Projets qui s'en servent** : [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -70,7 +79,27 @@ Huit séances de 3 h, soit 24 h. Chaque séance contient ses chapitres, son lab 
 | 7 | 3 h | 3 | ch. 7 Mise en cache | Lab 8.3 partie C ; Lab 8.4 partie B |
 | 8 | 3 h | 3 | ch. 8 Capacité, durée de vie, coût ; checkpoint de sortie | Ex. 10, 11, 12 |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Administrateur ou ingénieur HPC | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Ingénieur ML ou chercheur | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Développeur logiciel ou systèmes | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** Le dimensionnement des E/S de checkpoint relie ce module aux modules 9 et 10 : ne le sautez pas.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.
 
@@ -1096,8 +1125,9 @@ sudo apt-get install -y fio          # nécessaire au lab 8.2, partie B
 export PYTHON="$PWD/venv/bin/python"  # honoré par chaque verify.sh
 ~~~
 
+### Lab 8.1 — Démasquer un chargeur de données lent {#lab-8-1}
+
 ::: lab
-[Lab 8.1 — Démasquer un chargeur de données lent]{.tag}
 
 **Objectif.** Mesurer la part d'attente d'une boucle d'entraînement, la comparer à un modèle, distinguer un chargeur à latence d'un chargeur CPU et lire le profileur. **Durée.** 2,5 h (séance 5). **Prérequis matériels.** Un portable ou une VM Linux de 4 cœurs au moins, Python avec PyTorch CPU, `numpy` et `pytest` ; aucun GPU. **Simulé :** la lecture distante, le décodage et le pas GPU ; **réel :** le `DataLoader`, le temps d'attente, le CPU des workers, le profileur.
 
@@ -1115,8 +1145,9 @@ Sur la VM de test (2026-10-24) : `OK loader-bottleneck: stall 0/1/2/4/8 workers 
 **Pour aller plus loin.** Lancez `python3 run_lab.py --no-in-order` et comparez le *stall* à 8 workers à celui du modèle : la livraison dans l'ordre explique-t-elle l'écart ? Sur un nœud GPU, comparez `pin_memory=True` et `False` avec le même jeu synthétique, et lisez la ligne de temps CUDA du profileur. **Non exécuté ici.**
 :::
 
+### Lab 8.2 — Shards et lecture séquentielle {#lab-8-2}
+
 ::: lab
-[Lab 8.2 — Shards et lecture séquentielle]{.tag}
 
 **Objectif.** Chiffrer, avec des compteurs du noyau, ce que quatre dispositions d'un même jeu coûtent en ouvertures, en appels `read` et en octets lus, puis mesurer l'effet de la taille de requête avec `fio`. **Durée.** 2,5 h : partie A (compteurs) 1,5 h en séance 3, partie B (`fio`) 1 h en séance 4. **Prérequis matériels.** Linux, Python avec `numpy` et `pytest`, `pyarrow` et `webdataset` recommandés, `fio`, environ 200 Mio de disque libre ; aucun GPU. **Simulé :** les données (graine fixe) ; **réel :** les fichiers, le noyau, `fio`.
 
@@ -1134,8 +1165,9 @@ Sur la VM de test (2026-10-24) : `OK loader-bottleneck: stall 0/1/2/4/8 workers 
 **Pour aller plus loin.** Lancez `fio_gap.py --dir <point de montage>` sur un NFS ou un système parallèle, et comparez $\alpha$, $B$ et $n_{1/2}$ à ceux du disque local. **Non testé ici.**
 :::
 
+### Lab 8.3 — Coût d'un checkpoint {#lab-8-3}
+
 ::: lab
-[Lab 8.3 — Coût d'un checkpoint]{.tag}
 
 **Objectif.** Mesurer le coût d'écritures durables, ajuster $T = \alpha + S/B$, et confronter le modèle de surcoût synchrone et asynchrone à une boucle d'entraînement simulée. **Durée.** 2,5 h : parties A, B et D 1,5 h en séance 6, partie C 1 h en séance 7. **Prérequis matériels.** Linux, Python avec `numpy` et `pytest`, un disque qui accepte `O_DIRECT` ; aucun GPU. **Simulé :** le pas d'entraînement, le stockage lent de la partie B (l'écrivain se bride) et la copie GPU vers hôte (une copie en mémoire) ; **réel :** les écritures, `fsync`, `rename`, `O_DIRECT`.
 
@@ -1153,8 +1185,9 @@ Sur la VM de test (2026-10-24) : `OK loader-bottleneck: stall 0/1/2/4/8 workers 
 **Pour aller plus loin.** Lancez `bench_ckpt.py --dir <point de montage>` sur le stockage de votre cluster. Un test multi-clients (section 6.7) reste à écrire. **Non testé ici.**
 :::
 
+### Lab 8.4 — Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité {#lab-8-4}
+
 ::: lab
-[Lab 8.4 — Dimensionner : lecture, checkpoint, striping, requêtes, cache, capacité]{.tag}
 
 **Objectif.** Refaire chaque calcul du module avec du code testé, puis avec vos propres chiffres. **Durée.** 1,75 h : partie A 1 h en séance 1, partie B 0,75 h en séance 7. **Prérequis matériels.** Python et `pytest` ; aucun autre outil. **Simulé :** la simulation de cache est une simulation (graine fixe) ; les entrées des exemples sont des **valeurs d'exemple**.
 
@@ -1380,10 +1413,18 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les faits attribués à une source dans le texte ont été relus à la source le 24 octobre 2026 : les composants, les valeurs par défaut et les limites de striping, Data on MDT, la règle « as few objects… » et les quotas de Lustre ; l'architecture et le striping de BeeGFS ; la description générale de WEKA ; les chiffres du système de travail de Perlmutter, sa politique de purge et le matériel de Jean Zay ; la cohérence à la fermeture, `nconnect` et les compteurs de `/proc/<pid>/io` ; la cohérence et les débits par préfixe de S3 ; la sémantique de Mountpoint ; le format WebDataset ; la définition de Parquet, le cache mémoire projeté de Hugging Face Datasets et le `train.bin` de nanoGPT ; la docstring de `DataLoader` ; les résultats et le cache MinIO de l'étude sur les *data stalls* ; le résumé de CheckFreq ; le paragraphe sur le stockage de Llama 3 ; le chargeur unique par machine de MegaScale ; le guide de GPUDirect Storage et la configuration NVMe du DGX H100. Tous les chiffres des exemples et des corrigés viennent de `iosizing.py` (commandes `demo` et `exercises`) ou des sorties des labs, exécutés dans le bac à sable le 24 octobre 2026 (noyau Linux 6.18, 4 vCPU, PyTorch 2.14.1 CPU, `fio` 3.36, `pyarrow` 26.0.0, `webdataset` 1.0.2).
+### Documenté {#documente}
 
-**Recommandé.** L'ordre des chapitres ; les quatre flux d'E/S ; les seuils de la table de décision du chargeur (5 %, 0,7 cœur, 80 %) ; le protocole « shards immuables avec manifeste » pour l'invalidation ; l'affectation collante des shards ; la recette de stockage en cinq essais ; les quatre classes de durée de vie ; la politique de sauvegarde par classe ; la rotation $K$ derniers plus un sur $L$ avec un quota couvrant le pic. Ce sont des choix de ce parcours, pas des normes.
+Les faits attribués à une source dans le texte ont été relus à la source le 24 octobre 2026 : les composants, les valeurs par défaut et les limites de striping, Data on MDT, la règle « as few objects… » et les quotas de Lustre ; l'architecture et le striping de BeeGFS ; la description générale de WEKA ; les chiffres du système de travail de Perlmutter, sa politique de purge et le matériel de Jean Zay ; la cohérence à la fermeture, `nconnect` et les compteurs de `/proc/<pid>/io` ; la cohérence et les débits par préfixe de S3 ; la sémantique de Mountpoint ; le format WebDataset ; la définition de Parquet, le cache mémoire projeté de Hugging Face Datasets et le `train.bin` de nanoGPT ; la docstring de `DataLoader` ; les résultats et le cache MinIO de l'étude sur les *data stalls* ; le résumé de CheckFreq ; le paragraphe sur le stockage de Llama 3 ; le chargeur unique par machine de MegaScale ; le guide de GPUDirect Storage et la configuration NVMe du DGX H100. Tous les chiffres des exemples et des corrigés viennent de `iosizing.py` (commandes `demo` et `exercises`) ou des sorties des labs, exécutés dans le bac à sable le 24 octobre 2026 (noyau Linux 6.18, 4 vCPU, PyTorch 2.14.1 CPU, `fio` 3.36, `pyarrow` 26.0.0, `webdataset` 1.0.2).
 
-**À vérifier.** (1) La documentation de GPFS / IBM Storage Scale a répondu HTTP 403 : aucun fait sur ce système n'est avancé, et celle de WEKA n'a été lue que dans sa page de présentation. (2) La formule du taux de succès d'un LRU en époques aléatoires est une **dérivation de ce parcours** (champ moyen), vérifiée par simulation à 3 points près ; ce n'est pas un résultat publié. Le modèle d'affectation collante ou aléatoire est une simplification (cache sans éviction, parts égales). (3) L'écart entre le modèle du chargeur et la mesure à 8 workers n'est pas expliqué : la livraison dans l'ordre a été testée (`in_order=False`) et écartée. Plusieurs autres explications sont des **hypothèses non testées** : l'amplification de 3,4 de `mmap` (lecture autour de la faute de page), le 1,30 de la lecture aléatoire de shards (échantillons à cheval sur cinq pages), l'écart de l'asynchrone mesuré (8,9 %) et prédit (4,3 %), le coût de la première copie dans un tampon neuf (attribution tardive de la mémoire par l'hôte) et l'effet de l'option `discard` sur les écritures parallèles. (4) Les entrées des exemples (3 000 images par seconde, 110 ou 120 ko par image, 8 000 jetons par seconde, latences de 20 ms, 40 Go/s de débit partagé, 50 000 opérations de métadonnées par seconde, quart de prix) sont des **valeurs d'exemple**, pas des mesures de produits. (5) L'affirmation de WebDataset sur un gain de 3 à 10 fois n'a pas été reproduite. (6) Le manuel de Lustre lu est celui du site officiel ; vérifiez la version de votre déploiement pour les fonctions citées avec un numéro (2.11, 2.13). (7) `pin_memory` et GPUDirect Storage n'ont pas été exécutés (pas de GPU) ; `fio_gap.py` et `bench_ckpt.py` n'ont pas été lancés sur NFS, ni sur un système parallèle, ni sur un stockage objet monté. (8) La page de documentation HTML de `DataLoader` n'a pas livré de texte : les paramètres viennent de la docstring du code source (branche `main`, lue le 24 octobre 2026) ; relisez la documentation de votre version. (9) Aucun prix n'est cité.
+### Recommandé {#recommande}
 
-**Hors périmètre.** La conception d'un système de fichiers parallèle ou d'un stockage Ceph ; les réseaux de stockage (RDMA, NVMe sur fabric : module 7) ; le protocole et le format d'un checkpoint (atomicité, sommes de contrôle, reprise : module 10) ; les volumes Kubernetes et leurs pilotes CSI (module 12) ; le chiffrement au repos et le contrôle d'accès (module 16) ; le décodage d'images sur GPU (DALI) ; les tarifs des fournisseurs ; l'exécution de GPUDirect Storage.
+L'ordre des chapitres ; les quatre flux d'E/S ; les seuils de la table de décision du chargeur (5 %, 0,7 cœur, 80 %) ; le protocole « shards immuables avec manifeste » pour l'invalidation ; l'affectation collante des shards ; la recette de stockage en cinq essais ; les quatre classes de durée de vie ; la politique de sauvegarde par classe ; la rotation $K$ derniers plus un sur $L$ avec un quota couvrant le pic. Ce sont des choix de ce parcours, pas des normes.
+
+### À vérifier {#a-verifier}
+
+(1) La documentation de GPFS / IBM Storage Scale a répondu HTTP 403 : aucun fait sur ce système n'est avancé, et celle de WEKA n'a été lue que dans sa page de présentation. (2) La formule du taux de succès d'un LRU en époques aléatoires est une **dérivation de ce parcours** (champ moyen), vérifiée par simulation à 3 points près ; ce n'est pas un résultat publié. Le modèle d'affectation collante ou aléatoire est une simplification (cache sans éviction, parts égales). (3) L'écart entre le modèle du chargeur et la mesure à 8 workers n'est pas expliqué : la livraison dans l'ordre a été testée (`in_order=False`) et écartée. Plusieurs autres explications sont des **hypothèses non testées** : l'amplification de 3,4 de `mmap` (lecture autour de la faute de page), le 1,30 de la lecture aléatoire de shards (échantillons à cheval sur cinq pages), l'écart de l'asynchrone mesuré (8,9 %) et prédit (4,3 %), le coût de la première copie dans un tampon neuf (attribution tardive de la mémoire par l'hôte) et l'effet de l'option `discard` sur les écritures parallèles. (4) Les entrées des exemples (3 000 images par seconde, 110 ou 120 ko par image, 8 000 jetons par seconde, latences de 20 ms, 40 Go/s de débit partagé, 50 000 opérations de métadonnées par seconde, quart de prix) sont des **valeurs d'exemple**, pas des mesures de produits. (5) L'affirmation de WebDataset sur un gain de 3 à 10 fois n'a pas été reproduite. (6) Le manuel de Lustre lu est celui du site officiel ; vérifiez la version de votre déploiement pour les fonctions citées avec un numéro (2.11, 2.13). (7) `pin_memory` et GPUDirect Storage n'ont pas été exécutés (pas de GPU) ; `fio_gap.py` et `bench_ckpt.py` n'ont pas été lancés sur NFS, ni sur un système parallèle, ni sur un stockage objet monté. (8) La page de documentation HTML de `DataLoader` n'a pas livré de texte : les paramètres viennent de la docstring du code source (branche `main`, lue le 24 octobre 2026) ; relisez la documentation de votre version. (9) Aucun prix n'est cité.
+
+### Hors périmètre {#hors-perimetre}
+
+La conception d'un système de fichiers parallèle ou d'un stockage Ceph ; les réseaux de stockage (RDMA, NVMe sur fabric : module 7) ; le protocole et le format d'un checkpoint (atomicité, sommes de contrôle, reprise : module 10) ; les volumes Kubernetes et leurs pilotes CSI (module 12) ; le chiffrement au repos et le contrôle d'accès (module 16) ; le décodage d'images sur GPU (DALI) ; les tarifs des fournisseurs ; l'exécution de GPUDirect Storage.

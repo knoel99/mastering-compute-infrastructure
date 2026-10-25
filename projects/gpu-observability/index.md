@@ -10,6 +10,7 @@ project:
 badges:
   - {label: "Portfolio", class: core}
   - {label: "Code de départ et solution vérifiés (promtool 2.45)", class: verified}
+numbered: true
 ---
 
 ## Contexte et objectif {#contexte}

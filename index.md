@@ -2,6 +2,8 @@
 title: "Mastering Compute Infrastructure"
 subtitle: "Un parcours pour devenir compute infrastructure engineer : cours, labs vérifiés, projets de portfolio et enquête sur les masters HPC"
 description: "Parcours d'apprentissage en français pour opérer des clusters GPU, ordonnancer, entraîner à grande échelle et piloter la capacité multi-fournisseurs."
+numbered: true
+toc-inline: false
 ---
 
 <p class="lead">Un <em>compute infrastructure engineer</em> fait tourner les machines sur lesquelles on entraîne les modèles d'IA : clusters GPU, ordonnanceurs, réseaux, stockage, fiabilité, coût. Ce site rassemble de quoi apprendre ce métier de manière structurée : 16 modules en 6 phases, 6 projets de portfolio, des labs exécutables et une enquête sourcée sur les masters HPC en France, aux États-Unis, en Chine et dans le monde.</p>
@@ -11,6 +13,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 <a class="cta cta-ghost" href="path/index.html">Feuille de route</a>
 <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
+<a class="cta cta-ghost" href="market/index.html">Analyse du marché</a>
 <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>
 </div>
 
@@ -37,18 +40,20 @@ Volume total : **440 h de modules et 152 h de projets**, soit environ 49 semaine
 
 ## Cours {#cours}
 
-Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge **Cœur** signale un module indispensable ; **À survoler** un module que le lecteur de référence peut parcourir rapidement.
+Chaque cours est une longue page unique : fiche, plan de séances, chapitres avec exemples chiffrés, labs, exercices corrigés, checkpoint de sortie et références. Le badge **Cœur** signale un module indispensable à tous ; **Fondation** un module de base que vous pouvez survoler si vous le pratiquez déjà. La section « Comment travailler ce module » de chaque cours donne la priorité selon votre profil d'entrée.
 
-<h3 class="phase" id="phase0">Phase 0 — Fondations : machines et performance</h3>
+### Phase 0 — Fondations : machines et performance {#phase0 .phase .unnumbered}
+
 
 <p class="sub-line">Lire une machine et prédire sa performance avant de la mesurer.</p>
 
 <div class="cards">
-<a class="card" href="courses/linux-systems/index.html"><h4>Linux, systèmes et diagnostic de performance</h4><p class="meta">Module 01 · 24 h · À survoler</p><p>Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.</p></a>
+<a class="card" href="courses/linux-systems/index.html"><h4>Linux, systèmes et diagnostic de performance</h4><p class="meta">Module 01 · 24 h · Fondation</p><p>Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.</p></a>
 <a class="card" href="courses/perf-models/index.html"><h4>Architecture matérielle et modèles de performance</h4><p class="meta">Module 02 · 24 h · Cœur</p><p>Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.</p></a>
 </div>
 
-<h3 class="phase" id="phase1">Phase 1 — Calcul parallèle et GPU</h3>
+### Phase 1 — Calcul parallèle et GPU {#phase1 .phase .unnumbered}
+
 
 <p class="sub-line">Écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.</p>
 
@@ -57,7 +62,8 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <a class="card" href="courses/gpu-programming/index.html"><h4>Programmation GPU : CUDA, Triton et profilage</h4><p class="meta">Module 04 · 30 h · Cœur</p><p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p></a>
 </div>
 
-<h3 class="phase" id="phase2">Phase 2 — Exploiter un cluster</h3>
+### Phase 2 — Exploiter un cluster {#phase2 .phase .unnumbered}
+
 
 <p class="sub-line">Provisionner, ordonnancer, relier et alimenter en données un cluster GPU.</p>
 
@@ -68,7 +74,8 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <a class="card" href="courses/storage/index.html"><h4>Stockage et E/S pour l'entraînement</h4><p class="meta">Module 08 · 24 h · Cœur</p><p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p></a>
 </div>
 
-<h3 class="phase" id="phase3">Phase 3 — Systèmes d'entraînement distribué</h3>
+### Phase 3 — Systèmes d'entraînement distribué {#phase3 .phase .unnumbered}
+
 
 <p class="sub-line">Faire tourner un entraînement multi-nœuds qui survit aux pannes.</p>
 
@@ -78,7 +85,8 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <a class="card" href="courses/ray-rl-infra/index.html"><h4>Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</h4><p class="meta">Module 11 · 28 h · Cœur</p><p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p></a>
 </div>
 
-<h3 class="phase" id="phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</h3>
+### Phase 4 — Plateforme cloud-native et multi-fournisseurs {#phase4 .phase .unnumbered}
+
 
 <p class="sub-line">Placer, observer et facturer des charges sur plusieurs fournisseurs.</p>
 
@@ -89,7 +97,8 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <a class="card" href="courses/finops-capacity/index.html"><h4>FinOps, capacité, énergie et achats de calcul</h4><p class="meta">Module 15 · 24 h · Cœur</p><p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p></a>
 </div>
 
-<h3 class="phase" id="phase5">Phase 5 — Production et leadership</h3>
+### Phase 5 — Production et leadership {#phase5 .phase .unnumbered}
+
 
 <p class="sub-line">Opérer en production, décider, négocier, diriger et passer l'entretien.</p>
 
@@ -110,13 +119,17 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 <a class="card" href="projects/capstone-rfc/index.html"><h4>RFC et prototype : une plateforme de calcul de 8 à 256 GPU</h4><p class="meta">Projet 6 · 40 h</p><p>Le projet de synthèse : un document de conception complet, un modèle de capacité et de coût exécutable dont un vérificateur recoupe les chiffres, une revue contradictoire par grille et une soutenance.</p></a>
 </div>
 
+## Ce que demande le marché {#marche}
+
+Une analyse sourcée d'offres d'emploi d'infrastructure de calcul publiées aux États-Unis, en Europe et en Chine, dans les laboratoires d'IA, les grands groupes, les clouds GPU et les centres HPC : les compétences demandées, ce qui change d'une région à l'autre, et ce que le parcours couvre. <a href="market/index.html">Lire l'analyse</a>.
+
 ## Enquête sur les masters HPC {#masters}
 
 Une analyse sourcée des masters orientés calcul haute performance en France, aux États-Unis, en Chine et dans le reste du monde, croisée avec les offres d'emploi de compute infrastructure : ce que les masters enseignent, ce qu'ils n'enseignent presque pas, et ce que ce parcours ajoute. <a href="masters/index.html">Lire l'enquête</a>.
 
 ## Comment utiliser ce site {#usage}
 
-1.  Lisez le [point de départ](profile/index.html) : il compare un profil de référence au métier visé et dit quels modules survoler et lesquels travailler à fond.
+1.  Lisez le [point de départ](profile/index.html) : il décrit le métier et cinq profils d'entrée, et propose une grille d'autodiagnostic pour choisir quels modules travailler à fond et lesquels survoler.
 2.  Préparez votre [environnement de travail](lab-setup/index.html) si la page est publiée : un portable CPU suffit pour la base.
 3.  Suivez les phases dans l'ordre. Dans chaque module, faites les trois questions de positionnement avant de lire.
 4.  Faites les labs et lancez leur `verify.sh` : un lab compte quand sa vérification passe.

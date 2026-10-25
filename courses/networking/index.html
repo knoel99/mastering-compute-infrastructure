@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,101 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 07 · Phase 2 · 28 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs 7.1 et 7.2 vérifiés dans un bac à sable ; lab 7.3 (GPU) non exécuté</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Rappels : latence, débit utile, MTU, flux et congestion</a>
+<ul>
+<li><a href="#latence-débit-nominal-et-débit-utile">1.1. Latence, débit nominal et débit utile</a></li>
+<li><a href="#en-têtes-mtu-et-débit-utile">1.2. En-têtes, MTU et débit utile</a></li>
+<li><a href="#contrôle-de-flux-et-contrôle-de-congestion">1.3. Contrôle de flux et contrôle de congestion</a></li>
+<li><a href="#pourquoi-lentraînement-est-un-trafic-difficile">1.4. Pourquoi l'entraînement est un trafic difficile</a></li>
+</ul></li>
+<li><a href="#ch2">2. RDMA, verbs et GPUDirect</a>
+<ul>
+<li><a href="#pourquoi-contourner-le-noyau">2.1. Pourquoi contourner le noyau</a></li>
+<li><a href="#les-objets-des-verbs">2.2. Les objets des verbs</a></li>
+<li><a href="#les-coûts-cachés">2.3. Les coûts cachés</a></li>
+<li><a href="#gpudirect-rdma">2.4. GPUDirect RDMA</a></li>
+<li><a href="#gpudirect-storage">2.5. GPUDirect Storage</a></li>
+</ul></li>
+<li><a href="#ch3">3. InfiniBand : un réseau géré</a>
+<ul>
+<li><a href="#un-sous-réseau-un-gestionnaire">3.1. Un sous-réseau, un gestionnaire</a></li>
+<li><a href="#débits-et-générations">3.2. Débits et générations</a></li>
+<li><a href="#opensm-et-ses-moteurs-de-routage">3.3. OpenSM et ses moteurs de routage</a></li>
+<li><a href="#routage-statique-routage-adaptatif-calcul-dans-le-réseau">3.4. Routage statique, routage adaptatif, calcul dans le réseau</a></li>
+<li><a href="#opérations-quotidiennes">3.5. Opérations quotidiennes</a></li>
+</ul></li>
+<li><a href="#ch4">4. Ethernet pour l'IA : RoCE v2, PFC, ECN et DCQCN</a>
+<ul>
+<li><a href="#roce-v2-le-transport-infiniband-dans-des-paquets-udp">4.1. RoCE v2 : le transport InfiniBand dans des paquets UDP</a></li>
+<li><a href="#pourquoi-roce-veut-un-réseau-sans-perte">4.2. Pourquoi RoCE veut un réseau sans perte</a></li>
+<li><a href="#pfc-sans-perte-mais-avec-des-effets-de-bord">4.3. PFC : sans perte, mais avec des effets de bord</a></li>
+<li><a href="#ecn-et-dcqcn">4.4. ECN et DCQCN</a></li>
+<li><a href="#ce-que-disent-trois-déploiements-documentés">4.5. Ce que disent trois déploiements documentés</a></li>
+</ul></li>
+<li><a href="#ch5">5. Topologies : fat-tree, rails et sur-souscription</a>
+<ul>
+<li><a href="#le-fat-tree">5.1. Le fat-tree</a></li>
+<li><a href="#la-sur-souscription">5.2. La sur-souscription</a></li>
+<li><a href="#topologies-à-rails">5.3. Topologies à rails</a></li>
+<li><a href="#dragonfly-et-au-delà">5.4. Dragonfly et au-delà</a></li>
+<li><a href="#placement-sensible-à-la-topologie">5.5. Placement sensible à la topologie</a></li>
+</ul></li>
+<li><a href="#ch6">6. Dans le nœud : NVLink, NVSwitch, PCIe et affinité</a>
+<ul>
+<li><a href="#une-hiérarchie-de-liens">6.1. Une hiérarchie de liens</a></li>
+<li><a href="#la-grammaire-des-chemins">6.2. La grammaire des chemins</a></li>
+<li><a href="#laffinité-gpu-carte-réseau">6.3. L'affinité GPU-carte réseau</a></li>
+</ul></li>
+<li><a href="#ch7">7. NCCL : algorithmes, protocoles et journaux</a>
+<ul>
+<li><a href="#ce-que-nccl-fait-pour-vous">7.1. Ce que NCCL fait pour vous</a></li>
+<li><a href="#les-algorithmes">7.2. Les algorithmes</a></li>
+<li><a href="#les-protocoles">7.3. Les protocoles</a></li>
+<li><a href="#les-variables-denvironnement-utiles">7.4. Les variables d'environnement utiles</a></li>
+<li><a href="#lire-un-journal-nccl_debuginfo">7.5. Lire un journal <code>NCCL_DEBUG=INFO</code></a></li>
+</ul></li>
+<li><a href="#ch8">8. Mesure et diagnostic : nccl-tests, perftest, hangs et liens dégradés</a>
+<ul>
+<li><a href="#nccl-tests-et-le-débit-de-bus">8.1. nccl-tests et le débit de bus</a></li>
+<li><a href="#les-outils-de-bas-niveau">8.2. Les outils de bas niveau</a></li>
+<li><a href="#une-méthode-par-couches">8.3. Une méthode par couches</a></li>
+<li><a href="#isoler-un-composant-par-bissection">8.4. Isoler un composant par bissection</a></li>
+<li><a href="#blocages-délais-de-garde-et-observabilité">8.5. Blocages, délais de garde et observabilité</a></li>
+<li><a href="#le-rapport-de-recette">8.6. Le rapport de recette</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-7-1">Lab 7.1 — Dimensionner un fat-tree</a></li>
+<li><a href="#lab-7-2">Lab 7.2 — Lire un journal NCCL</a></li>
+<li><a href="#lab-7-3">Lab 7.3 — nccl-tests sur un vrai cluster</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> pourquoi un job qui tourne bien sur un nœud ralentit-il dès qu'il en occupe deux, et comment le démontrer avec des mesures plutôt qu'avec des soupçons ? Dans un entraînement multi-nœuds, chaque étape se termine par un échange de gradients. Le réseau décide alors si les GPU calculent ou s'ils attendent.</p>
 <p>Ce module vous apprend à <strong>choisir</strong> une technologie (InfiniBand ou RoCE), à <strong>dimensionner</strong> une topologie, à <strong>lire</strong> le journal d'initialisation de NCCL et à <strong>mesurer</strong> un réseau avec <code>nccl-tests</code> et <code>perftest</code>. Les calculs sont refaits par un calculateur testé. Une partie des commandes est exécutée pour de vrai, dans un bac à sable, sur un simulateur InfiniBand et le gestionnaire de sous-réseau réel OpenSM. Rien n'est exécuté sur des GPU : le lab 7.3 le dit.</p>
@@ -85,8 +180,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a>, <a href="../perf-models/index.html">Module 2 — Architecture matérielle et modèles de performance</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : aucune expérience d'InfiniBand ni de NCCL dans le profil, écart de 3 sur 4</td>
+<td>Pour qui</td>
+<td>Cœur pour tous : InfiniBand, RoCE et NCCL ; un administrateur HPC qui connaît InfiniBand y trouvera NCCL et le dimensionnement pour l'entraînement.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -113,6 +208,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Lire la topologie vue par un nœud GPU et vérifier l'affinité GPU-carte réseau (chapitre 6).</li>
 <li>Expliquer comment NCCL choisit un algorithme et lire son journal <code>NCCL_DEBUG=INFO</code> (chapitre 7).</li>
 <li>Mesurer avec <code>nccl-tests</code> et <code>perftest</code>, interpréter un écart et isoler une panne par bissection (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 2 — Exploiter un cluster</strong> (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.</li>
+<li><strong>S'appuie sur</strong> : <a href="../linux-systems/index.html">module 1 — Linux, systèmes et diagnostic de performance</a>, <a href="../perf-models/index.html">module 2 — Architecture matérielle et modèles de performance</a>.</li>
+<li><strong>Prépare</strong> : <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Onze séances, soit 28 h : trois de 3 h, six de 2,5 h et deux de 2 h. Le niveau ne diminue jamais. Chaque séance tient dans sa durée : lecture, lab et exercices compris, avec les estimations de 30 minutes par exercice ★, 1 h par ★★ et 1 h 30 par ★★★.</p>
@@ -215,7 +318,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Le diagnostic NCCL et le modèle de coût des collectives sont ce qui manque le plus souvent, quel que soit le profil d'entrée.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez directement au module suivant.</p>
 <ol type="1">
 <li><p><strong>Un lien de 400 Gb/s.</strong> Combien cela fait-il en Go/s ? Avec un temps d'aller-retour supposé de 5 µs, combien d'octets faut-il garder « en vol » pour saturer ce lien ?</p></li>
@@ -950,8 +1102,8 @@ OK nccl-tests output</code></pre>
 </div>
 <h2 id="labs">Labs</h2>
 <p>Trois labs, 9 h au total. Les labs 7.1 et 7.2 s'exécutent dans un bac à sable Linux sans GPU et ont été exécutés par l'auteur (Ubuntu 24.04, 4 vCPU, le 2026-10-24). Le lab 7.3 demande des GPU : il est <strong>linté et testé sur des tables synthétiques</strong>, mais son exécution réelle n'a pas été faite ; c'est pourquoi le badge du module est « non vérifié ». Les scripts <code>verify.sh</code> honorent <code>PYTHON=/chemin/vers/python</code>.</p>
+<h3 id="lab-7-1">Lab 7.1 — Dimensionner un fat-tree</h3>
 <div class="lab">
-<p><span class="tag">Lab 7.1 — Dimensionner un fat-tree</span></p>
 <p><strong>Objectif.</strong> Dimensionner des fat-trees avec un calculateur testé, le confronter aux chiffres publiés du DGX SuperPOD H100, puis vérifier avec le <strong>vrai</strong> gestionnaire de sous-réseau OpenSM, sur un fabric simulé, qu'un fabric généré par le calculateur est reconnu comme un fat-tree. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h). <strong>Prérequis matériels.</strong> Un portable Linux avec Python 3 et <code>pytest</code>. Partie B : <code>sudo apt-get install -y ibsim-utils opensm infiniband-diags</code> (testé sur Ubuntu 24.04 : ibsim 0.10, OpenSM 3.3.23, infiniband-diags 50.0, en tant que root). Aucun GPU, aucun coût.</p>
 <ol type="1">
 <li>Lisez <code>labs/networking/topology-sizing/fabric.py</code> : repérez <code>size_fabric</code>, la formule <code>5N/r</code> à trois niveaux, <code>effective_bandwidth</code> et <code>goodput_fraction</code>.</li>
@@ -967,8 +1119,8 @@ OK nccl-tests output</code></pre>
 <p>Sans les paquets de la partie B, le script affiche <code>SKIP part B</code> et se termine par <code>OK topology-sizing (part A only)</code> : dans ce cas, seule la partie A est vérifiée.</p>
 <p><strong>Pour aller plus loin.</strong> Étendez <code>ibsim_check.py</code> à trois niveaux. Ajoutez une quatrième configuration où une colonne entière est retirée, et observez le moteur retenu. Le simulateur ne transporte aucun paquet : ne mesurez pas de débit avec lui.</p>
 </div>
+<h3 id="lab-7-2">Lab 7.2 — Lire un journal NCCL</h3>
 <div class="lab">
-<p><span class="tag">Lab 7.2 — Lire un journal NCCL</span></p>
 <p><strong>Objectif.</strong> Écrire et tester un analyseur de journaux <code>NCCL_DEBUG=INFO</code> qui extrait la topologie, le réseau, les cartes, les anneaux et le moment où un rang cesse de progresser. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable Linux avec Python 3 et <code>pytest</code>. Aucun GPU. <strong>Données :</strong> les journaux du dossier <code>fixtures/</code> sont <strong>synthétiques</strong> (générés par <code>make_fixtures.py</code> avec des formats relus dans le code de NCCL, des valeurs inventées), sauf <code>public_nccl_docs.log</code>, un extrait de neuf lignes de la documentation de NCCL, avec sa source.</p>
 <ol type="1">
 <li>Lisez <code>make_fixtures.py</code> : l'en-tête cite le fichier source de NCCL pour chaque format de message. Relancez-le et constatez que les fichiers committés sont reproduits à l'identique.</li>
@@ -980,8 +1132,8 @@ OK nccl-tests output</code></pre>
 <p><strong>Critère de réussite.</strong> <code>./verify.sh</code> passe 11 tests et se termine par <code>OK nccl-log-reading: healthy log clean, 3 broken logs diagnosed with the expected code</code>. Le journal sain ne produit aucune erreur ; chaque journal cassé produit exactement l'erreur attendue (<code>socket_network</code>, <code>hca_mismatch</code>, <code>init_incomplete</code>).</p>
 <p><strong>Pour aller plus loin.</strong> Lancez l'analyseur sur un vrai journal de votre cluster (<code>NCCL_DEBUG=INFO NCCL_DEBUG_FILE=nccl.%h.%p.log</code>), et notez les lignes dont le format a changé. Ajoutez les lignes de la famille <code>TUNING</code> pour extraire l'algorithme et le protocole retenus.</p>
 </div>
+<h3 id="lab-7-3">Lab 7.3 — nccl-tests sur un vrai cluster</h3>
 <div class="lab">
-<p><span class="tag">Lab 7.3 — nccl-tests sur un vrai cluster</span></p>
 <p><strong>Objectif.</strong> Préparer et interpréter une recette <code>all_reduce_perf</code> sous Slurm sur deux nœuds de huit GPU. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h).</p>
 <p><strong>Prérequis matériels.</strong> Partie A : un portable Linux avec Python 3, <code>pytest</code> et <code>shellcheck</code> (optionnel). Partie B : deux nœuds de huit GPU avec Slurm, <code>nccl-tests</code> compilé avec <code>MPI=1</code> et un <code>srun</code> capable de lancer des rangs MPI ; coût indicatif : voir la page tarifaire de votre fournisseur le jour même.</p>
 <p><strong>État de vérification.</strong> La partie A est exécutée par <code>verify.sh</code> ; la partie B n'a <strong>pas</strong> été exécutée par l'auteur.</p>
@@ -1218,10 +1370,16 @@ degraded_rail.log:  HCAs per host {&#39;node-01&#39;: 8, &#39;node-02&#39;: 7}
 <li>SchedMD. <a href="https://slurm.schedmd.com/topology.html"><em>Topology Guide</em></a>. Chapitre 5, placement : voir aussi le <a href="../slurm/index.html#ch5">chapitre 5 du module 5</a>.</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les noms, versions d'introduction et comportements des variables et algorithmes de NCCL (guide d'utilisation, pages « Environment Variables », « Troubleshooting », « Logging »), les formules de débit de bus et les options de <code>nccl-tests</code>, la variable <code>NCCL_TESTS_MIN_BW</code> et la structure du tableau de sortie (code source de <code>nccl-tests</code>), les formats des messages de journal de NCCL (code source de <code>init.cc</code>, <code>search.cc</code>, <code>topo.cc</code>, <code>p2p.cc</code>, <code>net.cc</code> et <code>bootstrap.cc</code>), les tailles d'en-têtes (<code>ib_pack.h</code> du noyau Linux) et les valeurs de MTU (<code>verbs.h</code>), le port UDP 4791 (registre de l'IANA), les affirmations sur DCQCN, PFC et ECN (article de DCQCN, RFC 3168), les trois pannes de Guo et al., les formules du fat-tree (Al-Fares et al.), les comptes du DGX SuperPOD H100, les débits des cartes et commutateurs (pages NVIDIA), les réseaux de Llama 3, MegaScale et HPN, et la latence logarithmique des arbres binaires doubles ont été relus à la source le 24 octobre 2026. Les sorties d'OpenSM 3.3.23, <code>ibsim</code> 0.10, <code>infiniband-diags</code> 50.0 et <code>perftest</code> 24.01.0 sont celles du bac à sable ; les calculs des exemples et des corrigés sont refaits par <code>labs/networking/topology-sizing/fabric.py</code> ou par un script Python.</p>
-<p><strong>Recommandé.</strong> L'ordre des chapitres, le modèle jouet de sur-souscription, la réserve de tampon PFC de l'exercice 4, le modèle à parts égales entre canaux, la bissection, le seuil de 80 % du plateau attendu et la liste de contrôle en couches sont des choix pédagogiques de ce parcours, pas des normes. Les valeurs de latence de l'exemple 7.1 et tous les chiffres « hypothèse » sont des données d'école.</p>
-<p><strong>À vérifier.</strong> (1) Les 24 octets de trame Ethernet sur le fil (séquence de contrôle, préambule, espace inter-trame), l'encodage 64b/66b, la norme IEEE 802.1Qbb de PFC, la correspondance XDR = 800 Gb/s, les noms exacts des compteurs de port InfiniBand et le niveau 2 sans perte avec contrôle de flux par crédits d'InfiniBand sont des connaissances courantes <strong>non relues</strong> dans la spécification (payante ou inaccessible depuis le bac à sable). (2) Les mécanismes du routage adaptatif, de SHARP, de <code>PXN</code> et des algorithmes CollNet dépendent de la version et n'ont pas été relus. (3) L'article fondateur du dragonfly et le fat-tree de Leiserson (1985) n'ont pas été relus. (4) La lecture du « 1:7 » de Llama 3 comme « un septième de la bande passante » est une interprétation. (5) Les journaux NCCL et les tables <code>nccl-tests</code> du module sont <strong>synthétiques</strong> : les formats changent d'une version à l'autre et aucune exécution sur GPU n'a eu lieu. (6) Les pages produit de NVIDIA ne précisent pas si les 900 Go/s de NVLink se comptent par sens ou en bidirectionnel. (7) Plusieurs éditeurs (ACM, IEEE Xplore) répondent 403 aux outils automatiques : les articles sont lus sur les copies d'auteur citées.</p>
-<p><strong>Hors périmètre.</strong> L'architecture interne des commutateurs, Ultra Ethernet, les réseaux d'inférence, le réseau de stockage (module 8), le choix d'un parallélisme et son recouvrement (module 9), la supervision (module 14) et le coût des réseaux, dont les prix changent chaque trimestre : consultez les devis du jour.</p>
+<h3 id="documente">Documenté</h3>
+<p>Les noms, versions d'introduction et comportements des variables et algorithmes de NCCL (guide d'utilisation, pages « Environment Variables », « Troubleshooting », « Logging »), les formules de débit de bus et les options de <code>nccl-tests</code>, la variable <code>NCCL_TESTS_MIN_BW</code> et la structure du tableau de sortie (code source de <code>nccl-tests</code>), les formats des messages de journal de NCCL (code source de <code>init.cc</code>, <code>search.cc</code>, <code>topo.cc</code>, <code>p2p.cc</code>, <code>net.cc</code> et <code>bootstrap.cc</code>), les tailles d'en-têtes (<code>ib_pack.h</code> du noyau Linux) et les valeurs de MTU (<code>verbs.h</code>), le port UDP 4791 (registre de l'IANA), les affirmations sur DCQCN, PFC et ECN (article de DCQCN, RFC 3168), les trois pannes de Guo et al., les formules du fat-tree (Al-Fares et al.), les comptes du DGX SuperPOD H100, les débits des cartes et commutateurs (pages NVIDIA), les réseaux de Llama 3, MegaScale et HPN, et la latence logarithmique des arbres binaires doubles ont été relus à la source le 24 octobre 2026. Les sorties d'OpenSM 3.3.23, <code>ibsim</code> 0.10, <code>infiniband-diags</code> 50.0 et <code>perftest</code> 24.01.0 sont celles du bac à sable ; les calculs des exemples et des corrigés sont refaits par <code>labs/networking/topology-sizing/fabric.py</code> ou par un script Python.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>L'ordre des chapitres, le modèle jouet de sur-souscription, la réserve de tampon PFC de l'exercice 4, le modèle à parts égales entre canaux, la bissection, le seuil de 80 % du plateau attendu et la liste de contrôle en couches sont des choix pédagogiques de ce parcours, pas des normes. Les valeurs de latence de l'exemple 7.1 et tous les chiffres « hypothèse » sont des données d'école.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<ol type="1">
+<li>Les 24 octets de trame Ethernet sur le fil (séquence de contrôle, préambule, espace inter-trame), l'encodage 64b/66b, la norme IEEE 802.1Qbb de PFC, la correspondance XDR = 800 Gb/s, les noms exacts des compteurs de port InfiniBand et le niveau 2 sans perte avec contrôle de flux par crédits d'InfiniBand sont des connaissances courantes <strong>non relues</strong> dans la spécification (payante ou inaccessible depuis le bac à sable). (2) Les mécanismes du routage adaptatif, de SHARP, de <code>PXN</code> et des algorithmes CollNet dépendent de la version et n'ont pas été relus. (3) L'article fondateur du dragonfly et le fat-tree de Leiserson (1985) n'ont pas été relus. (4) La lecture du « 1:7 » de Llama 3 comme « un septième de la bande passante » est une interprétation. (5) Les journaux NCCL et les tables <code>nccl-tests</code> du module sont <strong>synthétiques</strong> : les formats changent d'une version à l'autre et aucune exécution sur GPU n'a eu lieu. (6) Les pages produit de NVIDIA ne précisent pas si les 900 Go/s de NVLink se comptent par sens ou en bidirectionnel. (7) Plusieurs éditeurs (ACM, IEEE Xplore) répondent 403 aux outils automatiques : les articles sont lus sur les copies d'auteur citées.</li>
+</ol>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>L'architecture interne des commutateurs, Ultra Ethernet, les réseaux d'inférence, le réseau de stockage (module 8), le choix d'un parallélisme et son recouvrement (module 9), la supervision (module 14) et le coût des réseaux, dont les prix changent chaque trimestre : consultez les devis du jour.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/provisioning/index.html"><span class="k">← Précédent</span>Module 06 — Provisioning, images et santé des nœuds GPU</a><a class="next" href="../../courses/storage/index.html"><span class="k">Suivant →</span>Module 08 — Stockage et E/S pour l'entraînement</a></nav>
 </main>

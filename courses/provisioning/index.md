@@ -39,7 +39,7 @@ Les labs s'exécutent sans GPU, par simulation. Chaque simulation est étiqueté
 | Volume | 24 h, dont 8 h de lecture, 10,5 h de labs et 5,5 h d'exercices |
 | Niveau d'entrée | 2 : à l'aise avec Linux, systemd et le réseau (module 1) |
 | Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html) |
-| Statut pour le lecteur de référence | cœur : Kubernetes, Terraform et FinOps sont acquis, mais ni le démarrage réseau, ni la recette GPU, ni les BMC |
+| Pour qui | Cœur : démarrage réseau, images, recette des nœuds GPU et contrôleurs de carte mère (BMC) ; survol possible si vous déployez déjà des nœuds bare-metal. |
 | Livrable | un rôle Ansible testé, un module Terraform qui dérive tout de la carte des nœuds, un script de recette dont la logique de décision est testée, un client Redfish testé |
 | Environnement | un portable ou une VM Linux, sans GPU ; Terraform, ansible-core et dnsmasq pour les labs. La recette réelle demande un nœud GPU avec DCGM (optionnel ; coût non chiffré ici, à demander à votre fournisseur) |
 | Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
@@ -53,6 +53,14 @@ Les labs s'exécutent sans GPU, par simulation. Chaque simulation est étiqueté
 -   Concevoir une recette à trois issues (accepter, rejouer, refuser) et expliquer pourquoi un code de retour ne suffit pas (chapitre 6).
 -   Planifier une mise à jour progressive et dimensionner un volant de nœuds de rechange (chapitre 7).
 -   Interroger un BMC par Redfish et décider de drainer un nœud sur sa santé matérielle (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 2 — Exploiter un cluster** (semaines 12-22) : provisionner, ordonnancer, relier et alimenter en données un cluster GPU.
+-   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
+-   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -70,7 +78,27 @@ Neuf séances, soit 24 h. Chaque séance contient ses chapitres, sa part de lab 
 | 8 | 3 h | 3 | ch. 7 Mises à jour, pannes et RMA | Lab 6.3 partie B ; Ex. 9 |
 | 9 | 3 h | 3 | ch. 8 BMC, Redfish et IPMI | Lab 6.4 ; Ex. 10, 11 |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Administrateur ou ingénieur HPC | survol guidé | les questions de positionnement, les chapitres signalés ci-dessous, un lab et le checkpoint |
+| Ingénieur ML ou chercheur | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Développeur logiciel ou systèmes | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** La recette des nœuds et les contrôles de santé matérielle sont demandés par la plupart des offres de flotte GPU : faites-en les labs même en survol.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et le chapitre 6.
 
@@ -817,8 +845,9 @@ sudo apt-get install -y dnsmasq-base shellcheck
 
 Chaque lab se lance avec `PYTHON=$(which python) bash verify.sh` depuis son dossier `labs/provisioning/<lab>/`. Les scripts n'affirment rien sur la durée d'exécution : ils comptent des changements, des codes de sortie et des lignes de fichier.
 
+### Lab 6.1 — Un rôle Ansible de nœud de calcul {#lab-6-1}
+
 ::: lab
-[Lab 6.1 — Un rôle Ansible de nœud de calcul]{.tag}
 
 **Objectif.** Faire converger trois nœuds simulés avec un rôle idempotent, détecter et corriger une dérive, déployer par lots avec un canari et protéger un secret. **Durée.** 3 h (partie A 1,5 h, partie B 1,5 h). **Prérequis matériels.** Portable CPU, Python et ansible-core ; coût nul ; aucun root.
 
@@ -835,8 +864,9 @@ Chaque lab se lance avec `PYTHON=$(which python) bash verify.sh` depuis son doss
 **Pour aller plus loin.** Passez `gpu_node_service_backend: systemd` sur une VM jetable avec systemd et vérifiez que les gestionnaires lancent les vraies commandes. Ajoutez un test Molecule si vous le connaissez (non couvert ici).
 :::
 
+### Lab 6.2 — Terraform : une flotte décrite en code {#lab-6-2}
+
 ::: lab
-[Lab 6.2 — Terraform : une flotte décrite en code]{.tag}
 
 **Objectif.** Dériver d'une seule carte des nœuds l'inventaire Ansible, la configuration DHCP et PXE, le script iPXE et les lignes Slurm ; lire un plan ; provoquer et corriger une dérive. **Durée.** 3 h. **Prérequis matériels.** Portable CPU, Terraform 1.6 ou plus, accès au registre pour télécharger `hashicorp/local` 2.9.1 (version épinglée dans `versions.tf`, une seule fois) ; dnsmasq et ansible-core pour deux contrôles facultatifs.
 
@@ -852,8 +882,9 @@ Chaque lab se lance avec `PYTHON=$(which python) bash verify.sh` depuis son doss
 **Pour aller plus loin.** Remplacez `local_file` par le fournisseur `canonical/maas` sur un MAAS de test (non couvert), ou ajoutez un environnement `staging`. Testez le démarrage réel avec une VM et un bridge isolé si vous disposez de KVM.
 :::
 
+### Lab 6.3 — Recette d'un nœud GPU {#lab-6-3}
+
 ::: lab
-[Lab 6.3 — Recette d'un nœud GPU]{.tag}
 
 **Objectif.** Écrire et tester les règles de décision d'une recette (accepter, rejouer, refuser) à partir de preuves ; connaître la collecte réelle. **Durée.** 3 h (partie A 1,5 h, partie B 1,5 h). **Prérequis matériels.** Portable CPU et pytest pour tout sauf l'étape 6 ; **un nœud GPU avec DCGM, gpu-burn et nccl-tests pour l'étape 6, non vérifiée et facultative**.
 
@@ -869,8 +900,9 @@ Chaque lab se lance avec `PYTHON=$(which python) bash verify.sh` depuis son doss
 **Pour aller plus loin.** Ajoutez un compteur de rejeux par nœud (au troisième *retest*, rejeter), puis branchez le verdict sur `scontrol update state=drain` (module 5).
 :::
 
+### Lab 6.4 — Supervision hors bande avec Redfish {#lab-6-4}
+
 ::: lab
-[Lab 6.4 — Supervision hors bande avec Redfish]{.tag}
 
 **Objectif.** Interroger un BMC simulé par Redfish, décider de drainer sur sa santé et n'accepter qu'un reset annoncé par le service. **Durée.** 1,5 h. **Prérequis matériels.** Portable CPU, Python 3 et pytest ; aucun BMC.
 
@@ -1136,10 +1168,18 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de `dcgmi diag`, option `-j`, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable `NCCL_TESTS_MIN_BW` ; sémantique de `scontrol reboot` ; racine `/redfish/v1/`, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, codes de sortie de `terraform plan`, limite de `prevent_destroy`. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, `hashicorp/local` 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale).
+### Documenté {#documente}
 
-**Recommandé.** Les sept états du cycle de vie ; la recette en trois issues et ses seuils (90 % et 95 %) ; le nœud doré comme référence ; la règle « pas d'action automatique au-delà du drain » pour les signaux du BMC ; les répertoires plutôt que les espaces de travail Terraform ; la lecture humaine du résumé `Plan:` ; le registre d'événements par nœud ; l'usage du niveau 2 de DCGM à chaque démarrage et du niveau 3 à la réception ; les pratiques de sécurité du BMC. Ce sont des choix de ce parcours, pas des règles des outils.
+Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de `dcgmi diag`, option `-j`, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable `NCCL_TESTS_MIN_BW` ; sémantique de `scontrol reboot` ; racine `/redfish/v1/`, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, codes de sortie de `terraform plan`, limite de `prevent_destroy`. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, `hashicorp/local` 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale).
 
-**À vérifier.** (1) La liste des champs de `nvidia-smi --query-gpu` et l'enveloppe du JSON de `dcgmi diag` : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) Les valeurs de l'option DHCP 93 annoncées par vos firmwares UEFI (7 ou 9). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt `ansible-documentation`. (11) Le comportement de `hashicorp/local` face à un fichier modifié est une observation sur la version 2.9.1.
+### Recommandé {#recommande}
 
-**Hors périmètre.** La configuration de Slurm elle-même ([module 5](../slurm/index.html)), le réseau d'interconnexion et NCCL en profondeur ([module 7](../networking/index.html)), la supervision continue des GPU ([module 14](../observability/index.html)), l'opérateur GPU de Kubernetes ([module 12](../kubernetes-gpu/index.html)), la construction d'images (Packer, intégration continue), les outils de mise à jour de firmware, le démarrage sécurisé et l'attestation, l'effacement sécurisé des disques, les API de provisionnement des nuages, OpenTofu, OpenCHAMI, OpenStack Ironic et xCAT (cités sans évaluation), et les partitions multi-locataires de NVSwitch.
+Les sept états du cycle de vie ; la recette en trois issues et ses seuils (90 % et 95 %) ; le nœud doré comme référence ; la règle « pas d'action automatique au-delà du drain » pour les signaux du BMC ; les répertoires plutôt que les espaces de travail Terraform ; la lecture humaine du résumé `Plan:` ; le registre d'événements par nœud ; l'usage du niveau 2 de DCGM à chaque démarrage et du niveau 3 à la réception ; les pratiques de sécurité du BMC. Ce sont des choix de ce parcours, pas des règles des outils.
+
+### À vérifier {#a-verifier}
+
+(1) La liste des champs de `nvidia-smi --query-gpu` et l'enveloppe du JSON de `dcgmi diag` : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) Les valeurs de l'option DHCP 93 annoncées par vos firmwares UEFI (7 ou 9). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt `ansible-documentation`. (11) Le comportement de `hashicorp/local` face à un fichier modifié est une observation sur la version 2.9.1.
+
+### Hors périmètre {#hors-perimetre}
+
+La configuration de Slurm elle-même ([module 5](../slurm/index.html)), le réseau d'interconnexion et NCCL en profondeur ([module 7](../networking/index.html)), la supervision continue des GPU ([module 14](../observability/index.html)), l'opérateur GPU de Kubernetes ([module 12](../kubernetes-gpu/index.html)), la construction d'images (Packer, intégration continue), les outils de mise à jour de firmware, le démarrage sécurisé et l'attestation, l'effacement sécurisé des disques, les API de provisionnement des nuages, OpenTofu, OpenCHAMI, OpenStack Ironic et xCAT (cités sans évaluation), et les partitions multi-locataires de NVSwitch.

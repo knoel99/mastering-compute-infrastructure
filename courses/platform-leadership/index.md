@@ -36,7 +36,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 | Volume | 28 h, dont environ 10 h de lecture, 7 h de labs et 11 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
 | Niveau d'entrée | 3 : vous avez déjà exploité un cluster ou une plateforme de calcul |
 | Prérequis | [Module 5 — Slurm](../slurm/index.html), module 12 — Kubernetes pour l'IA, module 14 — Observabilité |
-| Statut pour le lecteur de référence | cœur : l'écriture de décisions, la gestion d'incident et la direction d'équipe sont le cœur du métier visé, au-delà de l'outillage |
+| Pour qui | Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage. |
 | Livrable | un ADR vérifié, un post-mortem cohérent avec son journal, un dimensionnement chiffré et défendu à l'oral |
 | Environnement | un portable Linux avec Python, **sans GPU** ; aucun cloud ; les données des labs sont synthétiques ou fictives et étiquetées |
 | Projets qui s'appuient sur ce module | [Projet 6 — RFC et prototype](../../projects/capstone-rfc/index.html) |
@@ -50,6 +50,14 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 - Planifier une migration par cohortes avec des critères d'entrée, de sortie et de retour arrière (chapitre 5).
 - Fixer un budget de travail d'exploitation pour une petite équipe (chapitre 6).
 - Conduire un exercice de conception d'entretien avec un calcul et ses hypothèses dites (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 5 — Production et leadership** (semaines 42-48) : opérer en production, décider, négocier, diriger et passer l'entretien.
+-   **S'appuie sur** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html).
+-   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -66,7 +74,27 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 | 9 | 2 h | 3 | Chapitre 8 : exercice de conception | lab 16.3 (étapes 1 à 3) |
 | 10 | 2 h | 3 | Synthèse et checkpoint de sortie | lab 16.3 (étapes 4 et 5), exercice 9, checkpoint |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Administrateur ou ingénieur HPC | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Ingénieur ML ou chercheur | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+
+**À ne pas survoler.** Le RFC et la revue d'incident servent au projet 6, quel que soit votre profil.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Trois questions pour situer votre niveau. Répondez sans chercher, puis ouvrez les réponses.
 
@@ -475,8 +503,9 @@ La période de Young et Daly vaut $T^{\ast} = \sqrt{2CM}$, avec $C$ le temps d'�
 
 Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU, sans cloud, Python 3.13 et pytest 9.1, le 2026-10-24). Chacun a un `verify.sh` qui sort avec le code 0 ; lancez les commandes depuis le dossier du lab (`labs/platform-leadership/<lab>/`), après `pip install pytest` si besoin, et choisissez l'interpréteur avec `PYTHON=python3 bash verify.sh`. **Aucun ne décrit un système ou une personne réels** : le journal d'incident, le cahier des charges et les réponses d'entretien sont inventés pour l'exercice.
 
+### Lab 16.1 — Écrire une décision d'architecture vérifiable {#lab-16-1}
+
 ::: lab
-[Lab 16.1 — Écrire une décision d'architecture vérifiable]{.tag}
 
 **Objectif.** Écrire une ADR d'une page dont la structure est contrôlée mécaniquement : statut daté, contexte, décision, au moins deux alternatives écartées chacune avec une raison, conséquences positives **et** négatives, signal de révision. **Durée.** 2 h. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU.
 
@@ -491,8 +520,9 @@ Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 
 **Pour aller plus loin.** Comparez votre ADR à `solutions/adr_jupyterhub.md` (exercice 10) ; passez à une RFC complète avec `labs/projects/capstone-rfc/reference/rfc_lint.py`.
 :::
 
+### Lab 16.2 — Post-mortem d'un incident simulé {#lab-16-2}
+
 ::: lab
-[Lab 16.2 — Post-mortem d'un incident simulé]{.tag}
 
 **Objectif.** Reconstituer la chronologie d'un incident à partir d'un journal **synthétique**, mesurer ses jalons, puis écrire un post-mortem sans blâme dont les durées égalent celles du journal. **Durée.** 3 h. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU.
 
@@ -507,8 +537,9 @@ Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 
 **Pour aller plus loin.** Ajoutez au journal un événement de fausse alerte et mesurez son effet sur le temps de détection ; écrivez l'alerte qui aurait réduit la détection (projet 5).
 :::
 
+### Lab 16.3 — Exercice de conception : de 8 à 256 GPU {#lab-16-3}
+
 ::: lab
-[Lab 16.3 — Exercice de conception : de 8 à 256 GPU]{.tag}
 
 **Objectif.** Dimensionner l'entraînement d'un modèle dense avec un calculateur dont chaque hypothèse est explicite, puis comparer trois réponses d'entretien (insuffisante, solide, excellente) à la grille d'évaluation. **Durée.** 2 h. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU.
 
@@ -739,10 +770,18 @@ Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par `tools/fetch_text.py`).
+### Documenté {#documente}
 
-**Recommandé.** Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes.
+Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par `tools/fetch_text.py`).
 
-**À vérifier.** Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
+### Recommandé {#recommande}
 
-**Hors périmètre.** La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand.
+Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes.
+
+### À vérifier {#a-verifier}
+
+Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
+
+### Hors périmètre {#hors-perimetre}
+
+La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand.

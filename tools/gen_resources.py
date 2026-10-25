@@ -46,6 +46,7 @@ def main():
 title: "Ressources"
 subtitle: "{len(ok)} ressources vérifiées : lectures, cours ouverts, certifications, documentations, communautés"
 description: "Références à lire pour devenir compute infrastructure engineer, chacune vérifiée à sa source le 22 octobre 2026."
+numbered: true
 ---
 
 ## Comment utiliser cette page {{#usage}}

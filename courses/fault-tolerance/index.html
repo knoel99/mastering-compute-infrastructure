@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,104 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 10 · Phase 3 · 28 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable (CPU, pannes simulées)</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Pannes à grande échelle</a>
+<ul>
+<li><a href="#la-loi-des-grands-nombres-appliquée-aux-gpu">1.1. La loi des grands nombres appliquée aux GPU</a></li>
+<li><a href="#une-taxonomie-utile-à-laction">1.2. Une taxonomie utile à l'action</a></li>
+<li><a href="#ce-que-disent-les-données-publiées">1.3. Ce que disent les données publiées</a></li>
+<li><a href="#les-pannes-ne-sarrêtent-pas-au-matériel">1.4. Les pannes ne s'arrêtent pas au matériel</a></li>
+<li><a href="#combien-de-temps-un-job-survit-il-sans-reprise">1.5. Combien de temps un job survit-il sans reprise ?</a></li>
+</ul></li>
+<li><a href="#ch2">2. Modèle de coût : Young, Daly et goodput</a>
+<ul>
+<li><a href="#les-quatre-durées">2.1. Les quatre durées</a></li>
+<li><a href="#le-modèle-du-premier-ordre">2.2. Le modèle du premier ordre</a></li>
+<li><a href="#le-modèle-exact-et-la-correction-de-daly">2.3. Le modèle exact et la correction de Daly</a></li>
+<li><a href="#là-où-les-formules-mentent">2.4. Là où les formules mentent</a></li>
+<li><a href="#confrontation-aux-chiffres-publiés">2.5. Confrontation aux chiffres publiés</a></li>
+<li><a href="#dimensionner-le-coût-dun-checkpoint">2.6. Dimensionner le coût d'un checkpoint</a></li>
+</ul></li>
+<li><a href="#ch3">3. Écrire un checkpoint correct</a>
+<ul>
+<li><a href="#quel-état-sauvegarder">3.1. Quel état sauvegarder ?</a></li>
+<li><a href="#atomicité-le-protocole-en-quatre-temps">3.2. Atomicité : le protocole en quatre temps</a></li>
+<li><a href="#intégrité-ne-pas-faire-confiance-à-ce-qui-est-sur-disque">3.3. Intégrité : ne pas faire confiance à ce qui est sur disque</a></li>
+<li><a href="#checkpoints-répartis-et-formats">3.4. Checkpoints répartis et formats</a></li>
+<li><a href="#reprise-exacte-reprise-équivalente">3.5. Reprise exacte, reprise équivalente</a></li>
+</ul></li>
+<li><a href="#ch4">4. Checkpoints rapides</a>
+<ul>
+<li><a href="#où-va-le-temps-dun-checkpoint">4.1. Où va le temps d'un checkpoint</a></li>
+<li><a href="#les-règles-dun-checkpoint-asynchrone-correct">4.2. Les règles d'un checkpoint asynchrone correct</a></li>
+<li><a href="#en-mémoire-et-à-plusieurs-niveaux">4.3. En mémoire et à plusieurs niveaux</a></li>
+<li><a href="#la-couche-de-stockage">4.4. La couche de stockage</a></li>
+<li><a href="#déduplication-et-rotation">4.5. Déduplication et rotation</a></li>
+</ul></li>
+<li><a href="#ch5">5. Détecter : crashs, blocages, nœuds lents et silencieux</a>
+<ul>
+<li><a href="#quatre-familles-de-symptômes">5.1. Quatre familles de symptômes</a></li>
+<li><a href="#les-délais-dattente-un-budget-pas-une-valeur-par-défaut">5.2. Les délais d'attente : un budget, pas une valeur par défaut</a></li>
+<li><a href="#les-pulsations">5.3. Les pulsations</a></li>
+<li><a href="#les-nœuds-lents">5.4. Les nœuds lents</a></li>
+<li><a href="#le-silence-résultats-faux">5.5. Le silence : résultats faux</a></li>
+</ul></li>
+<li><a href="#ch6">6. Reprendre et redimensionner</a>
+<ul>
+<li><a href="#anatomie-dune-reprise">6.1. Anatomie d'une reprise</a></li>
+<li><a href="#torchrun-élastique">6.2. <code>torchrun</code> élastique</a></li>
+<li><a href="#un-superviseur-de-relance">6.3. Un superviseur de relance</a></li>
+<li><a href="#sous-slurm">6.4. Sous Slurm</a></li>
+<li><a href="#sous-kubernetes">6.5. Sous Kubernetes</a></li>
+</ul></li>
+<li><a href="#ch7">7. Erreurs GPU courantes</a>
+<ul>
+<li><a href="#lire-un-message-xid">7.1. Lire un message Xid</a></li>
+<li><a href="#mémoire-ecc-confinement-et-remappage">7.2. Mémoire : ECC, confinement et remappage</a></li>
+<li><a href="#réseau-et-liens">7.3. Réseau et liens</a></li>
+<li><a href="#thermique">7.4. Thermique</a></li>
+<li><a href="#la-conduite-à-tenir">7.5. La conduite à tenir</a></li>
+</ul></li>
+<li><a href="#ch8">8. Tests de chaos, procédures et post-mortems</a>
+<ul>
+<li><a href="#lingénierie-du-chaos-appliquée-à-lentraînement">8.1. L'ingénierie du chaos appliquée à l'entraînement</a></li>
+<li><a href="#un-catalogue-dinjections">8.2. Un catalogue d'injections</a></li>
+<li><a href="#les-journées-dexercice-game-days">8.3. Les journées d'exercice (<em>game days</em>)</a></li>
+<li><a href="#les-runbooks">8.4. Les runbooks</a></li>
+<li><a href="#le-post-mortem-sans-blâme">8.5. Le post-mortem sans blâme</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-10-1">Lab 10.1 — Intervalle de checkpoint optimal</a></li>
+<li><a href="#lab-10-2">Lab 10.2 — Checkpoint atomique et reprise exacte</a></li>
+<li><a href="#lab-10-3">Lab 10.3 — Superviseur de relance</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> un entraînement de plusieurs semaines sur des milliers de GPU sera interrompu des dizaines, voire des centaines de fois. Comment faire pour que ces interruptions coûtent dix pour cent du temps de calcul plutôt que soixante, et pour que personne ne soit réveillé à trois heures du matin pour relancer un job ?</p>
 <p>Ce module répond en six temps. Il <strong>chiffre</strong> la panne (taxonomie, données publiées, loi des grands nombres), <strong>modélise</strong> son coût (Young, Daly, goodput), apprend à <strong>écrire</strong> un checkpoint correct puis rapide, à <strong>détecter</strong> les pannes franches et silencieuses, à <strong>reprendre</strong> automatiquement en isolant le nœud fautif, et à <strong>tester</strong> le tout par injection de pannes. Les labs tournent sur un portable, sans GPU, avec des pannes simulées et signalées comme telles.</p>
@@ -85,8 +183,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../distributed-training/index.html">Module 9 — Entraînement distribué</a>, <a href="../storage/index.html">Module 8 — Stockage</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : aucune expérience de reprise après panne à grande échelle dans le profil</td>
+<td>Pour qui</td>
+<td>Cœur : reprise après panne à grande échelle, coût des checkpoints et procédures d'exploitation.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -113,6 +211,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Concevoir une boucle de reprise qui isole le nœud fautif et ne boucle pas indéfiniment (chapitre 6, lab 10.3).</li>
 <li>Lire un journal d'erreurs GPU (Xid, ECC) et décider : relancer le job, drainer le nœud ou ouvrir un dossier fournisseur (chapitre 7).</li>
 <li>Préparer un test de chaos, un runbook et un post-mortem sans blâme (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 3 — Systèmes d'entraînement distribué</strong> (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.</li>
+<li><strong>S'appuie sur</strong> : <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>, <a href="../storage/index.html">module 8 — Stockage et E/S pour l'entraînement</a>.</li>
+<li><strong>Prépare</strong> : <a href="../multi-cloud/index.html">module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et détection de pannes silencieuses</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Dix séances, soit 28 h : six de 3 h et quatre de 2,5 h. Le niveau ne diminue jamais d'une séance à la suivante.</p>
@@ -208,7 +314,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Le modèle de Young et Daly et la détection des blocages reviennent dans les projets 3, 4 et 5.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, lisez le chapitre 2 puis passez directement aux exercices ★★★.</p>
 <ol type="1">
 <li><p><strong>Perte attendue.</strong> Un job écrit un checkpoint toutes les 60 minutes. En moyenne, combien de travail perd-il à chaque panne, et pourquoi ?</p></li>
@@ -1130,8 +1285,8 @@ node verdict: drain-node</code></pre>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install numpy scipy pytest pyyaml safetensors</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch <span class="at">--index-url</span> https://download.pytorch.org/whl/cpu</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="bu">command</span> <span class="at">-v</span> python<span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
+<h3 id="lab-10-1">Lab 10.1 — Intervalle de checkpoint optimal</h3>
 <div class="lab">
-<p><span class="tag">Lab 10.1 — Intervalle de checkpoint optimal</span></p>
 <p><strong>Objectif.</strong> Comparer l'intervalle de Young, l'estimation de Daly et le minimum du modèle exact à une simulation de Monte-Carlo, et voir où le premier ordre cesse de valoir. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable, 1 cœur, quelques secondes de calcul ; aucun GPU.</p>
 <ol type="1">
 <li>Lisez <code>labs/fault-tolerance/young-daly/yd.py</code> : repérez le simulateur (<code>simulate</code>) et le modèle exact (<code>wall_per_work_exact</code>).</li>
@@ -1143,8 +1298,8 @@ node verdict: drain-node</code></pre>
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « OK young-daly: Young T=1155 s, Daly T=1116 s, exact argmin T=1116 s; goodput at Young 0.8767 vs best sampled 0.8767 » (sortie réelle du bac à sable, 2026-10-24) après <code>9 passed</code>. Temps d'exécution : environ deux secondes.</p>
 <p><strong>Pour aller plus loin.</strong> Remplacez les pannes de Weibull par une trace de pannes réelle de votre cluster (rejouée), et ajoutez un second niveau de checkpoint au simulateur (exemple 4.1).</p>
 </div>
+<h3 id="lab-10-2">Lab 10.2 — Checkpoint atomique et reprise exacte</h3>
 <div class="lab">
-<p><span class="tag">Lab 10.2 — Checkpoint atomique et reprise exacte</span></p>
 <p><strong>Objectif.</strong> Écrire et casser un checkpoint par répertoire, prouver qu'une reprise complète est identique à l'exécution continue, mesurer ce que chaque partie de l'état protège, et survivre à une campagne de <code>kill -9</code>. <strong>Durée.</strong> 4 h. <strong>Prérequis matériels.</strong> Un portable avec PyTorch CPU ; environ 50 secondes pour <code>verify.sh</code>.</p>
 <ol type="1">
 <li>Lisez <code>ckpt.py</code> : repérez le répertoire temporaire, le manifeste écrit en dernier et le renommage.</li>
@@ -1156,8 +1311,8 @@ node verdict: drain-node</code></pre>
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> passe 11 tests, affiche le tableau d'ablation, le résultat du DCP et du <code>safetensors</code>, puis « OK atomic-checkpoint: final state digest identical (948207a8778d...) after the kill campaign ». L'empreinte vue ci-dessus est celle de cette machine et de ce PyTorch ; la vôtre peut différer, <strong>elle doit être identique entre la référence et la campagne</strong>.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez la reprise sur un nombre de rangs différent avec DCP, ou une persistance asynchrone dans un fil, avec une seule écriture en vol. <strong>Limites.</strong> Le <code>kill -9</code> n'efface pas le cache du noyau : il ne prouve pas la durabilité après une coupure de courant. Les délais (<code>--sleep-ms</code>, <code>--slow-ckpt-ms</code>) sont simulés.</p>
 </div>
+<h3 id="lab-10-3">Lab 10.3 — Superviseur de relance</h3>
 <div class="lab">
-<p><span class="tag">Lab 10.3 — Superviseur de relance</span></p>
 <p><strong>Objectif.</strong> Écrire un superviseur qui détecte plantage et blocage, tue le groupe de processus, exclut un nœud fautif et s'arrête quand il ne progresse plus, et lire un journal d'erreurs GPU. <strong>Durée.</strong> 4 h. <strong>Prérequis matériels.</strong> Un portable ; aucun GPU, aucun Slurm requis pour la partie A.</p>
 <ol type="1">
 <li>Partie A. Lancez <code>IMPL=starter python3 -m pytest -q test_supervisor.py</code> : 10 échecs. Lisez chaque message.</li>
@@ -1416,10 +1571,16 @@ node verdict: drain-node</code></pre>
 <li>Google. <a href="https://sre.google/sre-book/postmortem-culture/"><em>Site Reliability Engineering, chapitre « Postmortem Culture »</em></a> : post-mortems sans blâme (chapitre 8).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les chiffres de Llama 3 (466, 47, 419 interruptions, tableau 5, « plus de 90 % », trois interventions), de Kokolis et coauteurs (6,50 et 2,34 pannes pour mille nœuds-jours, projections de 1,8 h et 0,23 h, formule de l'ETTR, 0,7 et 0,93, 548 préemptions pour 35 remises en file), d'Acme (11 % et 82 %, thermique, checkpoint asynchrone), d'OPT-175B et de BLOOM ont été lus le 24 octobre 2026 dans le texte des articles. Les faits sur CheckFreq, Gemini (résumé et première page) et MegaScale (sections 4 et 6.3) viennent des articles ; les métadonnées de Young et de Daly ont été vérifiées auprès de Crossref. Les comportements de DCP et de <code>torchrun</code> viennent de la documentation de PyTorch 2.14 ; les valeurs par défaut des délais ont aussi été relues dans le code de PyTorch 2.14.1. Le catalogue des Xid (mis à jour le 9 septembre 2026), la gestion des erreurs mémoire, <code>NCCL_IB_TIMEOUT</code>, <code>sbatch</code>, les Jobs Kubernetes, les principes du chaos et le chapitre « Postmortem Culture » ont été relus sur leurs pages officielles. Les sorties « réelles » viennent du bac à sable (Linux 6.18, 4 vCPU, sans GPU, PyTorch 2.14.1 CPU, Slurm 23.11.4), et tous les calculs « faits ici » ont été refaits en Python.</p>
-<p><strong>Recommandé.</strong> Les niveaux de triage Xid (surveiller, relancer, drainer), la règle « le délai de détection est plus long que la plus longue phase silencieuse », la garde « aucun progrès », l'exclusion après deux échecs, les cinq règles du checkpoint asynchrone, le modèle à deux niveaux du premier ordre (dérivé ici, vérifié par minimisation numérique), le calcul de rechanges par la loi de Poisson, la distinction reprise identique et reprise équivalente, le budget de temps d'une expérience de chaos : ce sont des choix de ce parcours, pas des règles de PyTorch, de NVIDIA, de Slurm ou de Kubernetes.</p>
-<p><strong>À vérifier.</strong> (1) La formule d'ordre supérieur de Daly n'a pas été relue dans l'article (accès payant) ; elle est vérifiée numériquement contre le modèle exact. (2) Le tableau 5 de Llama 3 est incohérent dans le texte récupéré (148 sur 419 ne fait pas 30,1 %, et 268 sur 419 ne fait pas 58,7 %) : nous citons les comptes, pas les pourcentages. (3) Le texte de Kokolis et coauteurs cite un MTTF de 7,9 h pour des jobs de 1 024 GPU ; avec le taux de 6,50 pour mille nœuds-jours, nous obtenons 28,8 h : nous n'avons pas pu réconcilier les deux et n'utilisons que les projections à 16 384 et 131 072 GPU, que nous reproduisons. (4) Le délai de 121 secondes avant éligibilité d'un job remis en file a été observé sur Slurm 23.11.4 par défaut ; nous n'avons pas identifié le paramètre en cause. (5) Les libellés d'action du catalogue Xid (<code>RESTART_APP</code>, <code>RESET_GPU</code>, <code>RESTART_BM</code>, <code>WORKFLOW_*</code>) ne sont pas définis dans la page lue ; les Xid et leurs libellés évoluent avec les pilotes, relisez le catalogue de votre version. (6) Le comportement par défaut de <code>dedup_replicated_tensors</code> et la signature de <code>async_save</code> changent selon la version de PyTorch : seul <code>save</code>/<code>load</code> a été exécuté. (7) Les injections de pannes réseau, GPU (DCGM) et de nœud lent du chapitre 8 n'ont pas été testées. (8) Les garanties de cohérence d'un stockage objet pour le motif « manifeste en dernier » dépendent du fournisseur. (9) Les scripts <code>train.sbatch</code> et <code>job.yaml</code> sont linté, pas exécutés, faute de GPU et de cluster.</p>
-<p><strong>Hors périmètre.</strong> Les bibliothèques de checkpoint multiniveau d'autres écosystèmes, le checkpoint/restauration au niveau du pilote GPU, les accélérateurs non NVIDIA, les stratégies de redimensionnement élastique qui préservent le lot global et la reproductibilité, l'orchestration de gang sous Kubernetes (JobSet et similaires), la détection matérielle de la corruption silencieuse, la résilience de l'inférence servie, et le dimensionnement financier des rechanges (module 15).</p>
+<h3 id="documente">Documenté</h3>
+<p>Les chiffres de Llama 3 (466, 47, 419 interruptions, tableau 5, « plus de 90 % », trois interventions), de Kokolis et coauteurs (6,50 et 2,34 pannes pour mille nœuds-jours, projections de 1,8 h et 0,23 h, formule de l'ETTR, 0,7 et 0,93, 548 préemptions pour 35 remises en file), d'Acme (11 % et 82 %, thermique, checkpoint asynchrone), d'OPT-175B et de BLOOM ont été lus le 24 octobre 2026 dans le texte des articles. Les faits sur CheckFreq, Gemini (résumé et première page) et MegaScale (sections 4 et 6.3) viennent des articles ; les métadonnées de Young et de Daly ont été vérifiées auprès de Crossref. Les comportements de DCP et de <code>torchrun</code> viennent de la documentation de PyTorch 2.14 ; les valeurs par défaut des délais ont aussi été relues dans le code de PyTorch 2.14.1. Le catalogue des Xid (mis à jour le 9 septembre 2026), la gestion des erreurs mémoire, <code>NCCL_IB_TIMEOUT</code>, <code>sbatch</code>, les Jobs Kubernetes, les principes du chaos et le chapitre « Postmortem Culture » ont été relus sur leurs pages officielles. Les sorties « réelles » viennent du bac à sable (Linux 6.18, 4 vCPU, sans GPU, PyTorch 2.14.1 CPU, Slurm 23.11.4), et tous les calculs « faits ici » ont été refaits en Python.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>Les niveaux de triage Xid (surveiller, relancer, drainer), la règle « le délai de détection est plus long que la plus longue phase silencieuse », la garde « aucun progrès », l'exclusion après deux échecs, les cinq règles du checkpoint asynchrone, le modèle à deux niveaux du premier ordre (dérivé ici, vérifié par minimisation numérique), le calcul de rechanges par la loi de Poisson, la distinction reprise identique et reprise équivalente, le budget de temps d'une expérience de chaos : ce sont des choix de ce parcours, pas des règles de PyTorch, de NVIDIA, de Slurm ou de Kubernetes.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<ol type="1">
+<li>La formule d'ordre supérieur de Daly n'a pas été relue dans l'article (accès payant) ; elle est vérifiée numériquement contre le modèle exact. (2) Le tableau 5 de Llama 3 est incohérent dans le texte récupéré (148 sur 419 ne fait pas 30,1 %, et 268 sur 419 ne fait pas 58,7 %) : nous citons les comptes, pas les pourcentages. (3) Le texte de Kokolis et coauteurs cite un MTTF de 7,9 h pour des jobs de 1 024 GPU ; avec le taux de 6,50 pour mille nœuds-jours, nous obtenons 28,8 h : nous n'avons pas pu réconcilier les deux et n'utilisons que les projections à 16 384 et 131 072 GPU, que nous reproduisons. (4) Le délai de 121 secondes avant éligibilité d'un job remis en file a été observé sur Slurm 23.11.4 par défaut ; nous n'avons pas identifié le paramètre en cause. (5) Les libellés d'action du catalogue Xid (<code>RESTART_APP</code>, <code>RESET_GPU</code>, <code>RESTART_BM</code>, <code>WORKFLOW_*</code>) ne sont pas définis dans la page lue ; les Xid et leurs libellés évoluent avec les pilotes, relisez le catalogue de votre version. (6) Le comportement par défaut de <code>dedup_replicated_tensors</code> et la signature de <code>async_save</code> changent selon la version de PyTorch : seul <code>save</code>/<code>load</code> a été exécuté. (7) Les injections de pannes réseau, GPU (DCGM) et de nœud lent du chapitre 8 n'ont pas été testées. (8) Les garanties de cohérence d'un stockage objet pour le motif « manifeste en dernier » dépendent du fournisseur. (9) Les scripts <code>train.sbatch</code> et <code>job.yaml</code> sont linté, pas exécutés, faute de GPU et de cluster.</li>
+</ol>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>Les bibliothèques de checkpoint multiniveau d'autres écosystèmes, le checkpoint/restauration au niveau du pilote GPU, les accélérateurs non NVIDIA, les stratégies de redimensionnement élastique qui préservent le lot global et la reproductibilité, l'orchestration de gang sous Kubernetes (JobSet et similaires), la détection matérielle de la corruption silencieuse, la résilience de l'inférence servie, et le dimensionnement financier des rechanges (module 15).</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/distributed-training/index.html"><span class="k">← Précédent</span>Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a><a class="next" href="../../courses/ray-rl-infra/index.html"><span class="k">Suivant →</span>Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a></nav>
 </main>

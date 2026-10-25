@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,110 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 13 · Phase 4 · 28 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs : 2 sur 3 vérifiés dans un bac à sable ; la branche cloud du lab 13.2 n'est pas exécutée</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Le paysage de l'offre GPU</a>
+<ul>
+<li><a href="#quatre-questions-qui-classent-une-offre">1.1. Quatre questions qui classent une offre</a></li>
+<li><a href="#les-familles-doffre">1.2. Les familles d'offre</a></li>
+<li><a href="#le-réseau-dun-nœud-dépend-du-fournisseur">1.3. Le réseau d'un nœud dépend du fournisseur</a></li>
+<li><a href="#les-centres-publics-une-famille-à-part">1.4. Les centres publics, une famille à part</a></li>
+<li><a href="#une-fiche-par-fournisseur">1.5. Une fiche par fournisseur</a></li>
+</ul></li>
+<li><a href="#ch2">2. Modèles de capacité</a>
+<ul>
+<li><a href="#six-modèles">2.1. Six modèles</a></li>
+<li><a href="#le-préavis-de-préemption">2.2. Le préavis de préemption</a></li>
+<li><a href="#le-coût-dune-heure-utile">2.3. Le coût d'une heure utile</a></li>
+<li><a href="#capacité-garantie-et-capacité-bon-marché">2.4. Capacité garantie et capacité bon marché</a></li>
+<li><a href="#choisir-un-modèle-par-charge">2.5. Choisir un modèle par charge</a></li>
+</ul></li>
+<li><a href="#ch3">3. Abstraire le fournisseur</a>
+<ul>
+<li><a href="#trois-problèmes-trois-familles-doutils">3.1. Trois problèmes, trois familles d'outils</a></li>
+<li><a href="#skypilot-un-courtier-entre-les-fournisseurs">3.2. SkyPilot : un courtier entre les fournisseurs</a></li>
+<li><a href="#les-jobs-managés-et-la-reprise">3.3. Les jobs managés et la reprise</a></li>
+<li><a href="#lire-un-job-ligne-à-ligne">3.4. Lire un job, ligne à ligne</a></li>
+<li><a href="#terraform-multi-fournisseur">3.5. Terraform multi-fournisseur</a></li>
+<li><a href="#kubernetes-sur-plusieurs-clusters">3.6. Kubernetes sur plusieurs clusters</a></li>
+<li><a href="#ce-que-labstraction-ne-cache-pas">3.7. Ce que l'abstraction ne cache pas</a></li>
+</ul></li>
+<li><a href="#ch4">4. Données et gravité</a>
+<ul>
+<li><a href="#trois-coûts-dun-déplacement">4.1. Trois coûts d'un déplacement</a></li>
+<li><a href="#anatomie-dune-facture-de-sortie">4.2. Anatomie d'une facture de sortie</a></li>
+<li><a href="#un-exemple-publié-avec-des-tarifs-daujourdhui">4.3. Un exemple publié, avec des tarifs d'aujourd'hui</a></li>
+<li><a href="#étaler-un-déménagement-ne-le-rend-pas-toujours-moins-cher">4.4. Étaler un déménagement ne le rend pas toujours moins cher</a></li>
+<li><a href="#copier-ou-relire-à-distance">4.5. Copier ou relire à distance ?</a></li>
+<li><a href="#les-sorties-gratuites-ont-des-conditions">4.6. Les sorties « gratuites » ont des conditions</a></li>
+<li><a href="#résidence-et-conformité">4.7. Résidence et conformité</a></li>
+</ul></li>
+<li><a href="#ch5">5. Placement, files et reprise entre fournisseurs</a>
+<ul>
+<li><a href="#trois-objectifs">5.1. Trois objectifs</a></li>
+<li><a href="#quatre-politiques">5.2. Quatre politiques</a></li>
+<li><a href="#ce-que-donne-le-simulateur">5.3. Ce que donne le simulateur</a></li>
+<li><a href="#le-piège-du-pool-à-la-demande">5.4. Le piège du pool à la demande</a></li>
+<li><a href="#le-seuil-de-bascule">5.5. Le seuil de bascule</a></li>
+<li><a href="#reprise-entre-fournisseurs">5.6. Reprise entre fournisseurs</a></li>
+<li><a href="#les-files">5.7. Les files</a></li>
+</ul></li>
+<li><a href="#ch6">6. Réseau et identité</a>
+<ul>
+<li><a href="#un-job-égale-un-site">6.1. Un job égale un site</a></li>
+<li><a href="#ce-qui-traverse-la-liaison">6.2. Ce qui traverse la liaison</a></li>
+<li><a href="#identités-fédérées">6.3. Identités fédérées</a></li>
+<li><a href="#comptes-projets-et-quotas">6.4. Comptes, projets et quotas</a></li>
+<li><a href="#segmenter">6.5. Segmenter</a></li>
+</ul></li>
+<li><a href="#ch7">7. Centres publics de calcul : accès et articulation avec le cloud</a>
+<ul>
+<li><a href="#un-autre-contrat-des-heures-attribuées">7.1. Un autre contrat : des heures attribuées</a></li>
+<li><a href="#en-france-genci-idris-edari">7.2. En France : GENCI, IDRIS, eDARI</a></li>
+<li><a href="#en-europe-eurohpc-et-les-usines-dia">7.3. En Europe : EuroHPC et les usines d'IA</a></li>
+<li><a href="#aux-états-unis">7.4. Aux États-Unis</a></li>
+<li><a href="#articuler-un-centre-public-et-un-cloud">7.5. Articuler un centre public et un cloud</a></li>
+</ul></li>
+<li><a href="#ch8">8. Gouvernance : inventaire, étiquettes, coûts, nettoyage</a>
+<ul>
+<li><a href="#inventaire-et-étiquetage">8.1. Inventaire et étiquetage</a></li>
+<li><a href="#des-coûts-comparables-entre-fournisseurs">8.2. Des coûts comparables entre fournisseurs</a></li>
+<li><a href="#nettoyer-automatiquement">8.3. Nettoyer automatiquement</a></li>
+<li><a href="#la-gouvernance-comme-code">8.4. La gouvernance comme code</a></li>
+<li><a href="#une-revue-périodique">8.5. Une revue périodique</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-13-1">Lab 13.1 — Simulateur de placement sensible aux coûts</a></li>
+<li><a href="#lab-13-2">Lab 13.2 — Un job SkyPilot indépendant du fournisseur</a></li>
+<li><a href="#lab-13-3">Lab 13.3 — Coût réel d'un déménagement de données</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#mesure-bac-a-sable">Mesuré dans le bac à sable, pas vérifié sur un cloud</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> votre équipe a besoin de 256 GPU pendant six semaines, aucun fournisseur n'en a autant de libres aujourd'hui au prix visé, et votre jeu de données de 60 To vit chez l'un d'eux. Où lancez-vous le job, que faites-vous quand on vous le reprend, et combien coûte réellement le déménagement ?</p>
 <p>Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offre (les <em>hyperscalers</em>, très grands clouds publics ; les <em>GPU clouds</em>, fournisseurs spécialisés dans les GPU ; les centres publics), les modèles de capacité, les outils qui abstraient le fournisseur, la gravité des données, le placement avec préemption, le réseau et l'identité, l'accès aux centres nationaux et la gouvernance. Un simulateur de placement et un calculateur de coût de déménagement sont exécutés dans un bac à sable ; un lab de job SkyPilot est analysé hors ligne mais <strong>jamais lancé sur un vrai cloud</strong>.</p>
@@ -85,8 +189,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../kubernetes-gpu/index.html">Module 12 — Kubernetes pour les GPU</a>, <a href="../fault-tolerance/index.html">Module 10 — Tolérance aux pannes</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : la plateforme de calcul d'une organisation réelle est presque toujours multi-fournisseurs</td>
+<td>Pour qui</td>
+<td>Cœur : la plateforme de calcul d'une organisation est presque toujours répartie entre plusieurs fournisseurs.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -113,6 +217,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Expliquer pourquoi un entraînement ne se coupe pas entre fournisseurs et dimensionner quotas et identités (chapitre 6).</li>
 <li>Choisir une voie d'accès à un centre national ou européen et convertir une demande d'heures GPU (chapitre 7).</li>
 <li>Mettre en place inventaire, étiquetage et nettoyage automatique (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
+<li><strong>S'appuie sur</strong> : <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../fault-tolerance/index.html">module 10 — Pannes, checkpointing et reprise automatique</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Dix séances, soit 28 h : sept de 3 h, deux de 2,5 h et une de 2 h. Le niveau 2 correspond aux méthodes de cœur, le niveau 3 à l'avancé ; il ne diminue jamais. Les durées de chaque séance additionnent exactement celles de ses chapitres, de ses parties de lab et de ses exercices.</p>
@@ -208,7 +319,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> La comparaison chiffrée d'offres de capacité et la reprise d'un job d'un fournisseur à l'autre servent au projet 4.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.</p>
 <ol type="1">
 <li><p><strong>Perdre un job.</strong> Un job préemptible subit en moyenne 0,15 interruption par heure d'allocation. Un checkpoint prend 3 minutes et une reprise 10 minutes. Quelle période de checkpoint minimise le gaspillage, et quelle part du temps alloué est perdue ?</p></li>
@@ -1072,8 +1232,8 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 </div>
 <h2 id="labs">Labs</h2>
 <p>Trois labs, 9,5 h au total : 4 h, 2,5 h et 3 h. Les labs 13.1 et 13.3 sont de type <code>sandbox</code> et ont été exécutés ; le lab 13.2 est de type <code>cluster</code> et sa branche cloud n'a <strong>jamais été exécutée</strong> (voir ci-dessous).</p>
+<h3 id="lab-13-1">Lab 13.1 — Simulateur de placement sensible aux coûts</h3>
 <div class="lab">
-<p><span class="tag">Lab 13.1 — Simulateur de placement sensible aux coûts</span></p>
 <p><strong>Objectif.</strong> Comparer quatre politiques de placement d'un job préemptible sur des tirages communs, et trouver la taille de données au-delà de laquelle basculer ne vaut plus son coût. <strong>Durée.</strong> 4 h (partie A, 1 h : formules et moteur ; partie B, 3 h : politiques, balayage, critère). <strong>Prérequis matériels.</strong> Portable CPU, Python 3 avec <code>pytest</code> ; ni GPU ni compte cloud. Les données du scénario sont <strong>synthétiques</strong>.</p>
 <ol type="1">
 <li>Lisez la docstring de <code>labs/multi-cloud/cost-aware-placement/reference/placement.py</code> : tirages communs, facturation d'une allocation, sémantique du checkpoint et de la copie.</li>
@@ -1086,8 +1246,8 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 <p><strong>Critère de réussite.</strong> <code>verify.sh</code> affiche la ligne <code>CRITERION (moves of 'aware' non-increasing with data size; cost &lt;= 1.05 x the best other policy): OK</code>, puis <code>CRITERION (threshold positive and non-increasing with lam): OK</code>, après des tests verts côté référence et rouges côté départ. Les critères sont <strong>structurels</strong>, pas des valeurs : le nombre de déménagements de <code>aware</code> ne croît pas avec la taille des données, son coût ne dépasse jamais de 5 % la meilleure des trois autres politiques, et le seuil de taille baisse quand <code>lam</code> monte. Aucun temps mesuré n'est testé.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez le même scénario dans le <a href="../../projects/multi-provider-scheduler/index.html">projet 4</a>, qui gère plusieurs jobs et une capacité limitée.</p>
 </div>
+<h3 id="lab-13-2">Lab 13.2 — Un job SkyPilot indépendant du fournisseur</h3>
 <div class="lab">
-<p><span class="tag">Lab 13.2 — Un job SkyPilot indépendant du fournisseur</span></p>
 <p><strong>Objectif.</strong> Écrire et contrôler un job managé qui survit à la préemption, avec sa politique de gouvernance. <strong>Durée.</strong> 2,5 h (partie A, 1,5 h : étapes 1 à 5 ; partie B, 1 h : étapes 6 et 7 ; l'étape 8, facultative, s'ajoute). <strong>Prérequis matériels.</strong> Portable CPU, Python 3 avec <code>pytest</code> et <code>pyyaml</code>, <code>yamllint</code> et <code>shellcheck</code> recommandés ; la branche d'analyse de SkyPilot exige <code>pip install skypilot==0.14.1</code> dans un environnement à part. La branche cloud exige un compte et du crédit.</p>
 <p><strong>Type <code>cluster</code>.</strong> Ce qui a été exécuté : lint, règles de gouvernance, analyse hors ligne par SkyPilot 0.14.1 et répétition locale de la reprise. <strong>Ce qui ne l'a pas été : tout lancement réel (<code>sky jobs launch</code>), toute bascule entre fournisseurs, toute préemption réelle.</strong></p>
 <ol type="1">
@@ -1103,8 +1263,8 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 <p><strong>Critère de réussite hors ligne.</strong> <code>verify.sh</code> affiche <code>OK skypilot parse: 4 files accepted (bad-job.yaml is valid for SkyPilot, only the policy refuses it), 5 mutations rejected</code>, <code>15 passed</code>, et <code>OK preemption rehearsal: resumed runs match the uninterrupted run exactly</code>. <strong>Critère sur cluster (non vérifié)</strong> : après la perte d'une VM, <code>sky jobs queue</code> montre au moins une reprise et le journal affiche un <code>resumed_from_step=</code> non nul.</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez un lieu Slurm (<code>infra: slurm</code>) à <code>any_of</code> et lisez ce que <code>policy_check.py --allow-prefix …</code> en dit (W4).</p>
 </div>
+<h3 id="lab-13-3">Lab 13.3 — Coût réel d'un déménagement de données</h3>
 <div class="lab">
-<p><span class="tag">Lab 13.3 — Coût réel d'un déménagement de données</span></p>
 <p><strong>Objectif.</strong> Programmer et tester le calculateur du chapitre 4, puis l'appliquer à vos propres volumes. <strong>Durée.</strong> 3 h (partie A, 1 h : carte tarifaire, scénarios ; partie B, 2 h : écrire les fonctions). <strong>Prérequis matériels.</strong> Portable CPU, Python 3 avec <code>pytest</code> et <code>pyyaml</code>. Les tarifs de <code>rates.yaml</code> sont <strong>réels et datés du 24 octobre 2026</strong> ; relisez-les le jour de votre étude.</p>
 <ol type="1">
 <li>Ouvrez <code>labs/multi-cloud/egress-cost/rates.yaml</code> : pour chaque entrée, retrouvez la source et la date. Ouvrez une source et vérifiez une valeur.</li>
@@ -1290,11 +1450,16 @@ job-eu.yaml: 0 error(s), 1 warning(s)</code></pre>
 <li>FinOps Foundation. <em>What is FOCUS?</em> <a href="https://focus.finops.org/what-is-focus/">focus.finops.org</a> : le format de données de facturation du chapitre 8.</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.</p>
-<p><strong>Recommandé.</strong> Le score de placement du chapitre 5, la valeur <span class="math inline">\lambda</span> du temps comme paramètre d'activité, la garde d'échéance, la règle « un job égale un site », le stockage neutre à sortie gratuite pour les checkpoints, les règles E1 à E6 et W1 à W4 de <code>policy_check.py</code> et leur choix d'étiquettes sont des choix de ce parcours, pas des normes. Les trois politiques naïves du lab 13.1 sont des cas d'école volontairement simples.</p>
-<p><strong>À vérifier.</strong> Tous les tarifs, franchises et dates d'appel cités changent : relisez la page du fournisseur le jour de la décision. Les tarifs de transfert de Google Cloud ne sont pas cités (tableau de la page aplati). Les règles exactes et les dates d'application du règlement européen sur les données (<em>Data Act</em>), notamment la fin des frais de changement de fournisseur, n'ont pas été relues à la source (EUR-Lex et le site de la Commission refusent l'accès depuis le bac à sable) ; le contrat de chaque fournisseur fait foi. L'annonce d'environ 70 % d'économie de la documentation SkyPilot est une affirmation du fournisseur de l'outil. Les offres et capacités des GPU clouds et des offres européennes, la liste des fournisseurs européens, les liaisons privées et leurs tarifs, la valeur de la préemption sur des GPU récents et l'état des appels d'EuroHPC, d'eDARI, d'ACCESS et du NAIRR sont instables et non documentés ici. Les règles d'installation d'outils et de réseau d'un centre public précis ne sont pas décrites.</p>
-<p><strong>Mesuré dans le bac à sable, pas vérifié sur un cloud.</strong> SkyPilot 0.14.1 rejette <code>type:</code> avec <code>mode: MOUNT</code>, les fautes de frappe et les mauvais types, et accepte un nom de stratégie <code>job_recovery</code> invalide (observation du 24 octobre 2026). Lu dans le code de SkyPilot 0.14.1 sans l'exécuter : le spot sur un contexte Kubernetes exige une étiquette de nœud. Le job <code>job.yaml</code> n'a jamais été lancé sur un compte cloud ni sur un cluster Kubernetes. Les trois politiques et le scénario du lab 13.1 sont synthétiques, tout comme les taux d'interruption, de disponibilité et le tarif de sortie de 0,09 u par Go de ce lab.</p>
-<p><strong>Hors périmètre.</strong> L'entraînement distribué entre fournisseurs, la négociation des contrats et le modèle de coût total (module 15), la sécurité d'une plateforme partagée (module 16), le provisionnement par Terraform en détail (module 6), la performance de NCCL sur chaque interconnexion (module 7), le droit des données et les certifications.</p>
+<h3 id="documente">Documenté</h3>
+<p>Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>Le score de placement du chapitre 5, la valeur <span class="math inline">\lambda</span> du temps comme paramètre d'activité, la garde d'échéance, la règle « un job égale un site », le stockage neutre à sortie gratuite pour les checkpoints, les règles E1 à E6 et W1 à W4 de <code>policy_check.py</code> et leur choix d'étiquettes sont des choix de ce parcours, pas des normes. Les trois politiques naïves du lab 13.1 sont des cas d'école volontairement simples.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<p>Tous les tarifs, franchises et dates d'appel cités changent : relisez la page du fournisseur le jour de la décision. Les tarifs de transfert de Google Cloud ne sont pas cités (tableau de la page aplati). Les règles exactes et les dates d'application du règlement européen sur les données (<em>Data Act</em>), notamment la fin des frais de changement de fournisseur, n'ont pas été relues à la source (EUR-Lex et le site de la Commission refusent l'accès depuis le bac à sable) ; le contrat de chaque fournisseur fait foi. L'annonce d'environ 70 % d'économie de la documentation SkyPilot est une affirmation du fournisseur de l'outil. Les offres et capacités des GPU clouds et des offres européennes, la liste des fournisseurs européens, les liaisons privées et leurs tarifs, la valeur de la préemption sur des GPU récents et l'état des appels d'EuroHPC, d'eDARI, d'ACCESS et du NAIRR sont instables et non documentés ici. Les règles d'installation d'outils et de réseau d'un centre public précis ne sont pas décrites.</p>
+<h3 id="mesure-bac-a-sable">Mesuré dans le bac à sable, pas vérifié sur un cloud</h3>
+<p>SkyPilot 0.14.1 rejette <code>type:</code> avec <code>mode: MOUNT</code>, les fautes de frappe et les mauvais types, et accepte un nom de stratégie <code>job_recovery</code> invalide (observation du 24 octobre 2026). Lu dans le code de SkyPilot 0.14.1 sans l'exécuter : le spot sur un contexte Kubernetes exige une étiquette de nœud. Le job <code>job.yaml</code> n'a jamais été lancé sur un compte cloud ni sur un cluster Kubernetes. Les trois politiques et le scénario du lab 13.1 sont synthétiques, tout comme les taux d'interruption, de disponibilité et le tarif de sortie de 0,09 u par Go de ce lab.</p>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>L'entraînement distribué entre fournisseurs, la négociation des contrats et le modèle de coût total (module 15), la sécurité d'une plateforme partagée (module 16), le provisionnement par Terraform en détail (module 6), la performance de NCCL sur chaque interconnexion (module 7), le droit des données et les certifications.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/kubernetes-gpu/index.html"><span class="k">← Précédent</span>Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a><a class="next" href="../../courses/observability/index.html"><span class="k">Suivant →</span>Module 14 — Observabilité et fiabilité d'une flotte GPU</a></nav>
 </main>

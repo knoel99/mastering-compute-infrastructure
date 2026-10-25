@@ -1,0 +1,1724 @@
+{
+ "unit": "jobs-cn-labs-hpc",
+ "retrieved_on": "2026-10-25",
+ "postings": [
+  {
+   "id": "deepseek-ai-cluster-performance-reliability-ops-hangzhou",
+   "company": "DeepSeek (深度求索)",
+   "company_type": "ai-lab",
+   "title": "AI算力集群性能与可靠性工程师（运维）",
+   "location": "Hangzhou, Zhejiang, China",
+   "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+   "source_url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+   "seniority": "ic",
+   "years_required": null,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "具备 Linux 服务器运维经验，熟悉集群环境下的系统管理、故障排查与性能分析"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "完成节点的基线检查与性能调优、验证工作"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "熟悉 GPU/AI 加速卡服务器、RDMA 网络等相关基础设施"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "熟悉 GPU/AI 加速卡服务器、RDMA 网络等相关基础设施"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "包括巡检、维修、故障定位与生命周期管理，缩短平均故障恢复时间（MTTR）"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "包括巡检、维修、故障定位与生命周期管理，缩短平均故障恢复时间（MTTR）"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "能够使用 Shell、Python、LLM等工具提升运维效率"
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "bonus",
+     "quote": "具备监控体系建设经验（如Prometheus、Grafana等），有可观测性平台落地经验者优先"
+    },
+    {
+     "id": "datacenter-facilities",
+     "level": "bonus",
+     "quote": "有机房交付、批量上架、集群 bring-up、验收测试经验"
+    },
+    {
+     "id": "bare-metal-provisioning",
+     "level": "bonus",
+     "quote": "有机房交付、批量上架、集群 bring-up、验收测试经验"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "有大规模AI超算集群（千卡以上）运维经验"
+    }
+   ],
+   "responsibilities": [
+    "Operate the AI supercomputing cluster's accelerator cards, servers and super-nodes: inspections, repairs, fault isolation and lifecycle management, reducing MTTR",
+    "Deliver and bring new compute capacity online, with node baseline checks, performance tuning and validation",
+    "Build and improve monitoring, alerting and observability for real-time cluster health awareness",
+    "Build automated operations tooling to raise the self-healing rate and cut manual intervention"
+   ],
+   "notes": "Posting in Chinese read through the LinkedIn guest API; the page shows a relative date ('3 months ago') only, so posted_on is null. Open to interns and full-time ('实习/全职'); HPC student-competition results (SC/ASC/ISC/PAC) listed as a plus.",
+   "evidence": [
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "具备 Linux 服务器运维经验，熟悉集群环境下的系统管理、故障排查与性能分析",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "完成节点的基线检查与性能调优、验证工作",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required), infiniband-roce (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "熟悉 GPU/AI 加速卡服务器、RDMA 网络等相关基础设施",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required), sre-oncall (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "包括巡检、维修、故障定位与生命周期管理，缩短平均故障恢复时间（MTTR）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "能够使用 Shell、Python、LLM等工具提升运维效率",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "具备监控体系建设经验（如Prometheus、Grafana等），有可观测性平台落地经验者优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): datacenter-facilities (bonus), bare-metal-provisioning (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "有机房交付、批量上架、集群 bring-up、验收测试经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4435024614",
+     "quote": "有大规模AI超算集群（千卡以上）运维经验",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "8/8"
+  },
+  {
+   "id": "pcl-ai-platform-ops-engineer-shenzhen",
+   "company": "Peng Cheng Laboratory (鹏城实验室)",
+   "company_type": "hpc-centre",
+   "title": "AI平台运维工程师",
+   "location": "Shenzhen (Nanshan), Guangdong, China",
+   "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+   "source_url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+   "seniority": "ic",
+   "years_required": 5,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": "2025-10-22",
+   "language": "zh",
+   "skills": [
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "精通Linux系统管理，熟悉内核参数调优"
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "精通Kubernetes、Docker等容器技术，有大规模集群管理经验"
+    },
+    {
+     "id": "containers",
+     "level": "required",
+     "quote": "精通Kubernetes、Docker等容器技术，有大规模集群管理经验"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "有GPU/NPU集群运维经验，熟悉NVIDIA驱动、CUDA、CANN"
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "required",
+     "quote": "有GPU/NPU集群运维经验，熟悉NVIDIA驱动、CUDA、CANN"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "了解AI训练/推理框架（PyTorch/TensorFlow/ONNX等）"
+    },
+    {
+     "id": "experiment-tracking",
+     "level": "bonus",
+     "quote": "有AI训练平台（如Kubeflow/MLflow）运维经验者优先"
+    },
+    {
+     "id": "slurm",
+     "level": "required",
+     "quote": "部署和维护作业调度平台，配置分区、QoS、资源限制等策略"
+    },
+    {
+     "id": "parallel-fs-storage",
+     "level": "required",
+     "quote": "监控存储性能（IOPS、带宽、延迟），定位和解决存储瓶颈"
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "required",
+     "quote": "搭建集群监控系统（Prometheus/Grafana等）"
+    },
+    {
+     "id": "dcgm-gpu-monitoring",
+     "level": "required",
+     "quote": "监控GPU/NPU利用率、内存、网络、存储等关键指标"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "快速定位和解决集群硬件故障（服务器宕机、内存错误、磁盘故障等）"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "制定应急预案，定期进行故障演练"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "编写运维脚本（Python/Bash），实现日常运维自动化"
+    },
+    {
+     "id": "bare-metal-provisioning",
+     "level": "required",
+     "quote": "负责AI集群服务器（GPU/NPU服务器）的规划、部署和运维"
+    }
+   ],
+   "responsibilities": [
+    "Plan, deploy and operate the GPU/NPU servers of the AI training and inference cluster, including OS, kernel tuning and driver upgrades",
+    "Run the job-scheduling platform (partitions, QoS, resource limits) and the containerised training environment with its image registry",
+    "Operate storage: monitor IOPS, bandwidth and latency, remove bottlenecks, define backup, archive and disaster-recovery policies",
+    "Build Prometheus/Grafana monitoring of GPU/NPU utilisation, memory, network and storage, and respond to alerts",
+    "Troubleshoot hardware and software failures, write emergency plans and run failure drills; automate operations with Python/Bash"
+   ],
+   "notes": "Posting in Chinese read through the public JSON endpoint of PCL's hotjob recruitment portal (https://hr.pcl.ac.cn/). Department 先进计算研究部; master's degree and 5+ years of operations required. publishDate 2025-10-22 with endDate 3000-01-01 and still listed on 2026-10-25 (rolling hire). The scheduler is not named: the 'partitions, QoS, resource limits' vocabulary is Slurm-like, hence the slurm tag; CANN (Huawei Ascend) is named next to CUDA.",
+   "evidence": [
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "精通Linux系统管理，熟悉内核参数调优",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (required), containers (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "精通Kubernetes、Docker等容器技术，有大规模集群管理经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required), non-nvidia-accelerators (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "有GPU/NPU集群运维经验，熟悉NVIDIA驱动、CUDA、CANN",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "了解AI训练/推理框架（PyTorch/TensorFlow/ONNX等）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): experiment-tracking (bonus)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "有AI训练平台（如Kubeflow/MLflow）运维经验者优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): slurm (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "部署和维护作业调度平台，配置分区、QoS、资源限制等策略",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): parallel-fs-storage (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "监控存储性能（IOPS、带宽、延迟），定位和解决存储瓶颈",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "搭建集群监控系统（Prometheus/Grafana等）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): dcgm-gpu-monitoring (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "监控GPU/NPU利用率、内存、网络、存储等关键指标",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "快速定位和解决集群硬件故障（服务器宕机、内存错误、磁盘故障等）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "制定应急预案，定期进行故障演练",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "编写运维脚本（Python/Bash），实现日常运维自动化",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): bare-metal-provisioning (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=687e051c8131aa76aa1320a0",
+     "quote": "负责AI集群服务器（GPU/NPU服务器）的规划、部署和运维",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "13/13"
+  },
+  {
+   "id": "pcl-cross-region-distributed-llm-training-engineer-shenzhen",
+   "company": "Peng Cheng Laboratory (鹏城实验室)",
+   "company_type": "hpc-centre",
+   "title": "跨地域分布式大模型训练方向-工程师/高级工程师",
+   "location": "Shenzhen, Guangdong, China",
+   "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+   "source_url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+   "seniority": "ic",
+   "years_required": null,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "training-platform",
+   "posted_on": "2026-08-01",
+   "language": "zh",
+   "skills": [
+    {
+     "id": "pytorch-distributed",
+     "level": "required",
+     "quote": "深入理解 PyTorch 分布式生态（DDP、FSDP），有修改或扩展分布式通信逻辑"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "在Megatron-LM等框架基础上，拓展支持多集群、跨地域的混合并行策略"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "熟悉 TCP/IP、RDMA、RoCEv2 基本原理"
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "熟悉 TCP/IP、RDMA、RoCEv2 基本原理"
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "至少熟练使用一种集合通信库（NCCL、Gloo、MPI）"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "bonus",
+     "quote": "并了解其内部协议及性能调优方法优先"
+    },
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "required",
+     "quote": "设计与落地跨地域训练任务的自动容错系统：包括网络分区检测、节点健康检查、任务自动重启与降级训练模式"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "设计与落地跨地域训练任务的自动容错系统：包括网络分区检测、节点健康检查、任务自动重启与降级训练模式"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "设计与落地跨地域训练任务的自动容错系统：包括网络分区检测、节点健康检查、任务自动重启与降级训练模式"
+    }
+   ],
+   "responsibilities": [
+    "Develop and integrate communication-compression modules (gradient quantisation, top-k sparsification, error feedback) to cut cross-region bandwidth",
+    "Extend Megatron-LM-style frameworks with hybrid data/tensor/pipeline parallelism across several clusters and regions",
+    "Design and deploy automatic fault tolerance for cross-region training: network-partition detection, node health checks, automatic restart and degraded training modes"
+   ],
+   "notes": "Posting in Chinese read through the public JSON endpoint of PCL's hotjob portal (department 先进计算研究部). The requirement text asks for a master's degree, while the structured education field says 博士研究生及以上. Engineer or senior engineer level; no years stated.",
+   "evidence": [
+    {
+     "claim": "Skill(s): pytorch-distributed (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+     "quote": "深入理解 PyTorch 分布式生态（DDP、FSDP），有修改或扩展分布式通信逻辑",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+     "quote": "在Megatron-LM等框架基础上，拓展支持多集群、跨地域的混合并行策略",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (required), networking-general (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+     "quote": "熟悉 TCP/IP、RDMA、RoCEv2 基本原理",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): nccl-collectives (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+     "quote": "至少熟练使用一种集合通信库（NCCL、Gloo、MPI）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (bonus)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+     "quote": "并了解其内部协议及性能调优方法优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): checkpoint-fault-tolerance (required), distributed-systems (required), hardware-health (required)",
+     "url": "https://hr.pcl.ac.cn/wecruit/positionInfo/listPositionDetail/SU62b979a5bef57c0f6fb046d7?iSaJAx=isAjax&request_locale=zh_CN&postId=6a6dd3ae431548130459b6d1",
+     "quote": "设计与落地跨地域训练任务的自动容错系统：包括网络分区检测、节点健康检查、任务自动重启与降级训练模式",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "6/6"
+  },
+  {
+   "id": "moorethreads-ai-compute-storage-engineer-shanghai",
+   "company": "Moore Threads (摩尔线程)",
+   "company_type": "vendor",
+   "title": "智算存储工程师(J10727)",
+   "location": "Shanghai (Pudong), China (also listed for Beijing and Hangzhou)",
+   "url": "https://www.liepin.com/job/1979605791.shtml",
+   "source_url": "https://www.liepin.com/job/1979605791.shtml",
+   "seniority": "ic",
+   "years_required": 3,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "storage",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "精通Go、C++ 或Python中至少一门语言，具备高性能、高并发系统开发或自动化脚本编写能力"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "精通Go、C++ 或Python中至少一门语言，具备高性能、高并发系统开发或自动化脚本编写能力"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "具备3年以上分布式系统或云系统开发/运维经验"
+    },
+    {
+     "id": "parallel-fs-storage",
+     "level": "required",
+     "quote": "熟悉至少一种主流分布式存储系统（如Lustre、MinIO、Ceph、GPFS）的架构与核心机制"
+    },
+    {
+     "id": "object-storage",
+     "level": "required",
+     "quote": "熟悉至少一种主流分布式存储系统（如Lustre、MinIO、Ceph、GPFS）的架构与核心机制"
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "熟悉Kubernetes存储生态，具有CSI插件的实际开发或运维经验"
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "熟悉Linux操作系统，对I/O栈、文件系统有深入理解"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "有支撑千亿参数大模型训练或AI训推平台存储系统的设计、开发或运维经验"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "bonus",
+     "quote": "具备存储性能分析（如GPFS 、Lustre ）和深度调优经验"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "bonus",
+     "quote": "熟悉InfiniBand、RoCE等高速网络技术"
+    },
+    {
+     "id": "data-pipelines",
+     "level": "bonus",
+     "quote": "熟悉AI训练数据流水线，或有向量数据库存储方案经验"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "具备业界知名的存储厂商或超算中心工作背景"
+    }
+   ],
+   "responsibilities": [
+    "Design, build and optimise the core storage platform behind AI training and large-scale data analytics",
+    "Handle exabyte-scale data and hundreds of GB/s of throughput with high reliability, performance and scalability",
+    "Integrate storage with Kubernetes (CSI) and tune the Linux I/O stack and file systems",
+    "Analyse and tune parallel file-system performance (GPFS, Lustre) for large-model training"
+   ],
+   "notes": "Posting in Chinese on Liepin, posted by a verified Moore Threads recruiter (page shows '· 摩尔线程'); the page shows '90天前更新' and an apply button, so posted_on is null. Same requisition listed in Shanghai, Beijing and Hangzhou.",
+   "evidence": [
+    {
+     "claim": "Skill(s): systems-lang (required), python (required)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "精通Go、C++ 或Python中至少一门语言，具备高性能、高并发系统开发或自动化脚本编写能力",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "具备3年以上分布式系统或云系统开发/运维经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): parallel-fs-storage (required), object-storage (required)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "熟悉至少一种主流分布式存储系统（如Lustre、MinIO、Ceph、GPFS）的架构与核心机制",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (required)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "熟悉Kubernetes存储生态，具有CSI插件的实际开发或运维经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "熟悉Linux操作系统，对I/O栈、文件系统有深入理解",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (bonus)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "有支撑千亿参数大模型训练或AI训推平台存储系统的设计、开发或运维经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (bonus)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "具备存储性能分析（如GPFS 、Lustre ）和深度调优经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (bonus)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "熟悉InfiniBand、RoCE等高速网络技术",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): data-pipelines (bonus)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "熟悉AI训练数据流水线，或有向量数据库存储方案经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus)",
+     "url": "https://www.liepin.com/job/1979605791.shtml",
+     "quote": "具备业界知名的存储厂商或超算中心工作背景",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "10/10"
+  },
+  {
+   "id": "moorethreads-ai-compute-network-engineer-shanghai",
+   "company": "Moore Threads (摩尔线程)",
+   "company_type": "vendor",
+   "title": "智算网络工程师(J10726)",
+   "location": "Shanghai (Pudong), China (also listed for Beijing and Hangzhou)",
+   "url": "https://www.liepin.com/job/1979605147.shtml",
+   "source_url": "https://www.liepin.com/job/1979605147.shtml",
+   "seniority": "senior",
+   "years_required": 5,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "network",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "具有5年以上数据中心网络架构设计和实施经验，有智算网络相关经验者优先"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "深刻理解RDMA技术，熟悉IB、RoCE等智算中心网络方案"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "熟悉AI业务流程，了解AI工作负载的特点和网络需求"
+    }
+   ],
+   "responsibilities": [
+    "Build and maintain the high-performance network that supports AI computing",
+    "Ensure the network meets the bandwidth, latency and reliability demands of large-scale AI training and inference",
+    "Design and optimise complex network architectures independently and coordinate with other departments"
+   ],
+   "notes": "Short posting in Chinese on Liepin by a verified Moore Threads recruiter ('· 摩尔线程'); header says 3年以上 but the requirements ask for 5+ years of data-centre network design, so years_required is 5 and seniority is recorded as senior. Page shows '90天前更新' with an apply button.",
+   "evidence": [
+    {
+     "claim": "Skill(s): networking-general (required)",
+     "url": "https://www.liepin.com/job/1979605147.shtml",
+     "quote": "具有5年以上数据中心网络架构设计和实施经验，有智算网络相关经验者优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (required)",
+     "url": "https://www.liepin.com/job/1979605147.shtml",
+     "quote": "深刻理解RDMA技术，熟悉IB、RoCE等智算中心网络方案",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://www.liepin.com/job/1979605147.shtml",
+     "quote": "熟悉AI业务流程，了解AI工作负载的特点和网络需求",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "3/3"
+  },
+  {
+   "id": "shlab-cloud-native-compute-cluster-sre-shanghai",
+   "company": "Shanghai AI Laboratory (上海人工智能实验室)",
+   "company_type": "ai-lab",
+   "title": "云原生&算力集群SRE",
+   "location": "Shanghai (Xuhui), China",
+   "url": "https://www.liepin.com/job/1985216485.shtml",
+   "source_url": "https://www.liepin.com/job/1985216485.shtml",
+   "seniority": "ic",
+   "years_required": 1,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "精通Kubernetes核心原理及组件（kube-apiserver、etcd、scheduler、controller-manager）"
+    },
+    {
+     "id": "containers",
+     "level": "required",
+     "quote": "熟悉Docker、Containerd容器运行时"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "1-3年及以上云原生SRE、算力集群运维相关工作经验"
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "required",
+     "quote": "熟练使用Prometheus、Grafana、ELK、Jaeger等可观测组件"
+    },
+    {
+     "id": "logging-tracing",
+     "level": "required",
+     "quote": "熟练使用Prometheus、Grafana、ELK、Jaeger等可观测组件"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "熟练掌握Go/Python任意一种语言，能够独立开发运维脚本、自动化工具、调度插件"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "熟练掌握Go/Python任意一种语言，能够独立开发运维脚本、自动化工具、调度插件"
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "熟悉Linux内核、网络、存储原理"
+    },
+    {
+     "id": "scheduler-design",
+     "level": "required",
+     "quote": "优化集群资源分配策略，解决算力资源碎片化、抢占冲突、资源浪费等问题"
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "落地算力资源弹性扩缩容、闲置资源回收机制，持续降低基础设施运维成本"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "bonus",
+     "quote": "有GPU算力集群、AI训练/推理集群运维优化经验优先"
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "bonus",
+     "quote": "熟悉算力调度框架、多卡通信、算力资源隔离、节点故障治理等相关技术"
+    },
+    {
+     "id": "hardware-health",
+     "level": "bonus",
+     "quote": "熟悉算力调度框架、多卡通信、算力资源隔离、节点故障治理等相关技术"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "有大规模AI算力集群运维经验"
+    }
+   ],
+   "responsibilities": [
+    "Keep the large Kubernetes and GPU compute clusters stable 24/7: operations, troubleshooting, post-mortems and root-cause fixes",
+    "Improve compute scheduling, resource isolation and load balancing to reduce fragmentation and pre-emption conflicts and raise GPU/CPU utilisation",
+    "Build cloud-native automation, monitoring, alerting, log analysis and tracing for full-stack observability",
+    "Tune network, storage, scheduling and kernel parameters; implement elastic scaling and idle-resource reclamation to cut cost",
+    "Support research and engineering teams and handle incidents affecting large-model training and inference"
+   ],
+   "notes": "Posting in Chinese on Liepin under the employer '上海人工智能实验室'; the page shows '8月27日更新' (update date, year not printed), so posted_on is null. CKA/CKS certification and Kubernetes community contributions are listed as pluses.",
+   "evidence": [
+    {
+     "claim": "Skill(s): kubernetes (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "精通Kubernetes核心原理及组件（kube-apiserver、etcd、scheduler、controller-manager）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): containers (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "熟悉Docker、Containerd容器运行时",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "1-3年及以上云原生SRE、算力集群运维相关工作经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (required), logging-tracing (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "熟练使用Prometheus、Grafana、ELK、Jaeger等可观测组件",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), systems-lang (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "熟练掌握Go/Python任意一种语言，能够独立开发运维脚本、自动化工具、调度插件",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "熟悉Linux内核、网络、存储原理",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): scheduler-design (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "优化集群资源分配策略，解决算力资源碎片化、抢占冲突、资源浪费等问题",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): finops-cost (required)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "落地算力资源弹性扩缩容、闲置资源回收机制，持续降低基础设施运维成本",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (bonus)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "有GPU算力集群、AI训练/推理集群运维优化经验优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): nccl-collectives (bonus), hardware-health (bonus)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "熟悉算力调度框架、多卡通信、算力资源隔离、节点故障治理等相关技术",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (bonus)",
+     "url": "https://www.liepin.com/job/1985216485.shtml",
+     "quote": "有大规模AI算力集群运维经验",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "11/11"
+  },
+  {
+   "id": "sensetime-llm-training-systems-engineer-shanghai",
+   "company": "SenseTime (商汤科技, SenseCore)",
+   "company_type": "ai-lab",
+   "title": "大模型训练系统工程师",
+   "location": "Shanghai (Xuhui), China",
+   "url": "https://www.liepin.com/job/1983194263.shtml",
+   "source_url": "https://www.liepin.com/job/1983194263.shtml",
+   "seniority": "ic",
+   "years_required": null,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "training-platform",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "建设大模型训练、推理、评测、数据管理和实验平台"
+    },
+    {
+     "id": "experiment-tracking",
+     "level": "required",
+     "quote": "建设大模型训练、推理、评测、数据管理和实验平台"
+    },
+    {
+     "id": "data-pipelines",
+     "level": "required",
+     "quote": "建设大模型训练、推理、评测、数据管理和实验平台"
+    },
+    {
+     "id": "rl-infra",
+     "level": "required",
+     "quote": "支撑多任务沙盒、长链条 RL 训练、多模态 Agentic RL 基础设施"
+    },
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "required",
+     "quote": "优化分布式训练稳定性、资源利用率、任务调度和故障恢复"
+    },
+    {
+     "id": "scheduler-design",
+     "level": "required",
+     "quote": "优化分布式训练稳定性、资源利用率、任务调度和故障恢复"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "熟悉分布式系统、云原生、训练框架、推理服务、数据平台等方向之一"
+    },
+    {
+     "id": "kubernetes",
+     "level": "bonus",
+     "quote": "有大规模训练平台、Kubernetes、Ray、Triton、vLLM、LightLLM、CUDA 优化经验者优先"
+    },
+    {
+     "id": "ray",
+     "level": "bonus",
+     "quote": "有大规模训练平台、Kubernetes、Ray、Triton、vLLM、LightLLM、CUDA 优化经验者优先"
+    },
+    {
+     "id": "inference-serving",
+     "level": "bonus",
+     "quote": "有大规模训练平台、Kubernetes、Ray、Triton、vLLM、LightLLM、CUDA 优化经验者优先"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "bonus",
+     "quote": "有大规模训练平台、Kubernetes、Ray、Triton、vLLM、LightLLM、CUDA 优化经验者优先"
+    }
+   ],
+   "responsibilities": [
+    "Build the platforms for large-model training, inference, evaluation, data management and experiments",
+    "Support multi-task sandboxes, long-horizon RL training and multimodal agentic RL infrastructure",
+    "Improve distributed-training stability, resource utilisation, job scheduling and failure recovery",
+    "Build productivity tooling for researchers and algorithm engineers"
+   ],
+   "notes": "Posting in Chinese on Liepin under '商汤科技SenseTime'; master's degree shown in the listing; page shows '90天前更新' with an apply button, so posted_on is null.",
+   "evidence": [
+    {
+     "claim": "Skill(s): ml-training-experience (required), experiment-tracking (required), data-pipelines (required)",
+     "url": "https://www.liepin.com/job/1983194263.shtml",
+     "quote": "建设大模型训练、推理、评测、数据管理和实验平台",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): rl-infra (required)",
+     "url": "https://www.liepin.com/job/1983194263.shtml",
+     "quote": "支撑多任务沙盒、长链条 RL 训练、多模态 Agentic RL 基础设施",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): checkpoint-fault-tolerance (required), scheduler-design (required)",
+     "url": "https://www.liepin.com/job/1983194263.shtml",
+     "quote": "优化分布式训练稳定性、资源利用率、任务调度和故障恢复",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://www.liepin.com/job/1983194263.shtml",
+     "quote": "熟悉分布式系统、云原生、训练框架、推理服务、数据平台等方向之一",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (bonus), ray (bonus), inference-serving (bonus), cuda-gpu (bonus)",
+     "url": "https://www.liepin.com/job/1983194263.shtml",
+     "quote": "有大规模训练平台、Kubernetes、Ray、Triton、vLLM、LightLLM、CUDA 优化经验者优先",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "5/5"
+  },
+  {
+   "id": "metax-distributed-training-performance-expert-nanjing",
+   "company": "MetaX (沐曦)",
+   "company_type": "vendor",
+   "title": "分布式训练性能优化专家-南京",
+   "location": "Nanjing (Yuhuatai), Jiangsu, China (also listed for Hangzhou)",
+   "url": "https://www.liepin.com/job/1978085713.shtml",
+   "source_url": "https://www.liepin.com/job/1978085713.shtml",
+   "seniority": "senior",
+   "years_required": 3,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "ml-systems-perf",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "pytorch-distributed",
+     "level": "required",
+     "quote": "熟悉Megatron、Verl等框架，熟悉常用分布式训练显存、通信及计算优化手段"
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "required",
+     "quote": "负责分布式训练框架（如Megatron-LM、DeepSpeed等）在自研软件栈上的适配"
+    },
+    {
+     "id": "rl-infra",
+     "level": "required",
+     "quote": "负责强化学习框架（如Verl等）在自研软件栈上的适配、功能测试以及性能调优"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "负责对大模型训练性能进行理论建模及寻优分布式切分方式"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "熟悉大模型模型结构及算子实现，如Transformer、MOE等"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "熟悉C++和Python编程，至少2年以上C++或Python编程经验"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "熟悉C++和Python编程，至少2年以上C++或Python编程经验"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "bonus",
+     "quote": "具有CUDA/ROCm/OPENCL开发经验者优先"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "负责基于大规模GPU集群的计算架构的设计和性能调优"
+    }
+   ],
+   "responsibilities": [
+    "Port, test and tune distributed-training frameworks (Megatron-LM, DeepSpeed) on MetaX's in-house GPU software stack",
+    "Port, test and tune reinforcement-learning frameworks such as Verl on the same stack",
+    "Design and tune the compute architecture of large GPU clusters",
+    "Model large-model training performance and search for the best distributed sharding strategy"
+   ],
+   "notes": "Posting in Chinese on Liepin under '沐曦集成电路(上海)股份有限公司' (GPU vendor); the header shows 3-10年 and a master's degree. Page shows '90天前更新' with an apply button, so posted_on is null. The page footer timestamp (更新时间) reads 2025-12-18 although the apply button is still active.",
+   "evidence": [
+    {
+     "claim": "Skill(s): pytorch-distributed (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "熟悉Megatron、Verl等框架，熟悉常用分布式训练显存、通信及计算优化手段",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): non-nvidia-accelerators (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "负责分布式训练框架（如Megatron-LM、DeepSpeed等）在自研软件栈上的适配",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): rl-infra (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "负责强化学习框架（如Verl等）在自研软件栈上的适配、功能测试以及性能调优",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "负责对大模型训练性能进行理论建模及寻优分布式切分方式",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "熟悉大模型模型结构及算子实现，如Transformer、MOE等",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), systems-lang (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "熟悉C++和Python编程，至少2年以上C++或Python编程经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (bonus)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "具有CUDA/ROCm/OPENCL开发经验者优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (required)",
+     "url": "https://www.liepin.com/job/1978085713.shtml",
+     "quote": "负责基于大规模GPU集群的计算架构的设计和性能调优",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "8/8"
+  },
+  {
+   "id": "metax-gpu-communication-library-expert-chengdu",
+   "company": "MetaX (沐曦)",
+   "company_type": "vendor",
+   "title": "GPU通信库开发专家-成都",
+   "location": "Chengdu (Gaoxin), Sichuan, China",
+   "url": "https://www.liepin.com/job/1984288585.shtml",
+   "source_url": "https://www.liepin.com/job/1984288585.shtml",
+   "seniority": "senior",
+   "years_required": 3,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "ml-systems-perf",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "根据产品化要求，开发通信库驱动和用户态并行计算相关驱动，保证高质量交付"
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "required",
+     "quote": "结合国产软硬件生态，开发多种基于GPGPU的通信库方案支持生态应用推广"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "具备良好的C/C++编程与调试能力"
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "掌握（Linux）操作系统的基本概念"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "bonus",
+     "quote": "熟悉异构计算的体系结构，有CUDA/OpenCL驱动开发经验或编程使用经验优先"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "bonus",
+     "quote": "熟悉RDMA网络通信，有网络交换机工作经验优先"
+    },
+    {
+     "id": "networking-general",
+     "level": "bonus",
+     "quote": "熟悉RDMA网络通信，有网络交换机工作经验优先"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "熟悉GPGPU通信库相关功能，或者集群环境中的多卡多机通信优先"
+    }
+   ],
+   "responsibilities": [
+    "Develop the communication-library drivers and user-space parallel-computing drivers to production quality",
+    "Understand how the communication library and user-space drivers are used at cluster scale and provide reliable solutions for large GPGPU deployments",
+    "Develop GPGPU communication-library solutions for the domestic hardware/software ecosystem"
+   ],
+   "notes": "Posting in Chinese on Liepin under '沐曦集成电路(上海)股份有限公司'; header shows 3-5年 and a bachelor's degree. Page shows '90天前更新' with an apply button, so posted_on is null.",
+   "evidence": [
+    {
+     "claim": "Skill(s): nccl-collectives (required)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "根据产品化要求，开发通信库驱动和用户态并行计算相关驱动，保证高质量交付",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): non-nvidia-accelerators (required)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "结合国产软硬件生态，开发多种基于GPGPU的通信库方案支持生态应用推广",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): systems-lang (required)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "具备良好的C/C++编程与调试能力",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "掌握（Linux）操作系统的基本概念",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (bonus)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "熟悉异构计算的体系结构，有CUDA/OpenCL驱动开发经验或编程使用经验优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (bonus), networking-general (bonus)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "熟悉RDMA网络通信，有网络交换机工作经验优先",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus)",
+     "url": "https://www.liepin.com/job/1984288585.shtml",
+     "quote": "熟悉GPGPU通信库相关功能，或者集群环境中的多卡多机通信优先",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "7/7"
+  },
+  {
+   "id": "sensetime-sensecore-sre-expert-beijing",
+   "company": "SenseTime (商汤科技, SenseCore)",
+   "company_type": "ai-lab",
+   "title": "SRE专家",
+   "location": "Beijing (Haidian), China",
+   "url": "https://www.liepin.com/job/1961065329.shtml",
+   "source_url": "https://www.liepin.com/job/1961065329.shtml",
+   "seniority": "senior",
+   "years_required": 5,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "负责服务器硬件、操作系统可靠性保障，包括标准化、调优和问题解决等"
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "熟悉硬件、linux操作系统、网络、虚拟化/容器等技术原理"
+    },
+    {
+     "id": "virtualization",
+     "level": "required",
+     "quote": "熟悉硬件、linux操作系统、网络、虚拟化/容器等技术原理"
+    },
+    {
+     "id": "containers",
+     "level": "required",
+     "quote": "熟悉硬件、linux操作系统、网络、虚拟化/容器等技术原理"
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "熟悉硬件、linux操作系统、网络、虚拟化/容器等技术原理"
+    },
+    {
+     "id": "bare-metal-provisioning",
+     "level": "required",
+     "quote": "负责 SRE 基础平台/工具建设，如CMDB、配置变更、自动装机、初始化、监控等"
+    },
+    {
+     "id": "ansible-config",
+     "level": "required",
+     "quote": "负责 SRE 基础平台/工具建设，如CMDB、配置变更、自动装机、初始化、监控等"
+    },
+    {
+     "id": "capacity-planning",
+     "level": "required",
+     "quote": "解决生产中容量、性能和稳定性问题"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "5年以上SRE实战经验，2年以上SRE架构设计经验"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "熟练掌握shell/python等至少一门开发语言"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "bonus",
+     "quote": "有大规模集群架构设计和开发、运维经验优先"
+    }
+   ],
+   "responsibilities": [
+    "Guarantee the reliability of server hardware and operating systems: standardisation, tuning and problem resolution",
+    "Build SRE platform tooling such as CMDB, configuration changes, automated OS installation, node initialisation and monitoring",
+    "Solve capacity, performance and stability problems in production",
+    "Operate the bare-metal and virtualised IaaS platform: service changes, incident response and fixes"
+   ],
+   "notes": "Posting in Chinese on Liepin under '商汤科技SenseTime', department '大装置/交付运维中心' (SenseCore AI infrastructure delivery and operations). The text does not name GPUs explicitly; it is classified gpu-cluster-ops because it runs SenseCore's IaaS. Page shows '90天前更新' and offers contact through the recruiter chat ('聊一聊', posted by a SenseTime operations director); it is not marked closed, so posted_on is null. The page footer timestamp (更新时间) reads 2026-05-28, so this requisition may be older than the others.",
+   "evidence": [
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "负责服务器硬件、操作系统可靠性保障，包括标准化、调优和问题解决等",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required), virtualization (required), containers (required), networking-general (required)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "熟悉硬件、linux操作系统、网络、虚拟化/容器等技术原理",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): bare-metal-provisioning (required), ansible-config (required)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "负责 SRE 基础平台/工具建设，如CMDB、配置变更、自动装机、初始化、监控等",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (required)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "解决生产中容量、性能和稳定性问题",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "5年以上SRE实战经验，2年以上SRE架构设计经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "熟练掌握shell/python等至少一门开发语言",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (bonus)",
+     "url": "https://www.liepin.com/job/1961065329.shtml",
+     "quote": "有大规模集群架构设计和开发、运维经验优先",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "7/7"
+  },
+  {
+   "id": "enflame-ai-software-expert-cluster-communication-shenzhen",
+   "company": "Enflame (燧原科技)",
+   "company_type": "vendor",
+   "title": "AI 软件技术专家-集群通信方向",
+   "location": "Shenzhen (Nanshan), Guangdong, China",
+   "url": "https://www.liepin.com/job/1980336157.shtml",
+   "source_url": "https://www.liepin.com/job/1980336157.shtml",
+   "seniority": "senior",
+   "years_required": 5,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "ml-systems-perf",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "设计/开发高性能、低延时、易用、可靠的分布式通信和并行计算组件"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "分布式通信和并行计算组件性能调优"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "熟悉Linux下的C/C++软件开发，熟悉cuda编程"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "熟悉Linux下的C/C++软件开发，熟悉cuda编程"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "集群环境下大模型推理和训练的系统调优"
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "required",
+     "quote": "参与下一代人工智能芯片的互联架构设计"
+    },
+    {
+     "id": "pytorch-distributed",
+     "level": "bonus",
+     "quote": "有大模型框架和工具（如megatron、deepspeed、fairscale等）经验，熟悉各类并行切分算法"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "擅长GPU、虚拟化、存储、编译器、HPC等其中一个或多个领域"
+    },
+    {
+     "id": "virtualization",
+     "level": "bonus",
+     "quote": "擅长GPU、虚拟化、存储、编译器、HPC等其中一个或多个领域"
+    }
+   ],
+   "responsibilities": [
+    "Study state-of-the-art distributed communication and parallel-computing schemes",
+    "Design and build high-performance, low-latency, reliable distributed communication and parallel-computing components for Enflame accelerators",
+    "Tune those components and the system performance of large-model training and inference on clusters",
+    "Contribute to the interconnect architecture of the next generation of AI chips"
+   ],
+   "notes": "Posting in Chinese on Liepin by a verified Enflame recruiter ('· 燧原科技'); master's degree preferred (bachelor's possible for strong candidates), 5+ years in the header. OpenMPI, NCCL and NVSHMEM experience listed as a plus. Page shows '90天前更新' with an apply button, so posted_on is null.",
+   "evidence": [
+    {
+     "claim": "Skill(s): nccl-collectives (required)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "设计/开发高性能、低延时、易用、可靠的分布式通信和并行计算组件",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "分布式通信和并行计算组件性能调优",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): systems-lang (required), cuda-gpu (required)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "熟悉Linux下的C/C++软件开发，熟悉cuda编程",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "集群环境下大模型推理和训练的系统调优",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): non-nvidia-accelerators (required)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "参与下一代人工智能芯片的互联架构设计",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): pytorch-distributed (bonus)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "有大模型框架和工具（如megatron、deepspeed、fairscale等）经验，熟悉各类并行切分算法",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus), virtualization (bonus)",
+     "url": "https://www.liepin.com/job/1980336157.shtml",
+     "quote": "擅长GPU、虚拟化、存储、编译器、HPC等其中一个或多个领域",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "7/7"
+  },
+  {
+   "id": "sugon-k8s-ai-scheduling-expert-tianjin",
+   "company": "Sugon (中科曙光)",
+   "company_type": "vendor",
+   "title": "K8S调度专家（天津）(J13614)",
+   "location": "Tianjin (Xiqing), China (also listed for Zhengzhou)",
+   "url": "https://www.liepin.com/job/1985982337.shtml",
+   "source_url": "https://www.liepin.com/job/1985982337.shtml",
+   "seniority": "senior",
+   "years_required": 5,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "training-platform",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "精通Kubernetes调度领域核心方法论，对资源隔离、优先级抢占、弹性伸缩等机制有体系化认知"
+    },
+    {
+     "id": "scheduler-design",
+     "level": "required",
+     "quote": "主导过AI业务关键路径的调度系统设计，如支持千卡规模训练任务调度、实时推理资源保障等"
+    },
+    {
+     "id": "multicloud-skypilot",
+     "level": "required",
+     "quote": "构建跨集群/跨云的智能调度中台，支持混合云、边缘计算等新兴AI业务场景"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "深入理解AI业务全流程（数据准备、训练调优、推理部署）"
+    },
+    {
+     "id": "capacity-planning",
+     "level": "bonus",
+     "quote": "对大规模集群资源纳管和大流量活动支撑有经验者优先"
+    }
+   ],
+   "responsibilities": [
+    "Lead the strategy and architecture of the Kubernetes scheduling system for AI workloads (generative AI, multimodal training, agents)",
+    "Design scheduling for the full model lifecycle and link scheduling policies to business metrics",
+    "Build a cross-cluster, cross-cloud scheduling layer for hybrid-cloud and edge AI scenarios",
+    "Package AI scheduling as a product that gives upper-layer AI platforms standard resource governance"
+   ],
+   "notes": "Posting in Chinese on Liepin by the Sugon entity '曙光信息产业(北京)' (Sugon group, 中科曙光); requires 5+ years of cloud-native architecture including 2+ years on AI/ML infrastructure and K8s component development. The page shows '10月8日更新' (year not printed) and an apply button, so posted_on is null.",
+   "evidence": [
+    {
+     "claim": "Skill(s): kubernetes (required)",
+     "url": "https://www.liepin.com/job/1985982337.shtml",
+     "quote": "精通Kubernetes调度领域核心方法论，对资源隔离、优先级抢占、弹性伸缩等机制有体系化认知",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): scheduler-design (required)",
+     "url": "https://www.liepin.com/job/1985982337.shtml",
+     "quote": "主导过AI业务关键路径的调度系统设计，如支持千卡规模训练任务调度、实时推理资源保障等",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): multicloud-skypilot (required)",
+     "url": "https://www.liepin.com/job/1985982337.shtml",
+     "quote": "构建跨集群/跨云的智能调度中台，支持混合云、边缘计算等新兴AI业务场景",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://www.liepin.com/job/1985982337.shtml",
+     "quote": "深入理解AI业务全流程（数据准备、训练调优、推理部署）",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (bonus)",
+     "url": "https://www.liepin.com/job/1985982337.shtml",
+     "quote": "对大规模集群资源纳管和大流量活动支撑有经验者优先",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "5/5"
+  },
+  {
+   "id": "enflame-ai-storage-architect-shanghai",
+   "company": "Enflame (燧原科技)",
+   "company_type": "vendor",
+   "title": "AI存储架构师",
+   "location": "Shanghai (Pudong), China (Beijing or Chengdu possible, Shanghai preferred)",
+   "url": "https://www.liepin.com/job/1984150637.shtml",
+   "source_url": "https://www.liepin.com/job/1984150637.shtml",
+   "seniority": "staff",
+   "years_required": 8,
+   "region": "cn",
+   "company_origin": "cn",
+   "role_family": "storage",
+   "posted_on": null,
+   "language": "zh",
+   "skills": [
+    {
+     "id": "parallel-fs-storage",
+     "level": "required",
+     "quote": "精通分布式存储、高性能存储架构原理"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "精通分布式存储、高性能存储架构原理"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "深刻理解大模型训练、推理的I/O特征与存储瓶颈"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "熟练掌握CXL、RDMA、NVMeoF、高速存储协议等核心技术"
+    },
+    {
+     "id": "data-pipelines",
+     "level": "required",
+     "quote": "具备大规模AI数据存储、流动优化落地经验"
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "熟悉Linux内核、存储IO调度、RAS、内存管理机制"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "具备底层存储性能调优、问题排查能力"
+    },
+    {
+     "id": "procurement-vendor",
+     "level": "required",
+     "quote": "结合业务规模化落地需求和AI存储供应链体系，评估各类存储介质的适配性、可靠性与成本优势"
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "结合业务规模化落地需求和AI存储供应链体系，评估各类存储介质的适配性、可靠性与成本优势"
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "required",
+     "quote": "深度结合AI芯片架构与超节点集群部署特性"
+    },
+    {
+     "id": "inference-serving",
+     "level": "required",
+     "quote": "重点优化prefill、decode（Attention、FFN、etc）及Prefix Caching、Speculative decoding等核心阶段的存储访问逻辑"
+    }
+   ],
+   "responsibilities": [
+    "Own the end-to-end storage architecture for large-model training and inference on Enflame AI chips and super-node clusters, including KV-data tiering and data-movement policies",
+    "Optimise storage access along the training and inference path (prefill, decode, prefix caching, speculative decoding), RDMA mechanisms and multi-level caches",
+    "Lead proofs of concept on emerging memory/storage technologies (cHBM, memory pooling, HBF) with industry partners",
+    "Evaluate storage media against the supply chain for fit, reliability and cost, and balance performance, capacity and cost for mass deployment",
+    "Write storage architecture guidelines and standards and coach R&D teams"
+   ],
+   "notes": "Posting in Chinese on Liepin under Enflame (燧原科技); the header shows '10月23日更新' and the page footer '更新时间' line reads 2026-10-23. Architect-level role (8+ years, 75-100k/month band) sitting between chip memory hierarchy and cluster storage; inference KV-cache access is part of the scope.",
+   "evidence": [
+    {
+     "claim": "Skill(s): parallel-fs-storage (required), distributed-systems (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "精通分布式存储、高性能存储架构原理",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "深刻理解大模型训练、推理的I/O特征与存储瓶颈",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "熟练掌握CXL、RDMA、NVMeoF、高速存储协议等核心技术",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): data-pipelines (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "具备大规模AI数据存储、流动优化落地经验",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "熟悉Linux内核、存储IO调度、RAS、内存管理机制",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "具备底层存储性能调优、问题排查能力",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): procurement-vendor (required), finops-cost (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "结合业务规模化落地需求和AI存储供应链体系，评估各类存储介质的适配性、可靠性与成本优势",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): non-nvidia-accelerators (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "深度结合AI芯片架构与超节点集群部署特性",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): inference-serving (required)",
+     "url": "https://www.liepin.com/job/1984150637.shtml",
+     "quote": "重点优化prefill、decode（Attention、FFN、etc）及Prefix Caching、Speculative decoding等核心阶段的存储访问逻辑",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "9/9"
+  }
+ ],
+ "blocked_sources": [
+  "https://app.mokahr.com/social-recruitment/moonshot/148506 — Moonshot AI (Kimi) careers on Moka: redirect loop to a JavaScript app; the job API is POST-only",
+  "https://mthreads.zhiye.com/social/jobs and https://sugon.zhiye.com/szdetails?jobId=150579391 — Beisen (zhiye) portals render jobs with JavaScript (fetch_text returns an empty page); the job-list API answers 500 to GET",
+  "https://www.nscc-tj.cn/ — National Supercomputing Center Tianjin: connection closed without response",
+  "https://www.nscc-gz.cn/ — National Supercomputing Center Guangzhou: connection reset",
+  "http://www.nsccjn.cn/ — National Supercomputing Center Jinan: HTTP 503",
+  "https://www.zhejianglab.org/ and https://www.baai.ac.cn/zh-cn/ — JavaScript-only pages (0 characters of text)",
+  "https://www.liepin.com/job/1975031485.shtml — MiniMax AI基础设施架构师 (Shanghai): page says 该职位已暂停招聘; the Beijing twin 1975031487 redirects to a transit page",
+  "https://www.liepin.com/job/1958134705.shtml — Shanghai AI Lab 大模型训练系统研发工程师: redirects to a transit page (posting gone)",
+  "https://www.liepin.com/job/1942523791.shtml — Sugon subsidiary (浙江曙光) HPC系统运维工程师: page timestamp 更新时间 2021-10-13, treated as stale and not collected",
+  "https://www.liepin.com/job/1967287185.shtml — Enflame AI数据中心网络互联资深专家: page timestamp 2025-11-06 and no apply button, dropped as probably stale",
+  "https://www.liepin.com/job/1985730989.shtml — 'GPU训练专家' listed on BAAI's Liepin company page is actually posted by 智御维科(重庆)科技有限公司, not BAAI; not collected",
+  "LinkedIn guest search (seeMoreJobPostings) returns no relevant postings for Moonshot AI, Zhipu, MiniMax, StepFun, Moore Threads, Biren or MetaX in China",
+  "Zhipu AI's Liepin company page (company-jobs/10087865) lists no infrastructure roles on 2026-10-25"
+ ],
+ "verification": {
+  "status": "verified",
+  "checked_claims": 99,
+  "verified_quotes": 99,
+  "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
+ }
+}

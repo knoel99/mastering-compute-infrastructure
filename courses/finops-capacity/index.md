@@ -37,7 +37,7 @@ Ce module est le volet technique de l'achat de calcul. Il part de l'utilisation 
 | Volume | 24 h, dont environ 9 h de lecture, 9 h de labs et 6 h d'exercices |
 | Niveau d'entrée | 2 : à l'aise avec Python (les labs s'écrivent et se testent avec `pytest`), la ligne de commande Linux et les coûts cloud ; avoir lu le module 2 |
 | Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html) |
-| Statut pour le lecteur de référence | cœur : FinOps cloud connu, mais ni contrats de capacité, ni énergie, ni prévision de demande pour des GPU |
+| Pour qui | Cœur : contrats de capacité, énergie et prévision de la demande en GPU ; le FinOps cloud classique n'en couvre qu'une partie. |
 | Livrable | un modèle de coût total testé, un plan de capacité chiffré avec ses risques et une revue de contrat appliquée à un contrat fictif |
 | Environnement | un portable CPU suffit ; aucun GPU ni compte cloud. Un Slurm réel est optionnel (lab 15.1, branche « live ») |
 | Projets liés | [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
@@ -51,6 +51,14 @@ Ce module est le volet technique de l'achat de calcul. Il part de l'utilisation 
 -   Estimer puissance, densité par baie et refroidissement d'un parc de GPU, et leur effet sur le calendrier (chapitre 5).
 -   Lire un contrat de capacité GPU, repérer les clauses qui comptent pour un entraînement et chiffrer ce qu'elles valent (chapitres 6 et 7).
 -   Construire une matrice de décision robuste, un appel d'offres technique et un tableau de pilotage trimestriel (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
+-   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
+-   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -68,7 +76,27 @@ Neuf séances, soit 24 h : six de 2,5 h et trois de 3 h. Le niveau 1 correspond 
 | 8 | 3 h | 3 | ch. 7 Négocier | Ex. 11, 12 |
 | 9 | 2.5 h | 3 | ch. 8 Matrices de décision, appel d'offres, pilotage ; checkpoint de sortie | Ex. 13 ; démarrage du Projet 6 |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Administrateur ou ingénieur HPC | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Ingénieur ML ou chercheur | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Développeur logiciel ou systèmes | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** La prévision de demande et le coût par GPU-heure productive sont demandés par les offres de capacité et de direction.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Les prix sont fictifs, en unités arbitraires (u). Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au chapitre 5.
 
@@ -941,8 +969,9 @@ pip install pytest numpy pyyaml
 export PYTHON="$(command -v python)"
 ~~~
 
+### Lab 15.1 — Du sacct au rapport de showback {#lab-15-1}
+
 ::: lab
-[Lab 15.1 — Du sacct au rapport de showback]{.tag}
 
 **Objectif.** Écrire l'outil qui transforme l'export de l'ordonnanceur en heures allouées par équipe, utilisation, heures perdues candidates, attentes et allocation du coût plein. **Durée.** 2,5 h. **Prérequis matériels.** Portable CPU, Python 3 et `pytest`. Pour la branche « live » : une machine Linux jetable avec accès root et le Slurm du module 5.
 
@@ -959,8 +988,9 @@ export PYTHON="$(command -v python)"
 **Pour aller plus loin.** Remplacez la trace synthétique par l'export de votre cluster. Ajoutez la lecture de `AllocTRES` avec plusieurs types de GPU et un coût par type.
 :::
 
+### Lab 15.2 — Prévision de la demande et capacité à engager {#lab-15-2}
+
 ::: lab
-[Lab 15.2 — Prévision de la demande et capacité à engager]{.tag}
 
 **Objectif.** Produire des scénarios de demande, en déduire la capacité à engager par la règle du quantile, mesurer le risque, et tester la prévision sur le passé. **Durée.** 2,5 h. **Prérequis matériels.** Portable CPU, Python 3, `numpy` et `pytest`.
 
@@ -977,8 +1007,9 @@ export PYTHON="$(command -v python)"
 **Pour aller plus loin.** Branchez la sortie de `sacct` du lab 15.1 comme historique, ajoutez un engagement par paliers (deux niveaux, deux durées) et comparez-le au niveau unique.
 :::
 
+### Lab 15.3 — Modèle de coût total paramétrable {#lab-15-3}
+
 ::: lab
-[Lab 15.3 — Modèle de coût total paramétrable]{.tag}
 
 **Objectif.** Construire l'outil qui compare achat, location, réservation, demande et spot en coût par GPU-heure utile, trouve les points morts et classe les hypothèses par influence. **Durée.** 2,5 h. **Prérequis matériels.** Portable CPU, Python 3, `pyyaml` et `pytest`.
 
@@ -996,8 +1027,9 @@ export PYTHON="$(command -v python)"
 **Pour aller plus loin.** Ajoutez une capacité maximale au spot, un délai de livraison par option, ou un scénario où la revente est nulle.
 :::
 
+### Lab 15.4 — Revue d'un contrat de capacité fictif {#lab-15-4}
+
 ::: lab
-[Lab 15.4 — Revue d'un contrat de capacité fictif]{.tag}
 
 **Objectif.** Appliquer une grille de revue à un contrat de capacité fictif, comprendre chaque clause rouge et chiffrer ce que vaut sa négociation. **Durée.** 1,5 h. **Prérequis matériels.** Portable CPU, Python 3, `pyyaml` et `pytest`.
 
@@ -1270,10 +1302,18 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les faits suivants ont été relus à la source le 24 octobre 2026 : les principes, personas, domaines, capacités et périmètres de la FinOps Foundation ; les indicateurs et les recommandations de showback du document « FinOps for AI » ; la puissance maximale de 10,2 kW du DGX H100, de 14,3 kW du DGX B200, les alimentations de 3,3 kW, le débit d'air, la température de fonctionnement et la chaleur dégagée de 38 557 BTU/h ; le TDP du H100 (page produit) et les 120 kW du rack GB200 NVL72 ; le PUE de Google et la moyenne de l'Uptime Institute citée par Google ; les densités de baie de l'enquête 2020 ; les 176 TWh du rapport du LBNL ; la structure et les crédits du SLA d'Amazon EC2 (page datée du 25 mai 2022) et de Google Compute Engine ; les conditions des Capacity Blocks et le préavis Spot d'AWS ; la dérogation aux frais de sortie d'AWS et sa mise à jour du 8 octobre 2026 ; les chiffres de Kokolis et al., Dubey et al. et Hu et al. ; les champs de `sacct` et le défaut de `DefMemPerCPU`. Tous les calculs des exemples et des corrigés ont été refaits en Python, les observations de Slurm ont été faites sur Slurm 23.11.4 (paquets Ubuntu 24.04) le 24 octobre 2026, et les quatre `verify.sh` ainsi que `verify-live.sh` ont été exécutés deux fois avec succès.
+### Documenté {#documente}
 
-**Recommandé.** Les politiques d'allocation de l'inactivité, la règle de dimensionner sur la puissance maximale, la grille de revue de contrat (poids et seuils), les seuils du tableau de pilotage, la marge de souplesse de 10 à 20 % sur un engagement, l'ordre des demandes de négociation, la matrice de décision et la plage de ±20 % de l'analyse de sensibilité sont des choix de ce parcours, pas des normes. La règle du quantile pour l'engagement est un résultat classique, présenté ici comme outil pédagogique.
+Les faits suivants ont été relus à la source le 24 octobre 2026 : les principes, personas, domaines, capacités et périmètres de la FinOps Foundation ; les indicateurs et les recommandations de showback du document « FinOps for AI » ; la puissance maximale de 10,2 kW du DGX H100, de 14,3 kW du DGX B200, les alimentations de 3,3 kW, le débit d'air, la température de fonctionnement et la chaleur dégagée de 38 557 BTU/h ; le TDP du H100 (page produit) et les 120 kW du rack GB200 NVL72 ; le PUE de Google et la moyenne de l'Uptime Institute citée par Google ; les densités de baie de l'enquête 2020 ; les 176 TWh du rapport du LBNL ; la structure et les crédits du SLA d'Amazon EC2 (page datée du 25 mai 2022) et de Google Compute Engine ; les conditions des Capacity Blocks et le préavis Spot d'AWS ; la dérogation aux frais de sortie d'AWS et sa mise à jour du 8 octobre 2026 ; les chiffres de Kokolis et al., Dubey et al. et Hu et al. ; les champs de `sacct` et le défaut de `DefMemPerCPU`. Tous les calculs des exemples et des corrigés ont été refaits en Python, les observations de Slurm ont été faites sur Slurm 23.11.4 (paquets Ubuntu 24.04) le 24 octobre 2026, et les quatre `verify.sh` ainsi que `verify-live.sh` ont été exécutés deux fois avec succès.
 
-**À vérifier.** Tous les prix, remises, durées de vie, tarifs d'énergie, taux d'interruption et notes de la matrice de décision sont des valeurs d'exemple fictives. Les résultats d'Erlang C et du vendeur de journaux sont classiques et n'ont pas été rouverts dans un manuel : le premier a été confronté à la simulation à événements discrets du projet 6 (200 000 jobs, trois graines), le second à une minimisation numérique du coût (test `test_closed_form_matches_the_grid_minimizer` du lab 15.2). Le texte du règlement européen sur les données n'a pas pu être lu (le site officiel refuse l'accès automatisé depuis le bac à sable) : seule la mention qu'en fait AWS est citée. Aucun délai de raccordement ou de livraison n'est donné, faute de source primaire lue. Les chiffres de l'Uptime Institute sont ceux de 2020 pour les densités ; la moyenne de 2025 est citée d'après la note de Google, sans lecture de l'enquête. L'écart entre 38 557 BTU/h et 10,2 kW n'est pas expliqué par la documentation. L'effet de `DefMemPerCPU` sur la capture est cohérent avec la documentation mais n'a pas fait l'objet d'un essai contraire. Les SLA des fournisseurs changent et peuvent différer pour les instances GPU et les réservations : relisez le texte en vigueur. L'existence du livre de Fisher et Ury et le sens de BATNA ont été confirmés par une notice encyclopédique, le livre n'a pas été relu. Aucun lab n'utilise de GPU : le format `gres/gpu` n'est testé que sur la trace synthétique, la branche « live » utilise des CPU.
+### Recommandé {#recommande}
 
-**Hors périmètre.** Les contrats de colocation détaillés (alimentation, redondance, accès), le droit des contrats et de la souveraineté des données, la fiscalité et la comptabilité (amortissement fiscal, crédit-bail), l'empreinte carbone et la mesure des émissions, la conception des circuits de refroidissement, le marché secondaire des GPU, l'achat de réseau et de stockage, et la FinOps de l'inférence à grande échelle en production.
+Les politiques d'allocation de l'inactivité, la règle de dimensionner sur la puissance maximale, la grille de revue de contrat (poids et seuils), les seuils du tableau de pilotage, la marge de souplesse de 10 à 20 % sur un engagement, l'ordre des demandes de négociation, la matrice de décision et la plage de ±20 % de l'analyse de sensibilité sont des choix de ce parcours, pas des normes. La règle du quantile pour l'engagement est un résultat classique, présenté ici comme outil pédagogique.
+
+### À vérifier {#a-verifier}
+
+Tous les prix, remises, durées de vie, tarifs d'énergie, taux d'interruption et notes de la matrice de décision sont des valeurs d'exemple fictives. Les résultats d'Erlang C et du vendeur de journaux sont classiques et n'ont pas été rouverts dans un manuel : le premier a été confronté à la simulation à événements discrets du projet 6 (200 000 jobs, trois graines), le second à une minimisation numérique du coût (test `test_closed_form_matches_the_grid_minimizer` du lab 15.2). Le texte du règlement européen sur les données n'a pas pu être lu (le site officiel refuse l'accès automatisé depuis le bac à sable) : seule la mention qu'en fait AWS est citée. Aucun délai de raccordement ou de livraison n'est donné, faute de source primaire lue. Les chiffres de l'Uptime Institute sont ceux de 2020 pour les densités ; la moyenne de 2025 est citée d'après la note de Google, sans lecture de l'enquête. L'écart entre 38 557 BTU/h et 10,2 kW n'est pas expliqué par la documentation. L'effet de `DefMemPerCPU` sur la capture est cohérent avec la documentation mais n'a pas fait l'objet d'un essai contraire. Les SLA des fournisseurs changent et peuvent différer pour les instances GPU et les réservations : relisez le texte en vigueur. L'existence du livre de Fisher et Ury et le sens de BATNA ont été confirmés par une notice encyclopédique, le livre n'a pas été relu. Aucun lab n'utilise de GPU : le format `gres/gpu` n'est testé que sur la trace synthétique, la branche « live » utilise des CPU.
+
+### Hors périmètre {#hors-perimetre}
+
+Les contrats de colocation détaillés (alimentation, redondance, accès), le droit des contrats et de la souveraineté des données, la fiscalité et la comptabilité (amortissement fiscal, crédit-bail), l'empreinte carbone et la mesure des émissions, la conception des circuits de refroidissement, le marché secondaire des GPU, l'achat de réseau et de stockage, et la FinOps de l'inférence à grande échelle en production.

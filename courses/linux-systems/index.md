@@ -38,7 +38,7 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 | Volume | 24 h, dont environ 9 h de lecture, 8 h de labs et 7 h d'exercices, de synthèse et de checkpoint |
 | Niveau d'entrée | 1 : à l'aise avec un terminal et capable de lire un script Python court |
 | Prérequis | aucun |
-| Statut pour le lecteur de référence | à survoler : un profil qui exploite déjà des conteneurs et du Kubernetes connaît l'essentiel ; lisez avec soin les chapitres 2 (cgroups), 3 (topologie) et 4 (méthode de mesure) |
+| Pour qui | Fondation pour tous ; survol possible si vous administrez déjà des serveurs Linux en production. |
 | Livrable | un rapport de triage reproductible de votre machine et un script d'exploitation idempotent avec tests |
 | Environnement | une machine Linux sans GPU suffit. Lab 1.4 : accès root. Lab 1.2 : `stress-ng` et `fio`. Lab 1.3 : `fio` pour la partie B seulement. Lab 1.5 : `shellcheck` et `systemd-analyze`. Voir la page [environnement de travail](../../lab-setup/index.html) |
 | Projets qui s'appuient sur ce module | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html) |
@@ -51,6 +51,15 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 - Dire, pour une lecture ou une écriture de fichier, ce qui touche le cache de pages et ce qui touche le disque (chapitre 7, lab 1.3).
 - Écrire un script d'exploitation **idempotent**, avec codes de retour et tests (chapitre 8, lab 1.5).
 - Lire une unité systemd, des limites de ressources et un journal du noyau sans deviner (chapitres 5 et 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 0 — Fondations : machines et performance** (semaines 1-5) : lire une machine et prédire sa performance avant de la mesurer.
+-   **S'appuie sur** : aucun module ; c'est un point d'entrée.
+-   **Prépare** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 6 — Provisioning, images et santé des nœuds GPU](../provisioning/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html), [module 8 — Stockage et E/S pour l'entraînement](../storage/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html).
+-   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -66,7 +75,27 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 | 8 | 2.5 h | 2 | Chapitre 8 : pannes matérielles vues du système, scripts d'exploitation robustes | lab 1.5 (qui inclut l'exercice 11) |
 | 9 | 2.5 h | 3 | Synthèse : dimensionner, diagnostiquer un cas ouvert, checkpoint de sortie | exercices 7 et 8, checkpoint |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Administrateur ou ingénieur HPC | survol guidé | les questions de positionnement, les chapitres signalés ci-dessous, un lab et le checkpoint |
+| Ingénieur ML ou chercheur | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** Même en survol, lisez les chapitres sur les cgroups, la topologie (NUMA, PCIe) et la méthode de mesure : tout le parcours s'appuie dessus.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Trois questions pour situer votre niveau. Répondez sans chercher, puis ouvrez les réponses.
 
@@ -776,8 +805,9 @@ unchanged: vm.max_map_count = 1048576
 
 Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). `verify.sh` de chaque lab sort avec le code 0 et affiche la valeur du critère de réussite. Installation préalable des outils des labs 1.2, 1.3 et 1.5 : `sudo apt-get install -y stress-ng fio shellcheck`. Le lab 1.4 exige root et un cgroup ; lisez ses avertissements avant de l'exécuter. Lancez chaque commande depuis le dossier du lab (`cd labs/linux-systems/<lab>`). Les durées de lab indiquées sont celles du travail guidé ; elles tiennent dans les séances du plan.
 
+### Lab 1.1 — Cartographier une machine {#lab-1-1}
+
 ::: lab
-[Lab 1.1 — Cartographier une machine]{.tag}
 
 **Objectif.** Produire un rapport JSON de la machine (processeurs, NUMA, mémoire, PCI, interfaces, disques) et sa **table de localité** GPU, carte réseau et NVMe. **Durée.** 1.5 h. **Prérequis matériels.** Un portable Linux ; aucun GPU.
 
@@ -792,8 +822,9 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 **Pour aller plus loin.** Sur une machine à GPU, comparez `locality` avec `nvidia-smi topo -m` et signalez toute divergence.
 :::
 
+### Lab 1.2 — Triage avec la méthode USE et la pression PSI {#lab-1-2}
+
 ::: lab
-[Lab 1.2 — Triage avec la méthode USE et la pression PSI]{.tag}
 
 **Objectif.** Reconnaître, avec des compteurs du noyau, quatre situations réelles : repos, processeur saturé, tâches bloquées sur le disque, et l'angle mort de PSI. **Durée.** 1.5 h. **Prérequis matériels.** Linux avec PSI, `stress-ng` et `fio`.
 
@@ -808,8 +839,9 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 **Pour aller plus loin.** Créez de la pression mémoire dans un cgroup (lab 1.4) et vérifiez que PSI `memory` la voit.
 :::
 
+### Lab 1.3 — Page cache : mesurer ce qui touche le disque {#lab-1-3}
+
 ::: lab
-[Lab 1.3 — Page cache : mesurer ce qui touche le disque]{.tag}
 
 **Objectif.** Raconter, avec trois compteurs du noyau, ce que deviennent 256 Mio écrits puis relus, et vérifier la loi de Little. **Durée.** 1.5 h. **Prérequis matériels.** Linux avec un système de fichiers sur disque (pas `tmpfs`) ; `fio` pour la partie B.
 
@@ -824,8 +856,9 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 **Pour aller plus loin.** Écrivez un checkpoint par blocs de 1 Gio avec `fsync` et `DONTNEED` après chaque bloc, et mesurez la mémoire résidente maximale.
 :::
 
+### Lab 1.4 — cgroups : limite mémoire, mise à mort, quota de processeur {#lab-1-4}
+
 ::: lab
-[Lab 1.4 — cgroups : limite mémoire, mise à mort, quota de processeur]{.tag}
 
 **Objectif.** Mettre un programme dans un cgroup, constater sa mise à mort par manque de mémoire, mesurer un quota de processeur. **Durée.** 1.5 h. **Prérequis matériels.** Linux, **root**, une machine jetable. **Branche exécutée.** Le script détecte la version : la branche **cgroup v1** a été exécutée dans le bac à sable ; la branche **cgroup v2** suit la documentation du noyau et **n'a pas pu être exécutée** (le bac à sable est en v1, avec seulement `hugetlb` côté v2).
 
@@ -840,8 +873,9 @@ Cinq labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4
 **Pour aller plus loin.** Ajoutez `memory.high` en v2 et montrez que le groupe est ralenti sans être tué.
 :::
 
+### Lab 1.5 — Un script d'exploitation idempotent {#lab-1-5}
+
 ::: lab
-[Lab 1.5 — Un script d'exploitation idempotent]{.tag}
 
 **Objectif.** Écrire et tester un script qui fixe des paramètres noyau de façon idempotente, vérifier une unité systemd hors ligne, et constater les angles morts de `set -e`. **Durée.** 2 h, exercice 11 compris. **Prérequis matériels.** Linux, `shellcheck` et `systemd-analyze` (paquet `systemd`) ; aucun accès root requis (le test `--apply` ne s'exécute qu'en root et sans effet).
 
@@ -1037,10 +1071,18 @@ Les pages web ci-dessous ont été consultées le 2026-10-24 ; la documentation 
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les définitions de PSI, de la méthode USE, de `memory.max`, `memory.high` et `cpu.max`, des espaces de noms, de la charge moyenne, de `RLIMIT_MEMLOCK`, des paramètres `vm.*`, de `O_DIRECT`, `DONTNEED` et `mincore`, de la THP, du format des messages Xid et des options `cgroup.conf` de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18.44, Ubuntu 24.04, 4 processeurs ; outils testés le 2026-10-24 : systemd 255, fio 3.36, stress-ng 0.17.06, iperf3 3.16, util-linux 2.39.3, procps-ng 4.0.4, ShellCheck 0.9.0) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.
+### Documenté {#documente}
 
-**Recommandé.** La table USE du chapitre 4, le code de retour 3 pour « non observable », les cinq règles du script d'exploitation, le choix de `memory.high` sous `memory.max` et l'ordre des chapitres sont des choix de cours, pas des normes.
+Les définitions de PSI, de la méthode USE, de `memory.max`, `memory.high` et `cpu.max`, des espaces de noms, de la charge moyenne, de `RLIMIT_MEMLOCK`, des paramètres `vm.*`, de `O_DIRECT`, `DONTNEED` et `mincore`, de la THP, du format des messages Xid et des options `cgroup.conf` de Slurm viennent des pages citées, lues pour ce module. Toutes les sorties de commande marquées « capturé » viennent de la machine du bac à sable (machine virtuelle Linux 6.18.44, Ubuntu 24.04, 4 processeurs ; outils testés le 2026-10-24 : systemd 255, fio 3.36, stress-ng 0.17.06, iperf3 3.16, util-linux 2.39.3, procps-ng 4.0.4, ShellCheck 0.9.0) ; les valeurs numériques des exemples et des exercices ont été recalculées en Python.
 
-**À vérifier.** Le comportement de PSI `io` sous E/S asynchrones profondes a été constaté **sur ce disque virtuel et ce noyau** seulement. La branche cgroup v2 du lab 1.4 n'a pas été exécutée. Le serveur à deux sockets du lab 1.1 est fabriqué. Les extraits `vmstat` de l'exercice 2 et les valeurs de l'exercice 8 sont fabriqués. La mise à jour de EEVDF depuis le noyau 6.6 est celle que décrit la documentation du noyau : lisez-la pour votre version. Que `systemd-analyze verify` retourne 0 sur un avertissement a été constaté avec systemd 255 seulement. L'écart de vitesse entre lecture à froid et à chaud du lab 1.3 (rapport 2,5) et son explication par un cache de l'hôte sont une hypothèse. Le code de classe PCI d'une carte RDMA configurée en Ethernet (RoCE), que le lab 1.1 classerait comme `ethernet`, n'a pas été vérifié. Les labs 1.2 et 1.3 lisent des compteurs de toute la machine ou de tout le disque : sur une machine partagée, une autre charge peut les faire échouer ; deux exécutions consécutives de chaque `verify.sh` ont réussi lors de la revue, ce qui ne prouve pas la robustesse.
+### Recommandé {#recommande}
 
-**Hors périmètre.** `perf`, les graphes de flammes et `bpftrace` (non installés dans le bac à sable, décrits sans sortie), `tc netem` (module absent de ce noyau), les lectures SMART, EDAC et BMC réelles (absentes en machine virtuelle), `nvidia-smi topo -m` et les messages Xid réels (aucun GPU), le réglage fin du noyau et l'administration d'un système de fichiers parallèle.
+La table USE du chapitre 4, le code de retour 3 pour « non observable », les cinq règles du script d'exploitation, le choix de `memory.high` sous `memory.max` et l'ordre des chapitres sont des choix de cours, pas des normes.
+
+### À vérifier {#a-verifier}
+
+Le comportement de PSI `io` sous E/S asynchrones profondes a été constaté **sur ce disque virtuel et ce noyau** seulement. La branche cgroup v2 du lab 1.4 n'a pas été exécutée. Le serveur à deux sockets du lab 1.1 est fabriqué. Les extraits `vmstat` de l'exercice 2 et les valeurs de l'exercice 8 sont fabriqués. La mise à jour de EEVDF depuis le noyau 6.6 est celle que décrit la documentation du noyau : lisez-la pour votre version. Que `systemd-analyze verify` retourne 0 sur un avertissement a été constaté avec systemd 255 seulement. L'écart de vitesse entre lecture à froid et à chaud du lab 1.3 (rapport 2,5) et son explication par un cache de l'hôte sont une hypothèse. Le code de classe PCI d'une carte RDMA configurée en Ethernet (RoCE), que le lab 1.1 classerait comme `ethernet`, n'a pas été vérifié. Les labs 1.2 et 1.3 lisent des compteurs de toute la machine ou de tout le disque : sur une machine partagée, une autre charge peut les faire échouer ; deux exécutions consécutives de chaque `verify.sh` ont réussi lors de la revue, ce qui ne prouve pas la robustesse.
+
+### Hors périmètre {#hors-perimetre}
+
+`perf`, les graphes de flammes et `bpftrace` (non installés dans le bac à sable, décrits sans sortie), `tc netem` (module absent de ce noyau), les lectures SMART, EDAC et BMC réelles (absentes en machine virtuelle), `nvidia-smi topo -m` et les messages Xid réels (aucun GPU), le réglage fin du noyau et l'administration d'un système de fichiers parallèle.

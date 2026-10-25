@@ -1,27 +1,28 @@
 ---
 title: "Enquête sur les masters HPC"
-subtitle: "36 programmes en France, aux États-Unis, en Chine et dans le monde, comparés à 12 offres d'emploi"
+subtitle: "36 programmes en France, aux États-Unis, en Chine et dans le monde, comparés à 96 offres d'emploi"
 description: "Ce que les masters de calcul haute performance enseignent, ce qu'ils n'enseignent presque pas, et ce que demandent les offres d'ingénieur d'infrastructure de calcul."
+numbered: true
 ---
 
 ## Résumé {#resume}
 
 -   **Les masters forment des programmeurs de calcul parallèle et de simulation, pas des opérateurs de plateformes.** MPI, GPU, architecture et numérique y ont souvent un cours dédié ; l'ordonnancement, le réseau d'interconnexion, la résilience et l'observabilité presque jamais.
--   **L'écart se chiffre.** Un cours dédié à l'interconnexion existe dans 1 programme sur 21 dont le syllabus est connu, alors que 7 offres sur 12 demandent InfiniBand ou RoCE. L'ordonnancement : 1 programme sur 8 contre 5 offres sur 12 pour Slurm.
+-   **L'écart se chiffre.** Un cours dédié à l'interconnexion existe dans 1 programme sur 21 dont le syllabus est connu, alors que 41 offres sur 96 demandent InfiniBand ou RoCE. L'ordonnancement : 1 programme sur 8 contre 21 offres sur 96 pour Slurm et 50 offres sur 96 pour Kubernetes.
 -   **Les programmes qui s'en approchent sont rares et orientés exploitation** : le diplôme d'administration de systèmes HPC du C-DAC (Inde), le master HPC de l'ICTP-SISSA (Italie) et certaines spécialisations d'EUMaster4HPC.
 -   **En France, un réseau de masters dédiés** (CHPS) donne une base solide en parallélisme ; **aux États-Unis, le HPC vit dans des cours** plus que dans des diplômes ; **en Chine, il vit dans des centres de supercalcul et des compétitions** plus que dans les maquettes de master.
 -   **Conséquence pour le parcours** : MPI, GPU et performance sont des fondations communes, que les masters enseignent bien ; l'essentiel de l'effort va aux sujets que les masters traitent peu et que les offres demandent.
 
 ## Méthode et limites {#methode}
 
-L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; **un contrôle mécanique a vérifié mot pour mot 592 citations sur 593** (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier `data/` du dépôt.
+L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; **un contrôle mécanique a vérifié mot pour mot 1437 citations sur 1438** (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier `data/` du dépôt.
 
 Cinq limites à garder en tête.
 
 -   **Échantillon non exhaustif.** Plusieurs programmes notables n'ont pas été étudiés faute de budget de recherche : en Europe, TUM, FAU, Stuttgart, RWTH, USI et Cambridge ; en France, Sorbonne et Ensimag ; à l'international, Tsukuba, KAIST et NUS (aucun programme lisible trouvé pour ces trois derniers).
 -   **Inconnu n'est pas absent.** Quand un syllabus n'était pas lisible, le thème est marqué *inconnu*. Les proportions ci-dessous sont calculées sur les seuls programmes dont la valeur est connue, et leur effectif est toujours indiqué.
 -   **Un cours dédié n'est pas un cours bien fait.** Le critère « cours dédié » signifie qu'un intitulé de cours ou de module nomme le thème ; il ne dit rien de la qualité ni de la profondeur.
--   **Peu d'offres d'emploi.** Douze offres, dont six chez des fournisseurs de GPU, trois dans des laboratoires d'IA, une dans un centre HPC et deux d'une start-up de robotique (anonymisées). Les années d'expérience demandées vont de 3 à 15, médiane de 8, sur les sept offres qui en donnent.
+-   **Les offres d'emploi ont leur propre page.** 96 offres publiques des États-Unis, d'Europe et de Chine sont analysées dans [Ce que demande le marché](../market/index.html) ; cette page n'en reprend que les compétences qui correspondent à un thème de master.
 -   **Des informations changent.** Les programmes évoluent chaque année : consultez la page officielle avant toute décision.
 
 ## Ce que l'échantillon couvre {#echantillon}
@@ -76,36 +77,30 @@ Trois lectures.
 
 ## Ce que demandent les offres {#demande}
 
-Sur les douze offres de postes d'infrastructure de calcul relevées, voici les compétences les plus citées, mises en regard du nombre de programmes qui leur consacrent un cours.
+Sur les 96 offres de postes d'infrastructure de calcul relevées (détail dans [Ce que demande le marché](../market/index.html)), voici les compétences les plus citées, mises en regard du nombre de programmes qui leur consacrent un cours.
 
 | Compétence demandée | Offres qui la citent | Thème de master correspondant | Programmes avec un cours dédié |
 |---|---|---|---|
-| Kubernetes | 10 sur 12 (8 exigées) | Conteneurs, Kubernetes | 5 sur 13 |
-| Astreinte, fiabilité (SRE) | 9 sur 12 (9 exigées) | Supervision, observabilité, SRE | 0 sur 4 |
-| Expérience HPC | 8 sur 12 (6 exigées) | Passage de messages (MPI) | 10 sur 21 |
-| InfiniBand / RoCE | 7 sur 12 (4 exigées) | Réseaux et interconnexions | 1 sur 21 |
-| Administration Linux | 7 sur 12 (7 exigées) | Administration de clusters | 3 sur 10 |
-| Planification de capacité | 6 sur 12 (6 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
-| Provisioning bare-metal | 5 sur 12 (4 exigées) | Administration de clusters | 3 sur 10 |
-| Prometheus / Grafana | 5 sur 12 (4 exigées) | Supervision, observabilité, SRE | 0 sur 4 |
-| Conception d'ordonnanceur | 5 sur 12 (4 exigées) | Ordonnancement de jobs | 1 sur 8 |
-| Slurm | 5 sur 12 (2 exigées) | Ordonnancement de jobs | 1 sur 8 |
-| Checkpoint, tolérance aux pannes | 4 sur 12 (3 exigées) | Résilience, checkpointing | 0 sur 12 |
-| DCGM / supervision GPU | 4 sur 12 (4 exigées) | Supervision, observabilité, SRE | 0 sur 4 |
-| Expérience d'entraînement ML | 4 sur 12 (3 exigées) | Systèmes pour l'IA (entraînement distribué) | 3 sur 14 |
-| NCCL / collectives | 4 sur 12 (2 exigées) | Systèmes pour l'IA (entraînement distribué) | 3 sur 14 |
-| PyTorch distribué | 4 sur 12 (2 exigées) | Systèmes pour l'IA (entraînement distribué) | 3 sur 14 |
-| Terraform / IaC | 4 sur 12 (3 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
-| Conteneurs | 3 sur 12 (2 exigées) | Conteneurs, Kubernetes | 5 sur 13 |
-| Cloud hyperscaler | 3 sur 12 (2 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
-| Multi-cloud (SkyPilot) | 3 sur 12 (2 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
-| Infra d'apprentissage par renforcement | 3 sur 12 (1 exigées) | Systèmes pour l'IA (entraînement distribué) | 3 sur 14 |
+| Administration Linux | 54 sur 96 (50 exigées) | Administration de clusters | 3 sur 10 |
+| Astreinte, fiabilité (SRE) | 52 sur 96 (49 exigées) | Supervision, observabilité, SRE | 0 sur 4 |
+| Kubernetes | 50 sur 96 (37 exigées) | Conteneurs, Kubernetes | 5 sur 13 |
+| Expérience HPC | 49 sur 96 (29 exigées) | Passage de messages (MPI) | 10 sur 21 |
+| Expérience d'entraînement ML | 44 sur 96 (27 exigées) | Systèmes pour l'IA (entraînement distribué) | 3 sur 14 |
+| InfiniBand / RoCE | 41 sur 96 (26 exigées) | Réseaux et interconnexions | 1 sur 21 |
+| Prometheus / Grafana | 35 sur 96 (25 exigées) | Supervision, observabilité, SRE | 0 sur 4 |
+| Stockage parallèle | 29 sur 96 (18 exigées) | Stockage et E/S parallèles | 4 sur 15 |
+| Provisioning bare-metal | 28 sur 96 (20 exigées) | Administration de clusters | 3 sur 10 |
+| Planification de capacité | 27 sur 96 (22 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
+| Conteneurs | 26 sur 96 (17 exigées) | Conteneurs, Kubernetes | 5 sur 13 |
+| Cloud hyperscaler | 26 sur 96 (18 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
+| NCCL / collectives | 25 sur 96 (15 exigées) | Systèmes pour l'IA (entraînement distribué) | 3 sur 14 |
+| Terraform / IaC | 25 sur 96 (16 exigées) | Cloud et multi-fournisseurs | 11 sur 19 |
 
-Les nombres sont à lire comme des ordres de grandeur sur de petits échantillons. Trois constats tiennent néanmoins :
+Les nombres de programmes sont petits : lisez-les comme des ordres de grandeur. Trois constats tiennent néanmoins :
 
--   **Kubernetes** est la compétence la plus citée (10 offres sur 12, dont 8 l'exigent), loin devant Slurm (5 sur 12, dont 2 l'exigent). Les offres lues viennent beaucoup de fournisseurs de GPU, où l'infrastructure ressemble à celle du cloud.
--   **L'astreinte et la fiabilité** figurent dans 9 offres sur 12, toutes en exigence, alors que l'observabilité n'a aucun cours dédié dans les programmes dont le contenu est connu.
--   **La planification de capacité** est exigée par 6 offres sur 12. Elle relève d'un métier que les masters n'enseignent pas : les thèmes de cloud qu'ils proposent portent sur la technique, pas sur l'achat ni la prévision.
+-   **Kubernetes** est cité par 50 offres sur 96 (dont 37 l'exigent), loin devant Slurm (21 offres sur 96, dont 12 l'exigent), que demandent surtout les centres HPC. Les masters, eux, n'enseignent presque ni l'un ni l'autre.
+-   **L'astreinte et la fiabilité** figurent dans 52 offres sur 96 (dont 49 en exigence), alors que l'observabilité n'a aucun cours dédié dans les programmes dont le contenu est connu.
+-   **La planification de capacité** est citée par 27 offres sur 96. Elle relève d'un métier que les masters n'enseignent pas : les thèmes de cloud qu'ils proposent portent sur la technique, pas sur l'achat ni la prévision.
 
 ## Les programmes les plus proches du métier {#proches}
 
@@ -120,13 +115,13 @@ Aucun programme ne couvre à lui seul le métier. Quatre s'en rapprochent par le
 
 | Constat de l'enquête | Module du parcours | Décision |
 |---|---|---|
-| Interconnexion : 1 programme sur 21, 7 offres sur 12 | Module 7 | module long (28 h) et labs de dimensionnement |
-| Ordonnancement : 1 programme sur 8, 5 offres sur 12 | Module 5 | 32 h, labs sur un vrai Slurm |
-| Résilience : 0 sur 12, 4 offres sur 12 | Modules 9 et 10 | 28 h et un projet dédié |
-| Observabilité et astreinte : 0 sur 4, 9 offres sur 12 | Modules 14 et 16 | 24 h, plus les pratiques de production |
-| Kubernetes : 5 sur 13, 10 offres sur 12 | Module 12 | 28 h, en s'appuyant sur l'expérience existante |
+| Interconnexion : 1 programme sur 21, 41 offres sur 96 | Module 7 | module long (28 h) et labs de dimensionnement |
+| Ordonnancement : 1 programme sur 8 ; Slurm 21 offres sur 96 | Module 5 | 32 h, labs sur un vrai Slurm |
+| Résilience : 0 sur 12, 19 offres sur 96 | Modules 9 et 10 | 28 h et un projet dédié |
+| Observabilité et astreinte : 0 sur 4, 52 offres sur 96 | Modules 14 et 16 | 24 h, plus les pratiques de production |
+| Kubernetes : 5 sur 13, 50 offres sur 96 | Module 12 | 28 h, centrés sur les GPU, les files d'attente et le placement |
 | MPI : 10 sur 21 ; GPU : 12 sur 21 | Modules 3 et 4 | fondations communes, volume standard |
-| Capacité et achats : 6 offres sur 12 | Module 15 | 24 h, avec l'énergie et les contrats |
+| Capacité et achats : 27 offres sur 96 | Module 15 | 24 h, avec l'énergie et les contrats |
 | Méthodes numériques : 20 sur 26, aucune offre | aucun | hors parcours, avec des renvois |
 
 L'enquête **confirme** le plan initial plutôt qu'elle ne le modifie : **les modules les plus longs du parcours portent sur les thèmes que les masters traitent le moins**, à savoir l'ordonnancement, le réseau, le stockage (phase 2) et la résilience (phase 3).

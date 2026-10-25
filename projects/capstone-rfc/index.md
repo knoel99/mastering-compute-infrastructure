@@ -10,6 +10,7 @@ project:
 badges:
   - {label: "Projet de synthèse", class: core}
   - {label: "Modèle et vérificateur vérifiés (CPU) ; RFC jugée par grille humaine", class: verified}
+numbered: true
 ---
 
 ## Contexte et objectif {#contexte}

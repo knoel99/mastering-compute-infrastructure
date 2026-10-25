@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Ce que demande le marché — Mastering Compute Infrastructure</title>
+<meta name="description" content="Analyse sourcée d'offres d'emploi d'ingénieur d'infrastructure de calcul dans les laboratoires d'IA, les grands groupes, les clouds GPU, les constructeurs et les centres HPC, région par région, comparée au contenu des seize modules.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+
+<link rel="stylesheet" href="../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../index.html">Accueil</a></p>
+<header id="title-block-header">
+<h1 class="title">Ce que demande le marché</h1>
+<p class="subtitle">96 offres d'infrastructure de calcul aux États-Unis, en Europe et en Chine, et ce que le parcours en couvre</p>
+</header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#resume">1. Résumé</a></li>
+<li><a href="#methode">2. Méthode et limites</a></li>
+<li><a href="#echantillon">3. L'échantillon</a>
+<ul>
+<li><a href="#regions-employeurs">3.1. Régions et employeurs</a></li>
+<li><a href="#employeurs-lus">3.2. Employeurs lus</a></li>
+<li><a href="#familles">3.3. Familles de postes</a></li>
+</ul></li>
+<li><a href="#demande">4. Les compétences les plus demandées</a></li>
+<li><a href="#regions">5. Ce qui change d'une région à l'autre</a>
+<ul>
+<li><a href="#us">5.1. États-Unis</a></li>
+<li><a href="#eu">5.2. Europe</a></li>
+<li><a href="#cn">5.3. Chine</a></li>
+</ul></li>
+<li><a href="#employeurs">6. Ce qui change d'un employeur à l'autre</a></li>
+<li><a href="#couverture">7. Ce que le parcours couvre</a></li>
+<li><a href="#ecarts">8. Écarts et décisions</a></li>
+<li><a href="#sources">9. Sources et portée</a>
+<ul>
+<li><a href="#documente">9.1. Documenté</a></li>
+<li><a href="#recommande">9.2. Recommandé</a></li>
+<li><a href="#a-verifier">9.3. À vérifier</a></li>
+<li><a href="#hors-perimetre">9.4. Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="resume">1. Résumé</h2>
+<ul>
+<li><strong>Un socle commun.</strong> Python, l'administration Linux, un langage système, l'astreinte, Kubernetes, l'expérience du calcul haute performance et le profilage figurent chacun dans au moins la moitié des offres de l'échantillon.</li>
+<li><strong>Kubernetes est plus demandé que Slurm</strong> : 52 % des offres contre 22 %. Slurm reste central dans les centres HPC et dans une partie des laboratoires américains ; en Chine, l'ordonnancement se fait sur Kubernetes ou sur des outils maison.</li>
+<li><strong>La santé matérielle est devenue un métier</strong> : détecter, drainer, réparer et remettre en service des nœuds figure dans 38 % des offres, et presque toujours en exigence.</li>
+<li><strong>Chaque région a son accent.</strong> Les États-Unis demandent plus souvent Slurm, Prometheus et l'expérience HPC ; l'Europe, Kubernetes, la sécurité, la conformité et l'automatisation ; la Chine, le savoir-faire d'entraînement de grands modèles, les collectives et les accélérateurs chinois.</li>
+<li><strong>Le parcours couvre l'essentiel et assume quelques écarts.</strong> Les manques les plus nets étaient les langages système, les accélérateurs non NVIDIA, la virtualisation, l'inférence et les systèmes distribués ; la section <a href="#ecarts">Écarts et décisions</a> dit ce qui a été ajouté et ce qui reste hors parcours.</li>
+</ul>
+<h2 id="methode">2. Méthode et limites</h2>
+<p>Les offres ont été lues entre le 22 et le 25 octobre 2026 sur les pages publiques des employeurs ou de leurs outils de recrutement (Greenhouse, Ashby, Lever, SmartRecruiters), sur les pages d'offres de LinkedIn, sur le portail de Tencent et sur des pages d'offres chinoises rendues côté serveur. Pour chaque offre, chaque compétence relevée porte une citation copiée de la page. <strong>Un contrôle mécanique a retrouvé mot pour mot 937 citations sur 937</strong> dans le texte des pages (<code>tools/verify_quotes.py</code>).</p>
+<p>Les compétences suivent une taxonomie fixe de 44 entrées, définie dans <code>specs/research-contract.md</code>. Une compétence est <strong>exigée</strong> quand elle figure dans les qualifications requises, ou qu'elle est manifestement centrale au poste ; elle est <strong>en bonus</strong> quand elle figure parmi les atouts.</p>
+<p>Cinq limites à garder en tête.</p>
+<ul>
+<li><strong>Échantillon choisi, pas tiré au hasard.</strong> Les employeurs ont été choisis pour couvrir les grands laboratoires, les grands groupes, les clouds GPU, les constructeurs et les centres HPC des trois régions. Les proportions décrivent cet échantillon, pas le marché entier.</li>
+<li><strong>Petits effectifs.</strong> Une différence de dix points entre deux régions correspond à quelques offres : lisez les écarts faibles comme du bruit.</li>
+<li><strong>Sources inégales.</strong> Plusieurs portails sont rendus en JavaScript ou fermés aux lecteurs automatiques : Hugging Face, Kyutai, Moonshot, Zhipu, MiniMax et les centres nationaux de supercalcul chinois n'ont pas pu être lus. Les offres chinoises viennent surtout de grands groupes, de laboratoires publics et de fabricants de puces.</li>
+<li><strong>Postes d'inférence.</strong> Les offres purement orientées inférence ont été limitées volontairement ; elles sont étiquetées pour pouvoir être exclues.</li>
+<li><strong>Années d'expérience.</strong> toutes zones : médiane 5 ans (1 à 15, sur 57 offres qui le disent) ; États-Unis : médiane 5 ans (2 à 15, sur 25 offres qui le disent) ; Europe : médiane 5 ans (2 à 10, sur 15 offres qui le disent) ; Chine : médiane 3 ans (1 à 8, sur 16 offres qui le disent). Les fourchettes varient beaucoup avec le niveau du poste.</li>
+</ul>
+<h2 id="echantillon">3. L'échantillon</h2>
+<h3 id="regions-employeurs">3.1. Régions et employeurs</h3>
+<p>La région est celle du lieu de travail. Les deux postes situés hors des trois régions (Singapour et Canada) comptent dans le total mais pas dans les colonnes régionales.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Zone du poste</th>
+<th>Laboratoires d'IA et start-ups</th>
+<th>Grands groupes et hyperscalers</th>
+<th>Clouds GPU</th>
+<th>Centres HPC</th>
+<th>Constructeurs</th>
+<th>Autres</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>États-Unis</td>
+<td>9</td>
+<td>5</td>
+<td>9</td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td><strong>33</strong></td>
+</tr>
+<tr class="even">
+<td>Europe</td>
+<td>17</td>
+<td>2</td>
+<td>11</td>
+<td>7</td>
+<td>0</td>
+<td>1</td>
+<td><strong>38</strong></td>
+</tr>
+<tr class="odd">
+<td>Chine</td>
+<td>4</td>
+<td>10</td>
+<td>0</td>
+<td>2</td>
+<td>7</td>
+<td>0</td>
+<td><strong>23</strong></td>
+</tr>
+<tr class="even">
+<td>Autres</td>
+<td>0</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td><strong>2</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td>30</td>
+<td>19</td>
+<td>20</td>
+<td>14</td>
+<td>11</td>
+<td>2</td>
+<td><strong>96</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="employeurs-lus">3.2. Employeurs lus</h3>
+<p>62 employeurs, au plus deux offres par employeur et par relevé :</p>
+<ul>
+<li><strong>États-Unis</strong> (23) : AMD, Amazon Web Services, Anthropic, Argonne National Laboratory, Cerebras Systems, CoreWeave, Crusoe, Databricks, Google, Lambda, Lawrence Berkeley National Laboratory, Los Alamos National Laboratory, Meta, Microsoft, NVIDIA, Oak Ridge National Laboratory, OpenAI, Perplexity, Thinking Machines Lab, Together AI, UC San Diego, Vultr, xAI.</li>
+<li><strong>Europe</strong> (27) : Aleph Alpha, Anthropic, Black Forest Labs, CEA/DAM Île-de-France, CERN, CSCS – Swiss National Supercomputing Centre, Commissariat au Numérique de Défense, DeepL, Deutsche Telekom IT Solutions HU, ElevenLabs, European Spallation Source ERIC, Fluidstack, Google DeepMind, H Company, Helsing, Isomorphic Labs, Leibniz-Rechenzentrum, Microsoft, Mistral AI, Nebius, Nscale, PhysicsX, Scaleway, Synthesia, Together AI, Verda, Wayve.</li>
+<li><strong>Chine</strong> (15) : Alibaba Cloud, Baidu, ByteDance, DeepSeek, Enflame, Huawei, JD.com, MetaX, Moore Threads, Peng Cheng Laboratory, SenseTime, Shanghai AI Laboratory, Sugon, Tencent, Xiaomi.</li>
+</ul>
+<h3 id="familles">3.3. Familles de postes</h3>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Famille de poste</th>
+<th>Offres</th>
+<th>Part</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Clusters GPU</td>
+<td>34</td>
+<td>35 %</td>
+</tr>
+<tr class="even">
+<td>Plateforme d'entraînement</td>
+<td>12</td>
+<td>12 %</td>
+</tr>
+<tr class="odd">
+<td>Performance des systèmes ML</td>
+<td>11</td>
+<td>11 %</td>
+</tr>
+<tr class="even">
+<td>Exploitation HPC</td>
+<td>11</td>
+<td>11 %</td>
+</tr>
+<tr class="odd">
+<td>Réseau</td>
+<td>9</td>
+<td>9 %</td>
+</tr>
+<tr class="even">
+<td>Stockage</td>
+<td>8</td>
+<td>8 %</td>
+</tr>
+<tr class="odd">
+<td>Autre</td>
+<td>3</td>
+<td>3 %</td>
+</tr>
+<tr class="even">
+<td>Plateforme d'inférence</td>
+<td>3</td>
+<td>3 %</td>
+</tr>
+<tr class="odd">
+<td>Capacité, FinOps</td>
+<td>3</td>
+<td>3 %</td>
+</tr>
+<tr class="even">
+<td>Direction d'équipe</td>
+<td>2</td>
+<td>2 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="demande">4. Les compétences les plus demandées</h2>
+<p>Le graphique donne, pour les compétences les plus citées, le nombre d'offres qui les mentionnent : la partie rouge compte les offres qui les <strong>exigent</strong>, la partie bleue celles qui les citent seulement en bonus.</p>
+<div class="bars" role="list">
+<div class="bar" role="listitem">
+<span class="blab">Python</span><span class="track"><span class="fill two" style="width:59%;float:left"></span><span class="fill" style="width:8%;float:left"></span></span><span class="val">65/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Administration Linux</span><span class="track"><span class="fill two" style="width:52%;float:left"></span><span class="fill" style="width:4%;float:left"></span></span><span class="val">54/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Langage système (Go, Rust, C++)</span><span class="track"><span class="fill two" style="width:50%;float:left"></span><span class="fill" style="width:5%;float:left"></span></span><span class="val">53/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Astreinte, fiabilité (SRE)</span><span class="track"><span class="fill two" style="width:51%;float:left"></span><span class="fill" style="width:3%;float:left"></span></span><span class="val">52/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Kubernetes</span><span class="track"><span class="fill two" style="width:38%;float:left"></span><span class="fill" style="width:14%;float:left"></span></span><span class="val">50/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Profilage, bancs d'essai</span><span class="track"><span class="fill two" style="width:45%;float:left"></span><span class="fill" style="width:6%;float:left"></span></span><span class="val">49/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Expérience HPC</span><span class="track"><span class="fill two" style="width:30%;float:left"></span><span class="fill" style="width:21%;float:left"></span></span><span class="val">49/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Expérience d'entraînement ML</span><span class="track"><span class="fill two" style="width:28%;float:left"></span><span class="fill" style="width:18%;float:left"></span></span><span class="val">44/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Systèmes distribués</span><span class="track"><span class="fill two" style="width:35%;float:left"></span><span class="fill" style="width:9%;float:left"></span></span><span class="val">43/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Réseau (général)</span><span class="track"><span class="fill two" style="width:30%;float:left"></span><span class="fill" style="width:14%;float:left"></span></span><span class="val">42/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">InfiniBand, RoCE</span><span class="track"><span class="fill two" style="width:27%;float:left"></span><span class="fill" style="width:16%;float:left"></span></span><span class="val">41/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Santé matérielle (burn-in, diagnostics, RMA)</span><span class="track"><span class="fill two" style="width:34%;float:left"></span><span class="fill" style="width:4%;float:left"></span></span><span class="val">37/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">CUDA, programmation GPU</span><span class="track"><span class="fill two" style="width:18%;float:left"></span><span class="fill" style="width:21%;float:left"></span></span><span class="val">37/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Prometheus, Grafana</span><span class="track"><span class="fill two" style="width:26%;float:left"></span><span class="fill" style="width:10%;float:left"></span></span><span class="val">35/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Systèmes de fichiers parallèles</span><span class="track"><span class="fill two" style="width:19%;float:left"></span><span class="fill" style="width:11%;float:left"></span></span><span class="val">29/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Provisioning bare-metal</span><span class="track"><span class="fill two" style="width:21%;float:left"></span><span class="fill" style="width:8%;float:left"></span></span><span class="val">28/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Planification de capacité</span><span class="track"><span class="fill two" style="width:23%;float:left"></span><span class="fill" style="width:5%;float:left"></span></span><span class="val">27/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">CI/CD, automatisation</span><span class="track"><span class="fill two" style="width:20%;float:left"></span><span class="fill" style="width:8%;float:left"></span></span><span class="val">27/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Cloud hyperscaler (AWS, GCP, Azure…)</span><span class="track"><span class="fill two" style="width:19%;float:left"></span><span class="fill" style="width:8%;float:left"></span></span><span class="val">26/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Conteneurs</span><span class="track"><span class="fill two" style="width:18%;float:left"></span><span class="fill" style="width:9%;float:left"></span></span><span class="val">26/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Sécurité, conformité</span><span class="track"><span class="fill two" style="width:23%;float:left"></span><span class="fill" style="width:3%;float:left"></span></span><span class="val">25/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Terraform, infrastructure as code</span><span class="track"><span class="fill two" style="width:17%;float:left"></span><span class="fill" style="width:9%;float:left"></span></span><span class="val">25/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Collectives (NCCL, RCCL, HCCL)</span><span class="track"><span class="fill two" style="width:16%;float:left"></span><span class="fill" style="width:10%;float:left"></span></span><span class="val">25/96</span>
+</div>
+<div class="bar" role="listitem">
+<span class="blab">Ansible, gestion de configuration</span><span class="track"><span class="fill two" style="width:18%;float:left"></span><span class="fill" style="width:6%;float:left"></span></span><span class="val">23/96</span>
+</div>
+</div>
+<p>Trois lectures.</p>
+<ul>
+<li><strong>Le cœur du métier est l'exploitation.</strong> Linux, l'astreinte, la santé matérielle, le réseau et le profilage pèsent plus que la programmation de noyaux ou le parallélisme de modèle.</li>
+<li><strong>L'expérience compte autant que les outils.</strong> « Expérience HPC » (51 %) et « expérience d'entraînement » (46 %) ne s'apprennent pas dans un cours ; les projets et l'exposition à de vraies machines les approchent.</li>
+<li><strong>Un langage système est attendu.</strong> Go, Rust ou C++ figurent dans 55 % des offres, et dans la plupart des offres des grands groupes, pour écrire des contrôleurs, des agents de nœud et des outils de flotte.</li>
+</ul>
+<h2 id="regions">5. Ce qui change d'une région à l'autre</h2>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Compétence</th>
+<th>Toutes (96)</th>
+<th>États-Unis (33)</th>
+<th>Europe (38)</th>
+<th>Chine (23)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Python</td>
+<td>68 %</td>
+<td>79 %</td>
+<td>68 %</td>
+<td>52 %</td>
+</tr>
+<tr class="even">
+<td>Administration Linux</td>
+<td>56 %</td>
+<td>55 %</td>
+<td>60 %</td>
+<td>52 %</td>
+</tr>
+<tr class="odd">
+<td>Langage système (Go, Rust, C++)</td>
+<td>55 %</td>
+<td>58 %</td>
+<td>53 %</td>
+<td>52 %</td>
+</tr>
+<tr class="even">
+<td>Astreinte, fiabilité (SRE)</td>
+<td>54 %</td>
+<td>58 %</td>
+<td>63 %</td>
+<td>39 %</td>
+</tr>
+<tr class="odd">
+<td>Kubernetes</td>
+<td>52 %</td>
+<td>48 %</td>
+<td>66 %</td>
+<td>35 %</td>
+</tr>
+<tr class="even">
+<td>Expérience HPC</td>
+<td>51 %</td>
+<td>61 %</td>
+<td>55 %</td>
+<td>35 %</td>
+</tr>
+<tr class="odd">
+<td>Profilage, bancs d'essai</td>
+<td>51 %</td>
+<td>52 %</td>
+<td>47 %</td>
+<td>52 %</td>
+</tr>
+<tr class="even">
+<td>Expérience d'entraînement ML</td>
+<td>46 %</td>
+<td>39 %</td>
+<td>37 %</td>
+<td>70 %</td>
+</tr>
+<tr class="odd">
+<td>Systèmes distribués</td>
+<td>45 %</td>
+<td>52 %</td>
+<td>45 %</td>
+<td>35 %</td>
+</tr>
+<tr class="even">
+<td>Réseau (général)</td>
+<td>44 %</td>
+<td>36 %</td>
+<td>50 %</td>
+<td>44 %</td>
+</tr>
+<tr class="odd">
+<td>InfiniBand, RoCE</td>
+<td>43 %</td>
+<td>48 %</td>
+<td>37 %</td>
+<td>48 %</td>
+</tr>
+<tr class="even">
+<td>CUDA, programmation GPU</td>
+<td>38 %</td>
+<td>30 %</td>
+<td>37 %</td>
+<td>52 %</td>
+</tr>
+<tr class="odd">
+<td>Santé matérielle (burn-in, diagnostics, RMA)</td>
+<td>38 %</td>
+<td>46 %</td>
+<td>37 %</td>
+<td>30 %</td>
+</tr>
+<tr class="even">
+<td>Prometheus, Grafana</td>
+<td>36 %</td>
+<td>55 %</td>
+<td>29 %</td>
+<td>26 %</td>
+</tr>
+<tr class="odd">
+<td>Systèmes de fichiers parallèles</td>
+<td>30 %</td>
+<td>30 %</td>
+<td>40 %</td>
+<td>17 %</td>
+</tr>
+<tr class="even">
+<td>Provisioning bare-metal</td>
+<td>29 %</td>
+<td>33 %</td>
+<td>34 %</td>
+<td>13 %</td>
+</tr>
+<tr class="odd">
+<td>Planification de capacité</td>
+<td>28 %</td>
+<td>27 %</td>
+<td>34 %</td>
+<td>22 %</td>
+</tr>
+<tr class="even">
+<td>CI/CD, automatisation</td>
+<td>28 %</td>
+<td>30 %</td>
+<td>40 %</td>
+<td>4 %</td>
+</tr>
+<tr class="odd">
+<td>Conteneurs</td>
+<td>27 %</td>
+<td>36 %</td>
+<td>21 %</td>
+<td>26 %</td>
+</tr>
+<tr class="even">
+<td>Cloud hyperscaler (AWS, GCP, Azure…)</td>
+<td>27 %</td>
+<td>39 %</td>
+<td>26 %</td>
+<td>9 %</td>
+</tr>
+<tr class="odd">
+<td>Terraform, infrastructure as code</td>
+<td>26 %</td>
+<td>33 %</td>
+<td>37 %</td>
+<td>0 %</td>
+</tr>
+<tr class="even">
+<td>Collectives (NCCL, RCCL, HCCL)</td>
+<td>26 %</td>
+<td>21 %</td>
+<td>24 %</td>
+<td>39 %</td>
+</tr>
+<tr class="odd">
+<td>Sécurité, conformité</td>
+<td>26 %</td>
+<td>24 %</td>
+<td>42 %</td>
+<td>0 %</td>
+</tr>
+<tr class="even">
+<td>Ansible, gestion de configuration</td>
+<td>24 %</td>
+<td>36 %</td>
+<td>26 %</td>
+<td>4 %</td>
+</tr>
+<tr class="odd">
+<td>Journaux, traces</td>
+<td>23 %</td>
+<td>33 %</td>
+<td>24 %</td>
+<td>4 %</td>
+</tr>
+<tr class="even">
+<td>Leadership, management</td>
+<td>23 %</td>
+<td>36 %</td>
+<td>24 %</td>
+<td>4 %</td>
+</tr>
+<tr class="odd">
+<td>Slurm</td>
+<td>22 %</td>
+<td>36 %</td>
+<td>21 %</td>
+<td>4 %</td>
+</tr>
+<tr class="even">
+<td>Entraînement distribué (PyTorch, Megatron, DeepSpeed…)</td>
+<td>20 %</td>
+<td>18 %</td>
+<td>10 %</td>
+<td>39 %</td>
+</tr>
+<tr class="odd">
+<td>Checkpoint, tolérance aux pannes</td>
+<td>20 %</td>
+<td>12 %</td>
+<td>26 %</td>
+<td>22 %</td>
+</tr>
+<tr class="even">
+<td>Conception d'ordonnanceur</td>
+<td>20 %</td>
+<td>18 %</td>
+<td>21 %</td>
+<td>17 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Compétences les plus caractéristiques de chaque région, comparées aux deux autres (au moins trois offres, écart d'au moins dix points) :</p>
+<ul>
+<li><strong>États-Unis</strong> : Prometheus, Grafana (55 % contre 27 % ailleurs); Slurm (36 % contre 14 % ailleurs); Leadership, management (36 % contre 16 % ailleurs); Ansible, gestion de configuration (36 % contre 18 % ailleurs); Cloud hyperscaler (AWS, GCP, Azure…) (39 % contre 21 % ailleurs); Python (79 % contre 62 % ailleurs).</li>
+<li><strong>Europe</strong> : Sécurité, conformité (42 % contre 16 % ailleurs); Kubernetes (66 % contre 43 % ailleurs); CI/CD, automatisation (40 % contre 21 % ailleurs); Terraform, infrastructure as code (37 % contre 19 % ailleurs); Systèmes de fichiers parallèles (40 % contre 24 % ailleurs); Astreinte, fiabilité (SRE) (63 % contre 48 % ailleurs).</li>
+<li><strong>Chine</strong> : Expérience d'entraînement ML (70 % contre 38 % ailleurs); Entraînement distribué (PyTorch, Megatron, DeepSpeed…) (39 % contre 14 % ailleurs); CUDA, programmation GPU (52 % contre 34 % ailleurs); Collectives (NCCL, RCCL, HCCL) (39 % contre 22 % ailleurs); Accélérateurs non NVIDIA (TPU, ROCm, Ascend…) (30 % contre 14 % ailleurs); Infrastructure de RL (17 % contre 3 % ailleurs).</li>
+</ul>
+<h3 id="us">5.1. États-Unis</h3>
+<p>Les laboratoires d'IA et les clouds GPU américains exploitent les plus grandes flottes. Leurs offres insistent sur l'automatisation de la santé des nœuds (détection, drainage, réparation, retour en service), sur les fabrics RoCE et InfiniBand à grande échelle et sur l'astreinte. Les laboratoires nationaux (Los Alamos, Oak Ridge, Berkeley, Argonne) ajoutent Slurm, le stockage parallèle, la sécurité et des contraintes d'habilitation propres au pays. Plusieurs offres citent des accélérateurs non NVIDIA (TPU, Trainium, ROCm).</p>
+<h3 id="eu">5.2. Europe</h3>
+<p>L'Europe mêle des laboratoires d'IA, des clouds GPU et souverains et de grands centres de calcul. Kubernetes y est cité dans 66 % des offres. La sécurité et la conformité (42 %) reflètent les qualifications souveraines et les enquêtes administratives des centres publics. La virtualisation et le stockage reviennent souvent chez les clouds. Les centres HPC demandent un master ou un diplôme d'ingénieur, plusieurs années de calcul intensif, et proposent souvent des contrats à durée déterminée.</p>
+<h3 id="cn">5.3. Chine</h3>
+<p>Les offres chinoises demandent le savoir-faire d'entraînement de grands modèles bien au-delà des postes de recherche : 70 % citent l'expérience d'entraînement, y compris pour l'exploitation, le réseau et le stockage. Les collectives (39 %) et RDMA (48 %) sont fréquentes ; les accélérateurs non NVIDIA (30 %) comprennent Ascend et les GPU de fabricants chinois. Slurm n'apparaît presque jamais (1 sur 23) : l'ordonnancement repose sur Kubernetes et sur des systèmes maison. Les offres lues demandent moins d'années d'expérience qu'ailleurs.</p>
+<h2 id="employeurs">6. Ce qui change d'un employeur à l'autre</h2>
+<div class="tbl-wrap">
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Compétence</th>
+<th>Laboratoires d'IA et start-ups (30)</th>
+<th>Grands groupes et hyperscalers (19)</th>
+<th>Clouds GPU (20)</th>
+<th>Centres HPC (14)</th>
+<th>Constructeurs (11)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Python</td>
+<td>77 %</td>
+<td>68 %</td>
+<td>65 %</td>
+<td>64 %</td>
+<td>55 %</td>
+</tr>
+<tr class="even">
+<td>Administration Linux</td>
+<td>47 %</td>
+<td>42 %</td>
+<td>70 %</td>
+<td>86 %</td>
+<td>55 %</td>
+</tr>
+<tr class="odd">
+<td>Langage système (Go, Rust, C++)</td>
+<td>40 %</td>
+<td>84 %</td>
+<td>65 %</td>
+<td>43 %</td>
+<td>55 %</td>
+</tr>
+<tr class="even">
+<td>Astreinte, fiabilité (SRE)</td>
+<td>70 %</td>
+<td>58 %</td>
+<td>50 %</td>
+<td>57 %</td>
+<td>9 %</td>
+</tr>
+<tr class="odd">
+<td>Kubernetes</td>
+<td>50 %</td>
+<td>42 %</td>
+<td>75 %</td>
+<td>43 %</td>
+<td>46 %</td>
+</tr>
+<tr class="even">
+<td>Expérience HPC</td>
+<td>43 %</td>
+<td>37 %</td>
+<td>45 %</td>
+<td>86 %</td>
+<td>73 %</td>
+</tr>
+<tr class="odd">
+<td>Profilage, bancs d'essai</td>
+<td>50 %</td>
+<td>53 %</td>
+<td>60 %</td>
+<td>43 %</td>
+<td>55 %</td>
+</tr>
+<tr class="even">
+<td>Expérience d'entraînement ML</td>
+<td>57 %</td>
+<td>58 %</td>
+<td>30 %</td>
+<td>14 %</td>
+<td>64 %</td>
+</tr>
+<tr class="odd">
+<td>Systèmes distribués</td>
+<td>53 %</td>
+<td>47 %</td>
+<td>50 %</td>
+<td>21 %</td>
+<td>36 %</td>
+</tr>
+<tr class="even">
+<td>Réseau (général)</td>
+<td>40 %</td>
+<td>53 %</td>
+<td>45 %</td>
+<td>50 %</td>
+<td>27 %</td>
+</tr>
+<tr class="odd">
+<td>InfiniBand, RoCE</td>
+<td>30 %</td>
+<td>37 %</td>
+<td>55 %</td>
+<td>50 %</td>
+<td>64 %</td>
+</tr>
+<tr class="even">
+<td>CUDA, programmation GPU</td>
+<td>50 %</td>
+<td>42 %</td>
+<td>25 %</td>
+<td>21 %</td>
+<td>46 %</td>
+</tr>
+<tr class="odd">
+<td>Santé matérielle (burn-in, diagnostics, RMA)</td>
+<td>50 %</td>
+<td>37 %</td>
+<td>40 %</td>
+<td>36 %</td>
+<td>18 %</td>
+</tr>
+<tr class="even">
+<td>Prometheus, Grafana</td>
+<td>33 %</td>
+<td>37 %</td>
+<td>50 %</td>
+<td>29 %</td>
+<td>27 %</td>
+</tr>
+<tr class="odd">
+<td>Systèmes de fichiers parallèles</td>
+<td>23 %</td>
+<td>5 %</td>
+<td>35 %</td>
+<td>79 %</td>
+<td>27 %</td>
+</tr>
+<tr class="even">
+<td>Provisioning bare-metal</td>
+<td>23 %</td>
+<td>16 %</td>
+<td>50 %</td>
+<td>50 %</td>
+<td>9 %</td>
+</tr>
+<tr class="odd">
+<td>Planification de capacité</td>
+<td>43 %</td>
+<td>21 %</td>
+<td>25 %</td>
+<td>14 %</td>
+<td>18 %</td>
+</tr>
+<tr class="even">
+<td>CI/CD, automatisation</td>
+<td>27 %</td>
+<td>37 %</td>
+<td>20 %</td>
+<td>43 %</td>
+<td>9 %</td>
+</tr>
+<tr class="odd">
+<td>Conteneurs</td>
+<td>20 %</td>
+<td>32 %</td>
+<td>20 %</td>
+<td>50 %</td>
+<td>27 %</td>
+</tr>
+<tr class="even">
+<td>Cloud hyperscaler (AWS, GCP, Azure…)</td>
+<td>40 %</td>
+<td>37 %</td>
+<td>10 %</td>
+<td>14 %</td>
+<td>18 %</td>
+</tr>
+<tr class="odd">
+<td>Terraform, infrastructure as code</td>
+<td>43 %</td>
+<td>21 %</td>
+<td>25 %</td>
+<td>14 %</td>
+<td>9 %</td>
+</tr>
+<tr class="even">
+<td>Collectives (NCCL, RCCL, HCCL)</td>
+<td>27 %</td>
+<td>32 %</td>
+<td>30 %</td>
+<td>14 %</td>
+<td>27 %</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li><strong>Laboratoires d'IA et start-ups</strong> : astreinte, systèmes distribués, capacité et coûts, cloud hyperscaler et Terraform.</li>
+<li><strong>Grands groupes et hyperscalers</strong> : langage système presque toujours, entraînement distribué, accélérateurs maison ou non NVIDIA.</li>
+<li><strong>Clouds GPU</strong> : Kubernetes, Linux, provisioning bare-metal, réseau, virtualisation pour le multi-locataire.</li>
+<li><strong>Centres HPC</strong> : Linux, stockage parallèle, Slurm ou PBS, sécurité, achats et relation avec les constructeurs.</li>
+<li><strong>Constructeurs</strong> : expérience HPC, InfiniBand, entraînement et accélérateurs propres.</li>
+</ul>
+<h2 id="couverture">7. Ce que le parcours couvre</h2>
+<p>La profondeur est relevée module par module dans le texte des pages : <strong>mentionné</strong> (cité), <strong>enseigné</strong> (une section ou un exemple travaillé l'explique), <strong>pratiqué</strong> (un lab, un exercice noté ou un jalon de projet le fait faire). Le tableau donne la profondeur maximale atteinte dans le parcours et les modules ou projets qui la portent.</p>
+<p><em>(couverture non calculée)</em></p>
+<h2 id="ecarts">8. Écarts et décisions</h2>
+<p>L'indice d'écart multiplie la part d'offres qui citent une compétence par ce qui manque au parcours pour la pratiquer (3 moins la profondeur). Les compétences d'expérience (années d'HPC ou d'entraînement) ne s'enseignent pas et sont traitées par les projets.</p>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Compétence</th>
+<th>Offres qui la citent</th>
+<th>Profondeur</th>
+<th>Indice d'écart</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+<!-- gen:decisions -->
+<!-- /gen:decisions -->
+<h2 id="sources">9. Sources et portée</h2>
+<h3 id="documente">9.1. Documenté</h3>
+<p>Les offres, leurs URL et les citations qui appuient chaque compétence sont dans <code>data/jobs/*.json</code> ; l'analyse est recalculée par <code>python3 tools/market_analysis.py</code>, la page par <code>python3 tools/gen_market.py</code>. La couverture des modules est dans <code>data/coverage.json</code>.</p>
+<h3 id="recommande">9.2. Recommandé</h3>
+<p>La taxonomie, le classement des employeurs en groupes, l'attribution des niveaux « exigé » et « bonus » et l'indice d'écart sont des choix de lecture, signalés comme tels.</p>
+<h3 id="a-verifier">9.3. À vérifier</h3>
+<p>Les offres changent chaque semaine : une offre lue en octobre 2026 peut être fermée. Refaites le relevé avant de prendre une décision de carrière.</p>
+<h3 id="hors-perimetre">9.4. Hors périmètre</h3>
+<p>Les salaires (rarement publiés, et pas en Chine), le volume total d'offres par pays, et les postes de recherche pure.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../profile/index.html"><span class="k">← Précédent</span>Point de départ</a><a class="next" href="../masters/index.html"><span class="k">Suivant →</span>Enquête sur les masters HPC</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../assets/theme.js"></script>
+</body>
+</html>

@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,7 +52,30 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Projet 1 · 24 h · modules : linux-systems, provisioning, slurm, observability</p>
 <p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Tests hors ligne et vérification en direct sur Slurm 23.11.4</span></p>
 </header>
-<h2 id="contexte">Contexte et objectif</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#contexte">1. Contexte et objectif</a>
+<ul>
+<li><a href="#pre">1.1. Prérequis de connaissances</a></li>
+</ul></li>
+<li><a href="#cahier">2. Cahier des charges</a></li>
+<li><a href="#jalons">3. Jalons</a></li>
+<li><a href="#livrables">4. Livrables</a></li>
+<li><a href="#criteres">5. Critères de réussite</a></li>
+<li><a href="#pistes">6. Pistes et indices</a>
+<ul>
+<li><a href="#reference-results">6.1. Résultats de la solution de référence</a></li>
+</ul></li>
+<li><a href="#extensions">7. Extensions</a></li>
+<li><a href="#portfolio">8. Pour le portfolio</a>
+<ul>
+<li><a href="#formules">8.1. Formules du projet</a></li>
+<li><a href="#lectures">8.2. Pour aller plus loin</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="contexte">1. Contexte et objectif</h2>
 <p>Un cluster Slurm est un <strong>état</strong> : comptes, QOS, parts d'équité, utilisateurs, partitions. Tant que cet état n'existe que dans l'historique d'un terminal, personne ne peut le relire, le revoir ni le reconstruire. Ce projet vous fait décrire l'état voulu dans un fichier, calculer <strong>ce qui manque</strong> par rapport à l'état réel, l'appliquer, puis observer le cluster avec des métriques et des alertes que vous avez testées.</p>
 <p>Le point de départ est un constat fait en écrivant le <a href="../../courses/slurm/index.html">module Slurm</a>. Ses scripts de lab ajoutent <code>|| true</code> à chaque <code>sacctmgr</code>, ce qui les rend « idempotents » mais <strong>cache aussi les vraies erreurs</strong>. En effet, <code>sacctmgr add</code> sur un objet qui existe déjà se termine avec le code 1, exactement comme une faute de frappe. La bonne méthode est d'<strong>observer l'état réel et de n'ajouter que la différence</strong>, comme le fait <code>terraform plan</code> : lire l'état réel, afficher l'écart, ne l'appliquer qu'ensuite.</p>
 <div class="key">
@@ -61,9 +84,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le projet se vérifie de deux façons. Hors ligne, avec des sorties <strong>réelles</strong> de Slurm 23.11.4 enregistrées dans <code>fixtures/</code> : aucun Slurm n'est nécessaire pour faire passer les tests. En direct, avec <code>verify-live.sh</code>, qui monte le Slurm du bac à sable du module 5, applique votre configuration deux fois et lit de vraies métriques.</p>
 <p><strong>État de la vérification en direct.</strong> Le 2026-10-24, <code>verify-live.sh</code> a été exécuté avec succès de bout en bout plusieurs fois sur le code de référence (dont deux fois sur la version finale), avec le Slurm 23.11.4 du bac à sable du module 5 (machine virtuelle Linux 6.18, 4 processeurs, sans GPU). Il applique 6 commandes <code>sacctmgr</code>, constate qu'un second passage n'en émet aucune, lit des métriques réelles (1 job en cours, 3 en attente, acceptées par <code>promtool</code>) et voit un nœud drainé devenir <code>slurm_node_unhealthy{reason="gpu_xid"} 1</code>.</p>
 <p>Limites : le drainage est provoqué à la main avec <code>scontrol update … reason=gpu_xid:79</code>, sans panne de GPU réelle, et les jobs sont des <code>sleep</code> sur processeur. L'exportateur lit <code>sshare</code> sans <code>-a</code> : il ne voit que les associations de l'utilisateur qui le lance (ici <code>root</code>), pas celles des autres utilisateurs.</p>
-<h3 id="pre">Prérequis de connaissances</h3>
+<h3 id="pre">1.1. Prérequis de connaissances</h3>
 <p>Le <a href="../../courses/slurm/index.html">module Slurm</a> (comptes, QOS, états de nœud, raisons d'attente) est le prérequis direct ; le chapitre sur la comptabilité explique ce que vous allez décrire en code. Les règles d'alerte et leurs tests reprennent la méthode du <a href="../gpu-observability/index.html">projet 5</a>, appliquée ici aux métriques d'un ordonnanceur et non d'un GPU. Ce projet vous fournit le test de mutation déjà écrit ; le projet 5 l'explique en détail.</p>
-<h2 id="cahier">Cahier des charges</h2>
+<h2 id="cahier">2. Cahier des charges</h2>
 <p>Le dossier <code>labs/projects/homelab-slurm/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>fixtures/</code> (sorties réelles de Slurm), <code>tests/</code> (24 tests), <code>verify.sh</code> (hors ligne) et <code>verify-live.sh</code> (sur un vrai Slurm).</p>
 <div class="tbl-wrap">
 <table>
@@ -119,7 +142,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Les quatre alertes sont <code>SlurmExporterStale</code> (métriques absentes ou périmées), <code>SlurmNodeUnhealthy</code> (nœud drainé ou en panne), <code>SlurmJobsPendingTooLong</code> (le plus vieux job attend depuis plus d'une heure) et <code>SlurmSchedulerStuck</code> (des jobs attendent, aucun ne tourne et des nœuds sont libres). La dernière est la panne classique du module 5 : un job qui attend à jamais avec la raison <code>InvalidAccount</code> alors que le nœud est libre.</p>
-<h2 id="jalons">Jalons</h2>
+<h2 id="jalons">3. Jalons</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -177,7 +200,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                  <span class="co"># référence verte, départ rouge</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> PYTHON=<span class="va">$PYTHON</span> IMPL=starter bash verify-live.sh   <span class="co"># votre code sur un vrai Slurm (root, bac à sable jetable)</span></span></code></pre></div>
 <p>Commencez par <strong>regarder</strong> les fixtures : ouvrez <code>fixtures/assoc.txt</code> et <code>fixtures/sshare.txt</code> et décrivez ce que vous voyez avant d'écrire un analyseur. L'indentation de <code>sshare</code>, par exemple, existe même avec l'option de sortie parsable ; on ne la découvre qu'en regardant.</p>
-<h2 id="livrables">Livrables</h2>
+<h2 id="livrables">4. Livrables</h2>
 <p>Votre dépôt public contient :</p>
 <ul>
 <li><code>cluster.yml</code>, <code>config.py</code> et <code>exporter.py</code> complétés, les règles et leurs tests, avec la commande unique qui lance tout ;</li>
@@ -192,7 +215,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Comment avez-vous borné les étiquettes de l'exportateur, et quelle série aurait explosé sans cela ?</li>
 <li>Pourquoi une alerte sur « rien ne tourne » exige-t-elle une série à zéro plutôt qu'une série absente ?</li>
 </ol>
-<h2 id="criteres">Critères de réussite</h2>
+<h2 id="criteres">5. Critères de réussite</h2>
 <p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
 <ul>
 <li><strong>État réel converge.</strong> Pour <code>cluster.yml</code> et les sorties capturées dans <code>fixtures/</code>, <code>plan</code> renvoie une liste vide et <code>drift</code> ne signale rien. Commande : <code>pytest -k real_captured_state</code>.</li>
@@ -203,7 +226,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Série à zéro.</strong> Un cluster au repos expose <code>slurm_jobs{state="RUNNING"} 0</code> et <code>PENDING 0</code>. Commande : <code>pytest -k zero_valued</code>.</li>
 <li><strong>Alertes.</strong> Chacune des six mutations (durée <code>for</code> portée à 90 minutes, comparaison inversée) fait échouer vos tests. Commande : <code>pytest tests/test_rules.py -k mutated</code>.</li>
 </ul>
-<h2 id="pistes">Pistes et indices</h2>
+<h2 id="pistes">6. Pistes et indices</h2>
 <p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
 <p><strong>Syntaxe de <code>sacctmgr</code>.</strong> Ne la devinez pas : testez-la sur le Slurm du bac à sable. Les formes qui ont été exécutées avec succès sont <code>add account NOM parent=P fairshare=N</code>, <code>modify account where name=NOM set fairshare=N</code>, <code>add user NOM account=A</code>, <code>add qos NOM Priority=N Preempt=autre</code>, <code>modify qos where name=NOM set Priority=N Preempt=a,b</code>, <code>modify user where name=NOM set qos+=Q</code> et <code>add user NOM account=A</code> pour un utilisateur déjà présent dans un autre compte.</p>
 <p><strong>Lire l'état.</strong> <code>sacctmgr -nP show assoc</code> mêle deux sortes de lignes : celles dont la colonne utilisateur est vide décrivent un compte (parent, part), les autres décrivent un utilisateur dans un compte (avec la liste de ses QOS). Un même utilisateur peut apparaître dans plusieurs comptes, comme <code>root</code> dans les fixtures.</p>
@@ -212,7 +235,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Fuseau horaire.</strong> <code>squeue</code> écrit l'heure de soumission (<code>%V</code>) dans le fuseau <strong>local</strong> de la machine. L'analyseur la lit comme de l'UTC : lancez donc les commandes avec <code>TZ=UTC</code>, sinon l'âge de chaque job en attente est faux du décalage horaire (observé : <code>TZ=America/New_York</code> donnait 14402 s pour un job soumis 2 s plus tôt, de quoi déclencher <code>SlurmJobsPendingTooLong</code> aussitôt).</p>
 <p><strong>Absence et zéro.</strong> Une alerte « des jobs attendent et aucun ne tourne » compare le nombre de jobs en cours à zéro. Si l'exportateur n'émet que les états qui existent, la série <code>RUNNING</code> <strong>n'existe pas</strong> quand rien ne tourne, et la comparaison ne donne rien : l'alerte ne se déclenche jamais, précisément dans le cas qu'elle doit couvrir. Émettez des zéros explicites.</p>
 <p><strong>États de nœud.</strong> <code>sinfo</code> affiche <code>drng</code> (en cours de drainage, des jobs tournent encore) puis <code>drain</code>. Les deux sont « mal portants » ; un suffixe comme <code>*</code> ou <code>~</code> doit disparaître avant de comparer.</p>
-<h3 id="reference-results">Résultats de la solution de référence</h3>
+<h3 id="reference-results">6.1. Résultats de la solution de référence</h3>
 <p>À lire <strong>après</strong> votre propre travail.</p>
 <details class="sol"><summary>Corrigé</summary>
 <p><strong>Observé sur Slurm 23.11.4 (bac à sable, 2026-10-24).</strong></p>
@@ -230,7 +253,7 @@ $ sacctmgr -i add qos urgent Priority=1000 Preempt=normal       # deuxième fois
 <li>Si <code>preempt</code> est absent du fichier alors que le cluster en a un, le plan émet un <code>modify</code> qui ne change rien et ne converge jamais. Ces deux cas ne sont pas testés.</li>
 </ul>
 </details>
-<h2 id="extensions">Extensions</h2>
+<h2 id="extensions">7. Extensions</h2>
 <ul>
 <li><strong>Contrôle de santé.</strong> Ajoutez la configuration <code>HealthCheckProgram</code> du lab 5.3 à <code>cluster.yml</code> et faites décrire par le code le nœud mis en quarantaine ; mesurez le délai entre la panne et l'alerte.</li>
 <li><strong>Plusieurs nœuds.</strong> Étendez le cluster à plusieurs <code>slurmd</code> et vérifiez que les métriques par nœud et les alertes se comportent de même.</li>
@@ -238,7 +261,7 @@ $ sacctmgr -i add qos urgent Priority=1000 Preempt=normal       # deuxième fois
 <li><strong>Tableau de bord.</strong> Générez un tableau de bord Grafana comme au projet 5, avec les quatre alertes en annotations.</li>
 <li><strong>Dérive.</strong> Faites supprimer, avec confirmation explicite, un objet signalé par <code>drift</code> ; décidez qui a le droit de lancer cette commande et comment le tracer.</li>
 </ul>
-<h2 id="portfolio">Pour le portfolio</h2>
+<h2 id="portfolio">8. Pour le portfolio</h2>
 <p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : le problème (état du cluster non reproductible), le schéma description, plan, application, exportateur, alertes, la commande qui lance les 24 tests, la sortie de <code>verify-live.sh</code>, et un paragraphe sur ce que le projet ne couvre pas.</p>
 <p><strong>Ce qu'il faut montrer.</strong> Le plan vide au second passage, les alertes testées et le test de mutation, et le runbook. Le recruteur lira d'abord ce que vous faites des erreurs de <code>sacctmgr</code>.</p>
 <p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui décrit un cluster comme du code, qui sait pourquoi <code>|| true</code> est un défaut, qui sépare l'absence d'une mesure de sa valeur zéro, et qui teste ses alertes comme du code.</p>
@@ -251,10 +274,10 @@ $ sacctmgr -i add qos urgent Priority=1000 Preempt=normal       # deuxième fois
 <li>« J'ai écrit des alertes sur les files d'attente de Slurm dont les tests échouent quand on modifie la règle, dont une qui détecte des jobs en attente avec des nœuds libres. »</li>
 <li>« Je sais dire ce que ce projet ne couvre pas : un cluster multi-nœuds, l'API REST et la suppression d'objets. »</li>
 </ol>
-<h3 id="formules">Formules du projet</h3>
+<h3 id="formules">8.1. Formules du projet</h3>
 <p>Ce projet n'introduit pas de formule nouvelle. L'âge du plus vieux job en attente, métrique de <code>SlurmJobsPendingTooLong</code>, est la différence entre l'instant de lecture et l'instant de soumission le plus ancien parmi les jobs en attente :</p>
 <p><span class="math display">\text{âge}_{\max} = t_{\text{lecture}} - \min_{j \in \text{PENDING}} t_{\text{soumission}}(j)</span></p>
-<h3 id="lectures">Pour aller plus loin</h3>
+<h3 id="lectures">8.2. Pour aller plus loin</h3>
 <ul>
 <li>SchedMD, documentation de <a href="https://slurm.schedmd.com/sacctmgr.html"><code>sacctmgr</code></a>, <a href="https://slurm.schedmd.com/sinfo.html"><code>sinfo</code></a>, <a href="https://slurm.schedmd.com/squeue.html"><code>squeue</code></a> et <a href="https://slurm.schedmd.com/sshare.html"><code>sshare</code></a>.</li>
 <li>Le <a href="../gpu-observability/index.html">projet 5</a> pour la méthode des règles testées par mutation.</li>

@@ -38,7 +38,7 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 | Volume | 28 h, dont 10 h de lecture, 13 h de labs et 5 h d'exercices |
 | Niveau d'entrée | 3 : à l'aise avec l'entraînement distribué (module 9). Les points de reprise du module 10 sont un plus : le chapitre 2 en rappelle l'essentiel |
 | Prérequis | [Module 9 — Entraînement distribué](../distributed-training/index.html) |
-| Statut pour le lecteur de référence | cœur : les charges de post-entraînement par renforcement sont une des raisons d'être d'une plateforme GPU |
+| Pour qui | Cœur : les charges de post-entraînement par renforcement sont l'une des raisons d'être d'une plateforme GPU. |
 | Livrable | un modèle de débit validé par simulation, une boucle acteur-apprenant mesurée sur des acteurs Ray réels et une note de dimensionnement d'une boucle en ligne |
 | Environnement | un portable CPU suffit (4 cœurs ; 8 Go recommandés, les labs ont été exécutés avec 16 Go) ; aucun GPU. Les GPU sont des **ressources logiques** simulées, et c'est écrit chaque fois |
 | Projets liés | [Projet 6 — RFC et prototype d'une plateforme de calcul](../../projects/capstone-rfc/index.html) (ce module figure parmi ses modules requis) |
@@ -52,6 +52,14 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 -   Concevoir une boucle acteur-apprenant, mesurer son obsolescence et son débit, et choisir entre file, crédits et tampon de rejeu (chapitres 5 et 6).
 -   Dimensionner le nombre d'acteurs, la taille d'une file et le coût par million de pas, avec des pools de types différents (chapitres 6 et 7).
 -   Choisir et exploiter Ray sur Kubernetes ou Slurm, l'observer, et le comparer à Dask, Spark ou Kubeflow Trainer (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 3 — Systèmes d'entraînement distribué** (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
+-   **S'appuie sur** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
+-   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -70,7 +78,27 @@ Dix séances, soit 28 h : cinq de 3 h, deux de 3,5 h, une de 2,5 h, une de 2 h e
 | 9 | 3.5 h | 3 | ch. 8 Kubernetes, Slurm, observabilité, alternatives (0,75 h) | Lab 11.2 partie B, suite (2,25 h) ; Ex. 10 (0,5 h) |
 | 10 | 1.5 h | 3 | Checkpoint de sortie (0,5 h) | Ex. 11, 12 (1 h) |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Administrateur ou ingénieur HPC | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Ingénieur ML ou chercheur | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** Les boucles acteur-apprenant et leur dimensionnement sont nouveaux pour presque tous les profils.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module 12.
 
@@ -799,8 +827,9 @@ python3 -m pip install "ray[data,train]" numpy pytest torch pyyaml
 
 Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » sont des ressources logiques ; les durées de simulateur et de mise à jour du lab 11.2 sont des `sleep` ; le temps du lab 11.3 est simulé. Ce qu'ils exécutent pour de vrai : le scheduler, les acteurs, le magasin d'objets, les pannes (processus tués), Ray Data et Ray Train. Les fichiers `deploy/` du lab 11.1 (Slurm, KubeRay) sont **lintés seulement** : ils demandent un cluster.
 
+### Lab 11.1 — Tâches, acteurs, ressources et pannes {#lab-11-1}
+
 ::: lab
-[Lab 11.1 — Tâches, acteurs, ressources et pannes]{.tag}
 
 **Objectif.** Mesurer le coût d'une tâche, comparer tâches et acteurs sur un pipeline, observer ce que Ray fait quand un processus meurt, et lire des ressources logiques. **Durée.** 4 h. **Prérequis matériels.** Un portable CPU, 4 cœurs, 8 Go recommandés (testé avec 16 Go) ; aucun GPU.
 
@@ -816,8 +845,9 @@ Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » s
 **Pour aller plus loin.** Démarrez un cluster Ray à deux machines (`ray start --head`, puis `--address`) et refaites la partie B en tuant un nœud ; limitez les CPU d'un travailleur avec un cgroup et constatez que Ray ne le fait pas à votre place.
 :::
 
+### Lab 11.2 — Boucle acteur-apprenant minimale {#lab-11-2}
+
 ::: lab
-[Lab 11.2 — Boucle acteur-apprenant minimale]{.tag}
 
 **Objectif.** Construire une boucle acteurs, tampon, apprenant et synchronisation de politique, mesurer son obsolescence et son débit, et observer l'effet d'une obsolescence imposée sur l'apprentissage. **Durée.** 6 h. **Prérequis matériels.** Ceux du lab 11.1.
 
@@ -832,8 +862,9 @@ Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » s
 **Pour aller plus loin.** Remplacez le couloir par un petit réseau PyTorch CPU ; implémentez la V-trace complète ; ajoutez un deuxième pool d'acteurs plus lent et suivez l'obsolescence par pool.
 :::
 
+### Lab 11.3 — Modèle de débit d'une boucle en ligne {#lab-11-3}
+
 ::: lab
-[Lab 11.3 — Modèle de débit d'une boucle en ligne]{.tag}
 
 **Objectif.** Écrire un modèle analytique d'une boucle acteurs-apprenant, le confronter à une simulation à événements discrets, et en tirer le nombre d'acteurs et de crédits. **Durée.** 3 h. **Prérequis matériels.** Ceux du lab 11.1 (seuls `numpy` et `pytest` servent ici) ; le temps est simulé.
 
@@ -1059,10 +1090,18 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les faits attribués à la documentation de Ray (ressources logiques et valeurs par défaut, placement groups, magasin d'objets à 30 %, moniteur de mémoire à 95 % et 250 ms, réglages de reprise, GCS, blocs de 1 à 128 Mio, flux et contre-pression, `FailureConfig`, autoscaler et `idleTimeoutSeconds` à 60 s, `ray symmetric-run` depuis Ray 2.49, export Prometheus) ont été relus sur docs.ray.io le 25 octobre 2026. Les faits sur Ray (tableau 2, 1,8 million de tâches par seconde), IMPALA (file de trajectoires, « policy-lag », V-trace, 250 000 images par seconde), PPO, GRPO, OpenRLHF, HybridFlow et Ape-X ont été relus dans le texte des articles. Les descriptions de Dask, Spark et Kubeflow Trainer viennent de leurs pages d'accueil. Tous les comportements décrits comme observés ont été reproduits avec Ray 2.59.0 dans le bac à sable ; les sorties citées en viennent. Les tableaux du modèle viennent de `report.py`, `plan.py`, `sweep.py` et `make_log.py`, relancés avant la dernière édition.
+### Documenté {#documente}
 
-**Recommandé.** L'ordre des chapitres, le critère « forme de la charge » du chapitre 1 et du tableau 8.4, la règle de crédits $K \approx 1{,}6\,N^\star$ de l'exemple 6.2 (valable pour cette boucle seulement), les trois jauges de boucle du chapitre 8 et le calcul du coût par million de pas sont des choix de ce parcours, pas des règles de Ray. Les prix, les unités de coût, les durées de démarrage et les tailles de boucle des exemples et des exercices sont **fictifs** : lisez la page de prix de votre fournisseur le jour même.
+Les faits attribués à la documentation de Ray (ressources logiques et valeurs par défaut, placement groups, magasin d'objets à 30 %, moniteur de mémoire à 95 % et 250 ms, réglages de reprise, GCS, blocs de 1 à 128 Mio, flux et contre-pression, `FailureConfig`, autoscaler et `idleTimeoutSeconds` à 60 s, `ray symmetric-run` depuis Ray 2.49, export Prometheus) ont été relus sur docs.ray.io le 25 octobre 2026. Les faits sur Ray (tableau 2, 1,8 million de tâches par seconde), IMPALA (file de trajectoires, « policy-lag », V-trace, 250 000 images par seconde), PPO, GRPO, OpenRLHF, HybridFlow et Ape-X ont été relus dans le texte des articles. Les descriptions de Dask, Spark et Kubeflow Trainer viennent de leurs pages d'accueil. Tous les comportements décrits comme observés ont été reproduits avec Ray 2.59.0 dans le bac à sable ; les sorties citées en viennent. Les tableaux du modèle viennent de `report.py`, `plan.py`, `sweep.py` et `make_log.py`, relancés avant la dernière édition.
 
-**À vérifier.** (1) L'article de Ray décrit un ordonnanceur global et des ordonnanceurs locaux (2018) ; l'architecture actuelle a évolué et sa description n'a pas été relue pour ce module. (2) La documentation affiche, sur Ray 2.59, un bandeau annonçant l'authentification par jeton activée par défaut pour les clusters locaux et étendue à tous les clusters en 2.61 ; les labs tournent sans changement sur 2.59.0, mais ce changement n'a pas été étudié. (3) `deploy/raycluster.yaml` n'est pas validé contre le schéma de la CRD KubeRay, ni appliqué ; `deploy/ray_slurm.sbatch` est linté, pas exécuté. (4) Le guide Ray « Gang Scheduling with RayJob and Kueue » et la section « SLURM networking caveats » sont listés dans la documentation et n'ont pas été relus. (5) La correction du lab 11.2 n'est pas V-trace : c'est un poids d'importance tronqué sur des retours de Monte-Carlo, et l'effet observé vaut pour ce jouet seulement. (6) Le modèle d'obsolescence est une estimation de champ moyen, sous-estimée près de la saturation. (7) Les chiffres de débit annoncés par IMPALA, OpenRLHF et HybridFlow n'ont pas été reproduits. (8) Les ressources que le coordinateur de Ray Train retient par défaut ne sont pas établies par la page de `ScalingConfig` lue : l'exercice 3 suppose qu'il n'en retient aucune. (9) Le rejeu infini d'une tâche tuée par le moniteur de mémoire est documenté, mais son interaction avec la garantie « au moins une tâche par appelant et par nœud » n'a pas été observée.
+### Recommandé {#recommande}
 
-**Hors périmètre.** Les algorithmes de renforcement au-delà de PPO et de GRPO (DPO, méthodes hors-ligne), la conception d'une fonction de récompense, Ray Serve et le service en ligne, l'entraînement sur GPU réel avec Ray (aucun GPU n'était disponible), le réseau d'un cluster multi-nœuds (module 7), le coût financier d'une flotte (module 15) et l'exploitation de KubeRay en production (mise à jour de l'opérateur, sécurité des jetons).
+L'ordre des chapitres, le critère « forme de la charge » du chapitre 1 et du tableau 8.4, la règle de crédits $K \approx 1{,}6\,N^\star$ de l'exemple 6.2 (valable pour cette boucle seulement), les trois jauges de boucle du chapitre 8 et le calcul du coût par million de pas sont des choix de ce parcours, pas des règles de Ray. Les prix, les unités de coût, les durées de démarrage et les tailles de boucle des exemples et des exercices sont **fictifs** : lisez la page de prix de votre fournisseur le jour même.
+
+### À vérifier {#a-verifier}
+
+(1) L'article de Ray décrit un ordonnanceur global et des ordonnanceurs locaux (2018) ; l'architecture actuelle a évolué et sa description n'a pas été relue pour ce module. (2) La documentation affiche, sur Ray 2.59, un bandeau annonçant l'authentification par jeton activée par défaut pour les clusters locaux et étendue à tous les clusters en 2.61 ; les labs tournent sans changement sur 2.59.0, mais ce changement n'a pas été étudié. (3) `deploy/raycluster.yaml` n'est pas validé contre le schéma de la CRD KubeRay, ni appliqué ; `deploy/ray_slurm.sbatch` est linté, pas exécuté. (4) Le guide Ray « Gang Scheduling with RayJob and Kueue » et la section « SLURM networking caveats » sont listés dans la documentation et n'ont pas été relus. (5) La correction du lab 11.2 n'est pas V-trace : c'est un poids d'importance tronqué sur des retours de Monte-Carlo, et l'effet observé vaut pour ce jouet seulement. (6) Le modèle d'obsolescence est une estimation de champ moyen, sous-estimée près de la saturation. (7) Les chiffres de débit annoncés par IMPALA, OpenRLHF et HybridFlow n'ont pas été reproduits. (8) Les ressources que le coordinateur de Ray Train retient par défaut ne sont pas établies par la page de `ScalingConfig` lue : l'exercice 3 suppose qu'il n'en retient aucune. (9) Le rejeu infini d'une tâche tuée par le moniteur de mémoire est documenté, mais son interaction avec la garantie « au moins une tâche par appelant et par nœud » n'a pas été observée.
+
+### Hors périmètre {#hors-perimetre}
+
+Les algorithmes de renforcement au-delà de PPO et de GRPO (DPO, méthodes hors-ligne), la conception d'une fonction de récompense, Ray Serve et le service en ligne, l'entraînement sur GPU réel avec Ray (aucun GPU n'était disponible), le réseau d'un cluster multi-nœuds (module 7), le coût financier d'une flotte (module 15) et l'exploitation de KubeRay en production (mise à jour de l'opérateur, sécurité des jetons).

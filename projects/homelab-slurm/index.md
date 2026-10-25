@@ -10,6 +10,7 @@ project:
 badges:
   - {label: "Portfolio", class: core}
   - {label: "Tests hors ligne et vérification en direct sur Slurm 23.11.4", class: verified}
+numbered: true
 ---
 
 ## Contexte et objectif {#contexte}

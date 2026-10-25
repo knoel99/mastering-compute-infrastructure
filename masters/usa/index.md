@@ -2,6 +2,7 @@
 title: "Masters et formations HPC aux États-Unis"
 subtitle: "6 programme(s) étudié(s), données sourcées et vérifiées"
 description: "Fiches de programmes HPC : durée, crédits, cours, accès aux machines, couverture des thèmes utiles à un ingénieur d'infrastructure de calcul."
+numbered: true
 ---
 
 ## Vue d'ensemble {#vue}
@@ -116,7 +117,7 @@ Cette page présente 6 programme(s) pour la zone « États-Unis ». Chaque fait 
 
 ### MS in Computational Science, Engineering, and Mathematics (CSEM) {#us-utaustin-oden-csem}
 
-<p class="badges"><span class="badge verified">Confiance élevée</span><span class="badge">Science computationnelle</span><span class="badge">US</span></p>
+<p class="badges"><span class="badge skim">Confiance moyenne</span><span class="badge">Science computationnelle</span><span class="badge">US</span></p>
 
 | | |
 |---|---|
@@ -141,7 +142,7 @@ Cette page présente 6 programme(s) pour la zone « États-Unis ». Chaque fait 
 
 **Liens avec l'industrie et la recherche.** CSE 397H internship in a research/industrial setting. TACC Frontera Fellowships for graduate students.
 
-**Limites de la fiche.** The Oden Institute site (oden.utexas.edu, www.ices.utexas.edu) fails TLS verification (incomplete certificate chain) from this environment, so the programme page, handbook PDF and degree requirements could not be read. Course evidence comes from the archived 2025-26 UT catalogue; the current 2026-27 catalogue page for the programme exposes only the facilities text. Which courses are required vs optional could not be confirmed, so the core/elective split is indicative (catalogue courses in the CSE prefix). MPI, GPU, scheduling, storage and similar topics are null, not 0.
+**Limites de la fiche.** The Oden Institute site (oden.utexas.edu, www.ices.utexas.edu) fails TLS verification (incomplete certificate chain) from this environment, so the programme page, handbook PDF and degree requirements could not be read. Course evidence comes from the archived 2025-26 UT catalogue; the current 2026-27 catalogue page for the programme exposes only the facilities text. Which courses are required vs optional could not be confirmed, so the core/elective split is indicative (catalogue courses in the CSE prefix). MPI, GPU, scheduling, storage and similar topics are null, not 0. Confidence capped at medium: part of the evidence comes from memory.
 
 **Sources.** [1](https://catalog.utexas.edu/archive/2025-26/graduate/areas-of-study/intercollegial-programs/computational-science-engineering-mathematics/) · [2](https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/cse/) · [3](https://catalog.utexas.edu/archive/2025-26/general-information/coursesatoz/c-s/) · [4](https://tacc.utexas.edu/systems/horizon/) · [5](https://tacc.utexas.edu/education/undergraduates-graduates/) · [6](https://oden.utexas.edu/academics/masters-program). Citations vérifiées mot pour mot : 12/12.
 

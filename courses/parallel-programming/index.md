@@ -38,7 +38,7 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 | Volume | 30 h, dont environ 12 h de lecture (11,75 h), 12 h de labs (4 h, 4,5 h et 3,5 h) et 6 h d'exercices (5,75 h : 15 min par ★, 30 min par ★★, 45 min par ★★★) |
 | Niveau d'entrée | 2 : lecture de C et de Python, ligne de commande Linux, modèles du module précédent |
 | Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html) |
-| Statut pour le lecteur de référence | cœur : rang, communicateur, collective, halo et liaison aux cœurs sont les mots que vous retrouverez dans NCCL, dans PyTorch distribué et dans les logs d'un job Slurm |
+| Pour qui | Cœur : rang, communicateur, collective et liaison aux cœurs reviennent dans NCCL, dans PyTorch distribué et dans les journaux de Slurm ; survol possible si vous pratiquez déjà MPI. |
 | Livrable | une étude de scalabilité reproductible d'un solveur MPI+OpenMP (lab 3.3), un all-reduce en anneau testé (lab 3.2) et un rapport d'une page |
 | Environnement | un portable CPU de 4 cœurs ou plus, Linux, GCC, Open MPI et mpi4py ; aucun GPU. La partie facultative sous Slurm demande en plus un conteneur jetable avec accès root |
 | Projets liés | [Projet 2 — Étude de passage à l'échelle](../../projects/scaling-study/index.html) (la méthode du chapitre 8 en est le fondement), [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html) (le lancement hybride du chapitre 7) |
@@ -53,6 +53,14 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 -   Dire quand un résultat doit être identique bit à bit, et comment l'obtenir malgré une addition non associative (chapitre 6).
 -   Lancer un job hybride MPI+OpenMP avec le bon placement, avec `mpirun` et sous Slurm (chapitre 7).
 -   Mener une étude de scalabilité forte et faible, avec intervalles de confiance, et expliquer l'écart au modèle (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 1 — Calcul parallèle et GPU** (semaines 6-11) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
+-   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
+-   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -72,7 +80,27 @@ Onze séances, soit 30 h : sept de 3 h, deux de 2,5 h et deux de 2 h. Le contenu
 | 10 | 2 h | 3 | pratique | Lab 3.3 partie C ; Ex. 10, 11 |
 | 11 | 2 h | 3 | checkpoint de sortie | Ex. 7, 12 |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Administrateur ou ingénieur HPC | survol guidé | les questions de positionnement, les chapitres signalés ci-dessous, un lab et le checkpoint |
+| Ingénieur ML ou chercheur | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** Si vous survolez, gardez l'étude de passage à l'échelle et la lecture des courbes : le projet 2 la reprend.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si les trois vous paraissent routinières, parcourez les exercices ★★★ et passez au module suivant.
 
@@ -1142,8 +1170,9 @@ cd labs/parallel-programming/openmp-reduction && bash verify.sh
 
 Chaque `verify.sh` sort avec le code 0 quand ses vérifications passent. Il affirme des résultats exacts, des compteurs et des propriétés de structure, **jamais une durée** : la machine peut être partagée. Les durées sont affichées pour que vous les analysiez. Les trois scripts ont été exécutés plusieurs fois le 25 octobre 2026 sur la VM de 4 cœurs décrite au chapitre 1 ; la partie D du lab 3.3 (Slurm) est facultative et se lance à part.
 
+### Lab 3.1 — OpenMP : réduction, ordonnancement, faux partage, tâches {#lab-3-1}
+
 ::: lab
-[Lab 3.1 — OpenMP : réduction, ordonnancement, faux partage, tâches]{.tag}
 
 **Objectif.** Mesurer sur votre machine ce que le chapitre 2 affirme : une course de données, le coût de `critical` et `atomic`, l'effet d'un ordonnancement prédit par la charge, un faux partage compté par adresse, le prix d'une tâche. **Durée.** 4 h : partie A 1 h 30, B 1 h, C 1 h, D 30 min. **Prérequis matériels.** Un portable CPU de 4 cœurs ou plus, GCC ; aucun GPU, aucun coût.
 
@@ -1158,8 +1187,9 @@ Chaque `verify.sh` sort avec le code 0 quand ses vérifications passent. Il affi
 **Pour aller plus loin.** Ajoutez `schedule(nonmonotonic:dynamic)`, `collapse(2)` sur une double boucle ou `taskloop`. Si vous disposez d'un serveur à deux sockets, ajoutez `numactl --interleave=all` et un premier accès parallèle : la VM du bac à sable n'a qu'un domaine NUMA et ne peut pas montrer cet effet.
 :::
 
+### Lab 3.2 — MPI : collectives, anneau fait main, interblocages, halo {#lab-3-2}
+
 ::: lab
-[Lab 3.2 — MPI : collectives, anneau fait main, interblocages, halo]{.tag}
 
 **Objectif.** Écrire un all-reduce en anneau avec `Sendrecv`, prouver qu'il est juste et que ses compteurs suivent les formules, déclencher puis corriger des interblocages, échanger un halo et confronter le modèle α-β à la mesure. **Durée.** 4,5 h : partie A 1 h 30, B 1 h, C 1 h, D 1 h. **Prérequis matériels.** Un portable CPU de 4 cœurs, Open MPI, mpi4py, numpy ; aucun GPU, aucun coût.
 
@@ -1174,8 +1204,9 @@ Chaque `verify.sh` sort avec le code 0 quand ses vérifications passent. Il affi
 **Pour aller plus loin.** Remplacez les rangs locaux par deux nœuds (`mpirun --hostfile`) et ajustez deux jeux $(\alpha, B)$, intra et inter nœud, pour le modèle à deux niveaux. Sur une machine à GPU, écrivez le même anneau avec `torch.distributed` et le backend `nccl`, et comparez à `all_reduce` : ce chemin n'est pas exécuté dans ce module.
 :::
 
+### Lab 3.3 — Jacobi 2D : décomposition de domaine et étude de passage à l'échelle {#lab-3-3}
+
 ::: lab
-[Lab 3.3 — Jacobi 2D : décomposition de domaine et étude de passage à l'échelle]{.tag}
 
 **Objectif.** Prouver qu'un solveur MPI+OpenMP donne le même champ pour toute décomposition, puis mener et rapporter une étude de scalabilité forte et faible avec intervalles de confiance, en séparant calcul, transfert et attente. **Durée.** 3,5 h : partie A 1 h, B 1 h 30, C 1 h. **Prérequis matériels.** Un portable CPU de 4 cœurs, Open MPI, GCC, mpi4py, numpy ; aucun GPU, aucun coût. La partie D facultative demande en plus un conteneur jetable avec accès root et le Slurm du module 5.
 
@@ -1472,12 +1503,20 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les faits suivants ont été lus à la source le 25 octobre 2026. OpenMP 6.0 (novembre 2024) : la section 7.6.7 sur l'ordre non spécifié des combinaisons d'une réduction, la section 13.6.3 sur les clauses `schedule` et le comportement sans clause, le tableau des variables de contrôle (nombre de threads par défaut laissé à l'implémentation). MPI 5.0 (5 juin 2025) : le non-dépassement des messages, les modes d'envoi (3.4), la règle de la mise en tampon (3.5), l'envoi-réception combiné (3.2.7), l'avis sur la reproductibilité de `MPI_REDUCE` (6.9.1), les niveaux de threads (11.6), les indications `collective_buffering` et `cb_nodes` (14.2.8). Patarasuk et Yuan : borne inférieure et hypothèse d'associativité. NCCL : les équivalences de collectives, les différences avec MPI, la remarque sur la progression, les valeurs de `NCCL_ALGO`. PyTorch 2.14 : le backend MPI optionnel et le conseil d'utiliser Gloo. Slurm : les trois modes de lancement, la note sur `--cpu-bind`. Open MPI : `--map-by ...:PE=n` remplace `--cpus-per-proc`, `--oversubscribe`, nombre de places égal au nombre de cœurs. Les valeurs de `ompi_info` (limite eager de 4 096 octets, liste des six algorithmes d'all-reduce) viennent de la machine d'essai.
+### Documenté {#documente}
+
+Les faits suivants ont été lus à la source le 25 octobre 2026. OpenMP 6.0 (novembre 2024) : la section 7.6.7 sur l'ordre non spécifié des combinaisons d'une réduction, la section 13.6.3 sur les clauses `schedule` et le comportement sans clause, le tableau des variables de contrôle (nombre de threads par défaut laissé à l'implémentation). MPI 5.0 (5 juin 2025) : le non-dépassement des messages, les modes d'envoi (3.4), la règle de la mise en tampon (3.5), l'envoi-réception combiné (3.2.7), l'avis sur la reproductibilité de `MPI_REDUCE` (6.9.1), les niveaux de threads (11.6), les indications `collective_buffering` et `cb_nodes` (14.2.8). Patarasuk et Yuan : borne inférieure et hypothèse d'associativité. NCCL : les équivalences de collectives, les différences avec MPI, la remarque sur la progression, les valeurs de `NCCL_ALGO`. PyTorch 2.14 : le backend MPI optionnel et le conseil d'utiliser Gloo. Slurm : les trois modes de lancement, la note sur `--cpu-bind`. Open MPI : `--map-by ...:PE=n` remplace `--cpus-per-proc`, `--oversubscribe`, nombre de places égal au nombre de cœurs. Les valeurs de `ompi_info` (limite eager de 4 096 octets, liste des six algorithmes d'all-reduce) viennent de la machine d'essai.
 
 Tous les chiffres des exemples et des corrigés viennent d'une exécution des scripts des labs sur la VM décrite au chapitre 1 (4 cœurs virtuels d'un Xeon à 2,8 GHz, Linux 6.18, GCC 13.3, Open MPI 4.1.6, mpi4py 4.1.2, PyTorch 2.14.1 pour CPU), le 25 octobre 2026, ou d'un calcul refait en Python. Les trois `verify.sh` ont été exécutés plusieurs fois avec succès ; le script Slurm de la partie D l'a été avec Slurm 23.11.4.
 
-**Recommandé.** L'ordre des chapitres, les analogies avec l'entraînement (chapitre 1), le « test du `Ssend` » comme usage de la règle de la norme, la tolérance relative de $10^{-12}$ proposée, la règle « un rang par domaine NUMA », le choix entre fichier partagé et fichier par rang, le plan d'étude du chapitre 8 et les seuils des exercices sont des choix pédagogiques de ce parcours, pas des normes.
+### Recommandé {#recommande}
 
-**À vérifier.** (1) L'article de Thakur, Rabenseifner et Gropp (2005) sur les algorithmes de collectives de MPICH est cité de mémoire : l'éditeur et l'hébergeur ont répondu 403, il n'a pas été rouvert. Les algorithmes d'Open MPI ne sont donc que nommés d'après `ompi_info` (dont Rabenseifner), jamais décrits. (2) La borne $\max(W/p, S)$ et l'encadrement $W/p + S$ de l'ordonnancement glouton sont des résultats classiques non rouverts pour ce module. (3) Les explications suivantes sont des hypothèses non testées : le mécanisme exact de la course de données (registre du compilateur), l'absence de faux partage mesurable avec des écritures `volatile`, la cause du déséquilibre de 1,31 entre rangs, le facteur de 7,4 du doublement récursif sur 2 Mio, le facteur 1,6 d'une mauvaise liaison. (4) La règle de liaison par défaut d'Open MPI (liés à un cœur avec 2 rangs, non liés avec 4) est observée, non lue dans la documentation. (5) Le seuil eager de 4 096 octets et le blocage des envois croisés sont propres à Open MPI 4.1.6 et à son transport mémoire partagée. (6) Le modèle à deux niveaux est dérivé, ses paramètres sont des exemples. (7) Le placement NUMA et le *first touch* ne sont pas démontrés : la VM n'a qu'un domaine. (8) L'écart de 29 % entre deux médianes de la même configuration, mesurées à quelques dizaines de minutes d'intervalle, n'est pas expliqué (dérive de la machine ou bruit d'échantillonnage : les deux intervalles se recouvrent). (9) Les versions changent : relisez les pages des normes et des bibliothèques à la date de votre lecture.
+L'ordre des chapitres, les analogies avec l'entraînement (chapitre 1), le « test du `Ssend` » comme usage de la règle de la norme, la tolérance relative de $10^{-12}$ proposée, la règle « un rang par domaine NUMA », le choix entre fichier partagé et fichier par rang, le plan d'étude du chapitre 8 et les seuils des exercices sont des choix pédagogiques de ce parcours, pas des normes.
 
-**Hors périmètre.** Les communications unilatérales (RMA), les communications partitionnées et les sessions de MPI 4 et 5 ; MPI sensible aux GPU et les noyaux GPU (module de programmation GPU) ; l'exécution multi-nœuds réelle, le réseau et la topologie (module Réseaux) ; les systèmes de fichiers parallèles et leur réglage (module Stockage) ; le parallélisme d'un modèle de langage, de données, de tenseurs et de pipeline (module d'entraînement distribué) ; le délestage OpenMP vers un GPU (`target`), les dépendances de tâches et `taskloop` au-delà de leur mention ; le Fortran ; l'hyperthreading ; les cours EPCC cités par le programme, non rouverts ici.
+### À vérifier {#a-verifier}
+
+(1) L'article de Thakur, Rabenseifner et Gropp (2005) sur les algorithmes de collectives de MPICH est cité de mémoire : l'éditeur et l'hébergeur ont répondu 403, il n'a pas été rouvert. Les algorithmes d'Open MPI ne sont donc que nommés d'après `ompi_info` (dont Rabenseifner), jamais décrits. (2) La borne $\max(W/p, S)$ et l'encadrement $W/p + S$ de l'ordonnancement glouton sont des résultats classiques non rouverts pour ce module. (3) Les explications suivantes sont des hypothèses non testées : le mécanisme exact de la course de données (registre du compilateur), l'absence de faux partage mesurable avec des écritures `volatile`, la cause du déséquilibre de 1,31 entre rangs, le facteur de 7,4 du doublement récursif sur 2 Mio, le facteur 1,6 d'une mauvaise liaison. (4) La règle de liaison par défaut d'Open MPI (liés à un cœur avec 2 rangs, non liés avec 4) est observée, non lue dans la documentation. (5) Le seuil eager de 4 096 octets et le blocage des envois croisés sont propres à Open MPI 4.1.6 et à son transport mémoire partagée. (6) Le modèle à deux niveaux est dérivé, ses paramètres sont des exemples. (7) Le placement NUMA et le *first touch* ne sont pas démontrés : la VM n'a qu'un domaine. (8) L'écart de 29 % entre deux médianes de la même configuration, mesurées à quelques dizaines de minutes d'intervalle, n'est pas expliqué (dérive de la machine ou bruit d'échantillonnage : les deux intervalles se recouvrent). (9) Les versions changent : relisez les pages des normes et des bibliothèques à la date de votre lecture.
+
+### Hors périmètre {#hors-perimetre}
+
+Les communications unilatérales (RMA), les communications partitionnées et les sessions de MPI 4 et 5 ; MPI sensible aux GPU et les noyaux GPU (module de programmation GPU) ; l'exécution multi-nœuds réelle, le réseau et la topologie (module Réseaux) ; les systèmes de fichiers parallèles et leur réglage (module Stockage) ; le parallélisme d'un modèle de langage, de données, de tenseurs et de pipeline (module d'entraînement distribué) ; le délestage OpenMP vers un GPU (`target`), les dépendances de tâches et `taskloop` au-delà de leur mention ; le Fortran ; l'hyperthreading ; les cours EPCC cités par le programme, non rouverts ici.

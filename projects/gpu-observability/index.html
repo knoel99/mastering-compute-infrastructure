@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,7 +52,30 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Projet 5 · 20 h · modules : observability, slurm, fault-tolerance</p>
 <p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Code de départ et solution vérifiés (promtool 2.45)</span></p>
 </header>
-<h2 id="contexte">Contexte et objectif</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#contexte">1. Contexte et objectif</a>
+<ul>
+<li><a href="#pre">1.1. Prérequis de connaissances</a></li>
+</ul></li>
+<li><a href="#cahier">2. Cahier des charges</a></li>
+<li><a href="#jalons">3. Jalons</a></li>
+<li><a href="#livrables">4. Livrables</a></li>
+<li><a href="#criteres">5. Critères de réussite</a></li>
+<li><a href="#pistes">6. Pistes et indices</a>
+<ul>
+<li><a href="#reference-results">6.1. Résultats de la solution de référence</a></li>
+</ul></li>
+<li><a href="#extensions">7. Extensions</a></li>
+<li><a href="#portfolio">8. Pour le portfolio</a>
+<ul>
+<li><a href="#formules">8.1. Formules du projet</a></li>
+<li><a href="#lectures">8.2. Pour aller plus loin</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="contexte">1. Contexte et objectif</h2>
 <p>Les pannes qui font du bruit sont les moins chères : un nœud qui tombe, un code d'erreur dans les journaux, un job qui s'arrête. Les pannes <strong>silencieuses</strong> coûtent souvent le plus, parce que les GPU restent réservés et facturés pendant que rien d'utile ne se passe. Le rapport technique de Llama 3 en décrit une classe : « Sometimes, hardware issues may cause still-functioning but slow stragglers that are hard to detect. Even a single straggler can slow down thousands of other GPUs, often appearing as functioning but slow communications » (<a href="https://arxiv.org/abs/2407.21783">Llama Team, 2024</a>).</p>
 <p>Ce projet vous fait construire la chaîne qui rend ces pannes visibles : un exportateur de métriques, des règles d'alerte <strong>testées</strong>, des détecteurs dont vous <strong>mesurez</strong> la qualité, et un tableau de bord. Tout est alimenté par un simulateur de cluster, car la matière première d'une alerte, ce sont des séries temporelles de pannes, et on ne peut pas les provoquer à la demande sur du vrai matériel.</p>
 <div class="key">
@@ -67,10 +90,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>dcgm-exporter sait aussi lire des fichiers de correspondance GPU-job (option <code>--hpc-job-mapping-dir</code>, étiquette <code>hpc_job</code>, d'après son code source) ; ce projet n'utilise pas cette option et écrit sa propre métrique de jointure, ce qui garde les règles lisibles et testables avec <code>promtool</code>.</p>
 <p>Les noms, types et textes d'aide des métriques sont ceux de la liste de compteurs par défaut de dcgm-exporter (<a href="https://github.com/NVIDIA/dcgm-exporter/blob/main/etc/default-counters.csv">etc/default-counters.csv</a>, lue à la rédaction). Notez le piège de <code>DCGM_FI_DEV_XID_ERRORS</code> : c'est une <strong>jauge</strong> dont le texte d'aide est « Value of the last XID error encountered. » (la dernière valeur, pas un compteur d'erreurs). Elle reste donc non nulle tant qu'aucune autre valeur ne la remplace (les sources lues ne disent pas quand elle retombe à zéro : à vérifier sur matériel), ce qui oriente la règle d'alerte.</p>
 <p>Le dépôt propose aussi, commentés par défaut, <code>DCGM_EXP_XID_ERRORS_COUNT</code> (jauge sur une fenêtre) et <code>DCGM_EXP_XID_ERRORS_TOTAL</code> (compteur depuis le démarrage de l'exportateur) ; ce projet s'en tient à la jauge historique.</p>
-<h3 id="pre">Prérequis de connaissances</h3>
+<h3 id="pre">1.1. Prérequis de connaissances</h3>
 <p>Vous devez savoir lire une métrique Prometheus (jauge, étiquettes, requête <code>avg by</code>) et écrire un peu de Python. Le <a href="../../courses/slurm/index.html">module Slurm</a> donne le contexte d'exploitation, en particulier le chapitre sur la santé des nœuds. Le module « observabilité » du parcours approfondit Prometheus, Alertmanager et les tableaux de bord ; vous pouvez faire ce projet avant de le lire.</p>
 <p>Installation de l'outil de test, sous Debian ou Ubuntu : <code>sudo apt-get install prometheus</code> fournit <code>promtool</code>. Les tests ont été exécutés avec la version 2.45.3.</p>
-<h2 id="cahier">Cahier des charges</h2>
+<h2 id="cahier">2. Cahier des charges</h2>
 <p>Le dossier <code>labs/projects/gpu-observability/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>tests/</code> (28 tests) et <code>verify.sh</code>. Le simulateur <code>sim.py</code> est fourni.</p>
 <div class="tbl-wrap">
 <table>
@@ -132,7 +155,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </div>
 <p>Le code de départ contient un squelette de <code>exporter.py</code> (liste des métriques donnée), les aides de <code>detectors.py</code> avec le détecteur naïf <strong>fondé sur l'utilisation GPU</strong>, laissé en place pour démontrer son aveuglement, une règle <code>GPUXidError</code> et son test. Les trois autres alertes, leurs tests, les deux détecteurs (avec <code>run</code>, <code>false_alarm_rate</code> et <code>detection_delay</code>) et le tableau de bord sont à écrire.</p>
 <p><strong>Ce qui est exécuté, et ce qui ne l'est pas.</strong> Les tests tournent sur un simulateur, sans GPU, avec <code>promtool</code> pour la syntaxe des métriques, des règles et des expressions du tableau de bord. L'exportateur n'a jamais été scruté par un vrai Prometheus (un client HTTP de test lit <code>/metrics</code>), et <code>dashboard.json</code> n'a pas été importé dans Grafana : ses tests vérifient le PromQL et les noms de métriques, pas le rendu.</p>
-<h2 id="jalons">Jalons</h2>
+<h2 id="jalons">3. Jalons</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -192,7 +215,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le test de mutation vaut le détour. Il copie vos règles, en modifie une (durée <code>for</code> portée à 90 minutes, ou comparaison inversée), relance <code>promtool test rules</code> et exige un échec. Une suite de tests qui passe encore sur une règle cassée ne protège de rien.</p>
 <p>Un cas qui franchit le seuil après la durée <code>for</code> suffit à tuer ces huit mutants ; des cas qui restent en deçà et des instants d'évaluation encore <em>en attente</em> (avant la fin de <code>for</code>) tuent aussi des mutants plus fins, comme une durée raccourcie.</p>
 <p>Copiez dans vos séries de test les étiquettes que l'exportateur ajoute (<code>UUID</code>, <code>modelName</code>) : sans elles, une jointure qui échouerait sur les vraies séries passe quand même vos tests.</p>
-<h2 id="livrables">Livrables</h2>
+<h2 id="livrables">4. Livrables</h2>
 <p>Votre dépôt public contient :</p>
 <ul>
 <li>le code complété, les règles, leurs tests <code>promtool</code> et la commande unique qui lance tout ;</li>
@@ -208,7 +231,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Comment avez-vous choisi les durées <code>for</code> et les seuils, et quel coût une alerte trop sensible fait-elle porter à la personne d'astreinte ?</li>
 <li>Que se passe-t-il quand l'exportateur lui-même tombe, et comment le saurez-vous ?</li>
 </ol>
-<h2 id="criteres">Critères de réussite</h2>
+<h2 id="criteres">5. Critères de réussite</h2>
 <p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
 <ul>
 <li><strong>Format.</strong> La sortie de l'exportateur est acceptée par <code>promtool check metrics</code> ; le seul avertissement toléré est celui de la casse des étiquettes <code>UUID</code>, <code>modelName</code> et <code>Hostname</code>, qui sont celles de dcgm-exporter.</li>
@@ -220,7 +243,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Limite de ce zéro.</strong> Le simulateur ne contient aucune phase légitimement creuse (chargement des données, sauvegarde de point de contrôle, évaluation), qui feront sur un vrai cluster les fausses alertes de <code>JobStalled</code> (voir le <a href="../../courses/fault-tolerance/index.html">module de tolérance aux pannes</a>).</li>
 <li><strong>Tableau de bord.</strong> Chaque expression passe <code>promtool check rules</code>, n'utilise que des métriques de l'exportateur et, pour les panneaux par job, joint l'allocation. Commande : <code>pytest tests/test_dashboard.py</code>.</li>
 </ul>
-<h2 id="pistes">Pistes et indices</h2>
+<h2 id="pistes">6. Pistes et indices</h2>
 <p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
 <p><strong>Jointure.</strong> dcgm-exporter décrit des GPU, Slurm décrit des jobs. Pour agréger par job, multipliez la métrique du GPU par la métrique d'allocation, valeur 1, en associant sur <code>Hostname</code> et <code>gpu</code> et en ramenant l'étiquette du job avec <code>group_left</code>. Vérifiez ce qui arrive aux GPU sans allocation : la multiplication les fait disparaître, ce qui est voulu ici.</p>
 <p><strong>Durée <code>for</code>.</strong> Une alerte passe par l'état « en attente » avant de se déclencher. Pour la tester, évaluez avant et après la durée : l'état avant doit être silencieux, l'état après doit être actif. L'écriture <code>0.55x39</code> de <code>promtool</code> produit <strong>quarante</strong> échantillons, pas trente-neuf : la notation <code>axn</code> répète la valeur <code>n</code> fois après la première.</p>
@@ -229,7 +252,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Traînard.</strong> Une valeur aberrante gonfle l'écart type : utilisez la médiane et l'écart absolu médian (MAD), multiplié par 1,4826 pour l'ajuster à un écart type gaussien. Un plancher sur l'échelle évite de diviser par un nombre minuscule sur une flotte très régulière ; choisissez-le d'après la <strong>variabilité réelle</strong> d'une flotte saine.</p>
 <p><strong>Persistance.</strong> Exiger que la condition dure plusieurs scrapes consécutifs divise fortement les alarmes fausses, au prix d'un délai. Mesurez ce compromis plutôt que de le supposer : c'est le tableau demandé dans les livrables.</p>
 <p><strong>Mesurer sans se tromper.</strong> Un dispositif qui ne déclenche jamais n'a ni fausse alerte ni bonne détection. Reportez toujours les deux, sur des pannes simulées <strong>et</strong> sur des exécutions saines.</p>
-<h3 id="reference-results">Résultats de la solution de référence</h3>
+<h3 id="reference-results">6.1. Résultats de la solution de référence</h3>
 <p>À lire <strong>après</strong> votre propre travail. Le simulateur est déterministe, ces valeurs sont donc reproductibles ; elles dépendent de ses hypothèses, pas d'un matériel réel.</p>
 <details class="sol"><summary>Corrigé</summary>
 <p><strong>Délais de détection</strong> (faute à t = 1 800 s, scrape de 15 s) :</p>
@@ -297,7 +320,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Tests d'alertes.</strong> Les quatre alertes de référence passent <code>promtool test rules</code> avec quatre scénarios, et les huit mutants sont tous détectés ; un seuil déplacé de peu (par exemple 84,9 °C au lieu de 80, ou 0,5 au lieu de 0,05 pour <code>JobStalled</code>) survit, parce que les séries de test sont loin des seuils.</p>
 <p><strong>Avertissement de format.</strong> <code>promtool check metrics</code> signale les étiquettes <code>UUID</code>, <code>modelName</code> et <code>Hostname</code> comme non conformes à la convention snake_case : ce sont celles de dcgm-exporter lui-même. La solution les conserve, parce que les règles et les tableaux de bord réels s'en servent ; c'est une décision à consigner dans l'ADR.</p>
 </details>
-<h2 id="extensions">Extensions</h2>
+<h2 id="extensions">7. Extensions</h2>
 <ul>
 <li><strong>Mutants plus fins.</strong> Ajoutez des séries proches des seuils (79 °C et 81 °C, 0,04 et 0,06) jusqu'à tuer les mutants « seuil déplacé de peu » et « durée <code>for</code> raccourcie ».</li>
 <li><strong>Alerter sur l'absence.</strong> Ajoutez une alerte qui se déclenche quand l'exportateur ne répond plus, avec <code>up</code> ou <code>absent</code>, et testez-la avec <code>promtool</code>. Un exportateur mort ressemble à un cluster sain.</li>
@@ -306,7 +329,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Seuils appris.</strong> Remplacez le plancher fixe du traînard par une estimation sur une fenêtre glissante de données saines et mesurez de nouveau délai et alarmes fausses.</li>
 <li><strong>Intégration Slurm.</strong> Faites écrire la jointure d'allocation par un prolog et un épilog Slurm (module Slurm, chapitre sur la santé des nœuds) au lieu d'un fichier statique, ou comparez avec l'option <code>--hpc-job-mapping-dir</code> de dcgm-exporter.</li>
 </ul>
-<h2 id="portfolio">Pour le portfolio</h2>
+<h2 id="portfolio">8. Pour le portfolio</h2>
 <p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : les trois pannes, le schéma exportateur, règles, détecteurs et tableau de bord, la commande qui lance les 28 tests, le tableau des délais et des alarmes fausses, et un paragraphe « ce qui n'est pas validé sur matériel réel ».</p>
 <p><strong>Ce qu'il faut montrer.</strong> Les tests <code>promtool</code>, le test de mutation, le tableau seuil-délai-alarmes et le runbook. Le tableau de bord vient en dernier : il ne prouve rien tout seul.</p>
 <p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui sait que l'utilisation GPU ne dit pas si le job travaille, qui chiffre ses détecteurs au lieu de les affirmer, qui teste ses alertes comme du code, et qui dit ce qu'il n'a pas pu valider.</p>
@@ -319,12 +342,12 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>« J'ai mesuré délai de détection et alarmes fausses d'un détecteur de traînard pour plusieurs seuils sur un cluster simulé, et montré qu'un plancher d'échelle inférieur au bruit laisse passer des alarmes fausses (16 en 1 024 GPU-heures à z de 6 sans persistance, 0 avec un plancher de 8 MHz). »</li>
 <li>« Je sais dire ce que ce projet ne valide pas : le profil réel d'un blocage sur GPU, et le comportement à grande échelle. »</li>
 </ol>
-<h3 id="formules">Formules du projet</h3>
+<h3 id="formules">8.1. Formules du projet</h3>
 <p>Le score robuste d'un GPU, avec x sa mesure, m la médiane de son job et MAD l'écart absolu médian :</p>
 <p><span class="math display">z = \frac{x - m}{\max\bigl(1{,}4826\,\mathrm{MAD},\; \text{plancher}\bigr)}</span></p>
 <p>Le délai de détection d'un détecteur à persistance k, avec un scrape toutes les Δ secondes, est de (k − 1)·Δ si la panne tombe sur un scrape, et d'au plus k·Δ sinon. La règle des trois borne le taux d'un événement non observé en n essais :</p>
 <p><span class="math display">p &lt; \frac{3}{n} \quad (95\ \%)</span></p>
-<h3 id="lectures">Pour aller plus loin</h3>
+<h3 id="lectures">8.2. Pour aller plus loin</h3>
 <ul>
 <li>Llama Team, <em>The Llama 3 Herd of Models</em>, 2024 : section sur la fiabilité, le diagnostic des blocages et des traînards, <a href="https://arxiv.org/abs/2407.21783">arxiv.org/abs/2407.21783</a>.</li>
 <li>Documentation de Prometheus : tests unitaires de règles (<code>promtool test rules</code>) et règles d'alerte.</li>

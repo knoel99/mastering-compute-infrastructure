@@ -6,7 +6,7 @@
       the section being read is highlighted and named in the top bar.
    3. Tables: wrapped so they scroll sideways on phones; two-column
       key / value tables (course fiches) stack on narrow screens.
-   UI strings in French. */
+   UI strings in French, except the theme button, named exactly as in the LLGA and MVA course sites. */
 (function () {
   var KEY = "mci-theme";
   var TOC_KEY = "mci-toc-hidden";
@@ -30,11 +30,11 @@
     var btn = document.getElementById("theme-toggle");
     if (!btn) return;
     var dark = theme === "dark";
-    btn.setAttribute("aria-label", dark ? "Passer en mode clair" : "Passer en mode sombre");
-    btn.setAttribute("title", dark ? "Passer en mode clair" : "Passer en mode sombre");
+    btn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+    btn.setAttribute("title", dark ? "Switch to light mode" : "Switch to dark mode");
     btn.setAttribute("aria-pressed", dark ? "true" : "false");
     btn.innerHTML = '<span aria-hidden="true">' + (dark ? "☀" : "☾") + '</span><span class="tb-label">' +
-      (dark ? "Clair" : "Sombre") + "</span>";
+      (dark ? "Light" : "Dark") + "</span>";
   }
   applyTheme(currentTheme(), false);
 
@@ -80,7 +80,7 @@
   /* ---------- 2. Side contents ---------- */
   function buildToc(main, nav) {
     var heads = Array.prototype.filter.call(main.querySelectorAll("h2, h3"), function (h) {
-      return h.id && h.id !== "contents" && !h.closest(".sidetoc, nav.toc, .tree, .period-card, #title-block-header");
+      return h.id && h.id !== "contents" && h.id !== "sommaire" && !h.closest(".sidetoc, nav.toc, .toc-inline, .tree, .period-card, #title-block-header");
     });
     if (!heads.length) return [];
     nav.innerHTML = "";

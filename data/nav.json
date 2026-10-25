@@ -5,6 +5,10 @@
    "label": "Point de départ"
   },
   {
+   "href": "market/index.html",
+   "label": "Ce que demande le marché"
+  },
+  {
    "href": "masters/index.html",
    "label": "Enquête sur les masters HPC"
   },

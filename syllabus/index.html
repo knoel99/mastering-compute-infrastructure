@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -36,6 +36,55 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h1 class="title">Plans détaillés des modules</h1>
 <p class="subtitle">Acquis visés, chapitres, labs et sources à lire pour chacun des modules du parcours</p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#lecture">Comment lire cette page</a></li>
+<li><a href="#phase0">Phase 0 — Fondations : machines et performance</a>
+<ul>
+<li><a href="#linux-systems">Module 01 — Linux, systèmes et diagnostic de performance (rédigé, 24 h)</a></li>
+<li><a href="#perf-models">Module 02 — Architecture matérielle et modèles de performance (rédigé, 24 h)</a></li>
+</ul></li>
+<li><a href="#phase1">Phase 1 — Calcul parallèle et GPU</a>
+<ul>
+<li><a href="#parallel-programming">Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (rédigé, 30 h)</a></li>
+<li><a href="#gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h)</a></li>
+</ul></li>
+<li><a href="#phase2">Phase 2 — Exploiter un cluster</a>
+<ul>
+<li><a href="#slurm">Module 05 — Slurm et exploitation d'un cluster HPC (rédigé, 32 h)</a></li>
+<li><a href="#provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 24 h)</a></li>
+<li><a href="#networking">Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (rédigé, 28 h)</a></li>
+<li><a href="#storage">Module 08 — Stockage et E/S pour l'entraînement (rédigé, 24 h)</a></li>
+</ul></li>
+<li><a href="#phase3">Phase 3 — Systèmes d'entraînement distribué</a>
+<ul>
+<li><a href="#distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (rédigé, 36 h)</a></li>
+<li><a href="#fault-tolerance">Module 10 — Pannes, checkpointing et reprise automatique (rédigé, 28 h)</a></li>
+<li><a href="#ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h)</a></li>
+</ul></li>
+<li><a href="#phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</a>
+<ul>
+<li><a href="#kubernetes-gpu">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (rédigé, 28 h)</a></li>
+<li><a href="#multi-cloud">Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (rédigé, 28 h)</a></li>
+<li><a href="#observability">Module 14 — Observabilité et fiabilité d'une flotte GPU (rédigé, 24 h)</a></li>
+<li><a href="#finops-capacity">Module 15 — FinOps, capacité, énergie et achats de calcul (rédigé, 24 h)</a></li>
+</ul></li>
+<li><a href="#phase5">Phase 5 — Production et leadership</a>
+<ul>
+<li><a href="#platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 28 h)</a></li>
+</ul></li>
+<li><a href="#projets">Projets</a>
+<ul>
+<li><a href="#homelab-slurm">Projet 1 — Mini-cluster Slurm instrumenté (24 h)</a></li>
+<li><a href="#scaling-study">Projet 2 — Étude de passage à l'échelle d'un entraînement (20 h)</a></li>
+<li><a href="#resilient-trainer">Projet 3 — Entraîneur tolérant aux pannes (24 h)</a></li>
+<li><a href="#multi-provider-scheduler">Projet 4 — Placement multi-fournisseurs sensible aux coûts (24 h)</a></li>
+<li><a href="#gpu-observability">Projet 5 — Observabilité GPU et détection de pannes silencieuses (20 h)</a></li>
+<li><a href="#capstone-rfc">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU (40 h)</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="lecture">Comment lire cette page</h2>
 <p>Cette page donne le plan de <strong>chaque module du parcours</strong>, qu'il soit déjà rédigé ou non. Un module rédigé a sa page complète (fiche, plan de séances, chapitres, labs vérifiés, exercices corrigés) ; un module marqué « plan » n'a pas encore son cours : ses chapitres, ses labs prévus et ses sources à lire sont donnés pour que vous puissiez commencer à travailler dessus avec les références officielles en attendant.</p>
 <p>Les sources citées dans les rubriques « Sources à lire et faits à vérifier » ne sont <strong>pas</strong> des faits établis : ce sont les références sur lesquelles le futur cours devra s'appuyer, et les affirmations chiffrées qu'il faudra relire à la source avant de les écrire.</p>

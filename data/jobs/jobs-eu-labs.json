@@ -1,0 +1,2826 @@
+{
+ "unit": "jobs-eu-labs",
+ "retrieved_on": "2026-10-25",
+ "postings": [
+  {
+   "id": "mistral-sre-fleet-health-paris",
+   "company": "Mistral AI",
+   "company_type": "ai-lab",
+   "title": "Site Reliability Engineer, Fleet Health & Delivery",
+   "location": "Paris, Île-de-France, France",
+   "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+   "source_url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+   "seniority": "unspecified",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": null,
+   "language": "en",
+   "skills": [
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "Strong Linux system administration experience at scale."
+    },
+    {
+     "id": "slurm",
+     "level": "required",
+     "quote": "Proficiency in Slurm and/or Kubernetes to manage workloads effectively."
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "Proficiency in Slurm and/or Kubernetes to manage workloads effectively."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Troubleshoot and resolve incidents to ensure high availability, performance, and security for our models, products, and compute platforms."
+    },
+    {
+     "id": "containers",
+     "level": "required",
+     "quote": "Explore and contribute to modern cloud-native technologies, including Kubernetes and GPU orchestration, as we evolve our sovereign AI platform."
+    },
+    {
+     "id": "parallel-fs-storage",
+     "level": "bonus",
+     "quote": "Familiarity with distributed storage, high performance networking, cloud security, or GPU/AI/ML workloads is a plus."
+    },
+    {
+     "id": "networking-general",
+     "level": "bonus",
+     "quote": "Familiarity with distributed storage, high performance networking, cloud security, or GPU/AI/ML workloads is a plus."
+    },
+    {
+     "id": "security-compliance",
+     "level": "bonus",
+     "quote": "Familiarity with distributed storage, high performance networking, cloud security, or GPU/AI/ML workloads is a plus."
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "Familiarity with distributed storage, high performance networking, cloud security, or GPU/AI/ML workloads is a plus."
+    }
+   ],
+   "responsibilities": [
+    "Own and operate the Linux, cloud and AI-workload infrastructure behind Mistral's sovereign AI offering",
+    "Troubleshoot incidents to keep models, products and compute platforms available and performant",
+    "Support customers and internal teams by diagnosing and resolving infrastructure issues",
+    "Help move the platform toward cloud-native Kubernetes and GPU orchestration"
+   ],
+   "notes": "Read through the LinkedIn guest API (Mistral's Lever board returns an empty list); LinkedIn prints only '1 month ago', so posted_on is null. Customer-facing SRE role on Mistral's compute fleet; LinkedIn seniority 'Not Applicable'.",
+   "evidence": [
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+     "quote": "Strong Linux system administration experience at scale.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): slurm (required), kubernetes (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+     "quote": "Proficiency in Slurm and/or Kubernetes to manage workloads effectively.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+     "quote": "Troubleshoot and resolve incidents to ensure high availability, performance, and security for our models, products, and compute platforms.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): containers (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+     "quote": "Explore and contribute to modern cloud-native technologies, including Kubernetes and GPU orchestration, as we evolve our sovereign AI platform.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): parallel-fs-storage (bonus), networking-general (bonus), security-compliance (bonus), ml-training-experience (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4459308512",
+     "quote": "Familiarity with distributed storage, high performance networking, cloud security, or GPU/AI/ML workloads is a plus.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "5/5"
+  },
+  {
+   "id": "mistral-research-engineer-gpu-performance-paris",
+   "company": "Mistral AI",
+   "company_type": "ai-lab",
+   "title": "Research Engineer, GPU Performance",
+   "location": "Paris, Île-de-France, France",
+   "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+   "source_url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+   "seniority": "unspecified",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "ml-systems-perf",
+   "posted_on": null,
+   "language": "en",
+   "skills": [
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "High technical competence for writing custom low-level kernels and pushing GPUs to their limits."
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "High expertise in the distributed computation infrastructure of current-generation GPU clusters."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Profile, benchmark and squeeze performance out of large-scale training and inference on thousands of GPUs."
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "Profile, benchmark and squeeze performance out of large-scale training and inference on thousands of GPUs."
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "from custom kernels to memory-layout and communication optimisations"
+    },
+    {
+     "id": "inference-serving",
+     "level": "required",
+     "quote": "Model LLM execution on various GPUs with high fidelity to assess hardware usage and build serving performance estimates."
+    },
+    {
+     "id": "capacity-planning",
+     "level": "required",
+     "quote": "Model LLM execution on various GPUs with high fidelity to assess hardware usage and build serving performance estimates."
+    },
+    {
+     "id": "ci-cd",
+     "level": "required",
+     "quote": "Strong software-design instincts: testing, code review, CI/CD."
+    }
+   ],
+   "responsibilities": [
+    "Write low-level GPU code (custom kernels, memory layout, communication) to maximise hardware utilisation",
+    "Co-design model architecture changes with research scientists for efficient inference",
+    "Integrate optimisations into the shared MLOps framework so every training run benefits",
+    "Profile and benchmark training and inference on thousands of GPUs and model LLM execution across GPU types"
+   ],
+   "notes": "LinkedIn guest API; page shows '1 week ago', so posted_on is null. Performance role spanning training and serving; tagged ml-systems-perf, not inference-platform.",
+   "evidence": [
+    {
+     "claim": "Skill(s): cuda-gpu (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+     "quote": "High technical competence for writing custom low-level kernels and pushing GPUs to their limits.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+     "quote": "High expertise in the distributed computation infrastructure of current-generation GPU clusters.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required), ml-training-experience (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+     "quote": "Profile, benchmark and squeeze performance out of large-scale training and inference on thousands of GPUs.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): nccl-collectives (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+     "quote": "from custom kernels to memory-layout and communication optimisations",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): inference-serving (required), capacity-planning (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+     "quote": "Model LLM execution on various GPUs with high fidelity to assess hardware usage and build serving performance estimates.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ci-cd (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4479597354",
+     "quote": "Strong software-design instincts: testing, code review, CI/CD.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "6/6"
+  },
+  {
+   "id": "elevenlabs-hpc-infrastructure-engineer-gpu-clusters",
+   "company": "ElevenLabs",
+   "company_type": "startup",
+   "title": "HPC Infrastructure Engineer - GPU Clusters",
+   "location": "Remote; listed for United States, Bulgaria, Poland, United Kingdom (offices London, Warsaw, New York, San Francisco)",
+   "url": "https://jobs.ashbyhq.com/elevenlabs/120da2b3-d88b-4e3c-9b89-d19ff73db9d9",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+   "seniority": "unspecified",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": "2026-10-19",
+   "language": "en",
+   "skills": [
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "Have run large-scale Linux server or GPU environments in production and enjoy both building and operating"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "Know the NVIDIA stack well — drivers, CUDA, NCCL, DCGM — or have deep systems experience and learn hardware stacks fast"
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "Know the NVIDIA stack well — drivers, CUDA, NCCL, DCGM — or have deep systems experience and learn hardware stacks fast"
+    },
+    {
+     "id": "dcgm-gpu-monitoring",
+     "level": "required",
+     "quote": "Know the NVIDIA stack well — drivers, CUDA, NCCL, DCGM — or have deep systems experience and learn hardware stacks fast"
+    },
+    {
+     "id": "bare-metal-provisioning",
+     "level": "required",
+     "quote": "Are comfortable with bare-metal environments, server hardware, and high-speed networking"
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "Are comfortable with bare-metal environments, server hardware, and high-speed networking"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Write solid automation in Python and/or Bash, with IaC tools like Ansible or Terraform"
+    },
+    {
+     "id": "ansible-config",
+     "level": "required",
+     "quote": "Write solid automation in Python and/or Bash, with IaC tools like Ansible or Terraform"
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "Write solid automation in Python and/or Bash, with IaC tools like Ansible or Terraform"
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "required",
+     "quote": "Are happy digging into noisy data (metrics, logs, PromQL) to find what's actually wrong"
+    },
+    {
+     "id": "slurm",
+     "level": "required",
+     "quote": "Run and tune job scheduling (Slurm or similar) so researchers get compute fairly and fast"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "Own the stack beneath the training code: OS images, NVIDIA drivers, CUDA, container runtimes, NCCL, high-speed networking (InfiniBand/RoCE)"
+    },
+    {
+     "id": "containers",
+     "level": "required",
+     "quote": "Own the stack beneath the training code: OS images, NVIDIA drivers, CUDA, container runtimes, NCCL, high-speed networking (InfiniBand/RoCE)"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "node health checks, automated draining and remediation, burn-in pipelines for new capacity"
+    },
+    {
+     "id": "capacity-planning",
+     "level": "required",
+     "quote": "Operate and improve our GPU fleet end to end: provisioning, scheduling, monitoring, upgrades, capacity planning"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Hunt down performance problems: stragglers, degraded links, thermal issues, flaky GPUs — and fix the class of problem, not just the instance"
+    },
+    {
+     "id": "parallel-fs-storage",
+     "level": "bonus",
+     "quote": "Parallel filesystems (WEKA, VAST, etc) or large-scale object storage"
+    },
+    {
+     "id": "object-storage",
+     "level": "bonus",
+     "quote": "Parallel filesystems (WEKA, VAST, etc) or large-scale object storage"
+    },
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "bonus",
+     "quote": "Experience supporting ML training workloads from the infra side (distributed training failure modes, checkpointing patterns)"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "Experience supporting ML training workloads from the infra side (distributed training failure modes, checkpointing patterns)"
+    },
+    {
+     "id": "gpu-cloud-providers",
+     "level": "bonus",
+     "quote": "Experience evaluating and working with GPU cloud providers"
+    },
+    {
+     "id": "datacenter-facilities",
+     "level": "bonus",
+     "quote": "Power and cooling awareness for dense GPU deployments"
+    },
+    {
+     "id": "security-compliance",
+     "level": "required",
+     "quote": "Keep clusters secure by default: access control, network isolation, secrets"
+    }
+   ],
+   "responsibilities": [
+    "Operate the NVIDIA GPU fleet (bare metal and rented) end to end: provisioning, scheduling, monitoring, upgrades and capacity planning",
+    "Automate node health checks, draining, remediation and burn-in of new capacity",
+    "Own the OS image, driver, CUDA, NCCL, container-runtime and InfiniBand/RoCE layer beneath training code",
+    "Run and tune Slurm-style scheduling and high-performance storage for datasets and checkpoints",
+    "Benchmark and validate rented GPU capacity against provider SLAs, and do hands-on racking and diagnostics when needed"
+   ],
+   "notes": "Remote role; Ashby lists United States as primary location with Bulgaria, Poland and the United Kingdom as secondary locations, so region 'eu' is a judgement call. ElevenLabs has London and Warsaw offices and Polish founders; company_origin 'eu' is likewise a judgement (the company also has a New York presence). Posted date from Ashby publishedAt. 'Bare metal and rented capacity' mix plus datacentre trips.",
+   "evidence": [
+    {
+     "claim": "Skill(s): linux-admin (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Have run large-scale Linux server or GPU environments in production and enjoy both building and operating",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required), nccl-collectives (required), dcgm-gpu-monitoring (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Know the NVIDIA stack well — drivers, CUDA, NCCL, DCGM — or have deep systems experience and learn hardware stacks fast",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): bare-metal-provisioning (required), networking-general (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Are comfortable with bare-metal environments, server hardware, and high-speed networking",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), ansible-config (required), terraform-iac (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Write solid automation in Python and/or Bash, with IaC tools like Ansible or Terraform",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Are happy digging into noisy data (metrics, logs, PromQL) to find what's actually wrong",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): slurm (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Run and tune job scheduling (Slurm or similar) so researchers get compute fairly and fast",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (required), containers (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Own the stack beneath the training code: OS images, NVIDIA drivers, CUDA, container runtimes, NCCL, high-speed networking (InfiniBand/RoCE)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "node health checks, automated draining and remediation, burn-in pipelines for new capacity",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Operate and improve our GPU fleet end to end: provisioning, scheduling, monitoring, upgrades, capacity planning",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Hunt down performance problems: stragglers, degraded links, thermal issues, flaky GPUs — and fix the class of problem, not just the instance",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): parallel-fs-storage (bonus), object-storage (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Parallel filesystems (WEKA, VAST, etc) or large-scale object storage",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): checkpoint-fault-tolerance (bonus), ml-training-experience (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Experience supporting ML training workloads from the infra side (distributed training failure modes, checkpointing patterns)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): gpu-cloud-providers (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Experience evaluating and working with GPU cloud providers",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): datacenter-facilities (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Power and cooling awareness for dense GPU deployments",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): security-compliance (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/elevenlabs",
+     "quote": "Keep clusters secure by default: access control, network isolation, secrets",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "15/15"
+  },
+  {
+   "id": "wayve-staff-sre-ai-infrastructure-london",
+   "company": "Wayve",
+   "company_type": "startup",
+   "title": "Staff SRE, AI Infrastructure",
+   "location": "London, United Kingdom",
+   "url": "https://jobs.ashbyhq.com/wayve/085402fd-1976-4725-bfc3-f0e9dd3bc2ab",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+   "seniority": "staff",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": "2026-10-05",
+   "language": "en",
+   "skills": [
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "You have hands-on experience owning the reliability of large-scale cloud, Kubernetes, or distributed infrastructure"
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "You’ll enhance Kubernetes scheduling, autoscaling, policy enforcement, and resource efficiency"
+    },
+    {
+     "id": "scheduler-design",
+     "level": "required",
+     "quote": "You’ll enhance Kubernetes scheduling, autoscaling, policy enforcement, and resource efficiency"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "You’re comfortable working in Python or Go, infrastructure as code, CI/CD or GitOps, and modern observability practices."
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "You’re comfortable working in Python or Go, infrastructure as code, CI/CD or GitOps, and modern observability practices."
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "You’re comfortable working in Python or Go, infrastructure as code, CI/CD or GitOps, and modern observability practices."
+    },
+    {
+     "id": "ci-cd",
+     "level": "required",
+     "quote": "develop continuous GitOps delivery using platforms such as Argo CD or Flux"
+    },
+    {
+     "id": "logging-tracing",
+     "level": "required",
+     "quote": "You’ll improve observability, automation, deployment safety, capacity planning, and incident learning"
+    },
+    {
+     "id": "capacity-planning",
+     "level": "required",
+     "quote": "build forecasting for GPU and storage capacity"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "You’ll improve GPU node health detection and automated recovery, strengthen the resilience of distributed AI training"
+    },
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "required",
+     "quote": "You’ll improve GPU node health detection and automated recovery, strengthen the resilience of distributed AI training"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "You understand distributed-systems failure modes across compute, networking, and storage"
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "can demonstrate measurable improvements to reliability, performance, capacity, or cost"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "Direct experience with GPU, ML-training, or HPC infrastructure is valuable"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "Direct experience with GPU, ML-training, or HPC infrastructure is valuable"
+    }
+   ],
+   "responsibilities": [
+    "Identify reliability risks across AI Platform, Compute & Data Platform and Cloud Infrastructure teams and engineer them away",
+    "Improve GPU node health detection, automated recovery and the resilience of distributed training",
+    "Build GitOps continuous delivery (Argo CD/Flux) and improve Kubernetes scheduling, autoscaling and policy",
+    "Forecast GPU and storage capacity and drive SLO and production-readiness practices"
+   ],
+   "notes": "Hybrid working from London. Autonomous-driving company, UK-headquartered. Posted date from Ashby publishedAt.",
+   "evidence": [
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You have hands-on experience owning the reliability of large-scale cloud, Kubernetes, or distributed infrastructure",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (required), scheduler-design (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You’ll enhance Kubernetes scheduling, autoscaling, policy enforcement, and resource efficiency",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), systems-lang (required), terraform-iac (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You’re comfortable working in Python or Go, infrastructure as code, CI/CD or GitOps, and modern observability practices.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ci-cd (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "develop continuous GitOps delivery using platforms such as Argo CD or Flux",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): logging-tracing (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You’ll improve observability, automation, deployment safety, capacity planning, and incident learning",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "build forecasting for GPU and storage capacity",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required), checkpoint-fault-tolerance (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You’ll improve GPU node health detection and automated recovery, strengthen the resilience of distributed AI training",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You understand distributed-systems failure modes across compute, networking, and storage",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): finops-cost (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "can demonstrate measurable improvements to reliability, performance, capacity, or cost",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus), ml-training-experience (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Direct experience with GPU, ML-training, or HPC infrastructure is valuable",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "10/10"
+  },
+  {
+   "id": "wayve-staff-swe-storage-platform-london",
+   "company": "Wayve",
+   "company_type": "startup",
+   "title": "Staff Software Engineer, Storage Platform",
+   "location": "London, United Kingdom",
+   "url": "https://jobs.ashbyhq.com/wayve/642db9f1-51b1-4e14-84f5-e0690f88deaa",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+   "seniority": "staff",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "storage",
+   "posted_on": "2026-10-14",
+   "language": "en",
+   "skills": [
+    {
+     "id": "object-storage",
+     "level": "required",
+     "quote": "You’ve owned petabyte-scale object storage end to end—including data layout, lifecycle management, performance and cost—with measurable outcomes against a cost target."
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "Give datasets clear owners, purposes and retention classes, with tagging and team-level cost attribution."
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "You’re a hands-on software engineer with strong Python, Go or comparable skills, plus production Kubernetes, Terraform and CI experience."
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "You’re a hands-on software engineer with strong Python, Go or comparable skills, plus production Kubernetes, Terraform and CI experience."
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "You’re a hands-on software engineer with strong Python, Go or comparable skills, plus production Kubernetes, Terraform and CI experience."
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "You’re a hands-on software engineer with strong Python, Go or comparable skills, plus production Kubernetes, Terraform and CI experience."
+    },
+    {
+     "id": "ci-cd",
+     "level": "required",
+     "quote": "You’re a hands-on software engineer with strong Python, Go or comparable skills, plus production Kubernetes, Terraform and CI experience."
+    },
+    {
+     "id": "security-compliance",
+     "level": "required",
+     "quote": "You bring strong security and access-management experience, including IAM/RBAC, encryption, secure replication and auditing."
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "required",
+     "quote": "Build retention, deletion and re-tiering capabilities for Azure Blob, backed by dry runs, audit trails and recovery paths."
+    },
+    {
+     "id": "data-pipelines",
+     "level": "required",
+     "quote": "Partner with ML and data teams to understand access patterns, remove storage bottlenecks and reduce the time GPUs spend waiting for data."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Improve throughput and latency by tackling small-object reads, throttling, unnecessary data access and cross-region hops."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Establish standards, dashboards and SLOs for availability, performance, cache effectiveness, storage tiers and cost."
+    },
+    {
+     "id": "leadership-mgmt",
+     "level": "required",
+     "quote": "Lead a hands-on, multi-quarter storage programme, from defining the problems and architecture to delivering platforms that teams adopt."
+    }
+   ],
+   "responsibilities": [
+    "Set the technical direction for storing and serving hundreds of petabytes of driving data for training and simulation",
+    "Build retention, deletion, re-tiering and cost-attribution capabilities on Azure Blob",
+    "Improve read throughput with Kubernetes-native NVMe caching and secure cross-region replication",
+    "Reduce GPU time spent waiting for data together with ML and data teams",
+    "Write RFCs, define SLOs and dashboards, and mentor engineers as the team grows"
+   ],
+   "notes": "Hybrid from the London office. First dedicated storage staff engineer; Azure-centric, AWS/GCP experience accepted. Posted date from Ashby publishedAt.",
+   "evidence": [
+    {
+     "claim": "Skill(s): object-storage (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You’ve owned petabyte-scale object storage end to end—including data layout, lifecycle management, performance and cost—with measurable outcomes against a cost target.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): finops-cost (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Give datasets clear owners, purposes and retention classes, with tagging and team-level cost attribution.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), systems-lang (required), kubernetes (required), terraform-iac (required), ci-cd (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You’re a hands-on software engineer with strong Python, Go or comparable skills, plus production Kubernetes, Terraform and CI experience.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): security-compliance (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "You bring strong security and access-management experience, including IAM/RBAC, encryption, secure replication and auditing.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hyperscaler-cloud (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Build retention, deletion and re-tiering capabilities for Azure Blob, backed by dry runs, audit trails and recovery paths.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): data-pipelines (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Partner with ML and data teams to understand access patterns, remove storage bottlenecks and reduce the time GPUs spend waiting for data.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Improve throughput and latency by tackling small-object reads, throttling, unnecessary data access and cross-region hops.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Establish standards, dashboards and SLOs for availability, performance, cache effectiveness, storage tiers and cost.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): leadership-mgmt (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/wayve",
+     "quote": "Lead a hands-on, multi-quarter storage programme, from defining the problems and architecture to delivering platforms that teams adopt.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "9/9"
+  },
+  {
+   "id": "bfl-mts-research-infrastructure-engineer-freiburg",
+   "company": "Black Forest Labs",
+   "company_type": "ai-lab",
+   "title": "Member of Technical Staff - Research Infrastructure Engineer",
+   "location": "Freiburg, Germany (or San Francisco)",
+   "url": "https://jobs.ashbyhq.com/black-forest-labs/728b8f3b-f355-4e02-84b8-a64c94d0f351",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+   "seniority": "unspecified",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "training-platform",
+   "posted_on": "2025-09-18",
+   "language": "en",
+   "skills": [
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Python, Bash, Go"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "Python, Bash, Go"
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "Deep knowledge of modern cloud infrastructure including Kubernetes, Infrastructure as Code, AWS, and GCP"
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "Deep knowledge of modern cloud infrastructure including Kubernetes, Infrastructure as Code, AWS, and GCP"
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "required",
+     "quote": "Deep knowledge of modern cloud infrastructure including Kubernetes, Infrastructure as Code, AWS, and GCP"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "Nvidia GPU drivers, and operators"
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "required",
+     "quote": "OTel, Prometheus"
+    },
+    {
+     "id": "logging-tracing",
+     "level": "required",
+     "quote": "OTel, Prometheus"
+    },
+    {
+     "id": "slurm",
+     "level": "required",
+     "quote": "Experience with SLURM"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "Experience building or operating large-scale training platforms"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "Worked with large scale compute clusters (GPUs)"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "Proven ability to debug performance and reliability issues across large distributed fleets"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Identify and resolve performance bottlenecks and capacity hotspots through deep analysis of distributed systems at scale."
+    },
+    {
+     "id": "capacity-planning",
+     "level": "required",
+     "quote": "Scale infrastructure to meet growing research demands while maintaining reliability and performance"
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "Build and evolve telemetry and monitoring systems to provide deep visibility into infrastructure performance, utilization, and costs across our cloud and datacenter fleets."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Participate in on-call rotations and incident response to maintain system reliability"
+    },
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "required",
+     "quote": "We build the systems to make multi-week/month long training possible"
+    }
+   ],
+   "responsibilities": [
+    "Maintain and scale the research GPU clusters and platforms behind FLUX model training",
+    "Debug performance bottlenecks and capacity hotspots across cloud and datacentre fleets",
+    "Build telemetry (OTel, Prometheus) covering performance, utilisation and cost",
+    "Design infrastructure with researchers that balances performance and cost, and take part in on-call"
+   ],
+   "notes": "First published 2025-09-18 (Ashby publishedAt) and still listed on 2026-10-25, likely an evergreen req. Salary band printed: EU EUR 100,000-230,000 + equity. Hybrid Freiburg/San Francisco. 'Experience building or operating large-scale training platforms' appears twice in the requirements.",
+   "evidence": [
+    {
+     "claim": "Skill(s): python (required), systems-lang (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Python, Bash, Go",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (required), terraform-iac (required), hyperscaler-cloud (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Deep knowledge of modern cloud infrastructure including Kubernetes, Infrastructure as Code, AWS, and GCP",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Nvidia GPU drivers, and operators",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (required), logging-tracing (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "OTel, Prometheus",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): slurm (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Experience with SLURM",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Experience building or operating large-scale training platforms",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Worked with large scale compute clusters (GPUs)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Proven ability to debug performance and reliability issues across large distributed fleets",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Identify and resolve performance bottlenecks and capacity hotspots through deep analysis of distributed systems at scale.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Scale infrastructure to meet growing research demands while maintaining reliability and performance",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): finops-cost (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Build and evolve telemetry and monitoring systems to provide deep visibility into infrastructure performance, utilization, and costs across our cloud and datacenter fleets.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "Participate in on-call rotations and incident response to maintain system reliability",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): checkpoint-fault-tolerance (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/black-forest-labs",
+     "quote": "We build the systems to make multi-week/month long training possible",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "13/13"
+  },
+  {
+   "id": "aleph-alpha-senior-performance-engineer-pretraining-heidelberg",
+   "company": "Aleph Alpha",
+   "company_type": "ai-lab",
+   "title": "Senior AI R&D Engineer - Performance - Pre-training (f/m/d)",
+   "location": "Heidelberg, Germany",
+   "url": "https://jobs.ashbyhq.com/alephalpha/2faca6ec-69bd-4e04-b055-05f24ddf0f4d",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+   "seniority": "senior",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "ml-systems-perf",
+   "posted_on": "2026-10-15",
+   "language": "en",
+   "skills": [
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Are proficient in Python and the PyTorch library."
+    },
+    {
+     "id": "pytorch-distributed",
+     "level": "required",
+     "quote": "Configure and tune composite parallelism strategies (e.g. TP, DP, HSDP/FSDP, EP), optimizing load balance, minimizing critical-path bottlenecks"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "Have a strong engineering background in parallel and/or distributed systems with proven track record of excellence."
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "Have hands-on experience with modern machine learning techniques (especially large language models and their life cycle)."
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "Deeply understand the CUDA programming model."
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "Have experience in distributed programming with APIs like NCCL or MPI."
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "Have experience in distributed programming with APIs like NCCL or MPI."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Have experience analysing profiling traces with tools such as PyTorch Profiler and Nvidia Nsight."
+    }
+   ],
+   "responsibilities": [
+    "Profile training loops with PyTorch Profiler and Nsight to remove system- and kernel-level bottlenecks",
+    "Configure and tune composite parallelism (TP, DP, HSDP/FSDP, EP) for LLM pre-training on thousands of Blackwell GPUs",
+    "Manage communication-to-computation trade-offs and load balance",
+    "Co-design hardware-efficient model architectures with researchers"
+   ],
+   "notes": "Hybrid with regular on-site presence in Heidelberg; employer entity Aleph Alpha Research GmbH. Preferred: TorchTitan/Megatron-LM/DeepSpeed contributions, MXFP4/MXFP8 low-precision training, NVSHMEM/CUDA IPC (bonus quotes not added separately because they duplicate required skills). Posted date from Ashby publishedAt.",
+   "evidence": [
+    {
+     "claim": "Skill(s): python (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Are proficient in Python and the PyTorch library.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): pytorch-distributed (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Configure and tune composite parallelism strategies (e.g. TP, DP, HSDP/FSDP, EP), optimizing load balance, minimizing critical-path bottlenecks",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Have a strong engineering background in parallel and/or distributed systems with proven track record of excellence.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Have hands-on experience with modern machine learning techniques (especially large language models and their life cycle).",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Deeply understand the CUDA programming model.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): nccl-collectives (required), hpc-experience (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Have experience in distributed programming with APIs like NCCL or MPI.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/alephalpha",
+     "quote": "Have experience analysing profiling traces with tools such as PyTorch Profiler and Nvidia Nsight.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "7/7"
+  },
+  {
+   "id": "helsing-hpc-systems-administrator-munich",
+   "company": "Helsing",
+   "company_type": "startup",
+   "title": "HPC Systems Administrator",
+   "location": "Munich, Germany (on-site, travel to Tussenhausen)",
+   "url": "https://helsing.ai/jobs/4879386101?gh_jid=4879386101",
+   "source_url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+   "seniority": "unspecified",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "hpc-ops",
+   "posted_on": "2026-06-01",
+   "language": "en",
+   "skills": [
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "have administered Linux systems within a production HPC or large shared compute environment"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "have administered Linux systems within a production HPC or large shared compute environment"
+    },
+    {
+     "id": "slurm",
+     "level": "required",
+     "quote": "have hands-on experience managing workload schedulers such as Slurm, PBS Pro, LSF, or similar"
+    },
+    {
+     "id": "parallel-fs-storage",
+     "level": "required",
+     "quote": "possess production experience with parallel filesystems (Lustre, BeeGFS, or GPFS) and high-speed interconnects (InfiniBand or RoCE)"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "possess production experience with parallel filesystems (Lustre, BeeGFS, or GPFS) and high-speed interconnects (InfiniBand or RoCE)"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "are capable of scripting and automating complex workflows with Bash, Python, and Ansible"
+    },
+    {
+     "id": "ansible-config",
+     "level": "required",
+     "quote": "are capable of scripting and automating complex workflows with Bash, Python, and Ansible"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "Ensure the environment remains highly available and consistently performant through proactive monitoring, patching, firmware updates, and incident response"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Ensure the environment remains highly available and consistently performant through proactive monitoring, patching, firmware updates, and incident response"
+    },
+    {
+     "id": "procurement-vendor",
+     "level": "required",
+     "quote": "Collaborate with hardware and software vendors to resolve support cases, process RMAs, and ensure upgrade quality"
+    },
+    {
+     "id": "security-compliance",
+     "level": "required",
+     "quote": "Maintain the strict security posture required for cleared work and support ongoing compliance reviews"
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "bonus",
+     "quote": "Expertise in GPU computing, including CUDA and NVIDIA toolchains, alongside MPI stack management"
+    },
+    {
+     "id": "containers",
+     "level": "bonus",
+     "quote": "Familiarity with HPC containers using Apptainer, Enroot, or Pyxis"
+    },
+    {
+     "id": "terraform-iac",
+     "level": "bonus",
+     "quote": "Competence in infrastructure-as-code practices using tools such as Terraform"
+    }
+   ],
+   "responsibilities": [
+    "Administer on-premises HPC compute nodes, schedulers, parallel storage, interconnects and licence servers",
+    "Run Slurm/PBS queues, fair-share, accounting and quotas",
+    "Manage the simulation software stack with Lmod, Spack or EasyBuild and onboard users",
+    "Patch, update firmware, monitor and respond to incidents; handle vendor cases and RMAs",
+    "Keep the security posture required for cleared defence work"
+   ],
+   "notes": "Defence company; the HPC cluster serves electromagnetics, CFD and multi-physics simulation rather than AI training. Role mentions 'cleared work' and classified environments (nice-to-have), so security clearance may be needed. On-site Munich. posted_on is Greenhouse first_published. Greenhouse content is HTML-escaped; quotes taken from single list items.",
+   "evidence": [
+    {
+     "claim": "Skill(s): linux-admin (required), hpc-experience (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "have administered Linux systems within a production HPC or large shared compute environment",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): slurm (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "have hands-on experience managing workload schedulers such as Slurm, PBS Pro, LSF, or similar",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): parallel-fs-storage (required), infiniband-roce (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "possess production experience with parallel filesystems (Lustre, BeeGFS, or GPFS) and high-speed interconnects (InfiniBand or RoCE)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), ansible-config (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "are capable of scripting and automating complex workflows with Bash, Python, and Ansible",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required), sre-oncall (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "Ensure the environment remains highly available and consistently performant through proactive monitoring, patching, firmware updates, and incident response",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): procurement-vendor (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "Collaborate with hardware and software vendors to resolve support cases, process RMAs, and ensure upgrade quality",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): security-compliance (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "Maintain the strict security posture required for cleared work and support ongoing compliance reviews",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "Expertise in GPU computing, including CUDA and NVIDIA toolchains, alongside MPI stack management",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): containers (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "Familiarity with HPC containers using Apptainer, Enroot, or Pyxis",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): terraform-iac (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs/4879386101",
+     "quote": "Competence in infrastructure-as-code practices using tools such as Terraform",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "10/10"
+  },
+  {
+   "id": "isomorphic-research-engineer-llm-performance-london",
+   "company": "Isomorphic Labs",
+   "company_type": "ai-lab",
+   "title": "Research Engineer (LLM Performance), London",
+   "location": "London, United Kingdom",
+   "url": "https://job-boards.greenhouse.io/isomorphiclabs/jobs/6184829004",
+   "source_url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+   "seniority": "ic",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "ml-systems-perf",
+   "posted_on": "2026-09-08",
+   "language": "en",
+   "skills": [
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "Significant experience with large scale distributed training of LLMs."
+    },
+    {
+     "id": "pytorch-distributed",
+     "level": "required",
+     "quote": "Knowledge of parallelism strategies and collective communication libraries (e.g. NCCL)."
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "required",
+     "quote": "Knowledge of parallelism strategies and collective communication libraries (e.g. NCCL)."
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "Good understanding of GPU architectures."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Diagnose and fix performance bottlenecks and communication overhead in distributed training and inference systems."
+    },
+    {
+     "id": "rl-infra",
+     "level": "required",
+     "quote": "Evaluate and deploy frameworks for supervised fine-tuning, reinforcement learning and LLM evaluation."
+    },
+    {
+     "id": "inference-serving",
+     "level": "bonus",
+     "quote": "Experience with general LLM serving stacks."
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "bonus",
+     "quote": "Knowledge of XLA, Triton, Pallas, CUDA or similar accelerator DSLs / compilers."
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "bonus",
+     "quote": "Prior experience building, deploying and maintaining production systems on GCP."
+    }
+   ],
+   "responsibilities": [
+    "Implement and optimise LLM post-training methods at scale on frontier models",
+    "Turn research methods into production-ready training systems",
+    "Diagnose performance bottlenecks and communication overhead in distributed training and inference",
+    "Deploy low-precision methods that balance throughput and accuracy"
+   ],
+   "notes": "Alphabet-owned drug-discovery AI lab headquartered in London. Hybrid, 3 office days a week. JAX or PyTorch accepted; GCP and XLA/Pallas as nice-to-haves suggest TPU exposure. Note that the essential list says reasoning about performance matters more than writing kernels from scratch. posted_on is Greenhouse first_published.",
+   "evidence": [
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Significant experience with large scale distributed training of LLMs.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): pytorch-distributed (required), nccl-collectives (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Knowledge of parallelism strategies and collective communication libraries (e.g. NCCL).",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Good understanding of GPU architectures.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Diagnose and fix performance bottlenecks and communication overhead in distributed training and inference systems.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): rl-infra (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Evaluate and deploy frameworks for supervised fine-tuning, reinforcement learning and LLM evaluation.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): inference-serving (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Experience with general LLM serving stacks.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): non-nvidia-accelerators (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Knowledge of XLA, Triton, Pallas, CUDA or similar accelerator DSLs / compilers.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hyperscaler-cloud (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs/6184829004",
+     "quote": "Prior experience building, deploying and maintaining production systems on GCP.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "8/8"
+  },
+  {
+   "id": "synthesia-principal-ml-platform-engineer-europe",
+   "company": "Synthesia",
+   "company_type": "startup",
+   "title": "Principal ML Platform Engineer",
+   "location": "Remote, Europe",
+   "url": "https://jobs.ashbyhq.com/synthesia/e9c63d3d-13cc-4049-ae0a-5fef402c595b",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+   "seniority": "staff",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "training-platform",
+   "posted_on": "2026-04-08",
+   "language": "en",
+   "skills": [
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "Design and improve the platform systems that support model training, evaluation, and production serving."
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "Experience with Kubernetes and operating distributed workloads in production."
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "Experience with Kubernetes and operating distributed workloads in production."
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "Solid hands-on experience with cloud infrastructure, Linux, and infrastructure automation."
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "required",
+     "quote": "Solid hands-on experience with cloud infrastructure, Linux, and infrastructure automation."
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Strong coding skills, ideally in Python or similar languages used for backend systems and tooling."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Strong experience building or operating production systems with a focus on reliability, scalability, and maintainability."
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "Build infrastructure and tooling that make ML workloads more reliable, scalable, and cost-efficient."
+    },
+    {
+     "id": "scheduler-design",
+     "level": "required",
+     "quote": "Improve how we schedule, monitor, and debug workloads running on GPUs and cloud infrastructure."
+    },
+    {
+     "id": "inference-serving",
+     "level": "bonus",
+     "quote": "Operating ML infrastructure or model serving systems in production."
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "Working with GPU-based systems or other performance-sensitive infrastructure."
+    },
+    {
+     "id": "logging-tracing",
+     "level": "bonus",
+     "quote": "Experience with observability and debugging in distributed systems."
+    },
+    {
+     "id": "terraform-iac",
+     "level": "bonus",
+     "quote": "Familiarity with Terraform, Datadog, GitHub Actions, or similar tools."
+    },
+    {
+     "id": "ci-cd",
+     "level": "bonus",
+     "quote": "Familiarity with Terraform, Datadog, GitHub Actions, or similar tools."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "bonus",
+     "quote": "Familiarity with performance optimization, scheduling, or resource allocation problems."
+    }
+   ],
+   "responsibilities": [
+    "Design the ML platform systems for training, evaluation and production serving of generative video models",
+    "Build reliable, scalable and cost-efficient infrastructure and tooling for ML workloads",
+    "Improve scheduling, monitoring and debugging of GPU and cloud workloads",
+    "Build internal tools and agent-operable workflows that cut operational overhead for researchers",
+    "Shape the platform's technical direction as a hands-on principal IC"
+   ],
+   "notes": "Remote within Europe; London-headquartered. Explicitly 'not a pure ML Engineer role'. Principal IC mapped to seniority 'staff'. Mixed training/serving platform; tagged training-platform. First published 2026-04-08 and still listed.",
+   "evidence": [
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Design and improve the platform systems that support model training, evaluation, and production serving.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (required), distributed-systems (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Experience with Kubernetes and operating distributed workloads in production.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required), hyperscaler-cloud (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Solid hands-on experience with cloud infrastructure, Linux, and infrastructure automation.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Strong coding skills, ideally in Python or similar languages used for backend systems and tooling.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Strong experience building or operating production systems with a focus on reliability, scalability, and maintainability.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): finops-cost (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Build infrastructure and tooling that make ML workloads more reliable, scalable, and cost-efficient.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): scheduler-design (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Improve how we schedule, monitor, and debug workloads running on GPUs and cloud infrastructure.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): inference-serving (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Operating ML infrastructure or model serving systems in production.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Working with GPU-based systems or other performance-sensitive infrastructure.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): logging-tracing (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Experience with observability and debugging in distributed systems.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): terraform-iac (bonus), ci-cd (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Familiarity with Terraform, Datadog, GitHub Actions, or similar tools.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/synthesia",
+     "quote": "Familiarity with performance optimization, scheduling, or resource allocation problems.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "12/12"
+  },
+  {
+   "id": "physicsx-staff-swe-infrastructure-kubernetes-london",
+   "company": "PhysicsX",
+   "company_type": "startup",
+   "title": "Staff Software Engineer, Infrastructure - Python & Kubernetes",
+   "location": "London, United Kingdom (hybrid, Shoreditch office)",
+   "url": "https://job-boards.eu.greenhouse.io/physicsx/jobs/4981153101",
+   "source_url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+   "seniority": "staff",
+   "years_required": 5,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "other",
+   "posted_on": "2026-09-21",
+   "language": "en",
+   "skills": [
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "5 or more years of professional experience operating Kubernetes in production."
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "strong experience authoring, structuring and operating Terraform at scale, including state management, module design and CI integration."
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "required",
+     "quote": "Own the design and delivery of core infrastructure across multi cloud providers (AWS, GCP, Azure) and on premises environments using Terraform and Crossplane."
+    },
+    {
+     "id": "multicloud-skypilot",
+     "level": "required",
+     "quote": "practical experience operating infrastructure across more than one cloud provider and on premises environments"
+    },
+    {
+     "id": "security-compliance",
+     "level": "required",
+     "quote": "experience with tools such as Vault, External Secrets Operator or cloud native secret stores, including dynamic provisioning and rotation."
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "solid knowledge of Kubernetes networking, CNI plugins, Istio service mesh and ingress patterns."
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "required",
+     "quote": "familiarity with GPU driver management, device plugins and the operational considerations of running accelerated workloads in Kubernetes."
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Python and Golang are the primary languages used across the platform."
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "Python and Golang are the primary languages used across the platform."
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "a solid grounding in distributed systems concepts, including failure modes, consistency and the operational challenges of running systems at scale."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Establish SLOs and reliability targets for core infrastructure components and lead the response to production incidents."
+    },
+    {
+     "id": "ci-cd",
+     "level": "bonus",
+     "quote": "Experience with GitOps workflows using tools such as Argo CD or Flux."
+    }
+   ],
+   "responsibilities": [
+    "Design and deliver core infrastructure across AWS, GCP, Azure and on-premises with Terraform and Crossplane",
+    "Architect and operate single- and multi-tenant Kubernetes clusters (vCluster) with strong isolation",
+    "Manage GPU driver configuration and accelerated node pools for AI and simulation workloads",
+    "Own cluster networking (CNI, Istio, ingress) and secrets management",
+    "Set SLOs for core infrastructure and lead incident response"
+   ],
+   "notes": "Physics-AI company for industrial engineering. Title says Staff while the body says 'Senior Software Engineer' for the Platform SRE Core Infrastructure team. Kubernetes core-platform role where GPU node pools are one part, so role_family 'other'. CKA/CKAD/CKS described as highly desirable. posted_on is Greenhouse first_published.",
+   "evidence": [
+    {
+     "claim": "Skill(s): kubernetes (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "5 or more years of professional experience operating Kubernetes in production.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): terraform-iac (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "strong experience authoring, structuring and operating Terraform at scale, including state management, module design and CI integration.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hyperscaler-cloud (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "Own the design and delivery of core infrastructure across multi cloud providers (AWS, GCP, Azure) and on premises environments using Terraform and Crossplane.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): multicloud-skypilot (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "practical experience operating infrastructure across more than one cloud provider and on premises environments",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): security-compliance (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "experience with tools such as Vault, External Secrets Operator or cloud native secret stores, including dynamic provisioning and rotation.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): networking-general (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "solid knowledge of Kubernetes networking, CNI plugins, Istio service mesh and ingress patterns.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): cuda-gpu (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "familiarity with GPU driver management, device plugins and the operational considerations of running accelerated workloads in Kubernetes.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (required), systems-lang (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "Python and Golang are the primary languages used across the platform.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "a solid grounding in distributed systems concepts, including failure modes, consistency and the operational challenges of running systems at scale.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "Establish SLOs and reliability targets for core infrastructure components and lead the response to production incidents.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ci-cd (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs/4981153101",
+     "quote": "Experience with GitOps workflows using tools such as Argo CD or Flux.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "11/11"
+  },
+  {
+   "id": "anthropic-staff-swe-node-infra-london",
+   "company": "Anthropic",
+   "company_type": "ai-lab",
+   "title": "Staff Software Engineer, Node Infra",
+   "location": "London, UK",
+   "url": "https://job-boards.greenhouse.io/anthropic/jobs/5211498008",
+   "source_url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+   "seniority": "staff",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "us",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": "2026-05-07",
+   "language": "en",
+   "skills": [
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "Deep expertise in distributed systems, reliability, and cloud platforms (e.g., Kubernetes, IaC, AWS/GCP/Azure)"
+    },
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "Deep expertise in distributed systems, reliability, and cloud platforms (e.g., Kubernetes, IaC, AWS/GCP/Azure)"
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "required",
+     "quote": "Deep expertise in distributed systems, reliability, and cloud platforms (e.g., Kubernetes, IaC, AWS/GCP/Azure)"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "Strong proficiency in at least one systems language (e.g., Rust, Go, or Python), IaC proficiency with Terraform."
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Strong proficiency in at least one systems language (e.g., Rust, Go, or Python), IaC proficiency with Terraform."
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "Strong proficiency in at least one systems language (e.g., Rust, Go, or Python), IaC proficiency with Terraform."
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "required",
+     "quote": "Hands-on experience with machine learning accelerators (GPUs, TPUs, or Trainium)"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "Design and operate the systems that detect, isolate, and remediate unhealthy hardware automatically, driving up fleet MTBI and minimizing stranded capacity"
+    },
+    {
+     "id": "bare-metal-provisioning",
+     "level": "required",
+     "quote": "Own the technical strategy and roadmap for node lifecycle management - ingestion, bring-up, health checking, and automated repair"
+    },
+    {
+     "id": "multicloud-skypilot",
+     "level": "required",
+     "quote": "Drive cross-team initiatives to build and scale AI clusters across multiple clouds and accelerator families"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Establish and evolve operational excellence practices (incident response, postmortem culture, on-call)"
+    },
+    {
+     "id": "leadership-mgmt",
+     "level": "required",
+     "quote": "Track record of leading complex, multi-quarter technical initiatives that span multiple teams or systems"
+    },
+    {
+     "id": "capacity-planning",
+     "level": "bonus",
+     "quote": "Experience managing large scale compute infrastructure at hyperscale (10K+ nodes), including capacity management and efficiency"
+    },
+    {
+     "id": "scheduler-design",
+     "level": "bonus",
+     "quote": "Depth in one or more of: Kubernetes internals (scheduler, autoscaler, kubelet, Karpenter), cluster orchestration systems (Mesos, Borg-like), or node provisioning pipelines"
+    },
+    {
+     "id": "virtualization",
+     "level": "bonus",
+     "quote": "Low-level systems experience: kernel, virtualization, device drivers, firmware, or hardware health/diagnostics daemons"
+    },
+    {
+     "id": "linux-admin",
+     "level": "bonus",
+     "quote": "Low-level systems experience: kernel, virtualization, device drivers, firmware, or hardware health/diagnostics daemons"
+    },
+    {
+     "id": "infiniband-roce",
+     "level": "bonus",
+     "quote": "Familiarity with high-performance networking (EFA, RDMA, InfiniBand) for distributed ML workloads."
+    }
+   ],
+   "responsibilities": [
+    "Own the roadmap for accelerator node lifecycle: ingestion, bring-up, health checking and automated repair",
+    "Build and scale AI clusters across multiple clouds and accelerator families (GPU, TPU, Trainium)",
+    "Design systems that detect, isolate and remediate unhealthy hardware to raise fleet MTBI and reduce stranded capacity",
+    "Shape compute strategy with cloud providers and internal research, inference and product teams",
+    "Run operational-excellence practices (incident response, postmortems, on-call) and mentor engineers"
+   ],
+   "notes": "Different role from the Anthropic London Cluster Infrastructure posting already in jobs.json. Salary printed: GBP 325,000-485,000. Hybrid: at least 25% in office. 7+ years appears only under preferred qualifications, so years_required is null. posted_on is Greenhouse first_published.",
+   "evidence": [
+    {
+     "claim": "Skill(s): distributed-systems (required), kubernetes (required), hyperscaler-cloud (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Deep expertise in distributed systems, reliability, and cloud platforms (e.g., Kubernetes, IaC, AWS/GCP/Azure)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): systems-lang (required), python (required), terraform-iac (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Strong proficiency in at least one systems language (e.g., Rust, Go, or Python), IaC proficiency with Terraform.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): non-nvidia-accelerators (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Hands-on experience with machine learning accelerators (GPUs, TPUs, or Trainium)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Design and operate the systems that detect, isolate, and remediate unhealthy hardware automatically, driving up fleet MTBI and minimizing stranded capacity",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): bare-metal-provisioning (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Own the technical strategy and roadmap for node lifecycle management - ingestion, bring-up, health checking, and automated repair",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): multicloud-skypilot (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Drive cross-team initiatives to build and scale AI clusters across multiple clouds and accelerator families",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Establish and evolve operational excellence practices (incident response, postmortem culture, on-call)",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): leadership-mgmt (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Track record of leading complex, multi-quarter technical initiatives that span multiple teams or systems",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Experience managing large scale compute infrastructure at hyperscale (10K+ nodes), including capacity management and efficiency",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): scheduler-design (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Depth in one or more of: Kubernetes internals (scheduler, autoscaler, kubelet, Karpenter), cluster orchestration systems (Mesos, Borg-like), or node provisioning pipelines",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): virtualization (bonus), linux-admin (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Low-level systems experience: kernel, virtualization, device drivers, firmware, or hardware health/diagnostics daemons",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): infiniband-roce (bonus)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211498008",
+     "quote": "Familiarity with high-performance networking (EFA, RDMA, InfiniBand) for distributed ML workloads.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "12/12"
+  },
+  {
+   "id": "gdm-tech-lead-gemini-inference-performance-london",
+   "company": "Google DeepMind",
+   "company_type": "ai-lab",
+   "title": "Tech Lead, Gemini Inference Performance, DeepMind",
+   "location": "London, UK",
+   "url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+   "source_url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+   "seniority": "manager",
+   "years_required": 8,
+   "region": "eu",
+   "company_origin": "us",
+   "role_family": "inference-platform",
+   "posted_on": null,
+   "language": "en",
+   "skills": [
+    {
+     "id": "leadership-mgmt",
+     "level": "required",
+     "quote": "5 years of experience in a people management, supervision/team leadership role."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Leverage roofline analysis, hardware-level profiling, and systems analysis to identify and eliminate performance bottlenecks"
+    },
+    {
+     "id": "inference-serving",
+     "level": "required",
+     "quote": "identify and eliminate performance bottlenecks across ML frameworks, compilers, custom kernels, and serving infrastructure on hardware accelerators."
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "analyze accelerator utilization, memory bandwidth saturation, and interconnect latency across large-scale topologies."
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "modeling how architectural choices impact latency, memory footprint, and serving costs."
+    }
+   ],
+   "responsibilities": [
+    "Set the technical roadmap for and manage a team of inference performance engineers",
+    "Find and remove bottlenecks across ML frameworks, compilers, custom kernels and serving infrastructure on accelerators",
+    "Optimise execution efficiency and memory footprint of Transformer and Mixture-of-Experts components",
+    "Model the latency, memory and serving-cost impact of architecture choices with research teams"
+   ],
+   "notes": "Google careers page, no posting date printed. Minimum qualifications are generic (8 years software, 5 years people management, 5 years technical leadership); the technical content is in the responsibilities. 'Hardware accelerators' is not named (TPU not stated), so non-nvidia-accelerators is not tagged. Google DeepMind is headquartered in London but is an Alphabet division, so company_origin 'us'.",
+   "evidence": [
+    {
+     "claim": "Skill(s): leadership-mgmt (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+     "quote": "5 years of experience in a people management, supervision/team leadership role.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+     "quote": "Leverage roofline analysis, hardware-level profiling, and systems analysis to identify and eliminate performance bottlenecks",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): inference-serving (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+     "quote": "identify and eliminate performance bottlenecks across ML frameworks, compilers, custom kernels, and serving infrastructure on hardware accelerators.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): networking-general (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+     "quote": "analyze accelerator utilization, memory bandwidth saturation, and interconnect latency across large-scale topologies.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): finops-cost (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/124901724409209542",
+     "quote": "modeling how architectural choices impact latency, memory footprint, and serving costs.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "5/5"
+  },
+  {
+   "id": "gdm-research-engineer-gemini-pretraining-london",
+   "company": "Google DeepMind",
+   "company_type": "ai-lab",
+   "title": "Research Engineer, Gemini Large Scale Pretraining, DeepMind",
+   "location": "London, UK (or Mountain View, CA, USA)",
+   "url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+   "source_url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+   "seniority": "ic",
+   "years_required": 2,
+   "region": "eu",
+   "company_origin": "us",
+   "role_family": "training-platform",
+   "posted_on": null,
+   "language": "en",
+   "skills": [
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "2 years of experience with software engineering involving Python-based ML/scientific libraries such as JAX"
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "required",
+     "quote": "1 year of experience with machine learning."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Respond to time-sensitive issues arising in large-scale training runs, and in ongoing research."
+    },
+    {
+     "id": "distributed-systems",
+     "level": "bonus",
+     "quote": "Experience with large-scale system design, distributed systems, or performance engineering."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "bonus",
+     "quote": "Experience with large-scale system design, distributed systems, or performance engineering."
+    },
+    {
+     "id": "data-pipelines",
+     "level": "required",
+     "quote": "a broad understanding of the tech stack, the model architecture and data pipeline."
+    }
+   ],
+   "responsibilities": [
+    "Build long-term engineering projects that enable new pretraining research",
+    "Respond to time-sensitive issues in large-scale Gemini training runs",
+    "Improve workflows and tooling used across pretraining",
+    "Help researchers with engineering problems across the codebase, tech stack, model architecture and data pipeline"
+   ],
+   "notes": "Google careers page, no posting date printed; the page lists London and Mountain View as the locations to choose from. Entry-level-friendly (2 years or OSS/internship). US salary band printed only. Research-engineering role inside the pretraining team, close to research; kept because it is about training-run operations and tooling. JAX is named but not distributed JAX, so pytorch-distributed is not tagged.",
+   "evidence": [
+    {
+     "claim": "Skill(s): python (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+     "quote": "2 years of experience with software engineering involving Python-based ML/scientific libraries such as JAX",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+     "quote": "1 year of experience with machine learning.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+     "quote": "Respond to time-sensitive issues arising in large-scale training runs, and in ongoing research.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (bonus), perf-profiling (bonus)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+     "quote": "Experience with large-scale system design, distributed systems, or performance engineering.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): data-pipelines (required)",
+     "url": "https://www.google.com/about/careers/applications/jobs/results/142611399284007622",
+     "quote": "a broad understanding of the tech stack, the model architecture and data pipeline.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "5/5"
+  },
+  {
+   "id": "deepl-staff-platform-engineer-hybrid-london",
+   "company": "DeepL",
+   "company_type": "startup",
+   "title": "Staff Platform Engineer",
+   "location": "London, United Kingdom (hybrid)",
+   "url": "https://jobs.ashbyhq.com/deepl/fb25de9d-3b6f-4c5f-8b33-41aba66ba997",
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+   "seniority": "staff",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "eu",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": "2026-10-22",
+   "language": "en",
+   "skills": [
+    {
+     "id": "kubernetes",
+     "level": "required",
+     "quote": "Deep, hands-on Kubernetes expertise: you have designed, built and operated clusters at scale, through their full lifecycle"
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "required",
+     "quote": "Depth at scale in either public cloud or on-prem infrastructure, plus the credibility to work in the other."
+    },
+    {
+     "id": "bare-metal-provisioning",
+     "level": "bonus",
+     "quote": "AWS experience is preferred, and bare-metal or data centre experience is strongly valued"
+    },
+    {
+     "id": "datacenter-facilities",
+     "level": "bonus",
+     "quote": "AWS experience is preferred, and bare-metal or data centre experience is strongly valued"
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "Networking and Linux depth you can debug with: you can follow a problem from a container through the host to the network edge"
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "Networking and Linux depth you can debug with: you can follow a problem from a container through the host to the network edge"
+    },
+    {
+     "id": "terraform-iac",
+     "level": "required",
+     "quote": "Infrastructure as code with Terraform or equivalent, and GitOps delivery with tooling such as ArgoCD, applied to environments you have owned in production"
+    },
+    {
+     "id": "ci-cd",
+     "level": "required",
+     "quote": "Infrastructure as code with Terraform or equivalent, and GitOps delivery with tooling such as ArgoCD, applied to environments you have owned in production"
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "Software engineering skills in at least one major language, Go or Python preferred, at the level of building tooling other engineers rely on"
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Software engineering skills in at least one major language, Go or Python preferred, at the level of building tooling other engineers rely on"
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Strong incident-management and reliability-engineering discipline, and the ownership mindset to build more resilient systems"
+    },
+    {
+     "id": "capacity-planning",
+     "level": "required",
+     "quote": "Take ownership of the reliability, capacity and cost efficiency of DeepL's compute infrastructure, CPU and GPU"
+    },
+    {
+     "id": "finops-cost",
+     "level": "required",
+     "quote": "Take ownership of the reliability, capacity and cost efficiency of DeepL's compute infrastructure, CPU and GPU"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "the on-prem clusters powering our research, including their hardware lifecycle"
+    },
+    {
+     "id": "security-compliance",
+     "level": "required",
+     "quote": "strengthen observability and security so the platform's behaviour is legible to the teams that depend on it"
+    },
+    {
+     "id": "logging-tracing",
+     "level": "required",
+     "quote": "strengthen observability and security so the platform's behaviour is legible to the teams that depend on it"
+    },
+    {
+     "id": "leadership-mgmt",
+     "level": "required",
+     "quote": "Mentor engineers across the infrastructure track and raise the technical bar of the group"
+    },
+    {
+     "id": "hpc-experience",
+     "level": "bonus",
+     "quote": "GPU infrastructure for training or inference at scale"
+    },
+    {
+     "id": "parallel-fs-storage",
+     "level": "bonus",
+     "quote": "Distributed storage systems in production, such as Ceph"
+    }
+   ],
+   "responsibilities": [
+    "Own reliability, capacity and cost efficiency of DeepL's hybrid CPU/GPU compute, including on-prem research GPU clusters and inference nodes",
+    "Design, build and operate production Kubernetes clusters across AWS and on-prem",
+    "Unify how workloads run across on-prem hardware and AWS and help research adopt cloud-native practices",
+    "Set infrastructure-as-code, observability and security standards and mentor engineers",
+    "Lead incident response for hybrid infrastructure and sustain the on-call rotation"
+   ],
+   "notes": "German company (Cologne HQ); posting is for London, hybrid two office days a week. Large on-prem GPU clusters for research plus hundreds of on-prem GPU inference nodes. GPU experience is only a bonus point. Posted date from Ashby publishedAt.",
+   "evidence": [
+    {
+     "claim": "Skill(s): kubernetes (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Deep, hands-on Kubernetes expertise: you have designed, built and operated clusters at scale, through their full lifecycle",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hyperscaler-cloud (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Depth at scale in either public cloud or on-prem infrastructure, plus the credibility to work in the other.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): bare-metal-provisioning (bonus), datacenter-facilities (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "AWS experience is preferred, and bare-metal or data centre experience is strongly valued",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required), networking-general (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Networking and Linux depth you can debug with: you can follow a problem from a container through the host to the network edge",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): terraform-iac (required), ci-cd (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Infrastructure as code with Terraform or equivalent, and GitOps delivery with tooling such as ArgoCD, applied to environments you have owned in production",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): systems-lang (required), python (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Software engineering skills in at least one major language, Go or Python preferred, at the level of building tooling other engineers rely on",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Strong incident-management and reliability-engineering discipline, and the ownership mindset to build more resilient systems",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (required), finops-cost (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Take ownership of the reliability, capacity and cost efficiency of DeepL's compute infrastructure, CPU and GPU",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "the on-prem clusters powering our research, including their hardware lifecycle",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): security-compliance (required), logging-tracing (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "strengthen observability and security so the platform's behaviour is legible to the teams that depend on it",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): leadership-mgmt (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Mentor engineers across the infrastructure track and raise the technical bar of the group",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "GPU infrastructure for training or inference at scale",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): parallel-fs-storage (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/deepl",
+     "quote": "Distributed storage systems in production, such as Ceph",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "13/13"
+  },
+  {
+   "id": "microsoft-ai-reliability-engineer-hpc-london",
+   "company": "Microsoft (Microsoft AI)",
+   "company_type": "big-tech",
+   "title": "AI Reliability Engineer, HPC",
+   "location": "London, England, United Kingdom",
+   "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+   "source_url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+   "seniority": "senior",
+   "years_required": 4,
+   "region": "eu",
+   "company_origin": "us",
+   "role_family": "gpu-cluster-ops",
+   "posted_on": null,
+   "language": "en",
+   "skills": [
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "required",
+     "quote": "Ensure uptime, resiliency, and fault tolerance of HPC clusters powering MAI model training and inference."
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "Ensure uptime, resiliency, and fault tolerance of HPC clusters powering MAI model training and inference."
+    },
+    {
+     "id": "logging-tracing",
+     "level": "required",
+     "quote": "Design and maintain monitoring, alerting, and logging systems to provide real-time visibility into all aspects of HPC systems including GPU, clusters, storage and networking."
+    },
+    {
+     "id": "dcgm-gpu-monitoring",
+     "level": "required",
+     "quote": "Design and maintain monitoring, alerting, and logging systems to provide real-time visibility into all aspects of HPC systems including GPU, clusters, storage and networking."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Lead on-call rotations, troubleshoot production issues, conduct blameless postmortems, and drive continuous improvements."
+    },
+    {
+     "id": "security-compliance",
+     "level": "required",
+     "quote": "Ensure data privacy, compliance, and secure operations across model training and serving environments."
+    },
+    {
+     "id": "kubernetes",
+     "level": "bonus",
+     "quote": "Experience with Kubernetes, Docker, container orchestration, and CI/CD pipelines for ML training or inference workloads."
+    },
+    {
+     "id": "containers",
+     "level": "bonus",
+     "quote": "Experience with Kubernetes, Docker, container orchestration, and CI/CD pipelines for ML training or inference workloads."
+    },
+    {
+     "id": "ci-cd",
+     "level": "bonus",
+     "quote": "Experience with Kubernetes, Docker, container orchestration, and CI/CD pipelines for ML training or inference workloads."
+    },
+    {
+     "id": "hyperscaler-cloud",
+     "level": "bonus",
+     "quote": "Experience with public cloud platforms such as Azure, AWS, or GCP, including infrastructure-as-code."
+    },
+    {
+     "id": "terraform-iac",
+     "level": "bonus",
+     "quote": "Experience with public cloud platforms such as Azure, AWS, or GCP, including infrastructure-as-code."
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "bonus",
+     "quote": "Experience with monitoring and observability tools such as Grafana, Datadog, or OpenTelemetry."
+    },
+    {
+     "id": "python",
+     "level": "bonus",
+     "quote": "Programming or scripting experience in Python, Go, or Bash."
+    },
+    {
+     "id": "systems-lang",
+     "level": "bonus",
+     "quote": "Programming or scripting experience in Python, Go, or Bash."
+    },
+    {
+     "id": "distributed-systems",
+     "level": "bonus",
+     "quote": "Experience with distributed systems, networking, storage, and high-performance computing (HPC)."
+    },
+    {
+     "id": "networking-general",
+     "level": "bonus",
+     "quote": "Experience with distributed systems, networking, storage, and high-performance computing (HPC)."
+    },
+    {
+     "id": "slurm",
+     "level": "bonus",
+     "quote": "Experience operating GPU clusters and workload schedulers for ML/AI workloads."
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "Experience with ML training or inference pipelines."
+    },
+    {
+     "id": "capacity-planning",
+     "level": "bonus",
+     "quote": "Experience with capacity planning and cost optimization for GPU-based infrastructure."
+    },
+    {
+     "id": "finops-cost",
+     "level": "bonus",
+     "quote": "Experience with capacity planning and cost optimization for GPU-based infrastructure."
+    }
+   ],
+   "responsibilities": [
+    "Keep the HPC clusters behind Microsoft AI (MAI) training and inference available, resilient and fault tolerant",
+    "Design monitoring, alerting and logging covering GPUs, clusters, storage and networking",
+    "Automate deployments, incident response, scaling and failover across CPU+GPU environments",
+    "Lead on-call, troubleshoot production issues and run blameless postmortems",
+    "Ensure privacy, compliance and secure operations across training and serving environments"
+   ],
+   "notes": "Microsoft AI (MAI) HPC infrastructure team in London, read through the LinkedIn guest API ('2 weeks ago', so posted_on null). Level IC5; UK base pay GBP 93,500-161,800 printed. Four office days a week expected. Required qualification is only a degree plus 4+ years SRE/DevOps/infrastructure; every technical item is listed as preferred. 'Workload schedulers' is generic (Slurm not named) and tagged slurm as bonus. Same role is also posted under the 'Microsoft AI' LinkedIn page (ID 4477153622).",
+   "evidence": [
+    {
+     "claim": "Skill(s): checkpoint-fault-tolerance (required), hpc-experience (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Ensure uptime, resiliency, and fault tolerance of HPC clusters powering MAI model training and inference.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): logging-tracing (required), dcgm-gpu-monitoring (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Design and maintain monitoring, alerting, and logging systems to provide real-time visibility into all aspects of HPC systems including GPU, clusters, storage and networking.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Lead on-call rotations, troubleshoot production issues, conduct blameless postmortems, and drive continuous improvements.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): security-compliance (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Ensure data privacy, compliance, and secure operations across model training and serving environments.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (bonus), containers (bonus), ci-cd (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience with Kubernetes, Docker, container orchestration, and CI/CD pipelines for ML training or inference workloads.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hyperscaler-cloud (bonus), terraform-iac (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience with public cloud platforms such as Azure, AWS, or GCP, including infrastructure-as-code.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience with monitoring and observability tools such as Grafana, Datadog, or OpenTelemetry.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): python (bonus), systems-lang (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Programming or scripting experience in Python, Go, or Bash.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (bonus), networking-general (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience with distributed systems, networking, storage, and high-performance computing (HPC).",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): slurm (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience operating GPU clusters and workload schedulers for ML/AI workloads.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience with ML training or inference pipelines.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): capacity-planning (bonus), finops-cost (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477685315",
+     "quote": "Experience with capacity planning and cost optimization for GPU-based infrastructure.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "12/12"
+  },
+  {
+   "id": "microsoft-ai-senior-network-production-engineer-london",
+   "company": "Microsoft (Microsoft AI)",
+   "company_type": "big-tech",
+   "title": "Senior Network Production Engineer, AI Supercomputing",
+   "location": "London, England, United Kingdom",
+   "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+   "source_url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+   "seniority": "senior",
+   "years_required": null,
+   "region": "eu",
+   "company_origin": "us",
+   "role_family": "network",
+   "posted_on": null,
+   "language": "en",
+   "skills": [
+    {
+     "id": "infiniband-roce",
+     "level": "required",
+     "quote": "Deep understanding of Ethernet, RDMA, RoCEv2, congestion control, routing, load balancing, and lossless or near-lossless network design."
+    },
+    {
+     "id": "networking-general",
+     "level": "required",
+     "quote": "Deep understanding of Ethernet, RDMA, RoCEv2, congestion control, routing, load balancing, and lossless or near-lossless network design."
+    },
+    {
+     "id": "hpc-experience",
+     "level": "required",
+     "quote": "Significant experience operating large-scale datacenter or high-performance computing networks in production."
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "Establish network qualification gates for admitting nodes and racks into large training pools."
+    },
+    {
+     "id": "linux-admin",
+     "level": "required",
+     "quote": "Strong Linux systems knowledge and proficiency in Python, Go, C++, or another systems-oriented programming language."
+    },
+    {
+     "id": "python",
+     "level": "required",
+     "quote": "Strong Linux systems knowledge and proficiency in Python, Go, C++, or another systems-oriented programming language."
+    },
+    {
+     "id": "systems-lang",
+     "level": "required",
+     "quote": "Strong Linux systems knowledge and proficiency in Python, Go, C++, or another systems-oriented programming language."
+    },
+    {
+     "id": "sre-oncall",
+     "level": "required",
+     "quote": "Willingness to participate in a global 24/7 on-call rotation."
+    },
+    {
+     "id": "logging-tracing",
+     "level": "required",
+     "quote": "Experience building monitoring, automation, diagnostic, or remediation systems for production infrastructure."
+    },
+    {
+     "id": "checkpoint-fault-tolerance",
+     "level": "required",
+     "quote": "Run failure-injection and resilience testing to validate behavior under link, NIC, switch, and path failures."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Work directly with training teams to investigate collective-performance degradation, stalls, timeouts, job restarts, and unexplained MFU loss."
+    },
+    {
+     "id": "scheduler-design",
+     "level": "required",
+     "quote": "Improve placement and routing policies for jobs spanning racks, rows, and network planes."
+    },
+    {
+     "id": "procurement-vendor",
+     "level": "required",
+     "quote": "Lead technical investigations involving internal infrastructure teams, cloud and datacenter operators, Azure Networking, NVIDIA, switch and NIC teams, and network-software partners."
+    },
+    {
+     "id": "nccl-collectives",
+     "level": "bonus",
+     "quote": "Experience with NCCL, collective communications, CUDA, GPUDirect RDMA, and distributed training frameworks."
+    },
+    {
+     "id": "cuda-gpu",
+     "level": "bonus",
+     "quote": "Experience with NCCL, collective communications, CUDA, GPUDirect RDMA, and distributed training frameworks."
+    },
+    {
+     "id": "pytorch-distributed",
+     "level": "bonus",
+     "quote": "Experience with NCCL, collective communications, CUDA, GPUDirect RDMA, and distributed training frameworks."
+    },
+    {
+     "id": "kubernetes",
+     "level": "bonus",
+     "quote": "Familiarity with Kubernetes, Slurm, workload placement, and cluster-health certification."
+    },
+    {
+     "id": "slurm",
+     "level": "bonus",
+     "quote": "Familiarity with Kubernetes, Slurm, workload placement, and cluster-health certification."
+    },
+    {
+     "id": "prometheus-grafana",
+     "level": "bonus",
+     "quote": "Experience with streaming telemetry, gNMI, Prometheus, Datadog, Kusto, eBPF, or equivalent observability systems."
+    },
+    {
+     "id": "ml-training-experience",
+     "level": "bonus",
+     "quote": "Experience operating GPU training clusters or other tightly coupled distributed-computing systems."
+    }
+   ],
+   "responsibilities": [
+    "Own availability and performance of the multi-rail RDMA Ethernet (MRC) backend network of Microsoft AI supercomputers",
+    "Define SLIs for packet loss, congestion, link health, tail latency and collective performance, and detect degraded components early",
+    "Diagnose failures across GPUs, NICs, switches, firmware, NCCL and Kubernetes, and automate mitigation (path avoidance, node quarantine)",
+    "Investigate collective-performance degradation and MFU loss with training teams; run failure-injection tests",
+    "Automate firmware/driver compliance, network qualification of new racks, and cross-company incident investigations with NVIDIA and Azure Networking"
+   ],
+   "notes": "Microsoft AI (MAI) London, read through the LinkedIn guest API ('2 weeks ago', so posted_on null). Level IC5; UK base pay GBP 93,500-161,800 printed. Global 24/7 on-call. Very explicit on goodput and 'network-attributed lost GPU hours' as success metrics. Also posted under the 'Microsoft AI' LinkedIn page (ID 4477155476).",
+   "evidence": [
+    {
+     "claim": "Skill(s): infiniband-roce (required), networking-general (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Deep understanding of Ethernet, RDMA, RoCEv2, congestion control, routing, load balancing, and lossless or near-lossless network design.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hpc-experience (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Significant experience operating large-scale datacenter or high-performance computing networks in production.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Establish network qualification gates for admitting nodes and racks into large training pools.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): linux-admin (required), python (required), systems-lang (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Strong Linux systems knowledge and proficiency in Python, Go, C++, or another systems-oriented programming language.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): sre-oncall (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Willingness to participate in a global 24/7 on-call rotation.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): logging-tracing (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Experience building monitoring, automation, diagnostic, or remediation systems for production infrastructure.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): checkpoint-fault-tolerance (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Run failure-injection and resilience testing to validate behavior under link, NIC, switch, and path failures.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Work directly with training teams to investigate collective-performance degradation, stalls, timeouts, job restarts, and unexplained MFU loss.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): scheduler-design (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Improve placement and routing policies for jobs spanning racks, rows, and network planes.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): procurement-vendor (required)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Lead technical investigations involving internal infrastructure teams, cloud and datacenter operators, Azure Networking, NVIDIA, switch and NIC teams, and network-software partners.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): nccl-collectives (bonus), cuda-gpu (bonus), pytorch-distributed (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Experience with NCCL, collective communications, CUDA, GPUDirect RDMA, and distributed training frameworks.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): kubernetes (bonus), slurm (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Familiarity with Kubernetes, Slurm, workload placement, and cluster-health certification.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): prometheus-grafana (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Experience with streaming telemetry, gNMI, Prometheus, Datadog, Kusto, eBPF, or equivalent observability systems.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): ml-training-experience (bonus)",
+     "url": "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/4477684327",
+     "quote": "Experience operating GPU training clusters or other tightly coupled distributed-computing systems.",
+     "source": "web",
+     "verified": true
+    }
+   ],
+   "evidence_verified": "14/14"
+  }
+ ],
+ "blocked_sources": [
+  "https://api.lever.co/v0/postings/mistral?mode=json — Mistral AI: Lever returns an empty list; Ashby (mistral, mistralai, mistral-ai) and Greenhouse (mistral, mistralai) tokens return HTTP 404. Mistral postings were read through the LinkedIn guest API (jobs-guest/jobs/api/jobPosting/<ID>), which prints relative dates only, so posted_on is null",
+  "https://apply.workable.com/api/v3/accounts/huggingface/jobs — Hugging Face: HTTP 429 Too Many Requests; Ashby and Greenhouse tokens 'huggingface' return 404; LinkedIn guest search (company filter, France/EU) only listed ML-engineer and open-source developer-tool roles, no compute-infrastructure posting, so Hugging Face is not represented",
+  "https://boards-api.greenhouse.io/v1/boards/<token>/jobs — HTTP 404 for blackforestlabs, wayve, deepmind, googledeepmind, synthesia, photoroom, alephalpha, owkin, deepl, poolside, kyutai; Black Forest Labs, Wayve, Synthesia, Photoroom, Aleph Alpha, Owkin, DeepL and Poolside answer on Ashby instead (black-forest-labs, wayve, synthesia, photoroom, alephalpha, owkin, deepl, poolside)",
+  "https://api.ashbyhq.com/posting-api/job-board/kyutai — Kyutai: HTTP 404 (also 'kyutai-labs' on Ashby and 'kyutai' on Greenhouse); no Kyutai posting read",
+  "https://www.google.com/about/careers/applications/jobs/results?q=... — Google careers search: job cards are not in the rendered text; job IDs were taken from the page's embedded data and the job page itself (/jobs/results/<id>) was read. Searches for Zurich returned no DeepMind compute-infrastructure role",
+  "https://api.ashbyhq.com/posting-api/job-board/poolside — Poolside 'Member of Engineering (Infrastructure)' (Remote EMEA) was read but excluded: it is a build/CI/CD developer-experience role (Bazel, Buildkite), not compute infrastructure; Poolside is also US-founded",
+  "https://api.ashbyhq.com/posting-api/job-board/photoroom — Photoroom 'Head of GenAI Platform' (Paris) was read but excluded: ML-organisation leadership that explicitly partners with the infrastructure team rather than owning compute or serving infrastructure",
+  "Meta (FAIR Paris/London), Apple Zurich, Microsoft Research Cambridge, OpenAI London: LinkedIn guest search cards for Meta in London/Paris showed Production Engineer and FAIR research roles only and were not read; Apple and Microsoft Research Cambridge were not searched; OpenAI's London infra titles on Ashby (ChatGPT Infrastructure, Cloud Infrastructure, Platform Systems, Network Engineer) were not read for lack of budget. Microsoft AI (MAI) London postings were used instead of Microsoft Research Cambridge"
+ ],
+ "verification": {
+  "status": "verified",
+  "checked_claims": 167,
+  "verified_quotes": 167,
+  "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
+ }
+}

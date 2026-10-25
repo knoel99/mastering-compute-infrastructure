@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -36,12 +36,29 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h1 class="title">Environnement de travail</h1>
 <p class="subtitle">Trois niveaux de machine, ce que chaque module exige, comment vérifier, comment ne pas se ruiner</p>
 </header>
-<h2 id="principe">Principe : commencer sans GPU</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#principe">1. Principe : commencer sans GPU</a>
+<ul>
+<li><a href="#niveaux">1.1. Les trois niveaux</a></li>
+</ul></li>
+<li><a href="#testee">2. Configuration testée</a></li>
+<li><a href="#install">3. Installation</a>
+<ul>
+<li><a href="#verifier">3.1. Vérifier l'installation</a></li>
+</ul></li>
+<li><a href="#exigences">4. Ce que chaque élément exige</a></li>
+<li><a href="#budget">5. Budget</a></li>
+<li><a href="#problemes">6. Problèmes fréquents</a></li>
+</ul>
+</section>
+<h2 id="principe">1. Principe : commencer sans GPU</h2>
 <p>Ce parcours se suit <strong>sans GPU</strong> pour tout ce qui est noté « vérifié » : les mécanismes d'infrastructure (ordonnancement, reprise après panne, mesure de passage à l'échelle, alertes) se travaillent sur des processeurs, et leurs pannes se reproduisent à la demande. Un GPU loué ne sert qu'aux <strong>extensions</strong> et à la validation finale d'hypothèses que ce site signale comme telles.</p>
 <div class="key">
 <p><span class="tag">Règle de budget</span> Ne louez rien avant d'avoir lu l'énoncé de l'extension et écrit ce que vous voulez mesurer. Une machine GPU allumée « pour voir » coûte plus cher qu'une heure de réflexion.</p>
 </div>
-<h3 id="niveaux">Les trois niveaux</h3>
+<h3 id="niveaux">1.1. Les trois niveaux</h3>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -81,7 +98,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Le niveau B est un choix de sécurité autant que de commodité : les scripts de Slurm écrivent dans <code>/etc/slurm</code>, créent des utilisateurs et démarrent des démons en <code>root</code>. <strong>Ne les lancez jamais</strong> sur une machine de travail ou de production. Le script <code>labs/slurm/slurm-sandbox/teardown.sh</code> défait l'installation (l'option <code>--purge-db</code> efface aussi la comptabilité) ; les deux autres labs Slurm s'appuient sur la même installation.</p>
-<h2 id="testee">Configuration testée</h2>
+<h2 id="testee">2. Configuration testée</h2>
 <p>Les « labs vérifiés » de ce site ont été exécutés dans la configuration suivante. Elle n'a rien d'exigeant : si la vôtre est comparable, vous devriez obtenir des résultats comparables, pas identiques.</p>
 <div class="tbl-wrap">
 <table>
@@ -124,7 +141,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Durées mesurées dans cette configuration, utiles pour planifier une séance : les trois labs Slurm vérifient en 36 s, 141 s et 52 s ; la vérification complète du projet 3 prend environ 1 min 15 s ; celle du projet 2, environ 40 s ; celle du projet 5, environ 6 s.</p>
-<h2 id="install">Installation</h2>
+<h2 id="install">3. Installation</h2>
 <p>Sous Ubuntu ou Debian. Ces commandes sont celles qui ont servi à préparer la configuration testée.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Niveau A : Python et outils de test</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt-get install <span class="at">-y</span> python3-venv python3-pip git</span>
@@ -138,11 +155,11 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> prometheus     <span class="co"># fournit promtool ; arrêtez le démon s&#39;il démarre</span></span></code></pre></div>
 <p>Le paquet <code>prometheus</code> peut démarrer un démon qui occupe le port 9090 ; les projets n'en ont pas besoin, seulement de <code>promtool</code>.</p>
 <p>Rien de tout cela n'est requis pour lire les pages : seuls les labs et les tests l'exigent.</p>
-<h3 id="verifier">Vérifier l'installation</h3>
+<h3 id="verifier">3.1. Vérifier l'installation</h3>
 <p>Le script <code>labs/check_env.sh</code> n'installe rien : il indique ce que la machine peut exécuter, niveau par niveau. L'option <code>--strict</code> fait échouer la commande si le niveau A est incomplet, ce qui sert dans une chaîne d'intégration continue.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span>~/mci-venv/bin/python <span class="fu">bash</span> labs/check_env.sh</span></code></pre></div>
 <p>Sur la configuration testée, il affiche pour le niveau A les versions de Python, de <code>torch</code>, <code>numpy</code>, <code>scipy</code>, <code>pytest</code> et <code>yaml</code>, puis pour le niveau B la présence de <code>sinfo</code>, <code>sbatch</code>, <code>sacctmgr</code>, <code>munge</code>, <code>mariadbd</code> et <code>promtool</code>. Sans GPU il écrit « none detected (fine: nothing is required) ».</p>
-<h2 id="exigences">Ce que chaque élément exige</h2>
+<h2 id="exigences">4. Ce que chaque élément exige</h2>
 <p>Tous les labs « vérifiés » tournent sans GPU. Le tableau liste, <strong>en plus</strong> de Python, NumPy, pytest et PyYAML, ce que demande chaque module ; la section « Labs » de chaque page donne les commandes exactes et les versions testées.</p>
 <div class="tbl-wrap">
 <table>
@@ -257,14 +274,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="budget">Budget</h2>
+<h2 id="budget">5. Budget</h2>
 <p>Cette page <strong>ne donne aucun prix</strong> : les tarifs des fournisseurs changent, varient selon la région et la disponibilité, et un chiffre recopié ici serait faux au moment où vous le lisez. La méthode, elle, ne change pas.</p>
 <p>Le coût d'une extension est le produit de trois quantités : la durée pendant laquelle la machine est allumée, le tarif horaire relevé <strong>le jour même</strong> sur la page de prix du fournisseur, et le nombre de machines. Ajoutez le stockage conservé après l'arrêt, souvent facturé séparément, et la sortie de données si vous en copiez. Pour borner la durée, partez des durées mesurées ci-dessus et multipliez par trois : vous perdrez du temps en configuration, pas en calcul.</p>
 <div class="war">
 <p><span class="tag">Trois protections avant la première machine louée</span> Premièrement, une alerte de budget chez le fournisseur, créée <strong>avant</strong> la première machine. Deuxièmement, un arrêt automatique ou un délai d'expiration sur chaque machine. Troisièmement, une étiquette commune sur tout ce que vous créez, pour tout retrouver et tout supprimer à la fin, volumes et adresses IP compris.</p>
 </div>
 <p>Les machines préemptibles ou « spot » coûtent moins cher en échange du droit pour le fournisseur de les reprendre à tout moment. C'est un excellent terrain d'entraînement pour le <a href="../projects/resilient-trainer/index.html">projet 3</a>, dont l'entraîneur reprend après une interruption brutale ; ce n'est pas un bon choix pour un lab que vous ne savez pas encore reprendre.</p>
-<h2 id="problemes">Problèmes fréquents</h2>
+<h2 id="problemes">6. Problèmes fréquents</h2>
 <ul>
 <li><strong>Un lab Slurm bloque sur « InvalidAccount ».</strong> La comptabilité n'est pas démarrée : <code>slurmdbd</code> ou MariaDB est arrêté. Relancez <code>setup.sh</code>, qui est idempotent.</li>
 <li><strong>Un lab Slurm échoue après un arrêt brutal de la machine.</strong> L'état de la base peut être incohérent : lancez <code>teardown.sh --purge-db</code> puis <code>setup.sh</code>.</li>

@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,108 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 09 · Phase 3 · 36 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable (CPU, gloo, sans GPU)</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Panorama : données, tenseurs, pipeline, experts, séquence</a>
+<ul>
+<li><a href="#pourquoi-découper-un-entraînement">1.1. Pourquoi découper un entraînement</a></li>
+<li><a href="#les-cinq-dimensions">1.2. Les cinq dimensions</a></li>
+<li><a href="#la-grille">1.3. La grille</a></li>
+<li><a href="#les-collectives-dont-vous-aurez-besoin">1.4. Les collectives dont vous aurez besoin</a></li>
+</ul></li>
+<li><a href="#ch2">2. DDP : seaux, recouvrement, torchrun et erreurs classiques</a>
+<ul>
+<li><a href="#ce-que-fait-ddp">2.1. Ce que fait DDP</a></li>
+<li><a href="#seaux-et-recouvrement">2.2. Seaux et recouvrement</a></li>
+<li><a href="#torchrun-et-le-rendez-vous">2.3. torchrun et le rendez-vous</a></li>
+<li><a href="#erreurs-classiques">2.4. Erreurs classiques</a></li>
+<li><a href="#accumuler-des-gradients">2.5. Accumuler des gradients</a></li>
+</ul></li>
+<li><a href="#ch3">3. Mémoire d'un entraînement : ZeRO, FSDP et activations</a>
+<ul>
+<li><a href="#les-quatre-postes">3.1. Les quatre postes</a></li>
+<li><a href="#zero-partitionner-les-états">3.2. ZeRO : partitionner les états</a></li>
+<li><a href="#fsdp-et-fully_shard">3.3. FSDP et <code>fully_shard</code></a></li>
+<li><a href="#les-activations">3.4. Les activations</a></li>
+</ul></li>
+<li><a href="#ch4">4. Tenseur, séquence, pipeline et experts</a>
+<ul>
+<li><a href="#parallélisme-tensoriel">4.1. Parallélisme tensoriel</a></li>
+<li><a href="#parallélisme-de-séquence-et-de-contexte">4.2. Parallélisme de séquence et de contexte</a></li>
+<li><a href="#parallélisme-de-pipeline">4.3. Parallélisme de pipeline</a></li>
+<li><a href="#parallélisme-dexperts">4.4. Parallélisme d'experts</a></li>
+</ul></li>
+<li><a href="#ch5">5. Choisir et dimensionner une disposition</a>
+<ul>
+<li><a href="#une-procédure-en-quatre-temps">5.1. Une procédure en quatre temps</a></li>
+<li><a href="#placer-les-dimensions-sur-la-topologie">5.2. Placer les dimensions sur la topologie</a></li>
+<li><a href="#le-planificateur-et-ce-quil-ne-voit-pas">5.3. Le planificateur et ce qu'il ne voit pas</a></li>
+<li><a href="#le-lot-global-comme-contrainte">5.4. Le lot global comme contrainte</a></li>
+<li><a href="#une-table-de-décision">5.5. Une table de décision</a></li>
+</ul></li>
+<li><a href="#ch6">6. Le MFU en pratique : mesurer, expliquer l'écart, agir</a>
+<ul>
+<li><a href="#mesurer-correctement">6.1. Mesurer correctement</a></li>
+<li><a href="#décomposer-lécart">6.2. Décomposer l'écart</a></li>
+<li><a href="#les-leviers">6.3. Les leviers</a></li>
+<li><a href="#du-mfu-au-rendement-utile">6.4. Du MFU au rendement utile</a></li>
+</ul></li>
+<li><a href="#ch7">7. Numérique et déterminisme</a>
+<ul>
+<li><a href="#les-formats-et-ce-quils-perdent">7.1. Les formats et ce qu'ils perdent</a></li>
+<li><a href="#pourquoi-un-run-distribué-nest-pas-bit-identique">7.2. Pourquoi un run distribué n'est pas bit-identique</a></li>
+<li><a href="#normes-de-gradient-pics-de-perte-et-nan">7.3. Normes de gradient, pics de perte et NaN</a></li>
+<li><a href="#la-reproductibilité-et-ses-limites">7.4. La reproductibilité et ses limites</a></li>
+<li><a href="#bug-de-distribution-ou-instabilité-numérique">7.5. Bug de distribution ou instabilité numérique ?</a></li>
+</ul></li>
+<li><a href="#ch8">8. Déboguer le distribué : hangs, désaccords et divergences</a>
+<ul>
+<li><a href="#cinq-familles-de-symptômes">8.1. Cinq familles de symptômes</a></li>
+<li><a href="#une-procédure-en-cinq-temps">8.2. Une procédure en cinq temps</a></li>
+<li><a href="#les-outils">8.3. Les outils</a></li>
+<li><a href="#deux-bugs-cinq-outils">8.4. Deux bugs, cinq outils</a></li>
+<li><a href="#un-entraînement-qui-diverge-dun-run-mono-processus">8.5. Un entraînement qui diverge d'un run mono-processus</a></li>
+</ul></li>
+<li><a href="#ch9">9. L'écosystème : lire les configurations de Megatron-LM, DeepSpeed, TorchTitan et des surcouches</a>
+<ul>
+<li><a href="#megatron-lm-et-megatron-core">9.1. Megatron-LM et Megatron Core</a></li>
+<li><a href="#deepspeed">9.2. DeepSpeed</a></li>
+<li><a href="#torchtitan">9.3. TorchTitan</a></li>
+<li><a href="#accelerate-et-lightning">9.4. Accelerate et Lightning</a></li>
+<li><a href="#lire-une-configuration-en-sept-questions">9.5. Lire une configuration en sept questions</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-9-1">Lab 9.1 — DDP à quatre processus sur CPU</a></li>
+<li><a href="#lab-9-2">Lab 9.2 — FSDP : mesurer la mémoire par rang</a></li>
+<li><a href="#lab-9-3">Lab 9.3 — Reproduire et diagnostiquer un hang</a></li>
+<li><a href="#lab-9-4">Lab 9.4 — Un planificateur de parallélisme testé</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> un modèle de langage ne tient plus sur un GPU, ou l'entraîner sur un seul prendrait des années. Comment le découper sur des dizaines ou des milliers de GPU, quelle part du temps part en communication, et comment savoir qu'un découpage est bon ? Un ingénieur d'infrastructure qui ne sait pas répondre dépend des chercheurs pour dire si son cluster est bien utilisé.</p>
 <p>Ce module donne un vocabulaire (données, tenseur, pipeline, experts, séquence), des formules de mémoire et de communication que vous refaites vous-même, un outil de calcul testé, et une méthode pour déboguer ce qui se passe quand plusieurs processus doivent rester d'accord. Les labs tournent sur CPU avec le backend <code>gloo</code> : la <strong>méthode</strong> est celle d'un cluster, pas les débits.</p>
@@ -85,8 +187,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../perf-models/index.html">Module 2 — Architecture et modèles de performance</a>, <a href="../gpu-programming/index.html">Module 4 — Programmation GPU</a>, <a href="../networking/index.html">Module 7 — Réseaux haute performance</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : aucune expérience d'entraînement multi-nœuds dans le profil</td>
+<td>Pour qui</td>
+<td>Cœur : DDP, FSDP, parallélisme tensoriel et pipeline ; survol possible si vous entraînez déjà sur plusieurs nœuds, en gardant les chapitres de diagnostic et de mémoire.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -113,6 +215,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Décomposer l'écart entre un MFU mesuré et un MFU attendu, et choisir le levier le plus rentable (chapitre 6).</li>
 <li>Séparer un bug de distribution d'une instabilité numérique, et dire ce qu'on peut exiger de la reproductibilité (chapitre 7).</li>
 <li>Localiser un hang par une procédure reproductible et lire la configuration de Megatron-LM, DeepSpeed ou TorchTitan (chapitres 8 et 9, lab 9.3).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 3 — Systèmes d'entraînement distribué</strong> (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.</li>
+<li><strong>S'appuie sur</strong> : <a href="../perf-models/index.html">module 2 — Architecture matérielle et modèles de performance</a>, <a href="../gpu-programming/index.html">module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a>.</li>
+<li><strong>Prépare</strong> : <a href="../fault-tolerance/index.html">module 10 — Pannes, checkpointing et reprise automatique</a>, <a href="../ray-rl-infra/index.html">module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>, <a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Douze séances de 3 h, soit 36 h. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé ; il ne diminue jamais. Les durées entre parenthèses sont celles de la lecture, des labs et des exercices : leur somme vaut 14 h, 13 h et 9 h.</p>
@@ -222,7 +332,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Le calcul de la mémoire et du trafic par stratégie de parallélisme sert ensuite au dimensionnement (modules 7, 13 et 15).</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, lisez les chapitres 5 et 8, faites les exercices ★★★ et passez au module 10.</p>
 <ol type="1">
 <li><p><strong>Tient-il sur un GPU ?</strong> Un modèle de 7 milliards de paramètres est entraîné en précision mixte BF16 avec Adam. Tient-il sur un GPU de 80 Go ? Justifiez par un calcul.</p></li>
@@ -1423,8 +1582,8 @@ findings:
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch <span class="at">--index-url</span> https://download.pytorch.org/whl/cpu</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install numpy pytest</span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="bu">command</span> <span class="at">-v</span> python<span class="va">)</span><span class="st">&quot;</span> <span class="va">OMP_NUM_THREADS</span><span class="op">=</span>1 <span class="va">GLOO_SOCKET_IFNAME</span><span class="op">=</span>lo</span></code></pre></div>
+<h3 id="lab-9-1">Lab 9.1 — DDP à quatre processus sur CPU</h3>
 <div class="lab">
-<p><span class="tag">Lab 9.1 — DDP à quatre processus sur CPU</span></p>
 <p><strong>Objectif.</strong> Entraîner un MLP avec DDP sur quatre processus, prouver l'équivalence avec un processus seul à l'arrondi près, prédire les seaux, mesurer la communication, reproduire et corriger deux erreurs classiques. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h). <strong>Prérequis matériels.</strong> Un portable à 4 cœurs et 2 Go libres, sans GPU.</p>
 <p><em>Partie A.</em></p>
 <ol type="1">
@@ -1444,8 +1603,8 @@ findings:
 <p>Sont exigés : écart des paramètres inférieur à 1e-5 ; deux exécutions de DDP identiques bit à bit ; seaux prédits égaux aux seaux journalisés ; <code>1 + (étapes - 1) × seaux</code> appels ; écart du découpage inégal supérieur à 1e-4 ; erreur de paramètre inutilisé reproduite (code 1) puis corrigée (code 0). Les temps affichés ne sont jamais assertés.</p>
 <p><strong>Pour aller plus loin.</strong> Essayez <code>--optim adamw --lr 0.003</code> (écart de l'ordre de 1e-6). Sur un nœud à GPU : <code>nccl</code>, <code>device_ids=[local_rank]</code> et <code>Avg backward comm/comp overlap time</code> sous <code>TORCH_DISTRIBUTED_DEBUG=DETAIL</code> (documenté, <strong>non exécuté ici</strong>).</p>
 </div>
+<h3 id="lab-9-2">Lab 9.2 — FSDP : mesurer la mémoire par rang</h3>
 <div class="lab">
-<p><span class="tag">Lab 9.2 — FSDP : mesurer la mémoire par rang</span></p>
 <p><strong>Objectif.</strong> Mesurer ce que chaque rang détient sous DDP et sous FSDP2, le comparer à une prédiction écrite à partir des formes des tenseurs, et montrer que FSDP2 et DDP calculent la même chose. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h). <strong>Prérequis matériels.</strong> Quatre cœurs, 3 Go libres, PyTorch 2.6 ou plus pour <code>fully_shard</code>.</p>
 <p><em>Partie A.</em></p>
 <ol type="1">
@@ -1465,8 +1624,8 @@ findings:
 <p>Sont exigés : octets de paramètres, de gradients et d'états <strong>exactement égaux</strong> à la prédiction sur chaque rang ; rapport DDP sur FSDP entre 3,9 et 4 ; paramètres égaux à 1e-5 près après trois étapes ; norme de gradient égale à 1e-3 près (relatif) ; pic de mémoire résidente de DDP supérieur d'au moins 15 % à celui de FSDP2.</p>
 <p><strong>Pour aller plus loin.</strong> Mesurez le pic en passe arrière avec <code>torch.profiler</code> en mode mémoire. Sur GPU, ajoutez <code>MixedPrecisionPolicy(param_dtype=torch.bfloat16, reduce_dtype=torch.float32)</code> (<strong>non testé ici</strong>).</p>
 </div>
+<h3 id="lab-9-3">Lab 9.3 — Reproduire et diagnostiquer un hang</h3>
 <div class="lab">
-<p><span class="tag">Lab 9.3 — Reproduire et diagnostiquer un hang</span></p>
 <p><strong>Objectif.</strong> Reproduire deux blocages, un rang qui saute une collective et un rang bloqué hors des collectives, et les localiser avec le délai, <code>TORCH_DISTRIBUTED_DEBUG</code>, <code>monitored_barrier</code>, un journal des collectives et les piles Python. <strong>Durée.</strong> 3 h (partie A : 1,5 h, partie B : 1,5 h). <strong>Prérequis matériels.</strong> Quatre cœurs presque inactifs (les rangs attendent), sans GPU. Le journal est un <strong>analogue écrit pour ce lab</strong> du <em>flight recorder</em> NCCL, qui n'existe pas pour <code>gloo</code> : le README du lab distingue le réel du simulé.</p>
 <p><em>Partie A : le rang qui saute.</em></p>
 <ol type="1">
@@ -1486,8 +1645,8 @@ findings:
 <p>Sont exigés : progression apparente jusqu'à l'étape 8 puis expiration (<code>skip</code>) ; <code>Detected mismatch between collectives on ranks</code> avec <code>OpType=BARRIER</code> sous <code>DETAIL</code> ; première divergence à la séquence 4 avec le rang 2 sur l'étape 5 ; trois rangs en attente dans la séquence 4, le rang 2 sans collective en cours et sa pile hors de <code>all_reduce</code>, par le délai comme par <code>kill -USR1</code> (<code>stuck</code>) ; <code>Rank 2 failed to pass monitoredBarrier</code> ; programme corrigé en code 0. Aucune durée n'est assertée.</p>
 <p><strong>Pour aller plus loin.</strong> Sur GPU : <code>TORCH_NCCL_TRACE_BUFFER_SIZE=2000 TORCH_NCCL_DUMP_ON_TIMEOUT=true</code>, puis <code>torchfrtrace &lt;répertoire&gt;</code> (<strong>documenté, non exécuté ici</strong>). Ajoutez un bug où un rang fait une étape de moins et vérifiez que l'analyseur le nomme.</p>
 </div>
+<h3 id="lab-9-4">Lab 9.4 — Un planificateur de parallélisme testé</h3>
 <div class="lab">
-<p><span class="tag">Lab 9.4 — Un planificateur de parallélisme testé</span></p>
 <p><strong>Objectif.</strong> Écrire un calculateur de mémoire et de communication à partir des formules de ZeRO, de Korthikanti et al. et de Megatron-LM, le valider contre les figures des articles, l'appliquer à un job de 70 milliards de paramètres, puis le confronter à un vrai parallélisme tensoriel et à <code>DeviceMesh</code>. <strong>Durée.</strong> 4 h (partie A : 2 h, partie B : 2 h). <strong>Prérequis matériels.</strong> Un portable ; PyTorch CPU pour <code>mesh_check.py</code> et <code>tp_mlp_check.py</code>.</p>
 <p><em>Partie A : la mémoire.</em></p>
 <ol type="1">
@@ -1771,10 +1930,16 @@ findings:
 <li>Documentation des outils, lue le 25 octobre 2026 : <a href="https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/parallelism-guide.html">Megatron Core</a>, <a href="https://www.deepspeed.ai/tutorials/zero/">DeepSpeed ZeRO</a> et <a href="https://www.deepspeed.ai/docs/config-json/">configuration</a>, <a href="https://raw.githubusercontent.com/pytorch/torchtitan/main/README.md">TorchTitan</a>, <a href="https://huggingface.co/docs/accelerate/usage_guides/fsdp">Accelerate</a>, <a href="https://lightning.ai/docs/pytorch/stable/advanced/model_parallel/fsdp.html">Lightning</a> : noms de paramètres, identités de configuration (chapitre 9).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Relus le 25 octobre 2026 : la documentation de PyTorch 2.14 (torchrun, DDP et ses notes, <code>fully_shard</code>, <code>torch.distributed</code>, reproductibilité, tutoriel du flight recorder) ; les articles Megatron-LM (sections 2 et 3, tableau 1), ZeRO (figure 1, section 7), FSDP, Korthikanti et al. (tableaux 2 et 4, équation 5), Llama 3 (tableau 4, sections 3.3.2 à 3.3.4), PaLM, Chen et al., GPipe ; le Playbook et <em>How to Scale Your Model</em> ; les documentations de Megatron Core, DeepSpeed, TorchTitan, Accelerate et Lightning. Le comportement des seaux de DDP à la première itération vient du <strong>code source</strong> de PyTorch 2.14.1 installé. Tous les calculs ont été refaits en Python. Les mesures viennent d'une VM de 4 vCPU (PyTorch 2.14.1 CPU, Python 3.13) ; les quatre <code>verify.sh</code> ont été exécutés au moins deux fois.</p>
-<p><strong>Recommandé.</strong> L'ordre des chapitres, la quatrième étape « mesurer », la marge de 10 % de mémoire, le seuil de 3 % de l'exercice 10, la règle « la décision de sauter un pas doit être collective » et les exercices sont des choix de ce parcours. Les bandes passantes de 400 et 25 Go/s et le MFU de 40 % des exemples sont des <strong>hypothèses</strong> d'école, jamais des mesures.</p>
-<p><strong>À vérifier.</strong> (1) Rien n'a été exécuté sur GPU ni avec NCCL : commandes du flight recorder, recouvrement réel de DDP et de FSDP2, MFU mesuré sont documentés, pas observés ici. (2) <code>_get_ddp_logging_data()</code> est une API privée, et <code>TORCH_DISTRIBUTED_DEBUG=DETAIL</code> avec DDP sur <code>gloo</code> CPU a planté avec PyTorch 2.14.1 : observation de l'auteur, non investiguée, non signalée en amont. (3) Les surcoûts de recalcul (7 % et 39 %) viennent d'<strong>une</strong> mesure de Korthikanti et al. ; l'approximation de <span class="math inline">12h^2</span> paramètres par couche est classique mais non sourcée ici. (4) Le tableau du guide de Megatron Core contredit sa propre formule pour DeepSeek-V3 ; la correspondance entre <code>--use-distributed-optimizer</code> et ZeRO-1 n'est pas vérifiée. (5) Les formats de configuration de TorchTitan changent vite (le fichier TOML essayé renvoie une erreur 404). (6) Les seuils du Playbook viennent d'expériences sur H100 ; sa page est rendue par JavaScript, nous avons lu sa version statique. (7) Aucun outil du chapitre 9 n'est installé : les fichiers de <code>configs/</code> sont analysés, jamais exécutés.</p>
-<p><strong>Hors périmètre.</strong> La programmation des noyaux (module 4), le réglage de NCCL et la topologie réseau (module 7), la tolérance aux pannes et le checkpointing distribué (module 10), l'apprentissage par renforcement et Ray (module 11), le parallélisme pour l'inférence, le détail du FP8, ZeRO-Infinity et le déchargement vers CPU ou NVMe, le routage des modèles à experts, les ordonnancements de pipeline sans bulle, l'attention en anneau et <code>torch.compile</code>.</p>
+<h3 id="documente">Documenté</h3>
+<p>Relus le 25 octobre 2026 : la documentation de PyTorch 2.14 (torchrun, DDP et ses notes, <code>fully_shard</code>, <code>torch.distributed</code>, reproductibilité, tutoriel du flight recorder) ; les articles Megatron-LM (sections 2 et 3, tableau 1), ZeRO (figure 1, section 7), FSDP, Korthikanti et al. (tableaux 2 et 4, équation 5), Llama 3 (tableau 4, sections 3.3.2 à 3.3.4), PaLM, Chen et al., GPipe ; le Playbook et <em>How to Scale Your Model</em> ; les documentations de Megatron Core, DeepSpeed, TorchTitan, Accelerate et Lightning. Le comportement des seaux de DDP à la première itération vient du <strong>code source</strong> de PyTorch 2.14.1 installé. Tous les calculs ont été refaits en Python. Les mesures viennent d'une VM de 4 vCPU (PyTorch 2.14.1 CPU, Python 3.13) ; les quatre <code>verify.sh</code> ont été exécutés au moins deux fois.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>L'ordre des chapitres, la quatrième étape « mesurer », la marge de 10 % de mémoire, le seuil de 3 % de l'exercice 10, la règle « la décision de sauter un pas doit être collective » et les exercices sont des choix de ce parcours. Les bandes passantes de 400 et 25 Go/s et le MFU de 40 % des exemples sont des <strong>hypothèses</strong> d'école, jamais des mesures.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<ol type="1">
+<li>Rien n'a été exécuté sur GPU ni avec NCCL : commandes du flight recorder, recouvrement réel de DDP et de FSDP2, MFU mesuré sont documentés, pas observés ici. (2) <code>_get_ddp_logging_data()</code> est une API privée, et <code>TORCH_DISTRIBUTED_DEBUG=DETAIL</code> avec DDP sur <code>gloo</code> CPU a planté avec PyTorch 2.14.1 : observation de l'auteur, non investiguée, non signalée en amont. (3) Les surcoûts de recalcul (7 % et 39 %) viennent d'<strong>une</strong> mesure de Korthikanti et al. ; l'approximation de <span class="math inline">12h^2</span> paramètres par couche est classique mais non sourcée ici. (4) Le tableau du guide de Megatron Core contredit sa propre formule pour DeepSeek-V3 ; la correspondance entre <code>--use-distributed-optimizer</code> et ZeRO-1 n'est pas vérifiée. (5) Les formats de configuration de TorchTitan changent vite (le fichier TOML essayé renvoie une erreur 404). (6) Les seuils du Playbook viennent d'expériences sur H100 ; sa page est rendue par JavaScript, nous avons lu sa version statique. (7) Aucun outil du chapitre 9 n'est installé : les fichiers de <code>configs/</code> sont analysés, jamais exécutés.</li>
+</ol>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>La programmation des noyaux (module 4), le réglage de NCCL et la topologie réseau (module 7), la tolérance aux pannes et le checkpointing distribué (module 10), l'apprentissage par renforcement et Ray (module 11), le parallélisme pour l'inférence, le détail du FP8, ZeRO-Infinity et le déchargement vers CPU ou NVMe, le routage des modèles à experts, les ordonnancements de pipeline sans bulle, l'attention en anneau et <code>torch.compile</code>.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/storage/index.html"><span class="k">← Précédent</span>Module 08 — Stockage et E/S pour l'entraînement</a><a class="next" href="../../courses/fault-tolerance/index.html"><span class="k">Suivant →</span>Module 10 — Pannes, checkpointing et reprise automatique</a></nav>
 </main>

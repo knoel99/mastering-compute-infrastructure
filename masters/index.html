@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -34,27 +34,41 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="crumb"><a href="../index.html">Accueil</a></p>
 <header id="title-block-header">
 <h1 class="title">Enquête sur les masters HPC</h1>
-<p class="subtitle">36 programmes en France, aux États-Unis, en Chine et dans le monde, comparés à 12 offres d'emploi</p>
+<p class="subtitle">36 programmes en France, aux États-Unis, en Chine et dans le monde, comparés à 96 offres d'emploi</p>
 </header>
-<h2 id="resume">Résumé</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#resume">1. Résumé</a></li>
+<li><a href="#methode">2. Méthode et limites</a></li>
+<li><a href="#echantillon">3. Ce que l'échantillon couvre</a></li>
+<li><a href="#enseigne">4. Ce que les masters enseignent</a></li>
+<li><a href="#demande">5. Ce que demandent les offres</a></li>
+<li><a href="#proches">6. Les programmes les plus proches du métier</a></li>
+<li><a href="#implications">7. Ce que cela change pour le parcours</a></li>
+<li><a href="#voies">8. Autres voies d'apprentissage</a></li>
+<li><a href="#sources">9. Sources et portée</a></li>
+</ul>
+</section>
+<h2 id="resume">1. Résumé</h2>
 <ul>
 <li><strong>Les masters forment des programmeurs de calcul parallèle et de simulation, pas des opérateurs de plateformes.</strong> MPI, GPU, architecture et numérique y ont souvent un cours dédié ; l'ordonnancement, le réseau d'interconnexion, la résilience et l'observabilité presque jamais.</li>
-<li><strong>L'écart se chiffre.</strong> Un cours dédié à l'interconnexion existe dans 1 programme sur 21 dont le syllabus est connu, alors que 7 offres sur 12 demandent InfiniBand ou RoCE. L'ordonnancement : 1 programme sur 8 contre 5 offres sur 12 pour Slurm.</li>
+<li><strong>L'écart se chiffre.</strong> Un cours dédié à l'interconnexion existe dans 1 programme sur 21 dont le syllabus est connu, alors que 41 offres sur 96 demandent InfiniBand ou RoCE. L'ordonnancement : 1 programme sur 8 contre 21 offres sur 96 pour Slurm et 50 offres sur 96 pour Kubernetes.</li>
 <li><strong>Les programmes qui s'en approchent sont rares et orientés exploitation</strong> : le diplôme d'administration de systèmes HPC du C-DAC (Inde), le master HPC de l'ICTP-SISSA (Italie) et certaines spécialisations d'EUMaster4HPC.</li>
 <li><strong>En France, un réseau de masters dédiés</strong> (CHPS) donne une base solide en parallélisme ; <strong>aux États-Unis, le HPC vit dans des cours</strong> plus que dans des diplômes ; <strong>en Chine, il vit dans des centres de supercalcul et des compétitions</strong> plus que dans les maquettes de master.</li>
 <li><strong>Conséquence pour le parcours</strong> : MPI, GPU et performance sont des fondations communes, que les masters enseignent bien ; l'essentiel de l'effort va aux sujets que les masters traitent peu et que les offres demandent.</li>
 </ul>
-<h2 id="methode">Méthode et limites</h2>
-<p>L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; <strong>un contrôle mécanique a vérifié mot pour mot 592 citations sur 593</strong> (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier <code>data/</code> du dépôt.</p>
+<h2 id="methode">2. Méthode et limites</h2>
+<p>L'enquête repose sur des pages officielles de programmes et de catalogues de cours, lues le 22 octobre 2026, et sur des offres d'emploi publiques. Pour chaque programme, un outil a relevé la durée, les crédits, la structure, les cours et leur couverture de 26 thèmes. Chaque fait porte une citation de la page source ; <strong>un contrôle mécanique a vérifié mot pour mot 1437 citations sur 1438</strong> (programmes, offres d'emploi et ressources) dans le texte des pages. Le détail des données est dans le dossier <code>data/</code> du dépôt.</p>
 <p>Cinq limites à garder en tête.</p>
 <ul>
 <li><strong>Échantillon non exhaustif.</strong> Plusieurs programmes notables n'ont pas été étudiés faute de budget de recherche : en Europe, TUM, FAU, Stuttgart, RWTH, USI et Cambridge ; en France, Sorbonne et Ensimag ; à l'international, Tsukuba, KAIST et NUS (aucun programme lisible trouvé pour ces trois derniers).</li>
 <li><strong>Inconnu n'est pas absent.</strong> Quand un syllabus n'était pas lisible, le thème est marqué <em>inconnu</em>. Les proportions ci-dessous sont calculées sur les seuls programmes dont la valeur est connue, et leur effectif est toujours indiqué.</li>
 <li><strong>Un cours dédié n'est pas un cours bien fait.</strong> Le critère « cours dédié » signifie qu'un intitulé de cours ou de module nomme le thème ; il ne dit rien de la qualité ni de la profondeur.</li>
-<li><strong>Peu d'offres d'emploi.</strong> Douze offres, dont six chez des fournisseurs de GPU, trois dans des laboratoires d'IA, une dans un centre HPC et deux d'une start-up de robotique (anonymisées). Les années d'expérience demandées vont de 3 à 15, médiane de 8, sur les sept offres qui en donnent.</li>
+<li><strong>Les offres d'emploi ont leur propre page.</strong> 96 offres publiques des États-Unis, d'Europe et de Chine sont analysées dans <a href="../market/index.html">Ce que demande le marché</a> ; cette page n'en reprend que les compétences qui correspondent à un thème de master.</li>
 <li><strong>Des informations changent.</strong> Les programmes évoluent chaque année : consultez la page officielle avant toute décision.</li>
 </ul>
-<h2 id="echantillon">Ce que l'échantillon couvre</h2>
+<h2 id="echantillon">3. Ce que l'échantillon couvre</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -94,7 +108,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Chaque zone a sa page, avec les fiches détaillées : <a href="france/index.html">France</a>, <a href="usa/index.html">États-Unis</a>, <a href="china/index.html">Chine</a>, <a href="world/index.html">reste du monde</a>.</p>
-<h2 id="enseigne">Ce que les masters enseignent</h2>
+<h2 id="enseigne">4. Ce que les masters enseignent</h2>
 <p>Le graphique montre, pour chaque thème, le nombre de programmes dont un cours ou un module <strong>dédié</strong> nomme le thème, sur les programmes dont la couverture est connue (le dénominateur varie donc d'un thème à l'autre).</p>
 <div class="bars" role="list">
 <div class="bar" role="listitem">
@@ -182,8 +196,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>L'<strong>exploitation</strong> est à peine représentée : administration de clusters (3 sur 10), stockage (4 sur 15), conteneurs et Kubernetes (5 sur 13).</li>
 <li>Quatre thèmes d'exploitation n'ont <strong>presque aucun cours dédié</strong> : ordonnancement (1 sur 8), interconnexion (1 sur 21), résilience (0 sur 12) et observabilité (0 sur 4, dont le syllabus n'est connu que pour quatre programmes).</li>
 </ul>
-<h2 id="demande">Ce que demandent les offres</h2>
-<p>Sur les douze offres de postes d'infrastructure de calcul relevées, voici les compétences les plus citées, mises en regard du nombre de programmes qui leur consacrent un cours.</p>
+<h2 id="demande">5. Ce que demandent les offres</h2>
+<p>Sur les 96 offres de postes d'infrastructure de calcul relevées (détail dans <a href="../market/index.html">Ce que demande le marché</a>), voici les compétences les plus citées, mises en regard du nombre de programmes qui leur consacrent un cours.</p>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -202,135 +216,99 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </thead>
 <tbody>
 <tr class="odd">
-<td>Kubernetes</td>
-<td>10 sur 12 (8 exigées)</td>
-<td>Conteneurs, Kubernetes</td>
-<td>5 sur 13</td>
+<td>Administration Linux</td>
+<td>54 sur 96 (50 exigées)</td>
+<td>Administration de clusters</td>
+<td>3 sur 10</td>
 </tr>
 <tr class="even">
 <td>Astreinte, fiabilité (SRE)</td>
-<td>9 sur 12 (9 exigées)</td>
+<td>52 sur 96 (49 exigées)</td>
 <td>Supervision, observabilité, SRE</td>
 <td>0 sur 4</td>
 </tr>
 <tr class="odd">
+<td>Kubernetes</td>
+<td>50 sur 96 (37 exigées)</td>
+<td>Conteneurs, Kubernetes</td>
+<td>5 sur 13</td>
+</tr>
+<tr class="even">
 <td>Expérience HPC</td>
-<td>8 sur 12 (6 exigées)</td>
+<td>49 sur 96 (29 exigées)</td>
 <td>Passage de messages (MPI)</td>
 <td>10 sur 21</td>
 </tr>
+<tr class="odd">
+<td>Expérience d'entraînement ML</td>
+<td>44 sur 96 (27 exigées)</td>
+<td>Systèmes pour l'IA (entraînement distribué)</td>
+<td>3 sur 14</td>
+</tr>
 <tr class="even">
 <td>InfiniBand / RoCE</td>
-<td>7 sur 12 (4 exigées)</td>
+<td>41 sur 96 (26 exigées)</td>
 <td>Réseaux et interconnexions</td>
 <td>1 sur 21</td>
 </tr>
 <tr class="odd">
-<td>Administration Linux</td>
-<td>7 sur 12 (7 exigées)</td>
+<td>Prometheus / Grafana</td>
+<td>35 sur 96 (25 exigées)</td>
+<td>Supervision, observabilité, SRE</td>
+<td>0 sur 4</td>
+</tr>
+<tr class="even">
+<td>Stockage parallèle</td>
+<td>29 sur 96 (18 exigées)</td>
+<td>Stockage et E/S parallèles</td>
+<td>4 sur 15</td>
+</tr>
+<tr class="odd">
+<td>Provisioning bare-metal</td>
+<td>28 sur 96 (20 exigées)</td>
 <td>Administration de clusters</td>
 <td>3 sur 10</td>
 </tr>
 <tr class="even">
 <td>Planification de capacité</td>
-<td>6 sur 12 (6 exigées)</td>
-<td>Cloud et multi-fournisseurs</td>
-<td>11 sur 19</td>
-</tr>
-<tr class="odd">
-<td>Provisioning bare-metal</td>
-<td>5 sur 12 (4 exigées)</td>
-<td>Administration de clusters</td>
-<td>3 sur 10</td>
-</tr>
-<tr class="even">
-<td>Prometheus / Grafana</td>
-<td>5 sur 12 (4 exigées)</td>
-<td>Supervision, observabilité, SRE</td>
-<td>0 sur 4</td>
-</tr>
-<tr class="odd">
-<td>Conception d'ordonnanceur</td>
-<td>5 sur 12 (4 exigées)</td>
-<td>Ordonnancement de jobs</td>
-<td>1 sur 8</td>
-</tr>
-<tr class="even">
-<td>Slurm</td>
-<td>5 sur 12 (2 exigées)</td>
-<td>Ordonnancement de jobs</td>
-<td>1 sur 8</td>
-</tr>
-<tr class="odd">
-<td>Checkpoint, tolérance aux pannes</td>
-<td>4 sur 12 (3 exigées)</td>
-<td>Résilience, checkpointing</td>
-<td>0 sur 12</td>
-</tr>
-<tr class="even">
-<td>DCGM / supervision GPU</td>
-<td>4 sur 12 (4 exigées)</td>
-<td>Supervision, observabilité, SRE</td>
-<td>0 sur 4</td>
-</tr>
-<tr class="odd">
-<td>Expérience d'entraînement ML</td>
-<td>4 sur 12 (3 exigées)</td>
-<td>Systèmes pour l'IA (entraînement distribué)</td>
-<td>3 sur 14</td>
-</tr>
-<tr class="even">
-<td>NCCL / collectives</td>
-<td>4 sur 12 (2 exigées)</td>
-<td>Systèmes pour l'IA (entraînement distribué)</td>
-<td>3 sur 14</td>
-</tr>
-<tr class="odd">
-<td>PyTorch distribué</td>
-<td>4 sur 12 (2 exigées)</td>
-<td>Systèmes pour l'IA (entraînement distribué)</td>
-<td>3 sur 14</td>
-</tr>
-<tr class="even">
-<td>Terraform / IaC</td>
-<td>4 sur 12 (3 exigées)</td>
+<td>27 sur 96 (22 exigées)</td>
 <td>Cloud et multi-fournisseurs</td>
 <td>11 sur 19</td>
 </tr>
 <tr class="odd">
 <td>Conteneurs</td>
-<td>3 sur 12 (2 exigées)</td>
+<td>26 sur 96 (17 exigées)</td>
 <td>Conteneurs, Kubernetes</td>
 <td>5 sur 13</td>
 </tr>
 <tr class="even">
 <td>Cloud hyperscaler</td>
-<td>3 sur 12 (2 exigées)</td>
+<td>26 sur 96 (18 exigées)</td>
 <td>Cloud et multi-fournisseurs</td>
 <td>11 sur 19</td>
 </tr>
 <tr class="odd">
-<td>Multi-cloud (SkyPilot)</td>
-<td>3 sur 12 (2 exigées)</td>
-<td>Cloud et multi-fournisseurs</td>
-<td>11 sur 19</td>
-</tr>
-<tr class="even">
-<td>Infra d'apprentissage par renforcement</td>
-<td>3 sur 12 (1 exigées)</td>
+<td>NCCL / collectives</td>
+<td>25 sur 96 (15 exigées)</td>
 <td>Systèmes pour l'IA (entraînement distribué)</td>
 <td>3 sur 14</td>
+</tr>
+<tr class="even">
+<td>Terraform / IaC</td>
+<td>25 sur 96 (16 exigées)</td>
+<td>Cloud et multi-fournisseurs</td>
+<td>11 sur 19</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Les nombres sont à lire comme des ordres de grandeur sur de petits échantillons. Trois constats tiennent néanmoins :</p>
+<p>Les nombres de programmes sont petits : lisez-les comme des ordres de grandeur. Trois constats tiennent néanmoins :</p>
 <ul>
-<li><strong>Kubernetes</strong> est la compétence la plus citée (10 offres sur 12, dont 8 l'exigent), loin devant Slurm (5 sur 12, dont 2 l'exigent). Les offres lues viennent beaucoup de fournisseurs de GPU, où l'infrastructure ressemble à celle du cloud.</li>
-<li><strong>L'astreinte et la fiabilité</strong> figurent dans 9 offres sur 12, toutes en exigence, alors que l'observabilité n'a aucun cours dédié dans les programmes dont le contenu est connu.</li>
-<li><strong>La planification de capacité</strong> est exigée par 6 offres sur 12. Elle relève d'un métier que les masters n'enseignent pas : les thèmes de cloud qu'ils proposent portent sur la technique, pas sur l'achat ni la prévision.</li>
+<li><strong>Kubernetes</strong> est cité par 50 offres sur 96 (dont 37 l'exigent), loin devant Slurm (21 offres sur 96, dont 12 l'exigent), que demandent surtout les centres HPC. Les masters, eux, n'enseignent presque ni l'un ni l'autre.</li>
+<li><strong>L'astreinte et la fiabilité</strong> figurent dans 52 offres sur 96 (dont 49 en exigence), alors que l'observabilité n'a aucun cours dédié dans les programmes dont le contenu est connu.</li>
+<li><strong>La planification de capacité</strong> est citée par 27 offres sur 96. Elle relève d'un métier que les masters n'enseignent pas : les thèmes de cloud qu'ils proposent portent sur la technique, pas sur l'achat ni la prévision.</li>
 </ul>
-<h2 id="proches">Les programmes les plus proches du métier</h2>
+<h2 id="proches">6. Les programmes les plus proches du métier</h2>
 <p>Aucun programme ne couvre à lui seul le métier. Quatre s'en rapprochent par leur contenu d'exploitation :</p>
 <ul>
 <li><strong><a href="world/index.html#in-cdac-pg-dhpcsa">C-DAC, diplôme d'administration de systèmes HPC</a></strong> (Inde) : 900 heures sur 24 semaines, avec Slurm et PBS Pro, Lustre et BeeGFS, InfiniBand, supervision, étalonnage (HPL, HPCG), conception de centre de données, Docker et Kubernetes. C'est le seul programme de l'échantillon à avoir un cours dédié à l'ordonnancement et à l'interconnexion.</li>
@@ -338,7 +316,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="world/index.html#eu-eumaster4hpc">EUMaster4HPC</a></strong> (consortium européen) : une seconde année avec les spécialisations « développement et support de systèmes » et « architecte de systèmes ».</li>
 <li><strong><a href="france/index.html#fr-saclay-dipac">Master DiPaC de Paris-Saclay</a></strong> (France, en anglais) : ordonnancement et équilibrage de charge sur clusters et clouds, génie logiciel HPC, programmation GPU.</li>
 </ul>
-<h2 id="implications">Ce que cela change pour le parcours</h2>
+<h2 id="implications">7. Ce que cela change pour le parcours</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -355,29 +333,29 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </thead>
 <tbody>
 <tr class="odd">
-<td>Interconnexion : 1 programme sur 21, 7 offres sur 12</td>
+<td>Interconnexion : 1 programme sur 21, 41 offres sur 96</td>
 <td>Module 7</td>
 <td>module long (28 h) et labs de dimensionnement</td>
 </tr>
 <tr class="even">
-<td>Ordonnancement : 1 programme sur 8, 5 offres sur 12</td>
+<td>Ordonnancement : 1 programme sur 8 ; Slurm 21 offres sur 96</td>
 <td>Module 5</td>
 <td>32 h, labs sur un vrai Slurm</td>
 </tr>
 <tr class="odd">
-<td>Résilience : 0 sur 12, 4 offres sur 12</td>
+<td>Résilience : 0 sur 12, 19 offres sur 96</td>
 <td>Modules 9 et 10</td>
 <td>28 h et un projet dédié</td>
 </tr>
 <tr class="even">
-<td>Observabilité et astreinte : 0 sur 4, 9 offres sur 12</td>
+<td>Observabilité et astreinte : 0 sur 4, 52 offres sur 96</td>
 <td>Modules 14 et 16</td>
 <td>24 h, plus les pratiques de production</td>
 </tr>
 <tr class="odd">
-<td>Kubernetes : 5 sur 13, 10 offres sur 12</td>
+<td>Kubernetes : 5 sur 13, 50 offres sur 96</td>
 <td>Module 12</td>
-<td>28 h, en s'appuyant sur l'expérience existante</td>
+<td>28 h, centrés sur les GPU, les files d'attente et le placement</td>
 </tr>
 <tr class="even">
 <td>MPI : 10 sur 21 ; GPU : 12 sur 21</td>
@@ -385,7 +363,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>fondations communes, volume standard</td>
 </tr>
 <tr class="odd">
-<td>Capacité et achats : 6 offres sur 12</td>
+<td>Capacité et achats : 27 offres sur 96</td>
 <td>Module 15</td>
 <td>24 h, avec l'énergie et les contrats</td>
 </tr>
@@ -398,20 +376,20 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>L'enquête <strong>confirme</strong> le plan initial plutôt qu'elle ne le modifie : <strong>les modules les plus longs du parcours portent sur les thèmes que les masters traitent le moins</strong>, à savoir l'ordonnancement, le réseau, le stockage (phase 2) et la résilience (phase 3).</p>
-<h2 id="voies">Autres voies d'apprentissage</h2>
+<h2 id="voies">8. Autres voies d'apprentissage</h2>
 <p>Les diplômes ne sont pas la seule voie. L'enquête a recensé des ressources de pratique, détaillées sur les pages de zone :</p>
 <ul>
 <li><strong>Les compétitions de clusters étudiants</strong> : le Student Cluster Competition de la conférence SC, l'ASC Student Supercomputer Challenge en Chine, les équipes qui participent à l'ISC (l'équipe de l'EPCC, issue de ses masters, en fait partie). Elles donnent accès à de vraies machines et à une exploitation sous contrainte.</li>
 <li><strong>Les centres de calcul et leurs formations</strong> : la documentation de Jean Zay (IDRIS), les catalogues de formation de l'IDRIS, du NERSC, du réseau CHPS, le certificat HPC de SciNet à Toronto.</li>
 <li><strong>Les cours ouverts</strong> : Stanford CS149 et CS336, CMU 15-418, Deep Learning Systems et Machine Learning Systems, Berkeley CS267 ; voir la page <a href="../resources/index.html">Ressources</a>.</li>
 </ul>
-<h2 id="sources">Sources et portée</h2>
+<h2 id="sources">9. Sources et portée</h2>
 <p><strong>Documenté.</strong> Les fiches par programme, avec leurs sources, sont sur les pages de zone ; les chiffres de cette page sont calculés par <code>tools/synthesize_research.py</code> à partir des fichiers du dossier <code>data/</code>, sans intervention d'un modèle.</p>
 <p><strong>Recommandé.</strong> Le regroupement par thèmes de la taxonomie et la lecture des proportions sont des jugements de ce parcours. La correspondance entre une compétence demandée et un thème de master est approximative.</p>
 <p><strong>À vérifier.</strong> Les programmes changent chaque année, les offres expirent, et la couverture de plusieurs programmes reste inconnue : traitez les proportions comme des ordres de grandeur.</p>
 <p><strong>Hors périmètre.</strong> Le classement des programmes par qualité, les frais d'inscription et les modalités d'admission.</p>
 <nav class="pager" aria-label="Navigation">
-<a class="prev" href="../profile/index.html"><span class="k">← Précédent</span>Point de départ</a><a class="next" href="../masters/france/index.html"><span class="k">Suivant →</span>Masters en France</a></nav>
+<a class="prev" href="../market/index.html"><span class="k">← Précédent</span>Ce que demande le marché</a><a class="next" href="../masters/france/index.html"><span class="k">Suivant →</span>Masters en France</a></nav>
 </main>
 </div>
 <footer class="foot">

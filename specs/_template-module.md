@@ -29,7 +29,7 @@ labs:
 | Volume | 24 h |
 | Niveau d'entrée | 1 |
 | Prérequis | aucun |
-| Statut pour le lecteur de référence | cœur |
+| Pour qui | (généré par tools/gen_module_parts.py) |
 | Livrable | … |
 | Environnement | portable CPU suffisant ; GPU optionnel |
 | Projets liés | … |
@@ -38,13 +38,23 @@ labs:
 
 -   …
 
+<!-- gen:place -->
+(généré par tools/gen_module_parts.py)
+<!-- /gen:place -->
+
 ### Plan de séances {#seances}
 
 | Séance | Durée | Niveau | Contenu | Pratique |
 |---|---|---|---|---|
 | 1 | 3 h | 1 | ch. 1 … | Ex. 1, 2 |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+(généré par tools/gen_module_parts.py)
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 1.  Question de positionnement 1.
 
@@ -68,8 +78,9 @@ Points clés — chapitre 1
 
 ## Labs {#labs}
 
+### Lab 1.1 — Titre {#lab-1-1}
+
 ::: lab
-[Lab 1.1 — Titre]{.tag}
 
 **Objectif.** … **Durée.** … **Prérequis matériels.** …
 
@@ -100,4 +111,18 @@ Corrigé.
 
 ## Sources et portée {#sources}
 
-**Documenté.** … **Recommandé.** … **À vérifier.** … **Hors périmètre.** …
+### Documenté {#documente}
+
+…
+
+### Recommandé {#recommande}
+
+…
+
+### À vérifier {#a-verifier}
+
+…
+
+### Hors périmètre {#hors-perimetre}
+
+…

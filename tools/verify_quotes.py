@@ -81,7 +81,10 @@ def main(argv):
             n += m
             ok += o
             if write and m and "confidence" in owner:
-                owner["confidence"] = conf(o / m)
+                c = conf(o / m)
+                if c == "high" and any(e.get("source") == "memory" for e in evs):
+                    c = "medium"   # memory-sourced evidence never supports high confidence (validate_research.py)
+                owner["confidence"] = c
             if write and m:
                 owner["evidence_verified"] = f"{o}/{m}"
         tot += n

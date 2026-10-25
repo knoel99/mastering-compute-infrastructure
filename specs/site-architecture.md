@@ -7,7 +7,8 @@ Site statique servi par **GitHub Pages directement depuis la branche** (`.nojeky
 ```
 index.md / index.html          accueil : parcours, arbre des modules, projets, masters, ressources
 assets/paper.css, theme.js     style (dérivé de LLGA : contraste ≥ 7:1, clair/sombre, mobile, sommaire latéral)
-profile/                       cible du parcours et écart avec CAREER.md (lecteur de référence)
+profile/                       point de départ : profils d'entrée, autodiagnostic, cible du métier
+market/                        analyse des offres d'emploi (US, Europe, Chine) et couverture par le parcours
 path/                          feuille de route : phases, semaines, jalons
 masters/                       enquête sur les masters HPC (synthèse, France, USA, Chine, monde, ressources)
 courses/<id>/index.md|html     un module = une longue page (specs/module-contract.md)

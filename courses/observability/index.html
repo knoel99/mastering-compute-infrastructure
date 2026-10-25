@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,96 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 14 · Phase 4 · 24 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable (sans GPU)</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Ce qu'on observe</a>
+<ul>
+<li><a href="#cinq-couches-une-clé-de-corrélation">1.1. Cinq couches, une clé de corrélation</a></li>
+<li><a href="#métriques-journaux-traces">1.2. Métriques, journaux, traces</a></li>
+<li><a href="#le-piège-de-la-moyenne">1.3. Le piège de la moyenne</a></li>
+<li><a href="#la-résolution-du-temps">1.4. La résolution du temps</a></li>
+</ul></li>
+<li><a href="#ch2">2. Métriques GPU : DCGM et dcgm-exporter</a>
+<ul>
+<li><a href="#dcgm-et-son-exportateur">2.1. DCGM et son exportateur</a></li>
+<li><a href="#les-familles-de-métriques">2.2. Les familles de métriques</a></li>
+<li><a href="#ce-que-lutilisation-gpu-ne-dit-pas">2.3. Ce que l'utilisation GPU ne dit pas</a></li>
+<li><a href="#lire-un-scrape">2.4. Lire un scrape</a></li>
+</ul></li>
+<li><a href="#ch3">3. Prometheus et Grafana pour le calcul</a>
+<ul>
+<li><a href="#dimensionner-avant-de-déployer">3.1. Dimensionner avant de déployer</a></li>
+<li><a href="#la-cardinalité-et-le-piège-de-létiquette-job">3.2. La cardinalité et le piège de l'étiquette <code>job</code></a></li>
+<li><a href="#règles-denregistrement">3.3. Règles d'enregistrement</a></li>
+<li><a href="#ce-qui-change-avec-des-jobs-éphémères">3.4. Ce qui change avec des jobs éphémères</a></li>
+</ul></li>
+<li><a href="#ch4">4. Journaux et traces</a>
+<ul>
+<li><a href="#ce-quon-journalise-et-comment-on-lindexe">4.1. Ce qu'on journalise, et comment on l'indexe</a></li>
+<li><a href="#localiser-un-rang-fautif">4.2. Localiser un rang fautif</a></li>
+<li><a href="#les-traces">4.3. Les traces</a></li>
+</ul></li>
+<li><a href="#ch5">5. Observabilité des ordonnanceurs</a>
+<ul>
+<li><a href="#les-questions-de-la-file">5.1. Les questions de la file</a></li>
+<li><a href="#exporter-slurm">5.2. Exporter Slurm</a></li>
+<li><a href="#pourquoi-un-job-attend">5.3. Pourquoi un job attend</a></li>
+<li><a href="#le-délai-dattente-et-ses-seaux">5.4. Le délai d'attente et ses seaux</a></li>
+<li><a href="#kubernetes-mêmes-questions-autres-métriques">5.5. Kubernetes : mêmes questions, autres métriques</a></li>
+</ul></li>
+<li><a href="#ch6">6. SLO de plateforme et goodput</a>
+<ul>
+<li><a href="#sli-slo-et-budget-derreur">6.1. SLI, SLO et budget d'erreur</a></li>
+<li><a href="#trois-sli-pour-une-plateforme-gpu">6.2. Trois SLI pour une plateforme GPU</a></li>
+<li><a href="#des-alertes-qui-réveillent-pour-de-bonnes-raisons">6.3. Des alertes qui réveillent pour de bonnes raisons</a></li>
+<li><a href="#le-goodput">6.4. Le goodput</a></li>
+</ul></li>
+<li><a href="#ch7">7. Détecter les pannes silencieuses</a>
+<ul>
+<li><a href="#une-typologie">7.1. Une typologie</a></li>
+<li><a href="#les-blocages-progrès-pas-activité">7.2. Les blocages : progrès, pas activité</a></li>
+<li><a href="#les-traînards-mesurer-le-calcul-pas-létape">7.3. Les traînards : mesurer le calcul, pas l'étape</a></li>
+<li><a href="#les-dérives-de-débit">7.4. Les dérives de débit</a></li>
+<li><a href="#tests-de-santé-continus">7.5. Tests de santé continus</a></li>
+</ul></li>
+<li><a href="#ch8">8. Suivi d'expériences et reproductibilité</a>
+<ul>
+<li><a href="#ce-quun-run-doit-enregistrer">8.1. Ce qu'un run doit enregistrer</a></li>
+<li><a href="#mlflow-en-pratique">8.2. MLflow, en pratique</a></li>
+<li><a href="#système-ou-modèle">8.3. Système ou modèle ?</a></li>
+<li><a href="#reproductibilité-viser-la-bonne-cible">8.4. Reproductibilité : viser la bonne cible</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-14-1">Lab 14.1 — Un exportateur de métriques de nœud testé</a></li>
+<li><a href="#lab-14-2">Lab 14.2 — Règles d'alerte testées avec promtool</a></li>
+<li><a href="#lab-14-3">Lab 14.3 — Détecteur de job bloqué</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> votre job de 512 GPU n'avance plus depuis vingt minutes, et personne ne le sait. Combien de temps faudra-t-il pour s'en apercevoir, pour trouver le rang fautif et pour relancer l'entraînement ? Sans observabilité, la réponse honnête est « jusqu'à ce qu'un chercheur se plaigne ». Avec elle, elle se compte en minutes.</p>
 <p>Ce module apprend à instrumenter une flotte GPU, à définir ce qu'on promet à ses utilisateurs (des objectifs de niveau de service, ou <em>SLO</em>), à détecter les pannes <strong>silencieuses</strong> et à relier une régression de courbe à sa cause, qu'elle vienne du matériel ou du modèle. Vous connaissez déjà Prometheus, Grafana et Terraform : ce module ne les réexplique pas. Il traite ce qui change quand la charge est un entraînement distribué synchrone sur du matériel qui tombe en panne sans bruit.</p>
@@ -86,8 +176,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../linux-systems/index.html">Module 1 — Linux, systèmes et diagnostic</a>, <a href="../slurm/index.html">Module 5 — Slurm</a></td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : l'outillage Prometheus est acquis, la sémantique GPU, la détection de blocages et les SLO de calcul ne le sont pas</td>
+<td>Pour qui</td>
+<td>Cœur : sémantique des métriques GPU, détection des blocages et objectifs de service (SLO) du calcul ; si vous maîtrisez déjà Prometheus, concentrez-vous sur ces trois points.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -113,6 +203,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Calculer un budget d'erreur, écrire une alerte à fenêtres multiples et la tester (chapitre 6).</li>
 <li>Mesurer le compromis entre fausses alarmes et délai de détection d'un blocage (chapitre 7).</li>
 <li>Distinguer, avec des métriques jointes dans MLflow, une régression du système d'une régression du modèle (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
+<li><strong>S'appuie sur</strong> : <a href="../linux-systems/index.html">module 1 — Linux, systèmes et diagnostic de performance</a>, <a href="../slurm/index.html">module 5 — Slurm et exploitation d'un cluster HPC</a>.</li>
+<li><strong>Prépare</strong> : <a href="../platform-leadership/index.html">module 16 — Plateforme interne, sécurité, production et leadership</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/homelab-slurm/index.html">Projet 1 — Mini-cluster Slurm instrumenté</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et détection de pannes silencieuses</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Dix séances, soit 24 h. Le niveau ne diminue jamais d'une séance à la suivante.</p>
@@ -208,7 +306,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>survol guidé</td>
+<td>les questions de positionnement, les chapitres signalés ci-dessous, un lab et le checkpoint</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Les pannes silencieuses des GPU et les SLO de calcul sont nouveaux même pour une équipe d'observabilité expérimentée.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module 15.</p>
 <ol type="1">
 <li><p><strong>Utilisation.</strong> Un GPU affiche 100 % d'utilisation (<code>GPU_UTIL</code>). Que pouvez-vous en conclure sur son travail utile ?</p></li>
@@ -904,8 +1051,8 @@ lrbug    tokens/s +0.0%  loss gap at equal step +2.413  slowest clock +0.0%  CUS
 </div>
 <h2 id="labs">Labs</h2>
 <p>Les trois labs s'exécutent sans GPU dans une VM Linux (testés sur 4 vCPU, 16 Go). Prérequis communs : <code>promtool</code> (<code>sudo apt-get install prometheus</code>, version 2.45.3 testée) et un Python avec <code>prometheus_client</code>, <code>pytest</code>, <code>pyyaml</code>, <code>torch</code> (version CPU) ; la partie C du lab 14.3 demande aussi <code>mlflow-skinny</code>, <code>sqlalchemy</code> et <code>alembic</code>. Chaque <code>verify.sh</code> respecte <code>${PYTHON:-python3}</code> et n'affirme rien sur une durée mesurée : la machine peut être partagée.</p>
+<h3 id="lab-14-1">Lab 14.1 — Un exportateur de métriques de nœud testé</h3>
 <div class="lab">
-<p><span class="tag">Lab 14.1 — Un exportateur de métriques de nœud testé</span></p>
 <p><strong>Objectif.</strong> Écrire et tester avec <code>prometheus_client</code> un exportateur qui publie un résumé de nœud GPU, l'état d'une file Slurm avec des étiquettes bornées et un histogramme de délai d'attente. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable CPU ; aucun GPU. La branche en direct demande le Slurm du module 5.</p>
 <p><strong>Ce qui est simulé, ce qui est réel.</strong> Le texte DCGM (<code>fixtures/dcgm_node.prom</code>) est <strong>simulé</strong> : noms et formats de dcgm-exporter, valeurs inventées, trois pannes plantées. Les fichiers <code>fixtures/slurm/*</code> sont des <strong>captures réelles</strong> de Slurm 23.11.4, réduites aux champs lus.</p>
 <ol type="1">
@@ -918,8 +1065,8 @@ lrbug    tokens/s +0.0%  loss gap at equal step +2.413  slowest clock +0.0%  CUS
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK mutants: 6/6 killed</code> puis <code>OK gpu-metrics-exporter</code> (sortie de l'auteur : <code>14 passed</code>, <code>slurm_job_wait_seconds_count{qos="normal"} 6.0</code>). La branche en direct a été exécutée une fois par l'auteur : <code>slurm_scrape_success 1.0</code> et <code>slurm_nodes{partition="debug",state="mixed"} 1.0</code>. <strong>Non vérifié</strong> : la lecture d'un vrai dcgm-exporter sur GPU.</p>
 <p><strong>Pour aller plus loin.</strong> Calculez le nombre de séries pour 500 nœuds de 8 GPU avec et sans le résumé de nœud. Remplacez la fixture par un <code>GET</code> sur un dcgm-exporter réel si vous avez un GPU.</p>
 </div>
+<h3 id="lab-14-2">Lab 14.2 — Règles d'alerte testées avec promtool</h3>
 <div class="lab">
-<p><span class="tag">Lab 14.2 — Règles d'alerte testées avec promtool</span></p>
 <p><strong>Objectif.</strong> Écrire des règles d'alerte et d'enregistrement, générer les alertes de SLO à partir d'un modèle, les tester avec <code>promtool test rules</code>, et prouver que les tests protègent les règles par mutation. <strong>Durée.</strong> 3.5 h. <strong>Prérequis matériels.</strong> Un portable CPU ; <code>promtool</code>.</p>
 <p><strong>Ce qui est simulé.</strong> Toutes les séries des tests sont synthétiques ; les seuils sont illustratifs.</p>
 <ol type="1">
@@ -932,8 +1079,8 @@ lrbug    tokens/s +0.0%  loss gap at equal step +2.413  slowest clock +0.0%  CUS
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK mutants: 12/12 killed</code> puis <code>OK alert-rules</code>. Si un mutant survit, c'est qu'un test manque : écrivez-le.</p>
 <p><strong>Pour aller plus loin.</strong> Écrivez <code>JobStuckPending</code> sur <code>slurm_pending_oldest_age_seconds{reason_class="capacity"}</code> et testez-la avec ses mutants ; ajoutez au lint une vérification que toute alerte <code>page</code> est atteignable depuis un SLO.</p>
 </div>
+<h3 id="lab-14-3">Lab 14.3 — Détecteur de job bloqué</h3>
 <div class="lab">
-<p><span class="tag">Lab 14.3 — Détecteur de job bloqué</span></p>
 <p><strong>Objectif.</strong> Mesurer le compromis fausses alarmes et délai de plusieurs détecteurs de blocage sur séries simulées, observer un <strong>vrai</strong> blocage de collective sur CPU, puis séparer une régression du système d'une régression du modèle. <strong>Durée.</strong> 3.5 h. <strong>Prérequis matériels.</strong> Un portable CPU avec <code>torch</code> ; 2 cœurs libres suffisent.</p>
 <p><strong>Ce qui est simulé, ce qui est réel.</strong> Partie A : séries <strong>simulées</strong>, pauses et signature de blocage <strong>supposées</strong> (<code>sim.py</code>). Partie B : processus, <code>gloo</code>, collective bloquée et piles <strong>réels</strong>, mais sur CPU et avec un blocage injecté ; ce n'est pas NCCL. Partie C : trois runs <strong>simulés</strong> enregistrés par l'API réelle de MLflow.</p>
 <ol type="1">
@@ -1215,10 +1362,16 @@ rank 2 innermost frame: train.py:212 in next_batch   -&gt; batch = next(data_ite
 <li>MLflow. <a href="https://mlflow.org/docs/latest/ml/tracking/"><em>Tracking</em></a> et <a href="https://mlflow.org/docs/latest/ml/tracking/system-metrics/"><em>System metrics</em></a> ; W&amp;B, <a href="https://docs.coreweave.com/products/wandb/track/config"><em>Configure experiments</em></a> : suivi d'expériences (chapitre 8).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les faits suivants ont été relus sur leurs sources le 24 octobre 2026. DCGM et dcgm-exporter : définition de l'utilisation GPU (<code>nvidia-smi</code>), des métriques de profil et des niveaux de diagnostic, port 9400, intervalle de collecte de 30 000 ms, option <code>-k</code>, liste de 25 métriques par défaut, existence de l'option <code>--hpc-job-mapping-dir</code> dans le code source, codes XID 79, 94 et 95. Prometheus : 1 à 2 octets par échantillon et la formule de capacité, rétention de 15 jours par défaut, blocs de deux heures, avertissement sur la cardinalité, nommage des règles d'enregistrement, usage de la Pushgateway, collecteur <em>textfile</em>, <code>keep_firing_for</code>, <code>sample_limit</code>, <code>group_wait</code>. Workbook SRE : vitesses de consommation, fenêtre courte au douzième, déconseil des durées, quatre critères. Llama 3 : 54 jours, 466, 47, 419, 78 %, 58,7 %, 90 %, variation diurne de 1 à 2 %. Kokolis et al. : définitions de l'ETTR et du goodput, contrôles toutes les cinq minutes, moins de 1 %. Acme : 15 s. MegaScale : battements de cœur et événements CUDA. PyTorch : délais de 10 et 30 minutes, variables du flight recorder. Loki, OpenTelemetry, Kueue, kube-state-metrics, MLflow (variable des métriques système, étiquettes <code>mlflow.source.git.*</code> lues dans le code source), W&amp;B (<code>config</code>), README du <code>prometheus-slurm-exporter</code> de vpenso (JSON, Slurm 23.02 minimum). Les comportements <strong>observés</strong> viennent d'exécutions du 24 octobre 2026 : Slurm 23.11.4, <code>promtool</code> 2.45.3, MLflow 3.17.2, PyTorch 2.14 (CPU, <code>gloo</code>), <code>prometheus_client</code> 0.26.0 ; les sorties citées en proviennent.</p>
-<p><strong>Recommandé.</strong> Les cinq couches, le regroupement des raisons d'attente en classes, les trois SLI de plateforme et leurs cibles (95 %, 99 %, 99,5 %), les seuils d'alerte (85 °C, rapport 1,3 à la médiane, 10 minutes sans pas), le contrat de l'entraîneur (<code>train_steps_total</code>, <code>train_compute_seconds</code>, phase déclarée), la conception de santé en trois strates, les réglages du CUSUM (<span class="math inline">k = 0{,}5\sigma</span>, <span class="math inline">h = 12\sigma</span>) et la cible de reproductibilité statistique sont des choix de ce parcours, pas des règles des outils. Tous les chiffres de pauses, de fractions de calcul (80 %, 70 %), de fréquence de pannes (12 h, 2 blocages pour 100 h) et de tailles de journaux sont des <strong>hypothèses d'exemple</strong>.</p>
-<p><strong>À vérifier.</strong> (1) La signature d'un blocage « utilisation haute, tensor nul, battement de cœur actif » n'a pas été mesurée sur GPU : le bac à sable n'a pas de GPU. (2) Le format des fichiers de l'option <code>--hpc-job-mapping-dir</code> n'a pas été relu. (3) Les étiquettes exactes de dcgm-exporter varient selon les versions (la présence de <code>modelName</code> n'a pas été vérifiée dans la documentation). (4) La requête LogQL, la configuration d'Alertmanager et les métriques de Kubernetes et de Kueue n'ont pas été exécutées : il n'y a pas de Loki, d'Alertmanager ni de cluster Kubernetes dans le bac à sable. (5) Les métriques GPU de MLflow demandent <code>nvidia-ml-py</code> et n'ont pas été exercées. (6) Le comportement du chien de garde NCCL n'a pas été observé : la partie B du lab 14.3 utilise <code>gloo</code>. (7) Le nombre de séries par nœud (1 000) et la mémoire par série sont à mesurer sur votre serveur. (8) Les champs JSON de <code>squeue</code> et de <code>sinfo</code> évoluent d'une version de Slurm à l'autre ; relisez la documentation de la vôtre. (9) Le tableau de <code>kube-state-metrics</code> marque <code>kube_pod_status_phase</code> comme expérimentale à la date de lecture.</p>
-<p><strong>Hors périmètre.</strong> La configuration complète d'Alertmanager (routage, inhibitions), le stockage de longue durée de Prometheus (écriture distante, Thanos, Mimir), le dimensionnement d'Elasticsearch, le déploiement de collecteurs OpenTelemetry, les compteurs réseau InfiniBand (module 7), la détection de corruption silencieuse de données, le profilage fin de noyaux (module 4), l'énergie et les coûts (module 15) et le déploiement de l'exportateur sur un vrai cluster de GPU.</p>
+<h3 id="documente">Documenté</h3>
+<p>Les faits suivants ont été relus sur leurs sources le 24 octobre 2026. DCGM et dcgm-exporter : définition de l'utilisation GPU (<code>nvidia-smi</code>), des métriques de profil et des niveaux de diagnostic, port 9400, intervalle de collecte de 30 000 ms, option <code>-k</code>, liste de 25 métriques par défaut, existence de l'option <code>--hpc-job-mapping-dir</code> dans le code source, codes XID 79, 94 et 95. Prometheus : 1 à 2 octets par échantillon et la formule de capacité, rétention de 15 jours par défaut, blocs de deux heures, avertissement sur la cardinalité, nommage des règles d'enregistrement, usage de la Pushgateway, collecteur <em>textfile</em>, <code>keep_firing_for</code>, <code>sample_limit</code>, <code>group_wait</code>. Workbook SRE : vitesses de consommation, fenêtre courte au douzième, déconseil des durées, quatre critères. Llama 3 : 54 jours, 466, 47, 419, 78 %, 58,7 %, 90 %, variation diurne de 1 à 2 %. Kokolis et al. : définitions de l'ETTR et du goodput, contrôles toutes les cinq minutes, moins de 1 %. Acme : 15 s. MegaScale : battements de cœur et événements CUDA. PyTorch : délais de 10 et 30 minutes, variables du flight recorder. Loki, OpenTelemetry, Kueue, kube-state-metrics, MLflow (variable des métriques système, étiquettes <code>mlflow.source.git.*</code> lues dans le code source), W&amp;B (<code>config</code>), README du <code>prometheus-slurm-exporter</code> de vpenso (JSON, Slurm 23.02 minimum). Les comportements <strong>observés</strong> viennent d'exécutions du 24 octobre 2026 : Slurm 23.11.4, <code>promtool</code> 2.45.3, MLflow 3.17.2, PyTorch 2.14 (CPU, <code>gloo</code>), <code>prometheus_client</code> 0.26.0 ; les sorties citées en proviennent.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>Les cinq couches, le regroupement des raisons d'attente en classes, les trois SLI de plateforme et leurs cibles (95 %, 99 %, 99,5 %), les seuils d'alerte (85 °C, rapport 1,3 à la médiane, 10 minutes sans pas), le contrat de l'entraîneur (<code>train_steps_total</code>, <code>train_compute_seconds</code>, phase déclarée), la conception de santé en trois strates, les réglages du CUSUM (<span class="math inline">k = 0{,}5\sigma</span>, <span class="math inline">h = 12\sigma</span>) et la cible de reproductibilité statistique sont des choix de ce parcours, pas des règles des outils. Tous les chiffres de pauses, de fractions de calcul (80 %, 70 %), de fréquence de pannes (12 h, 2 blocages pour 100 h) et de tailles de journaux sont des <strong>hypothèses d'exemple</strong>.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<ol type="1">
+<li>La signature d'un blocage « utilisation haute, tensor nul, battement de cœur actif » n'a pas été mesurée sur GPU : le bac à sable n'a pas de GPU. (2) Le format des fichiers de l'option <code>--hpc-job-mapping-dir</code> n'a pas été relu. (3) Les étiquettes exactes de dcgm-exporter varient selon les versions (la présence de <code>modelName</code> n'a pas été vérifiée dans la documentation). (4) La requête LogQL, la configuration d'Alertmanager et les métriques de Kubernetes et de Kueue n'ont pas été exécutées : il n'y a pas de Loki, d'Alertmanager ni de cluster Kubernetes dans le bac à sable. (5) Les métriques GPU de MLflow demandent <code>nvidia-ml-py</code> et n'ont pas été exercées. (6) Le comportement du chien de garde NCCL n'a pas été observé : la partie B du lab 14.3 utilise <code>gloo</code>. (7) Le nombre de séries par nœud (1 000) et la mémoire par série sont à mesurer sur votre serveur. (8) Les champs JSON de <code>squeue</code> et de <code>sinfo</code> évoluent d'une version de Slurm à l'autre ; relisez la documentation de la vôtre. (9) Le tableau de <code>kube-state-metrics</code> marque <code>kube_pod_status_phase</code> comme expérimentale à la date de lecture.</li>
+</ol>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>La configuration complète d'Alertmanager (routage, inhibitions), le stockage de longue durée de Prometheus (écriture distante, Thanos, Mimir), le dimensionnement d'Elasticsearch, le déploiement de collecteurs OpenTelemetry, les compteurs réseau InfiniBand (module 7), la détection de corruption silencieuse de données, le profilage fin de noyaux (module 4), l'énergie et les coûts (module 15) et le déploiement de l'exportateur sur un vrai cluster de GPU.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/multi-cloud/index.html"><span class="k">← Précédent</span>Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a><a class="next" href="../../courses/finops-capacity/index.html"><span class="k">Suivant →</span>Module 15 — FinOps, capacité, énergie et achats de calcul</a></nav>
 </main>

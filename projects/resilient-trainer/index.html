@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,7 +52,27 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Projet 3 · 24 h · modules : storage, distributed-training, fault-tolerance</p>
 <p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Code de départ et solution vérifiés (CPU)</span></p>
 </header>
-<h2 id="contexte">Contexte et objectif</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#contexte">1. Contexte et objectif</a>
+<ul>
+<li><a href="#pre">1.1. Prérequis de connaissances</a></li>
+</ul></li>
+<li><a href="#cahier">2. Cahier des charges</a></li>
+<li><a href="#jalons">3. Jalons</a></li>
+<li><a href="#livrables">4. Livrables</a></li>
+<li><a href="#criteres">5. Critères de réussite</a></li>
+<li><a href="#pistes">6. Pistes et indices</a></li>
+<li><a href="#extensions">7. Extensions</a></li>
+<li><a href="#portfolio">8. Pour le portfolio</a>
+<ul>
+<li><a href="#formules">8.1. Formules du jalon 5</a></li>
+<li><a href="#lectures">8.2. Pour aller plus loin</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="contexte">1. Contexte et objectif</h2>
 <p>Un entraînement qui dure des semaines sur des milliers de GPU sera interrompu, c'est une certitude statistique et non un risque. Le rapport technique de Llama 3 (§ 3.3.4) donne l'ordre de grandeur : « During a 54-day snapshot period of pre-training, we experienced a total of 466 job interruptions », dont 47 prévues et « the remaining 419 were unexpected » (<a href="https://arxiv.org/abs/2407.21783">Llama Team, 2024</a>). Environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou soupçonnés, et les GPU en forment la première catégorie, avec 58,7 %.</p>
 <p>Cela fait 419 interruptions imprévues, que nous assimilons ici à des pannes, en 1 296 heures : une toutes les 3,1 heures en moyenne, soit un intervalle moyen entre pannes (MTBF) d'environ 11 100 secondes pour l'ensemble de la machine. Le même rapport annonce pourtant « higher than 90% effective training time », avec une intervention manuelle importante seulement trois fois (« only three times during this period »). L'écart entre ces deux faits, c'est l'ingénierie de la reprise automatique : c'est elle que vous construisez ici, à petite échelle.</p>
 <div class="key">
@@ -71,9 +91,9 @@ Une panne entre deux checkpoints
 Une panne entre deux checkpoints : le travail depuis le dernier checkpoint terminé est perdu, puis le redémarrage coûte R. En moyenne la panne tombe au milieu d'une période. Cette frise est le modèle du jalon 5.
 </figcaption>
 </figure>
-<h3 id="pre">Prérequis de connaissances</h3>
+<h3 id="pre">1.1. Prérequis de connaissances</h3>
 <p>Vous devez savoir lire un entraînement PyTorch (modèle, optimiseur, boucle, <code>state_dict</code>) et vous servir d'un terminal Linux. Les signaux (<code>SIGTERM</code>, <code>SIGKILL</code>, <code>SIGUSR1</code>) sont rappelés dans le <a href="../../courses/slurm/index.html">module Slurm</a>, § 2.4, et son lab 5.1 montre un premier checkpoint sur signal ; les groupes de processus sont expliqués ici, dans les pistes du superviseur. Les modules « stockage », « entraînement distribué » et « tolérance aux pannes » du parcours approfondissent ce que ce projet pratique ; vous pouvez le faire avant de les lire, quitte à y revenir ensuite.</p>
-<h2 id="cahier">Cahier des charges</h2>
+<h2 id="cahier">2. Cahier des charges</h2>
 <p>Le dossier <code>labs/projects/resilient-trainer/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (solution à consulter <strong>après</strong> votre tentative), <code>tests/</code> (19 tests) et <code>verify.sh</code>. Les exigences, chacune liée à un test :</p>
 <div class="tbl-wrap">
 <table>
@@ -136,7 +156,7 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <p>L'entraîneur fourni, <code>train.py</code>, est identique dans <code>starter/</code> et <code>reference/</code>. Il contient trois crochets d'injection de panne, activés par la variable <code>FAULT</code> et déclenchés une seule fois par dossier de travail : <code>kill:N</code> (SIGKILL juste avant le pas N), <code>hang:N</code> (blocage éternel juste avant le pas N) et <code>torn:N</code> (arrêt brutal au milieu de l'écriture du checkpoint du pas N).</p>
 <p>Il est déterministe : le lot de données (synthétique : une régression linéaire bruitée) dépend uniquement du couple (graine, pas), et le réseau contient un <em>dropout</em>, qui consomme le générateur aléatoire global. C'est ce détail qui rend l'état du générateur PyTorch indispensable à la reprise exacte. L'état du générateur Python est sauvegardé par principe, mais rien dans <code>train.py</code> ne le consomme : aucun test ne détecte son oubli.</p>
 <p><strong>Hors périmètre</strong> du cœur du projet : l'entraînement multi-processus, les checkpoints répartis par rang, l'écriture asynchrone et le stockage objet. Ce sont des extensions.</p>
-<h2 id="jalons">Jalons</h2>
+<h2 id="jalons">3. Jalons</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -201,7 +221,7 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">IMPL</span><span class="op">=</span>starter <span class="va">$PYTHON</span> <span class="at">-m</span> pytest <span class="at">-q</span> tests                <span class="co"># 17 échecs sur 19 attendus</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                          <span class="co"># prouve référence verte, départ rouge</span></span></code></pre></div>
 <p>Le script <code>verify.sh</code> fait deux choses : il vérifie que la solution de référence passe les 19 tests, et que le code de départ en échoue au moins un. Un test qui passe aussi sur le code naïf ne prouve rien, et ce second contrôle le garantit. Il échoue donc dès que <code>starter/</code> est complété : travaillez dans une copie (<code>cp -r starter mon-code</code>, puis <code>IMPL=mon-code</code>).</p>
-<h2 id="livrables">Livrables</h2>
+<h2 id="livrables">4. Livrables</h2>
 <p>Votre dépôt public contient :</p>
 <ul>
 <li>le code complété (<code>ckpt.py</code>, <code>supervisor.py</code>, <code>goodput.py</code>) et les tests, avec une commande unique qui les lance ;</li>
@@ -217,7 +237,7 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <li>Pourquoi le superviseur détecte-t-il le blocage par la pulsation du programme plutôt que par un simple délai maximal d'exécution ?</li>
 <li>Quelle période de checkpoint retenez-vous, avec quelles valeurs de C et de M, et quelle part de ces valeurs est mesurée plutôt que supposée ?</li>
 </ol>
-<h2 id="criteres">Critères de réussite</h2>
+<h2 id="criteres">5. Critères de réussite</h2>
 <p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
 <ul>
 <li><strong>Reprise exacte.</strong> Après <code>FAULT=kill:57</code>, la perte de chaque pas 1 à 120 est identique, au bit près, à celle d'une exécution sans panne ; les pas 51 à 56 apparaissent deux fois dans <code>loss.jsonl</code>, avec la même valeur. Commande : <code>IMPL=mon-code pytest tests/test_resume.py -k kill9</code>.</li>
@@ -228,7 +248,7 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <li><strong>Mesure.</strong> Le rapport donne le coût de checkpoint <strong>mesuré</strong> pour au moins trois tailles d'état (option <code>--pad-mb</code>), la commande qui l'a produit et le MTBF <strong>supposé</strong>, avec sa source.</li>
 <li><strong>Tout ensemble.</strong> <code>bash verify.sh</code>, lancé sur le dépôt tel que fourni, se termine par « ok: reference passes, starter fails as intended », et <code>IMPL=mon-code pytest tests</code> passe en entier sur <strong>votre</strong> code.</li>
 </ul>
-<h2 id="pistes">Pistes et indices</h2>
+<h2 id="pistes">6. Pistes et indices</h2>
 <p>Ces indices ne donnent pas la solution ; ils indiquent où chercher. Essayez d'abord sans.</p>
 <p><strong>Écriture atomique.</strong> <code>os.replace</code> est atomique sur un système de fichiers POSIX local, mais seulement si le fichier temporaire est sur le <strong>même</strong> système de fichiers que la cible. Sans <code>fsync</code>, le renommage peut survivre à une coupure de courant alors que les données non : le fichier final existe, vide ou partiel (c'est le problème « zero-length » que la <a href="https://docs.kernel.org/admin-guide/ext4.html">documentation d'ext4</a> décrit à propos de l'option <code>auto_da_alloc</code>). Pensez aussi à synchroniser le <strong>dossier</strong>. Sur un système de fichiers réseau ou parallèle, lisez la documentation des garanties de renommage avant de supposer quoi que ce soit.</p>
 <p><strong>Somme de contrôle.</strong> Placer un en-tête (marque de format, empreinte SHA-256) devant la charge utile permet de valider le fichier sans le désérialiser ; un format sérialisé par <code>pickle</code> ne doit jamais être chargé avant validation. Une empreinte SHA-256 stockée dans le fichier détecte la corruption accidentelle, pas un adversaire qui la recalcule : dans la solution fournie, <code>torch.load(..., weights_only=True)</code> limite en plus ce que le fichier peut contenir.</p>
@@ -238,7 +258,7 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <p><strong>Pulsation et temps.</strong> Le délai de blocage doit dépasser largement la durée d'un checkpoint, car la pulsation n'est pas émise pendant l'écriture : avec 256 Mo d'état, C vaut environ 3 s et un délai de 3 s tuerait un entraîneur sain.</p>
 <p>Les tests de reprise utilisent un délai de 3 s : c'est leur principale dépendance au temps. Ils sont restés verts ici sous une charge d'environ trois processus par processeur avec écritures disque concurrentes, mais une machine plus saturée pourrait provoquer un faux positif. Enfin, la solution attend indéfiniment un enfant qui ignorerait <code>SIGTERM</code> ; en production on ajoute un délai puis <code>SIGKILL</code>.</p>
 <p><strong>Goodput.</strong> Le modèle du premier ordre est une approximation valable quand C est petit devant M. Rappelez-vous ce qu'il néglige : une panne pendant un checkpoint, et la loi de la position de la panne dans la période. Il suppose aussi C petit devant T : sans panne, le goodput réel vaut T/(T + C) et non 1 − C/T.</p>
-<h2 id="extensions">Extensions</h2>
+<h2 id="extensions">7. Extensions</h2>
 <ul>
 <li><strong>Plusieurs processus.</strong> Lancer l'entraîneur avec <code>torchrun</code> sur deux ou quatre processus (backend <code>gloo</code>) et sauvegarder l'état réparti avec <code>torch.distributed.checkpoint</code>. Que doit-il se passer si un seul rang est tué ?</li>
 <li><strong>Écriture asynchrone.</strong> Copier l'état en mémoire puis l'écrire dans un fil séparé. Mesurez l'effet sur C et prouvez que l'atomicité tient encore.</li>
@@ -246,7 +266,7 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <li><strong>Corruption silencieuse.</strong> Provoquer une altération d'un poids sans panne visible, puis la détecter en comparant les pertes de deux répliques. C'est la catégorie « soupçonnée » du rapport de Llama 3.</li>
 <li><strong>Variante GPU.</strong> Même code, un GPU, un modèle plus gros. Le coût dépend du fournisseur et de la région : <strong>relevez-le vous-même</strong> le jour de l'essai plutôt que de vous fier à un chiffre d'une page.</li>
 </ul>
-<h2 id="portfolio">Pour le portfolio</h2>
+<h2 id="portfolio">8. Pour le portfolio</h2>
 <p><strong>Structure du dépôt.</strong> Un <code>README.md</code> qui tient sur un écran : le problème en trois phrases, le schéma de la frise ci-dessus, la commande qui lance les 19 tests, le tableau du coût de checkpoint, et un paragraphe « ce que ce prototype ne fait pas ».</p>
 <p><strong>Ce qu'il faut montrer.</strong> Les tests en intégration continue, un exemple de <code>supervisor.jsonl</code> après un blocage, l'ADR et le runbook. Le recruteur lira l'ADR avant le code.</p>
 <p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Que vous raisonnez sur les pannes comme sur un cas courant, que vous savez les reproduire pour les tester, que vous distinguez le mesuré du supposé et que vous nommez les limites de votre travail.</p>
@@ -260,13 +280,13 @@ Une panne entre deux checkpoints : le travail depuis le dernier checkpoint termi
 <li>« J'ai comparé le modèle de Young-Daly à une simulation de Monte-Carlo et mesuré le coût de checkpoint pour quatre tailles d'état sur ma machine. »</li>
 <li>« Je sais dire ce que ce prototype ne couvre pas : l'entraînement multi-processus, le stockage partagé et la corruption silencieuse. »</li>
 </ol>
-<h3 id="formules">Formules du jalon 5</h3>
+<h3 id="formules">8.1. Formules du jalon 5</h3>
 <p>Notations (en secondes) : C est le coût d'un checkpoint, M le temps moyen entre pannes, R le coût d'un redémarrage et T la durée de calcul entre deux checkpoints. Le gaspillage au premier ordre est la somme du coût des checkpoints et du travail perdu et redémarré par panne :</p>
 <p><span class="math display">W(T) \approx \frac{C}{T} + \frac{T/2 + R}{M}</span></p>
 <p>Le travail perdu vaut en moyenne T/2 parce que la panne tombe, en moyenne, au milieu d'une période. En annulant la dérivée, on obtient la période optimale de Young :</p>
 <p><span class="math display">T^{*} = \sqrt{2\,C\,M}</span></p>
 <p>Le goodput est alors 1 − W : la part du temps réel passée à calculer ce qui sera effectivement conservé. Ces résultats viennent de Young (1974) et de Daly (2006), qui ajoute des termes d'ordre supérieur. Le test <code>test_simulation_agrees_with_model_near_optimum</code> vérifie ici que votre simulation et votre modèle s'accordent à 2 points près, puis compare la simulation à une référence exacte là où les pannes sont fréquentes : avec des pannes exponentielles, une panne pendant un checkpoint qui le perd et aucune panne pendant un redémarrage, sécuriser un segment de T + C secondes prend en moyenne <span class="math inline">(M + R)\,(e^{(T+C)/M} - 1)</span> secondes.</p>
-<h3 id="lectures">Pour aller plus loin</h3>
+<h3 id="lectures">8.2. Pour aller plus loin</h3>
 <ul>
 <li>Llama Team, <em>The Llama 3 Herd of Models</em>, 2024 : § 3.3.4 « Reliability and Operational Challenges », <a href="https://arxiv.org/abs/2407.21783">arxiv.org/abs/2407.21783</a>.</li>
 <li>J. W. Young, « A first order approximation to the optimum checkpoint interval », <em>Communications of the ACM</em> 17(9), 1974.</li>

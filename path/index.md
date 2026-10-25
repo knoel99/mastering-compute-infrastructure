@@ -2,6 +2,7 @@
 title: "Feuille de route"
 subtitle: "6 phases, 592 h au total, jalons et parcours courts"
 description: "Séquence des phases, volumes horaires, jalons de validation et parcours accélérés."
+numbered: true
 ---
 
 ## Comment lire cette feuille de route {#lecture}
@@ -35,9 +36,17 @@ Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que
 
 Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : Architecture matérielle et modèles de performance, Slurm et exploitation d'un cluster HPC, Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline, Pannes, checkpointing et reprise automatique, Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC, plus les projets Projet 2, Projet 3. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.
 
-## Parcours pour le lecteur de référence {#reference}
+## Parcours selon votre profil d'entrée {#profils}
 
-Le [point de départ](../profile/index.html) compare un profil de référence au métier visé. Il en déduit un parcours ajusté : survol des modules proches de l'expérience existante, travail à fond sur ceux où aucun appui n'existe.
+Le [point de départ](../profile/index.html) décrit cinq profils d'entrée et leurs priorités module par module. Le tableau en déduit un volume d'étude indicatif : les modules à fond et normaux comptent pour leur volume, les modules survolés pour un quart, les projets pour leur volume. C'est un ordre de grandeur, à corriger avec les questions de positionnement.
+
+| Profil d'entrée | À fond (A) | Survol guidé (C) | Volume indicatif |
+|---|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | 2, 3, 4, 5, 7, 8, 9, 11 | 14 | 570 h |
+| Administrateur ou ingénieur HPC | 9, 10, 11, 12, 13, 15 | 1, 3, 5, 6 | 510 h |
+| Ingénieur ML ou chercheur | 6, 7, 10, 12, 13, 14, 15, 16 | — | 590 h |
+| Développeur logiciel ou systèmes | 5, 6, 7, 8, 9, 15 | — | 590 h |
+| Étudiant ou personne en reconversion | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 | — | 590 h |
 
 ## Suivre sa progression {#suivi}
 

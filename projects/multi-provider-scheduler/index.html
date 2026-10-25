@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,7 +52,30 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Projet 4 · 24 h · modules : multi-cloud, finops-capacity, kubernetes-gpu</p>
 <p class="badges"><span class="badge core">Portfolio</span><span class="badge verified">Code de départ et solution vérifiés (CPU, sans cloud)</span></p>
 </header>
-<h2 id="contexte">Contexte et objectif</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#contexte">1. Contexte et objectif</a>
+<ul>
+<li><a href="#pre">1.1. Prérequis de connaissances</a></li>
+</ul></li>
+<li><a href="#cahier">2. Cahier des charges</a></li>
+<li><a href="#jalons">3. Jalons</a></li>
+<li><a href="#livrables">4. Livrables</a></li>
+<li><a href="#criteres">5. Critères de réussite</a></li>
+<li><a href="#pistes">6. Pistes et indices</a>
+<ul>
+<li><a href="#reference-results">6.1. Résultats de la solution de référence</a></li>
+</ul></li>
+<li><a href="#extensions">7. Extensions</a></li>
+<li><a href="#portfolio">8. Pour le portfolio</a>
+<ul>
+<li><a href="#formules">8.1. Formules du projet</a></li>
+<li><a href="#lectures">8.2. Pour aller plus loin</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="contexte">1. Contexte et objectif</h2>
 <p>Un même GPU se vend sous plusieurs formes : à la demande, cher mais fiable, ou préemptible (<em>spot</em>), moins cher mais que le fournisseur peut reprendre à tout moment. Plusieurs fournisseurs et plusieurs régions multiplient les choix. La question de l'ingénieur d'infrastructure n'est pas « quelle offre est la moins chère par heure ? » mais <strong>« où lancer ce job, avec quelle fréquence de checkpoint, et que faire quand on me le reprend ? »</strong>.</p>
 <p>Ce projet vous fait construire un simulateur qui répond à cette question par des chiffres reproductibles : des jobs arrivent, des politiques les placent, des interruptions détruisent le travail non sauvegardé, et l'on compare les coûts et les échéances manquées. Il se termine par la production des fichiers de configuration (tâches SkyPilot, un lanceur de jobs multi-cloud, et files Kueue, le système de files de jobs de Kubernetes) qui appliqueraient la politique retenue.</p>
 <div class="war">
@@ -61,9 +84,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <div class="key">
 <p><span class="tag">Idée centrale du projet</span> Le prix par heure n'est pas le coût d'une heure <strong>utile</strong>. Une offre à prix bas qui interrompt souvent fait perdre du travail et en fait refaire : son coût par heure productive peut dépasser celui d'une offre plus chère et plus stable. Le projet vous fait chiffrer cet écart, avec la formule de Young et Daly du <a href="../resilient-trainer/index.html">projet 3</a> pour choisir la fréquence de checkpoint. Sur les données inventées du projet, une ablation (section « Résultats ») montre que la fréquence de checkpoint pèse plus que le choix de l'offre.</p>
 </div>
-<h3 id="pre">Prérequis de connaissances</h3>
+<h3 id="pre">1.1. Prérequis de connaissances</h3>
 <p>Vous devez savoir lire un code Python de deux cents lignes et écrire des tests. Les notions de checkpoint, de reprise et de période optimale viennent du projet 3 : relisez sa section sur Young et Daly. Les modules « multi-cloud », « FinOps et capacité » et « Kubernetes pour les GPU » du parcours approfondissent le contexte ; ils ne sont pas requis pour faire le projet, qui rappelle ce dont il a besoin.</p>
-<h2 id="cahier">Cahier des charges</h2>
+<h2 id="cahier">2. Cahier des charges</h2>
 <p>Le dossier <code>labs/projects/multi-provider-scheduler/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (à consulter <strong>après</strong> votre tentative), <code>tests/</code> (33 tests) et <code>verify.sh</code>. Les données (<code>data.py</code>) sont fournies : quatre offres synthétiques et un générateur de jobs.</p>
 <div class="tbl-wrap">
 <table>
@@ -114,7 +137,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Le moteur suit une sémantique précise, donnée dans la docstring de <code>sim.py</code>. Un job en attente est proposé à la politique au début de chaque minute, dans l'ordre d'arrivée. Une allocation est facturée dès sa première minute, démarrage et checkpoints compris. Une interruption fait perdre toute la progression non sauvegardée, et le job est reproposé la même minute. Le dernier segment de calcul n'est pas suivi d'un checkpoint.</p>
-<h2 id="jalons">Jalons</h2>
+<h2 id="jalons">3. Jalons</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -170,7 +193,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHON</span><span class="op">=</span>/chemin/vers/python           <span class="co"># pytest, pyyaml et yamllint</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">IMPL</span><span class="op">=</span>starter <span class="va">$PYTHON</span> <span class="at">-m</span> pytest <span class="at">-q</span> tests     <span class="co"># 33 échecs sur 33 au départ</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                <span class="co"># référence verte, départ rouge</span></span></code></pre></div>
-<h2 id="livrables">Livrables</h2>
+<h2 id="livrables">4. Livrables</h2>
 <p>Votre dépôt public contient :</p>
 <ul>
 <li>le code complété, les tests et la commande unique qui les lance ;</li>
@@ -186,7 +209,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Que dit votre politique couverte quand toutes les offres préemptibles sont trop risquées pour l'échéance, et à quoi renonce-t-elle ?</li>
 <li>Quelles données réelles faudrait-il collecter pour croire les conclusions, et comment les collecteriez-vous sans citer de prix périmés ?</li>
 </ol>
-<h2 id="criteres">Critères de réussite</h2>
+<h2 id="criteres">5. Critères de réussite</h2>
 <p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
 <ul>
 <li><strong>Chronologies exactes.</strong> Job sans interruption : fin 330 min après l'arrivée et 330 minutes facturées ; avec interruption forcée à 100 min (coût de reprise nul) : fin 365 min après l'arrivée, 25 minutes perdues. Commande : <code>pytest tests/test_sim.py -k "timeline or forced"</code>.</li>
@@ -197,7 +220,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Manifestes.</strong> Les huit mutations testées (flavor inconnu, file inconnue, quota en texte, doublon, mauvaise version d'API, quota négatif, quota booléen, ressource absente de <code>coveredResources</code>) sont toutes rejetées. Commande : <code>pytest tests/test_manifests.py</code>.</li>
 <li><strong>Honnêteté.</strong> Votre README dit que les données sont inventées et que les manifestes ne sont validés que structurellement.</li>
 </ul>
-<h2 id="pistes">Pistes et indices</h2>
+<h2 id="pistes">6. Pistes et indices</h2>
 <p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
 <p><strong>Moteur.</strong> Écrivez d'abord un job, une offre, aucune interruption, et prédisez la minute de fin. Le piège classique est un décalage d'une minute : une allocation est facturée dès la minute où elle commence, et la fin d'un job est la minute <strong>suivant</strong> sa dernière minute de calcul.</p>
 <p>Vérifiez aussi que la capacité est restituée <strong>avant</strong> de proposer les jobs en attente, sinon un job attend une minute de trop.</p>
@@ -207,7 +230,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Comparaison.</strong> Deux intervalles de moyennes qui se recouvrent ne prouvent pas que deux politiques sont indiscernables : si les mêmes jobs et les mêmes interruptions sont rejoués, la <strong>différence par graine</strong> est bien plus précise. Calculez-la, avec son intervalle et le nombre de graines où chaque politique gagne.</p>
 <p><strong>Manifestes.</strong> Dans Kueue, un travail reçoit « the first flavor in the ClusterQueue's .spec.resourceGroups[*].flavors list that has enough unused nominalQuota » : l'<strong>ordre</strong> des flavors exprime la préférence. Dans SkyPilot, <code>ordered</code> fait basculer dans l'ordre indiqué, alors que pour <code>any_of</code> « the failover order will be decided by the optimizer ». Vérifiez les noms de champs dans la documentation de <strong>votre</strong> version.</p>
 <p>Une tâche SkyPilot peut aussi mélanger spot et à la demande : sa page sur les jobs gérés donne l'exemple <code>any_of: [{use_spot: true}, {use_spot: false}]</code>. Ce projet génère deux tâches, une par marché, pour garder des fichiers simples à valider.</p>
-<h3 id="reference-results">Résultats de la solution de référence</h3>
+<h3 id="reference-results">6.1. Résultats de la solution de référence</h3>
 <p>À lire <strong>après</strong> votre propre travail. Le simulateur est déterministe : ces valeurs sont reproductibles, mais elles dépendent entièrement des données inventées du projet.</p>
 <details class="sol"><summary>Corrigé</summary>
 <p><strong>Scénario.</strong> Trente jobs de 8, 16 ou 32 GPU, arrivant sur 3 jours, avec 6 à 48 heures de travail. Quatre offres : deux à la demande (64 GPU chacune), deux préemptibles (64 et 32 GPU, taux d'interruption de 0,15 et 0,60 par heure).</p>
@@ -341,7 +364,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le placement par coût attendu et la garde d'échéance n'ajoutent que −64 u [−1 498 ; +1 265], indiscernables de zéro, et −0,5 échéance manquée [−0,9 ; −0,1]. Dans ce scénario inventé, c'est la fréquence de checkpoint qui compte ; l'offre à 0,60 interruption par heure reste à 4,58 u contre 4,69 u.</p>
 <p>Le taux pour lequel les deux coûts attendus s'égalent est d'environ 0,64 interruption par heure : au-delà, l'offre à 3 u devient plus chère par heure utile et le placement par coût attendu devrait peser davantage. Cette simulation ne le teste pas (voir l'extension « Taux de l'offre risquée »).</p>
 </details>
-<h2 id="extensions">Extensions</h2>
+<h2 id="extensions">7. Extensions</h2>
 <ul>
 <li><strong>Interruptions corrélées.</strong> Dans la réalité, une interruption préemptible dans une région signale souvent une pénurie dans cette région : la documentation de SkyPilot écrit « preemptions in a region usually indicate a shortage of resources in that region ». Modélisez des pannes simultanées par région et mesurez ce que cela fait à une politique qui se rabat dans la même région.</li>
 <li><strong>Taux de l'offre risquée.</strong> Faites varier le taux d'interruption de l'offre à 3 u de 0,3 à 2 par heure et reprenez l'ablation : à partir de quel taux le placement par coût attendu, et non seulement l'intervalle de checkpoint, change-t-il le coût ? Comparez avec le croisement calculé à la main (environ 0,64).</li>
@@ -350,7 +373,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Terraform.</strong> Écrivez le module qui créerait les files de machines correspondantes et validez-le avec <code>terraform validate</code> ; c'est la validation que ce projet ne fait pas.</li>
 <li><strong>Compte réel.</strong> Lancez une tâche SkyPilot sur un compte de test avec une limite de budget <strong>créée avant</strong> (voir la page <a href="../../lab-setup/index.html">environnement de travail</a>) et comparez l'interruption observée à votre modèle.</li>
 </ul>
-<h2 id="portfolio">Pour le portfolio</h2>
+<h2 id="portfolio">8. Pour le portfolio</h2>
 <p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : la question, l'avertissement sur les données inventées, le tableau comparatif avec les différences appariées, la commande qui lance les 33 tests, et un paragraphe « ce que cette simulation ne montre pas ».</p>
 <p><strong>Ce qu'il faut montrer.</strong> Les chronologies exactes testées, la comparaison appariée, l'ablation, les manifestes et l'ADR. Les noms de fournisseurs réels n'y ont pas leur place tant que vous n'avez pas collecté de vraies données.</p>
 <p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui sait que le prix par heure n'est pas le coût d'une heure utile, qui compare des politiques avec des intervalles et des différences appariées plutôt qu'avec des moyennes seules, et qui sait dire à quel point une simulation sur données inventées engage ou n'engage pas.</p>
@@ -364,7 +387,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>« J'ai comparé trois politiques par différences appariées sur 20 graines, et montré que deux intervalles de moyennes qui se recouvrent peuvent cacher une différence nette. »</li>
 <li>« Je sais dire ce que ma simulation ne dit pas : les prix et les taux d'interruption y sont inventés, et mes manifestes ne sont validés que structurellement. »</li>
 </ol>
-<h3 id="formules">Formules du projet</h3>
+<h3 id="formules">8.1. Formules du projet</h3>
 <p>Avec C le coût d'un checkpoint, M le temps moyen entre interruptions (60 divisé par le taux par heure, en minutes), R le coût d'une reprise et T le temps de calcul entre deux checkpoints, la fraction de gaspillage au premier ordre est :</p>
 <p><span class="math display">W(T) = \frac{C}{T} + \frac{T/2 + R}{M}, \qquad T^{*} = \sqrt{2\,C\,M}</span></p>
 <p>Le coût attendu par heure productive d'une offre de prix <span class="math inline">p</span> est alors :</p>
@@ -372,7 +395,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Pour une offre à la demande, <span class="math inline">W</span> vaut zéro et le coût attendu égale le prix.</p>
 <p>Un exemple de lecture, avec deux offres hypothétiques (celles du test <code>test_hedged_prefers_lower_expected_cost_per_productive_hour_over_lower_price</code>) : avec C de 3 min et R de 10 min, une offre à 4 u et 0,15 interruption par heure (M de 400 min) a un <span class="math inline">T^{*}</span> d'environ 49 min, un <span class="math inline">W</span> d'environ 0,15 et un coût attendu d'environ 4,7 u ; une offre à 3 u et 1,5 interruption par heure (M de 40 min) a un <span class="math inline">W</span> d'environ 0,64 et un coût attendu d'environ 8,3 u. La moins chère à l'heure devient la plus chère par heure utile.</p>
 <p>Pour les offres <strong>du projet</strong> (3 u à 0,60 par heure, M de 100 min, <span class="math inline">T^{*}</span> d'environ 24 min, <span class="math inline">W</span> d'environ 0,34) le coût attendu est de 4,58 u, <strong>sous</strong> les 4,69 u de l'offre à 4 u : le croisement se situe vers 0,64 interruption par heure.</p>
-<h3 id="lectures">Pour aller plus loin</h3>
+<h3 id="lectures">8.2. Pour aller plus loin</h3>
 <ul>
 <li>Documentation de SkyPilot, <a href="https://docs.skypilot.co/en/latest/reference/yaml-spec.html">spécification YAML</a> : <code>accelerators</code>, <code>use_spot</code>, <code>any_of</code>, <code>ordered</code>, <code>job_recovery</code> (lue le 2026-10-24).</li>
 <li>Documentation de Kueue, pages <a href="https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/">ClusterQueue</a>, <a href="https://kueue.sigs.k8s.io/docs/concepts/resource_flavor/">ResourceFlavor</a> et <a href="https://kueue.sigs.k8s.io/docs/concepts/local_queue/">LocalQueue</a> : version d'API <code>kueue.x-k8s.io/v1beta2</code> à la date de lecture ; vérifiez la vôtre.</li>

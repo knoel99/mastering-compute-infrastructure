@@ -24,7 +24,7 @@ module:
   hours: 30            # volume d'étude total (lecture + labs + exercices)
   level: 2             # niveau d'entrée 1 | 2 | 3
 prerequisites: [linux-systems]      # ids de modules, [] si aucun
-status: core           # pour le lecteur de référence : core | skim | bonus
+status: core           # core (cœur pour tous) | skim (fondation, survol possible) | bonus
 badges:
   - {label: "Cœur du parcours", class: core}      # core | skim | bonus
   - {label: "Labs vérifiés dans un bac à sable", class: verified}   # ou unverified
@@ -39,17 +39,27 @@ labs:
 ## Introduction et vue d'ensemble {#intro}
 ### Fiche du module {#fiche}             (tableau Clé | Valeur)
 ### Ce que vous saurez vérifier {#acquis} (liste de capacités observables)
+### Place dans le parcours {#place}       (généré par tools/gen_module_parts.py)
 ### Plan de séances {#seances}
-## Avant de commencer {#avant}           (3 questions de positionnement, avec ::: sol)
+### Comment travailler ce module {#travailler}  (généré : priorité par profil d'entrée, méthode)
+## 0. Avant de commencer {#avant}
+### 0.1. Questions de positionnement {#positionnement}   (3 questions, avec ::: sol)
 ## 1. Titre du chapitre {#ch1}           (… jusqu'à #chN, 5 à 10 chapitres, numérotés sans trou)
+### 1.1. Titre de la sous-section
 ## Labs {#labs}
+### Lab N.1 — Titre {#lab-N-1}           (puis le bloc ::: lab, sans titre dans le bloc)
 ## Exercices {#ex}
 ## Checkpoint de sortie {#exit}
 ## Lectures et références {#refs}
 ## Sources et portée {#sources}
+### Documenté {#documente} · ### Recommandé {#recommande} · ### À vérifier {#a-verifier} · ### Hors périmètre {#hors-perimetre}
 ```
 
-**Fiche du module** : volume (h) · niveau d'entrée · prérequis · statut pour le lecteur de référence · livrable · environnement requis (portable CPU suffisant ? GPU optionnel et coût indicatif) · lien vers les projets qui s'appuient sur ce module.
+La structure suit celle des pages de cours de `polytechnique-llga` et de `master-mva` : un sommaire en tête de page (inséré au rendu par `tools/filters.lua`), une introduction en sous-sections, des chapitres numérotés de 0 à N avec des sous-sections N.k, puis les parties d'exercices et de références. Les blocs entre `<!-- gen:… -->` et `<!-- /gen:… -->` sont régénérés par `python3 tools/gen_module_parts.py` à partir de `data/curriculum.json` : ne les modifiez pas à la main.
+
+**Le parcours est généraliste.** Une page ne s'adresse jamais à une personne en particulier : elle s'adresse aux profils d'entrée de `data/curriculum.json` (`profiles` : plateforme, HPC, ML, logiciel, étudiant), et ce qu'elle suppose connu est dit comme une condition (« si vous exploitez déjà Kubernetes… »).
+
+**Fiche du module** : volume (h) · niveau d'entrée · prérequis · pour qui (généré, par profil d'entrée) · livrable · environnement requis (portable CPU suffisant ? GPU optionnel et coût indicatif) · lien vers les projets qui s'appuient sur ce module.
 
 **Plan de séances** : tableau exact `| Séance | Durée | Niveau | Contenu | Pratique |`. Séances de 2 à 3 h ; durées au format `3 h` ou `2.5 h` ; **la somme est égale à `module.hours`** ; niveau 1 = fondations, 2 = méthodes de cœur, 3 = avancé/recherche, **jamais décroissant**. Chaque ligne cite chapitres, labs et exercices.
 
@@ -64,7 +74,7 @@ labs:
 
 ## 5. Labs
 
-- Section `## Labs {#labs}` : **au moins 2** blocs `::: lab`, titre `[Lab N.M — Titre]{.tag}`.
+- Section `## Labs {#labs}` : **au moins 2** labs, chacun une sous-section `### Lab N.M — Titre {#lab-N-M}` suivie d'un bloc `::: lab`.
 - Chaque lab : **Objectif** · **Durée** · **Prérequis matériels** (laptop CPU / cluster / GPU, coût indicatif si payant) · **Étapes** numérotées · **Critère de réussite** observable (une valeur, une sortie, un graphe) · **Pour aller plus loin**.
 - Code et fichiers dans `labs/<module-id>/<lab-id>/` avec `README.md`. Les labs `kind: sandbox` ont un script exécutable `verify.sh` qui **réussit (code 0) sur une machine Linux sans GPU** et affiche la valeur du critère de réussite. Les labs `cluster` et `gpu` sont au moins linté (shellcheck/`bash -n`, `python -m py_compile`, YAML parsé) et le disent honnêtement dans `badges` (`unverified`).
 - Un lab dont le script n'a pas été exécuté ne peut pas porter le badge `verified`.

@@ -1424,8 +1424,8 @@
      "source": "memory"
     }
    ],
-   "confidence": "high",
-   "notes": "La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification.",
+   "confidence": "medium",
+   "notes": "La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification. Confidence capped at medium: part of the evidence comes from memory.",
    "evidence_verified": "1/1"
   }
  ],

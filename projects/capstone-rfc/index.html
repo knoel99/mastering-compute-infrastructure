@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,7 +52,32 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Projet 6 · 40 h · projet de synthèse, tous les modules d'infrastructure</p>
 <p class="badges"><span class="badge core">Projet de synthèse</span><span class="badge verified">Modèle et vérificateur vérifiés (CPU) ; RFC jugée par grille humaine</span></p>
 </header>
-<h2 id="contexte">Contexte et objectif</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#contexte">1. Contexte et objectif</a>
+<ul>
+<li><a href="#pre">1.1. Prérequis de connaissances</a></li>
+</ul></li>
+<li><a href="#cahier">2. Cahier des charges</a></li>
+<li><a href="#jalons">3. Jalons</a></li>
+<li><a href="#livrables">4. Livrables</a></li>
+<li><a href="#criteres">5. Critères de réussite</a></li>
+<li><a href="#pistes">6. Pistes et indices</a>
+<ul>
+<li><a href="#reference-results">6.1. Résultats de la solution de référence</a></li>
+</ul></li>
+<li><a href="#extensions">7. Extensions</a></li>
+<li><a href="#portfolio">8. Pour le portfolio</a>
+<ul>
+<li><a href="#grille">8.1. Grille de revue contradictoire</a></li>
+<li><a href="#soutenance">8.2. Questions de soutenance</a></li>
+<li><a href="#formules">8.3. Formules du projet</a></li>
+<li><a href="#lectures">8.4. Pour aller plus loin</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="contexte">1. Contexte et objectif</h2>
 <p>Le métier de responsable d'infrastructure de calcul consiste moins à installer des machines qu'à <strong>décider et à convaincre</strong> : combien de GPU, de quel type, achetés comment, partagés selon quelle politique, supervisés par qui, avec quel plan si cela tourne mal. Ces décisions s'écrivent dans un document de conception (<em>RFC</em>, <em>request for comments</em>) que d'autres lisent, contestent et approuvent.</p>
 <p>Ce projet de synthèse vous fait écrire une telle RFC pour une plateforme de 8 à 256 GPU, à partir d'un cahier des charges <strong>fictif</strong> fourni. Vous construisez le modèle de capacité et de coût qui étaye vos chiffres, un vérificateur qui contrôle que le coût mensuel écrit dans le texte est celui que calcule le modèle, puis vous soumettez le document à une revue contradictoire et vous le défendez à l'oral.</p>
 <div class="key">
@@ -63,9 +88,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </div>
 <p>Le projet s'appuie sur tout le parcours : la politique d'ordonnancement (module Slurm), le réseau et le stockage, la reprise après panne (projet 3), la mesure du passage à l'échelle (projet 2), la comparaison de politiques de placement (projet 4), l'observabilité (projet 5) et les arbitrages de coût. Il ne demande pas de tout refaire : il demande de <strong>choisir, chiffrer et justifier</strong>.</p>
 <p>Le code ne chiffre que deux choses, l'attente (files d'attente) et le coût (marché d'achat, pannes) ; le réseau, le stockage, l'orchestrateur et la topologie se défendent dans le texte de la RFC et ne sont pas modélisés, ce que la page « ce que ce modèle ne dit pas » doit écrire.</p>
-<h3 id="pre">Prérequis de connaissances</h3>
+<h3 id="pre">1.1. Prérequis de connaissances</h3>
 <p>Les projets 2 à 5 en sont les briques : relisez-les si besoin. Ce projet ajoute deux outils, la théorie des files d'attente pour estimer l'attente, et l'écriture technique. La théorie des files est rappelée dans les formules en fin de page ; l'écriture se travaille avec la grille de revue.</p>
-<h2 id="cahier">Cahier des charges</h2>
+<h2 id="cahier">2. Cahier des charges</h2>
 <p>Le dossier <code>labs/projects/capstone-rfc/</code> contient <code>starter/</code> (à compléter), <code>reference/</code> (modèle, vérificateur et une RFC complète à consulter <strong>après</strong> votre tentative), <code>tests/</code> (37 tests) et <code>verify.sh</code>. Le cahier des charges fictif est <code>requirements.yaml</code> : un groupe de recherche de 40 personnes, trois ingénieurs de plateforme, quatre classes de charge (pré-entraînement, réglage fin, évaluation, développement interactif), des objectifs d'attente, un budget mensuel.</p>
 <div class="tbl-wrap">
 <table>
@@ -116,7 +141,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p>Le vérificateur ne juge pas la qualité du raisonnement : il garantit la <strong>cohérence mécanique</strong> (le texte dit le coût total que le modèle calcule) et la <strong>présence</strong> des sections, des options, du tableau de décision, des risques et d'une partie « Hypothèses et limites ». Il ne contrôle ni les autres chiffres du texte (disponibilités, GPU-heures, sensibilité), ni la présence d'un signal de révision : c'est le rôle des critères ★ de la grille ci-dessous, où la qualité se juge.</p>
-<h2 id="jalons">Jalons</h2>
+<h2 id="jalons">3. Jalons</h2>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -179,7 +204,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">PYTHON</span><span class="op">=</span><span class="va">$PYTHON</span> <span class="fu">bash</span> verify.sh                <span class="co"># référence verte, départ rouge</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> starter/rfc_lint.py starter/rfc.md <span class="at">--requirements</span> starter/requirements.yaml</span></code></pre></div>
 <p>Commencez par le modèle, pas par le texte : une RFC dont on ne peut pas relancer les chiffres est une opinion. Réécrivez ensuite la RFC en citant <strong>seulement</strong> ce que le modèle a calculé.</p>
-<h2 id="livrables">Livrables</h2>
+<h2 id="livrables">4. Livrables</h2>
 <p>Votre dépôt public contient :</p>
 <ul>
 <li><code>capacity.py</code>, <code>rfc_lint.py</code> et leurs tests, avec une commande unique qui les lance ;</li>
@@ -192,7 +217,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <p>L'ADR tranche au moins quatre questions, en nommant l'alternative écartée : le marché d'achat de chaque classe, la taille du pool réservé, la règle de bascule quand la capacité préemptible manque, et les poids du tableau de décision.</p>
 <p>Le document doit trancher, dans sa section « Décision », une option <strong>et</strong> dire à partir de quel signal on reviendrait dessus : une décision sans critère de révision n'est pas une décision, c'est une préférence.</p>
-<h2 id="criteres">Critères de réussite</h2>
+<h2 id="criteres">5. Critères de réussite</h2>
 <p>Chaque critère est mesurable ; la commande qui le montre est indiquée.</p>
 <ul>
 <li><strong>Modèle exact.</strong> <code>erlang_c(2, 1.0)</code> vaut un tiers ; pour une file M/M/1 de charge 0,5 et de service 1, l'attente moyenne vaut 1,0 et le 90e centile <span class="math inline">\ln 5 / 0{,}5 \approx 3{,}22</span>. Commande : <code>pytest tests/test_capacity.py -k "exact or closed_forms"</code>.</li>
@@ -203,7 +228,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Revue.</strong> La grille remplie par un autre relecteur ne contient aucune case « 0 » sur les critères éliminatoires, et chaque remarque est suivie d'une correction ou d'une réponse écrite.</li>
 <li><strong>Honnêteté.</strong> La RFC dit quelles données sont inventées, quelles hypothèses sont les plus fragiles, et à quel seuil la décision serait révisée.</li>
 </ul>
-<h2 id="pistes">Pistes et indices</h2>
+<h2 id="pistes">6. Pistes et indices</h2>
 <p>Ces indices ne donnent pas la solution ; essayez d'abord sans.</p>
 <p><strong>La file d'attente.</strong> Un job de plusieurs GPU a besoin de tous ses GPU en même temps : on le modélise comme un client qui occupe un « serveur » de la taille du job. Le nombre de serveurs est le nombre de jobs qui tiennent dans le pool.</p>
 <p>Ce modèle ignore les rafales, les priorités entre classes et la fragmentation : ses attentes sont <strong>probablement optimistes</strong>, car l'attente croît avec la variabilité des arrivées et des durées (formule de Kingman), et des durées plus régulières que l'exponentielle la réduiraient. Ce n'est donc pas une borne garantie ; dites-le dans la RFC.</p>
@@ -212,7 +237,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Pool réservé ou élastique.</strong> Un pool réservé se paie en permanence mais n'a pas de délai d'obtention. Un pool élastique se paie à l'usage mais impose un délai : il ne peut pas tenir un objectif plus court que ce délai. Ce simple fait explique pourquoi la plus petite classe, la plus exigeante en latence, est souvent la seule réservée.</p>
 <p><strong>Le vérificateur.</strong> Lisez le texte comme un programme : les sections sont des titres exacts, les tableaux ont un en-tête que l'on reconnaît, le coût est une phrase au format fixe. C'est volontairement rigide : la rigidité rend le document vérifiable, la grille humaine juge le reste.</p>
 <p><strong>La décision.</strong> Un tableau de critères pondérés n'est pas une mesure : les notes sont des jugements. Écrivez ce qui fonde chaque note avec un chiffre du modèle, faites relire les poids par quelqu'un d'autre, et vérifiez qu'un changement raisonnable des poids ne renverse pas le classement.</p>
-<h3 id="reference-results">Résultats de la solution de référence</h3>
+<h3 id="reference-results">6.1. Résultats de la solution de référence</h3>
 <p>À lire <strong>après</strong> votre propre travail. Tout dépend des données inventées du cahier des charges.</p>
 <details class="sol"><summary>Corrigé</summary>
 <p><strong>Demande.</strong> 53 740 GPU-heures de travail par mois, dont 46 080 pour le pré-entraînement (86 %).</p>
@@ -273,7 +298,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Avec deux GPU réservés pour le développement au lieu de quatre, l'attente au 90e centile monte à 1,72 heure : quatre est le minimum.</p>
 <p><strong>Ce que la référence dit mal ou ne dit pas.</strong> Les notes de la décision sont des jugements ; les attentes sont probablement optimistes, sans être une borne garantie ; le classement dépend des poids (à poids égaux, C et D sont à égalité) ; la capacité préemptible est supposée toujours disponible au volume demandé. La RFC les écrit dans « Décision » et dans « Hypothèses et limites ».</p>
 </details>
-<h2 id="extensions">Extensions</h2>
+<h2 id="extensions">7. Extensions</h2>
 <ul>
 <li><strong>Simulation de bout en bout.</strong> Remplacez le modèle M/M/c par une simulation à événements discrets d'un pool partagé avec priorités entre classes (réutilisez le simulateur du projet 4) et mesurez de combien les attentes réelles dépassent celles du modèle M/M/c.</li>
 <li><strong>Réservation partagée.</strong> Au lieu d'un pool réservé par classe, un pool commun avec files par équipe et préemption (module Slurm) : refaites l'évaluation et comparez.</li>
@@ -281,7 +306,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Données réelles.</strong> Remplacez le cahier des charges fictif par les mesures de votre propre équipe (profil de charge, temps de service, taux de panne mesuré) et relancez tout. Les tests de <code>test_capacity.py</code> figent les chiffres du cahier fictif (317 161 u, 1,72 h) : travaillez sur une copie du dossier et adaptez ces valeurs attendues.</li>
 <li><strong>RFC d'un pair.</strong> Relisez la RFC d'une autre personne avec la grille et rédigez la revue : lire ce qu'on n'a pas écrit est la meilleure façon d'apprendre à écrire.</li>
 </ul>
-<h2 id="portfolio">Pour le portfolio</h2>
+<h2 id="portfolio">8. Pour le portfolio</h2>
 <p><strong>Structure du dépôt.</strong> Un <code>README.md</code> d'un écran : la question, l'avertissement sur les données fictives, la commande qui lance les 37 tests et le vérificateur, la décision de la RFC en une phrase avec son signal de révision, et un lien vers la RFC.</p>
 <p><strong>Ce qu'il faut montrer.</strong> La RFC, la grille de revue remplie par un autre, le modèle et ses tests, et l'accord entre la formule et la simulation. La RFC est le livrable : le code n'est que ce qui la rend vérifiable.</p>
 <p><strong>Ce qu'un recruteur d'infrastructure de calcul cherche.</strong> Quelqu'un qui écrit une décision que l'on peut contester, qui chiffre au lieu d'affirmer, qui sépare le mesuré de l'hypothèse, et qui sait défendre une option devant des questions hostiles.</p>
@@ -291,7 +316,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>« J'ai recoupé ma formule d'attente (Erlang C) avec une simulation indépendante et mesuré combien une simulation courte est trompeuse. »</li>
 <li>« Ma RFC a été relue par une autre personne avec une grille, et elle dit ce que son modèle ne dit pas : données inventées, rafales ignorées, capacité supposée disponible. »</li>
 </ol>
-<h3 id="grille">Grille de revue contradictoire</h3>
+<h3 id="grille">8.1. Grille de revue contradictoire</h3>
 <p>Un relecteur autre que l'auteur note chaque critère de 0 à 2 (0 absent ou faux, 1 partiel, 2 solide) et justifie chaque note. Les critères marqués ★ sont éliminatoires : un 0 sur l'un d'eux renvoie la RFC en réécriture.</p>
 <div class="tbl-wrap">
 <table>
@@ -345,7 +370,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h3 id="soutenance">Questions de soutenance</h3>
+<h3 id="soutenance">8.2. Questions de soutenance</h3>
 <p>La soutenance dure vingt minutes : cinq pour le problème et les options, cinq pour la décision et les chiffres, cinq pour la fiabilité et la migration, cinq pour les questions. Préparez ces questions, en sachant que le jury peut en poser d'autres :</p>
 <ol type="1">
 <li>Si le taux d'interruption réel était dix fois supérieur à votre hypothèse, que deviendrait la décision, et comment le sauriez-vous en deux semaines ?</li>
@@ -357,7 +382,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Comment un chercheur voit-il ce que lui coûte son job, et qu'est-ce que cela change à son comportement ?</li>
 <li>À quel moment cette plateforme cesse-t-elle d'être la bonne et que ferait-on alors ?</li>
 </ol>
-<h3 id="formules">Formules du projet</h3>
+<h3 id="formules">8.3. Formules du projet</h3>
 <p>Une file M/M/c reçoit des arrivées de Poisson, sert chaque client en une durée exponentielle et dispose de <span class="math inline">c</span> serveurs identiques, dans l'ordre d'arrivée. Avec un taux d'arrivée <span class="math inline">\lambda</span>, un taux de service <span class="math inline">\mu</span>, <span class="math inline">c</span> serveurs et une charge offerte <span class="math inline">a = \lambda/\mu</span>, la probabilité qu'une arrivée doive attendre est la formule d'Erlang C :</p>
 <p><span class="math display">P_{\text{attente}} = \frac{\dfrac{a^{c}}{c!}\cdot\dfrac{c}{c-a}}{\displaystyle\sum_{k=0}^{c-1}\frac{a^{k}}{k!} + \dfrac{a^{c}}{c!}\cdot\dfrac{c}{c-a}}</span></p>
 <p>La queue de l'attente est exponentielle, d'où l'attente moyenne et le 90e centile :</p>
@@ -365,7 +390,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le coût d'un pool réservé de <span class="math inline">N</span> GPU est <span class="math inline">N \times 730 \times p_{\text{réservé}}</span> par mois. Celui d'un pool élastique est le nombre de GPU-heures de travail, divisé par la disponibilité utile <span class="math inline">g</span>, multiplié par le prix. La disponibilité utile reprend le projet 3 :</p>
 <p><span class="math display">g = 1 - \left(\frac{C}{T^{*}} + \frac{T^{*}/2 + R}{M}\right), \qquad T^{*} = \sqrt{2\,C\,M}</span></p>
 <p>où <span class="math inline">C</span> est le coût d'un checkpoint, <span class="math inline">R</span> celui d'une reprise et <span class="math inline">M</span> le temps moyen entre incidents du job, dans la même unité (le code les prend en minutes). C'est un modèle du premier ordre : il est fiable tant que <span class="math inline">T^{*} \ll M</span> et devient pessimiste quand les pannes sont fréquentes.</p>
-<h3 id="lectures">Pour aller plus loin</h3>
+<h3 id="lectures">8.4. Pour aller plus loin</h3>
 <ul>
 <li>Le <a href="../resilient-trainer/index.html">projet 3</a> pour la période de Young et Daly, le <a href="../multi-provider-scheduler/index.html">projet 4</a> pour la comparaison de politiques de placement, le <a href="../gpu-observability/index.html">projet 5</a> pour l'observabilité.</li>
 <li>Une RFC d'ingénierie lue en entier vaut dix conseils d'écriture : cherchez celles que publient des projets ouverts de votre domaine, et lisez-en une avec la grille ci-dessus.</li>

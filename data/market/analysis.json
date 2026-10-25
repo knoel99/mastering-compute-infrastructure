@@ -1,0 +1,4802 @@
+{
+ "postings_total": 98,
+ "postings_used": 96,
+ "postings_core": 93,
+ "by_region": {
+  "eu": 38,
+  "us": 33,
+  "cn": 23,
+  "other": 2
+ },
+ "by_origin": {
+  "us": 40,
+  "eu": 31,
+  "cn": 25
+ },
+ "by_role": {
+  "gpu-cluster-ops": 34,
+  "training-platform": 12,
+  "ml-systems-perf": 11,
+  "hpc-ops": 11,
+  "network": 9,
+  "storage": 8,
+  "other": 3,
+  "inference-platform": 3,
+  "capacity-finops": 3,
+  "leadership": 2
+ },
+ "by_seniority": {
+  "ic": 38,
+  "senior": 30,
+  "staff": 11,
+  "unspecified": 9,
+  "manager": 6,
+  "lead": 2
+ },
+ "by_company_type": {
+  "ai-lab": 23,
+  "gpu-cloud": 20,
+  "hpc-centre": 14,
+  "big-tech": 11,
+  "vendor": 11,
+  "hyperscaler": 8,
+  "startup": 7,
+  "other": 2
+ },
+ "by_group": {
+  "lab": 30,
+  "cloud": 20,
+  "bigtech": 19,
+  "hpc": 14,
+  "vendor": 11,
+  "other": 2
+ },
+ "companies": {
+  "Anthropic": 4,
+  "Nebius": 3,
+  "Microsoft": 3,
+  "CoreWeave": 3,
+  "OpenAI": 3,
+  "Tencent": 2,
+  "ByteDance": 2,
+  "Xiaomi": 2,
+  "Huawei": 2,
+  "Alibaba Cloud": 2,
+  "Peng Cheng Laboratory": 2,
+  "Moore Threads": 2,
+  "SenseTime": 2,
+  "MetaX": 2,
+  "Enflame": 2,
+  "Scaleway": 2,
+  "Leibniz-Rechenzentrum": 2,
+  "CEA/DAM Île-de-France": 2,
+  "Verda": 2,
+  "Mistral AI": 2,
+  "Wayve": 2,
+  "Google DeepMind": 2,
+  "Lambda": 2,
+  "Crusoe": 2,
+  "Together AI": 2,
+  "NVIDIA": 2,
+  "xAI": 2,
+  "Meta": 2,
+  "JD.com": 1,
+  "Baidu": 1,
+  "DeepSeek": 1,
+  "Shanghai AI Laboratory": 1,
+  "Sugon": 1,
+  "Fluidstack": 1,
+  "CERN": 1,
+  "CSCS – Swiss National Supercomputing Centre": 1,
+  "Nscale": 1,
+  "Commissariat au Numérique de Défense": 1,
+  "European Spallation Source ERIC": 1,
+  "Deutsche Telekom IT Solutions HU": 1,
+  "ElevenLabs": 1,
+  "Black Forest Labs": 1,
+  "Aleph Alpha": 1,
+  "Helsing": 1,
+  "Isomorphic Labs": 1,
+  "Synthesia": 1,
+  "PhysicsX": 1,
+  "DeepL": 1,
+  "Los Alamos National Laboratory": 1,
+  "Lawrence Berkeley National Laboratory": 1,
+  "Oak Ridge National Laboratory": 1,
+  "Argonne National Laboratory": 1,
+  "Databricks": 1,
+  "AMD": 1,
+  "Cerebras Systems": 1,
+  "Vultr": 1,
+  "UC San Diego": 1,
+  "Amazon Web Services": 1,
+  "Thinking Machines Lab": 1,
+  "Perplexity": 1,
+  "Google": 1,
+  "H Company": 1
+ },
+ "companies_by_region": {
+  "us": [
+   "AMD",
+   "Amazon Web Services",
+   "Anthropic",
+   "Argonne National Laboratory",
+   "Cerebras Systems",
+   "CoreWeave",
+   "Crusoe",
+   "Databricks",
+   "Google",
+   "Lambda",
+   "Lawrence Berkeley National Laboratory",
+   "Los Alamos National Laboratory",
+   "Meta",
+   "Microsoft",
+   "NVIDIA",
+   "Oak Ridge National Laboratory",
+   "OpenAI",
+   "Perplexity",
+   "Thinking Machines Lab",
+   "Together AI",
+   "UC San Diego",
+   "Vultr",
+   "xAI"
+  ],
+  "eu": [
+   "Aleph Alpha",
+   "Anthropic",
+   "Black Forest Labs",
+   "CEA/DAM Île-de-France",
+   "CERN",
+   "CSCS – Swiss National Supercomputing Centre",
+   "Commissariat au Numérique de Défense",
+   "DeepL",
+   "Deutsche Telekom IT Solutions HU",
+   "ElevenLabs",
+   "European Spallation Source ERIC",
+   "Fluidstack",
+   "Google DeepMind",
+   "H Company",
+   "Helsing",
+   "Isomorphic Labs",
+   "Leibniz-Rechenzentrum",
+   "Microsoft",
+   "Mistral AI",
+   "Nebius",
+   "Nscale",
+   "PhysicsX",
+   "Scaleway",
+   "Synthesia",
+   "Together AI",
+   "Verda",
+   "Wayve"
+  ],
+  "cn": [
+   "Alibaba Cloud",
+   "Baidu",
+   "ByteDance",
+   "DeepSeek",
+   "Enflame",
+   "Huawei",
+   "JD.com",
+   "MetaX",
+   "Moore Threads",
+   "Peng Cheng Laboratory",
+   "SenseTime",
+   "Shanghai AI Laboratory",
+   "Sugon",
+   "Tencent",
+   "Xiaomi"
+  ],
+  "other": [
+   "ByteDance",
+   "Huawei"
+  ]
+ },
+ "companies_by_origin": {
+  "us": [
+   "AMD",
+   "Amazon Web Services",
+   "Anthropic",
+   "Argonne National Laboratory",
+   "Cerebras Systems",
+   "CoreWeave",
+   "Crusoe",
+   "Databricks",
+   "Google",
+   "Google DeepMind",
+   "Lambda",
+   "Lawrence Berkeley National Laboratory",
+   "Los Alamos National Laboratory",
+   "Meta",
+   "Microsoft",
+   "NVIDIA",
+   "Oak Ridge National Laboratory",
+   "OpenAI",
+   "Perplexity",
+   "Thinking Machines Lab",
+   "Together AI",
+   "UC San Diego",
+   "Vultr",
+   "xAI"
+  ],
+  "eu": [
+   "Aleph Alpha",
+   "Black Forest Labs",
+   "CEA/DAM Île-de-France",
+   "CERN",
+   "CSCS – Swiss National Supercomputing Centre",
+   "Commissariat au Numérique de Défense",
+   "DeepL",
+   "Deutsche Telekom IT Solutions HU",
+   "ElevenLabs",
+   "European Spallation Source ERIC",
+   "Fluidstack",
+   "H Company",
+   "Helsing",
+   "Isomorphic Labs",
+   "Leibniz-Rechenzentrum",
+   "Mistral AI",
+   "Nebius",
+   "Nscale",
+   "PhysicsX",
+   "Scaleway",
+   "Synthesia",
+   "Verda",
+   "Wayve"
+  ],
+  "cn": [
+   "Alibaba Cloud",
+   "Baidu",
+   "ByteDance",
+   "DeepSeek",
+   "Enflame",
+   "Huawei",
+   "JD.com",
+   "MetaX",
+   "Moore Threads",
+   "Peng Cheng Laboratory",
+   "SenseTime",
+   "Shanghai AI Laboratory",
+   "Sugon",
+   "Tencent",
+   "Xiaomi"
+  ],
+  "other": []
+ },
+ "demand_all": {
+  "n": 96,
+  "skills": {
+   "python": {
+    "any": 65,
+    "required": 57,
+    "share_any": 0.677,
+    "share_required": 0.594
+   },
+   "systems-lang": {
+    "any": 53,
+    "required": 48,
+    "share_any": 0.552,
+    "share_required": 0.5
+   },
+   "linux-admin": {
+    "any": 54,
+    "required": 50,
+    "share_any": 0.562,
+    "share_required": 0.521
+   },
+   "slurm": {
+    "any": 21,
+    "required": 12,
+    "share_any": 0.219,
+    "share_required": 0.125
+   },
+   "kubernetes": {
+    "any": 50,
+    "required": 37,
+    "share_any": 0.521,
+    "share_required": 0.385
+   },
+   "ray": {
+    "any": 4,
+    "required": 1,
+    "share_any": 0.042,
+    "share_required": 0.01
+   },
+   "multicloud-skypilot": {
+    "any": 7,
+    "required": 6,
+    "share_any": 0.073,
+    "share_required": 0.062
+   },
+   "terraform-iac": {
+    "any": 25,
+    "required": 16,
+    "share_any": 0.26,
+    "share_required": 0.167
+   },
+   "ansible-config": {
+    "any": 23,
+    "required": 17,
+    "share_any": 0.24,
+    "share_required": 0.177
+   },
+   "containers": {
+    "any": 26,
+    "required": 17,
+    "share_any": 0.271,
+    "share_required": 0.177
+   },
+   "pytorch-distributed": {
+    "any": 19,
+    "required": 14,
+    "share_any": 0.198,
+    "share_required": 0.146
+   },
+   "nccl-collectives": {
+    "any": 25,
+    "required": 15,
+    "share_any": 0.26,
+    "share_required": 0.156
+   },
+   "cuda-gpu": {
+    "any": 37,
+    "required": 17,
+    "share_any": 0.385,
+    "share_required": 0.177
+   },
+   "infiniband-roce": {
+    "any": 41,
+    "required": 26,
+    "share_any": 0.427,
+    "share_required": 0.271
+   },
+   "parallel-fs-storage": {
+    "any": 29,
+    "required": 18,
+    "share_any": 0.302,
+    "share_required": 0.188
+   },
+   "object-storage": {
+    "any": 8,
+    "required": 7,
+    "share_any": 0.083,
+    "share_required": 0.073
+   },
+   "prometheus-grafana": {
+    "any": 35,
+    "required": 25,
+    "share_any": 0.365,
+    "share_required": 0.26
+   },
+   "dcgm-gpu-monitoring": {
+    "any": 13,
+    "required": 12,
+    "share_any": 0.135,
+    "share_required": 0.125
+   },
+   "logging-tracing": {
+    "any": 22,
+    "required": 19,
+    "share_any": 0.229,
+    "share_required": 0.198
+   },
+   "experiment-tracking": {
+    "any": 5,
+    "required": 4,
+    "share_any": 0.052,
+    "share_required": 0.042
+   },
+   "checkpoint-fault-tolerance": {
+    "any": 19,
+    "required": 15,
+    "share_any": 0.198,
+    "share_required": 0.156
+   },
+   "scheduler-design": {
+    "any": 19,
+    "required": 16,
+    "share_any": 0.198,
+    "share_required": 0.167
+   },
+   "hyperscaler-cloud": {
+    "any": 26,
+    "required": 18,
+    "share_any": 0.271,
+    "share_required": 0.188
+   },
+   "gpu-cloud-providers": {
+    "any": 7,
+    "required": 6,
+    "share_any": 0.073,
+    "share_required": 0.062
+   },
+   "finops-cost": {
+    "any": 14,
+    "required": 13,
+    "share_any": 0.146,
+    "share_required": 0.135
+   },
+   "procurement-vendor": {
+    "any": 12,
+    "required": 11,
+    "share_any": 0.125,
+    "share_required": 0.115
+   },
+   "capacity-planning": {
+    "any": 27,
+    "required": 22,
+    "share_any": 0.281,
+    "share_required": 0.229
+   },
+   "security-compliance": {
+    "any": 25,
+    "required": 22,
+    "share_any": 0.26,
+    "share_required": 0.229
+   },
+   "sre-oncall": {
+    "any": 52,
+    "required": 49,
+    "share_any": 0.542,
+    "share_required": 0.51
+   },
+   "leadership-mgmt": {
+    "any": 22,
+    "required": 18,
+    "share_any": 0.229,
+    "share_required": 0.188
+   },
+   "hpc-experience": {
+    "any": 49,
+    "required": 29,
+    "share_any": 0.51,
+    "share_required": 0.302
+   },
+   "ml-training-experience": {
+    "any": 44,
+    "required": 27,
+    "share_any": 0.458,
+    "share_required": 0.281
+   },
+   "rl-infra": {
+    "any": 6,
+    "required": 6,
+    "share_any": 0.062,
+    "share_required": 0.062
+   },
+   "data-pipelines": {
+    "any": 13,
+    "required": 9,
+    "share_any": 0.135,
+    "share_required": 0.094
+   },
+   "networking-general": {
+    "any": 42,
+    "required": 29,
+    "share_any": 0.438,
+    "share_required": 0.302
+   },
+   "bare-metal-provisioning": {
+    "any": 28,
+    "required": 20,
+    "share_any": 0.292,
+    "share_required": 0.208
+   },
+   "ci-cd": {
+    "any": 27,
+    "required": 19,
+    "share_any": 0.281,
+    "share_required": 0.198
+   },
+   "inference-serving": {
+    "any": 16,
+    "required": 11,
+    "share_any": 0.167,
+    "share_required": 0.115
+   },
+   "non-nvidia-accelerators": {
+    "any": 17,
+    "required": 13,
+    "share_any": 0.177,
+    "share_required": 0.135
+   },
+   "perf-profiling": {
+    "any": 49,
+    "required": 43,
+    "share_any": 0.51,
+    "share_required": 0.448
+   },
+   "datacenter-facilities": {
+    "any": 13,
+    "required": 7,
+    "share_any": 0.135,
+    "share_required": 0.073
+   },
+   "distributed-systems": {
+    "any": 43,
+    "required": 34,
+    "share_any": 0.448,
+    "share_required": 0.354
+   },
+   "virtualization": {
+    "any": 17,
+    "required": 10,
+    "share_any": 0.177,
+    "share_required": 0.104
+   },
+   "hardware-health": {
+    "any": 37,
+    "required": 33,
+    "share_any": 0.385,
+    "share_required": 0.344
+   }
+  }
+ },
+ "demand_core": {
+  "n": 93,
+  "skills": {
+   "python": {
+    "any": 64,
+    "required": 56,
+    "share_any": 0.688,
+    "share_required": 0.602
+   },
+   "systems-lang": {
+    "any": 51,
+    "required": 46,
+    "share_any": 0.548,
+    "share_required": 0.495
+   },
+   "linux-admin": {
+    "any": 54,
+    "required": 50,
+    "share_any": 0.581,
+    "share_required": 0.538
+   },
+   "slurm": {
+    "any": 21,
+    "required": 12,
+    "share_any": 0.226,
+    "share_required": 0.129
+   },
+   "kubernetes": {
+    "any": 48,
+    "required": 36,
+    "share_any": 0.516,
+    "share_required": 0.387
+   },
+   "ray": {
+    "any": 3,
+    "required": 0,
+    "share_any": 0.032,
+    "share_required": 0.0
+   },
+   "multicloud-skypilot": {
+    "any": 7,
+    "required": 6,
+    "share_any": 0.075,
+    "share_required": 0.065
+   },
+   "terraform-iac": {
+    "any": 25,
+    "required": 16,
+    "share_any": 0.269,
+    "share_required": 0.172
+   },
+   "ansible-config": {
+    "any": 23,
+    "required": 17,
+    "share_any": 0.247,
+    "share_required": 0.183
+   },
+   "containers": {
+    "any": 25,
+    "required": 17,
+    "share_any": 0.269,
+    "share_required": 0.183
+   },
+   "pytorch-distributed": {
+    "any": 18,
+    "required": 13,
+    "share_any": 0.194,
+    "share_required": 0.14
+   },
+   "nccl-collectives": {
+    "any": 24,
+    "required": 14,
+    "share_any": 0.258,
+    "share_required": 0.151
+   },
+   "cuda-gpu": {
+    "any": 35,
+    "required": 15,
+    "share_any": 0.376,
+    "share_required": 0.161
+   },
+   "infiniband-roce": {
+    "any": 40,
+    "required": 25,
+    "share_any": 0.43,
+    "share_required": 0.269
+   },
+   "parallel-fs-storage": {
+    "any": 29,
+    "required": 18,
+    "share_any": 0.312,
+    "share_required": 0.194
+   },
+   "object-storage": {
+    "any": 8,
+    "required": 7,
+    "share_any": 0.086,
+    "share_required": 0.075
+   },
+   "prometheus-grafana": {
+    "any": 35,
+    "required": 25,
+    "share_any": 0.376,
+    "share_required": 0.269
+   },
+   "dcgm-gpu-monitoring": {
+    "any": 13,
+    "required": 12,
+    "share_any": 0.14,
+    "share_required": 0.129
+   },
+   "logging-tracing": {
+    "any": 22,
+    "required": 19,
+    "share_any": 0.237,
+    "share_required": 0.204
+   },
+   "experiment-tracking": {
+    "any": 5,
+    "required": 4,
+    "share_any": 0.054,
+    "share_required": 0.043
+   },
+   "checkpoint-fault-tolerance": {
+    "any": 19,
+    "required": 15,
+    "share_any": 0.204,
+    "share_required": 0.161
+   },
+   "scheduler-design": {
+    "any": 18,
+    "required": 15,
+    "share_any": 0.194,
+    "share_required": 0.161
+   },
+   "hyperscaler-cloud": {
+    "any": 25,
+    "required": 17,
+    "share_any": 0.269,
+    "share_required": 0.183
+   },
+   "gpu-cloud-providers": {
+    "any": 7,
+    "required": 6,
+    "share_any": 0.075,
+    "share_required": 0.065
+   },
+   "finops-cost": {
+    "any": 12,
+    "required": 11,
+    "share_any": 0.129,
+    "share_required": 0.118
+   },
+   "procurement-vendor": {
+    "any": 12,
+    "required": 11,
+    "share_any": 0.129,
+    "share_required": 0.118
+   },
+   "capacity-planning": {
+    "any": 27,
+    "required": 22,
+    "share_any": 0.29,
+    "share_required": 0.237
+   },
+   "security-compliance": {
+    "any": 25,
+    "required": 22,
+    "share_any": 0.269,
+    "share_required": 0.237
+   },
+   "sre-oncall": {
+    "any": 52,
+    "required": 49,
+    "share_any": 0.559,
+    "share_required": 0.527
+   },
+   "leadership-mgmt": {
+    "any": 21,
+    "required": 17,
+    "share_any": 0.226,
+    "share_required": 0.183
+   },
+   "hpc-experience": {
+    "any": 48,
+    "required": 28,
+    "share_any": 0.516,
+    "share_required": 0.301
+   },
+   "ml-training-experience": {
+    "any": 42,
+    "required": 25,
+    "share_any": 0.452,
+    "share_required": 0.269
+   },
+   "rl-infra": {
+    "any": 6,
+    "required": 6,
+    "share_any": 0.065,
+    "share_required": 0.065
+   },
+   "data-pipelines": {
+    "any": 13,
+    "required": 9,
+    "share_any": 0.14,
+    "share_required": 0.097
+   },
+   "networking-general": {
+    "any": 41,
+    "required": 28,
+    "share_any": 0.441,
+    "share_required": 0.301
+   },
+   "bare-metal-provisioning": {
+    "any": 28,
+    "required": 20,
+    "share_any": 0.301,
+    "share_required": 0.215
+   },
+   "ci-cd": {
+    "any": 27,
+    "required": 19,
+    "share_any": 0.29,
+    "share_required": 0.204
+   },
+   "inference-serving": {
+    "any": 13,
+    "required": 8,
+    "share_any": 0.14,
+    "share_required": 0.086
+   },
+   "non-nvidia-accelerators": {
+    "any": 15,
+    "required": 11,
+    "share_any": 0.161,
+    "share_required": 0.118
+   },
+   "perf-profiling": {
+    "any": 46,
+    "required": 40,
+    "share_any": 0.495,
+    "share_required": 0.43
+   },
+   "datacenter-facilities": {
+    "any": 13,
+    "required": 7,
+    "share_any": 0.14,
+    "share_required": 0.075
+   },
+   "distributed-systems": {
+    "any": 41,
+    "required": 33,
+    "share_any": 0.441,
+    "share_required": 0.355
+   },
+   "virtualization": {
+    "any": 17,
+    "required": 10,
+    "share_any": 0.183,
+    "share_required": 0.108
+   },
+   "hardware-health": {
+    "any": 37,
+    "required": 33,
+    "share_any": 0.398,
+    "share_required": 0.355
+   }
+  }
+ },
+ "demand_by_region": {
+  "us": {
+   "n": 33,
+   "skills": {
+    "python": {
+     "any": 26,
+     "required": 20,
+     "share_any": 0.788,
+     "share_required": 0.606
+    },
+    "systems-lang": {
+     "any": 19,
+     "required": 17,
+     "share_any": 0.576,
+     "share_required": 0.515
+    },
+    "linux-admin": {
+     "any": 18,
+     "required": 15,
+     "share_any": 0.545,
+     "share_required": 0.455
+    },
+    "slurm": {
+     "any": 12,
+     "required": 7,
+     "share_any": 0.364,
+     "share_required": 0.212
+    },
+    "kubernetes": {
+     "any": 16,
+     "required": 11,
+     "share_any": 0.485,
+     "share_required": 0.333
+    },
+    "ray": {
+     "any": 2,
+     "required": 0,
+     "share_any": 0.061,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.061,
+     "share_required": 0.061
+    },
+    "terraform-iac": {
+     "any": 11,
+     "required": 6,
+     "share_any": 0.333,
+     "share_required": 0.182
+    },
+    "ansible-config": {
+     "any": 12,
+     "required": 7,
+     "share_any": 0.364,
+     "share_required": 0.212
+    },
+    "containers": {
+     "any": 12,
+     "required": 8,
+     "share_any": 0.364,
+     "share_required": 0.242
+    },
+    "pytorch-distributed": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.182,
+     "share_required": 0.121
+    },
+    "nccl-collectives": {
+     "any": 7,
+     "required": 3,
+     "share_any": 0.212,
+     "share_required": 0.091
+    },
+    "cuda-gpu": {
+     "any": 10,
+     "required": 1,
+     "share_any": 0.303,
+     "share_required": 0.03
+    },
+    "infiniband-roce": {
+     "any": 16,
+     "required": 8,
+     "share_any": 0.485,
+     "share_required": 0.242
+    },
+    "parallel-fs-storage": {
+     "any": 10,
+     "required": 6,
+     "share_any": 0.303,
+     "share_required": 0.182
+    },
+    "object-storage": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.03,
+     "share_required": 0.03
+    },
+    "prometheus-grafana": {
+     "any": 18,
+     "required": 11,
+     "share_any": 0.545,
+     "share_required": 0.333
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 7,
+     "required": 6,
+     "share_any": 0.212,
+     "share_required": 0.182
+    },
+    "logging-tracing": {
+     "any": 11,
+     "required": 9,
+     "share_any": 0.333,
+     "share_required": 0.273
+    },
+    "experiment-tracking": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.061,
+     "share_required": 0.061
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.121,
+     "share_required": 0.121
+    },
+    "scheduler-design": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.182,
+     "share_required": 0.152
+    },
+    "hyperscaler-cloud": {
+     "any": 13,
+     "required": 9,
+     "share_any": 0.394,
+     "share_required": 0.273
+    },
+    "gpu-cloud-providers": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.152,
+     "share_required": 0.152
+    },
+    "finops-cost": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.061,
+     "share_required": 0.061
+    },
+    "procurement-vendor": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.152,
+     "share_required": 0.152
+    },
+    "capacity-planning": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.273,
+     "share_required": 0.212
+    },
+    "security-compliance": {
+     "any": 8,
+     "required": 7,
+     "share_any": 0.242,
+     "share_required": 0.212
+    },
+    "sre-oncall": {
+     "any": 19,
+     "required": 16,
+     "share_any": 0.576,
+     "share_required": 0.485
+    },
+    "leadership-mgmt": {
+     "any": 12,
+     "required": 9,
+     "share_any": 0.364,
+     "share_required": 0.273
+    },
+    "hpc-experience": {
+     "any": 20,
+     "required": 11,
+     "share_any": 0.606,
+     "share_required": 0.333
+    },
+    "ml-training-experience": {
+     "any": 13,
+     "required": 4,
+     "share_any": 0.394,
+     "share_required": 0.121
+    },
+    "rl-infra": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "data-pipelines": {
+     "any": 5,
+     "required": 3,
+     "share_any": 0.152,
+     "share_required": 0.091
+    },
+    "networking-general": {
+     "any": 12,
+     "required": 6,
+     "share_any": 0.364,
+     "share_required": 0.182
+    },
+    "bare-metal-provisioning": {
+     "any": 11,
+     "required": 8,
+     "share_any": 0.333,
+     "share_required": 0.242
+    },
+    "ci-cd": {
+     "any": 10,
+     "required": 7,
+     "share_any": 0.303,
+     "share_required": 0.212
+    },
+    "inference-serving": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.182,
+     "share_required": 0.121
+    },
+    "non-nvidia-accelerators": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.182,
+     "share_required": 0.121
+    },
+    "perf-profiling": {
+     "any": 17,
+     "required": 15,
+     "share_any": 0.515,
+     "share_required": 0.455
+    },
+    "datacenter-facilities": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.212,
+     "share_required": 0.121
+    },
+    "distributed-systems": {
+     "any": 17,
+     "required": 15,
+     "share_any": 0.515,
+     "share_required": 0.455
+    },
+    "virtualization": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.121,
+     "share_required": 0.061
+    },
+    "hardware-health": {
+     "any": 15,
+     "required": 12,
+     "share_any": 0.455,
+     "share_required": 0.364
+    }
+   }
+  },
+  "eu": {
+   "n": 38,
+   "skills": {
+    "python": {
+     "any": 26,
+     "required": 24,
+     "share_any": 0.684,
+     "share_required": 0.632
+    },
+    "systems-lang": {
+     "any": 20,
+     "required": 17,
+     "share_any": 0.526,
+     "share_required": 0.447
+    },
+    "linux-admin": {
+     "any": 23,
+     "required": 22,
+     "share_any": 0.605,
+     "share_required": 0.579
+    },
+    "slurm": {
+     "any": 8,
+     "required": 4,
+     "share_any": 0.211,
+     "share_required": 0.105
+    },
+    "kubernetes": {
+     "any": 25,
+     "required": 19,
+     "share_any": 0.658,
+     "share_required": 0.5
+    },
+    "ray": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.105,
+     "share_required": 0.079
+    },
+    "terraform-iac": {
+     "any": 14,
+     "required": 10,
+     "share_any": 0.368,
+     "share_required": 0.263
+    },
+    "ansible-config": {
+     "any": 10,
+     "required": 9,
+     "share_any": 0.263,
+     "share_required": 0.237
+    },
+    "containers": {
+     "any": 8,
+     "required": 5,
+     "share_any": 0.211,
+     "share_required": 0.132
+    },
+    "pytorch-distributed": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.105,
+     "share_required": 0.053
+    },
+    "nccl-collectives": {
+     "any": 9,
+     "required": 5,
+     "share_any": 0.237,
+     "share_required": 0.132
+    },
+    "cuda-gpu": {
+     "any": 14,
+     "required": 9,
+     "share_any": 0.368,
+     "share_required": 0.237
+    },
+    "infiniband-roce": {
+     "any": 14,
+     "required": 10,
+     "share_any": 0.368,
+     "share_required": 0.263
+    },
+    "parallel-fs-storage": {
+     "any": 15,
+     "required": 8,
+     "share_any": 0.395,
+     "share_required": 0.211
+    },
+    "object-storage": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.158,
+     "share_required": 0.132
+    },
+    "prometheus-grafana": {
+     "any": 11,
+     "required": 9,
+     "share_any": 0.289,
+     "share_required": 0.237
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.105,
+     "share_required": 0.105
+    },
+    "logging-tracing": {
+     "any": 9,
+     "required": 8,
+     "share_any": 0.237,
+     "share_required": 0.211
+    },
+    "experiment-tracking": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 10,
+     "required": 6,
+     "share_any": 0.263,
+     "share_required": 0.158
+    },
+    "scheduler-design": {
+     "any": 8,
+     "required": 6,
+     "share_any": 0.211,
+     "share_required": 0.158
+    },
+    "hyperscaler-cloud": {
+     "any": 10,
+     "required": 7,
+     "share_any": 0.263,
+     "share_required": 0.184
+    },
+    "gpu-cloud-providers": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.053,
+     "share_required": 0.026
+    },
+    "finops-cost": {
+     "any": 8,
+     "required": 7,
+     "share_any": 0.211,
+     "share_required": 0.184
+    },
+    "procurement-vendor": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.132,
+     "share_required": 0.105
+    },
+    "capacity-planning": {
+     "any": 13,
+     "required": 11,
+     "share_any": 0.342,
+     "share_required": 0.289
+    },
+    "security-compliance": {
+     "any": 16,
+     "required": 14,
+     "share_any": 0.421,
+     "share_required": 0.368
+    },
+    "sre-oncall": {
+     "any": 24,
+     "required": 24,
+     "share_any": 0.632,
+     "share_required": 0.632
+    },
+    "leadership-mgmt": {
+     "any": 9,
+     "required": 9,
+     "share_any": 0.237,
+     "share_required": 0.237
+    },
+    "hpc-experience": {
+     "any": 21,
+     "required": 15,
+     "share_any": 0.553,
+     "share_required": 0.395
+    },
+    "ml-training-experience": {
+     "any": 14,
+     "required": 8,
+     "share_any": 0.368,
+     "share_required": 0.211
+    },
+    "rl-infra": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.053,
+     "share_required": 0.053
+    },
+    "data-pipelines": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.079,
+     "share_required": 0.053
+    },
+    "networking-general": {
+     "any": 19,
+     "required": 14,
+     "share_any": 0.5,
+     "share_required": 0.368
+    },
+    "bare-metal-provisioning": {
+     "any": 13,
+     "required": 9,
+     "share_any": 0.342,
+     "share_required": 0.237
+    },
+    "ci-cd": {
+     "any": 15,
+     "required": 10,
+     "share_any": 0.395,
+     "share_required": 0.263
+    },
+    "inference-serving": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.158,
+     "share_required": 0.105
+    },
+    "non-nvidia-accelerators": {
+     "any": 3,
+     "required": 1,
+     "share_any": 0.079,
+     "share_required": 0.026
+    },
+    "perf-profiling": {
+     "any": 18,
+     "required": 16,
+     "share_any": 0.474,
+     "share_required": 0.421
+    },
+    "datacenter-facilities": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.105,
+     "share_required": 0.053
+    },
+    "distributed-systems": {
+     "any": 17,
+     "required": 13,
+     "share_any": 0.447,
+     "share_required": 0.342
+    },
+    "virtualization": {
+     "any": 10,
+     "required": 6,
+     "share_any": 0.263,
+     "share_required": 0.158
+    },
+    "hardware-health": {
+     "any": 14,
+     "required": 14,
+     "share_any": 0.368,
+     "share_required": 0.368
+    }
+   }
+  },
+  "cn": {
+   "n": 23,
+   "skills": {
+    "python": {
+     "any": 12,
+     "required": 12,
+     "share_any": 0.522,
+     "share_required": 0.522
+    },
+    "systems-lang": {
+     "any": 12,
+     "required": 12,
+     "share_any": 0.522,
+     "share_required": 0.522
+    },
+    "linux-admin": {
+     "any": 12,
+     "required": 12,
+     "share_any": 0.522,
+     "share_required": 0.522
+    },
+    "slurm": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.043,
+     "share_required": 0.043
+    },
+    "kubernetes": {
+     "any": 8,
+     "required": 6,
+     "share_any": 0.348,
+     "share_required": 0.261
+    },
+    "ray": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.043,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.043,
+     "share_required": 0.043
+    },
+    "terraform-iac": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "ansible-config": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.043,
+     "share_required": 0.043
+    },
+    "containers": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.261,
+     "share_required": 0.174
+    },
+    "pytorch-distributed": {
+     "any": 9,
+     "required": 8,
+     "share_any": 0.391,
+     "share_required": 0.348
+    },
+    "nccl-collectives": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.391,
+     "share_required": 0.304
+    },
+    "cuda-gpu": {
+     "any": 12,
+     "required": 6,
+     "share_any": 0.522,
+     "share_required": 0.261
+    },
+    "infiniband-roce": {
+     "any": 11,
+     "required": 8,
+     "share_any": 0.478,
+     "share_required": 0.348
+    },
+    "parallel-fs-storage": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.174,
+     "share_required": 0.174
+    },
+    "object-storage": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.043,
+     "share_required": 0.043
+    },
+    "prometheus-grafana": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.261,
+     "share_required": 0.217
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.087,
+     "share_required": 0.087
+    },
+    "logging-tracing": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.043,
+     "share_required": 0.043
+    },
+    "experiment-tracking": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.13,
+     "share_required": 0.087
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.217,
+     "share_required": 0.217
+    },
+    "scheduler-design": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.174,
+     "share_required": 0.174
+    },
+    "hyperscaler-cloud": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.087,
+     "share_required": 0.043
+    },
+    "gpu-cloud-providers": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "finops-cost": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.13,
+     "share_required": 0.13
+    },
+    "procurement-vendor": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.087,
+     "share_required": 0.087
+    },
+    "capacity-planning": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.217,
+     "share_required": 0.174
+    },
+    "security-compliance": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "sre-oncall": {
+     "any": 9,
+     "required": 9,
+     "share_any": 0.391,
+     "share_required": 0.391
+    },
+    "leadership-mgmt": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.043,
+     "share_required": 0.0
+    },
+    "hpc-experience": {
+     "any": 8,
+     "required": 3,
+     "share_any": 0.348,
+     "share_required": 0.13
+    },
+    "ml-training-experience": {
+     "any": 16,
+     "required": 14,
+     "share_any": 0.696,
+     "share_required": 0.609
+    },
+    "rl-infra": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.174,
+     "share_required": 0.174
+    },
+    "data-pipelines": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.217,
+     "share_required": 0.174
+    },
+    "networking-general": {
+     "any": 10,
+     "required": 8,
+     "share_any": 0.435,
+     "share_required": 0.348
+    },
+    "bare-metal-provisioning": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.13,
+     "share_required": 0.087
+    },
+    "ci-cd": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.043,
+     "share_required": 0.043
+    },
+    "inference-serving": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.13,
+     "share_required": 0.087
+    },
+    "non-nvidia-accelerators": {
+     "any": 7,
+     "required": 7,
+     "share_any": 0.304,
+     "share_required": 0.304
+    },
+    "perf-profiling": {
+     "any": 12,
+     "required": 10,
+     "share_any": 0.522,
+     "share_required": 0.435
+    },
+    "datacenter-facilities": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.043,
+     "share_required": 0.0
+    },
+    "distributed-systems": {
+     "any": 8,
+     "required": 5,
+     "share_any": 0.348,
+     "share_required": 0.217
+    },
+    "virtualization": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.13,
+     "share_required": 0.087
+    },
+    "hardware-health": {
+     "any": 7,
+     "required": 6,
+     "share_any": 0.304,
+     "share_required": 0.261
+    }
+   }
+  }
+ },
+ "demand_by_origin": {
+  "us": {
+   "n": 40,
+   "skills": {
+    "python": {
+     "any": 32,
+     "required": 25,
+     "share_any": 0.8,
+     "share_required": 0.625
+    },
+    "systems-lang": {
+     "any": 24,
+     "required": 21,
+     "share_any": 0.6,
+     "share_required": 0.525
+    },
+    "linux-admin": {
+     "any": 21,
+     "required": 17,
+     "share_any": 0.525,
+     "share_required": 0.425
+    },
+    "slurm": {
+     "any": 14,
+     "required": 7,
+     "share_any": 0.35,
+     "share_required": 0.175
+    },
+    "kubernetes": {
+     "any": 21,
+     "required": 14,
+     "share_any": 0.525,
+     "share_required": 0.35
+    },
+    "ray": {
+     "any": 2,
+     "required": 0,
+     "share_any": 0.05,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.1,
+     "share_required": 0.1
+    },
+    "terraform-iac": {
+     "any": 15,
+     "required": 9,
+     "share_any": 0.375,
+     "share_required": 0.225
+    },
+    "ansible-config": {
+     "any": 13,
+     "required": 8,
+     "share_any": 0.325,
+     "share_required": 0.2
+    },
+    "containers": {
+     "any": 13,
+     "required": 8,
+     "share_any": 0.325,
+     "share_required": 0.2
+    },
+    "pytorch-distributed": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.175,
+     "share_required": 0.1
+    },
+    "nccl-collectives": {
+     "any": 8,
+     "required": 3,
+     "share_any": 0.2,
+     "share_required": 0.075
+    },
+    "cuda-gpu": {
+     "any": 11,
+     "required": 1,
+     "share_any": 0.275,
+     "share_required": 0.025
+    },
+    "infiniband-roce": {
+     "any": 19,
+     "required": 10,
+     "share_any": 0.475,
+     "share_required": 0.25
+    },
+    "parallel-fs-storage": {
+     "any": 11,
+     "required": 7,
+     "share_any": 0.275,
+     "share_required": 0.175
+    },
+    "object-storage": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.05,
+     "share_required": 0.05
+    },
+    "prometheus-grafana": {
+     "any": 21,
+     "required": 12,
+     "share_any": 0.525,
+     "share_required": 0.3
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 8,
+     "required": 7,
+     "share_any": 0.2,
+     "share_required": 0.175
+    },
+    "logging-tracing": {
+     "any": 13,
+     "required": 11,
+     "share_any": 0.325,
+     "share_required": 0.275
+    },
+    "experiment-tracking": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.05,
+     "share_required": 0.05
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 8,
+     "required": 7,
+     "share_any": 0.2,
+     "share_required": 0.175
+    },
+    "scheduler-design": {
+     "any": 9,
+     "required": 6,
+     "share_any": 0.225,
+     "share_required": 0.15
+    },
+    "hyperscaler-cloud": {
+     "any": 16,
+     "required": 11,
+     "share_any": 0.4,
+     "share_required": 0.275
+    },
+    "gpu-cloud-providers": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.125,
+     "share_required": 0.125
+    },
+    "finops-cost": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.125,
+     "share_required": 0.1
+    },
+    "procurement-vendor": {
+     "any": 6,
+     "required": 6,
+     "share_any": 0.15,
+     "share_required": 0.15
+    },
+    "capacity-planning": {
+     "any": 13,
+     "required": 9,
+     "share_any": 0.325,
+     "share_required": 0.225
+    },
+    "security-compliance": {
+     "any": 10,
+     "required": 9,
+     "share_any": 0.25,
+     "share_required": 0.225
+    },
+    "sre-oncall": {
+     "any": 25,
+     "required": 22,
+     "share_any": 0.625,
+     "share_required": 0.55
+    },
+    "leadership-mgmt": {
+     "any": 15,
+     "required": 12,
+     "share_any": 0.375,
+     "share_required": 0.3
+    },
+    "hpc-experience": {
+     "any": 23,
+     "required": 14,
+     "share_any": 0.575,
+     "share_required": 0.35
+    },
+    "ml-training-experience": {
+     "any": 16,
+     "required": 5,
+     "share_any": 0.4,
+     "share_required": 0.125
+    },
+    "rl-infra": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "data-pipelines": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.15,
+     "share_required": 0.1
+    },
+    "networking-general": {
+     "any": 16,
+     "required": 8,
+     "share_any": 0.4,
+     "share_required": 0.2
+    },
+    "bare-metal-provisioning": {
+     "any": 13,
+     "required": 10,
+     "share_any": 0.325,
+     "share_required": 0.25
+    },
+    "ci-cd": {
+     "any": 12,
+     "required": 7,
+     "share_any": 0.3,
+     "share_required": 0.175
+    },
+    "inference-serving": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.175,
+     "share_required": 0.125
+    },
+    "non-nvidia-accelerators": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.175,
+     "share_required": 0.125
+    },
+    "perf-profiling": {
+     "any": 21,
+     "required": 18,
+     "share_any": 0.525,
+     "share_required": 0.45
+    },
+    "datacenter-facilities": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.175,
+     "share_required": 0.1
+    },
+    "distributed-systems": {
+     "any": 22,
+     "required": 18,
+     "share_any": 0.55,
+     "share_required": 0.45
+    },
+    "virtualization": {
+     "any": 5,
+     "required": 2,
+     "share_any": 0.125,
+     "share_required": 0.05
+    },
+    "hardware-health": {
+     "any": 18,
+     "required": 15,
+     "share_any": 0.45,
+     "share_required": 0.375
+    }
+   }
+  },
+  "eu": {
+   "n": 31,
+   "skills": {
+    "python": {
+     "any": 20,
+     "required": 19,
+     "share_any": 0.645,
+     "share_required": 0.613
+    },
+    "systems-lang": {
+     "any": 15,
+     "required": 13,
+     "share_any": 0.484,
+     "share_required": 0.419
+    },
+    "linux-admin": {
+     "any": 20,
+     "required": 20,
+     "share_any": 0.645,
+     "share_required": 0.645
+    },
+    "slurm": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.194,
+     "share_required": 0.129
+    },
+    "kubernetes": {
+     "any": 20,
+     "required": 16,
+     "share_any": 0.645,
+     "share_required": 0.516
+    },
+    "ray": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.065,
+     "share_required": 0.032
+    },
+    "terraform-iac": {
+     "any": 10,
+     "required": 7,
+     "share_any": 0.323,
+     "share_required": 0.226
+    },
+    "ansible-config": {
+     "any": 9,
+     "required": 8,
+     "share_any": 0.29,
+     "share_required": 0.258
+    },
+    "containers": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.226,
+     "share_required": 0.161
+    },
+    "pytorch-distributed": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.097,
+     "share_required": 0.065
+    },
+    "nccl-collectives": {
+     "any": 8,
+     "required": 5,
+     "share_any": 0.258,
+     "share_required": 0.161
+    },
+    "cuda-gpu": {
+     "any": 13,
+     "required": 9,
+     "share_any": 0.419,
+     "share_required": 0.29
+    },
+    "infiniband-roce": {
+     "any": 11,
+     "required": 8,
+     "share_any": 0.355,
+     "share_required": 0.258
+    },
+    "parallel-fs-storage": {
+     "any": 14,
+     "required": 7,
+     "share_any": 0.452,
+     "share_required": 0.226
+    },
+    "object-storage": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.161,
+     "share_required": 0.129
+    },
+    "prometheus-grafana": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.258,
+     "share_required": 0.258
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.097,
+     "share_required": 0.097
+    },
+    "logging-tracing": {
+     "any": 7,
+     "required": 6,
+     "share_any": 0.226,
+     "share_required": 0.194
+    },
+    "experiment-tracking": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 6,
+     "required": 3,
+     "share_any": 0.194,
+     "share_required": 0.097
+    },
+    "scheduler-design": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.161,
+     "share_required": 0.161
+    },
+    "hyperscaler-cloud": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.226,
+     "share_required": 0.161
+    },
+    "gpu-cloud-providers": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.065,
+     "share_required": 0.032
+    },
+    "finops-cost": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.161,
+     "share_required": 0.161
+    },
+    "procurement-vendor": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.129,
+     "share_required": 0.097
+    },
+    "capacity-planning": {
+     "any": 9,
+     "required": 9,
+     "share_any": 0.29,
+     "share_required": 0.29
+    },
+    "security-compliance": {
+     "any": 14,
+     "required": 12,
+     "share_any": 0.452,
+     "share_required": 0.387
+    },
+    "sre-oncall": {
+     "any": 18,
+     "required": 18,
+     "share_any": 0.581,
+     "share_required": 0.581
+    },
+    "leadership-mgmt": {
+     "any": 6,
+     "required": 6,
+     "share_any": 0.194,
+     "share_required": 0.194
+    },
+    "hpc-experience": {
+     "any": 18,
+     "required": 12,
+     "share_any": 0.581,
+     "share_required": 0.387
+    },
+    "ml-training-experience": {
+     "any": 11,
+     "required": 7,
+     "share_any": 0.355,
+     "share_required": 0.226
+    },
+    "rl-infra": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.065,
+     "share_required": 0.065
+    },
+    "data-pipelines": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.065,
+     "share_required": 0.032
+    },
+    "networking-general": {
+     "any": 15,
+     "required": 12,
+     "share_any": 0.484,
+     "share_required": 0.387
+    },
+    "bare-metal-provisioning": {
+     "any": 11,
+     "required": 7,
+     "share_any": 0.355,
+     "share_required": 0.226
+    },
+    "ci-cd": {
+     "any": 13,
+     "required": 10,
+     "share_any": 0.419,
+     "share_required": 0.323
+    },
+    "inference-serving": {
+     "any": 5,
+     "required": 3,
+     "share_any": 0.161,
+     "share_required": 0.097
+    },
+    "non-nvidia-accelerators": {
+     "any": 2,
+     "required": 0,
+     "share_any": 0.065,
+     "share_required": 0.0
+    },
+    "perf-profiling": {
+     "any": 14,
+     "required": 13,
+     "share_any": 0.452,
+     "share_required": 0.419
+    },
+    "datacenter-facilities": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.129,
+     "share_required": 0.065
+    },
+    "distributed-systems": {
+     "any": 12,
+     "required": 10,
+     "share_any": 0.387,
+     "share_required": 0.323
+    },
+    "virtualization": {
+     "any": 9,
+     "required": 6,
+     "share_any": 0.29,
+     "share_required": 0.194
+    },
+    "hardware-health": {
+     "any": 11,
+     "required": 11,
+     "share_any": 0.355,
+     "share_required": 0.355
+    }
+   }
+  },
+  "cn": {
+   "n": 25,
+   "skills": {
+    "python": {
+     "any": 13,
+     "required": 13,
+     "share_any": 0.52,
+     "share_required": 0.52
+    },
+    "systems-lang": {
+     "any": 14,
+     "required": 14,
+     "share_any": 0.56,
+     "share_required": 0.56
+    },
+    "linux-admin": {
+     "any": 13,
+     "required": 13,
+     "share_any": 0.52,
+     "share_required": 0.52
+    },
+    "slurm": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.04,
+     "share_required": 0.04
+    },
+    "kubernetes": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.36,
+     "share_required": 0.28
+    },
+    "ray": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.08,
+     "share_required": 0.04
+    },
+    "multicloud-skypilot": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.04,
+     "share_required": 0.04
+    },
+    "terraform-iac": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "ansible-config": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.04,
+     "share_required": 0.04
+    },
+    "containers": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.24,
+     "share_required": 0.16
+    },
+    "pytorch-distributed": {
+     "any": 9,
+     "required": 8,
+     "share_any": 0.36,
+     "share_required": 0.32
+    },
+    "nccl-collectives": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.36,
+     "share_required": 0.28
+    },
+    "cuda-gpu": {
+     "any": 13,
+     "required": 7,
+     "share_any": 0.52,
+     "share_required": 0.28
+    },
+    "infiniband-roce": {
+     "any": 11,
+     "required": 8,
+     "share_any": 0.44,
+     "share_required": 0.32
+    },
+    "parallel-fs-storage": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.16,
+     "share_required": 0.16
+    },
+    "object-storage": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.04,
+     "share_required": 0.04
+    },
+    "prometheus-grafana": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.24,
+     "share_required": 0.2
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.08,
+     "share_required": 0.08
+    },
+    "logging-tracing": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.08,
+     "share_required": 0.08
+    },
+    "experiment-tracking": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.12,
+     "share_required": 0.08
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.2,
+     "share_required": 0.2
+    },
+    "scheduler-design": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.2,
+     "share_required": 0.2
+    },
+    "hyperscaler-cloud": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.12,
+     "share_required": 0.08
+    },
+    "gpu-cloud-providers": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "finops-cost": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.16,
+     "share_required": 0.16
+    },
+    "procurement-vendor": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.08,
+     "share_required": 0.08
+    },
+    "capacity-planning": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.2,
+     "share_required": 0.16
+    },
+    "security-compliance": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.04,
+     "share_required": 0.04
+    },
+    "sre-oncall": {
+     "any": 9,
+     "required": 9,
+     "share_any": 0.36,
+     "share_required": 0.36
+    },
+    "leadership-mgmt": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.04,
+     "share_required": 0.0
+    },
+    "hpc-experience": {
+     "any": 8,
+     "required": 3,
+     "share_any": 0.32,
+     "share_required": 0.12
+    },
+    "ml-training-experience": {
+     "any": 17,
+     "required": 15,
+     "share_any": 0.68,
+     "share_required": 0.6
+    },
+    "rl-infra": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.16,
+     "share_required": 0.16
+    },
+    "data-pipelines": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.2,
+     "share_required": 0.16
+    },
+    "networking-general": {
+     "any": 11,
+     "required": 9,
+     "share_any": 0.44,
+     "share_required": 0.36
+    },
+    "bare-metal-provisioning": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.16,
+     "share_required": 0.12
+    },
+    "ci-cd": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.08,
+     "share_required": 0.08
+    },
+    "inference-serving": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.16,
+     "share_required": 0.12
+    },
+    "non-nvidia-accelerators": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.32,
+     "share_required": 0.32
+    },
+    "perf-profiling": {
+     "any": 14,
+     "required": 12,
+     "share_any": 0.56,
+     "share_required": 0.48
+    },
+    "datacenter-facilities": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.08,
+     "share_required": 0.04
+    },
+    "distributed-systems": {
+     "any": 9,
+     "required": 6,
+     "share_any": 0.36,
+     "share_required": 0.24
+    },
+    "virtualization": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.12,
+     "share_required": 0.08
+    },
+    "hardware-health": {
+     "any": 8,
+     "required": 7,
+     "share_any": 0.32,
+     "share_required": 0.28
+    }
+   }
+  }
+ },
+ "demand_by_group": {
+  "lab": {
+   "n": 30,
+   "skills": {
+    "python": {
+     "any": 23,
+     "required": 22,
+     "share_any": 0.767,
+     "share_required": 0.733
+    },
+    "systems-lang": {
+     "any": 12,
+     "required": 12,
+     "share_any": 0.4,
+     "share_required": 0.4
+    },
+    "linux-admin": {
+     "any": 14,
+     "required": 11,
+     "share_any": 0.467,
+     "share_required": 0.367
+    },
+    "slurm": {
+     "any": 8,
+     "required": 6,
+     "share_any": 0.267,
+     "share_required": 0.2
+    },
+    "kubernetes": {
+     "any": 15,
+     "required": 14,
+     "share_any": 0.5,
+     "share_required": 0.467
+    },
+    "ray": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.033,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.167,
+     "share_required": 0.133
+    },
+    "terraform-iac": {
+     "any": 13,
+     "required": 8,
+     "share_any": 0.433,
+     "share_required": 0.267
+    },
+    "ansible-config": {
+     "any": 5,
+     "required": 3,
+     "share_any": 0.167,
+     "share_required": 0.1
+    },
+    "containers": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.2,
+     "share_required": 0.167
+    },
+    "pytorch-distributed": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.133,
+     "share_required": 0.1
+    },
+    "nccl-collectives": {
+     "any": 8,
+     "required": 5,
+     "share_any": 0.267,
+     "share_required": 0.167
+    },
+    "cuda-gpu": {
+     "any": 15,
+     "required": 7,
+     "share_any": 0.5,
+     "share_required": 0.233
+    },
+    "infiniband-roce": {
+     "any": 9,
+     "required": 4,
+     "share_any": 0.3,
+     "share_required": 0.133
+    },
+    "parallel-fs-storage": {
+     "any": 7,
+     "required": 2,
+     "share_any": 0.233,
+     "share_required": 0.067
+    },
+    "object-storage": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.067,
+     "share_required": 0.033
+    },
+    "prometheus-grafana": {
+     "any": 10,
+     "required": 7,
+     "share_any": 0.333,
+     "share_required": 0.233
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.167,
+     "share_required": 0.167
+    },
+    "logging-tracing": {
+     "any": 9,
+     "required": 6,
+     "share_any": 0.3,
+     "share_required": 0.2
+    },
+    "experiment-tracking": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.067,
+     "share_required": 0.067
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.2,
+     "share_required": 0.167
+    },
+    "scheduler-design": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.3,
+     "share_required": 0.233
+    },
+    "hyperscaler-cloud": {
+     "any": 12,
+     "required": 8,
+     "share_any": 0.4,
+     "share_required": 0.267
+    },
+    "gpu-cloud-providers": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.1,
+     "share_required": 0.067
+    },
+    "finops-cost": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.267,
+     "share_required": 0.267
+    },
+    "procurement-vendor": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.067,
+     "share_required": 0.067
+    },
+    "capacity-planning": {
+     "any": 13,
+     "required": 11,
+     "share_any": 0.433,
+     "share_required": 0.367
+    },
+    "security-compliance": {
+     "any": 7,
+     "required": 6,
+     "share_any": 0.233,
+     "share_required": 0.2
+    },
+    "sre-oncall": {
+     "any": 21,
+     "required": 19,
+     "share_any": 0.7,
+     "share_required": 0.633
+    },
+    "leadership-mgmt": {
+     "any": 7,
+     "required": 7,
+     "share_any": 0.233,
+     "share_required": 0.233
+    },
+    "hpc-experience": {
+     "any": 13,
+     "required": 4,
+     "share_any": 0.433,
+     "share_required": 0.133
+    },
+    "ml-training-experience": {
+     "any": 17,
+     "required": 10,
+     "share_any": 0.567,
+     "share_required": 0.333
+    },
+    "rl-infra": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.1,
+     "share_required": 0.1
+    },
+    "data-pipelines": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.133,
+     "share_required": 0.133
+    },
+    "networking-general": {
+     "any": 12,
+     "required": 8,
+     "share_any": 0.4,
+     "share_required": 0.267
+    },
+    "bare-metal-provisioning": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.233,
+     "share_required": 0.167
+    },
+    "ci-cd": {
+     "any": 8,
+     "required": 4,
+     "share_any": 0.267,
+     "share_required": 0.133
+    },
+    "inference-serving": {
+     "any": 8,
+     "required": 4,
+     "share_any": 0.267,
+     "share_required": 0.133
+    },
+    "non-nvidia-accelerators": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.133,
+     "share_required": 0.1
+    },
+    "perf-profiling": {
+     "any": 15,
+     "required": 11,
+     "share_any": 0.5,
+     "share_required": 0.367
+    },
+    "datacenter-facilities": {
+     "any": 5,
+     "required": 2,
+     "share_any": 0.167,
+     "share_required": 0.067
+    },
+    "distributed-systems": {
+     "any": 16,
+     "required": 13,
+     "share_any": 0.533,
+     "share_required": 0.433
+    },
+    "virtualization": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.067,
+     "share_required": 0.033
+    },
+    "hardware-health": {
+     "any": 15,
+     "required": 14,
+     "share_any": 0.5,
+     "share_required": 0.467
+    }
+   }
+  },
+  "bigtech": {
+   "n": 19,
+   "skills": {
+    "python": {
+     "any": 13,
+     "required": 12,
+     "share_any": 0.684,
+     "share_required": 0.632
+    },
+    "systems-lang": {
+     "any": 16,
+     "required": 14,
+     "share_any": 0.842,
+     "share_required": 0.737
+    },
+    "linux-admin": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.421,
+     "share_required": 0.421
+    },
+    "slurm": {
+     "any": 3,
+     "required": 0,
+     "share_any": 0.158,
+     "share_required": 0.0
+    },
+    "kubernetes": {
+     "any": 8,
+     "required": 3,
+     "share_any": 0.421,
+     "share_required": 0.158
+    },
+    "ray": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.105,
+     "share_required": 0.053
+    },
+    "multicloud-skypilot": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.053,
+     "share_required": 0.053
+    },
+    "terraform-iac": {
+     "any": 4,
+     "required": 1,
+     "share_any": 0.211,
+     "share_required": 0.053
+    },
+    "ansible-config": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.053,
+     "share_required": 0.0
+    },
+    "containers": {
+     "any": 6,
+     "required": 2,
+     "share_any": 0.316,
+     "share_required": 0.105
+    },
+    "pytorch-distributed": {
+     "any": 9,
+     "required": 8,
+     "share_any": 0.474,
+     "share_required": 0.421
+    },
+    "nccl-collectives": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.316,
+     "share_required": 0.211
+    },
+    "cuda-gpu": {
+     "any": 8,
+     "required": 4,
+     "share_any": 0.421,
+     "share_required": 0.211
+    },
+    "infiniband-roce": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.368,
+     "share_required": 0.263
+    },
+    "parallel-fs-storage": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.053,
+     "share_required": 0.053
+    },
+    "object-storage": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "prometheus-grafana": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.368,
+     "share_required": 0.211
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.158,
+     "share_required": 0.158
+    },
+    "logging-tracing": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.263,
+     "share_required": 0.263
+    },
+    "experiment-tracking": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.105,
+     "share_required": 0.105
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 6,
+     "required": 6,
+     "share_any": 0.316,
+     "share_required": 0.316
+    },
+    "scheduler-design": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.158,
+     "share_required": 0.158
+    },
+    "hyperscaler-cloud": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.368,
+     "share_required": 0.263
+    },
+    "gpu-cloud-providers": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.053,
+     "share_required": 0.053
+    },
+    "finops-cost": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.158,
+     "share_required": 0.105
+    },
+    "procurement-vendor": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.105,
+     "share_required": 0.105
+    },
+    "capacity-planning": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.211,
+     "share_required": 0.158
+    },
+    "security-compliance": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.211,
+     "share_required": 0.211
+    },
+    "sre-oncall": {
+     "any": 11,
+     "required": 11,
+     "share_any": 0.579,
+     "share_required": 0.579
+    },
+    "leadership-mgmt": {
+     "any": 3,
+     "required": 1,
+     "share_any": 0.158,
+     "share_required": 0.053
+    },
+    "hpc-experience": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.368,
+     "share_required": 0.263
+    },
+    "ml-training-experience": {
+     "any": 11,
+     "required": 8,
+     "share_any": 0.579,
+     "share_required": 0.421
+    },
+    "rl-infra": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.105,
+     "share_required": 0.105
+    },
+    "data-pipelines": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.211,
+     "share_required": 0.105
+    },
+    "networking-general": {
+     "any": 10,
+     "required": 7,
+     "share_any": 0.526,
+     "share_required": 0.368
+    },
+    "bare-metal-provisioning": {
+     "any": 3,
+     "required": 1,
+     "share_any": 0.158,
+     "share_required": 0.053
+    },
+    "ci-cd": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.368,
+     "share_required": 0.211
+    },
+    "inference-serving": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.158,
+     "share_required": 0.105
+    },
+    "non-nvidia-accelerators": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.316,
+     "share_required": 0.211
+    },
+    "perf-profiling": {
+     "any": 10,
+     "required": 10,
+     "share_any": 0.526,
+     "share_required": 0.526
+    },
+    "datacenter-facilities": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.158,
+     "share_required": 0.105
+    },
+    "distributed-systems": {
+     "any": 9,
+     "required": 6,
+     "share_any": 0.474,
+     "share_required": 0.316
+    },
+    "virtualization": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.053,
+     "share_required": 0.053
+    },
+    "hardware-health": {
+     "any": 7,
+     "required": 6,
+     "share_any": 0.368,
+     "share_required": 0.316
+    }
+   }
+  },
+  "cloud": {
+   "n": 20,
+   "skills": {
+    "python": {
+     "any": 13,
+     "required": 12,
+     "share_any": 0.65,
+     "share_required": 0.6
+    },
+    "systems-lang": {
+     "any": 13,
+     "required": 12,
+     "share_any": 0.65,
+     "share_required": 0.6
+    },
+    "linux-admin": {
+     "any": 14,
+     "required": 14,
+     "share_any": 0.7,
+     "share_required": 0.7
+    },
+    "slurm": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.05,
+     "share_required": 0.05
+    },
+    "kubernetes": {
+     "any": 15,
+     "required": 11,
+     "share_any": 0.75,
+     "share_required": 0.55
+    },
+    "ray": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.05,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "terraform-iac": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.25,
+     "share_required": 0.25
+    },
+    "ansible-config": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.4,
+     "share_required": 0.4
+    },
+    "containers": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.2,
+     "share_required": 0.15
+    },
+    "pytorch-distributed": {
+     "any": 2,
+     "required": 0,
+     "share_any": 0.1,
+     "share_required": 0.0
+    },
+    "nccl-collectives": {
+     "any": 6,
+     "required": 1,
+     "share_any": 0.3,
+     "share_required": 0.05
+    },
+    "cuda-gpu": {
+     "any": 5,
+     "required": 2,
+     "share_any": 0.25,
+     "share_required": 0.1
+    },
+    "infiniband-roce": {
+     "any": 11,
+     "required": 8,
+     "share_any": 0.55,
+     "share_required": 0.4
+    },
+    "parallel-fs-storage": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.35,
+     "share_required": 0.25
+    },
+    "object-storage": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.2,
+     "share_required": 0.2
+    },
+    "prometheus-grafana": {
+     "any": 10,
+     "required": 9,
+     "share_any": 0.5,
+     "share_required": 0.45
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.2,
+     "share_required": 0.15
+    },
+    "logging-tracing": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.2,
+     "share_required": 0.2
+    },
+    "experiment-tracking": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 4,
+     "required": 1,
+     "share_any": 0.2,
+     "share_required": 0.05
+    },
+    "scheduler-design": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.15,
+     "share_required": 0.15
+    },
+    "hyperscaler-cloud": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.1,
+     "share_required": 0.1
+    },
+    "gpu-cloud-providers": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.1,
+     "share_required": 0.1
+    },
+    "finops-cost": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.05,
+     "share_required": 0.05
+    },
+    "procurement-vendor": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.05,
+     "share_required": 0.0
+    },
+    "capacity-planning": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.25,
+     "share_required": 0.25
+    },
+    "security-compliance": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.2,
+     "share_required": 0.1
+    },
+    "sre-oncall": {
+     "any": 10,
+     "required": 10,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "leadership-mgmt": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.2,
+     "share_required": 0.2
+    },
+    "hpc-experience": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.45,
+     "share_required": 0.35
+    },
+    "ml-training-experience": {
+     "any": 6,
+     "required": 2,
+     "share_any": 0.3,
+     "share_required": 0.1
+    },
+    "rl-infra": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "data-pipelines": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.1,
+     "share_required": 0.1
+    },
+    "networking-general": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.45,
+     "share_required": 0.35
+    },
+    "bare-metal-provisioning": {
+     "any": 10,
+     "required": 9,
+     "share_any": 0.5,
+     "share_required": 0.45
+    },
+    "ci-cd": {
+     "any": 4,
+     "required": 3,
+     "share_any": 0.2,
+     "share_required": 0.15
+    },
+    "inference-serving": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.05,
+     "share_required": 0.05
+    },
+    "non-nvidia-accelerators": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.05,
+     "share_required": 0.0
+    },
+    "perf-profiling": {
+     "any": 12,
+     "required": 12,
+     "share_any": 0.6,
+     "share_required": 0.6
+    },
+    "datacenter-facilities": {
+     "any": 5,
+     "required": 3,
+     "share_any": 0.25,
+     "share_required": 0.15
+    },
+    "distributed-systems": {
+     "any": 10,
+     "required": 9,
+     "share_any": 0.5,
+     "share_required": 0.45
+    },
+    "virtualization": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.3,
+     "share_required": 0.2
+    },
+    "hardware-health": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.4,
+     "share_required": 0.4
+    }
+   }
+  },
+  "hpc": {
+   "n": 14,
+   "skills": {
+    "python": {
+     "any": 9,
+     "required": 7,
+     "share_any": 0.643,
+     "share_required": 0.5
+    },
+    "systems-lang": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.429,
+     "share_required": 0.286
+    },
+    "linux-admin": {
+     "any": 12,
+     "required": 12,
+     "share_any": 0.857,
+     "share_required": 0.857
+    },
+    "slurm": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.5,
+     "share_required": 0.286
+    },
+    "kubernetes": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.429,
+     "share_required": 0.286
+    },
+    "ray": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "terraform-iac": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.143,
+     "share_required": 0.143
+    },
+    "ansible-config": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.5,
+     "share_required": 0.357
+    },
+    "containers": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.5,
+     "share_required": 0.357
+    },
+    "pytorch-distributed": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.071,
+     "share_required": 0.071
+    },
+    "nccl-collectives": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.143,
+     "share_required": 0.143
+    },
+    "cuda-gpu": {
+     "any": 3,
+     "required": 1,
+     "share_any": 0.214,
+     "share_required": 0.071
+    },
+    "infiniband-roce": {
+     "any": 7,
+     "required": 6,
+     "share_any": 0.5,
+     "share_required": 0.429
+    },
+    "parallel-fs-storage": {
+     "any": 11,
+     "required": 7,
+     "share_any": 0.786,
+     "share_required": 0.5
+    },
+    "object-storage": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.071,
+     "share_required": 0.071
+    },
+    "prometheus-grafana": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.286,
+     "share_required": 0.143
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.071,
+     "share_required": 0.071
+    },
+    "logging-tracing": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.143,
+     "share_required": 0.143
+    },
+    "experiment-tracking": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.071,
+     "share_required": 0.0
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.143,
+     "share_required": 0.143
+    },
+    "scheduler-design": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.071,
+     "share_required": 0.071
+    },
+    "hyperscaler-cloud": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.143,
+     "share_required": 0.071
+    },
+    "gpu-cloud-providers": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "finops-cost": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "procurement-vendor": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.357,
+     "share_required": 0.357
+    },
+    "capacity-planning": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.143,
+     "share_required": 0.143
+    },
+    "security-compliance": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.571,
+     "share_required": 0.571
+    },
+    "sre-oncall": {
+     "any": 8,
+     "required": 8,
+     "share_any": 0.571,
+     "share_required": 0.571
+    },
+    "leadership-mgmt": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.429,
+     "share_required": 0.286
+    },
+    "hpc-experience": {
+     "any": 12,
+     "required": 10,
+     "share_any": 0.857,
+     "share_required": 0.714
+    },
+    "ml-training-experience": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.143,
+     "share_required": 0.143
+    },
+    "rl-infra": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "data-pipelines": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.071,
+     "share_required": 0.0
+    },
+    "networking-general": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.5,
+     "share_required": 0.286
+    },
+    "bare-metal-provisioning": {
+     "any": 7,
+     "required": 4,
+     "share_any": 0.5,
+     "share_required": 0.286
+    },
+    "ci-cd": {
+     "any": 6,
+     "required": 6,
+     "share_any": 0.429,
+     "share_required": 0.429
+    },
+    "inference-serving": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "non-nvidia-accelerators": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.071,
+     "share_required": 0.071
+    },
+    "perf-profiling": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.429,
+     "share_required": 0.357
+    },
+    "datacenter-facilities": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "distributed-systems": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.214,
+     "share_required": 0.143
+    },
+    "virtualization": {
+     "any": 4,
+     "required": 2,
+     "share_any": 0.286,
+     "share_required": 0.143
+    },
+    "hardware-health": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.357,
+     "share_required": 0.357
+    }
+   }
+  },
+  "vendor": {
+   "n": 11,
+   "skills": {
+    "python": {
+     "any": 6,
+     "required": 4,
+     "share_any": 0.545,
+     "share_required": 0.364
+    },
+    "systems-lang": {
+     "any": 6,
+     "required": 6,
+     "share_any": 0.545,
+     "share_required": 0.545
+    },
+    "linux-admin": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.545,
+     "share_required": 0.455
+    },
+    "slurm": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.182,
+     "share_required": 0.091
+    },
+    "kubernetes": {
+     "any": 5,
+     "required": 4,
+     "share_any": 0.455,
+     "share_required": 0.364
+    },
+    "ray": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "terraform-iac": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.091,
+     "share_required": 0.0
+    },
+    "ansible-config": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.182,
+     "share_required": 0.091
+    },
+    "containers": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.273,
+     "share_required": 0.182
+    },
+    "pytorch-distributed": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.273,
+     "share_required": 0.182
+    },
+    "nccl-collectives": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.273,
+     "share_required": 0.273
+    },
+    "cuda-gpu": {
+     "any": 5,
+     "required": 2,
+     "share_any": 0.455,
+     "share_required": 0.182
+    },
+    "infiniband-roce": {
+     "any": 7,
+     "required": 3,
+     "share_any": 0.636,
+     "share_required": 0.273
+    },
+    "parallel-fs-storage": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.273,
+     "share_required": 0.273
+    },
+    "object-storage": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "prometheus-grafana": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.273,
+     "share_required": 0.182
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "logging-tracing": {
+     "any": 2,
+     "required": 2,
+     "share_any": 0.182,
+     "share_required": 0.182
+    },
+    "experiment-tracking": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "scheduler-design": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.182,
+     "share_required": 0.091
+    },
+    "hyperscaler-cloud": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.182,
+     "share_required": 0.091
+    },
+    "gpu-cloud-providers": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "finops-cost": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "procurement-vendor": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "capacity-planning": {
+     "any": 2,
+     "required": 0,
+     "share_any": 0.182,
+     "share_required": 0.0
+    },
+    "security-compliance": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "sre-oncall": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.091,
+     "share_required": 0.0
+    },
+    "leadership-mgmt": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "hpc-experience": {
+     "any": 8,
+     "required": 3,
+     "share_any": 0.727,
+     "share_required": 0.273
+    },
+    "ml-training-experience": {
+     "any": 7,
+     "required": 5,
+     "share_any": 0.636,
+     "share_required": 0.455
+    },
+    "rl-infra": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "data-pipelines": {
+     "any": 2,
+     "required": 1,
+     "share_any": 0.182,
+     "share_required": 0.091
+    },
+    "networking-general": {
+     "any": 3,
+     "required": 2,
+     "share_any": 0.273,
+     "share_required": 0.182
+    },
+    "bare-metal-provisioning": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "ci-cd": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.091,
+     "share_required": 0.091
+    },
+    "inference-serving": {
+     "any": 3,
+     "required": 3,
+     "share_any": 0.273,
+     "share_required": 0.273
+    },
+    "non-nvidia-accelerators": {
+     "any": 5,
+     "required": 5,
+     "share_any": 0.455,
+     "share_required": 0.455
+    },
+    "perf-profiling": {
+     "any": 6,
+     "required": 5,
+     "share_any": 0.545,
+     "share_required": 0.455
+    },
+    "datacenter-facilities": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "distributed-systems": {
+     "any": 4,
+     "required": 4,
+     "share_any": 0.364,
+     "share_required": 0.364
+    },
+    "virtualization": {
+     "any": 3,
+     "required": 1,
+     "share_any": 0.273,
+     "share_required": 0.091
+    },
+    "hardware-health": {
+     "any": 2,
+     "required": 0,
+     "share_any": 0.182,
+     "share_required": 0.0
+    }
+   }
+  },
+  "other": {
+   "n": 2,
+   "skills": {
+    "python": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.5,
+     "share_required": 0.0
+    },
+    "systems-lang": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "linux-admin": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "slurm": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "kubernetes": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "ray": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "multicloud-skypilot": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "terraform-iac": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "ansible-config": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "containers": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "pytorch-distributed": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "nccl-collectives": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "cuda-gpu": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "infiniband-roce": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "parallel-fs-storage": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "object-storage": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "prometheus-grafana": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "dcgm-gpu-monitoring": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "logging-tracing": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "experiment-tracking": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "checkpoint-fault-tolerance": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "scheduler-design": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "hyperscaler-cloud": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "gpu-cloud-providers": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "finops-cost": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "procurement-vendor": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "capacity-planning": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "security-compliance": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "sre-oncall": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "leadership-mgmt": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "hpc-experience": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "ml-training-experience": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.5,
+     "share_required": 0.0
+    },
+    "rl-infra": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "data-pipelines": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "networking-general": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "bare-metal-provisioning": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "ci-cd": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "inference-serving": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "non-nvidia-accelerators": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "perf-profiling": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "datacenter-facilities": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    },
+    "distributed-systems": {
+     "any": 1,
+     "required": 0,
+     "share_any": 0.5,
+     "share_required": 0.0
+    },
+    "virtualization": {
+     "any": 1,
+     "required": 1,
+     "share_any": 0.5,
+     "share_required": 0.5
+    },
+    "hardware-health": {
+     "any": 0,
+     "required": 0,
+     "share_any": 0.0,
+     "share_required": 0.0
+    }
+   }
+  }
+ },
+ "distinctive_by_region": {
+  "us": [
+   {
+    "skill": "prometheus-grafana",
+    "share_in": 0.545,
+    "share_out": 0.27,
+    "delta_points": 27.5
+   },
+   {
+    "skill": "slurm",
+    "share_in": 0.364,
+    "share_out": 0.143,
+    "delta_points": 22.1
+   },
+   {
+    "skill": "leadership-mgmt",
+    "share_in": 0.364,
+    "share_out": 0.159,
+    "delta_points": 20.5
+   },
+   {
+    "skill": "ansible-config",
+    "share_in": 0.364,
+    "share_out": 0.175,
+    "delta_points": 18.9
+   },
+   {
+    "skill": "hyperscaler-cloud",
+    "share_in": 0.394,
+    "share_out": 0.206,
+    "delta_points": 18.8
+   },
+   {
+    "skill": "python",
+    "share_in": 0.788,
+    "share_out": 0.619,
+    "delta_points": 16.9
+   },
+   {
+    "skill": "logging-tracing",
+    "share_in": 0.333,
+    "share_out": 0.175,
+    "delta_points": 15.8
+   },
+   {
+    "skill": "hpc-experience",
+    "share_in": 0.606,
+    "share_out": 0.46,
+    "delta_points": 14.6
+   },
+   {
+    "skill": "containers",
+    "share_in": 0.364,
+    "share_out": 0.222,
+    "delta_points": 14.2
+   },
+   {
+    "skill": "gpu-cloud-providers",
+    "share_in": 0.152,
+    "share_out": 0.032,
+    "delta_points": 12.0
+   },
+   {
+    "skill": "dcgm-gpu-monitoring",
+    "share_in": 0.212,
+    "share_out": 0.095,
+    "delta_points": 11.7
+   },
+   {
+    "skill": "datacenter-facilities",
+    "share_in": 0.212,
+    "share_out": 0.095,
+    "delta_points": 11.7
+   },
+   {
+    "skill": "terraform-iac",
+    "share_in": 0.333,
+    "share_out": 0.222,
+    "delta_points": 11.1
+   },
+   {
+    "skill": "hardware-health",
+    "share_in": 0.455,
+    "share_out": 0.349,
+    "delta_points": 10.6
+   },
+   {
+    "skill": "distributed-systems",
+    "share_in": 0.515,
+    "share_out": 0.413,
+    "delta_points": 10.2
+   },
+   {
+    "skill": "infiniband-roce",
+    "share_in": 0.485,
+    "share_out": 0.397,
+    "delta_points": 8.8
+   },
+   {
+    "skill": "bare-metal-provisioning",
+    "share_in": 0.333,
+    "share_out": 0.27,
+    "delta_points": 6.3
+   },
+   {
+    "skill": "sre-oncall",
+    "share_in": 0.576,
+    "share_out": 0.524,
+    "delta_points": 5.2
+   },
+   {
+    "skill": "procurement-vendor",
+    "share_in": 0.152,
+    "share_out": 0.111,
+    "delta_points": 4.1
+   },
+   {
+    "skill": "systems-lang",
+    "share_in": 0.576,
+    "share_out": 0.54,
+    "delta_points": 3.6
+   },
+   {
+    "skill": "ci-cd",
+    "share_in": 0.303,
+    "share_out": 0.27,
+    "delta_points": 3.3
+   },
+   {
+    "skill": "data-pipelines",
+    "share_in": 0.152,
+    "share_out": 0.127,
+    "delta_points": 2.5
+   },
+   {
+    "skill": "inference-serving",
+    "share_in": 0.182,
+    "share_out": 0.159,
+    "delta_points": 2.3
+   },
+   {
+    "skill": "non-nvidia-accelerators",
+    "share_in": 0.182,
+    "share_out": 0.175,
+    "delta_points": 0.7
+   },
+   {
+    "skill": "perf-profiling",
+    "share_in": 0.515,
+    "share_out": 0.508,
+    "delta_points": 0.7
+   },
+   {
+    "skill": "parallel-fs-storage",
+    "share_in": 0.303,
+    "share_out": 0.302,
+    "delta_points": 0.1
+   },
+   {
+    "skill": "capacity-planning",
+    "share_in": 0.273,
+    "share_out": 0.286,
+    "delta_points": -1.3
+   },
+   {
+    "skill": "pytorch-distributed",
+    "share_in": 0.182,
+    "share_out": 0.206,
+    "delta_points": -2.4
+   },
+   {
+    "skill": "scheduler-design",
+    "share_in": 0.182,
+    "share_out": 0.206,
+    "delta_points": -2.4
+   },
+   {
+    "skill": "linux-admin",
+    "share_in": 0.545,
+    "share_out": 0.571,
+    "delta_points": -2.6
+   },
+   {
+    "skill": "security-compliance",
+    "share_in": 0.242,
+    "share_out": 0.27,
+    "delta_points": -2.8
+   },
+   {
+    "skill": "kubernetes",
+    "share_in": 0.485,
+    "share_out": 0.54,
+    "delta_points": -5.5
+   },
+   {
+    "skill": "nccl-collectives",
+    "share_in": 0.212,
+    "share_out": 0.286,
+    "delta_points": -7.4
+   },
+   {
+    "skill": "virtualization",
+    "share_in": 0.121,
+    "share_out": 0.206,
+    "delta_points": -8.5
+   },
+   {
+    "skill": "ml-training-experience",
+    "share_in": 0.394,
+    "share_out": 0.492,
+    "delta_points": -9.8
+   },
+   {
+    "skill": "networking-general",
+    "share_in": 0.364,
+    "share_out": 0.476,
+    "delta_points": -11.2
+   },
+   {
+    "skill": "checkpoint-fault-tolerance",
+    "share_in": 0.121,
+    "share_out": 0.238,
+    "delta_points": -11.7
+   },
+   {
+    "skill": "cuda-gpu",
+    "share_in": 0.303,
+    "share_out": 0.429,
+    "delta_points": -12.6
+   }
+  ],
+  "eu": [
+   {
+    "skill": "security-compliance",
+    "share_in": 0.421,
+    "share_out": 0.155,
+    "delta_points": 26.6
+   },
+   {
+    "skill": "kubernetes",
+    "share_in": 0.658,
+    "share_out": 0.431,
+    "delta_points": 22.7
+   },
+   {
+    "skill": "ci-cd",
+    "share_in": 0.395,
+    "share_out": 0.207,
+    "delta_points": 18.8
+   },
+   {
+    "skill": "terraform-iac",
+    "share_in": 0.368,
+    "share_out": 0.19,
+    "delta_points": 17.8
+   },
+   {
+    "skill": "parallel-fs-storage",
+    "share_in": 0.395,
+    "share_out": 0.241,
+    "delta_points": 15.4
+   },
+   {
+    "skill": "sre-oncall",
+    "share_in": 0.632,
+    "share_out": 0.483,
+    "delta_points": 14.9
+   },
+   {
+    "skill": "virtualization",
+    "share_in": 0.263,
+    "share_out": 0.121,
+    "delta_points": 14.2
+   },
+   {
+    "skill": "object-storage",
+    "share_in": 0.158,
+    "share_out": 0.034,
+    "delta_points": 12.4
+   },
+   {
+    "skill": "checkpoint-fault-tolerance",
+    "share_in": 0.263,
+    "share_out": 0.155,
+    "delta_points": 10.8
+   },
+   {
+    "skill": "finops-cost",
+    "share_in": 0.211,
+    "share_out": 0.103,
+    "delta_points": 10.8
+   },
+   {
+    "skill": "networking-general",
+    "share_in": 0.5,
+    "share_out": 0.397,
+    "delta_points": 10.3
+   },
+   {
+    "skill": "capacity-planning",
+    "share_in": 0.342,
+    "share_out": 0.241,
+    "delta_points": 10.1
+   },
+   {
+    "skill": "bare-metal-provisioning",
+    "share_in": 0.342,
+    "share_out": 0.259,
+    "delta_points": 8.3
+   },
+   {
+    "skill": "linux-admin",
+    "share_in": 0.605,
+    "share_out": 0.534,
+    "delta_points": 7.1
+   },
+   {
+    "skill": "hpc-experience",
+    "share_in": 0.553,
+    "share_out": 0.483,
+    "delta_points": 7.0
+   },
+   {
+    "skill": "multicloud-skypilot",
+    "share_in": 0.105,
+    "share_out": 0.052,
+    "delta_points": 5.3
+   },
+   {
+    "skill": "ansible-config",
+    "share_in": 0.263,
+    "share_out": 0.224,
+    "delta_points": 3.9
+   },
+   {
+    "skill": "scheduler-design",
+    "share_in": 0.211,
+    "share_out": 0.19,
+    "delta_points": 2.1
+   },
+   {
+    "skill": "logging-tracing",
+    "share_in": 0.237,
+    "share_out": 0.224,
+    "delta_points": 1.3
+   },
+   {
+    "skill": "leadership-mgmt",
+    "share_in": 0.237,
+    "share_out": 0.224,
+    "delta_points": 1.3
+   },
+   {
+    "skill": "python",
+    "share_in": 0.684,
+    "share_out": 0.672,
+    "delta_points": 1.2
+   },
+   {
+    "skill": "procurement-vendor",
+    "share_in": 0.132,
+    "share_out": 0.121,
+    "delta_points": 1.1
+   },
+   {
+    "skill": "distributed-systems",
+    "share_in": 0.447,
+    "share_out": 0.448,
+    "delta_points": -0.1
+   },
+   {
+    "skill": "slurm",
+    "share_in": 0.211,
+    "share_out": 0.224,
+    "delta_points": -1.3
+   },
+   {
+    "skill": "hyperscaler-cloud",
+    "share_in": 0.263,
+    "share_out": 0.276,
+    "delta_points": -1.3
+   },
+   {
+    "skill": "inference-serving",
+    "share_in": 0.158,
+    "share_out": 0.172,
+    "delta_points": -1.4
+   },
+   {
+    "skill": "cuda-gpu",
+    "share_in": 0.368,
+    "share_out": 0.397,
+    "delta_points": -2.9
+   },
+   {
+    "skill": "hardware-health",
+    "share_in": 0.368,
+    "share_out": 0.397,
+    "delta_points": -2.9
+   },
+   {
+    "skill": "nccl-collectives",
+    "share_in": 0.237,
+    "share_out": 0.276,
+    "delta_points": -3.9
+   },
+   {
+    "skill": "systems-lang",
+    "share_in": 0.526,
+    "share_out": 0.569,
+    "delta_points": -4.3
+   },
+   {
+    "skill": "dcgm-gpu-monitoring",
+    "share_in": 0.105,
+    "share_out": 0.155,
+    "delta_points": -5.0
+   },
+   {
+    "skill": "datacenter-facilities",
+    "share_in": 0.105,
+    "share_out": 0.155,
+    "delta_points": -5.0
+   },
+   {
+    "skill": "perf-profiling",
+    "share_in": 0.474,
+    "share_out": 0.534,
+    "delta_points": -6.0
+   },
+   {
+    "skill": "data-pipelines",
+    "share_in": 0.079,
+    "share_out": 0.172,
+    "delta_points": -9.3
+   },
+   {
+    "skill": "infiniband-roce",
+    "share_in": 0.368,
+    "share_out": 0.466,
+    "delta_points": -9.8
+   },
+   {
+    "skill": "containers",
+    "share_in": 0.211,
+    "share_out": 0.31,
+    "delta_points": -9.9
+   },
+   {
+    "skill": "prometheus-grafana",
+    "share_in": 0.289,
+    "share_out": 0.414,
+    "delta_points": -12.5
+   },
+   {
+    "skill": "ml-training-experience",
+    "share_in": 0.368,
+    "share_out": 0.517,
+    "delta_points": -14.9
+   },
+   {
+    "skill": "pytorch-distributed",
+    "share_in": 0.105,
+    "share_out": 0.259,
+    "delta_points": -15.4
+   },
+   {
+    "skill": "non-nvidia-accelerators",
+    "share_in": 0.079,
+    "share_out": 0.241,
+    "delta_points": -16.2
+   }
+  ],
+  "cn": [
+   {
+    "skill": "ml-training-experience",
+    "share_in": 0.696,
+    "share_out": 0.384,
+    "delta_points": 31.2
+   },
+   {
+    "skill": "pytorch-distributed",
+    "share_in": 0.391,
+    "share_out": 0.137,
+    "delta_points": 25.4
+   },
+   {
+    "skill": "cuda-gpu",
+    "share_in": 0.522,
+    "share_out": 0.342,
+    "delta_points": 18.0
+   },
+   {
+    "skill": "nccl-collectives",
+    "share_in": 0.391,
+    "share_out": 0.219,
+    "delta_points": 17.2
+   },
+   {
+    "skill": "non-nvidia-accelerators",
+    "share_in": 0.304,
+    "share_out": 0.137,
+    "delta_points": 16.7
+   },
+   {
+    "skill": "rl-infra",
+    "share_in": 0.174,
+    "share_out": 0.027,
+    "delta_points": 14.7
+   },
+   {
+    "skill": "data-pipelines",
+    "share_in": 0.217,
+    "share_out": 0.11,
+    "delta_points": 10.7
+   },
+   {
+    "skill": "experiment-tracking",
+    "share_in": 0.13,
+    "share_out": 0.027,
+    "delta_points": 10.3
+   },
+   {
+    "skill": "infiniband-roce",
+    "share_in": 0.478,
+    "share_out": 0.411,
+    "delta_points": 6.7
+   },
+   {
+    "skill": "checkpoint-fault-tolerance",
+    "share_in": 0.217,
+    "share_out": 0.192,
+    "delta_points": 2.5
+   },
+   {
+    "skill": "perf-profiling",
+    "share_in": 0.522,
+    "share_out": 0.507,
+    "delta_points": 1.5
+   },
+   {
+    "skill": "networking-general",
+    "share_in": 0.435,
+    "share_out": 0.438,
+    "delta_points": -0.3
+   },
+   {
+    "skill": "containers",
+    "share_in": 0.261,
+    "share_out": 0.274,
+    "delta_points": -1.3
+   },
+   {
+    "skill": "finops-cost",
+    "share_in": 0.13,
+    "share_out": 0.151,
+    "delta_points": -2.1
+   },
+   {
+    "skill": "scheduler-design",
+    "share_in": 0.174,
+    "share_out": 0.205,
+    "delta_points": -3.1
+   },
+   {
+    "skill": "systems-lang",
+    "share_in": 0.522,
+    "share_out": 0.562,
+    "delta_points": -4.0
+   },
+   {
+    "skill": "inference-serving",
+    "share_in": 0.13,
+    "share_out": 0.178,
+    "delta_points": -4.8
+   },
+   {
+    "skill": "linux-admin",
+    "share_in": 0.522,
+    "share_out": 0.575,
+    "delta_points": -5.3
+   },
+   {
+    "skill": "virtualization",
+    "share_in": 0.13,
+    "share_out": 0.192,
+    "delta_points": -6.2
+   },
+   {
+    "skill": "capacity-planning",
+    "share_in": 0.217,
+    "share_out": 0.301,
+    "delta_points": -8.4
+   },
+   {
+    "skill": "hardware-health",
+    "share_in": 0.304,
+    "share_out": 0.411,
+    "delta_points": -10.7
+   },
+   {
+    "skill": "distributed-systems",
+    "share_in": 0.348,
+    "share_out": 0.479,
+    "delta_points": -13.1
+   },
+   {
+    "skill": "prometheus-grafana",
+    "share_in": 0.261,
+    "share_out": 0.397,
+    "delta_points": -13.6
+   },
+   {
+    "skill": "parallel-fs-storage",
+    "share_in": 0.174,
+    "share_out": 0.342,
+    "delta_points": -16.8
+   },
+   {
+    "skill": "sre-oncall",
+    "share_in": 0.391,
+    "share_out": 0.589,
+    "delta_points": -19.8
+   },
+   {
+    "skill": "python",
+    "share_in": 0.522,
+    "share_out": 0.726,
+    "delta_points": -20.4
+   },
+   {
+    "skill": "bare-metal-provisioning",
+    "share_in": 0.13,
+    "share_out": 0.342,
+    "delta_points": -21.2
+   },
+   {
+    "skill": "hpc-experience",
+    "share_in": 0.348,
+    "share_out": 0.562,
+    "delta_points": -21.4
+   },
+   {
+    "skill": "kubernetes",
+    "share_in": 0.348,
+    "share_out": 0.575,
+    "delta_points": -22.7
+   }
+  ]
+ },
+ "years_required": {
+  "cn": {
+   "n": 16,
+   "median": 3,
+   "min": 1,
+   "max": 8
+  },
+  "all": {
+   "n": 57,
+   "median": 5,
+   "min": 1,
+   "max": 15
+  },
+  "other": {
+   "n": 1,
+   "median": 3,
+   "min": 3,
+   "max": 3
+  },
+  "eu": {
+   "n": 15,
+   "median": 5,
+   "min": 2,
+   "max": 10
+  },
+  "us": {
+   "n": 25,
+   "median": 5,
+   "min": 2,
+   "max": 15
+  }
+ },
+ "skills_per_posting": {
+  "median": 12,
+  "min": 3,
+  "max": 23
+ },
+ "top_pairs_core": [
+  {
+   "a": "python",
+   "b": "systems-lang",
+   "n": 44
+  },
+  {
+   "a": "linux-admin",
+   "b": "python",
+   "n": 43
+  },
+  {
+   "a": "python",
+   "b": "sre-oncall",
+   "n": 41
+  },
+  {
+   "a": "hpc-experience",
+   "b": "python",
+   "n": 36
+  },
+  {
+   "a": "kubernetes",
+   "b": "python",
+   "n": 34
+  },
+  {
+   "a": "perf-profiling",
+   "b": "python",
+   "n": 33
+  },
+  {
+   "a": "hardware-health",
+   "b": "python",
+   "n": 33
+  },
+  {
+   "a": "kubernetes",
+   "b": "sre-oncall",
+   "n": 32
+  },
+  {
+   "a": "infiniband-roce",
+   "b": "linux-admin",
+   "n": 32
+  },
+  {
+   "a": "networking-general",
+   "b": "python",
+   "n": 32
+  },
+  {
+   "a": "linux-admin",
+   "b": "systems-lang",
+   "n": 32
+  },
+  {
+   "a": "hpc-experience",
+   "b": "linux-admin",
+   "n": 31
+  },
+  {
+   "a": "linux-admin",
+   "b": "sre-oncall",
+   "n": 31
+  },
+  {
+   "a": "prometheus-grafana",
+   "b": "python",
+   "n": 30
+  },
+  {
+   "a": "kubernetes",
+   "b": "linux-admin",
+   "n": 30
+  }
+ ]
+}

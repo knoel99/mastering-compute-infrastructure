@@ -2,6 +2,7 @@
 title: "Environnement de travail"
 subtitle: "Trois niveaux de machine, ce que chaque module exige, comment vérifier, comment ne pas se ruiner"
 description: "Ce qu'il faut pour suivre le parcours : un ordinateur sans GPU suffit pour la base, une machine Linux jetable pour Slurm, un GPU loué seulement pour les extensions."
+numbered: true
 ---
 
 ## Principe : commencer sans GPU {#principe}

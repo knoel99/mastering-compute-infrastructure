@@ -26,7 +26,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -36,7 +36,34 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h1 class="title">Masters et formations HPC en France</h1>
 <p class="subtitle">13 programme(s) étudié(s), données sourcées et vérifiées</p>
 </header>
-<h2 id="vue">Vue d'ensemble</h2>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#vue">1. Vue d'ensemble</a>
+<ul>
+<li><a href="#retenir">1.1. Ce qu'on retient de la France</a></li>
+</ul></li>
+<li><a href="#programmes">2. Les programmes</a>
+<ul>
+<li><a href="#fr-uvsq-chps">2.1. Master Calcul haute performance, simulation (CHPS) - M1, M2 IHPS and M2 MSCHP</a></li>
+<li><a href="#fr-bordeaux-cisd">2.2. Calcul Intensif et Sciences des Données (CISD) - semester 9 of the ENSEIRB-MATMECA computer-science engineering degree, shared with the Université de Bordeaux M2 informatique</a></li>
+<li><a href="#fr-toulouse-enseeiht-hpcbd">2.3. Ingénieur ENSEEIHT Informatique et Télécommunications (Sciences du Numérique), parcours HPC et Big Data (S7 to S9)</a></li>
+<li><a href="#fr-grenoble-mosig">2.4. Master of Science in Informatics at Grenoble (MoSIG), Master Informatique UGA</a></li>
+<li><a href="#fr-saclay-dipac">2.5. M2 Distributed and Parallel Computing (DiPaC), following the M1 DiPaQ</a></li>
+<li><a href="#fr-unistra-csmi">2.6. Master Mathématiques et applications, parcours Calcul scientifique et mathématiques de l'innovation (CSMI)</a></li>
+<li><a href="#fr-enslyon-info">2.7. Master of Computer Science, 'Computer Science: Concepts and Applications' (M1 + M2 Informatique fondamentale)</a></li>
+<li><a href="#fr-urca-chps">2.8. Master Informatique, mention Calcul haute performance et simulation (CHPS), parcours HPC-Image-IA (M1 + M2)</a></li>
+<li><a href="#fr-centralesupelec-metz-info3a">2.9. Diplôme d'ingénieur CentraleSupélec, mention Informatique, 3e année (S9-S10), modules HPC-HPDA</a></li>
+<li><a href="#fr-centralesupelec-gif-2el1550">2.10. Électif 2A 2EL1550 Calcul haute performance (cycle ingénieur)</a></li>
+<li><a href="#fr-lyon1-srs">2.11. Master Informatique, M2 parcours Systèmes, Réseaux et Sécurité (SRS)</a></li>
+<li><a href="#fr-rennes-sif">2.12. Master Informatique, M2 parcours Science Informatique (SIF), domaine Architecture, cloud et réseaux</a></li>
+<li><a href="#fr-rennes-cni">2.13. Master Informatique, parcours Cloud and Network Infrastructures (CNI)</a></li>
+</ul></li>
+<li><a href="#ecosysteme">3. Autour des diplômes : centres, écoles, compétitions</a></li>
+<li><a href="#sources">4. Sources et portée</a></li>
+</ul>
+</section>
+<h2 id="vue">1. Vue d'ensemble</h2>
 <p>Cette page présente 13 programme(s) pour la zone « France ». Chaque fait vient d'une page consultée le 22 octobre 2026 ; les citations ont été vérifiées mot pour mot contre le texte des pages. Un thème dont le syllabus n'a pas pu être lu est marqué <em>inconnu</em>, jamais <em>absent</em>.</p>
 <div class="tbl-wrap">
 <table style="width:100%;">
@@ -302,7 +329,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <p><strong>2</strong> cours dédié · <strong>1</strong> mentionné dans un cours · <strong>0</strong> absent d'un syllabus consulté · <strong>·</strong> inconnu (syllabus non accessible).</p>
-<h3 id="retenir">Ce qu'on retient de la France</h3>
+<h3 id="retenir">1.1. Ce qu'on retient de la France</h3>
 <ul>
 <li><strong>Un réseau de masters dédiés.</strong> Le réseau des masters CHPS (calcul haute performance, simulation) rassemble Paris-Saclay (avec l'UVSQ), Bordeaux, Toulouse, Perpignan et Reims, avec des séminaires communs et un hackathon. C'est la structure d'enseignement HPC la plus lisible de l'échantillon.</li>
 <li><strong>Une base solide en parallélisme.</strong> Sur les huit programmes français dont la couverture de MPI est connue, cinq ont un cours dédié ; la programmation GPU est dédiée dans six des sept dont la couverture est connue.</li>
@@ -310,8 +337,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Le programme le plus proche du métier</strong> est le master DiPaC de Paris-Saclay (en anglais), dont les compétences citent l'ordonnancement et l'équilibrage de charge sur clusters et clouds.</li>
 <li><strong>Des machines nationales documentées.</strong> Jean Zay (IDRIS) publie sa configuration : Slurm, système de fichiers Lustre, réseaux Omni-Path et InfiniBand et une partition H100 ; c'est un terrain de lecture pour qui veut voir à quoi ressemble un cluster de recherche réel.</li>
 </ul>
-<h2 id="programmes">Les programmes</h2>
-<h3 id="fr-uvsq-chps">Master Calcul haute performance, simulation (CHPS) - M1, M2 IHPS and M2 MSCHP</h3>
+<h2 id="programmes">2. Les programmes</h2>
+<h3 id="fr-uvsq-chps">2.1. Master Calcul haute performance, simulation (CHPS) - M1, M2 IHPS and M2 MSCHP</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">HPC (cœur)</span><span class="badge">FR</span>
 </p>
@@ -373,7 +400,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Ter@tec technology park: collaborations with ARM, AWS, CEA, CGG, Eviden, Intel, NVIDIA, Paratools, SiPEARL (Paris-Saclay page). HPC hackathons (Teratec) where CHPS students take part. Research partners: LI-PARAD, Maison de la Simulation, ECR (Exascale Computing Research: Intel, CEA, GENCI, UVSQ), CMLA. Joint network seminars and shared internship offers across the CHPS masters network.</p>
 <p><strong>Limites de la fiche.</strong> Course topics are assigned from unit titles and the programme overview: the per-unit descriptions on the Paris-Saclay site load via JavaScript ('Charger le détail') and were not read, so topics not named in any title or overview are null, not 0. The MSCHP track course list on the Paris-Saclay page is JS-only; its units come from chps.uvsq.fr. No page read names a specific machine or cluster that students use, so machines_access is empty (unknown, not none). Internship ECTS differ between sources (30 on UVSQ, 24 in Paris-Saclay catalogue).</p>
 <p><strong>Sources.</strong> <a href="https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation">1</a> · <a href="https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation/m1-calcul-haute-performance-simulation">2</a> · <a href="https://www.universite-paris-saclay.fr/en/education/masters-degree/calcul-haute-performance-simulation/m2-informatique-haute-performance-et-simulation-ihps">3</a> · <a href="https://www.chps.uvsq.fr/m2">4</a> · <a href="https://www.chps.uvsq.fr/programme-du-m2-chps">5</a>. Citations vérifiées mot pour mot : 11/11.</p>
-<h3 id="fr-bordeaux-cisd">Calcul Intensif et Sciences des Données (CISD) - semester 9 of the ENSEIRB-MATMECA computer-science engineering degree, shared with the Université de Bordeaux M2 informatique</h3>
+<h3 id="fr-bordeaux-cisd">2.2. Calcul Intensif et Sciences des Données (CISD) - semester 9 of the ENSEIRB-MATMECA computer-science engineering degree, shared with the Université de Bordeaux M2 informatique</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">HPC (cœur)</span><span class="badge">FR</span>
 </p>
@@ -435,7 +462,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Sectors listed by the programme: Airbus, Dassault, IBM, Thales, Total; CEA, EDF, IFP-EN. Industrial testimonials on the programme site from CEA DAM, ANEO and DDN Storage staff. Open Data University project subjects in the 'Fouille, extraction et visualisation' module. Shared HPC masters network seminars.</p>
 <p><strong>Limites de la fiche.</strong> Rare case with real unit descriptions (programme site gforgeron.gitlab.io/cisd), so 0 means the descriptions do not mention the theme. Scheduling is 1 because the course is about scheduling theory and the practical unit covers job submission on the training cluster; Slurm is not named on any page read. The training cluster is not named on the pages read, so machines_access is empty; PLAFRIM is named only in 'Projet Calcul Haute Performance', a course sheet of the sister MATMECA engineering stream (https://formation.bordeaux-inp.fr/plugins/odf-web/odf/_content/course-projet-calcul-haute-performance-fr-fr/Projet%20Calcul%20Haute%20Performance.pdf), not of CISD. The 2024 sheet listed Apprentissage profond efficace and Programmation 3D as a choice; the 2025 sheet and the site list the choice between Programmation 3D and quantum algorithmics. ECTS per element and the semester 10 content were not read.</p>
 <p><strong>Sources.</strong> <a href="https://gforgeron.gitlab.io/cisd/">1</a> · <a href="https://formation.bordeaux-inp.fr/fr/ENSEIRB-MATMECA/Ingenieur-informatique.html">2</a> · <a href="https://formation.bordeaux-inp.fr/plugins/odf-web/odf/_content/course-semestre-9-calcul-intensif-et-les-sciences-des-donnees-2-fr-fr/Semestre%209%20-%20Calcul%20Intensif%20et%20Sciences%20des%20Donn%C3%A9es.pdf">3</a> · <a href="https://www.onisep.fr/ressources/structures-enseignement/nouvelle-aquitaine/gironde/unite-de-formation-d-informatique-universite-de-bordeaux/master-mention-informatique">4</a>. Citations vérifiées mot pour mot : 14/14.</p>
-<h3 id="fr-toulouse-enseeiht-hpcbd">Ingénieur ENSEEIHT Informatique et Télécommunications (Sciences du Numérique), parcours HPC et Big Data (S7 to S9)</h3>
+<h3 id="fr-toulouse-enseeiht-hpcbd">2.3. Ingénieur ENSEEIHT Informatique et Télécommunications (Sciences du Numérique), parcours HPC et Big Data (S7 to S9)</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">FR</span>
 </p>
@@ -495,7 +522,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> S9 elective 'Projet USRP par SILICOM' (industrial partner project). Optimisation globale taught by an ENAC professor. PFE and 2A internship in companies (details not read). Member of the national Réseau des Masters CHPS (master-chps.fr): joint seminars, shared internships, Teratec hackathon.</p>
 <p><strong>Limites de la fiche.</strong> Toulouse has no standalone HPC master found; the HPC-oriented offer is the HPC et Big Data parcours of the ENSEEIHT engineering degree (Master-level). The search also showed a Mastère Spécialisé 'Ingénierie pour la Valorisation des Données Massives' (Bac+6, with a unit 'Calcul Haute performance et applications'), not read in detail. S9 descriptions of the mandatory UEs were read in full, so 0 for viz means they do not mention it; the S7/S8 sheets list titles only and the pages for the two 'Infrastructure for ...' electives are empty, hence null for sysadmin, scheduling, containers, ML systems and observability. Elective-based topics (cloud, bigdata, quantum) are scored 2 because a dedicated course names the theme, but they are optional. Page text is flagged 'indicatives et n'ont pas de valeur contractuelle'.</p>
 <p><strong>Sources.</strong> <a href="https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB.html">1</a> · <a href="https://formations.univ-toulouse.fr/fr/les-formations/diplome-d-ingenieur-FI/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WPP/ingenieur-enseeiht-informatique-et-telecommunications-M34Z6WXB/parcours-hpc-et-big-data-s9-MHAM8OOA.html">2</a> · <a href="https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s8-fr/Parcours%20HPC%20et%20Big%20Data%20S8.pdf">3</a> · <a href="https://formations.univ-toulouse.fr/plugins/odf-web/www/_content/course-cdmfr-parcours-hpc-et-big-data-s7-fr/Parcours%20HPC%20et%20Big%20Data%20S7.pdf">4</a> · <a href="https://formations.enseeiht.fr/enseeiht/plugins/odf-web/odf-n7/_content/course-parcours-hpc-et-big-data-s9-en/Parcours%20HPC%20et%20Big%20Data%20S9.pdf">5</a>. Citations vérifiées mot pour mot : 13/13.</p>
-<h3 id="fr-grenoble-mosig">Master of Science in Informatics at Grenoble (MoSIG), Master Informatique UGA</h3>
+<h3 id="fr-grenoble-mosig">2.4. Master of Science in Informatics at Grenoble (MoSIG), Master Informatique UGA</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Cloud et distribué</span><span class="badge">FR</span>
 </p>
@@ -552,7 +579,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Research teams listed for the Parallel, Distributed, Embedded Systems theme: Inria CORSE, LIG DRAKKAR, ERODS, MESCAL, MOAIS. Stage or research project can be done in a company R&amp;D department. Labelled 'Core AI' by MIAI (Multidisciplinary Institute in Artificial intelligence); double degree possible with Swansea.</p>
 <p><strong>Limites de la fiche.</strong> HPC content is thin: one optional 3-ECTS M1 unit (Parallel Algorithms and Programming) and no M2 unit named HPC or GPU in the 2026-2027 list read; the 2021 sheet of the same master listed 'Parallel systems' (6 ECTS), 'Software infrastructure for data centers and Cloud computing' and 'Scheduling', now absent. Descriptions were read for only 2 of the units (Parallel Algorithms and Programming, Cloud Computing), so topic values rest on titles for the rest; 0 means no unit title in the whole M1/M2 list names the theme (numerics, simulation, quantum). The catalogue URL says 'catalogue-2021' but shows 2026-2027 and 2027-2028 programme tabs and is flagged as under construction pending a vote. mosig.imag.fr (official MoSIG site) was unreachable. The older CHPS-type Grenoble offer (Ensimag filière) was not found.</p>
 <p><strong>Sources.</strong> <a href="https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD.html">1</a> · <a href="https://master-informatique.univ-grenoble-alpes.fr/academic-program/master-of-science-mosig/master-of-science-mosig-79796.kjsp?RH=1467387999848">2</a> · <a href="https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-parallel-algorithms-and-programming-IFZ6CMGD.html">3</a> · <a href="https://formations.univ-grenoble-alpes.fr/fr/catalogue-2021/master-XB/master-informatique-IAQK9B8Z/parcours-master-of-science-in-informatics-at-grenoble-mosig-IB9GGIRD/ue-cloud-computing-from-infrastructure-to-applications-KPGXHIZL.html">4</a> · <a href="https://master-informatique.univ-grenoble-alpes.fr/projets-recherche-et-industrie/parallel-distributed-embedded-systems/">5</a>. Citations vérifiées mot pour mot : 11/11.</p>
-<h3 id="fr-saclay-dipac">M2 Distributed and Parallel Computing (DiPaC), following the M1 DiPaQ</h3>
+<h3 id="fr-saclay-dipac">2.5. M2 Distributed and Parallel Computing (DiPaC), following the M1 DiPaQ</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">HPC (cœur)</span><span class="badge">FR</span>
 </p>
@@ -609,7 +636,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Programme integrated into the Paris-Saclay ecosystem of research laboratories and industrial partners (partners not named on the page read). Double-cursus route with CentraleSupélec, Polytech Paris-Saclay and ENSTA Paris engineering students. Career targets: R&amp;D engineer, ML engineer, research engineer, PhD.</p>
 <p><strong>Limites de la fiche.</strong> Per-unit descriptions load via JavaScript ('Charger le détail') and were not read; the page says seven fundamental HPC/parallel/distributed courses, but only six core units appeared in the extracted table, so one core unit may be missing from this record (possibly the one covering MPI/performance engineering: mpi is therefore null, not 0). Topic values 1 come from the competence and objective lists of the page (scheduling and load balancing on clusters and clouds, HPC software engineering, I/O and networks optimisation, responsible computing, fault tolerance), not from unit titles. The M2 total ECTS is not stated on the page read. Dates and admission data are for the 2026-2027 cycle.</p>
 <p><strong>Sources.</strong> <a href="https://www.universite-paris-saclay.fr/formation/master/informatique/distributed-and-parallel-computing-m2-dipac">1</a>. Citations vérifiées mot pour mot : 10/10.</p>
-<h3 id="fr-unistra-csmi">Master Mathématiques et applications, parcours Calcul scientifique et mathématiques de l'innovation (CSMI)</h3>
+<h3 id="fr-unistra-csmi">2.6. Master Mathématiques et applications, parcours Calcul scientifique et mathématiques de l'innovation (CSMI)</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Science computationnelle</span><span class="badge">FR</span>
 </p>
@@ -669,7 +696,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Projets avec des entreprises puis stages M1 et M2 (page programme). Association avec la plateforme Cemosis (Université de Strasbourg), impliquée dans PEPR NumPEx Exa-MA, SAGE-HPC et le CoE EuroHPC HiDALGO2.</p>
 <p><strong>Limites de la fiche.</strong> Titres des UE lus sur le catalogue 2026-2027 de la page UFR ; contenu des UE CHP 1/2/3 (MPI, OpenMP, GPU ?) non publié sur les pages consultées, d'où couverture null pour openmp/mpi/gpu/perf-model. L'export PDF ROF (sans paramètre de catalogue, probablement un catalogue plus ancien) liste 'Calcul parallèle' et 'Réseaux' au lieu de CHP 1/2/3 et nomme le parcours 'mathématiques de l'information' (devenu 'de l'innovation') : seule la page 2026-2027 est utilisée pour les intitulés CHP. Aucune machine citée pour les étudiants (csmi.cemosis.fr inaccessible, erreur TLS). Couverture viz=1 d'après le seul intitulé 'Prétraitement et post-traitement intégrés au réseau dans le calcul scientifique' (sens exact non confirmé).</p>
 <p><strong>Sources.</strong> <a href="https://mathinfo.unistra.fr/formations/master/master-mathematiques-et-applications/odf-parcours-calcul-scientifique-et-mathematiques-de-linnovation-csmi-PR438-18099/?tab=cours">1</a> · <a href="https://export-rof-api.unistra.fr/export/pdf/ME195/PR438">2</a> · <a href="https://www.cemosis.fr/en/">3</a>. Citations vérifiées mot pour mot : 10/10.</p>
-<h3 id="fr-enslyon-info">Master of Computer Science, 'Computer Science: Concepts and Applications' (M1 + M2 Informatique fondamentale)</h3>
+<h3 id="fr-enslyon-info">2.7. Master of Computer Science, 'Computer Science: Concepts and Applications' (M1 + M2 Informatique fondamentale)</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">FR</span>
 </p>
@@ -725,7 +752,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Le stage M1 peut se faire à l'étranger et/ou en entreprise (page M1) ; le M2 est orienté préparation à la recherche.</p>
 <p><strong>Limites de la fiche.</strong> Page M2 'List of courses' périmée (liste 2024-25) ; la page 'M2 next year' donne la liste 2026-2027. Pas de parcours HPC/ops : l'intérêt pour un futur ingénieur compute infra se limite à PDAP (M1), CR09 et Virtualization (M2). Aucun accès à une machine cité pour les étudiants (l'ENS héberge le PSMN, mais la page master ne le lie pas). Total ECTS M1 non lu.</p>
 <p><strong>Sources.</strong> <a href="https://informatique.ens-lyon.fr/en/academic-programs/master/m1">1</a> · <a href="https://informatique.ens-lyon.fr/en/academic-programs/master/m2">2</a> · <a href="https://informatique.ens-lyon.fr/en/academic-programs/master/m2-next-year">3</a> · <a href="https://suraj.gitlabpages.inria.fr/rac/home.html">4</a> · <a href="https://www.ens-lyon.fr/formation/catalogue-de-cours/info4106/2026">5</a>. Citations vérifiées mot pour mot : 14/14.</p>
-<h3 id="fr-urca-chps">Master Informatique, mention Calcul haute performance et simulation (CHPS), parcours HPC-Image-IA (M1 + M2)</h3>
+<h3 id="fr-urca-chps">2.8. Master Informatique, mention Calcul haute performance et simulation (CHPS), parcours HPC-Image-IA (M1 + M2)</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">HPC (cœur)</span><span class="badge">FR</span>
 </p>
@@ -791,7 +818,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Alternance (apprentissage / contrat de professionnalisation) : 2-3 semaines à l'université, 3-4 semaines en entreprise. Prix du jury au 2e Hackathon TERATEC (janv. 2024) pour une équipe de M2 ; visite du TGCC du CEA et du plateau Teratec (janv. 2026) ; participation au NVIDIA GTC 2026 et à SC'24. Rubrique 'Deep Learning Institute' (NVIDIA) sur le site du master.</p>
 <p><strong>Limites de la fiche.</strong> Maquette 2024 (CFVU 19/11/2023), première promotion HPC-Image-IA en septembre 2025 selon la réunion de rentrée M1 ; les fiches sont celles de la maquette, pas un syllabus détaillé par séance. Couverture 0 attribuée quand des recherches par mots-clés dans le texte complet des fiches (Lustre, GPFS, HDF5, checkpoint, tolérance aux pannes, monitoring, Prometheus, énergétique, quantique informatique) ne donnent aucune occurrence pertinente ; Slurm et InfiniBand ne sont pas nommés dans les fiches. Le site cite le RNCP 39279 alors que la maquette 2024 cite RNCP 34120. Matériel du nouveau ROMEO 2025 (GH200, InfiniBand) vu seulement dans un résultat de recherche, non vérifié car les pages ROMEO sont rendues en JavaScript : non repris ici.</p>
 <p><strong>Sources.</strong> <a href="https://romeo.univ-reims.fr/chps">1</a> · <a href="https://romeo.univ-reims.fr/chps/19_le-master-chps-;-les-deux-parcours.html">2</a> · <a href="https://romeo.univ-reims.fr/chps/media/images//maquette/Master_CHPS_2024_presentation_generale.pdf">3</a> · <a href="https://romeo.univ-reims.fr/chps/media/images//maquette/Master_CHPS_2024_parcours_HPC-Image-IA.pdf">4</a> · <a href="https://romeo.univ-reims.fr/chps/media/images//maquette/CHPS_2024_HPC-Image-IA_synthese.pdf">5</a> · <a href="https://romeo.univ-reims.fr/chps/media/images/maquette/Master-CHPS_2024_parcours-HPC-Image-IA_fiches-matieres.pdf">6</a>. Citations vérifiées mot pour mot : 16/16.</p>
-<h3 id="fr-centralesupelec-metz-info3a">Diplôme d'ingénieur CentraleSupélec, mention Informatique, 3e année (S9-S10), modules HPC-HPDA</h3>
+<h3 id="fr-centralesupelec-metz-info3a">2.9. Diplôme d'ingénieur CentraleSupélec, mention Informatique, 3e année (S9-S10), modules HPC-HPDA</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Mixte</span><span class="badge">FR</span>
 </p>
@@ -848,7 +875,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Stage de fin d'études de 15 ECTS (S10). Blocs HEP (innovation, management, droit).</p>
 <p><strong>Limites de la fiche.</strong> Deux modules HPC seulement sur une année généraliste informatique ; pas d'administration de cluster, de stockage parallèle ni d'ordonnanceur nommé (Slurm non cité dans les extraits lus). Coverage null pour les thèmes dont les descriptifs n'ont pas été lus en entier. Les modules HPC sont dans des blocs à choix (la somme des modules d'un bloc dépasse son nombre d'ECTS).</p>
 <p><strong>Sources.</strong> <a href="https://spe-info.metz.centralesupelec.fr/pdfs/catalog-info-3A-en.pdf">1</a>. Citations vérifiées mot pour mot : 9/9.</p>
-<h3 id="fr-centralesupelec-gif-2el1550">Électif 2A 2EL1550 Calcul haute performance (cycle ingénieur)</h3>
+<h3 id="fr-centralesupelec-gif-2el1550">2.10. Électif 2A 2EL1550 Calcul haute performance (cycle ingénieur)</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">HPC (cœur)</span><span class="badge">FR</span>
 </p>
@@ -898,7 +925,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Mémoire ou stage.</strong> Sans objet (un électif)</p>
 <p><strong>Limites de la fiche.</strong> Syllabus 2024-2025 (page 'full.pdf') ; le syllabus 2026-2027 n'a pas été lu. Couverture limitée aux thèmes de ce seul cours ; tous les autres thèmes restent null car le cursus de 2A n'a pas été examiné. Resilience et energy : simple mention ('aspects énergétiques', 'besoin de tolérance aux pannes') dans l'item architectures.</p>
 <p><strong>Sources.</strong> <a href="https://myschool.centralesupelec.fr/syllabus/2024-2025/2EL1550/fr/full.pdf">1</a>. Citations vérifiées mot pour mot : 7/7.</p>
-<h3 id="fr-lyon1-srs">Master Informatique, M2 parcours Systèmes, Réseaux et Sécurité (SRS)</h3>
+<h3 id="fr-lyon1-srs">2.11. Master Informatique, M2 parcours Systèmes, Réseaux et Sécurité (SRS)</h3>
 <p class="badges">
 <span class="badge verified">Confiance élevée</span><span class="badge">Exploitation / administration</span><span class="badge">FR</span>
 </p>
@@ -949,7 +976,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Liens avec l'industrie et la recherche.</strong> Alternance 2 semaines / 2 semaines. Préparation CCNA (Académie Locale Cisco), certifications Linux LPI ou AWS possibles.</p>
 <p><strong>Limites de la fiche.</strong> Fiche de l'offre de formation Lyon 1 datée (début de session 04/09/2023, dernière mise à jour 06/01/2023) : maquette 2026-2027 non vérifiée. Aucune UE HPC (MPI, GPU) lue pour ce parcours ; l'UE 'Systèmes avancés' (INF2311M, GPU/OpenCL/CUDA d'après un résultat de recherche) n'a pas pu être lue (redirection vers la page d'accueil). Autres thèmes null car la liste complète des UE du parcours n'a pas été lue.</p>
 <p><strong>Sources.</strong> <a href="https://offre-de-formations.univ-lyon1.fr/parcours-1525/m2-systemes-reseaux-et-securite-srs.html">1</a> · <a href="https://offre-de-formations.univ-lyon1.fr/ue-16726-143/stockage-cloud-et-virtualisation.html">2</a> · <a href="http://master-info.univ-lyon1.fr/SRS/">3</a>. Citations vérifiées mot pour mot : 8/8.</p>
-<h3 id="fr-rennes-sif">Master Informatique, M2 parcours Science Informatique (SIF), domaine Architecture, cloud et réseaux</h3>
+<h3 id="fr-rennes-sif">2.12. Master Informatique, M2 parcours Science Informatique (SIF), domaine Architecture, cloud et réseaux</h3>
 <p class="badges">
 <span class="badge unverified">Confiance faible</span><span class="badge">Mixte</span><span class="badge">FR</span>
 </p>
@@ -995,9 +1022,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Mémoire ou stage.</strong> Non lu</p>
 <p><strong>Limites de la fiche.</strong> TOUTES les données de cette fiche viennent d'un résultat de recherche web : les sites univ-rennes.fr, istic, irisa.fr (master.irisa.fr) et formations.univ-rennes.fr répondent HTTP 403 au récupérateur du dépôt, donc aucune citation n'a pu être vérifiée. À requalifier ou supprimer à la phase de vérification si l'accès ne s'ouvre pas.</p>
 <p><strong>Sources.</strong> <a href="http://master.irisa.fr/courses/lst_courses_rennes.html">1</a> · <a href="https://istic.univ-rennes.fr/master-informatique">2</a>. Citations vérifiées mot pour mot : 0 citations.</p>
-<h3 id="fr-rennes-cni">Master Informatique, parcours Cloud and Network Infrastructures (CNI)</h3>
+<h3 id="fr-rennes-cni">2.13. Master Informatique, parcours Cloud and Network Infrastructures (CNI)</h3>
 <p class="badges">
-<span class="badge verified">Confiance élevée</span><span class="badge">Cloud et distribué</span><span class="badge">FR</span>
+<span class="badge skim">Confiance moyenne</span><span class="badge">Cloud et distribué</span><span class="badge">FR</span>
 </p>
 <div class="tbl-wrap">
 <table>
@@ -1039,9 +1066,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </div>
 <p><strong>Structure.</strong> Parcours cloud et réseaux de l'université de Rennes : d'après un résultat de recherche, le M1 comprend 'Calcul à large échelle' et 'Service and Cloud Technologies'. La page EIT Digital décrit un master interdisciplinaire de gestion, exploitation et conception de réseaux, modèles de service et de déploiement cloud, edge et fog computing. Le contenu détaillé des cours n'a pas été lu.</p>
 <p><strong>Mémoire ou stage.</strong> Non lu</p>
-<p><strong>Limites de la fiche.</strong> La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification.</p>
+<p><strong>Limites de la fiche.</strong> La page EIT Digital (lue) ne mentionne pas explicitement Rennes ; le lien avec le parcours de l'université de Rennes vient d'un résultat de recherche (formations.univ-rennes.fr, HTTP 403). La page EIT indique 'no dates added' et l'état actuel de l'EIT Digital Master School n'a pas été vérifié. Entrée à requalifier ou supprimer à la phase de vérification. Confidence capped at medium: part of the evidence comes from memory.</p>
 <p><strong>Sources.</strong> <a href="https://formations.univ-rennes.fr/en/parcours/masters-degree-computer-science-pathway-cloud-and-network-infrastructures-cni">1</a> · <a href="https://www.eitdeeptechtalent.eu/courses/cloud-and-network-infrastructures-master-programme">2</a>. Citations vérifiées mot pour mot : 1/1.</p>
-<h2 id="ecosysteme">Autour des diplômes : centres, écoles, compétitions</h2>
+<h2 id="ecosysteme">3. Autour des diplômes : centres, écoles, compétitions</h2>
 <ul>
 <li><strong><a href="http://www.idris.fr/docs/jean-zay/jean-zay/jean-zay-hardware">IDRIS (CNRS) - Jean Zay supercomputer, GENCI national resource</a></strong> (centre) : Real national GPU supercomputer (CPU, V100, A100 and H100 partitions) operated with Slurm, a Lustre parallel file system and InfiniBand/Omni-Path networks: the closest public, documented example of the cluster stack a compute infrastructure engineer runs. The hardware, scheduler and filesystem pages are public documentation to read and reproduce in labs.</li>
 <li><strong><a href="http://www.idris.fr/docs/formations/catalogue-formations">IDRIS training catalogue (HPC and AI courses: MPI, OpenMP, GPU directives, Kokkos, Deep Learning Optimisé sur Jean Zay)</a></strong> (formation-courte) : Short, free (for CNRS and university staff) or CNRS-Formation-Entreprise courses taught by the Jean Zay support team, including a multi-GPU deep-learning scaling course; the course pages are public syllabi that fit a self-study path in parallel programming and distributed training. Registration site was under maintenance on the page read, so check dates.</li>
@@ -1052,7 +1079,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://romeo.univ-reims.fr/chps">Hackathon TERATEC</a></strong> (compétition) : Compétition HPC française à laquelle participent des étudiants (une équipe de M2 CHPS Reims y a obtenu le prix du jury en janvier 2024) ; bon terrain pour pratiquer l'optimisation sur machine réelle.</li>
 <li><strong><a href="https://www.cemosis.fr/en/">Cemosis (plateforme de modélisation et simulation, Université de Strasbourg)</a></strong> (centre) : Plateforme adossée au master CSMI, impliquée dans PEPR NumPEx (Exa-MA, SAGE-HPC) et le CoE EuroHPC HiDALGO2 : lien concret entre formation, HPC et projets exascale.</li>
 </ul>
-<h2 id="sources">Sources et portée</h2>
+<h2 id="sources">4. Sources et portée</h2>
 <p><strong>Documenté.</strong> Les pages officielles des programmes et des catalogues de cours, lues le 22 octobre 2026 ; chaque fiche cite ses liens.</p>
 <p><strong>Recommandé.</strong> L'attribution des thèmes de la taxonomie aux intitulés de cours est un jugement de lecture, signalé par des symboles ; elle n'est pas une mesure.</p>
 <p><strong>À vérifier.</strong> Les programmes changent chaque année : consultez la page officielle avant toute décision. Les pages chargées par JavaScript n'ont pas toujours pu être lues.</p>

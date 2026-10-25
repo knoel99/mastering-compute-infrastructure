@@ -194,7 +194,7 @@ def main():
     A = json.loads((ROOT / "data" / "market" / "analysis.json").read_text(encoding="utf-8"))
     posts = []
     for f in sorted((ROOT / "data" / "jobs").glob("*.json")):
-        posts += [p for p in json.loads(f.read_text(encoding="utf-8")).get("postings", []) if p.get("confidence") != "low"]
+        posts += [p for p in json.loads(f.read_text(encoding="utf-8")).get("postings", []) if p.get("url") and p.get("confidence") != "low"]   # same rule as market_analysis
     note = (ROOT / "market" / "_notes" / "index.md").read_text(encoding="utf-8")
     tq, okq = quotes()
     rep = {

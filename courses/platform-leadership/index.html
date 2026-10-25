@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,98 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 16 · Phase 5 · 28 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans le bac à sable (données synthétiques ou fictives, étiquetées)</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. La plateforme comme produit</a>
+<ul>
+<li><a href="#qui-sont-vos-utilisateurs">1.1. Qui sont vos utilisateurs</a></li>
+<li><a href="#quatre-mesures-pas-quarante">1.2. Quatre mesures, pas quarante</a></li>
+<li><a href="#mesurer-sans-se-tromper-de-cible">1.3. Mesurer sans se tromper de cible</a></li>
+<li><a href="#réduire-le-coût-dadoption">1.4. Réduire le coût d'adoption</a></li>
+</ul></li>
+<li><a href="#ch2">2. Sessions interactives et environnements de développement</a>
+<ul>
+<li><a href="#un-portail-hpc-ou-un-hub-multi-utilisateur">2.1. Un portail HPC ou un hub multi-utilisateur</a></li>
+<li><a href="#trois-façons-de-partager-un-gpu">2.2. Trois façons de partager un GPU</a></li>
+<li><a href="#les-règles-qui-évitent-le-gaspillage">2.3. Les règles qui évitent le gaspillage</a></li>
+</ul></li>
+<li><a href="#ch3">3. Sécurité d'une plateforme GPU partagée</a>
+<ul>
+<li><a href="#qui-est-un-locataire">3.1. Qui est un locataire</a></li>
+<li><a href="#identité-et-moindre-privilège">3.2. Identité et moindre privilège</a></li>
+<li><a href="#isolation">3.3. Isolation</a></li>
+<li><a href="#secrets">3.4. Secrets</a></li>
+<li><a href="#chaîne-dapprovisionnement-logicielle">3.5. Chaîne d'approvisionnement logicielle</a></li>
+<li><a href="#audit">3.6. Audit</a></li>
+</ul></li>
+<li><a href="#ch4">4. Fiabilité de production</a>
+<ul>
+<li><a href="#slo-et-budget-derreur">4.1. SLO et budget d'erreur</a></li>
+<li><a href="#une-astreinte-soutenable">4.2. Une astreinte soutenable</a></li>
+<li><a href="#gérer-un-incident">4.3. Gérer un incident</a></li>
+<li><a href="#le-post-mortem-sans-blâme">4.4. Le post-mortem sans blâme</a></li>
+<li><a href="#écrire-une-décision-adr-et-rfc">4.5. Écrire une décision : ADR et RFC</a></li>
+</ul></li>
+<li><a href="#ch5">5. Évolutions et migrations</a>
+<ul>
+<li><a href="#migrer-par-cohortes">5.1. Migrer par cohortes</a></li>
+<li><a href="#mettre-à-jour-slurm-lordre-compte">5.2. Mettre à jour Slurm : l'ordre compte</a></li>
+<li><a href="#changer-la-configuration-comme-du-code">5.3. Changer la configuration comme du code</a></li>
+<li><a href="#annoncer-le-changement">5.4. Annoncer le changement</a></li>
+</ul></li>
+<li><a href="#ch6">6. Diriger une petite équipe d'infrastructure</a>
+<ul>
+<li><a href="#le-travail-dexploitation-ou-toil">6.1. Le travail d'exploitation, ou <em>toil</em></a></li>
+<li><a href="#un-point-dentrée-unique-pour-les-demandes">6.2. Un point d'entrée unique pour les demandes</a></li>
+<li><a href="#choisir-quoi-automatiser">6.3. Choisir quoi automatiser</a></li>
+<li><a href="#documenter-lexploitation">6.4. Documenter l'exploitation</a></li>
+<li><a href="#réduire-la-dépendance-à-une-seule-personne">6.5. Réduire la dépendance à une seule personne</a></li>
+</ul></li>
+<li><a href="#ch7">7. Contribuer et se rendre visible</a>
+<ul>
+<li><a href="#ce-que-lit-quelquun-qui-évalue-votre-travail">7.1. Ce que lit quelqu'un qui évalue votre travail</a></li>
+<li><a href="#écrire-en-public-sans-rien-exposer">7.2. Écrire en public sans rien exposer</a></li>
+<li><a href="#contribuer-à-un-projet-ouvert">7.3. Contribuer à un projet ouvert</a></li>
+<li><a href="#faire-de-chaque-projet-un-récit">7.4. Faire de chaque projet un récit</a></li>
+</ul></li>
+<li><a href="#ch8">8. Entretiens et exercices de conception</a>
+<ul>
+<li><a href="#ce-qui-est-évalué">8.1. Ce qui est évalué</a></li>
+<li><a href="#le-déroulé-en-trente-minutes">8.2. Le déroulé en trente minutes</a></li>
+<li><a href="#le-calcul-de-tête">8.3. Le calcul de tête</a></li>
+<li><a href="#fiabilité-et-goulots">8.4. Fiabilité et goulots</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-16-1">Lab 16.1 — Écrire une décision d'architecture vérifiable</a></li>
+<li><a href="#lab-16-2">Lab 16.2 — Post-mortem d'un incident simulé</a></li>
+<li><a href="#lab-16-3">Lab 16.3 — Exercice de conception : de 8 à 256 GPU</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> vous avez un cluster qui fonctionne. Comment en faire une <strong>plateforme</strong> que des chercheurs choisissent d'utiliser, que l'on peut exploiter à trois sans s'épuiser, qui résiste à un incident à deux heures du matin et dont vous pouvez défendre les choix devant un directeur ou un jury d'entretien ?</p>
 <p>Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, observabilité). Celui-ci traite ce qui reste quand les briques tournent : le produit, la sécurité d'un matériel partagé, la fiabilité en production, les migrations, l'équipe et la manière de décider par écrit. Il s'appuie sur le <a href="../../projects/capstone-rfc/index.html">projet 6</a>, dont il donne les outils d'écriture et de revue.</p>
@@ -85,8 +177,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td><a href="../slurm/index.html">Module 5 — Slurm</a>, module 12 — Kubernetes pour l'IA, module 14 — Observabilité</td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : l'écriture de décisions, la gestion d'incident et la direction d'équipe sont le cœur du métier visé, au-delà de l'outillage</td>
+<td>Pour qui</td>
+<td>Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage.</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -112,6 +204,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Planifier une migration par cohortes avec des critères d'entrée, de sortie et de retour arrière (chapitre 5).</li>
 <li>Fixer un budget de travail d'exploitation pour une petite équipe (chapitre 6).</li>
 <li>Conduire un exercice de conception d'entretien avec un calcul et ses hypothèses dites (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 5 — Production et leadership</strong> (semaines 42-48) : opérer en production, décider, négocier, diriger et passer l'entretien.</li>
+<li><strong>S'appuie sur</strong> : <a href="../slurm/index.html">module 5 — Slurm et exploitation d'un cluster HPC</a>, <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../observability/index.html">module 14 — Observabilité et fiabilité d'une flotte GPU</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <div class="tbl-wrap">
@@ -206,7 +305,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Le RFC et la revue d'incident servent au projet 6, quel que soit votre profil.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Trois questions pour situer votre niveau. Répondez sans chercher, puis ouvrez les réponses.</p>
 <ol type="1">
 <li>Une plateforme de calcul affiche 98 % d'utilisation de ses GPU. Est-ce forcément un succès ?</li>
@@ -514,8 +662,8 @@ duration with failures   : 99.6 days</code></pre>
 </div>
 <h2 id="labs">Labs</h2>
 <p>Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU, sans cloud, Python 3.13 et pytest 9.1, le 2026-10-24). Chacun a un <code>verify.sh</code> qui sort avec le code 0 ; lancez les commandes depuis le dossier du lab (<code>labs/platform-leadership/&lt;lab&gt;/</code>), après <code>pip install pytest</code> si besoin, et choisissez l'interpréteur avec <code>PYTHON=python3 bash verify.sh</code>. <strong>Aucun ne décrit un système ou une personne réels</strong> : le journal d'incident, le cahier des charges et les réponses d'entretien sont inventés pour l'exercice.</p>
+<h3 id="lab-16-1">Lab 16.1 — Écrire une décision d'architecture vérifiable</h3>
 <div class="lab">
-<p><span class="tag">Lab 16.1 — Écrire une décision d'architecture vérifiable</span></p>
 <p><strong>Objectif.</strong> Écrire une ADR d'une page dont la structure est contrôlée mécaniquement : statut daté, contexte, décision, au moins deux alternatives écartées chacune avec une raison, conséquences positives <strong>et</strong> négatives, signal de révision. <strong>Durée.</strong> 2 h. <strong>Prérequis matériels.</strong> Un portable avec Python 3 et <code>pytest</code> ; aucun GPU.</p>
 <ol type="1">
 <li>Lisez <code>labs/platform-leadership/rfc-template/example_adr.md</code>, qui reprend une décision de la RFC de référence du projet 6 (données fictives).</li>
@@ -527,8 +675,8 @@ duration with failures   : 99.6 days</code></pre>
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « 12 passed », « the blank template is refused, as it should be » et « OK rfc-template ».</p>
 <p><strong>Pour aller plus loin.</strong> Comparez votre ADR à <code>solutions/adr_jupyterhub.md</code> (exercice 10) ; passez à une RFC complète avec <code>labs/projects/capstone-rfc/reference/rfc_lint.py</code>.</p>
 </div>
+<h3 id="lab-16-2">Lab 16.2 — Post-mortem d'un incident simulé</h3>
 <div class="lab">
-<p><span class="tag">Lab 16.2 — Post-mortem d'un incident simulé</span></p>
 <p><strong>Objectif.</strong> Reconstituer la chronologie d'un incident à partir d'un journal <strong>synthétique</strong>, mesurer ses jalons, puis écrire un post-mortem sans blâme dont les durées égalent celles du journal. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable avec Python 3 et <code>pytest</code> ; aucun GPU.</p>
 <ol type="1">
 <li>Lisez <code>incident.log</code> <strong>avant</strong> <code>postmortem_example.md</code> : trouvez vous-même la cause (un rang silencieux sur un GPU tombé du bus) et les jalons.</li>
@@ -540,8 +688,8 @@ duration with failures   : 99.6 days</code></pre>
 <p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « 20 passed », les cinq durées de l'exemple 4.3 (dont détection 1 h 40, acquittement 4 min, atténuation 18 min), « GPU-hours without progress (128 GPUs): 251.7 », « postmortem: ok » et « OK incident-review ».</p>
 <p><strong>Pour aller plus loin.</strong> Ajoutez au journal un événement de fausse alerte et mesurez son effet sur le temps de détection ; écrivez l'alerte qui aurait réduit la détection (projet 5).</p>
 </div>
+<h3 id="lab-16-3">Lab 16.3 — Exercice de conception : de 8 à 256 GPU</h3>
 <div class="lab">
-<p><span class="tag">Lab 16.3 — Exercice de conception : de 8 à 256 GPU</span></p>
 <p><strong>Objectif.</strong> Dimensionner l'entraînement d'un modèle dense avec un calculateur dont chaque hypothèse est explicite, puis comparer trois réponses d'entretien (insuffisante, solide, excellente) à la grille d'évaluation. <strong>Durée.</strong> 2 h. <strong>Prérequis matériels.</strong> Un portable avec Python 3 et <code>pytest</code> ; aucun GPU.</p>
 <ol type="1">
 <li>Lisez l'énoncé et la grille dans <code>labs/platform-leadership/design-interview/rubric.md</code>.</li>
@@ -809,10 +957,14 @@ duration with failures   : 99.6 days</code></pre>
 <li>NVIDIA. <a href="https://docs.nvidia.com/deploy/xid-errors/analyzing-xid-catalog.html"><em>XID Errors, Xid catalog</em></a> : sens de l'Xid 79 (« GPU has fallen off the bus ») que montre le journal synthétique du lab 16.2 (chapitre 4).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par <code>tools/fetch_text.py</code>).</p>
-<p><strong>Recommandé.</strong> Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes.</p>
-<p><strong>À vérifier.</strong> Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont <strong>fictifs ou synthétiques</strong>. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).</p>
-<p><strong>Hors périmètre.</strong> La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand.</p>
+<h3 id="documente">Documenté</h3>
+<p>Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par <code>tools/fetch_text.py</code>).</p>
+<h3 id="recommande">Recommandé</h3>
+<p>Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<p>Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont <strong>fictifs ou synthétiques</strong>. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).</p>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/finops-capacity/index.html"><span class="k">← Précédent</span>Module 15 — FinOps, capacité, énergie et achats de calcul</a><a class="next" href="../../projects/homelab-slurm/index.html"><span class="k">Suivant →</span>Projet 1 — Mini-cluster Slurm instrumenté</a></nav>
 </main>

@@ -39,7 +39,7 @@ Aucun GPU n'a servi à rédiger ce module. Tout ce qui est calculé ou capturé 
 | Volume | 30 h, dont 9,75 h de lecture, 12,5 h de labs et 7,75 h d'exercices |
 | Niveau d'entrée | 2 : Python solide, notions de roofline et de MFU (module 2) |
 | Prérequis | [Module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html) |
-| Statut pour le lecteur de référence | cœur : c'est la grammaire des conversations entre infrastructure et recherche sur la performance |
+| Pour qui | Cœur : la grammaire des échanges entre l'infrastructure et la recherche sur la performance ; survol possible si vous écrivez déjà des noyaux CUDA ou Triton. |
 | Livrable | quatre labs testés (modèle de warp, noyaux Numba, noyaux Triton, lecteur de trace) et une grille de diagnostic écrite par vous |
 | Environnement | un portable CPU suffit pour tous les labs ; `nvcc` 12.0 est optionnel (compilation sans exécution). Un GPU est utile pour les branches « Pour aller plus loin », décrites mais non exécutées ici ; leur coût de location n'est pas chiffré ici faute de tarif relu (voir le [module FinOps et capacité](../finops-capacity/index.html)) |
 | Projets liés | [Projet 2 — Étude de passage à l'échelle](../../projects/scaling-study/index.html) |
@@ -53,6 +53,15 @@ Aucun GPU n'a servi à rédiger ce module. Tout ce qui est calculé ou capturé 
 -   Choisir un format numérique pour un calcul et prévoir ses pièges : accumulation, sous-dépassement, ordre des sommes (chapitre 6).
 -   Lire une trace de profil et nommer le goulot : calcul, mémoire, lancement ou transferts (chapitre 7, lab 4.4).
 -   Dire ce qu'apportent la fusion, FlashAttention, `torch.compile` et les CUDA graphs, et quand ils ne paient pas (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 1 — Calcul parallèle et GPU** (semaines 6-11) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
+-   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
+-   **Prépare** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
+-   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -71,7 +80,27 @@ Dix séances, 30 h au total. Le niveau 1 correspond aux fondations, le niveau 2 
 | 9 | 3 h | 3 | consolidation du chapitre 7 (pas de nouvelle lecture) | Lab 4.4 partie B : traces de type GPU (1,5 h) ; Ex. 8 (0,75 h) et Ex. 6 (0,75 h) |
 | 10 | 3 h | 3 | ch. 8 Techniques d'accélération (1 h) | Ex. 9 et Ex. 10 (1 h chacun) ; checkpoint de sortie |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Administrateur ou ingénieur HPC | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Ingénieur ML ou chercheur | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** Le profilage et la lecture de traces servent à tous les profils, y compris si vous n'écrirez jamais de noyau.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si les trois vous paraissent routinières, lisez les exercices ★★★ et le chapitre 7, puis passez au module suivant.
 
@@ -1043,8 +1072,9 @@ Les quatre labs s'exécutent sur un portable Linux **sans GPU**. Prérequis comm
 python3 -m pip install numpy torch numba triton pytest
 ~~~
 
+### Lab 4.1 — Le warp et la mémoire, en modèle {#lab-4-1}
+
 ::: lab
-[Lab 4.1 — Le warp et la mémoire, en modèle]{.tag}
 
 **Objectif.** Écrire vous-même le modèle de coût d'un warp (secteurs de la mémoire globale, conflits de bancs, divergence, occupation) et le valider par des tests dont vous connaissez les valeurs. **Durée.** 2,5 h (partie A : 1 h, partie B : 1,5 h). **Prérequis matériels.** Portable CPU ; `nvcc` optionnel. **Vérifié ici :** le modèle, ses 25 tests, l'échec de l'ébauche. **Non exécuté ici :** les programmes `cuda/access_patterns.cu` et `cuda/transpose.cu`, compilés seulement.
 
@@ -1060,8 +1090,9 @@ python3 -m pip install numpy torch numba triton pytest
 **Pour aller plus loin.** Sur un GPU NVIDIA, lancez `access_patterns` : le programme affiche le rapport de trafic prédit par le modèle ($(4 + 4\min(p, 8))/8$ pour le pas $p$) à côté de la bande passante mesurée. Si votre GPU contredit la prédiction, c'est un résultat : cherchez le rôle du cache L2. Ce programme n'a pas été exécuté pour ce cours.
 :::
 
+### Lab 4.2 — Noyaux CUDA dans le simulateur Numba {#lab-4-2}
+
 ::: lab
-[Lab 4.2 — Noyaux CUDA dans le simulateur Numba]{.tag}
 
 **Objectif.** Écrire et tester des noyaux CUDA (réduction, scan, produit par tuiles) avec Numba dans son simulateur CPU, compter les lectures globales, provoquer les erreurs classiques et refaire les expériences de précision. **Durée.** 4 h (partie A : 1,5 h, partie B : 1,25 h, partie C : 1,25 h). **Prérequis matériels.** Portable CPU, 4 Go de mémoire ; GPU optionnel pour `bench_gpu.py`. **Vérifié ici :** noyaux, tests, compteurs, expériences de précision, compilation CUDA C++. **Non exécuté ici :** `bench_gpu.py` (octet-compilé) et les binaires CUDA.
 
@@ -1076,8 +1107,9 @@ python3 -m pip install numpy torch numba triton pytest
 **Pour aller plus loin.** Sur un GPU NVIDIA, lancez `NUMBA_ENABLE_CUDASIM=0 python3 bench_gpu.py` et placez les trois points (naïf, tuilé, `torch.matmul`) sur le roofline du module 2. Compilez et lancez `cuda/streams_overlap.cu` et comparez les quatre configurations à l'exemple 4.1. Ces deux programmes n'ont pas été exécutés pour ce cours.
 :::
 
+### Lab 4.3 — Triton en mode interpréteur {#lab-4-3}
+
 ::: lab
-[Lab 4.3 — Triton en mode interpréteur]{.tag}
 
 **Objectif.** Écrire et déboguer des noyaux Triton (addition fusionnée, softmax, produit par tuiles) avec `TRITON_INTERPRET=1`, et chiffrer le trafic mémoire que la fusion évite. **Durée.** 3 h. **Prérequis matériels.** Portable CPU ; GPU optionnel. **Vérifié ici :** correction des noyaux et décompte du trafic (Triton 3.8.0, 25 octobre 2026). **Non exécuté ici :** vitesse et auto-réglage (`bench_gpu.py`, octet-compilé seulement).
 
@@ -1093,8 +1125,9 @@ python3 -m pip install numpy torch numba triton pytest
 **Pour aller plus loin.** Sur un GPU, lancez `bench_gpu.py` : si le softmax est limité par la bande passante, le rapport des temps du noyau fusionné et des cinq opérations devrait s'approcher du rapport de trafic (environ 4), moins le coût fixe des lancements : c'est l'hypothèse du modèle, à confronter à la mesure. Ce programme n'a pas été exécuté pour ce cours.
 :::
 
+### Lab 4.4 — Lire une trace de profil {#lab-4-4}
+
 ::: lab
-[Lab 4.4 — Lire une trace de profil]{.tag}
 
 **Objectif.** Profiler un petit transformeur sur CPU avec PyTorch Profiler, vérifier le profil avec un modèle de FLOP, puis lire des traces de type GPU et en tirer un verdict. **Durée.** 3 h (partie A : 1,5 h, partie B : 1,5 h). **Prérequis matériels.** Portable CPU, 2 cœurs libres. **Vérifié ici :** le profil CPU, l'analyseur de trace et ses verdicts. **Fabriqué à la main, non mesuré :** les trois traces `fixtures/*.json`, qui n'apportent aucune information sur un vrai GPU.
 
@@ -1330,10 +1363,18 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les faits attribués aux sources ont été relus à la source le 25 octobre 2026 : guide de programmation CUDA v13.4.2 (warps de 32 threads, masquage SIMT, absence de garantie d'ordonnancement entre blocs, limites de la capacité 8.0, asynchronisme, mémoire épinglée requise pour les copies asynchrones, surcoût de lancement et graphes), guide des bonnes pratiques (coalescence en secteurs de 32 octets, 32 bancs, définitions d'occupation, de divergence, remplissage d'une colonne, exemple de 12 Go/s en mémoire épinglée), billet Hopper (132 SM, 50 Mo de L2, 256 Kio combinés, formats FP8), guides Nsight Compute et Nsight Systems (sections, options), documentation du simulateur de Numba, du débogage et de l'auto-réglage de Triton, tutoriel de softmax fusionné, article de Triton, article de FlashAttention (théorèmes, résultats), article de précision mixte, documentation de PyTorch (profileur, précision des produits, `torch.compile`, reproductibilité, exécution asynchrone), billet sur les CUDA graphs et catégories de Kineto. Tous les nombres calculés des exemples et des corrigés ont été refaits en Python. Les sorties capturées viennent d'un portable de rédaction (Linux, 4 vCPU, sans GPU) avec PyTorch 2.14.1 CPU, Numba 0.68.0, Triton 3.8.0, `nvcc` 12.0.140 en compilation seule ; les labs ont été exécutés le 25 octobre 2026.
+### Documenté {#documente}
 
-**Recommandé.** L'ordre des chapitres et les durées, la grille Triton, bibliothèque ou CUDA, les quatre verdicts de lecture de trace et leurs seuils (50 µs, 60 %, 85 %, 50 %), l'usage de bornes de gain avant toute optimisation et la règle « profil avant, plafond calculé, profil après » sont des choix de ce parcours, pas des règles des constructeurs. Les hypothèses chiffrées des exercices 5 et 10 sont des données d'énoncé.
+Les faits attribués aux sources ont été relus à la source le 25 octobre 2026 : guide de programmation CUDA v13.4.2 (warps de 32 threads, masquage SIMT, absence de garantie d'ordonnancement entre blocs, limites de la capacité 8.0, asynchronisme, mémoire épinglée requise pour les copies asynchrones, surcoût de lancement et graphes), guide des bonnes pratiques (coalescence en secteurs de 32 octets, 32 bancs, définitions d'occupation, de divergence, remplissage d'une colonne, exemple de 12 Go/s en mémoire épinglée), billet Hopper (132 SM, 50 Mo de L2, 256 Kio combinés, formats FP8), guides Nsight Compute et Nsight Systems (sections, options), documentation du simulateur de Numba, du débogage et de l'auto-réglage de Triton, tutoriel de softmax fusionné, article de Triton, article de FlashAttention (théorèmes, résultats), article de précision mixte, documentation de PyTorch (profileur, précision des produits, `torch.compile`, reproductibilité, exécution asynchrone), billet sur les CUDA graphs et catégories de Kineto. Tous les nombres calculés des exemples et des corrigés ont été refaits en Python. Les sorties capturées viennent d'un portable de rédaction (Linux, 4 vCPU, sans GPU) avec PyTorch 2.14.1 CPU, Numba 0.68.0, Triton 3.8.0, `nvcc` 12.0.140 en compilation seule ; les labs ont été exécutés le 25 octobre 2026.
 
-**À vérifier.** **Aucun programme de ce module n'a tourné sur un GPU** : les fichiers `cuda/*.cu` ont seulement été compilés, `bench_gpu.py` seulement octet-compilé, et toutes les prédictions de vitesse (rapports de trafic de 4 et de 4,5, gains de recouvrement, rapport d'environ 24 de FlashAttention tiré de formules en $\Theta$) sont des bornes de modèle à confronter à une mesure. Les commandes `nsys` et `ncu` des chapitres 7 et du lab 4.4 sont documentées mais non exécutées ; leurs options varient selon les versions. Le tableau des limites par SM du guide CUDA a été lu ; seules les valeurs de la capacité 8.0 servent aux calculs, et les colonnes du texte extrait sont parfois fusionnées (nombre de blocs résidents par SM) : relisez le tableau de votre capacité de calcul. Les 228 Kio de mémoire partagée de la capacité 9.0 sont ceux du tableau des capacités de mémoire partagée du même guide. La largeur d'exposant et le mode d'arrondi de TF32, le nombre de moteurs de copie d'un GPU donné, la nécessité de formes et d'adresses stables pour un CUDA graph, les noms des options d'épinglage de PyTorch, l'absence de mise à l'échelle avec `bfloat16` et le surcoût du profilage n'ont pas été relus à la source. La documentation de Triton annonce que l'interpréteur ne gère pas `bfloat16` ; notre essai (Triton 3.8.0) n'a pas levé d'exception mais a rendu des valeurs fausses (observation d'une version, refaite par `probe_observations.py`). L'échec de `@triton.autotune` dans l'interpréteur et l'arrêt brutal sans masque sont aussi des observations d'une version. Les traces de type GPU du lab 4.4 sont fabriquées. Les chiffres de fiche technique du H100 (3,35 To/s) viennent du module 2 et n'ont pas été relus ici.
+### Recommandé {#recommande}
 
-**Hors périmètre.** Les communications entre GPU (NCCL, voir les modules sur les réseaux), la programmation des cœurs tensoriels (`mma`, CUTLASS), la programmation multi-GPU et les groupes coopératifs, les clusters de blocs et le TMA de Hopper, le scan de Blelloch, les GPU non NVIDIA (ROCm), la sparsité, le partage de GPU (MIG) et l'installation des profileurs. L'observabilité d'une flotte (DCGM, métriques d'utilisation) relève du module sur l'observabilité.
+L'ordre des chapitres et les durées, la grille Triton, bibliothèque ou CUDA, les quatre verdicts de lecture de trace et leurs seuils (50 µs, 60 %, 85 %, 50 %), l'usage de bornes de gain avant toute optimisation et la règle « profil avant, plafond calculé, profil après » sont des choix de ce parcours, pas des règles des constructeurs. Les hypothèses chiffrées des exercices 5 et 10 sont des données d'énoncé.
+
+### À vérifier {#a-verifier}
+
+**Aucun programme de ce module n'a tourné sur un GPU** : les fichiers `cuda/*.cu` ont seulement été compilés, `bench_gpu.py` seulement octet-compilé, et toutes les prédictions de vitesse (rapports de trafic de 4 et de 4,5, gains de recouvrement, rapport d'environ 24 de FlashAttention tiré de formules en $\Theta$) sont des bornes de modèle à confronter à une mesure. Les commandes `nsys` et `ncu` des chapitres 7 et du lab 4.4 sont documentées mais non exécutées ; leurs options varient selon les versions. Le tableau des limites par SM du guide CUDA a été lu ; seules les valeurs de la capacité 8.0 servent aux calculs, et les colonnes du texte extrait sont parfois fusionnées (nombre de blocs résidents par SM) : relisez le tableau de votre capacité de calcul. Les 228 Kio de mémoire partagée de la capacité 9.0 sont ceux du tableau des capacités de mémoire partagée du même guide. La largeur d'exposant et le mode d'arrondi de TF32, le nombre de moteurs de copie d'un GPU donné, la nécessité de formes et d'adresses stables pour un CUDA graph, les noms des options d'épinglage de PyTorch, l'absence de mise à l'échelle avec `bfloat16` et le surcoût du profilage n'ont pas été relus à la source. La documentation de Triton annonce que l'interpréteur ne gère pas `bfloat16` ; notre essai (Triton 3.8.0) n'a pas levé d'exception mais a rendu des valeurs fausses (observation d'une version, refaite par `probe_observations.py`). L'échec de `@triton.autotune` dans l'interpréteur et l'arrêt brutal sans masque sont aussi des observations d'une version. Les traces de type GPU du lab 4.4 sont fabriquées. Les chiffres de fiche technique du H100 (3,35 To/s) viennent du module 2 et n'ont pas été relus ici.
+
+### Hors périmètre {#hors-perimetre}
+
+Les communications entre GPU (NCCL, voir les modules sur les réseaux), la programmation des cœurs tensoriels (`mma`, CUTLASS), la programmation multi-GPU et les groupes coopératifs, les clusters de blocs et le TMA de Hopper, le scan de Blelloch, les GPU non NVIDIA (ROCm), la sparsité, le partage de GPU (MIG) et l'installation des profileurs. L'observabilité d'une flotte (DCGM, métriques d'utilisation) relève du module sur l'observabilité.

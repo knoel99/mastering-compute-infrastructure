@@ -7,7 +7,7 @@ Computes, with no network and no model:
     origin and per employer group, with and without inference-only roles;
   * distinctive skills of each region (share in the region minus share elsewhere, in points);
   * the coverage of each skill by the course (max depth over modules and projects, owners) and a gap list.
-Only postings whose quotes are mostly verified count (confidence != low, or no evidence because withheld).
+Only public postings (with a URL) whose quotes are mostly verified count (confidence != low).
     python3 tools/market_analysis.py            # writes data/market/analysis.json and prints a summary
 """
 import json
@@ -49,6 +49,11 @@ ROLE_FR = {"training-platform": "Plateforme d'entraînement", "gpu-cluster-ops":
            "storage": "Stockage", "capacity-finops": "Capacité, FinOps", "leadership": "Direction d'équipe", "other": "Autre"}
 
 
+def short_company(name):
+    """Display name: the part before any parenthesis ("CEA/DAM Île-de-France (TGCC…)" -> "CEA/DAM Île-de-France")."""
+    return name.split(" (")[0].strip()
+
+
 def load_postings():
     posts = []
     for f in sorted((ROOT / "data" / "jobs").glob("*.json")):
@@ -56,7 +61,9 @@ def load_postings():
         for p in d.get("postings", []):
             p["_unit"] = d.get("unit", f.stem)
             posts.append(p)
-    solid = [p for p in posts if p.get("confidence") != "low"]
+    # a posting counts only if it is public (a URL) and its quotes are mostly verified: the two anonymised
+    # postings kept in data/jobs/jobs.json for the record have no URL and are left out of the analysis
+    solid = [p for p in posts if p.get("url") and p.get("confidence") != "low"]
     return posts, solid
 
 
@@ -121,8 +128,9 @@ def main():
                       ("seniority", "by_seniority"), ("company_type", "by_company_type")):
         res[name] = dict(Counter(p.get(key, "?") for p in posts).most_common())
     res["by_group"] = dict(Counter(GROUPS.get(p["company_type"], "other") for p in posts).most_common())
-    res["companies"] = dict(Counter(p["company"] for p in posts).most_common())
-    res["companies_by_region"] = {r: sorted({p["company"] for p in posts if p.get("region") == r}) for r in REGION_FR}
+    res["companies"] = dict(Counter(short_company(p["company"]) for p in posts).most_common())
+    res["companies_by_region"] = {r: sorted({short_company(p["company"]) for p in posts if p.get("region") == r}) for r in REGION_FR}
+    res["companies_by_origin"] = {r: sorted({short_company(p["company"]) for p in posts if p.get("company_origin") == r}) for r in REGION_FR}
     res["demand_all"] = demand(posts)
     res["demand_core"] = demand(core)
     res["demand_by_region"] = {r: demand([p for p in posts if p.get("region") == r]) for r in ("us", "eu", "cn")}

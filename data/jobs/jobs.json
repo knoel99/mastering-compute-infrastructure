@@ -70,6 +70,16 @@
      "id": "infiniband-roce",
      "level": "bonus",
      "quote": "Slurm or Kubernetes, GPU networking such as InfiniBand/RoCE, or storage caching"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Profile the complete training loop—data loading, decoding, CPU-GPU memory transfers, and compute kernels—eliminating bottlenecks to keep MFU high"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "ML training infrastructure, distributed systems, or high-performance ML software"
     }
    ],
    "responsibilities": [
@@ -79,12 +89,13 @@
     "Integrate and benchmark accelerated kernels and mixed precision; write custom optimizations when worthwhile.",
     "Make long runs reliable: checkpointing, fault-tolerant resume, determinism and numerical/distributed failure diagnosis with researchers."
    ],
-   "notes": "Training-focused (pretraining, mid-training, post-training of robotic foundation models); the cluster operations side (Slurm/K8s/InfiniBand) is only a bonus. Seed posting, anonymized, no URL.",
+   "notes": "Training-focused (pretraining, mid-training, post-training of robotic foundation models); the cluster operations side (Slurm/K8s/InfiniBand) is only a bonus. Seed posting, anonymized, no URL. posted_on is the creation date printed by the job portal (2026-10-21).",
    "region": "eu",
    "company_origin": "eu",
    "role_family": "training-platform",
    "language": "en",
-   "evidence": []
+   "evidence": [],
+   "posted_on": "2026-10-21"
   },
   {
    "id": "seed-robotics-compute-infra-lead",
@@ -214,6 +225,21 @@
      "id": "bare-metal-provisioning",
      "level": "bonus",
      "quote": "standing up clusters from tens to hundreds of nodes"
+    },
+    {
+     "id": "virtualization",
+     "level": "required",
+     "quote": "virtualized GPU/CPU dev sessions"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "provisioning, Linux, high-performance networking (InfiniBand / RoCE), storage for training, utilization, and GPU/node failure modes"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "so we can place, burst, and fail over workloads across GPU clouds, hyperscalers, and HPC without rewriting jobs"
     }
    ],
    "responsibilities": [
@@ -224,12 +250,13 @@
     "Build provider-agnostic observability (Prometheus/Grafana, traces, logs, MLflow) and virtualized GPU/CPU dev sessions.",
     "Forecast capacity and cost and take part in provider negotiations as technical lead."
    ],
-   "notes": "Training-first (explicitly 'not inference-only'); closest match to the target profile. 8+ years stated. Seed posting, anonymized, no URL.",
+   "notes": "Training-first (explicitly 'not inference-only'); closest match to the target profile. 8+ years stated. Seed posting, anonymized, no URL. posted_on is the creation date printed by the job portal (2026-09-14).",
    "region": "eu",
    "company_origin": "eu",
    "role_family": "leadership",
    "language": "en",
-   "evidence": []
+   "evidence": [],
+   "posted_on": "2026-09-14"
   },
   {
    "id": "anthropic-staff-cluster-infra-london",
@@ -315,6 +342,16 @@
      "id": "ci-cd",
      "level": "bonus",
      "quote": "workflow orchestration (Temporal, Argo Workflows)"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "Deep expertise in distributed systems, reliability, and cloud platforms (e.g., Kubernetes, IaC, AWS/GCP/Azure)"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "able to automatically drain and recover in response to failure"
     }
    ],
    "responsibilities": [
@@ -324,10 +361,10 @@
     "Drive scalability, homogeneity and fault tolerance of clusters, including automatic drain and recovery on failure.",
     "Raise operational excellence (incident response, postmortems, on-call health) and mentor engineers."
    ],
-   "notes": "Cluster-fleet platform role (K8s and IaC heavy, no Slurm or HPC wording). Page lists 10+ years of software engineering as preferred and does not give a required number. Salary range published on the page (GBP 325,000 to 485,000). The 'multicloud-skypilot' tag only means multi-provider cluster provisioning: SkyPilot is not named.",
+   "notes": "Cluster-fleet platform role (K8s and IaC heavy, no Slurm or HPC wording). Page lists 10+ years of software engineering as preferred and does not give a required number. Salary range published on the page (GBP 325,000 to 485,000). The 'multicloud-skypilot' tag only means multi-provider cluster provisioning: SkyPilot is not named. posted_on is the first_published date printed by the Greenhouse API endpoint https://boards-api.greenhouse.io/v1/boards/anthropic/jobs/5211297008 (the human page read as source_url prints no date).",
    "evidence": [
     {
-     "claim": "Skill(s): kubernetes (required), hyperscaler-cloud (required)",
+     "claim": "Skill(s): kubernetes (required), hyperscaler-cloud (required), distributed-systems (required)",
      "url": "https://job-boards.greenhouse.io/anthropic/jobs/5211297008",
      "quote": "Deep expertise in distributed systems, reliability, and cloud platforms (e.g., Kubernetes, IaC, AWS/GCP/Azure)",
      "source": "web",
@@ -416,14 +453,22 @@
      "quote": "workflow orchestration (Temporal, Argo Workflows)",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://job-boards.greenhouse.io/anthropic/jobs/5211297008",
+     "quote": "able to automatically drain and recover in response to failure",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "13/13",
+   "evidence_verified": "14/14",
    "region": "eu",
    "company_origin": "us",
    "role_family": "gpu-cluster-ops",
    "language": "en",
-   "source_url": "https://job-boards.greenhouse.io/anthropic/jobs/5211297008"
+   "source_url": "https://job-boards.greenhouse.io/anthropic/jobs/5211297008",
+   "posted_on": "2026-05-07"
   },
   {
    "id": "coreweave-principal-cluster-orchestration",
@@ -479,6 +524,16 @@
      "id": "ray",
      "level": "bonus",
      "quote": "Experience with systems such as Kueue, Kubeflow, Argo Workflows, Ray, Istio, or Knative."
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "15+ years of experience building and operating large-scale distributed systems."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Measure and improve scheduling latency, container startup time, image distribution, and cold-start performance."
     }
    ],
    "responsibilities": [
@@ -527,7 +582,7 @@
      "verified": true
     },
     {
-     "claim": "Skill(s): containers (required)",
+     "claim": "Skill(s): containers (required), perf-profiling (required)",
      "url": "https://boards-api.greenhouse.io/v1/boards/coreweave/jobs/4658799006",
      "quote": "Measure and improve scheduling latency, container startup time, image distribution, and cold-start performance.",
      "source": "web",
@@ -546,14 +601,22 @@
      "quote": "Experience with systems such as Kueue, Kubeflow, Argo Workflows, Ray, Istio, or Knative.",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/coreweave/jobs/4658799006",
+     "quote": "15+ years of experience building and operating large-scale distributed systems.",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "8/8",
+   "evidence_verified": "9/9",
    "region": "us",
    "company_origin": "us",
    "role_family": "gpu-cluster-ops",
    "language": "en",
-   "source_url": "https://boards-api.greenhouse.io/v1/boards/coreweave/jobs/4658799006"
+   "source_url": "https://boards-api.greenhouse.io/v1/boards/coreweave/jobs/4658799006",
+   "posted_on": "2026-02-27"
   },
   {
    "id": "nebius-senior-hpc-cluster-engineer",
@@ -614,6 +677,16 @@
      "id": "nccl-collectives",
      "level": "bonus",
      "quote": "collective communication libraries"
+    },
+    {
+     "id": "virtualization",
+     "level": "required",
+     "quote": "support for new GPU hardware through software stacks like Kubernetes, QEMU, and KVM"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "focused on performance optimization, low-level programming"
     }
    ],
    "responsibilities": [
@@ -623,7 +696,7 @@
     "Automate proactive fault monitoring, detection and resolution in GPU and InfiniBand environments.",
     "Configure and operate GPU devices and InfiniBand fabrics reliably."
    ],
-   "notes": "Provider-side (GPU cloud) HPC role at the GPU plus InfiniBand plus virtualization layer, with no scheduler requirement. 5+ years system-level software development and 3+ years Linux stated. Posting text read through the public Greenhouse JSON endpoint (evidence URL) because careers.nebius.com renders a JavaScript listing.",
+   "notes": "Provider-side (GPU cloud) HPC role at the GPU plus InfiniBand plus virtualization layer, with no scheduler requirement. 5+ years system-level software development and 3+ years Linux stated. Posting text read through the public Greenhouse JSON endpoint (evidence URL) because careers.nebius.com renders a JavaScript listing. posted_on is the Greenhouse first_published date (2025-03-14) printed on the source_url endpoint; the same endpoint shows updated_at 2026-10-13, and the posting is still listed.",
    "evidence": [
     {
      "claim": "Skill(s): linux-admin (required)",
@@ -687,14 +760,29 @@
      "quote": "collective communication libraries",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): virtualization (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/nebius/jobs/4558237101",
+     "quote": "support for new GPU hardware through software stacks like Kubernetes, QEMU, and KVM",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://boards-api.greenhouse.io/v1/boards/nebius/jobs/4558237101",
+     "quote": "focused on performance optimization, low-level programming",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "9/9",
+   "evidence_verified": "11/11",
    "region": "eu",
    "company_origin": "eu",
    "role_family": "hpc-ops",
    "language": "en",
-   "source_url": "https://boards-api.greenhouse.io/v1/boards/nebius/jobs/4558237101"
+   "source_url": "https://boards-api.greenhouse.io/v1/boards/nebius/jobs/4558237101",
+   "posted_on": "2025-03-14"
   },
   {
    "id": "togetherai-staff-storage-hpc-amsterdam",
@@ -780,6 +868,16 @@
      "id": "checkpoint-fault-tolerance",
      "level": "bonus",
      "quote": "ML/AI storage patterns (model weights, checkpointing, dataset caching)"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "troubleshoot with profiling tools; scale to thousands of nodes"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "3+ years managing distributed storage at multi-petabyte scale"
     }
    ],
    "responsibilities": [
@@ -789,7 +887,7 @@
     "Build Kubernetes storage operators and self-service platforms with multi-tenancy, quotas and performance isolation.",
     "Lead capacity planning and cost optimization of the storage fleet; run SLOs, DR and chaos tests."
    ],
-   "notes": "Storage/HPC side of a GPU cloud, a strong match for the parallel-storage and fast-interconnect topics. 8+ years in storage engineering, 3+ years of multi-petabyte distributed storage. Same company lists comparable roles in San Francisco and Bangalore.",
+   "notes": "Storage/HPC side of a GPU cloud, a strong match for the parallel-storage and fast-interconnect topics. 8+ years in storage engineering, 3+ years of multi-petabyte distributed storage. Same company lists comparable roles in San Francisco and Bangalore. posted_on is the first_published date printed by the Greenhouse API endpoint https://boards-api.greenhouse.io/v1/boards/togetherai/jobs/5028749007 (the human page read as source_url prints no date).",
    "evidence": [
     {
      "claim": "Skill(s): parallel-fs-storage (required)",
@@ -874,14 +972,29 @@
      "quote": "ML/AI storage patterns (model weights, checkpointing, dataset caching)",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://job-boards.greenhouse.io/togetherai/jobs/5028749007",
+     "quote": "troubleshoot with profiling tools; scale to thousands of nodes",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://job-boards.greenhouse.io/togetherai/jobs/5028749007",
+     "quote": "3+ years managing distributed storage at multi-petabyte scale",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "12/12",
+   "evidence_verified": "14/14",
    "region": "eu",
    "company_origin": "us",
    "role_family": "storage",
    "language": "en",
-   "source_url": "https://job-boards.greenhouse.io/togetherai/jobs/5028749007"
+   "source_url": "https://job-boards.greenhouse.io/togetherai/jobs/5028749007",
+   "posted_on": "2026-01-20"
   },
   {
    "id": "hcompany-infra-ml-compute-paris",
@@ -967,6 +1080,11 @@
      "id": "terraform-iac",
      "level": "bonus",
      "quote": "Terraform"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "Detecting, draining and repairing unhealthy GPU nodes"
     }
    ],
    "responsibilities": [
@@ -1014,7 +1132,7 @@
      "verified": true
     },
     {
-     "claim": "Skill(s): dcgm-gpu-monitoring (required)",
+     "claim": "Skill(s): dcgm-gpu-monitoring (required), hardware-health (required)",
      "url": "https://api.ashbyhq.com/posting-api/job-board/hcompany",
      "quote": "Detecting, draining and repairing unhealthy GPU nodes",
      "source": "web",
@@ -1075,7 +1193,8 @@
    "company_origin": "eu",
    "role_family": "training-platform",
    "language": "en",
-   "source_url": "https://api.ashbyhq.com/posting-api/job-board/hcompany"
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/hcompany",
+   "posted_on": "2026-10-12"
   },
   {
    "id": "openai-swe-gpu-infra-hpc",
@@ -1131,6 +1250,21 @@
      "id": "prometheus-grafana",
      "level": "bonus",
      "quote": "Familiarity with monitoring tools (e.g., Prometheus, Grafana)."
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "Identify and fix performance bottlenecks and inefficiencies."
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "build automation for detection and remediation at scale"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "bonus",
+     "quote": "High-performance computing (HPC) or distributed systems experience."
     }
    ],
    "responsibilities": [
@@ -1178,7 +1312,7 @@
      "verified": true
     },
     {
-     "claim": "Skill(s): hpc-experience (bonus)",
+     "claim": "Skill(s): hpc-experience (bonus), distributed-systems (bonus)",
      "url": "https://api.ashbyhq.com/posting-api/job-board/openai",
      "quote": "High-performance computing (HPC) or distributed systems experience.",
      "source": "web",
@@ -1197,14 +1331,29 @@
      "quote": "Familiarity with monitoring tools (e.g., Prometheus, Grafana).",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/openai",
+     "quote": "Identify and fix performance bottlenecks and inefficiencies.",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/openai",
+     "quote": "build automation for detection and remediation at scale",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "8/8",
+   "evidence_verified": "10/10",
    "region": "us",
    "company_origin": "us",
    "role_family": "gpu-cluster-ops",
    "language": "en",
-   "source_url": "https://api.ashbyhq.com/posting-api/job-board/openai"
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/openai",
+   "posted_on": "2026-02-05"
   },
   {
    "id": "scaleway-head-engineering-gpu-paris",
@@ -1255,6 +1404,21 @@
      "id": "sre-oncall",
      "level": "required",
      "quote": "Ensure the reliability, scalability, performance, and maintainability of our GPU infrastructure"
+    },
+    {
+     "id": "non-nvidia-accelerators",
+     "level": "bonus",
+     "quote": "Familiarity in GPU and/or HPC environments, ideally involving NVIDIA and AMD technologies"
+    },
+    {
+     "id": "distributed-systems",
+     "level": "required",
+     "quote": "Strong understanding of distributed infrastructure, cluster architecture, reliability, and production operations"
+    },
+    {
+     "id": "virtualization",
+     "level": "required",
+     "quote": "Experience with orchestration, provisioning, and observability technologies such as Kubernetes, Proxmox, Warewulf, Prometheus, and Grafana"
     }
    ],
    "responsibilities": [
@@ -1264,7 +1428,7 @@
     "Oversee design, deployment and operational readiness of new GPU clusters.",
     "Evolve cluster management, capacity management and automation; keep the GPU fleet reliable and scalable."
    ],
-   "notes": "Management role for a French sovereign GPU cloud (Slurm is not named; Warewulf, Lustre, DDN and VAST are). 10+ years of infrastructure engineering stated. Posting text read through the public Lever JSON endpoint (evidence URL).",
+   "notes": "Management role for a French sovereign GPU cloud (Slurm is not named; Warewulf, Lustre, DDN and VAST are). 10+ years of infrastructure engineering stated. Posting text read through the public Lever JSON endpoint (evidence URL). posted_on converted from the Lever createdAt timestamp (1787320853362 ms, UTC) printed on the source_url endpoint.",
    "evidence": [
     {
      "claim": "Skill(s): leadership-mgmt (required)",
@@ -1274,14 +1438,14 @@
      "verified": true
     },
     {
-     "claim": "Skill(s): hpc-experience (required)",
+     "claim": "Skill(s): hpc-experience (required), non-nvidia-accelerators (bonus)",
      "url": "https://api.lever.co/v0/postings/scaleway?mode=json",
      "quote": "Familiarity in GPU and/or HPC environments, ideally involving NVIDIA and AMD technologies",
      "source": "web",
      "verified": true
     },
     {
-     "claim": "Skill(s): kubernetes (required), prometheus-grafana (required), bare-metal-provisioning (required)",
+     "claim": "Skill(s): kubernetes (required), prometheus-grafana (required), bare-metal-provisioning (required), virtualization (required)",
      "url": "https://api.lever.co/v0/postings/scaleway?mode=json",
      "quote": "Experience with orchestration, provisioning, and observability technologies such as Kubernetes, Proxmox, Warewulf, Prometheus, and Grafana",
      "source": "web",
@@ -1307,14 +1471,22 @@
      "quote": "Ensure the reliability, scalability, performance, and maintainability of our GPU infrastructure",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): distributed-systems (required)",
+     "url": "https://api.lever.co/v0/postings/scaleway?mode=json",
+     "quote": "Strong understanding of distributed infrastructure, cluster architecture, reliability, and production operations",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "6/6",
+   "evidence_verified": "7/7",
    "region": "eu",
    "company_origin": "eu",
    "role_family": "leadership",
    "language": "en",
-   "source_url": "https://api.lever.co/v0/postings/scaleway?mode=json"
+   "source_url": "https://api.lever.co/v0/postings/scaleway?mode=json",
+   "posted_on": "2026-08-21"
   },
   {
    "id": "crusoe-senior-gpu-capacity-planner",
@@ -1350,6 +1522,11 @@
      "id": "ml-training-experience",
      "level": "bonus",
      "quote": "Deep technical familiarity with distributed AI training frameworks and multi-tenant cloud storage dynamics."
+    },
+    {
+     "id": "datacenter-facilities",
+     "level": "required",
+     "quote": "communicate complex infrastructure and physical layout constraints clearly to business stakeholders"
     }
    ],
    "responsibilities": [
@@ -1388,14 +1565,22 @@
      "quote": "Deep technical familiarity with distributed AI training frameworks and multi-tenant cloud storage dynamics.",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): datacenter-facilities (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/crusoe",
+     "quote": "communicate complex infrastructure and physical layout constraints clearly to business stakeholders",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "4/4",
+   "evidence_verified": "5/5",
    "region": "us",
    "company_origin": "us",
    "role_family": "capacity-finops",
    "language": "en",
-   "source_url": "https://api.ashbyhq.com/posting-api/job-board/crusoe"
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/crusoe",
+   "posted_on": "2026-06-25"
   },
   {
    "id": "lambda-senior-hpc-fleet-engineering",
@@ -1486,6 +1671,21 @@
      "id": "security-compliance",
      "level": "bonus",
      "quote": "Understanding of compliance frameworks (SOC 2, ISO 27001, etc.)"
+    },
+    {
+     "id": "hardware-health",
+     "level": "required",
+     "quote": "Create runbooks and automated remediations for common cluster failure modes"
+    },
+    {
+     "id": "perf-profiling",
+     "level": "required",
+     "quote": "from GPU architectures to hardware performance optimization"
+    },
+    {
+     "id": "datacenter-facilities",
+     "level": "bonus",
+     "quote": "Experience with data center power and thermal design"
     }
    ],
    "responsibilities": [
@@ -1580,14 +1780,36 @@
      "quote": "Understanding of compliance frameworks (SOC 2, ISO 27001, etc.)",
      "source": "web",
      "verified": true
+    },
+    {
+     "claim": "Skill(s): hardware-health (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/lambda",
+     "quote": "Create runbooks and automated remediations for common cluster failure modes",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): perf-profiling (required)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/lambda",
+     "quote": "from GPU architectures to hardware performance optimization",
+     "source": "web",
+     "verified": true
+    },
+    {
+     "claim": "Skill(s): datacenter-facilities (bonus)",
+     "url": "https://api.ashbyhq.com/posting-api/job-board/lambda",
+     "quote": "Experience with data center power and thermal design",
+     "source": "web",
+     "verified": true
     }
    ],
-   "evidence_verified": "12/12",
+   "evidence_verified": "15/15",
    "region": "us",
    "company_origin": "us",
    "role_family": "gpu-cluster-ops",
    "language": "en",
-   "source_url": "https://api.ashbyhq.com/posting-api/job-board/lambda"
+   "source_url": "https://api.ashbyhq.com/posting-api/job-board/lambda",
+   "posted_on": "2026-09-01"
   },
   {
    "id": "cea-dam-devops-services-hpc",
@@ -1662,7 +1884,7 @@
     "Document the work, in particular runbooks for level-1 and level-2 operators.",
     "Help users run complex scientific workflows and promote good practice for using compute resources."
    ],
-   "notes": "French-language public-research HPC centre posting (CDI, status 'Cadre', availability 2027-01-01). Service layer around the schedulers (not hardware or fabric). No years of experience stated; engineering degree (Bac+5) or doctorate expected; an administrative security investigation applies to all CEA staff. Quotes are in French.",
+   "notes": "French-language public-research HPC centre posting (CDI, status 'Cadre', availability 2027-01-01). Service layer around the schedulers (not hardware or fabric). No years of experience stated; engineering degree (Bac+5) or doctorate expected; an administrative security investigation applies to all CEA staff. Quotes are in French. No publication date on the page (reference 2026-41750; position available 01/01/2027); posted_on left null.",
    "evidence": [
     {
      "claim": "Skill(s): linux-admin (required)",
@@ -1719,7 +1941,8 @@
    "company_origin": "eu",
    "role_family": "hpc-ops",
    "language": "fr",
-   "source_url": "https://www.emploi.cea.fr/offre-de-emploi/emploi-ingenieur-e-devops-services-hpc-h-f-h-f_41750.aspx"
+   "source_url": "https://www.emploi.cea.fr/offre-de-emploi/emploi-ingenieur-e-devops-services-hpc-h-f-h-f_41750.aspx",
+   "posted_on": null
   }
  ],
  "blocked_sources": [
@@ -1733,8 +1956,8 @@
  ],
  "verification": {
   "status": "verified",
-  "checked_claims": 92,
-  "verified_quotes": 92,
+  "checked_claims": 105,
+  "verified_quotes": 105,
   "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
  }
 }

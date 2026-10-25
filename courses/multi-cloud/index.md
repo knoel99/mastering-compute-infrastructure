@@ -36,7 +36,7 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 | Volume | 28 h, dont 12 h de lecture, 9,5 h de labs et 6,5 h d'exercices (répartition estimée par l'auteur, non mesurée) |
 | Niveau d'entrée | 3 : Kubernetes pour les GPU et la tolérance aux pannes sont acquis |
 | Prérequis | [Module 12 — Kubernetes pour les GPU](../kubernetes-gpu/index.html), [Module 10 — Tolérance aux pannes](../fault-tolerance/index.html) |
-| Statut pour le lecteur de référence | cœur : la plateforme de calcul d'une organisation réelle est presque toujours multi-fournisseurs |
+| Pour qui | Cœur : la plateforme de calcul d'une organisation est presque toujours répartie entre plusieurs fournisseurs. |
 | Livrable | un simulateur de placement testé, un calculateur de coût de déménagement de données testé, un job SkyPilot analysé hors ligne avec sa politique de gouvernance |
 | Environnement | un portable CPU suffit pour les labs 13.1 et 13.3 et pour la branche hors ligne du lab 13.2. La branche cloud du lab 13.2 demande un compte cloud et du crédit : lancez de petits jobs de quelques minutes et vérifiez l'arrêt automatique |
 | Projets liés | [Projet 4 — Placement multi-fournisseurs](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
@@ -51,6 +51,14 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 -   Expliquer pourquoi un entraînement ne se coupe pas entre fournisseurs et dimensionner quotas et identités (chapitre 6).
 -   Choisir une voie d'accès à un centre national ou européen et convertir une demande d'heures GPU (chapitre 7).
 -   Mettre en place inventaire, étiquetage et nettoyage automatique (chapitre 8).
+
+<!-- gen:place -->
+### Place dans le parcours {#place}
+
+-   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
+-   **S'appuie sur** : [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
+-   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+<!-- /gen:place -->
 
 ### Plan de séances {#seances}
 
@@ -69,7 +77,27 @@ Dix séances, soit 28 h : sept de 3 h, deux de 2,5 h et une de 2 h. Le niveau 2 
 | 9 | 3 h | 3 | ch. 8 Gouvernance (1 h) | Lab 13.2 partie B : résidence et jobs étendus (1 h) ; Ex. 11 (1 h) |
 | 10 | 2.5 h | 3 | Synthèse et checkpoint de sortie | Ex. 8, 12, 2 (2,5 h) |
 
-## Avant de commencer {#avant}
+<!-- gen:travailler -->
+### Comment travailler ce module {#travailler}
+
+Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le [point de départ](../../profile/index.html). Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.
+
+| Profil d'entrée | Priorité | Ce que cela veut dire ici |
+|---|---|---|
+| Ingénieur plateforme, SRE ou DevOps | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Administrateur ou ingénieur HPC | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Ingénieur ML ou chercheur | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+| Développeur logiciel ou systèmes | normal | les chapitres dans l'ordre, les labs, les exercices ★ et ★★ |
+| Étudiant ou personne en reconversion | à fond | tous les chapitres, tous les labs et les exercices ★★★ |
+
+**À ne pas survoler.** La comparaison chiffrée d'offres de capacité et la reprise d'un job d'un fournisseur à l'autre servent au projet 4.
+
+**Méthode.** Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son `verify.sh` passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe.
+<!-- /gen:travailler -->
+
+## 0. Avant de commencer {#avant}
+
+### 0.1. Questions de positionnement {#positionnement}
 
 Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si elles vous semblent routinières, parcourez les exercices ★★★ et passez au module suivant.
 
@@ -843,8 +871,9 @@ Points clés — chapitre 8
 
 Trois labs, 9,5 h au total : 4 h, 2,5 h et 3 h. Les labs 13.1 et 13.3 sont de type `sandbox` et ont été exécutés ; le lab 13.2 est de type `cluster` et sa branche cloud n'a **jamais été exécutée** (voir ci-dessous).
 
+### Lab 13.1 — Simulateur de placement sensible aux coûts {#lab-13-1}
+
 ::: lab
-[Lab 13.1 — Simulateur de placement sensible aux coûts]{.tag}
 
 **Objectif.** Comparer quatre politiques de placement d'un job préemptible sur des tirages communs, et trouver la taille de données au-delà de laquelle basculer ne vaut plus son coût. **Durée.** 4 h (partie A, 1 h : formules et moteur ; partie B, 3 h : politiques, balayage, critère). **Prérequis matériels.** Portable CPU, Python 3 avec `pytest` ; ni GPU ni compte cloud. Les données du scénario sont **synthétiques**.
 
@@ -860,8 +889,9 @@ Trois labs, 9,5 h au total : 4 h, 2,5 h et 3 h. Les labs 13.1 et 13.3 sont de ty
 **Pour aller plus loin.** Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez le même scénario dans le [projet 4](../../projects/multi-provider-scheduler/index.html), qui gère plusieurs jobs et une capacité limitée.
 :::
 
+### Lab 13.2 — Un job SkyPilot indépendant du fournisseur {#lab-13-2}
+
 ::: lab
-[Lab 13.2 — Un job SkyPilot indépendant du fournisseur]{.tag}
 
 **Objectif.** Écrire et contrôler un job managé qui survit à la préemption, avec sa politique de gouvernance. **Durée.** 2,5 h (partie A, 1,5 h : étapes 1 à 5 ; partie B, 1 h : étapes 6 et 7 ; l'étape 8, facultative, s'ajoute). **Prérequis matériels.** Portable CPU, Python 3 avec `pytest` et `pyyaml`, `yamllint` et `shellcheck` recommandés ; la branche d'analyse de SkyPilot exige `pip install skypilot==0.14.1` dans un environnement à part. La branche cloud exige un compte et du crédit.
 
@@ -881,8 +911,9 @@ Trois labs, 9,5 h au total : 4 h, 2,5 h et 3 h. Les labs 13.1 et 13.3 sont de ty
 **Pour aller plus loin.** Ajoutez un lieu Slurm (`infra: slurm`) à `any_of` et lisez ce que `policy_check.py --allow-prefix …` en dit (W4).
 :::
 
+### Lab 13.3 — Coût réel d'un déménagement de données {#lab-13-3}
+
 ::: lab
-[Lab 13.3 — Coût réel d'un déménagement de données]{.tag}
 
 **Objectif.** Programmer et tester le calculateur du chapitre 4, puis l'appliquer à vos propres volumes. **Durée.** 3 h (partie A, 1 h : carte tarifaire, scénarios ; partie B, 2 h : écrire les fonctions). **Prérequis matériels.** Portable CPU, Python 3 avec `pytest` et `pyyaml`. Les tarifs de `rates.yaml` sont **réels et datés du 24 octobre 2026** ; relisez-les le jour de votre étude.
 
@@ -1113,12 +1144,22 @@ Sauf mention contraire, les pages ci-dessous ont été lues le 24 octobre 2026 ;
 
 ## Sources et portée {#sources}
 
-**Documenté.** Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.
+### Documenté {#documente}
 
-**Recommandé.** Le score de placement du chapitre 5, la valeur $\lambda$ du temps comme paramètre d'activité, la garde d'échéance, la règle « un job égale un site », le stockage neutre à sortie gratuite pour les checkpoints, les règles E1 à E6 et W1 à W4 de `policy_check.py` et leur choix d'étiquettes sont des choix de ce parcours, pas des normes. Les trois politiques naïves du lab 13.1 sont des cas d'école volontairement simples.
+Les préavis de préemption, les limites des Capacity Blocks, les modèles de provisionnement de Google Cloud, les champs du YAML de SkyPilot et le comportement de la reprise, l'exemple chiffré de sortie de données et les résultats de bascule de l'article SkyPilot, les statuts et le flux de MultiKueue, les alias de providers Terraform, la fédération d'identité de Google Cloud, les quotas d'instances en vCPU d'AWS, l'activation des étiquettes d'allocation, les conditions des sorties gratuites d'AWS et de Google Cloud, les seuils d'eDARI, le matériel de Jean Zay et les modes d'accès d'EuroHPC, d'ACCESS et du pilote NAIRR ont été relus à leur source le 24 octobre 2026. Les tarifs du lab 13.3 viennent de l'API de prix d'AWS (publications du 16 septembre 2026 pour le transfert et du 15 octobre 2026 pour le stockage S3), de l'API de prix d'Azure et des pages de Cloudflare R2 et de Backblaze B2. Les calculs des exemples et des corrigés ont été refaits avec le code des labs.
 
-**À vérifier.** Tous les tarifs, franchises et dates d'appel cités changent : relisez la page du fournisseur le jour de la décision. Les tarifs de transfert de Google Cloud ne sont pas cités (tableau de la page aplati). Les règles exactes et les dates d'application du règlement européen sur les données (*Data Act*), notamment la fin des frais de changement de fournisseur, n'ont pas été relues à la source (EUR-Lex et le site de la Commission refusent l'accès depuis le bac à sable) ; le contrat de chaque fournisseur fait foi. L'annonce d'environ 70 % d'économie de la documentation SkyPilot est une affirmation du fournisseur de l'outil. Les offres et capacités des GPU clouds et des offres européennes, la liste des fournisseurs européens, les liaisons privées et leurs tarifs, la valeur de la préemption sur des GPU récents et l'état des appels d'EuroHPC, d'eDARI, d'ACCESS et du NAIRR sont instables et non documentés ici. Les règles d'installation d'outils et de réseau d'un centre public précis ne sont pas décrites.
+### Recommandé {#recommande}
 
-**Mesuré dans le bac à sable, pas vérifié sur un cloud.** SkyPilot 0.14.1 rejette `type:` avec `mode: MOUNT`, les fautes de frappe et les mauvais types, et accepte un nom de stratégie `job_recovery` invalide (observation du 24 octobre 2026). Lu dans le code de SkyPilot 0.14.1 sans l'exécuter : le spot sur un contexte Kubernetes exige une étiquette de nœud. Le job `job.yaml` n'a jamais été lancé sur un compte cloud ni sur un cluster Kubernetes. Les trois politiques et le scénario du lab 13.1 sont synthétiques, tout comme les taux d'interruption, de disponibilité et le tarif de sortie de 0,09 u par Go de ce lab.
+Le score de placement du chapitre 5, la valeur $\lambda$ du temps comme paramètre d'activité, la garde d'échéance, la règle « un job égale un site », le stockage neutre à sortie gratuite pour les checkpoints, les règles E1 à E6 et W1 à W4 de `policy_check.py` et leur choix d'étiquettes sont des choix de ce parcours, pas des normes. Les trois politiques naïves du lab 13.1 sont des cas d'école volontairement simples.
 
-**Hors périmètre.** L'entraînement distribué entre fournisseurs, la négociation des contrats et le modèle de coût total (module 15), la sécurité d'une plateforme partagée (module 16), le provisionnement par Terraform en détail (module 6), la performance de NCCL sur chaque interconnexion (module 7), le droit des données et les certifications.
+### À vérifier {#a-verifier}
+
+Tous les tarifs, franchises et dates d'appel cités changent : relisez la page du fournisseur le jour de la décision. Les tarifs de transfert de Google Cloud ne sont pas cités (tableau de la page aplati). Les règles exactes et les dates d'application du règlement européen sur les données (*Data Act*), notamment la fin des frais de changement de fournisseur, n'ont pas été relues à la source (EUR-Lex et le site de la Commission refusent l'accès depuis le bac à sable) ; le contrat de chaque fournisseur fait foi. L'annonce d'environ 70 % d'économie de la documentation SkyPilot est une affirmation du fournisseur de l'outil. Les offres et capacités des GPU clouds et des offres européennes, la liste des fournisseurs européens, les liaisons privées et leurs tarifs, la valeur de la préemption sur des GPU récents et l'état des appels d'EuroHPC, d'eDARI, d'ACCESS et du NAIRR sont instables et non documentés ici. Les règles d'installation d'outils et de réseau d'un centre public précis ne sont pas décrites.
+
+### Mesuré dans le bac à sable, pas vérifié sur un cloud {#mesure-bac-a-sable}
+
+SkyPilot 0.14.1 rejette `type:` avec `mode: MOUNT`, les fautes de frappe et les mauvais types, et accepte un nom de stratégie `job_recovery` invalide (observation du 24 octobre 2026). Lu dans le code de SkyPilot 0.14.1 sans l'exécuter : le spot sur un contexte Kubernetes exige une étiquette de nœud. Le job `job.yaml` n'a jamais été lancé sur un compte cloud ni sur un cluster Kubernetes. Les trois politiques et le scénario du lab 13.1 sont synthétiques, tout comme les taux d'interruption, de disponibilité et le tarif de sortie de 0,09 u par Go de ce lab.
+
+### Hors périmètre {#hors-perimetre}
+
+L'entraînement distribué entre fournisseurs, la négociation des contrats et le modèle de coût total (module 15), la sécurité d'une plateforme partagée (module 16), le provisionnement par Terraform en détail (module 6), la performance de NCCL sur chaque interconnexion (module 7), le droit des données et les certifications.

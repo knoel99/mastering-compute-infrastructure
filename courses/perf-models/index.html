@@ -41,7 +41,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
   <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
   <a class="brand" href="../../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
   <span class="tb-title" id="tb-title"></span>
-  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Thème</span></button>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
 </header>
 <div class="layout">
 <nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
@@ -52,6 +52,97 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="subtitle">Module 02 · Phase 0 · 24 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable</span></p>
 </header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#intro">Introduction et vue d'ensemble</a>
+<ul>
+<li><a href="#fiche">Fiche du module</a></li>
+<li><a href="#acquis">Ce que vous saurez vérifier</a></li>
+<li><a href="#place">Place dans le parcours</a></li>
+<li><a href="#seances">Plan de séances</a></li>
+<li><a href="#travailler">Comment travailler ce module</a></li>
+</ul></li>
+<li><a href="#avant">0. Avant de commencer</a>
+<ul>
+<li><a href="#positionnement">0.1. Questions de positionnement</a></li>
+</ul></li>
+<li><a href="#ch1">1. Du transistor au nœud : ce que le logiciel voit de la machine</a>
+<ul>
+<li><a href="#quatre-grandeurs">1.1. Quatre grandeurs</a></li>
+<li><a href="#la-hiérarchie-mémoire">1.2. La hiérarchie mémoire</a></li>
+<li><a href="#le-pic-de-calcul-dun-processeur">1.3. Le pic de calcul d'un processeur</a></li>
+<li><a href="#le-nœud-complet">1.4. Le nœud complet</a></li>
+</ul></li>
+<li><a href="#ch2">2. Le GPU, machine à débit</a>
+<ul>
+<li><a href="#une-architecture-pour-le-parallélisme-massif">2.1. Une architecture pour le parallélisme massif</a></li>
+<li><a href="#lire-une-fiche-technique">2.2. Lire une fiche technique</a></li>
+<li><a href="#cpu-et-gpu-face-à-face">2.3. CPU et GPU face à face</a></li>
+</ul></li>
+<li><a href="#ch3">3. Mesurer proprement</a>
+<ul>
+<li><a href="#les-règles-de-base">3.1. Les règles de base</a></li>
+<li><a href="#deux-benchmarks-de-référence">3.2. Deux benchmarks de référence</a></li>
+<li><a href="#rapporter-honnêtement">3.3. Rapporter honnêtement</a></li>
+</ul></li>
+<li><a href="#ch4">4. Le modèle roofline</a>
+<ul>
+<li><a href="#intensité-arithmétique">4.1. Intensité arithmétique</a></li>
+<li><a href="#les-deux-toits">4.2. Les deux toits</a></li>
+<li><a href="#quatre-exemples-sur-le-h100">4.3. Quatre exemples sur le H100</a></li>
+<li><a href="#limites-du-modèle">4.4. Limites du modèle</a></li>
+<li><a href="#utiliser-le-roofline-en-pratique">4.5. Utiliser le roofline en pratique</a></li>
+</ul></li>
+<li><a href="#ch5">5. Amdahl, Gustafson et l'efficacité parallèle</a>
+<ul>
+<li><a href="#la-loi-damdahl">5.1. La loi d'Amdahl</a></li>
+<li><a href="#la-loi-de-gustafson">5.2. La loi de Gustafson</a></li>
+<li><a href="#au-delà-de-la-fraction-séquentielle">5.3. Au-delà de la fraction séquentielle</a></li>
+<li><a href="#les-retardataires">5.4. Les retardataires</a></li>
+</ul></li>
+<li><a href="#ch6">6. Le modèle α-β et les communications collectives</a>
+<ul>
+<li><a href="#le-modèle-de-hockney">6.1. Le modèle de Hockney</a></li>
+<li><a href="#le-all-reduce">6.2. Le all-reduce</a></li>
+<li><a href="#lalgorithme-en-anneau">6.3. L'algorithme en anneau</a></li>
+<li><a href="#arbre-contre-anneau">6.4. Arbre contre anneau</a></li>
+<li><a href="#débit-algorithmique-et-débit-de-bus">6.5. Débit algorithmique et débit de bus</a></li>
+<li><a href="#recouvrir-calcul-et-communication">6.6. Recouvrir calcul et communication</a></li>
+</ul></li>
+<li><a href="#ch7">7. FLOP d'un transformeur, MFU et mémoire d'un entraînement</a>
+<ul>
+<li><a href="#combien-de-flop-par-token">7.1. Combien de FLOP par token</a></li>
+<li><a href="#mfu-et-hfu">7.2. MFU et HFU</a></li>
+<li><a href="#quelles-valeurs-sont-bonnes">7.3. Quelles valeurs sont bonnes ?</a></li>
+<li><a href="#la-mémoire-dun-entraînement">7.4. La mémoire d'un entraînement</a></li>
+</ul></li>
+<li><a href="#ch8">8. Mener une étude de passage à l'échelle</a>
+<ul>
+<li><a href="#le-protocole-en-sept-étapes">8.1. Le protocole en sept étapes</a></li>
+<li><a href="#statistiques-minimales">8.2. Statistiques minimales</a></li>
+<li><a href="#lire-un-tableau-de-passage-à-léchelle-fort">8.3. Lire un tableau de passage à l'échelle fort</a></li>
+<li><a href="#les-pièges-classiques">8.4. Les pièges classiques</a></li>
+<li><a href="#le-rapport">8.5. Le rapport</a></li>
+</ul></li>
+<li><a href="#labs">Labs</a>
+<ul>
+<li><a href="#lab-2-1">Lab 2.1 — STREAM et GEMM : votre roofline</a></li>
+<li><a href="#lab-2-2">Lab 2.2 — α-β : prédire puis mesurer un all-reduce</a></li>
+<li><a href="#lab-2-3">Lab 2.3 — Un calculateur de MFU testé</a></li>
+</ul></li>
+<li><a href="#ex">Exercices</a></li>
+<li><a href="#exit">Checkpoint de sortie</a></li>
+<li><a href="#refs">Lectures et références</a></li>
+<li><a href="#sources">Sources et portée</a>
+<ul>
+<li><a href="#documente">Documenté</a></li>
+<li><a href="#recommande">Recommandé</a></li>
+<li><a href="#a-verifier">À vérifier</a></li>
+<li><a href="#hors-perimetre">Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> avant de lancer un job sur 64 GPU, pouvez-vous dire combien de temps il devrait durer, et pourquoi il durera plus longtemps ? Un ingénieur d'infrastructure qui ne sait pas répondre dépend de la bonne volonté des chercheurs pour savoir si son cluster fonctionne correctement.</p>
 <p>Ce module vous donne cinq outils de raisonnement : la hiérarchie mémoire, le modèle <em>roofline</em>, les lois d'Amdahl et de Gustafson, le modèle de communication α-β et le MFU (<em>model FLOPs utilization</em>). Il vous donne surtout la discipline de les confronter à des mesures.</p>
@@ -86,8 +177,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>aucun</td>
 </tr>
 <tr class="even">
-<td>Statut pour le lecteur de référence</td>
-<td>cœur : c'est la grammaire commune de tout le parcours</td>
+<td>Pour qui</td>
+<td>Cœur pour tous : c'est la grammaire commune du parcours (roofline, modèle α-β, MFU).</td>
 </tr>
 <tr class="odd">
 <td>Livrable</td>
@@ -112,6 +203,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Estimer le temps d'un all-reduce avec le modèle α-β, ajuster α et la bande passante sur des mesures, et comparer anneau et arbre (chapitre 6).</li>
 <li>Calculer les FLOP d'un entraînement de transformeur et son MFU, et repérer un MFU mal calculé (chapitre 7).</li>
 <li>Planifier une étude de passage à l'échelle dont les conclusions résistent à la critique (chapitre 8).</li>
+</ul>
+<!-- gen:place -->
+<h3 id="place">Place dans le parcours</h3>
+<ul>
+<li><strong>Phase 0 — Fondations : machines et performance</strong> (semaines 1-5) : lire une machine et prédire sa performance avant de la mesurer.</li>
+<li><strong>S'appuie sur</strong> : aucun module ; c'est un point d'entrée.</li>
+<li><strong>Prépare</strong> : <a href="../parallel-programming/index.html">module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>, <a href="../gpu-programming/index.html">module 4 — Programmation GPU : CUDA, Triton et profilage</a>, <a href="../networking/index.html">module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a>, <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>, <a href="../finops-capacity/index.html">module 15 — FinOps, capacité, énergie et achats de calcul</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
 <p>Huit séances de 3 h, soit 24 h. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé. Il ne diminue jamais d'une séance à la suivante.</p>
@@ -193,7 +292,56 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tbody>
 </table>
 </div>
-<h2 id="avant">Avant de commencer</h2>
+<!-- gen:travailler -->
+<h3 id="travailler">Comment travailler ce module</h3>
+<p>Le parcours s'adresse à plusieurs profils d'entrée, décrits dans le <a href="../../profile/index.html">point de départ</a>. Le tableau donne la priorité conseillée pour ce module ; les questions de positionnement (section 0.1) la confirment ou la corrigent.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Profil d'entrée</th>
+<th>Priorité</th>
+<th>Ce que cela veut dire ici</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ingénieur plateforme, SRE ou DevOps</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+<tr class="even">
+<td>Administrateur ou ingénieur HPC</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Ingénieur ML ou chercheur</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="even">
+<td>Développeur logiciel ou systèmes</td>
+<td>normal</td>
+<td>les chapitres dans l'ordre, les labs, les exercices ★ et ★★</td>
+</tr>
+<tr class="odd">
+<td>Étudiant ou personne en reconversion</td>
+<td>à fond</td>
+<td>tous les chapitres, tous les labs et les exercices ★★★</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>À ne pas survoler.</strong> Le roofline, le modèle α-β et le MFU reviennent dans les modules 3, 4, 7, 9 et 15 : ne les survolez pas, même si les formules vous sont familières.</p>
+<p><strong>Méthode.</strong> Répondez aux questions de positionnement avant de lire. Lisez ensuite un chapitre par séance, en refaisant les exemples chiffrés. Faites chaque lab jusqu'à ce que son <code>verify.sh</code> passe, puis les exercices dans l'ordre des étoiles. Terminez par le checkpoint de sortie : une capacité compte quand sa preuve existe. <!-- /gen:travailler --></p>
+<h2 id="avant">0. Avant de commencer</h2>
+<h3 id="positionnement">0.1. Questions de positionnement</h3>
 <p>Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas à vous noter. Si les trois vous paraissent routinières, parcourez les exercices ★★★ et passez directement au module suivant.</p>
 <ol type="1">
 <li><p><strong>Mémoire ou calcul.</strong> Un noyau lit deux vecteurs de <span class="math inline">2^{30}</span> nombres FP32 et écrit leur somme dans un troisième. Combien d'octets traversent le lien mémoire, combien d'opérations flottantes sont faites, et ce noyau est-il plutôt limité par le calcul ou par la mémoire ?</p></li>
@@ -761,8 +909,8 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 </ul>
 </div>
 <h2 id="labs">Labs</h2>
+<h3 id="lab-2-1">Lab 2.1 — STREAM et GEMM : votre roofline</h3>
 <div class="lab">
-<p><span class="tag">Lab 2.1 — STREAM et GEMM : votre roofline</span></p>
 <p><strong>Objectif.</strong> Mesurer la bande passante mémoire et le débit de produit matriciel de votre machine, puis construire son roofline. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Un portable CPU avec Python 3 et NumPy ; aucun GPU.</p>
 <ol type="1">
 <li>Ouvrez <code>labs/perf-models/stream-gemm/</code> et lisez <code>stream_gemm.py</code> : repérez le compte d'octets de la copie (16 par élément) et de l'addition (24).</li>
@@ -774,8 +922,8 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK roofline coherent » et vous pouvez donner, avec leurs unités, votre bande passante, votre pic GEMM et votre point de rupture. Sur la VM de test à 4 vCPU (relevé du 2026-10-25, une dizaine d'exécutions rapides), l'addition donne de 8 à 11 Go/s, le GEMM de 250 à 470 GFLOP/s et le point de rupture de 25 à 52 FLOP par octet ; la dispersion vient d'une machine partagée, et le GEMM peut tomber dix fois plus bas quand d'autres charges l'occupent. Vos valeurs seront différentes, c'est normal.</p>
 <p><strong>Pour aller plus loin.</strong> Sur un GPU, remplacez NumPy par PyTorch : mesurez l'addition de vecteurs sur le GPU, un GEMM en BF16, et comparez au pic <strong>dense</strong> de la fiche technique. Vous retrouverez qu'un petit GEMM est loin du pic (exemple 4.3).</p>
 </div>
+<h3 id="lab-2-2">Lab 2.2 — α-β : prédire puis mesurer un all-reduce</h3>
 <div class="lab">
-<p><span class="tag">Lab 2.2 — α-β : prédire puis mesurer un all-reduce</span></p>
 <p><strong>Objectif.</strong> Ajuster le modèle de l'anneau sur des mesures d'all-reduce et juger de sa qualité. <strong>Durée.</strong> 3 h. <strong>Prérequis matériels.</strong> Portable CPU, Python 3 et PyTorch (version CPU suffisante) ; 4 cœurs recommandés.</p>
 <ol type="1">
 <li>Lisez <code>labs/perf-models/allreduce-model/bench_allreduce.py</code> : repérez la chauffe, la barrière avant chaque mesure et le maximum entre rangs.</li>
@@ -787,8 +935,8 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <p><strong>Critère de réussite.</strong> <code>./verify.sh</code> affiche « OK alpha-beta fit usable » avec une erreur relative médiane inférieure à 60 % sur la plage ajustée. Sur la VM de test (relevé du 2026-10-25, treize exécutions), l'ajustement donne <span class="math inline">\alpha</span> de 250 à 910 <span class="math inline">\mu</span>s (les valeurs hautes quand la machine est chargée) et <span class="math inline">B</span> de 0,7 à 1,9 Go/s, avec une erreur médiane de 6 à 23 % : les processus <code>gloo</code> partagent les mêmes cœurs, ce n'est donc pas un réseau. Le but est la méthode, pas ces chiffres.</p>
 <p><strong>Pour aller plus loin.</strong> Sur un nœud multi-GPU, remplacez le backend par <code>nccl</code> et placez le tenseur sur GPU, puis comparez le débit de bus mesuré à la bande passante NVLink de la fiche technique.</p>
 </div>
+<h3 id="lab-2-3">Lab 2.3 — Un calculateur de MFU testé</h3>
 <div class="lab">
-<p><span class="tag">Lab 2.3 — Un calculateur de MFU testé</span></p>
 <p><strong>Objectif.</strong> Maîtriser le calcul du MFU en le programmant avec ses cas limites. <strong>Durée.</strong> 2 h. <strong>Prérequis matériels.</strong> Portable, Python 3 et <code>pytest</code>.</p>
 <ol type="1">
 <li>Lisez <code>labs/perf-models/mfu-calculator/mfu.py</code> : repérez la formule de PaLM (annexe B) et l'absence de comptage de la recomputation.</li>
@@ -947,10 +1095,14 @@ All-reduce en anneau sur quatre rangs : un reduce-scatter puis un all-gather, so
 <li>Hoefler, Belli. <em>Scientific Benchmarking of Parallel Computing Systems: Twelve Ways to Tell the Masses when Reporting Performance Results</em>. SC15, 2015. <a href="https://doi.org/10.1145/2807591.2807644">doi:10.1145/2807591.2807644</a> : chapitres 3 et 8.</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
-<p><strong>Documenté.</strong> Les chiffres du H100 (page produit NVIDIA et blog Hopper), la définition et les valeurs de MFU de PaLM, le tableau 4 et la section 3.3.4 de Llama 3, la règle des 16 octets par paramètre de ZeRO, les définitions de débit algorithmique et de bus de <code>nccl-tests</code>, la borne inférieure de Patarasuk et Yuan, et l'étude de Hoefler et Belli ont été relus à la source le 22 octobre 2026, puis recontrôlés lors d'une relecture indépendante le 25 octobre 2026. Tous les calculs des exemples et des corrigés ont été refaits en Python. Les comptes d'octets de STREAM viennent du code source <code>stream.c</code>.</p>
-<p><strong>Recommandé.</strong> L'ordre des chapitres, le choix de l'anneau et de l'arbre naïf comme modèles pédagogiques, le protocole en sept étapes et la discipline de prédire avant de mesurer sont des choix de ce parcours, pas des normes.</p>
-<p><strong>À vérifier.</strong> Les références d'Amdahl (1967), de Gustafson (1988), de Hockney (1994) et de Karp et Flatt (1990), citées dans le texte, n'ont été confrontées qu'aux métadonnées Crossref (auteurs, année, revue) le 25 octobre 2026 ; les articles n'ont pas été relus. Le site officiel de STREAM n'a pas pu être rouvert (erreur de proxy). Les valeurs mesurées dans les labs viennent d'une VM partagée de 4 vCPU et varient d'un facteur 2 ou plus d'une exécution à l'autre. Les plages de capacité et de latence du tableau du chapitre 1 sont des ordres de grandeur non sourcés. Les chiffres des fiches techniques évoluent : relisez la page du fabricant avant toute décision d'achat.</p>
-<p><strong>Hors périmètre.</strong> Les communications point à point sur réseau réel (module 7), le choix d'un parallélisme et ses effets sur la mémoire (module 9), la tolérance aux pannes (module 10) et le coût financier (module 15).</p>
+<h3 id="documente">Documenté</h3>
+<p>Les chiffres du H100 (page produit NVIDIA et blog Hopper), la définition et les valeurs de MFU de PaLM, le tableau 4 et la section 3.3.4 de Llama 3, la règle des 16 octets par paramètre de ZeRO, les définitions de débit algorithmique et de bus de <code>nccl-tests</code>, la borne inférieure de Patarasuk et Yuan, et l'étude de Hoefler et Belli ont été relus à la source le 22 octobre 2026, puis recontrôlés lors d'une relecture indépendante le 25 octobre 2026. Tous les calculs des exemples et des corrigés ont été refaits en Python. Les comptes d'octets de STREAM viennent du code source <code>stream.c</code>.</p>
+<h3 id="recommande">Recommandé</h3>
+<p>L'ordre des chapitres, le choix de l'anneau et de l'arbre naïf comme modèles pédagogiques, le protocole en sept étapes et la discipline de prédire avant de mesurer sont des choix de ce parcours, pas des normes.</p>
+<h3 id="a-verifier">À vérifier</h3>
+<p>Les références d'Amdahl (1967), de Gustafson (1988), de Hockney (1994) et de Karp et Flatt (1990), citées dans le texte, n'ont été confrontées qu'aux métadonnées Crossref (auteurs, année, revue) le 25 octobre 2026 ; les articles n'ont pas été relus. Le site officiel de STREAM n'a pas pu être rouvert (erreur de proxy). Les valeurs mesurées dans les labs viennent d'une VM partagée de 4 vCPU et varient d'un facteur 2 ou plus d'une exécution à l'autre. Les plages de capacité et de latence du tableau du chapitre 1 sont des ordres de grandeur non sourcés. Les chiffres des fiches techniques évoluent : relisez la page du fabricant avant toute décision d'achat.</p>
+<h3 id="hors-perimetre">Hors périmètre</h3>
+<p>Les communications point à point sur réseau réel (module 7), le choix d'un parallélisme et ses effets sur la mémoire (module 9), la tolérance aux pannes (module 10) et le coût financier (module 15).</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/linux-systems/index.html"><span class="k">← Précédent</span>Module 01 — Linux, systèmes et diagnostic de performance</a><a class="next" href="../../courses/parallel-programming/index.html"><span class="k">Suivant →</span>Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a></nav>
 </main>
