@@ -1,12 +1,12 @@
 ---
 title: "Plateforme interne, sécurité, production et leadership"
-subtitle: "Module 16 · Phase 5 · 28 h"
-description: "Transformer un cluster en plateforme que des chercheurs adoptent : mesure de l'adoption, sessions interactives, sécurité multi-locataire, astreinte et post-mortems, migrations, direction d'équipe et entretien."
+subtitle: "Module 16 · Phase 5 · 30,5 h"
+description: "Transformer un cluster en plateforme que des chercheurs adoptent : mesure de l'adoption, sessions interactives, sécurité multi-locataire, astreinte et post-mortems, migrations, direction d'équipe, plan de contrôle fiable et livraison continue, entretien."
 module:
   id: platform-leadership
   number: 16
   phase: 5
-  hours: 28
+  hours: 30.5
   level: 3
 prerequisites: [slurm, kubernetes-gpu, observability]
 status: core
@@ -17,13 +17,14 @@ labs:
   - {id: rfc-template, kind: sandbox}
   - {id: incident-review, kind: sandbox}
   - {id: design-interview, kind: sandbox}
+  - {id: quorum-drill, kind: sandbox}
 ---
 
 ## Introduction et vue d'ensemble {#intro}
 
 **La question à laquelle ce module répond :** vous avez un cluster qui fonctionne. Comment en faire une **plateforme** que des chercheurs choisissent d'utiliser, que l'on peut exploiter à trois sans s'épuiser, qui résiste à un incident à deux heures du matin et dont vous pouvez défendre les choix devant un directeur ou un jury d'entretien ?
 
-Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, observabilité). Celui-ci traite ce qui reste quand les briques tournent : le produit, la sécurité d'un matériel partagé, la fiabilité en production, les migrations, l'équipe et la manière de décider par écrit. Il s'appuie sur le [projet 6](../../projects/capstone-rfc/index.html), dont il donne les outils d'écriture et de revue.
+Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, observabilité). Celui-ci traite ce qui reste quand les briques tournent : le produit, la sécurité d'un matériel partagé, la fiabilité en production, les migrations, l'équipe, la manière de décider par écrit, puis le plan de contrôle de la plateforme et la livraison de ses changements. Il s'appuie sur le [projet 6](../../projects/capstone-rfc/index.html), dont il donne les outils d'écriture et de revue.
 
 ::: key
 [Règle de ce module]{.tag} Une décision de plateforme n'est solide que si elle est écrite, chiffrée, contestable et réversible : on peut dire quel chiffre la fonde, quelle alternative on a écartée et pourquoi, et quel signal la ferait rouvrir. Tout ce que ce module vous fait écrire est donc vérifié mécaniquement avant d'être relu par une personne.
@@ -33,7 +34,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 
 | Clé | Valeur |
 |---|---|
-| Volume | 28 h, dont environ 10 h de lecture, 7 h de labs et 11 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
+| Volume | 30,5 h, dont environ 11 h de lecture, 7,5 h de labs et 12 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
 | Niveau d'entrée | 3 : avoir suivi les phases 2 à 4 du parcours, ou avoir exploité un cluster ou une plateforme de calcul |
 | Prérequis | [Module 5 — Slurm](../slurm/index.html), module 12 — Kubernetes pour l'IA, module 14 — Observabilité |
 | Pour qui | Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage. |
@@ -50,6 +51,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 - Planifier une migration par cohortes avec des critères d'entrée, de sortie et de retour arrière (chapitre 5).
 - Fixer un budget de travail d'exploitation pour une petite équipe (chapitre 6).
 - Conduire un exercice de conception d'entretien avec un calcul et ses hypothèses dites (chapitre 8).
+- Calculer la probabilité qu'un cluster de consensus garde son quorum selon le nombre et le placement de ses membres, conduire un exercice de restauration mesuré et livrer un changement d'infrastructure par canaris (chapitre 9).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
@@ -72,7 +74,8 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 | 7 | 3 h | 3 | Chapitre 6 : diriger une petite équipe d'infrastructure | exercice 5, lab 16.1 (étapes 4 et 5) |
 | 8 | 3 h | 3 | Chapitre 7 : contribuer et se rendre visible, puis chapitre 8 (début) | exercice 10 |
 | 9 | 2 h | 3 | Chapitre 8 : exercice de conception | lab 16.3 (étapes 1 à 3) |
-| 10 | 2 h | 3 | Synthèse et checkpoint de sortie | lab 16.3 (étapes 4 et 5), exercice 9, checkpoint |
+| 10 | 2.5 h | 3 | Chapitre 9 : plan de contrôle, consensus, haute disponibilité et livraison continue | lab 16.4, exercices 12 et 13 |
+| 11 | 2 h | 3 | Synthèse et checkpoint de sortie | lab 16.3 (étapes 4 et 5), exercice 9, checkpoint |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -499,9 +502,178 @@ La période de Young et Daly vaut $T^{\ast} = \sqrt{2CM}$, avec $C$ le temps d'�
 -   Montrez la fiabilité : MTBF du job, taille et temps du checkpoint, période de Young et Daly.
 :::
 
+## 9. Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue {#ch9}
+
+Les chapitres précédents supposent que le cœur de la plateforme répond : l'ordonnanceur accepte les jobs, le serveur d'API répond, la comptabilité enregistre. Ce chapitre traite ce cœur, le **plan de contrôle**, et la manière d'y livrer des changements sans l'abattre. La conception de systèmes distribués revient dans une large part des offres du [relevé du marché](../../market/index.html), la CI/CD dans une part notable, plus forte en Europe : c'est aussi un sujet d'entretien.
+
+### 9.1. Ce qu'est le plan de contrôle d'une plateforme de calcul
+
+::: def
+[Plan de contrôle et plan de données]{.tag} Le *plan de contrôle* (*control plane*) regroupe les composants qui gardent l'état de la plateforme (files d'attente, allocations, objets déclarés) et prennent les décisions de placement. Le *plan de données* (*data plane*) exécute le travail : les nœuds et leurs jobs. Le plan de données peut survivre un moment sans plan de contrôle, mais il ne reçoit plus rien de neuf.
+:::
+
+Trois plans de contrôle reviennent dans ce parcours.
+
+| Plateforme | Décide | Mémorise | Si le plan de contrôle tombe |
+|---|---|---|---|
+| Slurm ([module 5](../slurm/index.html#ch1)) | `slurmctld` | `StateSaveLocation` (état des jobs) ; base de `slurmdbd` (comptabilité) | plus de soumission ni de placement ; un contrôleur qui redémarre sans son état annule les jobs |
+| Kubernetes ([module 12](../kubernetes-gpu/index.html#ch8)) | `kube-apiserver`, ordonnanceur, contrôleurs | etcd | les pods déjà placés peuvent continuer, aucun nouveau pod n'est placé |
+| Ray ([module 11](../ray-rl-infra/index.html#ch2)) | GCS, sur le nœud de tête | mémoire du GCS, ou un stockage durable si on l'a configuré | sans tolérance aux pannes, tout le cluster Ray tombe |
+
+Pour Slurm, `StateSaveLocation` contient « information about queued, running and recently completed jobs », et le guide d'administration prévient : « If a controller comes up without access to the state information, queued and running jobs will be cancelled » ([Quick Start Administrator Guide](https://slurm.schedmd.com/quickstart_admin.html), Slurm 26.05, lu le 2026-10-25). Le répertoire d'état vaut donc plus que la machine du contrôleur.
+
+Pour Kubernetes, « All Kubernetes objects are stored in etcd » ; si la majorité des membres d'etcd est perdue, « Although the scheduled pods might continue to run, no new pods can be scheduled » ([Operating etcd clusters for Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/)). Pour Ray, la page sur la tolérance aux pannes du GCS (*Global Control Service*) le dit sans nuance : par défaut, « If it fails, the entire Ray cluster fails » ([GCS fault tolerance](https://docs.ray.io/en/latest/ray-core/fault_tolerance/gcs.html)).
+
+Le point commun : la panne du plan de contrôle n'arrête pas toujours les jobs en cours, mais elle arrête tout le **travail neuf**, y compris les reprises. Les reprises automatiques que l'exemple 4.2 exige (drainer un nœud, remettre un job en file) passent par lui : tant qu'il est absent, une panne de nœud n'est plus traitée.
+
+::: war
+[Décembre 2024 : un service de télémétrie sature les plans de contrôle Kubernetes]{.tag} D'après le post-mortem d'OpenAI, un nouveau service de télémétrie faisait exécuter à chaque nœud des appels coûteux à l'API Kubernetes, dont le coût croissait avec la taille du cluster ; les serveurs d'API des grands clusters ont cédé. Le plan de données devait tenir seul, mais « DNS relies on the control plane ».
+
+Le test sur un cluster de préproduction n'avait rien montré, l'effet n'apparaissant qu'au-delà d'une certaine taille ; le cache DNS a retardé les symptômes pendant que le déploiement continuait ; et retirer le service fautif exigeait l'accès au plan de contrôle saturé ([post-mortem du 11 décembre 2024](https://status.openai.com/incidents/ctrsv3lwd797)).
+:::
+
+### 9.2. Consensus et quorum
+
+Comment etcd garde-t-il un état cohérent sur plusieurs machines ? Par un algorithme de *consensus*, Raft, publié par Diego Ongaro et John Ousterhout à USENIX ATC 2014 ([article](https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro)). Les membres élisent un *leader* qui reçoit les écritures et les réplique dans un journal ; une entrée est validée (*committed*) quand une **majorité** de membres l'a stockée. L'article donne l'ordre de grandeur courant : « five is a typical number, which allows the system to tolerate two failures ».
+
+La majorité empêche le cerveau divisé (*split brain*). Chaque membre vote au plus une fois par mandat (*term*) et il faut une majorité pour être élu : deux leaders ne peuvent donc pas être élus pour le même mandat (propriété *Election Safety*, §5.2 de l'article). Après une coupure du réseau, au plus un des deux côtés a la majorité : celui-là continue, l'autre refuse les écritures.
+
+::: thm
+[Quorum et tolérance aux pannes]{.tag} Un cluster de $n$ membres a besoin d'un quorum de $q = \lfloor n/2 \rfloor + 1$ membres pour valider une écriture ; il tolère donc $f = \lfloor (n-1)/2 \rfloor$ pannes. Trois membres en tolèrent une, cinq en tolèrent deux, sept en tolèrent trois. Un quatrième ou un sixième membre n'ajoute aucune tolérance, puisque la majorité augmente avec lui ([FAQ d'etcd](https://etcd.io/docs/v3.7/faq/)).
+:::
+
+Pourquoi pas neuf membres ? Parce que chaque écriture attend la majorité. La FAQ d'etcd l'écrit : « Although larger clusters provide better fault tolerance, the write performance suffers because data must be replicated across more machines », et conseille de ne pas dépasser sept membres. La documentation de Kubernetes recommande cinq membres en production et décrit le passage de trois à cinq comme « A reasonable scaling ».
+
+Éloigner les membres (plusieurs salles, plusieurs régions) les place dans des domaines de panne distincts, mais chaque écriture paie alors l'aller-retour vers la majorité : la FAQ d'etcd parle d'une latence « somewhat pronounced » entre centres de données. Le nombre de membres et leur distance se choisissent donc ensemble.
+
+::: ex
+[Exemple 9.1 — Garder le quorum avec 3 ou 5 membres]{.tag} Hypothèse à énoncer : chaque membre est disponible une fraction $a$ du temps, **indépendamment** des autres. La probabilité qu'au moins $q$ membres sur $n$ soient en service est une queue de loi binomiale :
+
+$$ P(n, a) = \sum_{k=q}^{n} \binom{n}{k}\, a^{k}\, (1-a)^{n-k} $$
+
+Pour trois membres, elle vaut $3a^2 - 2a^3$. La commande `python3 quorum.py table --a 0.99 0.999 --max-members 5` du lab 16.4 donne $P$ et l'indisponibilité $U = 1 - P$, convertie en minutes sur un mois de 30 jours (43 200 minutes, comme au chapitre 4) :
+
+~~~text
+members  quorum  tolerated  P(quorum) a=0.99    U (min/30 d)  P(quorum) a=0.999   U (min/30 d)
+      1       1          0  0.990000000  1.00e-02 ( 432.0000)  0.999000000  1.00e-03 (  43.2000)
+      2       2          0  0.980100000  1.99e-02 ( 859.6800)  0.998001000  2.00e-03 (  86.3568)
+      3       2          1  0.999702000  2.98e-04 (  12.8736)  0.999997002  3.00e-06 (   0.1295)
+      4       3          1  0.999407970  5.92e-04 (  25.5757)  0.999994008  5.99e-06 (   0.2589)
+      5       3          2  0.999990149  9.85e-06 (   0.4255)  0.999999990  9.99e-09 (   0.0004)
+~~~
+
+Avec des membres à 99 %, un membre seul manque 432 minutes par mois, trois membres 12,9 minutes, cinq membres 0,43 minute. À 99,9 %, trois membres manquent 0,13 minute et cinq 0,0004. Quatre membres font pire que trois (25,6 contre 12,9 minutes à 99 %), comme l'annonce la FAQ d'etcd.
+
+Tout repose sur l'indépendance. Si les cinq membres partagent un rack, une alimentation ou un commutateur, ce domaine les emporte ensemble, et le quorum ne peut être plus disponible que lui : $P = r \cdot P(5, a)$, où $r$ est la disponibilité du domaine. Avec un rack hypothétique à $r = 0{,}9995$, l'indisponibilité passe d'environ $10^{-8}$ à $5 \times 10^{-4}$ (21,6 minutes par mois), environ 50 000 fois plus. Placer les membres compte autant que les compter (exercice 12).
+:::
+
+### 9.3. La haute disponibilité en pratique
+
+Slurm n'emploie pas de consensus pour son contrôleur : il fait du **basculement** (*failover*) entre un primaire et des secours. D'après la page `slurm.conf`, si `SlurmctldHost` est répété, « the first entry will run as the primary and all other entries as standby backups » ; un secours prend la main après `SlurmctldTimeout`, 120 secondes par défaut. Condition : `StateSaveLocation` doit être « readable and writable from the primary and all backup controllers at all times » ([slurm.conf](https://slurm.schedmd.com/slurm.conf.html), lu le 2026-10-25).
+
+Ce répertoire partagé déplace le problème : il devient un point unique de défaillance, et sa latence ralentit le contrôleur. Le guide d'administration déconseille NFS et demande « a shared mount that is accessible to the two controllers and allows low-latency reads and writes ». Il prévient aussi qu'une panne avant l'écriture sur disque perd de l'état, écrit toutes les cinq secondes par défaut.
+
+Pour la comptabilité, `AccountingStorageBackupHost` dans `slurm.conf` et `DbdBackupHost` dans [`slurmdbd.conf`](https://slurm.schedmd.com/slurmdbd.conf.html) déclarent un second `slurmdbd`. Les deux instances doivent accéder à la **même** base : la disponibilité de la base de données elle-même reste à assurer à part, et ce module ne la traite pas.
+
+Kubernetes, avec kubeadm, propose deux topologies ([Options for Highly Available Topology](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/)). Dans la topologie **empilée** (*stacked*), celle par défaut, chaque nœud de plan de contrôle porte aussi un membre etcd : c'est plus simple, mais perdre un nœud fait perdre les deux, d'où « a minimum of three stacked control plane nodes ». Avec un etcd **externe**, etcd a ses propres machines : les pannes sont découplées, au prix de « twice the number of hosts », soit au moins trois plus trois.
+
+Pour Ray, la tolérance aux pannes du GCS exige un stockage durable : un Redis hautement disponible (« officially supported », mais d'après une note de la page seulement avec KubeRay pour Ray Serve) ou un RocksDB embarqué, encore en alpha. Pendant la reprise, on ne crée plus d'acteurs ni de nœuds, mais « running Ray tasks and actors remain alive » ; un *raylet* qui ne retrouve pas le GCS en 60 secondes s'arrête (même page).
+
+::: key
+[Ce que la haute disponibilité ne protège pas]{.tag} La réplication copie tout, y compris les erreurs : un `kubectl delete` malheureux, une configuration fausse ou une donnée corrompue par un bogue se retrouvent aussitôt sur tous les membres. La haute disponibilité protège de la **perte d'une machine**. Elle ne protège ni d'une écriture fausse, ni d'un point unique caché (système de fichiers partagé, répartiteur de charge devant les serveurs d'API, DNS), ni d'un changement mal livré : pour cela, il faut des sauvegardes restaurées (9.4) et des changements progressifs (9.5).
+:::
+
+### 9.4. Sauvegarder, restaurer, et le prouver
+
+Pour etcd, la documentation de Kubernetes décrit deux voies : le snapshot intégré et le snapshot de volume. Le snapshot intégré se prend sur un membre vivant avec `etcdctl snapshot save`. Sa vérification (`snapshot status`) et sa restauration (`snapshot restore`) passent par `etcdutl`, les commandes équivalentes d'`etcdctl` étant « deprecated since etcd v3.5.x ». Pour restaurer un cluster, la même page demande d'arrêter d'abord tous les serveurs d'API, puis de restaurer l'état dans chaque membre etcd.
+
+Pour Slurm, le guide de mise à jour (section 5.2) nomme ce qu'il faut sauvegarder au minimum : le contenu de `StateSaveLocation`, tout le répertoire de configuration et, si `slurmdbd` est configuré, la base de comptabilité. Il ne donne pas la procédure, propre à chaque site. Pour une base MariaDB, l'outil de sauvegarde logique est `mariadb-dump`, anciennement `mysqldump` ([documentation MariaDB](https://mariadb.com/docs/server/clients-and-utilities/backup-restore-and-import-clients/mariadb-dump)). Rappelez-vous l'exemple 5.2 : restaurer efface tout ce qui a suivi la sauvegarde.
+
+::: def
+[RPO et RTO]{.tag} Le *RPO* (*recovery point objective*) est la perte de données acceptée, exprimée en temps : au pire, l'intervalle entre deux sauvegardes. Le *RTO* (*recovery time objective*) est la durée acceptée entre la panne et le service rétabli. Les deux se **mesurent** pendant un exercice de restauration ; ils ne se déduisent pas d'une fiche technique.
+:::
+
+::: key
+[Une sauvegarde jamais restaurée n'est pas une sauvegarde]{.tag} Règle de ce parcours : chaque sauvegarde du plan de contrôle a sa procédure de restauration écrite dans une fiche d'exploitation (section 6.4). Une personne qui ne l'a pas écrite l'exécute à date fixe, dans un environnement jetable, et note deux mesures : la durée (RTO) et ce qui a été perdu (RPO).
+:::
+
+::: war
+[Janvier 2017 : des sauvegardes que personne n'avait restaurées]{.tag} Pendant l'incident de base de données de GitLab.com, l'équipe constata que « the process of both finding and using backups failed completely ». Les dumps quotidiens échouaient sans bruit : `pg_dump` 9.2 face à une base PostgreSQL 9.6, et des courriels d'erreur rejetés par le serveur de réception. La restauration partit d'un snapshot LVM pris à la main six heures avant ; des heures de modifications (projets, commentaires, comptes) furent perdues ([post-mortem](https://about.gitlab.com/blog/postmortem-of-database-outage-of-january-31/)).
+:::
+
+::: ex
+[Exemple 9.2 — Un exercice de restauration sur un etcd jetable]{.tag} Le script `etcd_drill.sh` du lab 16.4 démarre trois membres etcd 3.7.0 sur une seule machine, écrit 100 clés, prend un snapshot, écrit une clé de plus, arrête un membre, puis un deuxième, et restaure le snapshot dans un nouveau répertoire. Extraits de la sortie réelle, exécutée deux fois le 2026-10-25 :
+
+~~~text
+│   HASH   │ REVISION │ TOTAL KEYS │ TOTAL SIZE │ VERSION │
+│ c5f8257a │      101 │        100 │      37 kB │   3.7.0 │
+write with one member down: accepted
+write with two members down: refused (Error: context deadline exceeded)
+keys under /drill/job/ after restore: 100
+key written after the snapshot: <absent>
+restore and restart of one member: 1.2 s (measured on this machine)
+RESTORE DRILL OK
+~~~
+
+Trois leçons. Avec un membre arrêté, le quorum de 2 sur 3 accepte encore les écritures ; avec deux, le membre restant les refuse, car il ne peut pas réunir de majorité. La clé écrite après le snapshot a disparu : c'est le RPO, rendu visible. Enfin, 1,2 seconde mesure la restauration de 37 ko sur une machine locale : la procédure est validée, pas sa durée sur une vraie base.
+:::
+
+### 9.5. Livrer l'infrastructure en continu
+
+Le chapitre 5 traitait la configuration comme du code : un état voulu versionné, un plan par différence, une relecture. La pratique *GitOps* va plus loin. Ses quatre principes, publiés par le projet [OpenGitOps](https://opengitops.dev/), sont : un état voulu déclaratif, « Versioned and Immutable », tiré automatiquement par des agents (« Pulled Automatically »), et « Continuously Reconciled » : les agents observent sans cesse l'état réel et tentent d'y appliquer l'état voulu.
+
+Sur Kubernetes, deux outils sont courants. Argo CD est « a declarative, GitOps continuous delivery tool for Kubernetes » qui marque *OutOfSync* une application dont l'état réel s'écarte du dépôt ([documentation](https://argo-cd.readthedocs.io/en/stable/)). Flux est « a tool for keeping Kubernetes clusters in sync with sources of configuration », projet diplômé de la CNCF ([documentation](https://fluxcd.io/flux/)). Plusieurs offres du relevé les citent nommément. Pour Slurm, ce parcours n'utilise pas d'agent : le plan par différence du [projet 1](../../projects/homelab-slurm/index.html), relu avant d'être appliqué, en tient lieu (le projet l'applique à la main ; le faire lancer par la CI après fusion est une extension).
+
+Avec GitOps, tout changement passe par une demande de fusion : les contrôles automatiques avant fusion, tous déjà employés dans le parcours, deviennent la première protection du plan de contrôle.
+
+| Ce qui change | Contrôle avant fusion | Où le parcours l'emploie |
+|---|---|---|
+| Scripts shell (drainage, recette, `verify.sh`) | `shellcheck` | modules 1, 5 et 6 |
+| Règles d'alerte Prometheus | `promtool test rules` ([tests unitaires de règles](https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/)) | module 14, projet 5 |
+| Manifestes Kubernetes | validation contre les schémas de la version cible (par exemple `kubeconform`), puis `kubectl --dry-run=server` | module 12 (lab 12.4 pour le serveur d'API) |
+| Infrastructure Terraform | `terraform plan -detailed-exitcode`, relu | [module 6, chapitre 4](../provisioning/index.html#ch4) |
+| Comptes et QOS de Slurm | plan par différence, puis second plan vide | projet 1, section 5.3 |
+
+`kubeval` n'est plus maintenu et renvoie vers `kubeconform` ([README de kubeval](https://github.com/instrumenta/kubeval)) ; celui-ci valide contre les spécifications OpenAPI, mais les validations faites côté serveur « are not covered », d'où `kubectl --dry-run=server` ([README de kubeconform](https://github.com/yannh/kubeconform)).
+
+Les pilotes et les firmwares, eux, changent des nœuds. Le [module 6, chapitre 7](../provisioning/index.html#ch7) en donne la mécanique : drainer un lot, changer, redémarrer, vérifier par la recette rapide, remettre en service, avec un canari en premier lot, une taille de lot bornée et un arrêt au premier échec. Ce qui manque souvent, ce sont des critères de retour arrière **écrits avant** de commencer et évalués par la machine.
+
+Le SRE Workbook définit le *canarying* comme « a partial and time-limited deployment of a change in a service and its evaluation ». On compare le canari à un groupe témoin (*control*) resté sur l'ancienne version, au même moment, plutôt qu'à la période précédente : « Before/After Evaluation Is Risky ». L'impact sur le budget d'erreur est proportionnel à la part exposée : 20 % d'erreurs sur 5 % du trafic donnent 1 % au total ([Canarying Releases](https://sre.google/workbook/canarying-releases/)).
+
+Pour un lot de nœuds GPU, trois critères de retour arrière automatiques suffisent pour commencer (choix de ce parcours ; les seuils se fixent sur vos mesures) :
+
+1.  un nœud canari échoue à la recette rapide après le changement ([module 6, chapitre 6](../provisioning/index.html#ch6)) ;
+2.  le taux d'erreurs Xid ou de jobs en échec des canaris dépasse celui du groupe témoin sur la même fenêtre ;
+3.  la santé du plan de contrôle se dégrade pendant le déploiement (latence du serveur d'API, changements de leader d'etcd) : c'est la leçon de l'incident de 2024 de la section 9.1.
+
+Chaque critère a un propriétaire, un seuil et une action automatique : arrêter le déploiement et remettre l'image précédente sur le lot. Un humain décide de reprendre ; personne n'a à décider de s'arrêter.
+
+### 9.6. Ce que les entretiens demandent sur les systèmes distribués
+
+Dans le relevé, les offres parlent de systèmes distribués en termes généraux plutôt que d'algorithmes nommés ; certaines demandent de connaître les composants du plan de contrôle de Kubernetes, etcd compris. Les questions portent donc moins sur une preuve de Raft que sur ses conséquences d'exploitation. Cinq questions à préparer (liste de ce parcours) :
+
+1.  *Pourquoi trois ou cinq membres, et jamais quatre ?* Majorité, tolérance, latence d'écriture (9.2).
+2.  *Le contrôleur Slurm, etcd ou le GCS tombe : que deviennent les jobs ?* Jobs en cours contre travail neuf, contrôleur sans son état (9.1).
+3.  *Comment éviter deux leaders après une coupure du réseau ?* Un vote par mandat et une majorité (9.2).
+4.  *Trois membres etcd dans le même rack, est-ce de la haute disponibilité ?* Domaines de panne et indépendance (exemple 9.1, exercice 12).
+5.  *Comment déployez-vous un nouveau pilote GPU sur mille nœuds ?* Canari, groupe témoin, lots bornés, retour arrière automatique (9.5).
+
+Dans chaque réponse, donnez le chiffre et l'hypothèse qui le porte, comme au chapitre 8.
+
+::: recap
+[Points clés]{.tag}
+
+-   Le plan de contrôle garde l'état et décide : `slurmctld` et son `StateSaveLocation`, `kube-apiserver` et etcd, le GCS de Ray. Sa panne arrête le travail neuf ; un contrôleur Slurm qui redémarre sans son état annule les jobs.
+-   Un cluster de consensus de n membres a un quorum de ⌊n/2⌋ + 1 et tolère ⌊(n − 1)/2⌋ pannes : trois ou cinq membres, jamais un nombre pair.
+-   La formule binomiale suppose des pannes indépendantes ; un rack ou une alimentation partagés plafonnent la disponibilité. Aucun domaine de panne ne doit porter plus de membres que le cluster ne tolère de pannes (2 sur 5).
+-   La haute disponibilité protège de la perte d'une machine, pas d'une écriture fausse ni d'un changement mal livré.
+-   Une sauvegarde n'existe que restaurée : procédure écrite, exercée à date fixe, RTO et RPO mesurés.
+-   Livrez par un dépôt relu et testé avant fusion, puis par canaris comparés à un groupe témoin, avec des critères de retour arrière écrits d'avance.
+:::
+
 ## Labs {#labs}
 
-Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU, sans cloud, Python 3.13 et pytest 9.1, le 2026-10-24). Chacun a un `verify.sh` qui sort avec le code 0 ; lancez les commandes depuis le dossier du lab (`labs/platform-leadership/<lab>/`), après `pip install pytest` si besoin, et choisissez l'interpréteur avec `PYTHON=python3 bash verify.sh`. **Aucun ne décrit un système ou une personne réels** : le journal d'incident, le cahier des charges et les réponses d'entretien sont inventés pour l'exercice.
+Quatre labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 4 processeurs, sans GPU, sans cloud, Python 3.13 et pytest 9.1, le 2026-10-24, et le 2026-10-25 pour le lab 16.4). Chacun a un `verify.sh` qui sort avec le code 0 ; lancez les commandes depuis le dossier du lab (`labs/platform-leadership/<lab>/`), après `pip install pytest` si besoin, et choisissez l'interpréteur avec `PYTHON=python3 bash verify.sh`. **Aucun ne décrit un système ou une personne réels** : le journal d'incident, le cahier des charges et les réponses d'entretien sont inventés pour l'exercice.
 
 ### Lab 16.1 — Écrire une décision d'architecture vérifiable {#lab-16-1}
 
@@ -552,6 +724,23 @@ Trois labs, tous exécutés dans le bac à sable (machine virtuelle Linux 6.18, 
 **Critère de réussite.** `bash verify.sh` affiche « 8 passed » puis la sortie de l'exemple 8.1 (« duration with failures : 99.6 days ») et « OK design-interview ». Les tests vérifient que les chiffres des réponses « solide » et « excellente » sont ceux que reproduit le calculateur, et que la réponse « insuffisante » (« environ 25 jours ») est fausse selon lui (96,0 jours).
 
 **Pour aller plus loin.** Refaites l'exercice pour 7 milliards de paramètres sur 1 000 milliards de jetons (exercice 9).
+:::
+
+### Lab 16.4 — Quorum d'un cluster de consensus et exercice de restauration {#lab-16-4}
+
+::: lab
+
+**Objectif.** Calculer la probabilité qu'un cluster de consensus garde son quorum, vérifier la formule contre une simulation de Monte-Carlo à graine fixe, puis mesurer l'effet des domaines de panne. **Durée.** 30 min, plus 30 min pour la partie facultative. **Prérequis matériels.** Un portable avec Python 3 et `pytest` ; aucun GPU. Partie facultative : les binaires `etcd`, `etcdctl` et `etcdutl` (testés en version 3.7.0 ; les versions 3.5 et 3.6 n'ont pas été essayées), sans privilège administrateur.
+
+1.  Lisez `labs/platform-leadership/quorum-drill/quorum.py` : la formule binomiale, le modèle à domaines de panne et la simulation.
+2.  Lancez `python3 quorum.py table --a 0.99 0.999` et retrouvez les valeurs de l'exemple 9.1.
+3.  Lancez `python3 quorum.py check --trials 100000 --seed 2026` : la simulation est comparée à la formule avec une tolérance de quatre écarts-types, sur des disponibilités assez basses pour que des pertes de quorum s'observent.
+4.  Lancez `python3 quorum.py racks` avec les dispositions de l'exercice 12 et expliquez pourquoi deux racks ne suffisent pas.
+5.  Lancez `bash verify.sh` et lisez les quinze tests.
+
+**Critère de réussite.** `bash verify.sh` affiche « 15 passed », la table de l'exemple 9.1 (dont « 0.999702000 » pour trois membres à 99 %), « formula and simulation agree » et « OK quorum-drill ».
+
+**Pour aller plus loin.** Avec `ETCD_BIN=<dossier des binaires> bash etcd_drill.sh`, montez un vrai cluster etcd de trois membres sur `127.0.0.1`, prenez un snapshot, arrêtez un puis deux membres et restaurez (exemple 9.2) ; le script vérifie que les 100 clés reviennent et que la clé écrite après le snapshot est perdue. Il a été exécuté deux fois le 2026-10-25 avec etcd 3.7.0, mais `verify.sh` ne l'exige pas.
 :::
 
 ## Exercices {#ex}
@@ -734,6 +923,56 @@ Ce qui fait la qualité : le contexte chiffre la demande (650 × 1,2 / 730 = 1,0
 (a) Somme 224 minutes ; moyenne 224 / 7 = **32 minutes** ; médiane (quatrième valeur triée) **12 minutes**. (b) La moyenne vaut 2,7 fois la médiane (32 / 12) parce qu'un incident de 133 minutes tire tout vers le haut. Rapportez la **médiane** pour le fonctionnement courant et le **maximum** à part, avec son post-mortem : c'est l'incident de 133 minutes qui montre où la supervision ne voit rien, et c'est lui qu'on étudie en premier. Avec sept valeurs, un 90e centile n'aurait pas de sens.
 :::
 
+::: exo
+[Exercice 12 · ★★ — Placer cinq membres etcd]{.tag} Une plateforme Kubernetes a un etcd de cinq membres. Hypothèses de l'énoncé : un membre est disponible 99,9 % du temps quand son rack l'est ($a = 0{,}999$), et chaque rack (alimentation et commutateur de baie) l'est 99,95 % du temps ($r = 0{,}9995$), indépendamment des autres racks.
+
+(a) Avec `quorum.py racks` (lab 16.4), calculez l'indisponibilité du quorum, en minutes par mois de 30 jours, pour : cinq membres dans un rack ; 3 + 2 sur deux racks ; 2 + 2 + 1 sur trois racks ; et, pour comparer, trois membres sur trois racks (1 + 1 + 1). (b) Pourquoi deux racks n'apportent-ils rien ? Énoncez la règle de placement. (c) Que donnerait l'hypothèse d'indépendance seule pour cinq membres, et qu'en concluez-vous ?
+:::
+
+::: sol
+Commande : `python3 quorum.py racks --a 0.999 --r 0.9995 --layout 5 --layout 3,2 --layout 2,2,1 --layout 1,1,1`.
+
+(a) Un seul rack : indisponibilité de 5,00e-4, soit **21,6 minutes** par mois. Deux racks (3 + 2) : 5,02e-4, soit **21,7 minutes**. Trois racks (2 + 2 + 1) : 3,76e-6, soit **0,16 minute**. Trois membres sur trois racks : 6,74e-6, soit **0,29 minute**.
+
+(b) En 3 + 2, perdre le rack de trois membres suffit à perdre le quorum : il reste deux membres, il en faut trois. Ce rack coûte à lui seul 1 − r = 5e-4, autant qu'un rack unique, et le second rack ajoute un petit risque (s'il tombe, les trois autres membres doivent tous tenir).
+
+Règle : **aucun domaine de panne ne porte plus de membres que le cluster ne tolère de pannes**, ici f = 2, donc au moins trois domaines pour cinq membres. En 2 + 2 + 1, la perte de n'importe quel rack laisse au moins trois membres.
+
+(c) Membres indépendants seuls : 9,99e-9, soit 0,0004 minute par mois. Le modèle avec racks donne, en 2 + 2 + 1, une indisponibilité **376 fois** plus grande : un chiffre calculé sous l'hypothèse d'indépendance est optimiste. Surtout, trois membres bien placés (0,29 minute) font **74 fois** mieux que cinq membres dans un rack (21,6 minutes) : le placement compte plus que le nombre. Ces valeurs de a et r sont des hypothèses ; la méthode s'applique à vos disponibilités mesurées.
+:::
+
+::: exo
+[Exercice 13 · ★★★ — Lire un exercice de restauration et décider]{.tag} Pendant un exercice sur un etcd de trois membres, `etcdctl endpoint health -w table` affiche (sortie réelle de `etcd_drill.sh`, lab 16.4, cluster jetable sur une seule machine) :
+
+~~~text
+┌────────────────────────┬────────┬──────────────┬───────────────────────────┐
+│        ENDPOINT        │ HEALTH │     TOOK     │           ERROR           │
+├────────────────────────┼────────┼──────────────┼───────────────────────────┤
+│ http://127.0.0.1:23791 │   true │    6.04847ms │                           │
+│ http://127.0.0.1:23792 │   true │   6.457915ms │                           │
+│ http://127.0.0.1:23793 │  false │ 2.001054301s │ context deadline exceeded │
+└────────────────────────┴────────┴──────────────┴───────────────────────────┘
+~~~
+
+(a) Combien de membres sont sains, combien de pannes supplémentaires le cluster tolère-t-il, et qu'arrive-t-il aux écritures si un autre membre tombe ? (b) Un collègue propose d'ajouter tout de suite un quatrième membre « pour regagner de la marge » avant de réparer le troisième. Que répondez-vous, et dans quel ordre opérez-vous ?
+
+(c) La même plateforme sauvegarde la base de comptabilité de Slurm par un dump quotidien. Avec le débit de l'exemple 5.2 (847,5 jobs par mois de 730 heures), combien de jobs perdent leur comptabilité au pire et en moyenne en cas de restauration ? Et avec un dump toutes les 6 heures ? (d) L'exercice a restauré 100 clés en 1,2 seconde : que vaut cette mesure pour votre RTO ?
+:::
+
+::: sol
+(a) Deux membres sur trois répondent en environ 6 ms ; le troisième dépasse le délai de 2 secondes (« context deadline exceeded »). Le quorum de 2 est atteint, mais le cluster ne tolère **plus aucune** panne : si un autre membre tombe, le dernier refuse les écritures, comme l'étape 4 du script le montre (« write with two members down: refused »). Dans ce cas, les pods déjà placés peuvent continuer, mais plus aucun nouveau pod n'est placé (section 9.1).
+
+(b) Non. Un quatrième membre porte le quorum à 3 : avec un membre en panne, il faut que les deux sains et le nouveau soient tous en service. Si le nouveau ne rejoint pas le cluster (adresse fausse, disque lent), deux membres sur quatre tournent et le quorum est perdu sans retour : la [FAQ d'etcd](https://etcd.io/docs/v3.7/faq/) décrit ce cas, et etcd refuse par défaut un tel ajout (`strict-reconfig-check`).
+
+L'ordre correct est celui de la FAQ, « remove the member first and then add its replacement » : `etcdctl member remove` du membre en panne (deux membres, quorum 2), puis `etcdctl member add` de son remplaçant (trois membres, quorum 2). Pendant toute l'opération, le quorum reste à 2.
+
+(c) Le débit est de 847,5 / 730 = 1,16 job par heure. Avec un dump quotidien, la perte est au pire de 24 heures, soit 24 × 1,16 = **27,9 jobs** ; si la panne tombe au hasard entre deux dumps, elle vaut en moyenne la moitié, **13,9 jobs**. Avec un dump toutes les 6 heures : au pire **6,97 jobs**, en moyenne **3,48**.
+
+L'arbitrage oppose la charge d'un dump sur la base à la valeur de la comptabilité pour l'équité et les rapports. Dans les deux cas, ce RPO ne vaut que si un dump a déjà été restauré.
+
+(d) Presque rien : 37 ko, un seul membre, une machine locale, aucun réseau. La mesure valide la **procédure**, pas sa durée. Le RTO réel comprend la détection, la décision, l'arrêt des serveurs d'API, la copie du snapshot, la restauration de chaque membre à la taille réelle de la base, le redémarrage et la vérification. Mesurez-le sur un environnement jetable de taille réaliste, étape par étape, comme les jalons d'un incident du chapitre 4.
+:::
+
 ## Checkpoint de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
@@ -745,6 +984,7 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 -   **Je peux écrire un post-mortem sans blâme dont les chiffres tiennent.** Preuve : le lab 16.2, avec `postmortem_lint.py` qui répond « ok ».
 -   **Je peux écrire une décision contestable.** Preuve : l'ADR du lab 16.1, relue par une personne.
 -   **Je peux dimensionner à voix haute.** Preuve : l'exercice 9 refait en trente minutes avec hypothèses dites et effet d'une erreur de MFU chiffré.
+-   **Je peux dimensionner et éprouver un plan de contrôle.** Preuve : l'exercice 12 refait pour votre propre placement (membres, racks, alimentations), et un exercice de restauration exécuté (lab 16.4 ou votre plateforme) avec sa durée et ce qui a été perdu.
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
@@ -754,7 +994,7 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 
 ## Lectures et références {#refs}
 
-Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié en ligne par Google ; toutes les pages web ci-dessous ont été lues le 2026-10-24.
+Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié en ligne par Google ; les pages web ci-dessous ont été lues le 2026-10-24, et le 2026-10-25 pour celles du chapitre 9.
 
 -   Google. [*Site Reliability Engineering*, chap. *Embracing Risk*](https://sre.google/sre-book/embracing-risk/) : budget d'erreur et SLO (chapitre 4).
 -   Google. [*Site Reliability Engineering*, chap. *Being On-Call*](https://sre.google/sre-book/being-on-call/) : limites de l'astreinte et taille d'équipe (chapitres 4 et 6).
@@ -767,6 +1007,9 @@ Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié
 -   Kubernetes. [*Multi-tenancy*](https://kubernetes.io/docs/concepts/security/multi-tenancy/) et [*Pod Security Standards*](https://kubernetes.io/docs/concepts/security/pod-security-standards/) : locataires et profils de sécurité (chapitre 3).
 -   Kubernetes. [*Secrets*](https://kubernetes.io/docs/concepts/configuration/secret/), [*Images*](https://kubernetes.io/docs/concepts/containers/images/) et [*Auditing*](https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/) : secrets, empreintes d'images, audit (chapitre 3).
 -   NVIDIA. [*XID Errors, Xid catalog*](https://docs.nvidia.com/deploy/xid-errors/analyzing-xid-catalog.html) : sens de l'Xid 79 (« GPU has fallen off the bus ») que montre le journal synthétique du lab 16.2 (chapitre 4).
+-   Ongaro, D. et Ousterhout, J. [*In Search of an Understandable Consensus Algorithm*](https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro), USENIX ATC, 2014 : lire §5.2 (élection d'un leader) et §5.3 (réplication du journal) pour la majorité et l'unicité du leader par mandat (chapitre 9).
+-   etcd. [*Frequently Asked Questions*](https://etcd.io/docs/v3.7/faq/), documentation v3.7 : taille des majorités, tolérance aux pannes, taille maximale d'un cluster, ordre de remplacement d'un membre (chapitre 9).
+-   Kubernetes. [*Operating etcd clusters for Kubernetes*](https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/) et [*Options for Highly Available Topology*](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/ha-topology/) : sauvegarde et restauration d'etcd, cinq membres en production, topologies empilée et externe (chapitre 9).
 
 ## Sources et portée {#sources}
 
@@ -774,14 +1017,18 @@ Le *SRE Book* (Beyer, Jones, Petoff et Murphy, dir., O'Reilly, 2016) est publié
 
 Les définitions du budget d'erreur, les limites de 50 % et 25 %, le minimum de huit ingénieurs, le plafond de deux incidents par garde de 12 heures, la définition du toil et du post-mortem sans blâme viennent du SRE Book ; l'ordre de mise à jour de Slurm, l'absence de retour arrière et la fenêtre de compatibilité viennent du guide de mise à jour de SchedMD ; les propriétés de MIG et des tranches de temps, de la multi-location, des Secrets, des empreintes d'images et de l'audit, ainsi que le sens de l'Xid 79, viennent des pages citées, lues pour ce module. Les citations en anglais sont reproduites telles que ces pages les contiennent (texte lu le 2026-10-24, conservé par `tools/fetch_text.py`).
 
+Pour le chapitre 9 (pages lues le 2026-10-25) : la règle de majorité et l'unicité du leader par mandat viennent de l'article de Raft ; les tailles de majorité, la tolérance aux pannes, la limite de sept membres, l'effet de la taille sur les écritures et l'ordre de remplacement d'un membre, de la FAQ d'etcd v3.7 ; les cinq membres en production, la sauvegarde et la restauration d'etcd, l'arrêt des serveurs d'API avant restauration et les deux topologies, de la documentation de Kubernetes. Le basculement de `slurmctld`, `SlurmctldTimeout`, `StateSaveLocation` et le secours de `slurmdbd` viennent de `slurm.conf`, de `slurmdbd.conf` et du guide d'administration de Slurm 26.05, la liste minimale des sauvegardes, du guide de mise à jour ; la tolérance aux pannes du GCS, de la documentation de Ray ; `mariadb-dump`, de la documentation MariaDB. Les principes GitOps, Argo CD, Flux, `promtool test rules`, l'abandon de kubeval, les limites de kubeconform et la définition du canarying viennent des pages citées. Les deux incidents viennent de leurs post-mortems publics. La part des offres qui citent les systèmes distribués, la CI/CD, GitOps ou les composants de Kubernetes vient du [relevé du marché](../../market/index.html).
+
 ### Recommandé {#recommande}
 
-Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes.
+Les quatre mesures d'adoption, la répartition en cohortes, l'obligation d'un signal de révision dans une ADR, le canal unique de demandes, la fiche d'exploitation exécutée par un tiers et la grille d'entretien sont des choix de ce parcours, pas des normes. Il en va de même, au chapitre 9, de la règle de placement (aucun domaine de panne ne porte plus de membres que le cluster ne tolère de pannes), de l'exercice de restauration à date fixe avec RTO et RPO mesurés, de la liste des contrôles avant fusion, des trois critères de retour arrière et des cinq questions d'entretien.
 
 ### À vérifier {#a-verifier}
 
 Le journal d'incident, le cahier des charges du projet 6, les données des exercices et les réponses d'entretien sont **fictifs ou synthétiques**. Les profils MIG (taille des instances) dépendent du GPU : l'hypothèse de 10 Go de l'exercice 6 est à vérifier dans le guide MIG de votre matériel. Les seuils de la grille d'entretien sont un repère d'entraînement. Les durées des séances et des labs sont des estimations de l'auteur, non mesurées auprès d'un lecteur. La fenêtre de compatibilité de Slurm change d'une version à l'autre (deux, puis trois versions majeures précédentes) : relisez le guide pour votre version cible. La liste des adaptateurs d'Open OnDemand est celle de la documentation 4.2.0. Le comportement du lanceur interactif sur votre ordonnanceur n'a pas été exécuté dans le bac à sable (aucun JupyterHub ni Open OnDemand n'y est installé).
 
+Pour le chapitre 9 : les disponibilités de membre et de rack de l'exemple 9.1 et de l'exercice 12 sont des **hypothèses**, et l'indépendance des pannes en est une autre. L'exercice de restauration a tourné avec etcd 3.7.0 sur une seule machine, sans réseau ni base de taille réelle : sa durée n'est pas un RTO. La répartition des commandes entre `etcdctl` et `etcdutl` change d'une version d'etcd à l'autre, et le stockage RocksDB du GCS de Ray est en alpha : relisez la documentation de votre version. La haute disponibilité de Slurm, les topologies de Kubernetes, Argo CD, Flux et kubeconform n'ont pas été exécutés dans le bac à sable.
+
 ### Hors périmètre {#hors-perimetre}
 
-La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand.
+La conformité réglementaire (RGPD, certifications), la gestion des ressources humaines, le recrutement, la négociation budgétaire détaillée, la sécurité du noyau et des hyperviseurs, et l'exploitation réelle d'un JupyterHub ou d'Open OnDemand. Pour le chapitre 9 : les preuves formelles de Raft ou de Paxos, les pannes byzantines, la réplication de la base de comptabilité elle-même (MariaDB), l'installation et l'exploitation d'Argo CD ou de Flux, et la livraison progressive des applications servies aux utilisateurs.

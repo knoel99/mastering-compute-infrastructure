@@ -6,6 +6,7 @@ Tout `courses/<id>/index.md` respecte ce contrat. Les contrôles mécaniques son
 
 - Prose en **français**, vouvoiement du lecteur (« vous »). Termes techniques anglais établis conservés tels quels (*checkpoint*, *scheduler*, *rank*, *throughput*), en italique à la première occurrence et définis. Pas de calque artificiel (« ordonnanceur » ne remplace pas *scheduler* partout : écrire « ordonnanceur (*scheduler*) » à la première occurrence puis choisir et s'y tenir).
 - **Code, identifiants, commentaires de code, messages de commit : en anglais** (le lecteur publiera ce code sur GitHub).
+- Volume : 4 500 à 18 000 mots de prose, hors code, formules, blocs générés, liste de références et section « Sources et portée » (gate `check_gates.py`).
 - Phrases complètes. Pas de style « notes télégraphiques ». Un paragraphe ≤ 100 mots, une idée par paragraphe (gate `check_airiness.py` : A1 ≤ 100 mots par bloc, A2 ≤ 6 formules en ligne, A3 formule longue sur sa propre ligne en `$$…$$`).
 - Chaque affirmation chiffrée sur un système réel (panne, débit, coût, taille de cluster) porte une source en lien. Sans source : la reformuler comme **ordre de grandeur** ou la supprimer. Jamais de chiffre inventé « pour faire vrai ».
 - Les versions d'outils sont toujours datées (« testé avec Slurm X.Y le 2026-10-22 ») ; ne jamais affirmer « dernière version » sans l'avoir lue sur la source officielle.

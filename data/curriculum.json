@@ -250,11 +250,11 @@
    "id": "gpu-programming",
    "number": 4,
    "phase": 1,
-   "hours": 30,
+   "hours": 32.5,
    "level": 2,
    "status": "core",
    "title": "Programmation GPU : CUDA, Triton et profilage",
-   "summary": "Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.",
+   "summary": "Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, Nsight et les accélérateurs d'autres fabricants (AMD, TPU, Trainium, Ascend).",
    "prerequisites": [
     "perf-models"
    ],
@@ -262,7 +262,8 @@
     "Écrire un noyau CUDA (Numba) avec mémoire partagée et le comparer à une version vectorisée",
     "Expliquer la coalescence, l'occupation et la divergence de warps sur un exemple chiffré",
     "Lire un profil Nsight/PyTorch Profiler et nommer le goulot (calcul, mémoire, lancement)",
-    "Expliquer ce qu'apporte FlashAttention, la fusion de noyaux et la précision mixte"
+    "Expliquer ce qu'apporte FlashAttention, la fusion de noyaux et la précision mixte",
+    "Transposer le vocabulaire GPU vers AMD/ROCm, les TPU, Trainium et Ascend, et dresser une liste de contrôle de portabilité"
    ],
    "chapters": [
     "Le modèle d'exécution CUDA : grille, blocs, warps, SM ; synchronisation",
@@ -272,7 +273,8 @@
     "Triton : programmer par blocs, auto-réglage, quand préférer Triton à CUDA",
     "Précision numérique : FP32, TF32, BF16, FP16, FP8 ; sommes, mise à l'échelle de perte, déterminisme",
     "Profiler : Nsight Systems/Compute, PyTorch Profiler, métriques clés, lecture d'une trace",
-    "Techniques d'accélération : fusion, FlashAttention, torch.compile, CUDA graphs, quand elles paient"
+    "Techniques d'accélération : fusion, FlashAttention, torch.compile, CUDA graphs, quand elles paient",
+    "Au-delà de NVIDIA : AMD, TPU, Trainium et accélérateurs chinois"
    ],
    "labs": [
     {
@@ -390,11 +392,11 @@
    "id": "provisioning",
    "number": 6,
    "phase": 2,
-   "hours": 24,
+   "hours": 26.5,
    "level": 2,
    "status": "core",
    "title": "Provisioning, images et santé des nœuds GPU",
-   "summary": "Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.",
+   "summary": "Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette, supervision matérielle et virtualisation multi-locataire.",
    "prerequisites": [
     "linux-systems"
    ],
@@ -402,7 +404,8 @@
     "Décrire la chaîne PXE → image → configuration → enregistrement dans l'ordonnanceur",
     "Écrire des rôles Ansible idempotents et des modules Terraform pour un cluster",
     "Valider un nœud GPU avant mise en service (pilote, DCGM diag, burn-in, bande passante)",
-    "Concevoir une procédure de remplacement et de mise à jour sans interrompre la production"
+    "Concevoir une procédure de remplacement et de mise à jour sans interrompre la production",
+    "Lire les groupes IOMMU d'un hôte, choisir un mode de partage du GPU selon l'isolation vendue, et recetter un nœud virtualisé"
    ],
    "chapters": [
     "Cycle de vie d'un nœud : recette, installation, exploitation, retrait",
@@ -412,7 +415,8 @@
     "La pile GPU : pilote, CUDA, Fabric Manager, DCGM, conteneurs GPU ; compatibilités et pièges de versions",
     "Recette et burn-in : DCGM diagnostics, gpu-burn, nccl-tests, tests mémoire/PCIe/NVLink",
     "Mises à jour et pannes : rolling updates, firmware, gestion des RMA, traçabilité",
-    "BMC, Redfish, IPMI et supervision hors bande"
+    "BMC, Redfish, IPMI et supervision hors bande",
+    "Virtualisation et multi-locataire : KVM, VFIO, MIG, vGPU et KubeVirt"
    ],
    "labs": [
     {
@@ -752,11 +756,11 @@
    "id": "ray-rl-infra",
    "number": 11,
    "phase": 3,
-   "hours": 28,
+   "hours": 30.5,
    "level": 3,
    "status": "core",
    "title": "Ray, infrastructure d'apprentissage par renforcement et boucles en ligne",
-   "summary": "Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.",
+   "summary": "Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré, et l'inférence qui produit les rollouts (moteurs, cache KV, batching continu).",
    "prerequisites": [
     "distributed-training"
    ],
@@ -764,7 +768,8 @@
     "Expliquer le modèle de Ray (tâches, acteurs, objets) et choisir quand l'utiliser",
     "Concevoir une architecture acteur-apprenant avec synchronisation de politique et tampon de rejeu",
     "Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)",
-    "Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte"
+    "Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte",
+    "Dimensionner le cache KV d'un moteur d'inférence à partir du `config.json` d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement"
    ],
    "chapters": [
     "Pourquoi un framework distribué général : tâches, acteurs, ressources, ordonnancement dans Ray",
@@ -774,7 +779,8 @@
     "Architectures acteur-apprenant : rollouts distribués, synchronisation de poids, obsolescence, tampons de rejeu",
     "Boucles en ligne et temps réel : latence de bout en bout, files, contre-pression, déséquilibre acteurs/apprenants",
     "Hétérogénéité : GPU d'entraînement, GPU d'évaluation moins chers, CPU ; placement et files par type",
-    "Ray sur Kubernetes (KubeRay) et sur Slurm ; observabilité d'une application Ray ; alternatives (Dask, Spark, Kubeflow)"
+    "Ray sur Kubernetes (KubeRay) et sur Slurm ; observabilité d'une application Ray ; alternatives (Dask, Spark, Kubeflow)",
+    "Inférence pour les rollouts et pour le service : moteurs, cache KV et batching continu"
    ],
    "labs": [
     {
@@ -794,6 +800,12 @@
      "title": "Modèle de débit d'une boucle en ligne",
      "kind": "sandbox",
      "idea": "Modèle analytique + simulation événementielle : combien d'acteurs pour saturer un apprenant ; tests de cohérence modèle/simulation."
+    },
+    {
+     "id": "batching-sim",
+     "title": "Batching statique, batching continu et cache KV paginé",
+     "kind": "sandbox",
+     "idea": "Simulateur déterministe en Python standard : comparer batching statique et continu, et la réservation du cache KV à son allocation par pages ; tests sur des propriétés structurelles."
     }
    ],
    "facts": [
@@ -1103,11 +1115,11 @@
    "id": "platform-leadership",
    "number": 16,
    "phase": 5,
-   "hours": 28,
+   "hours": 30.5,
    "level": 3,
    "status": "core",
    "title": "Plateforme interne, sécurité, production et leadership",
-   "summary": "Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.",
+   "summary": "Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, plan de contrôle à haute disponibilité, livraison continue, fiabilité de production, direction d'équipe et entretien.",
    "prerequisites": [
     "slurm",
     "kubernetes-gpu",
@@ -1117,7 +1129,8 @@
     "Concevoir une plateforme de calcul self-service (sessions interactives, files, quotas, modèles de jobs)",
     "Définir un modèle de sécurité multi-locataire (identité, isolation, secrets, audit) pour des GPU partagés",
     "Instituer des pratiques de production : astreinte, gestion d'incident, post-mortems, revues de conception",
-    "Préparer un entretien de compute infrastructure lead : conception, dépannage, leadership, négociation"
+    "Préparer un entretien de compute infrastructure lead : conception, dépannage, leadership, négociation",
+    "Calculer la probabilité qu'un cluster de consensus garde son quorum selon le nombre et le placement de ses membres, conduire un exercice de restauration mesuré et livrer un changement d'infrastructure par canaris"
    ],
    "chapters": [
     "La plateforme comme produit : utilisateurs, besoins, adoption, mesure de la vélocité des chercheurs",
@@ -1127,7 +1140,8 @@
     "Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs",
     "Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication",
     "Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible",
-    "Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser"
+    "Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser",
+    "Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue"
    ],
    "labs": [
     {
@@ -1147,6 +1161,12 @@
      "title": "Exercice de conception : de 8 à 256 GPU",
      "kind": "sandbox",
      "idea": "Énoncé d'entretien de conception avec grille d'évaluation et réponses de niveaux différents ; calculateur de dimensionnement testé."
+    },
+    {
+     "id": "quorum-drill",
+     "title": "Quorum d'un cluster de consensus et exercice de restauration",
+     "kind": "sandbox",
+     "idea": "Probabilité de garder le quorum (formule binomiale contre Monte-Carlo à graine fixe) et exercice de sauvegarde et restauration d'etcd avec etcdctl et etcdutl."
     }
    ],
    "facts": [

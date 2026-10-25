@@ -34,4 +34,12 @@ out="$(run busbw --ranks 8 --size-gib 4 --ms 41 --baseline 200)"; echo "$out"
 expect "$out" 'busbw = algbw * f  : 183.3 GB/s  (92 % of the baseline 200.0)'
 run compat --driver 570 --cuda 12.9
 if run compat --driver 570 --cuda 13.0; then echo "FAIL: driver 570 must not satisfy CUDA 13"; exit 1; fi
+out="$(run mig --request 3g.20gb=3 --request 2g.10gb=4 --request 1g.5gb=6)"; echo "$out"
+expect "$out" 'minimum            : 4 GPU(s)'
+expect "$out" 'idle in total      : 5/28 compute slices (17.9 %), 6/32 memory slices (18.8 %)'
+out="$(run mig --request 4g.20gb=3 --request 3g.20gb=1 --request 2g.10gb=3)"; echo "$out"
+expect "$out" 'lower bounds       : compute 21/7 -> 3 GPU(s), memory 22/8 -> 3 GPU(s)'
+expect "$out" 'minimum            : 4 GPU(s)'
+out="$(run mig --request 4g.20gb=3 --request 3g.20gb=1 --request 2g.10gb=2 --request 1g.5gb=2)"; echo "$out"
+expect "$out" 'minimum            : 3 GPU(s)'
 echo "OK exercise-calcs: every figure quoted in the solutions is recomputed above"

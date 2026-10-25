@@ -150,6 +150,7 @@ Les deux commandes se terminent avec le code 1, comme n'importe quelle erreur : 
 - **API plutôt que lignes de commande.** Remplacez les appels à `sinfo` et `squeue` par l'API REST `slurmrestd` et comparez la robustesse de l'analyse.
 - **Tableau de bord.** Générez un tableau de bord Grafana comme au projet 5, avec les quatre alertes en annotations.
 - **Dérive.** Faites supprimer, avec confirmation explicite, un objet signalé par `drift` ; décidez qui a le droit de lancer cette commande et comment le tracer.
+- **Exportateur en Go.** Réécrivez `exporter.py` en Go avec [client_golang](https://pkg.go.dev/github.com/prometheus/client_golang/prometheus), sur un registre `prometheus.NewRegistry()` : celui par défaut ajoute des séries du *runtime* Go et du processus. Commandes lues, noms de métriques, étiquettes bornées et `slurm_scrape_ok` ne changent pas, donc les règles et leurs tests `promtool` non plus. La preuve : `go test` sur les mêmes `fixtures/` retrouve 4 jobs en attente (3 `Priority`, 1 `Resources`) et le nœud `drng` de raison `gpu_xid` ; `promtool check metrics` accepte la sortie de `--once` ; à instant fixé, les deux expositions ont les mêmes séries et valeurs, à l'arrondi d'affichage près.
 
 ## Pour le portfolio {#portfolio}
 

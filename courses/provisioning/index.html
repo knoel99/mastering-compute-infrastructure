@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Provisioning, images et santé des nœuds GPU — Mastering Compute Infrastructure</title>
-<meta name="description" content="Du châssis nu au nœud en production : démarrage réseau, images, Ansible et Terraform, pile GPU, recette et burn-in, mises à jour, RMA et supervision hors bande.">
+<meta name="description" content="Du châssis nu au nœud en production : démarrage réseau, images, Ansible et Terraform, pile GPU, recette et burn-in, mises à jour, RMA, supervision hors bande et virtualisation multi-locataire.">
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
@@ -49,7 +49,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
 <header id="title-block-header">
 <h1 class="title">Provisioning, images et santé des nœuds GPU</h1>
-<p class="subtitle">Module 06 · Phase 2 · 24 h</p>
+<p class="subtitle">Module 06 · Phase 2 · 26,5 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge unverified">Labs : 3 vérifiés dans un bac à sable, la recette GPU non exécutée</span></p>
 </header>
 <section id="sommaire" class="unnumbered toc-inline">
@@ -128,6 +128,15 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#du-signal-hors-bande-à-une-décision">8.3. Du signal hors bande à une décision</a></li>
 <li><a href="#sécuriser-le-bmc">8.4. Sécuriser le BMC</a></li>
 </ul></li>
+<li><a href="#ch9">9. Virtualisation et multi-locataire : KVM, VFIO, MIG, vGPU et KubeVirt</a>
+<ul>
+<li><a href="#pourquoi-les-nuages-gpu-virtualisent-et-ce-que-cela-coûte">9.1. Pourquoi les nuages GPU virtualisent, et ce que cela coûte</a></li>
+<li><a href="#kvm-vfio-et-le-passage-dun-gpu-à-une-vm">9.2. KVM, VFIO et le passage d'un GPU à une VM</a></li>
+<li><a href="#partager-un-gpu-mig-time-slicing-mps-et-vgpu">9.3. Partager un GPU : MIG, time-slicing, MPS et vGPU</a></li>
+<li><a href="#kubevirt-des-vm-comme-objets-kubernetes">9.4. KubeVirt : des VM comme objets Kubernetes</a></li>
+<li><a href="#isolation-et-hygiène-entre-locataires">9.5. Isolation et hygiène entre locataires</a></li>
+<li><a href="#recette-dun-nœud-gpu-virtualisé">9.6. Recette d'un nœud GPU virtualisé</a></li>
+</ul></li>
 <li><a href="#labs">Labs</a>
 <ul>
 <li><a href="#lab-6-1">Lab 6.1 — Un rôle Ansible de nœud de calcul</a></li>
@@ -149,7 +158,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> comment passer d'un châssis qui vient d'être vissé dans une baie à un nœud qui peut recevoir un entraînement de deux semaines, de façon répétable, et comment savoir que le centième nœud est identique au premier ? Un ingénieur d'infrastructure ne se juge pas à la première installation, mais à la deux-centième, et à la façon dont il remplace un nœud en panne un mardi à 3 h.</p>
-<p>Ce module suit la vie d'un nœud : démarrage réseau et images, configuration idempotente avec Ansible, description de la flotte avec Terraform, pile logicielle du GPU, recette et <em>burn-in</em> (test de rodage sous charge), mises à jour sans arrêter la production, remplacement sous garantie (<em>RMA</em>), et supervision par le contrôleur de gestion (<em>BMC</em>) quand le système d'exploitation ne répond plus.</p>
+<p>Ce module suit la vie d'un nœud : démarrage réseau et images, configuration idempotente avec Ansible, description de la flotte avec Terraform, pile logicielle du GPU, recette et <em>burn-in</em> (test de rodage sous charge), mises à jour sans arrêter la production, remplacement sous garantie (<em>RMA</em>), supervision par le contrôleur de gestion (<em>BMC</em>) quand le système d'exploitation ne répond plus, et virtualisation pour louer le nœud à plusieurs clients.</p>
 <div class="key">
 <p><span class="tag">Règle de ce module</span> Déclarez l'état voulu, laissez des outils idempotents le réaliser, puis <strong>prouvez-le</strong> avant de laisser un job entrer. Un nœud dont on ne peut pas montrer la recette n'est pas en production : il est seulement allumé.</p>
 </div>
@@ -170,7 +179,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Volume</td>
-<td>24 h, dont 8 h de lecture, 10,5 h de labs et 5,5 h d'exercices</td>
+<td>26,5 h, dont 9,5 h de lecture, 10,5 h de labs et 6,5 h d'exercices</td>
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
@@ -208,6 +217,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Concevoir une recette à trois issues (accepter, rejouer, refuser) et expliquer pourquoi un code de retour ne suffit pas (chapitre 6).</li>
 <li>Planifier une mise à jour progressive et dimensionner un volant de nœuds de rechange (chapitre 7).</li>
 <li>Interroger un BMC par Redfish et décider de drainer un nœud sur sa santé matérielle (chapitre 8).</li>
+<li>Lire les groupes IOMMU d'un hôte, choisir un mode de partage du GPU selon l'isolation vendue, et recetter un nœud virtualisé (chapitre 9).</li>
 </ul>
 <!-- gen:place -->
 <h3 id="place">Place dans le parcours</h3>
@@ -217,7 +227,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Projets qui s'en servent</strong> : <a href="../../projects/homelab-slurm/index.html">Projet 1 — Mini-cluster Slurm instrumenté</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
-<p>Neuf séances, soit 24 h. Chaque séance contient ses chapitres, sa part de lab et ses exercices, et un exercice n'est placé qu'après la séance qui enseigne ce dont il a besoin. Le niveau ne diminue jamais.</p>
+<p>Dix séances, soit 26,5 h. Chaque séance contient ses chapitres, sa part de lab et ses exercices, et un exercice n'est placé qu'après la séance qui enseigne ce dont il a besoin. Le niveau ne diminue jamais.</p>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -299,6 +309,13 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>3</td>
 <td>ch. 8 BMC, Redfish et IPMI</td>
 <td>Lab 6.4 ; Ex. 10, 11</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>2.5 h</td>
+<td>3</td>
+<td>ch. 9 Virtualisation et multi-locataire</td>
+<td><code>virt-checks/verify.sh</code> ; Ex. 12, 13</td>
 </tr>
 </tbody>
 </table>
@@ -1005,12 +1022,229 @@ OK wrong password: exit 2 (error: 401 on /redfish/v1/Systems)</code></pre>
 <li>Le réseau de gestion est isolé, les identifiants sont uniques et secrets.</li>
 </ul>
 </div>
+<h2 id="ch9">9. Virtualisation et multi-locataire : KVM, VFIO, MIG, vGPU et KubeVirt</h2>
+<p>Les chapitres 1 à 8 livrent un nœud nu à un seul propriétaire, l'ordonnanceur. Un nuage GPU loue le même nœud à des clients qui ne se connaissent pas, souvent sous forme de machines virtuelles. Ce chapitre décrit ce que cette couche ajoute à la chaîne, et réutilise la recette du chapitre 6.</p>
+<h3 id="pourquoi-les-nuages-gpu-virtualisent-et-ce-que-cela-coûte">9.1. Pourquoi les nuages GPU virtualisent, et ce que cela coûte</h3>
+<p>Plusieurs offres de clouds GPU et de centres de calcul citent QEMU/KVM, KubeVirt, Proxmox ou OpenStack (voir l'<a href="../../market/index.html">analyse du marché</a>). Ce parcours en retient trois raisons. Le <strong>multi-locataire</strong> : des clients différents administrent leur machine sans toucher l'hôte, le BMC (chapitre 8) ni le réseau de démarrage (chapitre 2). L'<strong>isolation</strong> : la frontière entre clients repose sur le matériel (IOMMU, MIG), pas sur une convention. La <strong>facturation</strong> : une VM ou une instance MIG naît, se mesure et disparaît comme une unité.</p>
+<div class="def">
+<p><span class="tag">Hôte, invité, locataire</span> L'<strong>hôte</strong> est le système qui tourne sur le matériel, l'<strong>invité</strong> (<em>guest</em>) celui d'une VM, le <strong>locataire</strong> (<em>tenant</em>) le client qui loue des invités ou des fractions de GPU. Sous Linux, KVM est un sous-système du noyau ouvert par <code>/dev/kvm</code> (<a href="https://docs.kernel.org/virt/kvm/api.html">API KVM</a>), et <a href="https://www.qemu.org/">QEMU</a> le processus qui fait tourner la VM et lui attache ses périphériques.</p>
+</div>
+<p>Le prix se paie en exploitation : deux systèmes à tenir (l'hôte et l'image de l'invité, chacun avec son pilote, chapitre 5), une topologie PCI masquée à l'invité, des contraintes d'IOMMU sur le pair-à-pair (§9.2) et des VM à GPU qui ne migrent pas à chaud (§9.4). Aucune source lue ne chiffre le surcoût pour votre matériel : mesurez-le par la recette dans l'invité, face au nœud doré du chapitre 1.</p>
+<h3 id="kvm-vfio-et-le-passage-dun-gpu-à-une-vm">9.2. KVM, VFIO et le passage d'un GPU à une VM</h3>
+<p>Le <em>passthrough</em> PCI confie un périphérique entier à un invité. Pour un GPU, la <a href="https://docs.nvidia.com/vgpu/latest/grid-vgpu-user-guide/grid-vgpu-introduction.html">documentation vGPU de NVIDIA</a> décrit un GPU assigné à une seule VM, accédé exclusivement par le pilote NVIDIA de cette VM et jamais partagé. Côté hôte, le noyau confie ce rôle à <strong>VFIO</strong> (<em>Virtual Function I/O</em>), qui expose le périphérique à l'espace utilisateur, ici QEMU, sous la protection de l'IOMMU.</p>
+<p>L'IOMMU traduit et restreint les adresses de DMA des périphériques : c'est elle qui empêche un GPU confié à un invité d'écrire dans la mémoire de l'hôte. Elle s'active dans le BIOS (VT-d chez Intel, IOMMU chez AMD), puis sur la ligne de commande du noyau, dont la <a href="https://docs.kernel.org/admin-guide/kernel-parameters.html">documentation des paramètres</a> définit <code>intel_iommu=on</code>, <code>iommu=pt</code> (DMA sans traduction par défaut) et, pour <code>amd_iommu=</code>, des options comme <code>off</code> ou <code>force_isolation</code>, sans valeur <code>on</code>.</p>
+<div class="def">
+<p><span class="tag">Groupe IOMMU</span> D'après la <a href="https://docs.kernel.org/driver-api/vfio.html">documentation VFIO du noyau</a>, un groupe est un ensemble de périphériques isolable de tous les autres, et l'<strong>unité de propriété</strong> de VFIO. Tous ses membres doivent être liés à un pilote VFIO, ou au moins détachés de leur pilote d'hôte, avant que le groupe soit utilisable. Un pont PCI sans ACS (<em>Access Control Services</em>), qui laisse deux périphériques communiquer sans passer par l'IOMMU, les place dans le même groupe.</p>
+</div>
+<p>La liaison se fait dans sysfs : détacher le périphérique de son pilote, désigner <code>vfio-pci</code> par <code>driver_override</code>, puis le lier, selon la méthode du <a href="https://kubevirt.io/user-guide/compute/host-devices/">guide KubeVirt</a>. Le script <code>labs/provisioning/virt-checks/bind_vfio.sh</code> traite chaque membre du groupe, saute les ponts (que <code>vfio-pci</code> ne prend pas en charge) et n'agit qu'avec <code>--apply</code>. Sortie réelle de sa simulation sur l'arborescence <strong>synthétique</strong> d'un serveur fictif (2026-10-25) :</p>
+<pre class="text"><code>$ SYSFS=&quot;$tmp/root/sys&quot; bash bind_vfio.sh 0000:18:00.0    # as in verify.sh, section B
+# IOMMU group 30 of 0000:18:00.0
+modprobe vfio-pci
+# skip bridge 0000:17:00.0 (vfio-pci does not support PCI bridges)
+echo 0000:18:00.0 &gt; /sys/bus/pci/drivers/nvidia/unbind
+echo vfio-pci &gt; /sys/bus/pci/devices/0000:18:00.0/driver_override
+echo 0000:18:00.0 &gt; /sys/bus/pci/drivers/vfio-pci/bind
+echo 0000:19:00.0 &gt; /sys/bus/pci/drivers/mlx5_core/unbind
+...</code></pre>
+<p>Demander le GPU <code>18:00.0</code>, c'est aussi retirer à l'hôte la carte réseau <code>19:00.0</code> de son groupe.</p>
+<div class="note">
+<p><span class="tag">IOMMU et pair-à-pair PCIe sur un hôte nu</span> La <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/gpu_troubleshooting.html">page de dépannage GPU de NCCL</a> indique que, sur un hôte Linux nu, CUDA et le pilote NVIDIA ne prennent pas en charge le pair-à-pair PCIe avec IOMMU actif, et rappelle que le guide CUDA demande alors de désactiver l'IOMMU pour éviter une corruption silencieuse de la mémoire du GPU. Un hôte de VM exige au contraire l'IOMMU : le rôle d'un nœud, nu ou hôte de VM, est une donnée de la carte des nœuds (chapitre 1).</p>
+</div>
+<p>La même page en tire deux conséquences pour GPUDirect RDMA (<a href="../networking/index.html">module 7</a>, §2.4 et chapitre 6). Les VM exigent l'ACS, qu'on ne peut donc pas désactiver comme sur un hôte nu, et la performance maximale dans une VM demande d'activer ATS (<em>Address Translation Services</em>) sur les cartes réseau. Une topologie PCI virtuelle exposée par <code>/sys</code> peut aussi dégrader les performances ; NCCL charge par défaut, s'il existe, le fichier <code>/var/run/nvidia-topologyd/virtualTopology.xml</code> (variable <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html"><code>NCCL_TOPO_FILE</code></a>, depuis NCCL 2.6), qui décrit tout ou partie de la topologie.</p>
+<div class="ex">
+<p><span class="tag">Exemple 9.1 — Ce que la machine de rédaction offre au passthrough : rien</span> Le script <code>labs/provisioning/virt-checks/iommu_report.py</code> lit sysfs sans droits root et sans <code>lspci</code>, absent ici. Sortie réelle sur la VM de rédaction (Python 3.13, 2026-10-25), abrégée de huit lignes de périphériques :</p>
+<pre class="text"><code>$ python3 iommu_report.py
+kernel IOMMU args  : (none)
+CPU virt. flags    : (none: no vmx/svm flag)
+/dev/kvm           : absent
+vfio-pci driver    : not registered
+PCI devices        : 11
+IOMMU groups       : 0
+  0000:00:00.0  8086:0d57  host bridge              driver=-  iommu_group=none
+  0000:00:08.0  1af4:1041  virtio network card      driver=virtio-pci  iommu_group=none
+  0000:00:09.0  1af4:1053  virtio socket (vsock)    driver=virtio-pci  iommu_group=none
+verdict            : no IOMMU group, so no device of this machine can be handed to a VM with VFIO</code></pre>
+<p>Lecture. <code>/sys/kernel/iommu_groups</code> est vide : VFIO n'a rien à confier. Les onze périphériques sont un pont hôte et dix périphériques virtio (fournisseur 0x1AF4, d'après la <a href="https://docs.oasis-open.org/virtio/virtio/v1.2/csd01/virtio-v1.2-csd01.html">spécification virtio 1.2</a>, §4.1.2), et sans <code>vmx</code>, <code>svm</code> ni <code>/dev/kvm</code>, aucune VM accélérée ne peut démarrer. La machine est elle-même un invité : sa ligne de commande noyau contient <code>--firecracker-init</code> (micro-VM <a href="https://firecracker-microvm.github.io/">Firecracker</a>). Le passthrough n'est donc <strong>pas exécuté</strong> ici ; <code>verify.sh</code> rejoue sa logique sur l'arborescence synthétique de l'exercice 13.</p>
+</div>
+<h3 id="partager-un-gpu-mig-time-slicing-mps-et-vgpu">9.3. Partager un GPU : MIG, time-slicing, MPS et vGPU</h3>
+<p>Si vous avez lu le module 12, vous connaissez MIG (§2.4) et le time-slicing (§2.5) côté Kubernetes. Ici, un fournisseur vend des fractions de GPU et doit dire quelle garantie il vend.</p>
+<p>Le <a href="https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/introduction.html">guide MIG</a> donne à chaque instance des chemins séparés dans tout le système mémoire (<em>crossbar</em>, banques de cache L2, contrôleurs et bus de la DRAM), une qualité de service définie et une isolation des fautes entre VM, conteneurs ou processus. D'après la page <a href="https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/virtualization.html"><em>Virtualization</em></a>, un invité Linux qui reçoit un GPU MIG en passthrough utilise les mêmes outils et profils qu'un hôte nu.</p>
+<p>La page <a href="https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/getting-started-with-mig.html"><em>Getting Started</em></a> ajoute deux faits d'exploitation. Depuis Hopper, le mode MIG ne survit ni au redémarrage ni au déchargement du pilote, et les instances ne survivent jamais au redémarrage : la géométrie se recrée à chaque démarrage. Et <code>nvidia-smi mig -lgipp</code> liste, par profil, les positions de départ permises sur huit tranches de mémoire.</p>
+<p>Sur l'A100 40 Go de l'exemple du guide, <code>1g.5gb</code> commence en 0 à 6, <code>1g.10gb</code> en 0, 2, 4 ou 6, <code>2g.10gb</code> en 0, 2 ou 4, <code>3g.20gb</code> en 0 ou 4, <code>4g.20gb</code> et <code>7g.40gb</code> en 0 seulement. La tranche 7 ne sert jamais à un <code>1g.5gb</code>, et un GPU ne porte qu'un <code>4g.20gb</code>. La commande <code>calc.py mig</code> place des demandes avec ce modèle : positions permises, aucun chevauchement, au plus 7 tranches de calcul (les SM du profil divisés par 14 dans la même sortie).</p>
+<div class="ex">
+<p><span class="tag">Exemple 9.2 — Placer une semaine de demandes MIG</span> Trois demandes <code>3g.20gb</code>, quatre <code>2g.10gb</code> et six <code>1g.5gb</code>, sur des A100 40 Go. Sortie réelle de <code>labs/provisioning/exercise-calcs/calc.py</code> (2026-10-25), sans la ligne qui compte les géométries :</p>
+<pre class="text"><code>$ python3 calc.py mig --request 3g.20gb=3 --request 2g.10gb=4 --request 1g.5gb=6
+requests           : 6 x 1g.5gb, 4 x 2g.10gb, 3 x 3g.20gb
+lower bounds       : compute 23/7 -&gt; 4 GPU(s), memory 26/8 -&gt; 4 GPU(s)
+minimum            : 4 GPU(s)
+  GPU 0: 2g.10gb@0 2g.10gb@2 2g.10gb@4 1g.5gb@6           idle: 0 compute, 1 memory slice(s)
+  GPU 1: 2g.10gb@0 1g.5gb@2 1g.5gb@3 1g.5gb@4 1g.5gb@5 1g.5gb@6 idle: 0 compute, 1 memory slice(s)
+  GPU 2: 3g.20gb@0 3g.20gb@4                              idle: 1 compute, 0 memory slice(s)
+  GPU 3: 3g.20gb@0                                        idle: 4 compute, 4 memory slice(s)
+idle in total      : 5/28 compute slices (17.9 %), 6/32 memory slices (18.8 %)</code></pre>
+<p>Le placement atteint les bornes, mais 23 tranches de calcul sur 28 laissent 17,9 % du calcul acheté inutilisé. La tranche de mémoire 7 des GPU 0 et 1 reste vide : aucun <code>1g.5gb</code> n'y commence. Le modèle vient d'une sortie d'exemple : confirmez une géométrie sur votre GPU.</p>
+</div>
+<p><strong>MPS</strong> (<em>Multi-Process Service</em>) fait partager un GPU à plusieurs processus CUDA à la fois. D'après sa <a href="https://docs.nvidia.com/deploy/mps/latest/when-to-use-mps.html">documentation</a>, chaque client a un espace d'adressage GPU isolé et une part de calcul qu'on peut borner, mais une faute fatale est signalée à tous les clients des GPU concernés, sans dire lequel l'a causée, et le mode <code>-multiuser-server</code> supprime l'isolation entre utilisateurs. Ce parcours en conclut que MPS partage un GPU entre processus d'un même locataire, pas entre locataires.</p>
+<p><strong>NVIDIA vGPU</strong> donne à plusieurs VM un accès direct et simultané au même GPU, avec le pilote standard dans l'invité ; le logiciel est sous licence et son gestionnaire s'installe sur l'hôte. Un vGPU est soit partagé dans le temps, avec trois <a href="https://docs.nvidia.com/vgpu/latest/grid-vgpu-user-guide/changing-vgpu-scheduling-policy.html">ordonnanceurs</a> (<em>best effort</em> par défaut, <em>equal share</em>, <em>fixed share</em>) et une mémoire fixée par <a href="https://docs.nvidia.com/vgpu/latest/grid-vgpu-user-guide/virtual-gpu-types-grid-reference.html">type</a>, soit adossé à une instance MIG, dont il garde l'isolation et la rigidité.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Mécanisme</th>
+<th>Mémoire</th>
+<th>Fautes</th>
+<th>Granularité</th>
+<th>Coût d'exploitation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GPU en passthrough</td>
+<td>dédiée</td>
+<td>dédiées</td>
+<td>un GPU entier par VM</td>
+<td>VFIO, pilote dans l'image invitée, pas de migration à chaud</td>
+</tr>
+<tr class="even">
+<td>MIG</td>
+<td>chemins séparés</td>
+<td>isolées par instance</td>
+<td>profils fixes, 1/7 du calcul au plus fin</td>
+<td>GPU vidé pour changer, géométrie recréée au démarrage, fragments</td>
+</tr>
+<tr class="odd">
+<td>vGPU dans le temps</td>
+<td>taille fixée par type</td>
+<td>non établi par les pages lues</td>
+<td>types définis par NVIDIA</td>
+<td>licence, gestionnaire sur l'hôte, ordonnanceur à choisir</td>
+</tr>
+<tr class="even">
+<td>MPS</td>
+<td>espaces d'adressage isolés</td>
+<td>confinement limité</td>
+<td>part de calcul par client</td>
+<td>serveur par utilisateur</td>
+</tr>
+<tr class="odd">
+<td>Time-slicing</td>
+<td>non isolée</td>
+<td>non isolées</td>
+<td>temps partagé également entre processus</td>
+<td>pas de métriques par conteneur (module 12)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Sources : les pages citées dans cette section, et <a href="https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-sharing.html"><em>Time-Slicing GPUs</em></a> pour la dernière ligne.</p>
+<div class="key">
+<p><span class="tag">On ne vend comme isolé que ce que la documentation dit isolé</span> Un GPU en passthrough ou une instance MIG sont des frontières matérielles ; le time-slicing n'en est pas une, MPS seulement en partie. Un client qui achète de l'isolation achète une frontière, pas un quota.</p>
+</div>
+<h3 id="kubevirt-des-vm-comme-objets-kubernetes">9.4. KubeVirt : des VM comme objets Kubernetes</h3>
+<p>Si vous exploitez déjà Kubernetes (module 12), KubeVirt y ajoute des VM. D'après son <a href="https://kubevirt.io/user-guide/architecture/architecture/">architecture</a>, une <em>VirtualMachineInstance</em> (VMI) se poste au serveur d'API comme un pod ; des contrôleurs la planifient, un démon par hôte, <code>virt-handler</code>, la lance aux côtés du kubelet, et chaque VMI tourne dans un pod <code>virt-launcher</code>. VM et conteneurs coexistent alors dans un même cluster.</p>
+<p>Le guide des périphériques d'hôte reprend les prérequis du §9.2 et précise que KubeVirt n'assigne que des périphériques liés à <code>vfio-pci</code> (vGPU SR-IOV mis à part). L'administrateur autorise un modèle par son couple fournisseur:produit dans la ressource <code>KubeVirt</code>, puis la VMI le demande par son nom de ressource. Extraits des deux fichiers de <code>labs/provisioning/virt-checks/manifests/</code>, analysés par <code>verify.sh</code>, jamais appliqués :</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># kubevirt-permitted-gpu.yaml (KubeVirt custom resource)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">permittedHostDevices</span><span class="kw">:</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pciHostDevices</span><span class="kw">:</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">pciVendorSelector</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;10DE:2236&quot;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">resourceName</span><span class="kw">:</span><span class="at"> nvidia.com/GA102GL_A10</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">externalResourceProvider</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">  # the GPU Operator sandbox device plugin allocates the device</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># vmi-gpu-passthrough.yaml (VirtualMachineInstance)</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">devices</span><span class="kw">:</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">gpus</span><span class="kw">:</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">deviceName</span><span class="kw">:</span><span class="at"> nvidia.com/GA102GL_A10</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">name</span><span class="kw">:</span><span class="at"> gpu1</span></span></code></pre></div>
+<p>Avec l'<a href="https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/gpu-operator-kubevirt.html">opérateur GPU</a>, l'option <code>sandboxWorkloads.enabled</code> (désactivée par défaut) fait lire l'étiquette de nœud <code>nvidia.com/gpu.workload.config</code> : <code>container</code>, <code>vm-passthrough</code> ou <code>vm-vgpu</code>. En <code>vm-passthrough</code>, un <em>VFIO Manager</em> lie <code>vfio-pci</code> à tous les GPU du nœud et un <em>sandbox device plugin</em> les annonce au kubelet. Un nœud ne porte qu'un de ces trois types de charge : le choix s'inscrit dans la carte des nœuds, comme son image.</p>
+<p>Deux limites documentées comptent. Le plugin de KubeVirt ne permet pas de choisir un périphérique par son adresse (la documentation l'illustre avec des disques NVMe identiques, attribués au hasard). Et le passthrough PCI d'un GPU, comme les vGPU SR-IOV, n'est <a href="https://kubevirt.io/user-guide/compute/live_migration/">pas migrable à chaud</a> ; seule une VM à un vGPU unique de type <em>mdev</em> l'est, en alpha dans KubeVirt v1.9. Une mise à jour d'hôte (chapitre 7) se fait donc par drain, VM arrêtées ou replanifiées.</p>
+<h3 id="isolation-et-hygiène-entre-locataires">9.5. Isolation et hygiène entre locataires</h3>
+<p>Entre deux locataires, un GPU doit revenir dans un état connu. D'après la <a href="https://docs.nvidia.com/deploy/nvidia-smi/index.html">documentation de <code>nvidia-smi</code></a>, <code>nvidia-smi -r</code> réinitialise un GPU et peut servir à effacer son état matériel et logiciel quand il faudrait sinon redémarrer ; et, ECC actif, le pilote nettoie la mémoire (<em>ECC memory scrubbing</em>) à son initialisation. Aucune page lue ne présente ces mécanismes comme un effacement garanti des données d'un client : traitez-les comme une remise en état, à vérifier.</p>
+<p>Les règles de ce parcours en découlent. Réinitialisez chaque GPU, ou redémarrez l'hôte, entre deux locataires. Relisez alors les drapeaux de remappage et les compteurs ECC (chapitre 6), pour voir avant la location suivante un défaut apparu pendant la précédente. Recréez la géométrie MIG. Comparez les versions de firmware à l'inventaire (chapitre 7), puisqu'en passthrough le GPU est piloté par le pilote de l'invité. Gardez le réseau de gestion hors de portée des invités (chapitre 8).</p>
+<p>L'informatique confidentielle va plus loin. Selon la <a href="https://docs.nvidia.com/confidential-computing/virtual-machines">documentation NVIDIA des VM confidentielles</a>, une telle VM tourne dans un environnement de confiance matériel (AMD SEV-SNP ou Intel TDX), et un GPU Hopper ou Blackwell qui lui est confié étend cette protection à sa mémoire et à ses échanges avec le CPU. Le fournisseur configure ce mode, le locataire atteste le GPU.</p>
+<h3 id="recette-dun-nœud-gpu-virtualisé">9.6. Recette d'un nœud GPU virtualisé</h3>
+<p>Un nœud virtualisé se recette deux fois : l'hôte, puis l'invité tel que le client le recevra. Cette liste complète la recette du chapitre 6 ; ses seuils restent des paramètres de site.</p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Contrôle</th>
+<th>Comment</th>
+<th>Accepté si</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>IOMMU de l'hôte</td>
+<td><code>/proc/cmdline</code>, <code>iommu_report.py</code></td>
+<td>chaque GPU vendu est dans un groupe aux membres connus, liés à <code>vfio-pci</code></td>
+</tr>
+<tr class="even">
+<td>Rôle du nœud</td>
+<td>étiquette <code>nvidia.com/gpu.workload.config</code></td>
+<td>la valeur de la carte des nœuds</td>
+</tr>
+<tr class="odd">
+<td>Pile de l'invité</td>
+<td><code>nvidia-smi</code> dans l'image, table du chapitre 5</td>
+<td>pilote compatible avec la version de CUDA annoncée</td>
+</tr>
+<tr class="even">
+<td>Recette dans l'invité</td>
+<td><code>dcgmi diag</code>, <code>gpu_burn</code>, nccl-tests</td>
+<td>verdict <em>accept</em>, débit de bus comparé au nœud doré nu</td>
+</tr>
+<tr class="odd">
+<td>Chemin réseau</td>
+<td><code>NCCL_DEBUG=INFO</code>, <code>ib_write_bw --use_cuda</code> (module 7)</td>
+<td><code>GDRDMA</code> dans le journal si l'offre promet GPUDirect RDMA</td>
+</tr>
+<tr class="even">
+<td>Isolation</td>
+<td>deux invités sur un hôte</td>
+<td>aucun ne voit les GPU de l'autre ; en MIG, <code>nvidia-smi -L</code> ne liste que ses instances</td>
+</tr>
+<tr class="odd">
+<td>Hygiène</td>
+<td>fin de location simulée</td>
+<td>réinitialisation, drapeaux, firmware et géométrie MIG conformes</td>
+</tr>
+<tr class="even">
+<td>Maintenance</td>
+<td>drain d'un hôte qui porte des VM</td>
+<td>VM arrêtées ou replanifiées, sans migration à chaud</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 9</p>
+<ul>
+<li>On virtualise pour louer un parc à plusieurs clients ; le surcoût se mesure par la recette dans l'invité.</li>
+<li>Le passthrough passe par l'IOMMU et VFIO ; le groupe IOMMU est l'unité de propriété, tous ses membres partent ensemble.</li>
+<li>Un hôte nu veut l'IOMMU coupée pour le pair-à-pair PCIe, un hôte de VM l'exige ; dans une VM, l'ACS reste actif et ATS sert GPUDirect RDMA.</li>
+<li>MIG isole par instance avec des placements fixes ; le time-slicing n'isole rien ; MPS confine mal les fautes ; vGPU est sous licence.</li>
+<li>KubeVirt fait des VM des objets Kubernetes ; un GPU en passthrough n'y migre pas à chaud.</li>
+<li>Entre deux locataires : réinitialisation, drapeaux, firmware et géométrie MIG, puis recette de l'invité.</li>
+</ul>
+</div>
 <h2 id="labs">Labs</h2>
 <p>Les quatre labs tournent sur un portable ou une VM Linux <strong>sans GPU</strong>, n'exigent pas les droits root (seule l'installation des paquets en a besoin) et ne touchent jamais la configuration de la machine : chaque nœud est un répertoire temporaire. Les outils utilisés ont été testés le 24 octobre 2026 avec Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7 (fournisseur <code>hashicorp/local</code> 2.9.1), dnsmasq 2.91 et shellcheck. Installation préalable :</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> .venv/bin/activate</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install ansible-core ansible-lint yamllint pytest</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> dnsmasq-base shellcheck</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Terraform &gt;= 1.6 : binaire officiel sur releases.hashicorp.com, vérifié par la somme SHA-256</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> venv .venv <span class="kw">&amp;&amp;</span> <span class="bu">.</span> .venv/bin/activate</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install ansible-core ansible-lint yamllint pytest</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> dnsmasq-base shellcheck</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Terraform &gt;= 1.6 : binaire officiel sur releases.hashicorp.com, vérifié par la somme SHA-256</span></span></code></pre></div>
 <p>Chaque lab se lance avec <code>PYTHON=$(which python) bash verify.sh</code> depuis son dossier <code>labs/provisioning/&lt;lab&gt;/</code>. Les scripts n'affirment rien sur la durée d'exécution : ils comptent des changements, des codes de sortie et des lignes de fichier.</p>
 <h3 id="lab-6-1">Lab 6.1 — Un rôle Ansible de nœud de calcul</h3>
 <div class="lab">
@@ -1069,7 +1303,7 @@ OK wrong password: exit 2 (error: 401 on /redfish/v1/Systems)</code></pre>
 <p><strong>Pour aller plus loin.</strong> Remplacez le simulateur par l'émulateur de votre constructeur s'il en publie un, ou par un vrai BMC de test, avec HTTPS et un compte dédié en lecture seule.</p>
 </div>
 <h2 id="ex">Exercices</h2>
-<p>Les chiffres des énoncés marqués « fictifs » sont inventés pour l'exercice. Les calculs des corrigés sont refaits par <code>bash labs/provisioning/exercise-calcs/verify.sh</code>.</p>
+<p>Les chiffres des énoncés marqués « fictifs » sont inventés pour l'exercice. Les calculs des corrigés sont refaits par <code>bash labs/provisioning/exercise-calcs/verify.sh</code>, la sortie de l'exercice 13 par <code>labs/provisioning/virt-checks/verify.sh</code>.</p>
 <div class="exo">
 <p><span class="tag">Exercice 1 · ★★ — Le MTTF d'un gros job</span> Kokolis et al. rapportent, sur leurs deux clusters de recherche, un MTTF de 47,7 jours pour les jobs de 8 GPU et de 7,9 h pour les jobs de 1 024 GPU. Si les pannes étaient indépendantes et de même taux par GPU, le MTTF d'un job de <span class="math inline">N</span> GPU vaudrait <span class="math inline">\text{MTTF}(8)\times 8/N</span>.</p>
 <ol type="a">
@@ -1232,17 +1466,66 @@ Plan: 4 to add, 0 to change, 5 to destroy.</code></pre>
 <p><strong>Volant.</strong> Avec 10 jours, la moyenne de nœuds en réparation vaut <span class="math inline">256\times 0{,}0025\times 10 = 6{,}4</span> et 11 réserves couvrent 95 % des cas (probabilité cumulée 0,969). Avec 21 jours, la moyenne passe à 13,44 et il en faut 20 (probabilité 0,966) : 7,8 % de la flotte au lieu de 4,3 %.</p>
 <p><strong>Arbitrage.</strong> Chaque réserve est de la capacité payée et inactive ; raccourcir le délai de RMA (contrat, stock de pièces sur site) coûte aussi. La comparaison se fait en nœuds-équivalents : 9 réserves de plus contre un meilleur délai de réparation. Le prix de chaque option se lit sur la page du fournisseur le jour de la décision, pas ici. Calcul : <code>calc.py spares --nodes 256 --rate-per-1000-node-days 2.5 --repair-days 21 --quantile 0.95</code>.</p>
 </details>
+<div class="exo">
+<p><span class="tag">Exercice 12 · ★★ — Quand les bornes se trompent : placer des instances MIG</span> Un fournisseur loue des instances MIG sur des A100 40 Go, avec les positions de départ du §9.3 et 7 tranches de calcul par GPU. Demandes de la semaine (<strong>fictives</strong>) : trois <code>4g.20gb</code>, une <code>3g.20gb</code>, trois <code>2g.10gb</code>.</p>
+<ol type="a">
+<li>Calculez les bornes inférieures en tranches de calcul et de mémoire. (b) Pourquoi faut-il un GPU de plus, et quelle disposition l'atteint ? (c) Quelle part du calcul reste inutilisée ? (d) Le client d'une <code>2g.10gb</code> accepte deux <code>1g.5gb</code> à la place : combien de GPU, et que perd-il ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Calcul : <span class="math inline">3\times 4 + 3 + 3\times 2 = 21</span> tranches sur 7, soit 3 GPU. Mémoire : <span class="math inline">3\times 4 + 4 + 3\times 2 = 22</span> tranches sur 8, soit 3 GPU.</p></li>
+<li><p>Un <code>4g.20gb</code> ne commence qu'en 0 : chacun prend son GPU, dont il reste les tranches 4 à 7 et 3 tranches de calcul, soit un <code>3g.20gb</code>, soit un seul <code>2g.10gb</code> (position 4) et un <code>1g</code>. Trois tels GPU accueillent le <code>3g.20gb</code> et deux <code>2g.10gb</code> au plus : le troisième en exige un quatrième. Sortie de <code>calc.py mig --request 4g.20gb=3 --request 3g.20gb=1 --request 2g.10gb=3</code> :</p></li>
+</ol>
+<pre class="text"><code>minimum            : 4 GPU(s)
+  GPU 0: 4g.20gb@0 3g.20gb@4                              idle: 0 compute, 0 memory slice(s)
+  GPU 1: 2g.10gb@0 2g.10gb@2 2g.10gb@4                    idle: 1 compute, 2 memory slice(s)
+  GPU 2: 4g.20gb@0                                        idle: 3 compute, 4 memory slice(s)
+  GPU 3: 4g.20gb@0                                        idle: 3 compute, 4 memory slice(s)
+idle in total      : 7/28 compute slices (25.0 %), 10/32 memory slices (31.2 %)</code></pre>
+<ol start="3" type="a">
+<li><p>7 tranches sur 28, soit 25 % du calcul, et 31,2 % de la mémoire.</p></li>
+<li><p>Avec <code>--request 2g.10gb=2 --request 1g.5gb=2</code>, trois GPU suffisent (<code>4g</code>+<code>3g</code>, puis deux fois <code>4g</code>+<code>2g</code>+<code>1g</code>) et il ne reste que 2 tranches de mémoire sur 24 (8,3 %). Le client garde 2 tranches de calcul et 2 de mémoire, mais en deux instances <code>1g.5gb</code>, forcément sur deux GPU différents : un job qui remplissait la mémoire d'un <code>2g.10gb</code> n'y tient plus, et la page <em>Deployment Considerations</em> du guide MIG indique qu'avec le pilote R570 le pair-à-pair n'existe qu'entre instances d'un même GPU.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 13 · ★★★ — Vendre un serveur aux groupes IOMMU mêlés</span> Sur l'arborescence <strong>synthétique</strong> d'un serveur fictif à quatre GPU, <code>iommu_report.py --root</code> affiche (sortie réelle, abrégée) :</p>
+<pre class="text"><code>group 30: 2 endpoint(s), blocked by host driver(s): 0000:18:00.0=nvidia, 0000:19:00.0=mlx5_core
+  0000:17:00.0  1000:c010  PCI bridge               driver=-
+  0000:18:00.0  10de:2330  3D controller            driver=nvidia
+  0000:19:00.0  15b3:1021  InfiniBand controller    driver=mlx5_core
+  -&gt; these 2 endpoints can only be given together, to one VM
+group 31: 2 endpoint(s), blocked by host driver(s): 0000:2b:00.0=nvidia, 0000:2c:00.0=mlx5_core
+group 45: 1 endpoint(s), ready for VFIO
+  0000:3d:00.0  10de:2330  3D controller            driver=vfio-pci
+group 46: 1 endpoint(s), blocked by host driver(s): 0000:4e:00.0=nvidia
+verdict            : 1 of 4 group(s) ready for VFIO</code></pre>
+<ol type="a">
+<li>Quels GPU peut-on louer seuls en passthrough, aujourd'hui puis après liaison, et qu'impose le groupe 30 ? (b) Proposez des unités de vente et arbitrez entre garder GPU et carte réseau ensemble ou obtenir des groupes plus fins. (c) Que risque-t-on si les quatre GPU portent le même nom de ressource dans KubeVirt ? (d) Quels tests exigez-vous avant la vente ?</li>
+</ol>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Seul <code>3d:00.0</code> (groupe 45) est prêt ; <code>4e:00.0</code> le devient après liaison à <code>vfio-pci</code>. <code>18:00.0</code> et <code>2b:00.0</code> partagent leur groupe avec une carte InfiniBand : il faut lier GPU et carte (le pont sans pilote est sauté, voir la sortie de <code>bind_vfio.sh</code> au §9.2) et les confier à la même VM. Le groupe étant l'unité de propriété de VFIO, la carte ne sert plus ni à l'hôte ni à un autre locataire.</p></li>
+<li><p>Deux unités « GPU et carte » (groupes 30 et 31), utiles pour GPUDirect RDMA puisque la carte est sous le même commutateur (distance <code>PIX</code>, module 7), et deux unités « GPU seul ». La fusion des groupes signale un commutateur qui n'isole pas ses ports, alors qu'une VM exige l'ACS (§9.2).</p></li>
+</ol>
+<p>Activer l'ACS, si le matériel le permet (contrôle : <code>lspci -vvv | grep ACSCtl</code>), donne des groupes plus fins et une vente plus souple, mais fait remonter le pair-à-pair vers le contrôleur racine, d'où ATS sur les cartes. Tranchez par la mesure dans l'invité, puis gardez une seule forme sur toute la flotte.</p>
+<ol start="3" type="a">
+<li><p>Le plugin ne choisit pas par adresse : une VM qui demande « un GPU » peut recevoir <code>18:00.0</code> et immobiliser sa carte, ou échouer si le groupe n'est pas entièrement lié. Parade : une seule forme de groupe par nœud, inscrite dans la carte des nœuds.</p></li>
+<li><p>Le tableau du §9.6 sur une VM de chaque unité, avec, pour les unités avec carte, <code>GDRDMA</code> dans le journal NCCL et un <code>ib_write_bw --use_cuda</code> comparable au chemin par la mémoire de l'hôte. Rien de cela n'est exécuté dans le bac à sable : la sortie vient de la section A de <code>virt-checks/verify.sh</code>.</p></li>
+</ol>
+</details>
 <h2 id="exit">Checkpoint de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux décrire la chaîne de démarrage d'un nœud et la dépanner.</strong> Preuve : le schéma du chapitre 2 refait de mémoire, avec la panne probable à chaque étape, et l'exercice 2.</li>
-<li><strong>Je peux écrire un rôle Ansible dont la seconde exécution donne <code>changed=0</code>.</strong> Preuve : le lab 6.1, avec votre propre tâche ajoutée et la récapitulation des deux passes.</li>
-<li><strong>Je peux déployer un changement par lots et l'arrêter au premier échec.</strong> Preuve : le lab 6.1, partie B, avec le canari en échec.</li>
+<li><strong>Je peux écrire un rôle Ansible idempotent et le déployer par lots en l'arrêtant au premier échec.</strong> Preuve : le lab 6.1, avec votre propre tâche, la récapitulation des deux passes et le canari en échec de la partie B.</li>
 <li><strong>Je peux décrire une flotte avec Terraform et lire un plan.</strong> Preuve : le lab 6.2 et l'exercice 5 refaits sur un nouveau nœud.</li>
 <li><strong>Je peux vérifier la cohérence de la pile GPU d'un nœud.</strong> Preuve : <code>check_stack</code> complété au lab 6.3 et l'exercice 6.</li>
 <li><strong>Je peux concevoir une recette à trois issues.</strong> Preuve : <code>starter/decide.py</code> complété jusqu'à ce que les tests passent, et un scénario supplémentaire de votre cru.</li>
 <li><strong>Je peux dimensionner une mise à jour et un volant de rechange.</strong> Preuve : les exercices 10 et 11 refaits sur des chiffres de votre flotte.</li>
 <li><strong>Je peux interroger un BMC par Redfish et en tirer une décision.</strong> Preuve : le lab 6.4 et la règle ajoutée.</li>
+<li><strong>Je peux dire ce qu'un hôte offre au passthrough et quelle isolation je vends.</strong> Preuve : <code>iommu_report.py</code> lu et expliqué sur une machine ou sur l'arborescence synthétique, et les exercices 12 et 13.</li>
 </ul>
 <p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
 <ol type="1">
@@ -1265,19 +1548,20 @@ Plan: 4 to add, 0 to change, 5 to destroy.</code></pre>
 <li>Warewulf. <a href="https://warewulf.org/docs/main/getting-started/provisioning.html"><em>The Provisioning Process</em></a> et Canonical, <a href="https://canonical.com/maas/docs/stable/explanation/deploying-machines/"><em>MAAS : commissioning et déploiement</em></a> : deux chaînes de provisionnement documentées (chapitre 2).</li>
 <li>DMTF. <a href="https://www.dmtf.org/sites/default/files/standards/documents/DSP0266_1.22.0.pdf"><em>Redfish Specification DSP0266 1.22.0</em></a>, 2025 : racine, authentification, hypermédia (chapitre 8).</li>
 <li>SchedMD. <a href="https://slurm.schedmd.com/scontrol.html"><em>scontrol</em></a> : <code>reboot</code>, <code>ASAP</code>, <code>nextstate</code> (chapitre 7).</li>
-<li>LBNL. <a href="https://raw.githubusercontent.com/mej/nhc/master/README.md"><em>Node Health Check (NHC)</em></a> : contrôle de santé de référence pour Slurm (chapitres 6 et 7).</li>
+<li>Noyau Linux. <a href="https://docs.kernel.org/driver-api/vfio.html"><em>VFIO</em></a>, et KubeVirt, <a href="https://kubevirt.io/user-guide/compute/host-devices/"><em>Host Devices Assignment</em></a> : groupes IOMMU, liaison à <code>vfio-pci</code>, GPU dans une VM Kubernetes (chapitre 9).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/datacenter/tesla/mig-user-guide/latest/index.html"><em>Multi-Instance GPU User Guide</em></a> : isolation, profils, placements et persistance des instances (chapitre 9).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
 <h3 id="documente">Documenté</h3>
-<p>Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de <code>dcgmi diag</code>, option <code>-j</code>, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable <code>NCCL_TESTS_MIN_BW</code> ; sémantique de <code>scontrol reboot</code> ; racine <code>/redfish/v1/</code>, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, codes de sortie de <code>terraform plan</code>, limite de <code>prevent_destroy</code>. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, <code>hashicorp/local</code> 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale).</p>
+<p>Les faits attribués à une source ont été relus sur la page indiquée le 24 octobre 2026 : chiffres de fiabilité de Llama 3 (466, 47, 419 interruptions sur 54 jours ; 78 % attribuées au matériel) et de Kokolis et al. (6,50 et 2,34 pannes pour 1 000 nœuds-jours sur RSC-1 et RSC-2, MTTF de 7,9 h à 1 024 GPU contre 47,7 jours à 8 GPU, 40 nœuds citrons, jusqu'à 50-75 % de bande passante perdue à la mise en service) ; niveaux et durées annoncées de <code>dcgmi diag</code>, option <code>-j</code>, codes de sortie 226 et 205 ; table de compatibilité CUDA (450, 525, 580) ; règles de version de Fabric Manager ; drapeaux et seuils de remappage de lignes ; formule du débit de bus et variable <code>NCCL_TESTS_MIN_BW</code> ; sémantique de <code>scontrol reboot</code> ; racine <code>/redfish/v1/</code>, authentification Basic et énumérations de santé du DMTF ; chaîne de démarrage de Warewulf, déploiement de MAAS, boucle d'iPXE, codes de sortie de <code>terraform plan</code>, limite de <code>prevent_destroy</code>. Les sorties citées viennent des labs, exécutés sur Python 3.13, ansible-core 2.21.5, ansible-lint 26.10.1, Terraform 1.16.7, <code>hashicorp/local</code> 2.9.1, dnsmasq 2.91 et ipmitool 1.8.19 (aide locale). Chapitre 9, pages lues le 25 octobre 2026 : groupes IOMMU et liaison à <code>vfio-pci</code>, paramètres IOMMU du noyau, isolation, persistance et placements de MIG, confinement des erreurs de MPS, licence et ordonnanceurs de vGPU, prérequis et limites de KubeVirt, étiquette de l'opérateur GPU, ACS et ATS dans une VM, <code>nvidia-smi -r</code>, VM confidentielles ; sorties de <code>virt-checks</code> et de <code>calc.py mig</code>.</p>
 <h3 id="recommande">Recommandé</h3>
-<p>Les sept états du cycle de vie ; la recette en trois issues et ses seuils (90 % et 95 %) ; le nœud doré comme référence ; la règle « pas d'action automatique au-delà du drain » pour les signaux du BMC ; les répertoires plutôt que les espaces de travail Terraform ; la lecture humaine du résumé <code>Plan:</code> ; le registre d'événements par nœud ; l'usage du niveau 2 de DCGM à chaque démarrage et du niveau 3 à la réception ; les pratiques de sécurité du BMC. Ce sont des choix de ce parcours, pas des règles des outils.</p>
+<p>Les sept états du cycle de vie ; la recette en trois issues et ses seuils (90 % et 95 %) ; le nœud doré comme référence ; la règle « pas d'action automatique au-delà du drain » pour les signaux du BMC ; les répertoires plutôt que les espaces de travail Terraform ; la lecture humaine du résumé <code>Plan:</code> ; le registre d'événements par nœud ; l'usage du niveau 2 de DCGM à chaque démarrage et du niveau 3 à la réception ; les pratiques de sécurité du BMC ; au chapitre 9, le rôle de nœud inscrit dans la carte, la double recette hôte puis invité, la remise en état entre locataires et une seule forme de groupe IOMMU par nœud. Ce sont des choix de ce parcours, pas des règles des outils.</p>
 <h3 id="a-verifier">À vérifier</h3>
 <ol type="1">
-<li>La liste des champs de <code>nvidia-smi --query-gpu</code> et l'enveloppe du JSON de <code>dcgmi diag</code> : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) Les valeurs de l'option DHCP 93 annoncées par vos firmwares UEFI (7 ou 9). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt <code>ansible-documentation</code>. (11) Le comportement de <code>hashicorp/local</code> face à un fichier modifié est une observation sur la version 2.9.1.</li>
+<li>La liste des champs de <code>nvidia-smi --query-gpu</code> et l'enveloppe du JSON de <code>dcgmi diag</code> : la documentation ne montre qu'un fragment. (2) Les clés du JSON de nccl-tests, lues dans le code source de la branche principale : le format évolue. (3) Les valeurs de l'option DHCP 93 annoncées par vos firmwares UEFI (7 ou 9). (4) Le chemin PXE de bout en bout : aucune machine n'a démarré sur les fichiers générés. (5) Le client Redfish n'a jamais parlé à un vrai BMC. (6) Les pages de guidance sur la sécurité d'IPMI et des BMC (NSA, CISA, spécification Intel) ont refusé l'accès depuis le bac à sable : les pratiques de la section 8.4 ne sont donc pas sourcées. (7) Les limites attribuées à MAAS, Warewulf et BCM sont des déductions ; les conditions de licence de BCM sont à relire le jour de l'achat. (8) Les durées de DCGM sont des bornes mesurées par NVIDIA sur des systèmes Hopper. (9) Les critères de RMA couvrent les GPU listés par NVIDIA ; consultez le contrat de votre fournisseur. (10) Les pages de la documentation d'Ansible renvoyaient une erreur 429 : leurs sources ont été lues dans le dépôt <code>ansible-documentation</code>. (11) Le comportement de <code>hashicorp/local</code> face à un fichier modifié est une observation sur la version 2.9.1. (12) Rien du chapitre 9 n'a tourné sur un hyperviseur : la machine de rédaction n'a ni groupe IOMMU ni <code>/dev/kvm</code>. (13) NVIDIA et KubeVirt demandent <code>amd_iommu=on</code>, valeur absente de la documentation du noyau. (14) Le modèle de placement MIG vient d'une sortie d'exemple sur A100 40 Go. (15) Aucune page lue ne garantit l'effacement des données d'un locataire par une réinitialisation, ni l'isolation des fautes d'un vGPU partagé dans le temps.</li>
 </ol>
 <h3 id="hors-perimetre">Hors périmètre</h3>
-<p>La configuration de Slurm elle-même (<a href="../slurm/index.html">module 5</a>), le réseau d'interconnexion et NCCL en profondeur (<a href="../networking/index.html">module 7</a>), la supervision continue des GPU (<a href="../observability/index.html">module 14</a>), l'opérateur GPU de Kubernetes (<a href="../kubernetes-gpu/index.html">module 12</a>), la construction d'images (Packer, intégration continue), les outils de mise à jour de firmware, le démarrage sécurisé et l'attestation, l'effacement sécurisé des disques, les API de provisionnement des nuages, OpenTofu, OpenCHAMI, OpenStack Ironic et xCAT (cités sans évaluation), et les partitions multi-locataires de NVSwitch.</p>
+<p>La configuration de Slurm elle-même (<a href="../slurm/index.html">module 5</a>), le réseau d'interconnexion et NCCL en profondeur (<a href="../networking/index.html">module 7</a>), la supervision continue des GPU (<a href="../observability/index.html">module 14</a>), l'opérateur GPU de Kubernetes (<a href="../kubernetes-gpu/index.html">module 12</a>) hors son mode KubeVirt, le SR-IOV et le réseau des invités, OpenStack et Proxmox, la construction d'images (Packer, intégration continue), les outils de mise à jour de firmware, le démarrage sécurisé et l'attestation, l'effacement sécurisé des disques, les API de provisionnement des nuages, OpenTofu, OpenCHAMI, OpenStack Ironic et xCAT (cités sans évaluation), et les partitions multi-locataires de NVSwitch.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/slurm/index.html"><span class="k">← Précédent</span>Module 05 — Slurm et exploitation d'un cluster HPC</a><a class="next" href="../../courses/networking/index.html"><span class="k">Suivant →</span>Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL</a></nav>
 </main>

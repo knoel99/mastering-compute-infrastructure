@@ -48,12 +48,12 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#phase1">Phase 1 — Calcul parallèle et GPU</a>
 <ul>
 <li><a href="#parallel-programming">Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (rédigé, 30 h)</a></li>
-<li><a href="#gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h)</a></li>
+<li><a href="#gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 32,5 h)</a></li>
 </ul></li>
 <li><a href="#phase2">Phase 2 — Exploiter un cluster</a>
 <ul>
 <li><a href="#slurm">Module 05 — Slurm et exploitation d'un cluster HPC (rédigé, 32 h)</a></li>
-<li><a href="#provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 24 h)</a></li>
+<li><a href="#provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 26,5 h)</a></li>
 <li><a href="#networking">Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (rédigé, 28 h)</a></li>
 <li><a href="#storage">Module 08 — Stockage et E/S pour l'entraînement (rédigé, 24 h)</a></li>
 </ul></li>
@@ -61,7 +61,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <ul>
 <li><a href="#distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (rédigé, 36 h)</a></li>
 <li><a href="#fault-tolerance">Module 10 — Pannes, checkpointing et reprise automatique (rédigé, 28 h)</a></li>
-<li><a href="#ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h)</a></li>
+<li><a href="#ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 30,5 h)</a></li>
 </ul></li>
 <li><a href="#phase4">Phase 4 — Plateforme cloud-native et multi-fournisseurs</a>
 <ul>
@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul></li>
 <li><a href="#phase5">Phase 5 — Production et leadership</a>
 <ul>
-<li><a href="#platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 28 h)</a></li>
+<li><a href="#platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 30,5 h)</a></li>
 </ul></li>
 <li><a href="#projets">Projets</a>
 <ul>
@@ -196,8 +196,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Cours de référence cités par les masters (EPCC, Berkeley CS267)</li>
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2.</p>
-<h3 id="gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h)</h3>
-<p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p>
+<h3 id="gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 32,5 h)</h3>
+<p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, Nsight et les accélérateurs d'autres fabricants (AMD, TPU, Trainium, Ascend).</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
 <p><strong>Cours complet :</strong> <a href="../courses/gpu-programming/index.html">Programmation GPU : CUDA, Triton et profilage</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
@@ -206,6 +206,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Expliquer la coalescence, l'occupation et la divergence de warps sur un exemple chiffré</li>
 <li>Lire un profil Nsight/PyTorch Profiler et nommer le goulot (calcul, mémoire, lancement)</li>
 <li>Expliquer ce qu'apporte FlashAttention, la fusion de noyaux et la précision mixte</li>
+<li>Transposer le vocabulaire GPU vers AMD/ROCm, les TPU, Trainium et Ascend, et dresser une liste de contrôle de portabilité</li>
 </ul>
 <p><strong>Chapitres :</strong></p>
 <ol type="1">
@@ -217,6 +218,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Précision numérique : FP32, TF32, BF16, FP16, FP8 ; sommes, mise à l'échelle de perte, déterminisme</li>
 <li>Profiler : Nsight Systems/Compute, PyTorch Profiler, métriques clés, lecture d'une trace</li>
 <li>Techniques d'accélération : fusion, FlashAttention, torch.compile, CUDA graphs, quand elles paient</li>
+<li>Au-delà de NVIDIA : AMD, TPU, Trainium et accélérateurs chinois</li>
 </ol>
 <p><strong>Labs :</strong></p>
 <ul>
@@ -269,8 +271,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Version testée et date à indiquer ; ne pas écrire 'dernière version' sans lecture de la source officielle</li>
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 1, Projet 6.</p>
-<h3 id="provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 24 h)</h3>
-<p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p>
+<h3 id="provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 26,5 h)</h3>
+<p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette, supervision matérielle et virtualisation multi-locataire.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
 <p><strong>Cours complet :</strong> <a href="../courses/provisioning/index.html">Provisioning, images et santé des nœuds GPU</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
@@ -279,6 +281,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Écrire des rôles Ansible idempotents et des modules Terraform pour un cluster</li>
 <li>Valider un nœud GPU avant mise en service (pilote, DCGM diag, burn-in, bande passante)</li>
 <li>Concevoir une procédure de remplacement et de mise à jour sans interrompre la production</li>
+<li>Lire les groupes IOMMU d'un hôte, choisir un mode de partage du GPU selon l'isolation vendue, et recetter un nœud virtualisé</li>
 </ul>
 <p><strong>Chapitres :</strong></p>
 <ol type="1">
@@ -290,6 +293,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Recette et burn-in : DCGM diagnostics, gpu-burn, nccl-tests, tests mémoire/PCIe/NVLink</li>
 <li>Mises à jour et pannes : rolling updates, firmware, gestion des RMA, traçabilité</li>
 <li>BMC, Redfish, IPMI et supervision hors bande</li>
+<li>Virtualisation et multi-locataire : KVM, VFIO, MIG, vGPU et KubeVirt</li>
 </ol>
 <p><strong>Labs :</strong></p>
 <ul>
@@ -452,8 +456,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Documentation NVIDIA sur les codes Xid</li>
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 3, Projet 6.</p>
-<h3 id="ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h)</h3>
-<p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p>
+<h3 id="ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 30,5 h)</h3>
+<p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré, et l'inférence qui produit les rollouts (moteurs, cache KV, batching continu).</p>
 <p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).</p>
 <p><strong>Cours complet :</strong> <a href="../courses/ray-rl-infra/index.html">Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
@@ -462,6 +466,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Concevoir une architecture acteur-apprenant avec synchronisation de politique et tampon de rejeu</li>
 <li>Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)</li>
 <li>Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte</li>
+<li>Dimensionner le cache KV d'un moteur d'inférence à partir du <code>config.json</code> d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement</li>
 </ul>
 <p><strong>Chapitres :</strong></p>
 <ol type="1">
@@ -473,12 +478,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Boucles en ligne et temps réel : latence de bout en bout, files, contre-pression, déséquilibre acteurs/apprenants</li>
 <li>Hétérogénéité : GPU d'entraînement, GPU d'évaluation moins chers, CPU ; placement et files par type</li>
 <li>Ray sur Kubernetes (KubeRay) et sur Slurm ; observabilité d'une application Ray ; alternatives (Dask, Spark, Kubeflow)</li>
+<li>Inférence pour les rollouts et pour le service : moteurs, cache KV et batching continu</li>
 </ol>
 <p><strong>Labs :</strong></p>
 <ul>
 <li><strong>Acteurs et tâches Ray</strong> (bac à sable, sans GPU) : Pipeline de traitement avec tâches/acteurs Ray local ; mesure d'efficacité, tolérance à la mort d'un acteur ; tests.</li>
 <li><strong>Boucle acteur-apprenant minimale</strong> (bac à sable, sans GPU) : Environnement jouet, N acteurs, un apprenant, tampon de rejeu, synchronisation de politique ; mesurer obsolescence et débit ; courbe d'apprentissage reproductible.</li>
 <li><strong>Modèle de débit d'une boucle en ligne</strong> (bac à sable, sans GPU) : Modèle analytique + simulation événementielle : combien d'acteurs pour saturer un apprenant ; tests de cohérence modèle/simulation.</li>
+<li><strong>Batching statique, batching continu et cache KV paginé</strong> (bac à sable, sans GPU) : Simulateur déterministe en Python standard : comparer batching statique et continu, et la réservation du cache KV à son allocation par pages ; tests sur des propriétés structurelles.</li>
 </ul>
 <p><strong>Sources à lire et faits à vérifier :</strong></p>
 <ul>
@@ -633,8 +640,8 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 4, Projet 6.</p>
 <h2 id="phase5">Phase 5 — Production et leadership</h2>
-<h3 id="platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 28 h)</h3>
-<p>Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.</p>
+<h3 id="platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 30,5 h)</h3>
+<p>Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, plan de contrôle à haute disponibilité, livraison continue, fiabilité de production, direction d'équipe et entretien.</p>
 <p><strong>Prérequis :</strong> module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).</p>
 <p><strong>Cours complet :</strong> <a href="../courses/platform-leadership/index.html">Plateforme interne, sécurité, production et leadership</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
@@ -643,6 +650,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Définir un modèle de sécurité multi-locataire (identité, isolation, secrets, audit) pour des GPU partagés</li>
 <li>Instituer des pratiques de production : astreinte, gestion d'incident, post-mortems, revues de conception</li>
 <li>Préparer un entretien de compute infrastructure lead : conception, dépannage, leadership, négociation</li>
+<li>Calculer la probabilité qu'un cluster de consensus garde son quorum selon le nombre et le placement de ses membres, conduire un exercice de restauration mesuré et livrer un changement d'infrastructure par canaris</li>
 </ul>
 <p><strong>Chapitres :</strong></p>
 <ol type="1">
@@ -654,12 +662,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication</li>
 <li>Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible</li>
 <li>Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser</li>
+<li>Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue</li>
 </ol>
 <p><strong>Labs :</strong></p>
 <ul>
 <li><strong>Écrire une RFC de plateforme</strong> (bac à sable, sans GPU) : Modèle de RFC/ADR avec grille de relecture automatisée (sections, décisions, alternatives, risques, métriques) et script de lint ; exemple complet fourni.</li>
 <li><strong>Post-mortem d'un incident simulé</strong> (bac à sable, sans GPU) : Jeu de logs et chronologie synthétiques (clairement étiquetés) ; trouver la cause, écrire le post-mortem ; corrigé détaillé.</li>
 <li><strong>Exercice de conception : de 8 à 256 GPU</strong> (bac à sable, sans GPU) : Énoncé d'entretien de conception avec grille d'évaluation et réponses de niveaux différents ; calculateur de dimensionnement testé.</li>
+<li><strong>Quorum d'un cluster de consensus et exercice de restauration</strong> (bac à sable, sans GPU) : Probabilité de garder le quorum (formule binomiale contre Monte-Carlo à graine fixe) et exercice de sauvegarde et restauration d'etcd avec etcdctl et etcdutl.</li>
 </ul>
 <p><strong>Sources à lire et faits à vérifier :</strong></p>
 <ul>

@@ -27,16 +27,16 @@ Ce site est construit module par module, et chaque page est vérifiée avant d'�
 
 ## Le parcours en un coup d'œil {#parcours}
 
-Volume total : **440 h de modules et 152 h de projets**, soit environ 49 semaines à 12 h par semaine. Le détail, les jalons et les parcours courts sont dans la [feuille de route](path/index.html).
+Volume total : **450 h de modules et 152 h de projets**, soit environ 50 semaines à 12 h par semaine. Le détail, les jalons et les parcours courts sont dans la [feuille de route](path/index.html).
 
 | Phase | Modules | Volume |
 |---|---|---|
 | 0 — Fondations : machines et performance | 1, 2 | 48 h |
-| 1 — Calcul parallèle et GPU | 3, 4 | 60 h |
-| 2 — Exploiter un cluster | 5, 6, 7, 8 | 108 h |
-| 3 — Systèmes d'entraînement distribué | 9, 10, 11 | 92 h |
+| 1 — Calcul parallèle et GPU | 3, 4 | 62,5 h |
+| 2 — Exploiter un cluster | 5, 6, 7, 8 | 110,5 h |
+| 3 — Systèmes d'entraînement distribué | 9, 10, 11 | 94,5 h |
 | 4 — Plateforme cloud-native et multi-fournisseurs | 12, 13, 14, 15 | 104 h |
-| 5 — Production et leadership | 16 | 28 h |
+| 5 — Production et leadership | 16 | 30,5 h |
 
 ## Cours {#cours}
 
@@ -59,7 +59,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 <div class="cards">
 <a class="card" href="courses/parallel-programming/index.html"><h4>Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</h4><p class="meta">Module 03 · 30 h · Cœur</p><p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p></a>
-<a class="card" href="courses/gpu-programming/index.html"><h4>Programmation GPU : CUDA, Triton et profilage</h4><p class="meta">Module 04 · 30 h · Cœur</p><p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p></a>
+<a class="card" href="courses/gpu-programming/index.html"><h4>Programmation GPU : CUDA, Triton et profilage</h4><p class="meta">Module 04 · 32,5 h · Cœur</p><p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, Nsight et les accélérateurs d'autres fabricants (AMD, TPU, Trainium, Ascend).</p></a>
 </div>
 
 ### Phase 2 — Exploiter un cluster {#phase2 .phase .unnumbered}
@@ -69,7 +69,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 
 <div class="cards">
 <a class="card" href="courses/slurm/index.html"><h4>Slurm et exploitation d'un cluster HPC</h4><p class="meta">Module 05 · 32 h · Cœur</p><p>L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.</p></a>
-<a class="card" href="courses/provisioning/index.html"><h4>Provisioning, images et santé des nœuds GPU</h4><p class="meta">Module 06 · 24 h · Cœur</p><p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p></a>
+<a class="card" href="courses/provisioning/index.html"><h4>Provisioning, images et santé des nœuds GPU</h4><p class="meta">Module 06 · 26,5 h · Cœur</p><p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette, supervision matérielle et virtualisation multi-locataire.</p></a>
 <a class="card" href="courses/networking/index.html"><h4>Réseaux haute performance : InfiniBand, RoCE et NCCL</h4><p class="meta">Module 07 · 28 h · Cœur</p><p>Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.</p></a>
 <a class="card" href="courses/storage/index.html"><h4>Stockage et E/S pour l'entraînement</h4><p class="meta">Module 08 · 24 h · Cœur</p><p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p></a>
 </div>
@@ -82,7 +82,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <div class="cards">
 <a class="card" href="courses/distributed-training/index.html"><h4>Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</h4><p class="meta">Module 09 · 36 h · Cœur</p><p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p></a>
 <a class="card" href="courses/fault-tolerance/index.html"><h4>Pannes, checkpointing et reprise automatique</h4><p class="meta">Module 10 · 28 h · Cœur</p><p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p></a>
-<a class="card" href="courses/ray-rl-infra/index.html"><h4>Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</h4><p class="meta">Module 11 · 28 h · Cœur</p><p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p></a>
+<a class="card" href="courses/ray-rl-infra/index.html"><h4>Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</h4><p class="meta">Module 11 · 30,5 h · Cœur</p><p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré, et l'inférence qui produit les rollouts (moteurs, cache KV, batching continu).</p></a>
 </div>
 
 ### Phase 4 — Plateforme cloud-native et multi-fournisseurs {#phase4 .phase .unnumbered}
@@ -103,7 +103,7 @@ Chaque cours est une longue page unique : fiche, plan de séances, chapitres ave
 <p class="sub-line">Opérer en production, décider, négocier, diriger et passer l'entretien.</p>
 
 <div class="cards">
-<a class="card" href="courses/platform-leadership/index.html"><h4>Plateforme interne, sécurité, production et leadership</h4><p class="meta">Module 16 · 28 h · Cœur</p><p>Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.</p></a>
+<a class="card" href="courses/platform-leadership/index.html"><h4>Plateforme interne, sécurité, production et leadership</h4><p class="meta">Module 16 · 30,5 h · Cœur</p><p>Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, plan de contrôle à haute disponibilité, livraison continue, fiabilité de production, direction d'équipe et entretien.</p></a>
 </div>
 
 ## Projets de portfolio {#projets}

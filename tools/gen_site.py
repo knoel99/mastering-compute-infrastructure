@@ -17,6 +17,12 @@ PHASES = {p["n"]: p for p in C["phases"]}
 HPW = 12  # reference pace: hours per week
 
 
+def hfmt(x):
+    """Hours in French notation: 30 -> "30", 30.5 -> "30,5"."""
+    x = round(float(x), 2)
+    return str(int(x)) if x == int(x) else f"{x:g}".replace(".", ",")
+
+
 def has_course(i):
     return (ROOT / "courses" / i / "index.md").exists()
 
@@ -34,7 +40,7 @@ def status_label(m):
 
 
 def card_course(m):
-    meta = f"Module {m['number']:02d} · {m['hours']} h · {status_label(m)}"
+    meta = f"Module {m['number']:02d} · {hfmt(m['hours'])} h · {status_label(m)}"
     if has_course(m["id"]):
         return (f'<a class="card" href="courses/{m["id"]}/index.html"><h4>{m["title"]}</h4>'
                 f'<p class="meta">{meta}</p><p>{m["summary"]}</p></a>')
@@ -43,7 +49,7 @@ def card_course(m):
 
 
 def card_project(p):
-    meta = f"Projet {p['number']} · {p['hours']} h"
+    meta = f"Projet {p['number']} · {hfmt(p['hours'])} h"
     if has_project(p["id"]):
         return (f'<a class="card" href="projects/{p["id"]}/index.html"><h4>{p["title"].split(" — ", 1)[-1]}</h4>'
                 f'<p class="meta">{meta}</p><p>{p["summary"]}</p></a>')
@@ -109,12 +115,12 @@ Ce site est construit module par module, et chaque page est vérifiée avant d'�
 
 ## Le parcours en un coup d'œil {{#parcours}}
 
-Volume total : **{mh} h de modules et {ph} h de projets**, soit environ {round((mh + ph) / HPW)} semaines à {HPW} h par semaine. Le détail, les jalons et les parcours courts sont dans la [feuille de route](path/index.html).
+Volume total : **{hfmt(mh)} h de modules et {hfmt(ph)} h de projets**, soit environ {round((mh + ph) / HPW)} semaines à {HPW} h par semaine. Le détail, les jalons et les parcours courts sont dans la [feuille de route](path/index.html).
 
 | Phase | Modules | Volume |
 |---|---|---|
 """ + "\n".join(
-        f"| {n} — {PHASES[n]['title']} | {', '.join(str(m['number']) for m in C['modules'] if m['phase']==n)} | {sum(m['hours'] for m in C['modules'] if m['phase']==n)} h |"
+        f"| {n} — {PHASES[n]['title']} | {', '.join(str(m['number']) for m in C['modules'] if m['phase']==n)} | {hfmt(sum(m['hours'] for m in C['modules'] if m['phase']==n))} h |"
         for n in sorted(PHASES)) + f"""
 
 ## Cours {{#cours}}
@@ -199,20 +205,20 @@ def roadmap():
         hm = sum(m["hours"] for m in ms)
         hp = sum(PROJ[i]["hours"] for i in proj_by_phase[n])
         tot += hm + hp
-        rows.append(f"| {n} — {PHASES[n]['title']} | {', '.join(m['id'] for m in ms)} | {hm} h | {', '.join(str(PROJ[i]['number']) for i in proj_by_phase[n]) or '—'} ({hp} h) | {round((hm + hp) / HPW)} sem. | {jal[n]} |")
+        rows.append(f"| {n} — {PHASES[n]['title']} | {', '.join(m['id'] for m in ms)} | {hfmt(hm)} h | {', '.join(str(PROJ[i]['number']) for i in proj_by_phase[n]) or '—'} ({hfmt(hp)} h) | {round((hm + hp) / HPW)} sem. | {jal[n]} |")
     short = ["perf-models", "slurm", "distributed-training", "fault-tolerance", "multi-cloud"]
     short_p = ["scaling-study", "resilient-trainer"]
     sh = sum(MODS[i]["hours"] for i in short) + sum(PROJ[i]["hours"] for i in short_p)
     txt = f"""---
 title: "Feuille de route"
-subtitle: "{len(PHASES)} phases, {tot} h au total, jalons et parcours courts"
+subtitle: "{len(PHASES)} phases, {hfmt(tot)} h au total, jalons et parcours courts"
 description: "Séquence des phases, volumes horaires, jalons de validation et parcours accélérés."
 numbered: true
 ---
 
 ## Comment lire cette feuille de route {{#lecture}}
 
-Le volume total est de **{mh} h de modules et {ph} h de projets**, soit **{tot} h**. À titre de repère, {HPW} h par semaine donnent environ {round(tot / HPW)} semaines ; 25 h par semaine, environ {round(tot / 25)} semaines ; un temps plein de 35 h, environ {round(tot / 35)} semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.
+Le volume total est de **{hfmt(mh)} h de modules et {hfmt(ph)} h de projets**, soit **{hfmt(tot)} h**. À titre de repère, {HPW} h par semaine donnent environ {round(tot / HPW)} semaines ; 25 h par semaine, environ {round(tot / 25)} semaines ; un temps plein de 35 h, environ {round(tot / 35)} semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.
 
 Un rythme hebdomadaire type de {HPW} h : deux séances de lecture de 3 h, une séance de lab de 3 h, et 3 h d'exercices et de relecture. Tenez un journal d'apprentissage dans un dépôt public : c'est aussi une pièce de portfolio.
 
@@ -232,7 +238,7 @@ Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que
 -   **Le multi-fournisseurs en phase 4**, parce qu'il suppose de savoir reprendre un job après une panne (phase 3).
 -   **Le leadership en dernier**, parce qu'on dirige mieux ce qu'on a opéré soi-même.
 
-## Parcours court : l'essentiel en {sh} h {{#court}}
+## Parcours court : l'essentiel en {hfmt(sh)} h {{#court}}
 
 Si vous n'avez pas le temps de tout suivre, ce sous-ensemble couvre le noyau technique de l'entraînement à grande échelle : {', '.join(f"{MODS[i]['title']}" for i in short)}, plus les projets {', '.join(PROJ[i]['title'].split(' — ')[0] for i in short_p)}. Il ne remplace pas le parcours complet : l'exploitation du réseau, du stockage, de Kubernetes et de la capacité manque.
 
@@ -270,7 +276,7 @@ Les sources citées dans les rubriques « Sources à lire et faits à vérifier 
             done = has_course(m["id"])
             tag = "rédigé" if done else "plan"
             title = f"[{m['title']}](../courses/{m['id']}/index.html)" if done else m["title"]   # the syllabus lives in syllabus/
-            out.append(f"### Module {m['number']:02d} — {m['title']} ({tag}, {m['hours']} h) {{#{m['id']}}}\n")
+            out.append(f"### Module {m['number']:02d} — {m['title']} ({tag}, {hfmt(m['hours'])} h) {{#{m['id']}}}\n")
             out.append(f"{m['summary']}\n")
             if m["prerequisites"]:
                 out.append("**Prérequis :** " + ", ".join(f"module {MODS[i]['number']} ({MODS[i]['title']})" for i in m["prerequisites"]) + ".\n")
@@ -289,7 +295,7 @@ Les sources citées dans les rubriques « Sources à lire et faits à vérifier 
                 out.append("\n**Projets qui s'appuient sur ce module :** " + ", ".join(f"Projet {p['number']}" for p in feeds) + ".\n")
     out.append("\n## Projets {#projets}\n")
     for p in C["projects"]:
-        out.append(f"### {p['title']} ({p['hours']} h) {{#{p['id']}}}\n")
+        out.append(f"### {p['title']} ({hfmt(p['hours'])} h) {{#{p['id']}}}\n")
         out.append(f"{p['summary']}\n")
         out.append("**Modules mobilisés :** " + ", ".join(f"{MODS[i]['number']}" for i in p["modules"]) + ".\n")
         out.append(f"**Plan :** {p['idea']}\n")

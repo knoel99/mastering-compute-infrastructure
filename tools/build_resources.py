@@ -67,6 +67,11 @@ def imported():
 
 
 items = CURATED + imported()
+# items added directly to learning.json (for example by a later research pass) are kept, not silently dropped
+f = ROOT / "data" / "resources" / "learning.json"
+if f.exists():
+    known = {i["id"] for i in items}
+    items += [i for i in json.loads(f.read_text(encoding="utf-8")).get("items", []) if i["id"] not in known]
 (ROOT / "data" / "resources").mkdir(parents=True, exist_ok=True)
-(ROOT / "data" / "resources" / "learning.json").write_text(json.dumps({"unit": "res", "retrieved_on": "2026-10-24", "items": items, "blocked_sources": [], "verification": {"status": "unverified"}}, ensure_ascii=False, indent=1), encoding="utf-8")
+(ROOT / "data" / "resources" / "learning.json").write_text(json.dumps({"unit": "res", "retrieved_on": "2026-10-25", "items": items, "blocked_sources": [], "verification": {"status": "unverified"}}, ensure_ascii=False, indent=1), encoding="utf-8")
 print(len(CURATED), "curated +", len(items) - len(CURATED), "imported =", len(items))

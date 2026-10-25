@@ -167,6 +167,7 @@ Le taux pour lequel les deux coûts attendus s'égalent est d'environ 0,64 inter
 - **Coûts cachés.** Ajoutez le coût de sortie de données entre régions et le coût du stockage des checkpoints ; qu'est-ce qui change dans le classement ?
 - **Terraform.** Écrivez le module qui créerait les files de machines correspondantes et validez-le avec `terraform validate` ; c'est la validation que ce projet ne fait pas.
 - **Compte réel.** Lancez une tâche SkyPilot sur un compte de test avec une limite de budget **créée avant** (voir la page [environnement de travail](../../lab-setup/index.html)) et comparez l'interruption observée à votre modèle.
+- **Moteur en Rust.** Réécrivez en Rust la seule fonction `simulate` (offres, jobs et table `forced` lus en JSON, politique « moins cher par heure » écrite des deux côtés). Les deux chronologies exactes (330 et 365 min, politique jouet `Fixed` de `test_sim.py`) deviennent des tests `cargo test`. Le tirage de `random.Random`, semé par une chaîne, ne se reproduit pas simplement : Python écrit le tirage uniforme de chaque couple (job, numéro d'allocation), Rust applique la formule de `_fail_after`. La preuve : coût et fin de chaque job identiques sur 20 graines, puis un banc d'essai qui **mesure** l'accélération.
 
 ## Pour le portfolio {#portfolio}
 

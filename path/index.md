@@ -1,13 +1,13 @@
 ---
 title: "Feuille de route"
-subtitle: "6 phases, 592 h au total, jalons et parcours courts"
+subtitle: "6 phases, 602 h au total, jalons et parcours courts"
 description: "Séquence des phases, volumes horaires, jalons de validation et parcours accélérés."
 numbered: true
 ---
 
 ## Comment lire cette feuille de route {#lecture}
 
-Le volume total est de **440 h de modules et 152 h de projets**, soit **592 h**. À titre de repère, 12 h par semaine donnent environ 49 semaines ; 25 h par semaine, environ 24 semaines ; un temps plein de 35 h, environ 17 semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.
+Le volume total est de **450 h de modules et 152 h de projets**, soit **602 h**. À titre de repère, 12 h par semaine donnent environ 50 semaines ; 25 h par semaine, environ 24 semaines ; un temps plein de 35 h, environ 17 semaines. Ce sont des ordres de grandeur : un module que vous maîtrisez déjà se parcourt en deux ou trois heures grâce à ses questions de positionnement.
 
 Un rythme hebdomadaire type de 12 h : deux séances de lecture de 3 h, une séance de lab de 3 h, et 3 h d'exercices et de relecture. Tenez un journal d'apprentissage dans un dépôt public : c'est aussi une pièce de portfolio.
 
@@ -16,11 +16,11 @@ Un rythme hebdomadaire type de 12 h : deux séances de lecture de 3 h, une séan
 | Phase | Modules | Volume | Projets | Durée à 12 h/sem. | Jalon de validation |
 |---|---|---|---|---|---|
 | 0 — Fondations : machines et performance | linux-systems, perf-models | 48 h | — (0 h) | 4 sem. | Rapport de mesure reproductible (roofline, α-β) et calculateur de MFU testé. |
-| 1 — Calcul parallèle et GPU | parallel-programming, gpu-programming | 60 h | — (0 h) | 5 sem. | Étude de scalabilité d'un solveur MPI et noyaux GPU validés par leurs tests. |
-| 2 — Exploiter un cluster | slurm, provisioning, networking, storage | 108 h | 1 (24 h) | 11 sem. | Projet 1 : un mini-cluster Slurm reproductible, instrumenté, avec politique d'équité. |
-| 3 — Systèmes d'entraînement distribué | distributed-training, fault-tolerance, ray-rl-infra | 92 h | 2, 3 (44 h) | 11 sem. | Projets 2 et 3 : étude de passage à l'échelle et entraîneur tolérant aux pannes. |
+| 1 — Calcul parallèle et GPU | parallel-programming, gpu-programming | 62,5 h | — (0 h) | 5 sem. | Étude de scalabilité d'un solveur MPI et noyaux GPU validés par leurs tests. |
+| 2 — Exploiter un cluster | slurm, provisioning, networking, storage | 110,5 h | 1 (24 h) | 11 sem. | Projet 1 : un mini-cluster Slurm reproductible, instrumenté, avec politique d'équité. |
+| 3 — Systèmes d'entraînement distribué | distributed-training, fault-tolerance, ray-rl-infra | 94,5 h | 2, 3 (44 h) | 12 sem. | Projets 2 et 3 : étude de passage à l'échelle et entraîneur tolérant aux pannes. |
 | 4 — Plateforme cloud-native et multi-fournisseurs | kubernetes-gpu, multi-cloud, observability, finops-capacity | 104 h | 4, 5 (44 h) | 12 sem. | Projets 4 et 5 : placement multi-fournisseurs et observabilité GPU. |
-| 5 — Production et leadership | platform-leadership | 28 h | 6 (40 h) | 6 sem. | Projet 6 : RFC de plateforme de 8 à 256 GPU et soutenance de 20 minutes. |
+| 5 — Production et leadership | platform-leadership | 30,5 h | 6 (40 h) | 6 sem. | Projet 6 : RFC de plateforme de 8 à 256 GPU et soutenance de 20 minutes. |
 
 Chaque phase se termine par son jalon : tant que le livrable n'existe pas et que ses vérifications ne passent pas, la phase n'est pas terminée, quel que soit le temps passé.
 
@@ -42,11 +42,11 @@ Le [point de départ](../profile/index.html) décrit cinq profils d'entrée et l
 
 | Profil d'entrée | À fond (A) | Survol guidé (C) | Volume indicatif |
 |---|---|---|---|
-| Ingénieur plateforme, SRE ou DevOps | 2, 3, 4, 5, 7, 8, 9, 11 | 14 | 570 h |
-| Administrateur ou ingénieur HPC | 9, 10, 11, 12, 13, 15 | 1, 3, 5, 6 | 510 h |
-| Ingénieur ML ou chercheur | 6, 7, 10, 12, 13, 14, 15, 16 | — | 590 h |
-| Développeur logiciel ou systèmes | 5, 6, 7, 8, 9, 15 | — | 590 h |
-| Étudiant ou personne en reconversion | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 | — | 590 h |
+| Ingénieur plateforme, SRE ou DevOps | 2, 3, 4, 5, 7, 8, 9, 11 | 14 | 580 h |
+| Administrateur ou ingénieur HPC | 9, 10, 11, 12, 13, 15 | 1, 3, 5, 6 | 520 h |
+| Ingénieur ML ou chercheur | 6, 7, 10, 12, 13, 14, 15, 16 | — | 600 h |
+| Développeur logiciel ou systèmes | 5, 6, 7, 8, 9, 15 | — | 600 h |
+| Étudiant ou personne en reconversion | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 | — | 600 h |
 
 ## Suivre sa progression {#suivi}
 

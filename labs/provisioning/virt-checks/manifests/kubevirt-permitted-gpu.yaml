@@ -1,0 +1,20 @@
+# KubeVirt custom resource that permits one GPU model for PCI passthrough to virtual machines.
+# Structure from the KubeVirt user guide (Host Devices Assignment) and the NVIDIA GPU Operator page
+# "GPU Operator with KubeVirt" (A10 example), both read 2026-10-25. Replace pciVendorSelector (lspci -nn)
+# and resourceName (node .status.allocatable) with the values of your GPUs. Parsed, never applied here.
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  configuration:
+    developerConfiguration:
+      featureGates:
+        - GPU
+        - DisableMDEVConfiguration
+    permittedHostDevices:
+      pciHostDevices:
+        - pciVendorSelector: "10DE:2236"
+          resourceName: nvidia.com/GA102GL_A10
+          externalResourceProvider: true  # the GPU Operator sandbox device plugin allocates the device

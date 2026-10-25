@@ -145,7 +145,7 @@ Le niveau visé est celui d'un ingénieur confirmé d'infrastructure de calcul. 
 | Observabilité et fiabilité | 3 | | | [14](../courses/observability/index.html) |
 | FinOps, capacité, achats | 3 | | | [15](../courses/finops-capacity/index.html) |
 | Plateforme, sécurité, leadership | 3 | | | [16](../courses/platform-leadership/index.html) |
-| Langages de systèmes (Go, Rust, C++) | 2 | | | aucun module dédié : C++ et Python dans les modules 3 et 4, Go dans les ressources |
+| Langages de systèmes (Go, Rust, C++) | 2 | | | pas de module dédié : C dans le module [3](../courses/parallel-programming/index.html), CUDA C++ dans le module [4](../courses/gpu-programming/index.html) ; [ressources Go et Rust](../resources/index.html), extensions des projets [1](../projects/homelab-slurm/index.html#extensions), [4](../projects/multi-provider-scheduler/index.html#extensions) et [5](../projects/gpu-observability/index.html#extensions) |
 
 ### Lire le résultat {#lecture}
 

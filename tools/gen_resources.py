@@ -45,7 +45,7 @@ def main():
     out = [f"""---
 title: "Ressources"
 subtitle: "{len(ok)} ressources vérifiées : lectures, cours ouverts, certifications, documentations, communautés"
-description: "Références à lire pour devenir compute infrastructure engineer, chacune vérifiée à sa source le 22 octobre 2026."
+description: "Références à lire pour devenir compute infrastructure engineer, chacune vérifiée à sa source entre le 22 et le 25 octobre 2026."
 numbered: true
 ---
 
@@ -62,7 +62,7 @@ Les certifications évoluent vite : relisez la page officielle de l'examen avant
     if ko:
         out.append("\n## Pistes non vérifiées {#a-verifier}\n\nCes ressources ont été repérées mais leur page n'a pas pu être relue avec succès : traitez-les comme des pistes à confirmer.\n")
         out += [line(i) for i in ko]
-    out.append("\n## Sources et portée {#sources}\n\n**Documenté.** Ressources relues à leur source le 22 octobre 2026 (outil `tools/verify_quotes.py`).\n\n**Recommandé.** Le tri par type et le commentaire d'usage sont des choix de ce parcours.\n\n**À vérifier.** Les offres de formation et de certification changent : confirmez sur la page officielle.\n")
+    out.append("\n## Sources et portée {#sources}\n\n**Documenté.** Ressources relues à leur source entre le 22 et le 25 octobre 2026 (outil `tools/verify_quotes.py`).\n\n**Recommandé.** Le tri par type et le commentaire d'usage sont des choix de ce parcours.\n\n**À vérifier.** Les offres de formation et de certification changent : confirmez sur la page officielle.\n")
     (ROOT / "resources").mkdir(exist_ok=True)
     (ROOT / "resources" / "index.md").write_text("\n".join(out), encoding="utf-8")
     print(f"resources/index.md: {len(ok)} verified, {len(ko)} to check")

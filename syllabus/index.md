@@ -135,9 +135,9 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 
 **Projets qui s'appuient sur ce module :** Projet 2.
 
-### Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h) {#gpu-programming}
+### Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 32,5 h) {#gpu-programming}
 
-Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.
+Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton, Nsight et les accélérateurs d'autres fabricants (AMD, TPU, Trainium, Ascend).
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
 
@@ -149,6 +149,7 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 -   Expliquer la coalescence, l'occupation et la divergence de warps sur un exemple chiffré
 -   Lire un profil Nsight/PyTorch Profiler et nommer le goulot (calcul, mémoire, lancement)
 -   Expliquer ce qu'apporte FlashAttention, la fusion de noyaux et la précision mixte
+-   Transposer le vocabulaire GPU vers AMD/ROCm, les TPU, Trainium et Ascend, et dresser une liste de contrôle de portabilité
 
 **Chapitres :**
 
@@ -160,6 +161,7 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 6.  Précision numérique : FP32, TF32, BF16, FP16, FP8 ; sommes, mise à l'échelle de perte, déterminisme
 7.  Profiler : Nsight Systems/Compute, PyTorch Profiler, métriques clés, lecture d'une trace
 8.  Techniques d'accélération : fusion, FlashAttention, torch.compile, CUDA graphs, quand elles paient
+9.  Au-delà de NVIDIA : AMD, TPU, Trainium et accélérateurs chinois
 
 **Labs :**
 
@@ -220,9 +222,9 @@ L'ordonnanceur de référence du calcul scientifique et de l'entraînement : par
 
 **Projets qui s'appuient sur ce module :** Projet 1, Projet 6.
 
-### Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 24 h) {#provisioning}
+### Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 26,5 h) {#provisioning}
 
-Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.
+Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette, supervision matérielle et virtualisation multi-locataire.
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
 
@@ -234,6 +236,7 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 -   Écrire des rôles Ansible idempotents et des modules Terraform pour un cluster
 -   Valider un nœud GPU avant mise en service (pilote, DCGM diag, burn-in, bande passante)
 -   Concevoir une procédure de remplacement et de mise à jour sans interrompre la production
+-   Lire les groupes IOMMU d'un hôte, choisir un mode de partage du GPU selon l'isolation vendue, et recetter un nœud virtualisé
 
 **Chapitres :**
 
@@ -245,6 +248,7 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 6.  Recette et burn-in : DCGM diagnostics, gpu-burn, nccl-tests, tests mémoire/PCIe/NVLink
 7.  Mises à jour et pannes : rolling updates, firmware, gestion des RMA, traçabilité
 8.  BMC, Redfish, IPMI et supervision hors bande
+9.  Virtualisation et multi-locataire : KVM, VFIO, MIG, vGPU et KubeVirt
 
 **Labs :**
 
@@ -430,9 +434,9 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Projets qui s'appuient sur ce module :** Projet 3, Projet 6.
 
-### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h) {#ray-rl-infra}
+### Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 30,5 h) {#ray-rl-infra}
 
-Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.
+Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré, et l'inférence qui produit les rollouts (moteurs, cache KV, batching continu).
 
 **Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).
 
@@ -444,6 +448,7 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 -   Concevoir une architecture acteur-apprenant avec synchronisation de politique et tampon de rejeu
 -   Dimensionner collecte de données et apprentissage pour une boucle en ligne (débit, latence, obsolescence)
 -   Orchestrer des traitements de données CPU/GPU hétérogènes sur une même flotte
+-   Dimensionner le cache KV d'un moteur d'inférence à partir du `config.json` d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement
 
 **Chapitres :**
 
@@ -455,12 +460,14 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 6.  Boucles en ligne et temps réel : latence de bout en bout, files, contre-pression, déséquilibre acteurs/apprenants
 7.  Hétérogénéité : GPU d'entraînement, GPU d'évaluation moins chers, CPU ; placement et files par type
 8.  Ray sur Kubernetes (KubeRay) et sur Slurm ; observabilité d'une application Ray ; alternatives (Dask, Spark, Kubeflow)
+9.  Inférence pour les rollouts et pour le service : moteurs, cache KV et batching continu
 
 **Labs :**
 
 -   **Acteurs et tâches Ray** (bac à sable, sans GPU) : Pipeline de traitement avec tâches/acteurs Ray local ; mesure d'efficacité, tolérance à la mort d'un acteur ; tests.
 -   **Boucle acteur-apprenant minimale** (bac à sable, sans GPU) : Environnement jouet, N acteurs, un apprenant, tampon de rejeu, synchronisation de politique ; mesurer obsolescence et débit ; courbe d'apprentissage reproductible.
 -   **Modèle de débit d'une boucle en ligne** (bac à sable, sans GPU) : Modèle analytique + simulation événementielle : combien d'acteurs pour saturer un apprenant ; tests de cohérence modèle/simulation.
+-   **Batching statique, batching continu et cache KV paginé** (bac à sable, sans GPU) : Simulateur déterministe en Python standard : comparer batching statique et continu, et la réservation du cache KV à son allocation par pages ; tests sur des propriétés structurelles.
 
 **Sources à lire et faits à vérifier :**
 
@@ -640,9 +647,9 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 
 ## Phase 5 — Production et leadership {#phase5}
 
-### Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 28 h) {#platform-leadership}
+### Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 30,5 h) {#platform-leadership}
 
-Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.
+Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, plan de contrôle à haute disponibilité, livraison continue, fiabilité de production, direction d'équipe et entretien.
 
 **Prérequis :** module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).
 
@@ -654,6 +661,7 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 -   Définir un modèle de sécurité multi-locataire (identité, isolation, secrets, audit) pour des GPU partagés
 -   Instituer des pratiques de production : astreinte, gestion d'incident, post-mortems, revues de conception
 -   Préparer un entretien de compute infrastructure lead : conception, dépannage, leadership, négociation
+-   Calculer la probabilité qu'un cluster de consensus garde son quorum selon le nombre et le placement de ses membres, conduire un exercice de restauration mesuré et livrer un changement d'infrastructure par canaris
 
 **Chapitres :**
 
@@ -665,12 +673,14 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 6.  Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication
 7.  Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible
 8.  Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser
+9.  Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue
 
 **Labs :**
 
 -   **Écrire une RFC de plateforme** (bac à sable, sans GPU) : Modèle de RFC/ADR avec grille de relecture automatisée (sections, décisions, alternatives, risques, métriques) et script de lint ; exemple complet fourni.
 -   **Post-mortem d'un incident simulé** (bac à sable, sans GPU) : Jeu de logs et chronologie synthétiques (clairement étiquetés) ; trouver la cause, écrire le post-mortem ; corrigé détaillé.
 -   **Exercice de conception : de 8 à 256 GPU** (bac à sable, sans GPU) : Énoncé d'entretien de conception avec grille d'évaluation et réponses de niveaux différents ; calculateur de dimensionnement testé.
+-   **Quorum d'un cluster de consensus et exercice de restauration** (bac à sable, sans GPU) : Probabilité de garder le quorum (formule binomiale contre Monte-Carlo à graine fixe) et exercice de sauvegarde et restauration d'etcd avec etcdctl et etcdutl.
 
 **Sources à lire et faits à vérifier :**
 

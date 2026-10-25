@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Ressources — Mastering Compute Infrastructure</title>
-<meta name="description" content="Références à lire pour devenir compute infrastructure engineer, chacune vérifiée à sa source le 22 octobre 2026.">
+<meta name="description" content="Références à lire pour devenir compute infrastructure engineer, chacune vérifiée à sa source entre le 22 et le 25 octobre 2026.">
 <meta name="color-scheme" content="light dark">
 <script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 
@@ -34,18 +34,19 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="crumb"><a href="../index.html">Accueil</a></p>
 <header id="title-block-header">
 <h1 class="title">Ressources</h1>
-<p class="subtitle">47 ressources vérifiées : lectures, cours ouverts, certifications, documentations, communautés</p>
+<p class="subtitle">58 ressources vérifiées : lectures, cours ouverts, certifications, documentations, communautés</p>
 </header>
 <section id="sommaire" class="unnumbered toc-inline">
 <h2 class="unnumbered">Sommaire</h2>
 <ul>
 <li><a href="#usage">1. Comment utiliser cette page</a></li>
 <li><a href="#paper">2. Articles et rapports à lire</a></li>
-<li><a href="#course">3. Cours ouverts</a></li>
-<li><a href="#docs">4. Documentations de référence</a></li>
-<li><a href="#community">5. Communautés et conférences</a></li>
-<li><a href="#tool">6. Outils</a></li>
-<li><a href="#sources">7. Sources et portée</a></li>
+<li><a href="#book">3. Livres</a></li>
+<li><a href="#course">4. Cours ouverts</a></li>
+<li><a href="#docs">5. Documentations de référence</a></li>
+<li><a href="#community">6. Communautés et conférences</a></li>
+<li><a href="#tool">7. Outils</a></li>
+<li><a href="#sources">8. Sources et portée</a></li>
 </ul>
 </section>
 <h2 id="usage">1. Comment utiliser cette page</h2>
@@ -55,7 +56,9 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <ul>
 <li><strong><a href="https://www.cs.fsu.edu/~xyuan/paper/09jpdc.pdf">Bandwidth optimal all-reduce algorithms for clusters of workstations</a></strong> · Patarasuk, Yuan, 2009 (avancé, gratuit). Borne inférieure de données émises par un all-reduce et algorithme en anneau optimal.</li>
 <li><strong><a href="https://arxiv.org/abs/2403.07648">Characterization of Large Language Model Development in the Datacenter</a></strong> · Hu et al., 2024 (avancé, gratuit). Caractérisation de charges de développement de LLM et de leurs pannes dans un centre de calcul.</li>
+<li><strong><a href="https://arxiv.org/abs/2401.09670">DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving</a></strong> · Zhong et al., 2024 (avancé, gratuit). Séparer prefill et décodage sur des GPU différents, chaque phase dimensionnée selon son objectif de latence (TTFT, TPOT) : la référence de la désagrégation en inférence.</li>
 <li><strong><a href="https://arxiv.org/abs/2104.04473">Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM</a></strong> · Narayanan et al., 2021 (avancé, gratuit). Combinaison des parallélismes de données, tensoriel et pipeline à grande échelle.</li>
+<li><strong><a href="https://arxiv.org/abs/2309.06180">Efficient Memory Management for Large Language Model Serving with PagedAttention</a></strong> · Kwon et al., 2023 (avancé, gratuit). Le papier de vLLM : gérer le cache KV par pages, comme la mémoire virtuelle d'un système d'exploitation, pour moins fragmenter la mémoire et grouper plus de requêtes.</li>
 <li><strong><a href="https://arxiv.org/abs/2205.14135">FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness</a></strong> · Dao et al., 2022 (avancé, gratuit). Un exemple de noyau gouverné par le trafic mémoire : lien direct avec le roofline.</li>
 <li><strong><a href="https://arxiv.org/abs/2402.15627">MegaScale: Scaling Large Language Model Training to More Than 10,000 GPUs</a></strong> · Jiang et al., 2024 (avancé, gratuit). Retour d'expérience de ByteDance sur l'efficacité, le diagnostic et la tolérance aux pannes à plus de 10 000 GPU.</li>
 <li><strong><a href="https://arxiv.org/abs/2204.02311">PaLM: Scaling Language Modeling with Pathways</a></strong> · Chowdhery et al., 2022 (avancé, gratuit). Définition du MFU (section 4.1) et formule des FLOP par token (annexe B).</li>
@@ -63,11 +66,17 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://arxiv.org/abs/2410.21680">Revisiting Reliability in Large-Scale Machine Learning Research Clusters</a></strong> · Kokolis et al., 2024 (avancé, gratuit). Étude de la fiabilité de grands clusters de recherche en apprentissage automatique.</li>
 <li><strong><a href="https://arxiv.org/abs/2407.21783">The Llama 3 Herd of Models</a></strong> · Dubey et al., 2024 (avancé, gratuit). Tableau 4 (MFU par configuration de parallélisme) et section 3.3.4 sur la fiabilité à 16 000 GPU.</li>
 <li><strong><a href="https://arxiv.org/abs/1910.02054">ZeRO: Memory Optimizations Toward Training Trillion Parameter Models</a></strong> · Rajbhandari et al., 2020 (avancé, gratuit). Section 3.1 : 16 octets par paramètre en précision mixte avec Adam ; partition des états d'optimiseur.</li>
+<li><strong><a href="https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro">In Search of an Understandable Consensus Algorithm</a></strong> · Diego Ongaro, John Ousterhout, 2014 (intermédiaire, gratuit). Raft (USENIX ATC 2014) : élection d'un leader, réplication du journal, sûreté et changement de membres, à lire avant de raisonner sur la disponibilité d'un plan de contrôle.</li>
 <li><strong><a href="https://arxiv.org/abs/1712.05889">Ray: A Distributed Framework for Emerging AI Applications</a></strong> · Moritz et al., 2017 (intermédiaire, gratuit). Modèle de tâches et d'acteurs de Ray, base du module 11.</li>
 <li><strong><a href="https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.html">Roofline: An Insightful Visual Performance Model for Floating-Point Programs and Multicore Architectures</a></strong> · Williams, Waterman, Patterson, 2008 (intermédiaire, gratuit). Version rapport technique de l'article du modèle roofline (version CACM 2009 : doi:10.1145/1498765.1498785).</li>
 <li><strong><a href="https://evaluate.inf.usi.ch/node/366">Scientific Benchmarking of Parallel Computing Systems: Twelve Ways to Tell the Masses when Reporting Performance Results</a></strong> · Hoefler, Belli, 2015 (intermédiaire, gratuit). Règles de mesure et de rapport statistique ; base des chapitres 3 et 8 du module 2.</li>
 </ul>
-<h2 id="course">3. Cours ouverts</h2>
+<h2 id="book">3. Livres</h2>
+<ul>
+<li><strong><a href="https://book.kubebuilder.io/">The Kubebuilder Book</a></strong> · Projet Kubebuilder (kubernetes-sigs), 2026 (intermédiaire, gratuit). Écrire sa propre API Kubernetes et son contrôleur en Go : boucle de réconciliation, finalizers, versionnage d'API, réconciliation périodique.</li>
+<li><strong><a href="https://doc.rust-lang.org/book/">The Rust Programming Language</a></strong> · Steve Klabnik, Carol Nichols, Chris Krycho, avec des contributions de la communauté Rust, 2026 (introduction, gratuit). Le livre officiel du langage, gratuit en ligne ; la version consultée le 2026-10-25 suppose Rust 1.97.0 (sorti le 2026-07-09) et l'édition 2024.</li>
+</ul>
+<h2 id="course">4. Cours ouverts</h2>
 <ul>
 <li><strong><a href="https://www.cs.cmu.edu/~418/">CMU 15-418/15-618 Parallel Computer Architecture and Programming</a></strong> · 2026 (intermédiaire, coût non précisé). Public syllabus and assignments for parallel hardware and programming (multicore, GPUs, 'C-like' parallel languages); sister course of Stanford CS149 with a systems-programming flavour.</li>
 <li><strong><a href="https://mlsyscourse.org/">CMU 15-442/15-642 Machine Learning Systems</a></strong> · 2026 (intermédiaire, coût non précisé). Public schedule covering data/ZeRO, model and pipeline parallelism, GPU architecture and CUDA, GEMM on modern GPUs and LLM serving: the most direct ML-systems syllabus found for a training/inference platform engineer.</li>
@@ -78,22 +87,27 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://cs149.stanford.edu/">Stanford CS149 Parallel Computing</a></strong> · 2026 (intermédiaire, coût non précisé). Best public syllabus found for the hardware/software boundary of parallel systems: multicore and SIMD, work scheduling, CUDA, DNN execution on GPUs, datacenter-scale AI serving, coherence and synchronisation, with programming assignments including CUDA kernels and a Trainium2 kernel.</li>
 <li><strong><a href="https://cs336.stanford.edu/">Stanford CS336 Language Modeling from Scratch</a></strong> · 2026 (intermédiaire, coût non précisé). A public course where one assignment is explicitly systems: profile, write a Triton FlashAttention2 kernel and build a memory-efficient distributed training loop, which is the user-level view of what a GPU-cluster platform must serve.</li>
 <li><strong><a href="https://sites.google.com/lbl.gov/cs267-spr2025">UC Berkeley CS267 Applications of Parallel Computers</a></strong> · 2026 (intermédiaire, coût non précisé). Long-running reference course (Demmel, Yelick and others) on programming parallel computers for science and engineering; public site with syllabus; part of the Berkeley Designated Emphasis in Computational Science and Engineering.</li>
+<li><strong><a href="https://go.dev/tour/">A Tour of Go</a></strong> · Projet Go (go.dev), 2026 (introduction, gratuit). Introduction interactive en quatre sections avec exercices : un premier pas pour lire puis écrire le Go des contrôleurs, agents de nœud et outils de flotte.</li>
 </ul>
-<h2 id="docs">4. Documentations de référence</h2>
+<h2 id="docs">5. Documentations de référence</h2>
 <ul>
 <li><strong><a href="https://slurm.schedmd.com/topology.html">Slurm — Topology Guide</a></strong> · SchedMD, 2026 (avancé, gratuit). topology/tree, topology/block et --switches (module 5, chapitre 5).</li>
+<li><strong><a href="https://rocm.docs.amd.com/en/latest/">AMD ROCm documentation</a></strong> · AMD, 2026 (intermédiaire, gratuit). La pile GPU d'AMD (HIP, RCCL, AMD SMI, ROCm Validation Suite, partitionnement GPU) ; la version affichée le 2026-10-25 est ROCm 10.1.0.</li>
+<li><strong><a href="https://go.dev/doc/effective_go">Effective Go</a></strong> · Projet Go (go.dev), 2009 (intermédiaire, gratuit). Les idiomes du langage, dont la section Concurrency (goroutines, canaux) ; écrit pour la sortie de Go en 2009 et non mis à jour, il ne couvre ni les génériques ni les modules.</li>
+<li><strong><a href="https://kubevirt.io/user-guide/">KubeVirt user guide</a></strong> · Projet KubeVirt, 2026 (intermédiaire, gratuit). Des machines virtuelles gérées comme des objets Kubernetes ; les pages Host Devices Assignment et Mediated devices and virtual GPUs traitent du passage d'un GPU à une VM.</li>
 <li><strong><a href="https://slurm.schedmd.com/fair_tree.html">Slurm — Fair Tree Fairshare Algorithm</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). Algorithme d'équité par défaut depuis 19.05 (module 5, chapitre 3).</li>
 <li><strong><a href="https://slurm.schedmd.com/gres.html">Slurm — Generic Resource (GRES) Scheduling</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). Déclaration des GPU et gestion de MIG (module 5, chapitre 5).</li>
 <li><strong><a href="https://slurm.schedmd.com/priority_multifactor.html">Slurm — Multifactor Priority Plugin</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). La formule de priorité d'un job et ses poids (module 5, chapitre 3).</li>
 <li><strong><a href="https://slurm.schedmd.com/preempt.html">Slurm — Preemption</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). PreemptType, PreemptMode, GraceTime (module 5, chapitre 4).</li>
 <li><strong><a href="https://slurm.schedmd.com/prolog_epilog.html">Slurm — Prolog and Epilog Guide</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). Sémantique des prologues et épilogues et conséquences de leurs échecs (module 5, chapitre 7).</li>
 <li><strong><a href="https://slurm.schedmd.com/cgroup.conf.html">Slurm — cgroup.conf</a></strong> · SchedMD, 2026 (intermédiaire, gratuit). ConstrainDevices, ConstrainCores, ConstrainRAMSpace.</li>
+<li><strong><a href="https://prometheus.io/docs/instrumenting/writing_exporters/">Writing exporters</a></strong> · Projet Prometheus, 2026 (intermédiaire, gratuit). Les règles de conception d'un exporter, quel que soit le langage : un collecteur qui lit l'état à chaque scrape, le nommage des métriques, les métriques sur le scrape lui-même.</li>
 <li><strong><a href="https://raw.githubusercontent.com/NVIDIA/nccl-tests/master/doc/PERFORMANCE.md">nccl-tests — performance metrics</a></strong> · NVIDIA, 2026 (intermédiaire, gratuit). Définitions de algbw et busbw, base du module 7.</li>
 <li><strong><a href="https://slurm.schedmd.com/sbatch.html">Slurm — sbatch</a></strong> · SchedMD, 2026 (introduction, gratuit). Toutes les options de soumission, dont --signal, --requeue et --gpus-per-node.</li>
 <li><strong><a href="https://slurm.schedmd.com/sinfo.html">Slurm — sinfo</a></strong> · SchedMD, 2026 (introduction, gratuit). États de nœuds et sorties de sinfo.</li>
 <li><strong><a href="https://slurm.schedmd.com/squeue.html">Slurm — squeue</a></strong> · SchedMD, 2026 (introduction, gratuit). Codes de raison d'attente d'un job.</li>
 </ul>
-<h2 id="community">5. Communautés et conférences</h2>
+<h2 id="community">6. Communautés et conférences</h2>
 <ul>
 <li><strong><a href="https://m.tech.china.com/article/20260521/202605211874155.html">ASC 世界大学生超级计算机竞赛</a></strong> · 2026 (intermédiaire, coût non précisé). Teams build and tune a small cluster under a 5000 W power cap and run HPL, HPCG and scientific/AI applications: the closest hands-on training to cluster operations available to students of these universities; PKU, Tsinghua and ZJU teams appear in the 2026 results.</li>
 <li><strong><a href="https://romeo.univ-reims.fr/16_cc-fr.html">CC-FR</a></strong> · 2026 (intermédiaire, coût non précisé). Point d'entrée français du programme EuroCC : formations de prise en main d'un supercalculateur et formations avancées (containers, LLM) sur le réseau des mésocentres MesoNET, utile pour pratiquer sur de vraies machines hors université.</li>
@@ -107,14 +121,15 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong><a href="https://english.nudt.edu.cn/nav/About/AtAGlance/d9d8150917a24b18ba2089168ab6f43f.htm">国防科技大学</a></strong> · 2026 (intermédiaire, coût non précisé). NUDT is the builder of the TianHe supercomputers; its computer college is therefore a major HPC training site in China, but no NUDT graduate curriculum page was reachable (see blocked_sources), so no programme entry is given.</li>
 <li><strong><a href="https://www.tsinghua.edu.cn/info/1175/111550.htm">清华大学学生超算团队</a></strong> · 2026 (intermédiaire, coût non précisé). Student team organised with the HPC group of the CS department (coached by HPC faculty and supported by HPC-institute PhD students); wins in the three international student cluster competitions, including cluster power control, a core cluster-operations skill.</li>
 </ul>
-<h2 id="tool">6. Outils</h2>
+<h2 id="tool">7. Outils</h2>
 <ul>
 <li><strong><a href="https://raw.githubusercontent.com/mej/nhc/master/README.md">LBNL Node Health Check (NHC)</a></strong> · Lawrence Berkeley National Laboratory, 2026 (intermédiaire, gratuit). Implémentation de référence d'un contrôle de santé de nœud pour Slurm et d'autres ordonnanceurs.</li>
+<li><strong><a href="https://pkg.go.dev/github.com/prometheus/client_golang/prometheus">Prometheus Go client library (package prometheus)</a></strong> · Projet Prometheus, 2026 (intermédiaire, gratuit). La bibliothèque d'instrumentation Go de Prometheus (registre, collecteurs, exposition HTTP par promhttp) : la base d'un exporter de nœud ou de GPU écrit en Go.</li>
 <li><strong><a href="https://raw.githubusercontent.com/NVIDIA/pyxis/master/README.md">Pyxis — Slurm container plugin</a></strong> · NVIDIA, 2026 (intermédiaire, gratuit). Plugin SPANK qui ajoute --container-image à srun.</li>
 <li><strong><a href="https://www.nvidia.com/en-us/software/slinky/">Slinky — Slurm and Kubernetes</a></strong> · SchedMD / NVIDIA, 2026 (intermédiaire, gratuit). Projet ouvert pour exécuter des clusters Slurm dans Kubernetes (module 5, chapitre 8 ; module 12).</li>
 </ul>
-<h2 id="sources">7. Sources et portée</h2>
-<p><strong>Documenté.</strong> Ressources relues à leur source le 22 octobre 2026 (outil <code>tools/verify_quotes.py</code>).</p>
+<h2 id="sources">8. Sources et portée</h2>
+<p><strong>Documenté.</strong> Ressources relues à leur source entre le 22 et le 25 octobre 2026 (outil <code>tools/verify_quotes.py</code>).</p>
 <p><strong>Recommandé.</strong> Le tri par type et le commentaire d'usage sont des choix de ce parcours.</p>
 <p><strong>À vérifier.</strong> Les offres de formation et de certification changent : confirmez sur la page officielle.</p>
 <nav class="pager" aria-label="Navigation">

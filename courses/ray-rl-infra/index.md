@@ -1,29 +1,30 @@
 ---
 title: "Ray, apprentissage par renforcement et boucles en ligne"
-subtitle: "Module 11 · Phase 3 · 28 h"
-description: "Les charges qui ne sont pas un simple gros job : tâches et acteurs Ray, boucles acteurs-apprenant, obsolescence des politiques, contre-pression et pools hétérogènes."
+subtitle: "Module 11 · Phase 3 · 30,5 h"
+description: "Les charges qui ne sont pas un simple gros job : tâches et acteurs Ray, boucles acteurs-apprenant, obsolescence des politiques, contre-pression, pools hétérogènes et moteurs d'inférence."
 module:
   id: ray-rl-infra
   number: 11
   phase: 3
-  hours: 28
+  hours: 30.5
   level: 3
 prerequisites: [distributed-training]
 status: core
 badges:
   - {label: "Cœur du parcours", class: core}
-  - {label: "Labs vérifiés sur Ray 2.59 local (CPU)", class: verified}
+  - {label: "Labs vérifiés en local sur CPU (Ray 2.59)", class: verified}
 labs:
   - {id: ray-actors, kind: sandbox}
   - {id: actor-learner-toy, kind: sandbox}
   - {id: throughput-model, kind: sandbox}
+  - {id: batching-sim, kind: sandbox}
 ---
 
 ## Introduction et vue d'ensemble {#intro}
 
 **La question à laquelle ce module répond :** que faire quand la charge n'est pas un job SPMD (*single program, multiple data* : tous les processus exécutent le même programme sur des données différentes) de 512 GPU, mais une application faite de rôles différents qui s'échangent des données en continu ? Un entraînement par renforcement d'un modèle de langage en est l'exemple type : des moteurs de génération produisent des trajectoires (ici, des réponses complètes), un évaluateur les note, un apprenant met à jour la politique (le modèle qui choisit les actions), puis les nouveaux poids retournent aux générateurs.
 
-Les modules précédents traitaient un job : le placer, le faire survivre, le mesurer. Ici, la charge est un petit système distribué avec ses files, ses états et ses pannes partielles. Le module vous donne trois outils : le modèle de programmation de Ray (tâches, acteurs, objets), un vocabulaire d'architectures acteur-apprenant, et un modèle de files d'attente qui permet de dimensionner la boucle avant de la construire.
+Les modules précédents traitaient un job : le placer, le faire survivre, le mesurer. Ici, la charge est un petit système distribué avec ses files, ses états et ses pannes partielles. Le module vous donne quatre outils : le modèle de programmation de Ray (tâches, acteurs, objets), un vocabulaire d'architectures acteur-apprenant, un modèle de files d'attente qui permet de dimensionner la boucle avant de la construire, et le dimensionnement d'un moteur d'inférence (cache KV, batching, goodput), celui qui produit les rollouts et sert aussi les utilisateurs.
 
 Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de versions de la politique une trajectoire a-t-elle de retard quand l'apprenant l'utilise ? Elle relie des choix d'infrastructure (nombre d'acteurs, taille de file, fréquence de synchronisation) à la qualité de l'apprentissage.
 
@@ -35,11 +36,11 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 
 | Clé | Valeur |
 |---|---|
-| Volume | 28 h, dont 10 h de lecture, 13 h de labs et 5 h d'exercices |
+| Volume | 30,5 h, dont 11,25 h de lecture, 13,5 h de labs et 5,75 h d'exercices |
 | Niveau d'entrée | 3 : à l'aise avec l'entraînement distribué (module 9). Les points de reprise du module 10 sont un plus : le chapitre 2 en rappelle l'essentiel |
 | Prérequis | [Module 9 — Entraînement distribué](../distributed-training/index.html) |
 | Pour qui | Cœur : les charges de post-entraînement par renforcement sont l'une des raisons d'être d'une plateforme GPU. |
-| Livrable | un modèle de débit validé par simulation, une boucle acteur-apprenant mesurée sur des acteurs Ray réels et une note de dimensionnement d'une boucle en ligne |
+| Livrable | un modèle de débit validé par simulation, une boucle acteur-apprenant mesurée sur des acteurs Ray réels, une note de dimensionnement d'une boucle en ligne et le dimensionnement d'un moteur d'inférence (cache KV, goodput sous SLO) |
 | Environnement | un portable CPU suffit (4 cœurs ; 8 Go recommandés, les labs ont été exécutés avec 16 Go) ; aucun GPU. Les GPU sont des **ressources logiques** simulées, et c'est écrit chaque fois |
 | Projets liés | [Projet 6 — RFC et prototype d'une plateforme de calcul](../../projects/capstone-rfc/index.html) (ce module figure parmi ses modules requis) |
 
@@ -52,6 +53,7 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 -   Concevoir une boucle acteur-apprenant, mesurer son obsolescence et son débit, et choisir entre file, crédits et tampon de rejeu (chapitres 5 et 6).
 -   Dimensionner le nombre d'acteurs, la taille d'une file et le coût par million de pas, avec des pools de types différents (chapitres 6 et 7).
 -   Choisir et exploiter Ray sur Kubernetes ou Slurm, l'observer, et le comparer à Dask, Spark ou Kubeflow Trainer (chapitre 8).
+-   Dimensionner le cache KV d'un moteur d'inférence à partir du `config.json` d'un modèle, expliquer batching continu, PagedAttention et cache de préfixes, et choisir les signaux d'autoscaling et les priorités d'une flotte partagée entre service, rollouts et entraînement (chapitre 9).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
@@ -63,7 +65,7 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 
 ### Plan de séances {#seances}
 
-Dix séances, soit 28 h : cinq de 3 h, deux de 3,5 h, une de 2,5 h, une de 2 h et une de 1,5 h. Chaque séance tient dans sa durée avec ses chapitres, sa part de lab et ses exercices, et un exercice n'apparaît qu'après la séance qui enseigne ce qu'il demande. Le niveau ne diminue jamais.
+Onze séances, soit 30,5 h : cinq de 3 h, deux de 3,5 h, deux de 2,5 h, une de 2 h et une de 1,5 h. Chaque séance tient dans sa durée avec ses chapitres, sa part de lab et ses exercices, et un exercice n'apparaît qu'après la séance qui enseigne ce qu'il demande. Le niveau ne diminue jamais.
 
 | Séance | Durée | Niveau | Contenu | Pratique |
 |---|---|---|---|---|
@@ -76,7 +78,8 @@ Dix séances, soit 28 h : cinq de 3 h, deux de 3,5 h, une de 2,5 h, une de 2 h e
 | 7 | 3 h | 3 | Lab 11.3 partie 2 | Simulation à événements discrets et tests (2 h) ; Ex. 7, 8 (1 h) |
 | 8 | 3 h | 3 | ch. 7 Hétérogénéité (0,75 h) | Lab 11.2 partie B, acteurs Ray réels (1,75 h) ; Ex. 9 (0,5 h) |
 | 9 | 3.5 h | 3 | ch. 8 Kubernetes, Slurm, observabilité, alternatives (0,75 h) | Lab 11.2 partie B, suite (2,25 h) ; Ex. 10 (0,5 h) |
-| 10 | 1.5 h | 3 | Checkpoint de sortie (0,5 h) | Ex. 11, 12 (1 h) |
+| 10 | 2.5 h | 3 | ch. 9 Inférence : moteurs, cache KV, batching continu (1,25 h) | Lab 11.4, batching simulé (0,5 h) ; Ex. 13, 14 (0,75 h) |
+| 11 | 1.5 h | 3 | Checkpoint de sortie (0,5 h) | Ex. 11, 12 (1 h) |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -817,15 +820,154 @@ Points clés — chapitre 8
 -   Dask, Spark, Kubeflow Trainer couvrent d'autres formes de charge ; choisissez par la forme de la charge.
 :::
 
+## 9. Inférence pour les rollouts et pour le service : moteurs, cache KV et batching continu {#ch9}
+
+Le chapitre 4 a laissé une boîte fermée : l'étage de génération tourne « sur un moteur d'inférence », et c'est souvent lui qui domine l'itération. Ce chapitre ouvre cette boîte. Le même moteur sert aussi les utilisateurs d'un modèle en production, et les deux charges se disputent les GPU de l'entraînement. Plusieurs offres du [relevé du parcours](../../market/index.html) citent des moteurs de service comme vLLM ou SGLang, et l'une demande d'optimiser les accès au stockage du prefill, du decode et du cache de préfixes : ce chapitre en donne les mécanismes.
+
+### 9.1. Deux charges d'inférence sur une même flotte
+
+Une génération de rollouts et un service en ligne exécutent le même calcul : un modèle produit des jetons un à un à partir d'un prompt. OpenRLHF génère ses rollouts avec vLLM (section 4.4), un moteur conçu pour le service de modèles. Les deux charges ne poursuivent pourtant pas le même objectif, et l'infrastructure doit savoir laquelle elle sert.
+
+| | Rollouts de post-entraînement | Service en ligne |
+|---|---|---|
+| Objectif | débit en jetons par seconde, pour le lot entier | latence de chaque requête, sous un objectif de service (SLO) |
+| Arrivées | par vagues, au rythme de l'apprenant | continues, variables dans la journée |
+| Poids | changent à chaque version (section 5.4) | fixes entre deux déploiements |
+| Ce qui coûte | la génération la plus lente, en mode synchrone (section 5.1) | la queue de la distribution des latences |
+| Préemption | possible, au prix du travail en vol | à éviter : elle dégrade le SLO |
+
+Les deux charges partagent souvent les GPU de l'entraînement. Le [mode veille de vLLM](https://docs.vllm.ai/en/latest/features/sleep_mode.html), « especially useful for RLHF, training, or cost-saving scenarios » selon sa documentation, libère la mémoire sans arrêter le serveur. Au niveau 1, les poids partent en mémoire CPU et le cache KV est effacé ; au niveau 2, les deux sont effacés, ce qui convient à une mise à jour des poids. C'est un moyen de partager les mêmes GPU entre entraînement et génération (note de la section 4.4).
+
+### 9.2. Ce que fait un moteur : prefill, decode et cache KV
+
+Une requête passe par deux phases, que l'article de PagedAttention ([Kwon et al., SOSP 2023](https://arxiv.org/abs/2309.06180)) décrit. Le **prefill** (*prompt phase*) traite tout le prompt d'un coup, par des produits de matrices qui exploitent bien le parallélisme du GPU ; pour un prompt qui n'est pas court, il tend à être limité par le calcul (DistServe, section 9.5). Il produit le premier jeton. Le **decode** produit ensuite un jeton par itération et par séquence ; il sous-utilise le calcul et devient limité par la bande passante mémoire. C'est l'exemple 4.4 du [module 2](../perf-models/index.html#ch4), à l'échelle d'un modèle entier.
+
+::: def
+[Cache KV]{.tag} Pour produire le jeton suivant, l'attention a besoin des clés et des valeurs de tous les jetons précédents, dans chaque couche. Le moteur les garde en mémoire GPU au lieu de les recalculer : c'est le **cache KV** (*key-value cache*). Il grandit d'une entrée par jeton et par séquence, et il est libéré à la fin de la requête, sauf si le moteur le garde pour un préfixe commun (section 9.4).
+:::
+
+Deux moteurs ouverts sont cités par des offres du relevé : vLLM, né de l'article de PagedAttention, et SGLang ([Zheng et al., 2023](https://arxiv.org/abs/2312.07104)), dont le moteur d'exécution introduit RadixAttention pour réutiliser le cache KV. Les mécanismes qui suivent leur sont communs ; les options citées sont celles de vLLM.
+
+### 9.3. Dimensionner le cache KV
+
+::: thm
+[Taille du cache KV par jeton]{.tag} Pour un modèle à $n_L$ couches et $n_{KV}$ têtes de clés-valeurs de dimension $d_h$, stockées sur $e$ octets par élément :
+
+$$k = 2 \times n_L \times n_{KV} \times d_h \times e \quad \text{octets par jeton}$$
+
+Le facteur 2 compte la clé et la valeur. L'article de PagedAttention fait le calcul pour OPT-13B, sans têtes groupées : 2 × 5 120 (taille cachée) × 40 couches × 2 octets, soit 800 Ko par jeton. Avec l'attention à têtes groupées (*grouped-query attention*, GQA), seules les têtes de clés-valeurs comptent, pas les têtes de requête.
+:::
+
+::: ex
+[Exemple 9.1 — Combien de séquences de 8 192 jetons sur un GPU de 80 Go ?]{.tag} Le [`config.json` de Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json) (lu le 2026-10-25) donne 36 couches, 8 têtes de clés-valeurs, `head_dim` = 128 et `torch_dtype` = `bfloat16`. D'où $k = 2 \times 36 \times 8 \times 128 \times 2 = 147\,456$ octets (144 Kio) par jeton, et 1,208 Go par séquence de 8 192 jetons. Les dimensions du même fichier donnent 8,19 milliards de paramètres (la [fiche du modèle](https://huggingface.co/Qwen/Qwen3-8B) annonce 8,2), soit $W = 16{,}38$ Go de poids en BF16.
+
+Sur un GPU de 80 Go (H100 SXM, module 2), vLLM n'utilise par défaut que 92 % de la mémoire (`--gpu-memory-utilization`, [documentation](https://docs.vllm.ai/en/latest/configuration/engine_args.html) lue le 2026-10-25). Restent $0{,}92 \times 80 - 16{,}38 = 57{,}22$ Go, soit 47 séquences de 8 192 jetons ; 52 si l'on prenait toute la mémoire. C'est un plafond : les activations et les graphes CUDA en prennent une part, que seul un démarrage réel mesure.
+
+Deux leviers changent ce nombre. Sans GQA (32 têtes de clés-valeurs au lieu de 8), le cache passerait à 576 Kio par jeton, soit 11 séquences. Un cache en FP8 (`--kv-cache-dtype fp8`) divise $e$ par deux : 94 séquences, si la qualité des réponses le permet.
+:::
+
+::: key
+[Le cache KV fixe la taille du lot]{.tag} Le nombre de séquences simultanées, donc le débit du decode, est borné par la mémoire laissée au cache KV après les poids, bien avant le calcul. Dimensionnez un moteur en jetons de cache disponibles, puis divisez par la longueur des contextes.
+:::
+
+À chaque itération de decode, le GPU relit tous les poids et le cache KV de tout le lot, pour un jeton par séquence. Le coût fixe des poids se partage entre les séquences, d'où l'intérêt d'en faire tourner beaucoup à la fois. Le modèle roofline borne la durée d'une itération, pour $B$ séquences de contexte $L$ et une bande passante mémoire $\beta$ :
+
+$$t_{\text{step}} \ge \frac{W + B\,L\,k}{\beta}$$
+
+::: ex
+[Exemple 9.2 — Ce que coûte une itération de decode]{.tag} Avec les valeurs de l'exemple 9.1, des contextes de 8 192 jetons et $\beta = 3{,}35$ To/s (H100 SXM), la borne donne :
+
+| Séquences $B$ | Itération (borne basse) | Jetons/s (borne haute) | Part du cache KV dans les octets lus |
+|---|---|---|---|
+| 1 | 5,25 ms | 190 | 7 % |
+| 16 | 10,66 ms | 1 501 | 54 % |
+| 47 | 21,84 ms | 2 152 | 78 % |
+
+Passer de 1 à 47 séquences multiplie le débit par 11,3 et la durée d'une itération par 4,2 : chaque séquence reçoit ses jetons plus lentement. Lot plein, le cache KV domine les octets lus : GQA et FP8 accélèrent aussi le decode. Un moteur réel reste en deçà de ces bornes ; mesurez-le.
+:::
+
+### 9.4. PagedAttention, batching continu et cache de préfixes
+
+Les systèmes antérieurs réservaient pour chaque requête une zone contiguë à la longueur maximale possible. Les auteurs de PagedAttention mesurent que seuls 20,4 % à 38,2 % de la mémoire du cache KV y stockaient réellement des jetons ; le reste était perdu en réservation et en fragmentation. PagedAttention découpe le cache en **blocs** d'un nombre fixe de jetons, alloués à la demande et non contigus, comme les pages de la mémoire virtuelle. vLLM annonce un gaspillage presque nul et un débit multiplié par 2 à 4 à latence égale.
+
+Le second mécanisme vient d'Orca ([Yu et al., OSDI 2022](https://www.usenix.org/conference/osdi22/presentation/yu)) : l'ordonnancement **par itération** (*iteration-level scheduling*), aujourd'hui appelé **batching continu**. L'ordonnanceur lance le modèle une itération à la fois ; une séquence terminée libère sa place aussitôt, et une requête en attente la prend. Orca rapporte un débit multiplié par 36,9 à latence égale face à FasterTransformer, sur GPT-3 175B. Pour des rollouts de longueurs très variables, c'est décisif : en lot statique, chaque place attend la plus longue réponse du lot.
+
+::: ex
+[Exemple 9.3 — Lot statique, lot continu, cache paginé]{.tag} Le lab 11.4 simule un moteur sur 64 requêtes arrivées ensemble, comme une vague de rollouts : réponses de 18 à 982 jetons (médiane 95), 32 places, cache de 16 384 jetons. Une itération dure la borne de l'exemple 9.2, plus le prefill des prompts admis. Le temps est **simulé**. Sortie de `sim.py` :
+
+~~~text
+    policy       kv  steps  time s   tok/s slot use mean run max run preempt
+    static  reserve   4967   25.00     627     0.10      3.2      12       0
+continuous  reserve   1889    9.95    1575     0.26      8.3      12       0
+continuous    paged   1114    6.16    2544     0.44     14.1      32       0
+~~~
+
+À mémoire réservée égale, le lot continu produit les mêmes 15 679 jetons en 2,63 fois moins d'itérations : seule l'admission a changé. Réserver le prompt plus 1 024 jetons plafonne le lot à 12 séquences ; le cache paginé en admet 32 et divise encore les itérations par 1,70. Le temps baisse un peu moins (2,51 puis 1,62) : une itération plus chargée lit plus de cache KV.
+:::
+
+Le troisième mécanisme évite de refaire un calcul déjà fait. Le **cache de préfixes** garde les blocs KV d'une requête terminée et les réutilise quand une nouvelle requête commence par les mêmes jetons. vLLM identifie chaque bloc par un hachage de ses jetons et de tous ceux qui le précèdent, et évince les blocs inutilisés selon une politique LRU ([conception du cache de préfixes](https://docs.vllm.ai/en/latest/design/prefix_caching.html)) ; SGLang range les préfixes dans un arbre radix. Le prefill d'un long préfixe commun est évité, et avec lui une partie du délai avant le premier jeton.
+
+::: ex
+[Exemple 9.4 — Le préfixe partagé d'un groupe GRPO]{.tag} GRPO produit $G$ réponses par prompt (section 4.3). Avec $G = 8$, un prompt de 1 000 jetons et des réponses de 2 000 jetons en moyenne (hypothèses d'exemple), sur Qwen3-8B : sans partage, le moteur fait le prefill de 8 000 jetons ; avec, de 1 000, soit 87,5 % de moins. Le cache KV du groupe passe de 3,54 Go à 2,51 Go (29 % de moins), car le prompt n'est stocké qu'une fois.
+
+PagedAttention partage déjà le prompt entre les échantillons d'une même requête ; le cache de préfixes étend ce partage à des requêtes distinctes, si elles arrivent sur le **même** moteur. Un répartiteur qui disperse les huit requêtes d'un groupe annule le gain : routez par prompt.
+:::
+
+### 9.5. Mesurer un service : TTFT, TPOT et goodput
+
+::: def
+[TTFT, TPOT et goodput]{.tag} Le **TTFT** (*time to first token*) est le délai entre l'arrivée d'une requête et son premier jeton : attente plus prefill. Le **TPOT** (*time per output token*) est la durée moyenne entre deux jetons suivants : le rythme du decode. Une réponse de $n$ jetons dure environ $\text{TTFT} + (n-1)\,\text{TPOT}$. Le **goodput** par GPU, au sens de DistServe ([Zhong et al., OSDI 2024](https://arxiv.org/abs/2401.09670)), est le plus grand taux de requêtes qu'un GPU sert en tenant à la fois les objectifs de TTFT et de TPOT pour une part fixée des requêtes, par exemple 90 %.
+:::
+
+Au [module 15](../finops-capacity/index.html#ch2), *goodput* compte les GPU-heures qui produisent un progrès conservé : précisez toujours lequel. Le débit seul ne suffit pas, car un moteur saturé produit beaucoup de jetons par seconde avec des TTFT de plusieurs secondes. vLLM exporte pour Prometheus ([métriques](https://docs.vllm.ai/en/latest/usage/metrics.html), lues le 2026-10-25) les histogrammes `vllm:time_to_first_token_seconds` et `vllm:inter_token_latency_seconds`, et les jauges `vllm:num_requests_waiting` et `vllm:kv_cache_usage_perc`.
+
+::: ex
+[Exemple 9.5 — Le goodput d'un GPU simulé]{.tag} `sim.py --sweep` (lab 11.4) envoie 400 requêtes à des taux croissants, arrivées de Poisson, et compte la part qui tient un TTFT de 500 ms et un TPOT de 20 ms. Extrait, en temps simulé :
+
+~~~text
+ rate     policy       kv   tok/s  TTFT p95  TPOT p95  attain
+   16 continuous    paged    3202      60ms     6.5ms    0.99
+   20 continuous    paged    3518    1809ms     9.2ms    0.40
+   24 continuous    paged    3569    4108ms     8.8ms    0.25
+~~~
+
+À 16 requêtes par seconde, 99 % des requêtes tiennent l'objectif. À 20, le débit monte encore de 10 %, mais 40 % seulement le tiennent : la file fait exploser le TTFT. Au pas de 4 du balayage, le goodput est donc de 16 requêtes par seconde, et non 24, où le débit est le plus haut. En lot statique, aucun taux n'atteint 90 % : le TTFT p95 dépasse 29 s dès 4 requêtes par seconde. Le TPOT p95 passe de 6,5 à 9,2 ms : plus de séquences et de prefills par itération ralentissent tout le monde.
+:::
+
+Ce dernier effet est l'**interférence** entre prefill et decode. DistServe la supprime en plaçant les deux phases sur des GPU différents, chacune avec son parallélisme, et annonce 7,4 fois plus de requêtes servies ou un SLO 12,6 fois plus serré, pour plus de 90 % des requêtes dans les contraintes. vLLM propose cette séparation comme fonction [expérimentale](https://docs.vllm.ai/en/latest/features/disagg_prefill.html), qui « DOES NOT improve throughput » : elle règle séparément TTFT et latence entre jetons. SGLang la [documente](https://docs.sglang.io/docs/advanced_features/pd_disaggregation) aussi. L'autre réponse, active par défaut dans vLLM lorsque c'est possible ([guide d'optimisation](https://docs.vllm.ai/en/latest/configuration/optimization.html)), est le prefill découpé (*chunked prefill*) en morceaux mêlés au decode.
+
+La séparation a un prix : le cache KV du prompt passe du GPU de prefill au GPU de decode. Pour Qwen3-8B et un prompt de 2 000 jetons, c'est 295 Mo : 11,8 ms sur un lien de 25 Go/s (hypothèse de la section 5.4), et sur le NVLink du H100, dont les 900 Go/s sont une bande passante totale ([blog Hopper](https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/)), 0,33 ms à ce débit et 0,66 ms à sa moitié. À 10 requêtes par seconde, ce transfert demande 2,95 Go/s : c'est aussi un problème de réseau ([module 7](../networking/index.html)).
+
+### 9.6. Autoscaling et cohabitation avec l'entraînement
+
+Un service suit sa charge en ajoutant des réplicas, et le signal compte. L'utilisation du GPU est trompeuse : elle mesure la présence de noyaux ([module 14](../observability/index.html#ch2)), et un moteur en batching continu en exécute en permanence, avec 2 séquences comme avec 40. Les bons signaux sont la file et la mémoire : `vllm:num_requests_waiting` et `vllm:kv_cache_usage_perc`. Ray Serve règle son autoscaler sur le nombre moyen de requêtes en cours par réplica (`target_ongoing_requests`, [guide d'autoscaling](https://docs.ray.io/en/latest/serve/autoscaling-guide.html)) ; sur Kubernetes, un HPA peut lire une [métrique personnalisée](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).
+
+Un réplica neuf lit ses poids, puis initialise le moteur. Pour 16,4 Go, la lecture prend 16,4 s à 1 Go/s et 3,3 s à 5 Go/s (débits d'hypothèse, à mesurer sur votre stockage, [module 8](../storage/index.html)) ; l'initialisation s'y ajoute, et ce cours ne l'a pas mesurée. Gardez assez de réplicas chauds pour absorber la croissance du trafic pendant un démarrage (exercice 14). Le mode veille raccourcit ce délai, car le moteur reste initialisé.
+
+Sur une flotte partagée, les coûts de préemption diffèrent. Le service a un SLO : il passe en premier. Un rollout préempté perd sa génération en cours ; avec des crédits (section 6.4), le nombre de trajectoires en vol borne cette perte. Un apprenant préempté repart de son dernier point de reprise ([module 10](../fault-tolerance/index.html)). Kueue exprime ces priorités entre charges ([module 12, chapitre 3](../kubernetes-gpu/index.html#ch3)) ; dans un moteur, vLLM sert par arrivée ou par priorité (`--scheduling-policy`) et compte dans `vllm:num_preemptions` les séquences évincées faute de cache KV.
+
+Enfin, le coût par jeton suit l'utilisation (exemple 1.2 du [module 15](../finops-capacity/index.html#ch1)) : les réplicas chauds gardés pour le SLO coûtent sans servir. Prêter leurs GPU aux rollouts pendant les creux, par le mode veille ou par une préemption au bord d'une trajectoire, récupère une partie de ce coût ; l'exercice 14 chiffre cet arbitrage.
+
+::: recap
+Points clés — chapitre 9
+
+-   Rollouts et service partagent les moteurs : les premiers visent le débit, le second une latence sous SLO.
+-   Prefill souvent limité par le calcul ; decode, un jeton par itération, limité par la bande passante mémoire.
+-   Cache KV : $k = 2\,n_L\,n_{KV}\,d_h\,e$ octets par jeton ; la mémoire laissée après les poids borne le lot.
+-   PagedAttention pagine le cache, le batching continu remplit chaque place libérée, le cache de préfixes évite un prefill commun.
+-   Mesurez TTFT, TPOT et goodput sous SLO ; séparer prefill et decode coûte un transfert de cache KV.
+-   Autoscalez sur la file et le cache KV, comptez le démarrage à froid, préemptez d'abord ce qui coûte le moins à refaire.
+:::
+
 ## Labs {#labs}
 
-Les trois labs tournent sur un **Ray réel, local, sans GPU** (testé avec Ray 2.59.0, Python 3.13, le 2026-10-25). Installation préalable :
+Les labs 11.1 à 11.3 tournent sur un **Ray réel, local, sans GPU** (testé avec Ray 2.59.0, Python 3.13, le 2026-10-25) ; le lab 11.4 est un simulateur en Python standard, sans Ray. Installation préalable :
 
 ~~~bash
 python3 -m pip install "ray[data,train]" numpy pytest torch pyyaml
 ~~~
 
-Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » sont des ressources logiques ; les durées de simulateur et de mise à jour du lab 11.2 sont des `sleep` ; le temps du lab 11.3 est simulé. Ce qu'ils exécutent pour de vrai : le scheduler, les acteurs, le magasin d'objets, les pannes (processus tués), Ray Data et Ray Train. Les fichiers `deploy/` du lab 11.1 (Slurm, KubeRay) sont **lintés seulement** : ils demandent un cluster.
+Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » sont des ressources logiques ; les durées de simulateur et de mise à jour du lab 11.2 sont des `sleep` ; le temps des labs 11.3 et 11.4 est simulé, et le moteur d'inférence du lab 11.4 aussi. Ce qu'ils exécutent pour de vrai : le scheduler, les acteurs, le magasin d'objets, les pannes (processus tués), Ray Data et Ray Train. Les fichiers `deploy/` du lab 11.1 (Slurm, KubeRay) sont **lintés seulement** : ils demandent un cluster.
 
 ### Lab 11.1 — Tâches, acteurs, ressources et pannes {#lab-11-1}
 
@@ -876,6 +1018,23 @@ Ce que les labs **simulent** est dit dans chaque README et ici : les « GPU » s
 **Critère de réussite.** `verify.sh` affiche « OK throughput-model » : 20 tests passent, l'écart de débit entre modèle et simulation reste sous 6 % sur toute la table de `report.py` (0,7 % sur la VM de l'auteur), et la loi de Little tient à moins de 3 % sur la file. Le résultat ne dépend d'aucune horloge : il est identique d'une machine à l'autre.
 
 **Pour aller plus loin.** Ajoutez un mode « rejeu » à la simulation ; modélisez deux pools d'acteurs de vitesses différentes ; réinjectez dans le modèle les paramètres mesurés au lab 11.2 (temps de rollout par acteur, durée de mise à jour du pilote) et comparez le débit prédit au débit mesuré.
+:::
+
+### Lab 11.4 — Batching statique, batching continu et cache KV paginé {#lab-11-4}
+
+::: lab
+
+**Objectif.** Mesurer, sur un moteur d'inférence simulé, ce que changent le batching continu et la pagination du cache KV, puis tirer un goodput sous SLO d'un balayage de charge. **Durée.** 0,5 h dans la séance 10, davantage pour « Pour aller plus loin ». **Prérequis matériels.** Un portable CPU et Python 3 (bibliothèque standard seule) ; ni GPU, ni Ray. Le temps est simulé.
+
+1.  Lisez `labs/ray-rl-infra/batching-sim/sim.py` : repérez la durée d'une itération (la borne de l'exemple 9.2), la règle d'admission des deux politiques et la préemption du mode `paged`.
+2.  Lancez `PYTHON=... bash verify.sh` (quelques secondes) : 11 tests passent, puis s'affichent la table de l'exemple 9.3 et le balayage de l'exemple 9.5.
+3.  Refaites à la main le calcul de `test_static_steps_equal_the_sum_of_batch_maxima` : pourquoi les itérations d'un lot statique sont-elles la somme des maxima de chaque lot ?
+4.  Faites varier `--kv-budget` (8192, 32768, 65536) : à partir de quelle taille la pagination ne change-t-elle plus rien, et pourquoi des préemptions apparaissent-elles à 8 192 ?
+5.  Resserrez le SLO avec `python3 sim.py --sweep --tpot-slo-ms 6` : quelle contrainte devient active, et que devient le goodput ?
+
+**Critère de réussite.** `verify.sh` s'arrête avec le code 0 et affiche « OK batching-sim » : 11 tests passent, et le lot continu termine les 64 requêtes en moins d'itérations que le lot statique (1 889 contre 4 967 à mémoire réservée égale). La sortie est identique d'une exécution et d'une machine à l'autre.
+
+**Pour aller plus loin.** Ajoutez un cache de préfixes : des groupes de $G$ requêtes qui partagent leur prompt, routées au hasard ou par prompt entre deux moteurs, et comparez les jetons de prefill. Ajoutez un prefill découpé et mesurez son effet sur le TPOT p95.
 :::
 
 ## Exercices {#ex}
@@ -1054,6 +1213,57 @@ Choix : $N = 104$ et $K = 192 = 3\,b$. $K = 128$ perdrait 8 %. Le prix est 17 ac
 Recommandation : si le travail peut glisser de quelques minutes (un jeu de rollouts à produire avant une échéance lointaine), (B) économise le plus. Si la boucle doit repartir sans délai (apprenant qui attend les données), (C) paie 4,8 nœuds-heures de plus pour réduire de 25 % le creux. Toute la décision tient à la valeur de ces 3 minutes. Tous ces chiffres sont des hypothèses d'exemple ; seul `idleTimeoutSeconds` à 60 s est un défaut documenté de KubeRay.
 :::
 
+::: exo
+[Exercice 13 · ★★ — Servir Qwen3-32B : un GPU ou deux ?]{.tag} Le [`config.json` de Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json) (lu le 2026-10-25) donne 64 couches, 8 têtes de clés-valeurs, `head_dim` = 128, en `bfloat16` ; on en compte 32,76 milliards de paramètres (la fiche annonce 32,8). Le modèle est servi par vLLM sur des GPU de 80 Go, avec la fraction de mémoire par défaut de 92 %.
+
+(a) Calculez le cache KV par jeton et par séquence de 8 192 jetons. (b) Combien de séquences de 8 192 jetons tiennent sur un seul GPU ? (c) Et en parallélisme tensoriel sur deux GPU, chacun portant la moitié des poids et la moitié des têtes de clés-valeurs ? Comparez par GPU.
+
+(d) Un post-entraînement GRPO envoie des groupes de $G = 16$ réponses, sur des prompts de 1 500 jetons, pour des réponses de 3 000 jetons en moyenne. Combien de groupes complets tiennent dans le cache de la configuration (c), avec et sans partage du préfixe ? Quelle part du prefill le partage évite-t-il ?
+:::
+
+::: sol
+(a) $k = 2 \times 64 \times 8 \times 128 \times 2 = 262\,144$ octets, soit 256 Kio par jeton, et 2,147 Go par séquence de 8 192 jetons. Les poids pèsent $2 \times 32{,}76 = 65{,}5$ Go en BF16.
+
+(b) Il reste $0{,}92 \times 80 - 65{,}5 = 8{,}08$ Go pour le cache, soit 3,76 séquences : **3**.
+
+(c) Chaque GPU porte 32,76 Go de poids et garde $73{,}6 - 32{,}76 = 40{,}84$ Go de cache, à 128 Kio par jeton (4 têtes sur 8). La paire tient $40{,}84 \cdot 10^9 / (8\,192 \times 131\,072) = 38{,}03$, soit **38** séquences : 19 par GPU contre 3, soit 6,3 fois plus. Le second GPU ne double pas seulement la mémoire : il libère la place des poids.
+
+(d) Sans partage, un groupe occupe $16 \times 4\,500 \times 256$ Kio = 18,87 Go ; avec partage, $(1\,500 + 16 \times 3\,000) \times 256$ Kio = 12,98 Go, soit 31,25 % de moins. Dans les $2 \times 40{,}84 = 81{,}7$ Go de la paire tiennent **4** groupes sans partage et **6** avec. Le prefill passe de 24 000 à 1 500 jetons par groupe : 93,8 % évités, si les 16 requêtes arrivent sur ce moteur.
+
+Ces calculs ignorent les activations, les graphes CUDA et les tampons de communication : un démarrage réel donne le vrai nombre de blocs.
+:::
+
+::: exo
+[Exercice 14 · ★★★ — Une flotte partagée entre service et rollouts]{.tag} Une flotte de 32 GPU sert Qwen3-8B en ligne, un réplica par GPU, et prête le reste à des rollouts. Supposez qu'une mesure réelle confirme le goodput du lab 11.4 : 16 requêtes par seconde par réplica sous le SLO (TTFT de 500 ms, TPOT de 20 ms). Le trafic, **fictif**, vaut 200 requêtes par seconde pendant 10 h et 40 le reste de la journée ; au matin, il monte de 30 requêtes par seconde chaque minute.
+
+Un réplica neuf lit 16,38 Go de poids à 2 Go/s, puis s'initialise en 60 s (hypothèse). Un matin, avant que l'autoscaler ne réagisse, le tableau de bord (fictif) d'un réplica affiche :
+
+~~~text
+vllm:num_requests_running                     47
+vllm:num_requests_waiting                     38
+vllm:kv_cache_usage_perc                      0.99
+rate(vllm:num_preemptions)                    3.1 /s
+p95 of vllm:time_to_first_token_seconds       2.4 s
+DCGM_FI_DEV_GPU_UTIL                          100
+~~~
+
+(a) Diagnostiquez. Quel signal d'autoscaling aurait dû agir ? Augmenter `--max-num-seqs` aide-t-il ? (b) Combien de réplicas chauds faut-il au-delà du besoin pour absorber la montée pendant un démarrage ? Combien de réplicas au pic et au creux ? (c) Combien de GPU-heures par jour reviennent aux rollouts, contre une allocation fixe dimensionnée pour le pic ? (d) Quand le service reprend des GPU, quel ordre de préemption proposez-vous, et comment bornez-vous le travail perdu ?
+:::
+
+::: sol
+(a) Le cache KV est plein (0,99) avec 47 séquences, le plafond de l'exemple 9.1 pour des contextes longs. 38 requêtes attendent, et le moteur évince des séquences qu'il devra recalculer : le TTFT p95 de 2,4 s vaut 4,8 fois l'objectif. L'utilisation du GPU à 100 % ne dit rien, elle y était déjà à faible charge (section 9.6). Le signal utile est `vllm:num_requests_waiting` durablement positif, ou `vllm:kv_cache_usage_perc` au-dessus d'un seuil (0,9 par exemple).
+
+Augmenter `--max-num-seqs` n'aide pas : la limite est le cache, pas le nombre de places, et l'on ajouterait des préemptions ; le [guide d'optimisation](https://docs.vllm.ai/en/latest/configuration/optimization.html) conseille au contraire de le réduire contre les préemptions. Les leviers sont un cache FP8 (deux fois plus de séquences, si la qualité tient) et, surtout, un réplica de plus.
+
+(b) Un démarrage dure $16{,}38/2 + 60 = 68{,}2$ s. Le trafic gagne pendant ce temps $0{,}5 \times 68{,}2 = 34{,}1$ requêtes par seconde, soit 2,1 réplicas : il en faut **3** chauds en réserve. Au pic, $200/16 = 12{,}5$ donne 13 réplicas, plus 3 : **16**. Au creux, $40/16 = 2{,}5$ donne 3, plus 3 : **6**.
+
+(c) Avec l'autoscaling, les rollouts reçoivent $(32 - 16) \times 10 + (32 - 6) \times 14 = 160 + 364 = 524$ GPU-heures par jour. Une allocation fixe pour le pic n'a pas besoin de réserve de démarrage : 13 réplicas, qui laissent $19 \times 24 = 456$ GPU-heures aux rollouts. L'autoscaling leur en rend 68 de plus par jour (15 %). Les GPU du service servent alors en moyenne 66 % de leur goodput, contre 51 % en allocation fixe ; l'écart avec 100 % est le prix des réplicas chauds et des creux.
+
+(d) Le service passe en premier : il a un SLO, et Kueue l'exprime par une priorité de charge (module 12). Viennent ensuite les rollouts, qu'on préempte au bord d'une trajectoire. Avec, par hypothèse, $K = 64$ crédits et des trajectoires de 120 s par réplica (comme à l'exercice 11), une préemption perd au plus 64 trajectoires, soit 2,1 heures-réplica de génération. L'apprenant passe en dernier : préempté, il repart d'un point de reprise et bloque toute la boucle (module 10).
+
+Mettez le moteur de rollouts en veille de niveau 1 plutôt que de le détruire. À son retour, il recopie ses poids depuis la mémoire CPU, 0,66 s à 25 Go/s (hypothèse), au lieu des 68 s d'un démarrage à froid. Toutes les valeurs de trafic et de durée sont des hypothèses d'exemple.
+:::
+
 ## Checkpoint de sortie {#exit}
 
 Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.
@@ -1064,6 +1274,7 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 -   **Je peux mesurer l'obsolescence d'une boucle.** Preuve : la table A du lab 11.2, identique à chaque exécution, et la partie B comparée à $N/b$.
 -   **Je peux dimensionner acteurs et crédits.** Preuve : `plan.py` et `sweep.py` sur votre boucle, avec l'arbitrage entre obsolescence et débit chiffré (exercices 6, 8, 11).
 -   **Je peux comparer deux types de nœuds au coût par million de pas.** Preuve : l'exercice 9 refait avec les prix lus sur une page fournisseur le jour même.
+-   **Je peux dimensionner un moteur d'inférence.** Preuve : le cache KV d'un modèle dont vous avez lu le `config.json`, le nombre de séquences qui tiennent sur un GPU, et un goodput sous SLO tiré du lab 11.4 (exemples 9.1 et 9.5, exercices 13 et 14).
 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
@@ -1080,28 +1291,29 @@ Trois questions d'entretien à traiter en deux minutes chacune.
 -   Shao et al. *DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models*. 2024. [arXiv:2402.03300](https://arxiv.org/abs/2402.03300) : section 4.1, GRPO (chapitre 4).
 -   Hu et al. *OpenRLHF: An Easy-to-use, Scalable and High-performance RLHF Framework*. 2024 (version 6, octobre 2025, relue). [arXiv:2405.11143](https://arxiv.org/abs/2405.11143) : rôles de GPU et génération asynchrone, sections 1 et 3.1 (chapitres 4 et 5).
 -   Sheng et al. *HybridFlow: A Flexible and Efficient RLHF Framework*. 2024. [arXiv:2409.19256](https://arxiv.org/abs/2409.19256) : contrôleur unique et multiple, redécoupage des poids (chapitre 4).
--   Ray. [*Resources*](https://docs.ray.io/en/latest/ray-core/scheduling/resources.html), [*Placement Groups*](https://docs.ray.io/en/latest/ray-core/scheduling/placement-group.html), [*Memory management*](https://docs.ray.io/en/latest/ray-core/scheduling/memory-management.html) et [*Out-of-memory prevention*](https://docs.ray.io/en/latest/ray-core/scheduling/ray-oom-prevention.html) : ressources logiques, groupes, magasin d'objets, moniteur de mémoire (chapitres 1 et 2).
--   Ray. [*Task fault tolerance*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/tasks.html), [*Actor fault tolerance*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/actors.html), [*Object fault tolerance*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/objects.html) et [*GCS fault tolerance*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/gcs.html) : réglages et limites de reprise (chapitre 2).
+-   Ray. [*Resources*](https://docs.ray.io/en/latest/ray-core/scheduling/resources.html), [*Placement Groups*](https://docs.ray.io/en/latest/ray-core/scheduling/placement-group.html), [*Memory management*](https://docs.ray.io/en/latest/ray-core/scheduling/memory-management.html), [*Out-of-memory prevention*](https://docs.ray.io/en/latest/ray-core/scheduling/ray-oom-prevention.html), puis [*Task*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/tasks.html), [*Actor*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/actors.html), [*Object*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/objects.html) et [*GCS fault tolerance*](https://docs.ray.io/en/latest/ray-core/fault_tolerance/gcs.html) : ressources logiques, groupes, magasin d'objets, moniteur de mémoire, réglages et limites de reprise (chapitres 1 et 2).
 -   Ray. [*Ray Data internals*](https://docs.ray.io/en/latest/data/data-internals.html), [*Dataset.map_batches*](https://docs.ray.io/en/latest/data/api/doc/ray.data.Dataset.map_batches.html) et [*Ray Train fault tolerance*](https://docs.ray.io/en/latest/train/user-guides/fault-tolerance.html) : blocs, flux, contre-pression, reprises (chapitre 3).
--   Ray. [*KubeRay autoscaling*](https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/configuring-autoscaling.html) et [*README de KubeRay*](https://raw.githubusercontent.com/ray-project/kuberay/master/README.md) : `RayCluster`, `RayJob`, `RayService`, autoscaler (chapitre 8).
--   Ray. [*Deploying on Slurm*](https://docs.ray.io/en/latest/cluster/vms/user-guides/community/slurm.html) : `ray symmetric-run` (chapitre 8).
+-   Ray. [*KubeRay autoscaling*](https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/configuring-autoscaling.html), [*README de KubeRay*](https://raw.githubusercontent.com/ray-project/kuberay/master/README.md) et [*Deploying on Slurm*](https://docs.ray.io/en/latest/cluster/vms/user-guides/community/slurm.html) : `RayCluster`, `RayJob`, `RayService`, autoscaler, `ray symmetric-run` (chapitre 8).
 -   Ray. [*Metrics*](https://docs.ray.io/en/latest/cluster/metrics.html), [*System metrics*](https://docs.ray.io/en/latest/ray-observability/reference/system-metrics.html) et [*State API et CLI*](https://docs.ray.io/en/latest/ray-observability/user-guides/cli-sdk.html) : export Prometheus, noms de métriques (chapitre 8).
 -   [*Dask*](https://docs.dask.org/en/stable/), [*Apache Spark*](https://spark.apache.org/docs/latest/) et [*Kubeflow Trainer*](https://www.kubeflow.org/docs/components/trainer/overview/) : pages d'accueil des alternatives (chapitre 8).
+-   Kwon, Li, Zhuang, Sheng, Zheng, Yu, Gonzalez, Zhang, Stoica. *Efficient Memory Management for Large Language Model Serving with PagedAttention*. SOSP 2023. [arXiv:2309.06180](https://arxiv.org/abs/2309.06180) : sections 2 et 3 pour prefill, decode et taille du cache KV, section 4 pour les blocs (chapitre 9).
+-   Zhong, Liu, Chen, Hu, Zhu, Liu, Jin, Zhang. *DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving*. OSDI 2024. [arXiv:2401.09670](https://arxiv.org/abs/2401.09670) : TTFT, TPOT, goodput par GPU et séparation des phases (chapitre 9).
+-   vLLM. [*Engine arguments*](https://docs.vllm.ai/en/latest/configuration/engine_args.html), [*Metrics*](https://docs.vllm.ai/en/latest/usage/metrics.html), [*Automatic prefix caching*](https://docs.vllm.ai/en/latest/design/prefix_caching.html), [*Disaggregated prefilling*](https://docs.vllm.ai/en/latest/features/disagg_prefill.html), [*Optimization and Tuning*](https://docs.vllm.ai/en/latest/configuration/optimization.html) et [*Sleep mode*](https://docs.vllm.ai/en/latest/features/sleep_mode.html), lus le 2026-10-25 : réglages par défaut, métriques et mécanismes actuels (chapitre 9).
 
 ## Sources et portée {#sources}
 
 ### Documenté {#documente}
 
-Les faits attribués à la documentation de Ray (ressources logiques et valeurs par défaut, placement groups, magasin d'objets à 30 %, moniteur de mémoire à 95 % et 250 ms, réglages de reprise, GCS, blocs de 1 à 128 Mio, flux et contre-pression, `FailureConfig`, autoscaler et `idleTimeoutSeconds` à 60 s, `ray symmetric-run` depuis Ray 2.49, export Prometheus) ont été relus sur docs.ray.io le 25 octobre 2026. Les faits sur Ray (tableau 2, 1,8 million de tâches par seconde), IMPALA (file de trajectoires, « policy-lag », V-trace, 250 000 images par seconde), PPO, GRPO, OpenRLHF, HybridFlow et Ape-X ont été relus dans le texte des articles. Les descriptions de Dask, Spark et Kubeflow Trainer viennent de leurs pages d'accueil. Tous les comportements décrits comme observés ont été reproduits avec Ray 2.59.0 dans le bac à sable ; les sorties citées en viennent. Les tableaux du modèle viennent de `report.py`, `plan.py`, `sweep.py` et `make_log.py`, relancés avant la dernière édition.
+Les faits attribués à la documentation de Ray (ressources logiques et valeurs par défaut, placement groups, magasin d'objets à 30 %, moniteur de mémoire à 95 % et 250 ms, réglages de reprise, GCS, blocs de 1 à 128 Mio, flux et contre-pression, `FailureConfig`, autoscaler et `idleTimeoutSeconds` à 60 s, `ray symmetric-run` depuis Ray 2.49, export Prometheus) ont été relus sur docs.ray.io le 25 octobre 2026. Les faits sur Ray (tableau 2, 1,8 million de tâches par seconde), IMPALA (file de trajectoires, « policy-lag », V-trace, 250 000 images par seconde), PPO, GRPO, OpenRLHF, HybridFlow et Ape-X ont été relus dans le texte des articles. Les descriptions de Dask, Spark et Kubeflow Trainer viennent de leurs pages d'accueil. Tous les comportements décrits comme observés ont été reproduits avec Ray 2.59.0 dans le bac à sable ; les sorties citées en viennent. Les tableaux du modèle viennent de `report.py`, `plan.py`, `sweep.py` et `make_log.py`, relancés avant la dernière édition. Pour le chapitre 9, ont été relus le 25 octobre 2026 : les résumés et le texte de PagedAttention (phases, 800 Ko par jeton pour OPT-13B, 20,4 % à 38,2 %, gain de 2 à 4), de DistServe (TTFT, TPOT, goodput, 7,4 et 12,6), d'Orca (36,9) et de SGLang ; la documentation stable de vLLM (version 0.32.0 sur PyPI ce jour-là : 0,92 par défaut, FP8, prefill découpé, politiques d'ordonnancement, métriques, cache de préfixes, séparation expérimentale, mode veille) ; le guide d'autoscaling de Ray Serve ; la page HPA de Kubernetes ; les `config.json` et fiches de Qwen3-8B et Qwen3-32B ; la page produit du H100 (80 Go, 3,35 To/s, NVLink 900 Go/s) et le blog Hopper (900 Go/s de bande passante totale) ; les offres du relevé qui citent vLLM, SGLang ou le cache de préfixes (`data/jobs/`). Les sorties du lab 11.4 viennent de `sim.py`, exécuté deux fois à l'identique.
 
 ### Recommandé {#recommande}
 
-L'ordre des chapitres, le critère « forme de la charge » du chapitre 1 et du tableau 8.4, la règle de crédits $K \approx 1{,}6\,N^\star$ de l'exemple 6.2 (valable pour cette boucle seulement), les trois jauges de boucle du chapitre 8 et le calcul du coût par million de pas sont des choix de ce parcours, pas des règles de Ray. Les prix, les unités de coût, les durées de démarrage et les tailles de boucle des exemples et des exercices sont **fictifs** : lisez la page de prix de votre fournisseur le jour même.
+L'ordre des chapitres, le critère « forme de la charge » du chapitre 1 et du tableau 8.4, la règle de crédits $K \approx 1{,}6\,N^\star$ de l'exemple 6.2 (valable pour cette boucle seulement), les trois jauges de boucle du chapitre 8 et le calcul du coût par million de pas sont des choix de ce parcours, pas des règles de Ray. Les prix, les unités de coût, les durées de démarrage et les tailles de boucle des exemples et des exercices sont **fictifs** : lisez la page de prix de votre fournisseur le jour même. Au chapitre 9, le routage par prompt, le choix des signaux d'autoscaling, la règle des réplicas chauds, l'ordre de préemption (service, rollouts, apprenant) et le modèle d'itération du lab 11.4 sont des choix de ce parcours ; le trafic et les débits de stockage y sont des hypothèses.
 
 ### À vérifier {#a-verifier}
 
-(1) L'article de Ray décrit un ordonnanceur global et des ordonnanceurs locaux (2018) ; l'architecture actuelle a évolué et sa description n'a pas été relue pour ce module. (2) La documentation affiche, sur Ray 2.59, un bandeau annonçant l'authentification par jeton activée par défaut pour les clusters locaux et étendue à tous les clusters en 2.61 ; les labs tournent sans changement sur 2.59.0, mais ce changement n'a pas été étudié. (3) `deploy/raycluster.yaml` n'est pas validé contre le schéma de la CRD KubeRay, ni appliqué ; `deploy/ray_slurm.sbatch` est linté, pas exécuté. (4) Le guide Ray « Gang Scheduling with RayJob and Kueue » et la section « SLURM networking caveats » sont listés dans la documentation et n'ont pas été relus. (5) La correction du lab 11.2 n'est pas V-trace : c'est un poids d'importance tronqué sur des retours de Monte-Carlo, et l'effet observé vaut pour ce jouet seulement. (6) Le modèle d'obsolescence est une estimation de champ moyen, sous-estimée près de la saturation. (7) Les chiffres de débit annoncés par IMPALA, OpenRLHF et HybridFlow n'ont pas été reproduits. (8) Les ressources que le coordinateur de Ray Train retient par défaut ne sont pas établies par la page de `ScalingConfig` lue : l'exercice 3 suppose qu'il n'en retient aucune. (9) Le rejeu infini d'une tâche tuée par le moniteur de mémoire est documenté, mais son interaction avec la garantie « au moins une tâche par appelant et par nœud » n'a pas été observée.
+(1) L'article de Ray décrit un ordonnanceur global et des ordonnanceurs locaux (2018) ; l'architecture actuelle a évolué et sa description n'a pas été relue pour ce module. (2) La documentation affiche, sur Ray 2.59, un bandeau annonçant l'authentification par jeton activée par défaut pour les clusters locaux et étendue à tous les clusters en 2.61 ; les labs tournent sans changement sur 2.59.0, mais ce changement n'a pas été étudié. (3) `deploy/raycluster.yaml` n'est pas validé contre le schéma de la CRD KubeRay, ni appliqué ; `deploy/ray_slurm.sbatch` est linté, pas exécuté. (4) Le guide Ray « Gang Scheduling with RayJob and Kueue » et la section « SLURM networking caveats » sont listés dans la documentation et n'ont pas été relus. (5) La correction du lab 11.2 n'est pas V-trace : c'est un poids d'importance tronqué sur des retours de Monte-Carlo, et l'effet observé vaut pour ce jouet seulement. (6) Le modèle d'obsolescence est une estimation de champ moyen, sous-estimée près de la saturation. (7) Les chiffres de débit annoncés par IMPALA, OpenRLHF et HybridFlow n'ont pas été reproduits. (8) Les ressources que le coordinateur de Ray Train retient par défaut ne sont pas établies par la page de `ScalingConfig` lue : l'exercice 3 suppose qu'il n'en retient aucune. (9) Le rejeu infini d'une tâche tuée par le moniteur de mémoire est documenté, mais son interaction avec la garantie « au moins une tâche par appelant et par nœud » n'a pas été observée. (10) Les défauts de vLLM changent d'une version à l'autre : relisez `--gpu-memory-utilization` pour la vôtre. (11) Les nombres de séquences des exemples 9.1 et de l'exercice 13 ignorent activations, graphes CUDA et tampons ; la durée d'initialisation d'un moteur n'a pas été mesurée ; le partage des têtes de clés-valeurs entre deux GPU en parallélisme tensoriel n'a pas été vérifié sur vLLM. (12) Les gains annoncés par PagedAttention, Orca, DistServe et SGLang n'ont pas été reproduits ; aucun moteur n'a tourné sur GPU, et le lab 11.4 donne des bornes, pas des mesures.
 
 ### Hors périmètre {#hors-perimetre}
 
-Les algorithmes de renforcement au-delà de PPO et de GRPO (DPO, méthodes hors-ligne), la conception d'une fonction de récompense, Ray Serve et le service en ligne, l'entraînement sur GPU réel avec Ray (aucun GPU n'était disponible), le réseau d'un cluster multi-nœuds (module 7), le coût financier d'une flotte (module 15) et l'exploitation de KubeRay en production (mise à jour de l'opérateur, sécurité des jetons).
+Les algorithmes de renforcement au-delà de PPO et de GRPO (DPO, méthodes hors-ligne), la conception d'une fonction de récompense, l'API de Ray Serve et les plateformes de service (KServe, LeaderWorkerSet), TensorRT-LLM, la quantification des poids, le décodage spéculatif et le service multi-nœuds de grands modèles, l'entraînement sur GPU réel avec Ray (aucun GPU n'était disponible), le réseau d'un cluster multi-nœuds (module 7), le coût financier d'une flotte (module 15) et l'exploitation de KubeRay en production (mise à jour de l'opérateur, sécurité des jetons).

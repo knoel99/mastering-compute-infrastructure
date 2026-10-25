@@ -179,7 +179,11 @@ def check_course(path: Path):
             errs.append("code fence without language")
             break
     # words
-    w = prose_words(body)
+    # the reference list and the sources section are not prose to read (same rule as check_airiness.py)
+    reading = body
+    for a in ("refs", "sources"):
+        reading = reading.replace(section_text(body, a), "\n")
+    w = prose_words(reading)
     if not MIN_WORDS <= w <= MAX_WORDS:
         errs.append(f"{w} prose words (expected {MIN_WORDS}-{MAX_WORDS})")
     # internal links

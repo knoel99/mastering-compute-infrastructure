@@ -1,6 +1,6 @@
 {
  "unit": "res",
- "retrieved_on": "2026-10-24",
+ "retrieved_on": "2026-10-25",
  "items": [
   {
    "id": "palm",
@@ -967,13 +967,246 @@
     "verified": true
    },
    "evidence_verified": "1/1"
+  },
+  {
+   "id": "go-tour",
+   "kind": "course",
+   "title": "A Tour of Go",
+   "by": "Projet Go (go.dev)",
+   "year": 2026,
+   "url": "https://go.dev/tour/",
+   "topics": [
+    "hpc-software-eng"
+   ],
+   "level": "intro",
+   "cost": "free",
+   "why": "Introduction interactive en quatre sections avec exercices : un premier pas pour lire puis écrire le Go des contrôleurs, agents de nœud et outils de flotte.",
+   "evidence": {
+    "url": "https://go.dev/learn/",
+    "quote": "An interactive introduction to Go in four sections. Each section concludes with a few exercises so you can practice what you've learned.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "effective-go",
+   "kind": "docs",
+   "title": "Effective Go",
+   "by": "Projet Go (go.dev)",
+   "year": 2009,
+   "url": "https://go.dev/doc/effective_go",
+   "topics": [
+    "hpc-software-eng"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Les idiomes du langage, dont la section Concurrency (goroutines, canaux) ; écrit pour la sortie de Go en 2009 et non mis à jour, il ne couvre ni les génériques ni les modules.",
+   "evidence": {
+    "url": "https://go.dev/doc/effective_go",
+    "quote": "This document was written for Go's release in 2009 and is not actively updated.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "prometheus-client-golang",
+   "kind": "tool",
+   "title": "Prometheus Go client library (package prometheus)",
+   "by": "Projet Prometheus",
+   "year": 2026,
+   "url": "https://pkg.go.dev/github.com/prometheus/client_golang/prometheus",
+   "topics": [
+    "observability-sre"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "La bibliothèque d'instrumentation Go de Prometheus (registre, collecteurs, exposition HTTP par promhttp) : la base d'un exporter de nœud ou de GPU écrit en Go.",
+   "evidence": {
+    "url": "https://pkg.go.dev/github.com/prometheus/client_golang/prometheus",
+    "quote": "Package prometheus is the core instrumentation package. It provides metrics primitives to instrument code for monitoring.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "prometheus-writing-exporters",
+   "kind": "docs",
+   "title": "Writing exporters",
+   "by": "Projet Prometheus",
+   "year": 2026,
+   "url": "https://prometheus.io/docs/instrumenting/writing_exporters/",
+   "topics": [
+    "observability-sre"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Les règles de conception d'un exporter, quel que soit le langage : un collecteur qui lit l'état à chaque scrape, le nommage des métriques, les métriques sur le scrape lui-même.",
+   "evidence": {
+    "url": "https://prometheus.io/docs/instrumenting/writing_exporters/",
+    "quote": "When implementing the collector for your exporter, you should never use the usual direct instrumentation approach and then update the metrics on each scrape.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "kubebuilder-book",
+   "kind": "book",
+   "title": "The Kubebuilder Book",
+   "by": "Projet Kubebuilder (kubernetes-sigs)",
+   "year": 2026,
+   "url": "https://book.kubebuilder.io/",
+   "topics": [
+    "containers-k8s"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Écrire sa propre API Kubernetes et son contrôleur en Go : boucle de réconciliation, finalizers, versionnage d'API, réconciliation périodique.",
+   "evidence": {
+    "url": "https://book.kubebuilder.io/",
+    "quote": "This book will teach readers how to develop their own Kubernetes APIs and the principles from which the core Kubernetes APIs are designed.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "rust-book",
+   "kind": "book",
+   "title": "The Rust Programming Language",
+   "by": "Steve Klabnik, Carol Nichols, Chris Krycho, avec des contributions de la communauté Rust",
+   "year": 2026,
+   "url": "https://doc.rust-lang.org/book/",
+   "topics": [
+    "hpc-software-eng"
+   ],
+   "level": "intro",
+   "cost": "free",
+   "why": "Le livre officiel du langage, gratuit en ligne ; la version consultée le 2026-10-25 suppose Rust 1.97.0 (sorti le 2026-07-09) et l'édition 2024.",
+   "evidence": {
+    "url": "https://doc.rust-lang.org/book/",
+    "quote": "This version of the text assumes you’re using Rust 1.97.0 (released 2026-07-09) or later with edition = \"2024\"",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "vllm-pagedattention",
+   "kind": "paper",
+   "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+   "by": "Kwon et al.",
+   "year": 2023,
+   "url": "https://arxiv.org/abs/2309.06180",
+   "topics": [
+    "ml-systems"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Le papier de vLLM : gérer le cache KV par pages, comme la mémoire virtuelle d'un système d'exploitation, pour moins fragmenter la mémoire et grouper plus de requêtes.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2309.06180",
+    "quote": "we propose PagedAttention, an attention algorithm inspired by the classical virtual memory and paging techniques in operating systems",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "distserve",
+   "kind": "paper",
+   "title": "DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving",
+   "by": "Zhong et al.",
+   "year": 2024,
+   "url": "https://arxiv.org/abs/2401.09670",
+   "topics": [
+    "ml-systems"
+   ],
+   "level": "advanced",
+   "cost": "free",
+   "why": "Séparer prefill et décodage sur des GPU différents, chaque phase dimensionnée selon son objectif de latence (TTFT, TPOT) : la référence de la désagrégation en inférence.",
+   "evidence": {
+    "url": "https://arxiv.org/abs/2401.09670",
+    "quote": "DistServe assigns prefill and decoding computation to different GPUs, hence eliminating prefill-decoding interferences.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "raft",
+   "kind": "paper",
+   "title": "In Search of an Understandable Consensus Algorithm",
+   "by": "Diego Ongaro, John Ousterhout",
+   "year": 2014,
+   "url": "https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro",
+   "topics": [
+    "distributed-sys",
+    "resilience"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Raft (USENIX ATC 2014) : élection d'un leader, réplication du journal, sûreté et changement de membres, à lire avant de raisonner sur la disponibilité d'un plan de contrôle.",
+   "evidence": {
+    "url": "https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro",
+    "quote": "Raft separates the key elements of consensus, such as leader election, log replication, and safety",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "rocm-docs",
+   "kind": "docs",
+   "title": "AMD ROCm documentation",
+   "by": "AMD",
+   "year": 2026,
+   "url": "https://rocm.docs.amd.com/en/latest/",
+   "topics": [
+    "gpu-prog",
+    "sysadmin"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "La pile GPU d'AMD (HIP, RCCL, AMD SMI, ROCm Validation Suite, partitionnement GPU) ; la version affichée le 2026-10-25 est ROCm 10.1.0.",
+   "evidence": {
+    "url": "https://rocm.docs.amd.com/en/latest/",
+    "quote": "ROCm is AMD’s open-source GPU computing platform: an end-to-end ecosystem of compilers, runtimes, and libraries for AI, HPC, and domain-specific workloads.",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
+  },
+  {
+   "id": "kubevirt-guide",
+   "kind": "docs",
+   "title": "KubeVirt user guide",
+   "by": "Projet KubeVirt",
+   "year": 2026,
+   "url": "https://kubevirt.io/user-guide/",
+   "topics": [
+    "containers-k8s"
+   ],
+   "level": "intermediate",
+   "cost": "free",
+   "why": "Des machines virtuelles gérées comme des objets Kubernetes ; les pages Host Devices Assignment et Mediated devices and virtual GPUs traitent du passage d'un GPU à une VM.",
+   "evidence": {
+    "url": "https://kubevirt.io/user-guide/",
+    "quote": "User Workloads: Creating, customizing, using, and monitoring virtual machines",
+    "source": "web",
+    "verified": true
+   },
+   "evidence_verified": "1/1"
   }
  ],
  "blocked_sources": [],
  "verification": {
   "status": "verified",
-  "checked_claims": 47,
-  "verified_quotes": 47,
+  "checked_claims": 58,
+  "verified_quotes": 58,
   "method": "tools/verify_quotes.py (verbatim substring in cached page text)"
  }
 }

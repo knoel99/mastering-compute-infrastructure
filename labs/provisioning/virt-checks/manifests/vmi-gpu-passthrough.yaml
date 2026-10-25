@@ -1,0 +1,24 @@
+# A VirtualMachineInstance that receives one passthrough GPU. The devices.gpus field and the deviceName/name
+# pair follow the KubeVirt user guide (Host Devices Assignment), read 2026-10-25. Parsed, never applied here.
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  name: tenant-a-gpu-vm
+  namespace: tenant-a
+spec:
+  domain:
+    resources:
+      requests:
+        memory: 64Gi
+    devices:
+      gpus:
+        - deviceName: nvidia.com/GA102GL_A10
+          name: gpu1
+      disks:
+        - name: rootdisk
+          disk:
+            bus: virtio
+  volumes:
+    - name: rootdisk
+      containerDisk:
+        image: registry.example.com/tenant-a/guest-gpu:2026-10  # your guest image, with the NVIDIA guest driver

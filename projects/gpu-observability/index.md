@@ -180,6 +180,7 @@ Ces zéros valent pour le simulateur, qui n'a aucune phase légitimement creuse 
 - **Alertmanager.** Ajoutez regroupement, inhibition (un nœud en erreur XID masque les alertes de ses GPU) et silences, puis testez l'acheminement avec `amtool`.
 - **Seuils appris.** Remplacez le plancher fixe du traînard par une estimation sur une fenêtre glissante de données saines et mesurez de nouveau délai et alarmes fausses.
 - **Intégration Slurm.** Faites écrire la jointure d'allocation par un prolog et un épilog Slurm (module Slurm, chapitre sur la santé des nœuds) au lieu d'un fichier statique, ou comparez avec l'option `--hpc-job-mapping-dir` de dcgm-exporter.
+- **Détecteur en Go ou en Rust.** Portez `StalledJob` et `Straggler` de `detectors.py` dans un service qui lit les échantillons ligne à ligne. Mêmes paramètres : activité tensorielle médiane sous 0,05 pendant 20 scrapes ; z de 6 sur l'échelle max(1,4826 × MAD ; 5 MHz), 8 scrapes ; médiane d'un nombre pair de valeurs égale à la moyenne des deux centrales (`statistics.median`). Le simulateur reste en Python : faites-lui écrire en JSON Lines les échantillons de quelques graines et pannes, et les alertes du code Python. La preuve : mêmes alertes au même scrape, même tableau délai / alarmes fausses.
 
 ## Pour le portfolio {#portfolio}
 

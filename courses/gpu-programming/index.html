@@ -49,7 +49,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p class="crumb"><a href="../../index.html">Accueil</a> › <a href="../../index.html#cours">Cours</a></p>
 <header id="title-block-header">
 <h1 class="title">Programmation GPU : CUDA, Triton et profilage</h1>
-<p class="subtitle">Module 04 · Phase 1 · 30 h</p>
+<p class="subtitle">Module 04 · Phase 1 · 32.5 h</p>
 <p class="badges"><span class="badge core">Cœur du parcours</span><span class="badge verified">Labs vérifiés dans un bac à sable (sans GPU)</span></p>
 </header>
 <section id="sommaire" class="unnumbered toc-inline">
@@ -130,6 +130,15 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><a href="#les-cuda-graphs">8.5. Les CUDA graphs</a></li>
 <li><a href="#quand-cela-ne-paie-pas">8.6. Quand cela ne paie pas</a></li>
 </ul></li>
+<li><a href="#ch9">9. Au-delà de NVIDIA : AMD, TPU, Trainium et accélérateurs chinois</a>
+<ul>
+<li><a href="#pourquoi-une-flotte-devient-hétérogène">9.1. Pourquoi une flotte devient hétérogène</a></li>
+<li><a href="#amd-instinct-et-rocm-hip-une-quasi-copie-de-cuda">9.2. AMD Instinct et ROCm : HIP, une quasi-copie de CUDA</a></li>
+<li><a href="#tpu-et-xla-compiler-le-graphe-entier">9.3. TPU et XLA : compiler le graphe entier</a></li>
+<li><a href="#aws-trainium-et-le-neuron-sdk">9.4. AWS Trainium et le Neuron SDK</a></li>
+<li><a href="#huawei-ascend-et-les-piles-chinoises">9.5. Huawei Ascend et les piles chinoises</a></li>
+<li><a href="#ce-qui-change-pour-léquipe-dinfrastructure">9.6. Ce qui change pour l'équipe d'infrastructure</a></li>
+</ul></li>
 <li><a href="#labs">Labs</a>
 <ul>
 <li><a href="#lab-4-1">Lab 4.1 — Le warp et la mémoire, en modèle</a></li>
@@ -150,12 +159,12 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 </section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
-<p><strong>La question à laquelle ce module répond :</strong> un entraînement tourne sur 64 GPU à 35 % de MFU, et l'équipe de recherche vous demande si « c'est le matériel ». Pour répondre, il faut lire un profil et nommer le goulot : calcul, bande passante mémoire, lancement des noyaux, transferts ou attente du CPU. Cela suppose de comprendre un noyau GPU, sans forcément en écrire en production.</p>
-<p>Ce module est le pont entre le modèle roofline du <a href="../perf-models/index.html">module 2</a> et le diagnostic d'une flotte. Vous écrirez de petits noyaux CUDA avec Numba, vous les ferez tourner dans un simulateur CPU, puis vous apprendrez Triton, la précision numérique, le profilage et les techniques qui font gagner du temps (fusion, FlashAttention, CUDA graphs).</p>
+<p><strong>La question à laquelle ce module répond :</strong> un entraînement tourne sur 64 GPU à 35 % de MFU, et l'équipe de recherche vous demande si « c'est le matériel ». Pour répondre, il faut lire un profil et nommer le goulot : calcul, bande passante mémoire, lancement, transferts ou attente du CPU. Cela suppose de comprendre un noyau GPU, sans forcément en écrire en production.</p>
+<p>Ce module est le pont entre le modèle roofline du <a href="../perf-models/index.html">module 2</a> et le diagnostic d'une flotte. Vous écrirez de petits noyaux CUDA avec Numba dans un simulateur CPU, puis Triton, la précision numérique, le profilage, les techniques d'accélération (fusion, FlashAttention, CUDA graphs) et les accélérateurs non NVIDIA.</p>
 <div class="key">
 <p><span class="tag">Règle de ce module</span> Un noyau est limité par une seule ressource à la fois : le calcul, la mémoire ou le lancement. Avant d'optimiser, on mesure laquelle ; après, on revérifie. Un conseil d'optimisation sans profil est une hypothèse.</p>
 </div>
-<p>Aucun GPU n'a servi à rédiger ce module. Tout ce qui est calculé ou capturé ici vient d'un portable CPU : simulateur CUDA de Numba, interpréteur de Triton, profileur PyTorch sur CPU, modèles analytiques écrits pour le cours. Chaque section dit ce qui a été exécuté et ce qui ne l'a pas été ; les traces « de type GPU » sont des <strong>fixtures fabriquées à la main</strong>, étiquetées comme telles.</p>
+<p>Aucun GPU n'a servi à rédiger ce module : tout ce qui est calculé ou capturé vient d'un portable CPU (simulateur Numba, interpréteur Triton, profileur PyTorch, modèles analytiques). Chaque section dit ce qui a été exécuté ; les traces « de type GPU » sont des <strong>fixtures fabriquées à la main</strong>, étiquetées comme telles.</p>
 <h3 id="fiche">Fiche du module</h3>
 <div class="tbl-wrap">
 <table>
@@ -172,7 +181,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Volume</td>
-<td>30 h, dont 9,75 h de lecture, 12,5 h de labs et 7,75 h d'exercices</td>
+<td>32,5 h, dont 11 h de lecture, 12,5 h de labs et 9 h d'exercices</td>
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
@@ -210,6 +219,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Choisir un format numérique pour un calcul et prévoir ses pièges : accumulation, sous-dépassement, ordre des sommes (chapitre 6).</li>
 <li>Lire une trace de profil et nommer le goulot : calcul, mémoire, lancement ou transferts (chapitre 7, lab 4.4).</li>
 <li>Dire ce qu'apportent la fusion, FlashAttention, <code>torch.compile</code> et les CUDA graphs, et quand ils ne paient pas (chapitre 8).</li>
+<li>Transposer le vocabulaire GPU vers AMD/ROCm, les TPU, Trainium et Ascend, et dresser une liste de contrôle de portabilité (chapitre 9).</li>
 </ul>
 <!-- gen:place -->
 <h3 id="place">Place dans le parcours</h3>
@@ -220,7 +230,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li><strong>Projets qui s'en servent</strong> : <a href="../../projects/scaling-study/index.html">Projet 2 — Étude de passage à l'échelle d'un entraînement</a>. <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
-<p>Dix séances, 30 h au total. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé ; il ne diminue jamais. Les durées de chaque séance additionnent les lectures, les parties de labs et les exercices indiqués, au quart d'heure près.</p>
+<p>Onze séances, 32,5 h au total. Le niveau 1 correspond aux fondations, le niveau 2 aux méthodes de cœur, le niveau 3 à l'avancé ; il ne diminue jamais. Les durées de chaque séance additionnent les lectures, les parties de labs et les exercices indiqués, au quart d'heure près.</p>
 <div class="tbl-wrap">
 <table>
 <colgroup>
@@ -308,7 +318,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>3 h</td>
 <td>3</td>
 <td>ch. 8 Techniques d'accélération (1 h)</td>
-<td>Ex. 9 et Ex. 10 (1 h chacun) ; checkpoint de sortie</td>
+<td>Ex. 9 et Ex. 10 (1 h chacun)</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>2.5 h</td>
+<td>3</td>
+<td>ch. 9 Au-delà de NVIDIA (1,25 h)</td>
+<td>Ex. 11 et Ex. 12 (1,25 h) ; checkpoint de sortie</td>
 </tr>
 </tbody>
 </table>
@@ -378,7 +395,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ol>
 </details>
 <h2 id="ch1">1. Le modèle d'exécution CUDA : grille, blocs, warps, SM</h2>
-<p>Un GPU se programme en écrivant le travail d'<strong>un seul thread</strong>, puis en demandant au matériel d'en lancer des milliers. Ce chapitre donne le vocabulaire et les trois idées qui expliquent presque tous les profils : le découpage en blocs et en warps, la divergence et l'occupation.</p>
+<p>Un GPU se programme en écrivant le travail d'<strong>un seul thread</strong>, puis en demandant au matériel d'en lancer des milliers. Ce chapitre donne le vocabulaire et les trois idées qui expliquent presque tous les profils : le découpage en blocs et warps, la divergence et l'occupation.</p>
 <h3 id="grille-blocs-threads">1.1. Grille, blocs, threads</h3>
 <p>Un <strong>noyau</strong> (<em>kernel</em>) est une fonction exécutée par un très grand nombre de <strong>threads</strong>. Les threads sont regroupés en <strong>blocs</strong>, et l'ensemble des blocs d'un lancement forme la <strong>grille</strong>. Chaque thread connaît ses coordonnées (<code>threadIdx</code>, <code>blockIdx</code>, <code>blockDim</code>) et s'en sert pour choisir l'élément de données dont il s'occupe.</p>
 <p>Le matériel est organisé en <strong>multiprocesseurs de flux</strong> (<em>streaming multiprocessors</em>, SM). Selon le guide de programmation CUDA (v13.4.2, lu le 25 octobre 2026), tous les threads d'un bloc s'exécutent sur un même SM, ce qui leur permet de communiquer par la mémoire partagée du SM et de se synchroniser. À l'inverse, le guide précise qu'il n'y a aucune garantie d'ordonnancement entre blocs : un bloc ne doit jamais attendre le résultat d'un autre bloc du même lancement.</p>
@@ -435,7 +452,7 @@ ptxas info    : Used 9 registers, 1024 bytes smem, 372 bytes cmem[0]</code></pre
 <p><span class="tag">L'occupation n'est pas la performance</span> La documentation de Nsight Compute est explicite : une occupation plus élevée ne donne pas toujours de meilleures performances, mais une occupation basse réduit toujours la capacité à masquer les latences. Une occupation de 25 % avec beaucoup de calcul indépendant par thread peut être très bonne ; 100 % avec des accès mémoire désordonnés ne l'est pas. L'occupation est un indicateur à lire, pas un objectif.</p>
 </div>
 <h3 id="synchronisation">1.5. Synchronisation</h3>
-<p>Dans un bloc, <code>__syncthreads()</code> est une barrière : aucun thread ne la franchit avant que tous les threads du bloc l'aient atteinte, et les écritures en mémoire partagée faites avant sont visibles après. C'est le seul mécanisme simple de coopération. Entre blocs, il n'y a pas de barrière dans un noyau : la fin du noyau tient lieu de barrière globale.</p>
+<p>Dans un bloc, <code>__syncthreads()</code> est une barrière : aucun thread ne la franchit avant que tous l'aient atteinte, et les écritures en mémoire partagée faites avant sont visibles après. Entre blocs, il n'y a pas de barrière dans un noyau : la fin du noyau tient lieu de barrière globale.</p>
 <p>Une barrière doit être atteinte par <strong>tous</strong> les threads du bloc. Placée dans un <code>if</code> dont la condition varie d'un thread à l'autre, elle est un bogue. La documentation du simulateur de Numba note que, si des threads divergents entrent dans des appels différents de <code>syncthreads()</code>, le lancement n'échoue pas mais le comportement est imprévisible : le chapitre 3 montre ce que cela donne.</p>
 <div class="recap">
 <p>Points clés — chapitre 1</p>
@@ -447,7 +464,7 @@ ptxas info    : Used 9 registers, 1024 bytes smem, 372 bytes cmem[0]</code></pre
 </ul>
 </div>
 <h2 id="ch2">2. Hiérarchie mémoire GPU : coalescence et conflits de bancs</h2>
-<p>Sur la plupart des noyaux d'un entraînement, ce n'est pas le calcul qui limite mais la façon dont les threads accèdent à la mémoire. Ce chapitre décrit les niveaux de mémoire d'un GPU, puis les deux règles d'accès qui font perdre ou gagner un facteur de 4 à 32 : la coalescence en mémoire globale et les conflits de bancs en mémoire partagée.</p>
+<p>Sur la plupart des noyaux d'un entraînement, ce n'est pas le calcul qui limite mais la façon dont les threads accèdent à la mémoire. Ce chapitre décrit les niveaux de mémoire, puis les deux règles d'accès qui font perdre ou gagner un facteur de 4 à 32 : la coalescence en mémoire globale et les conflits de bancs en mémoire partagée.</p>
 <h3 id="les-niveaux-de-mémoire">2.1. Les niveaux de mémoire</h3>
 <p>Le tableau résume les niveaux visibles du programmeur. Les capacités viennent du guide de programmation CUDA (annexe des capacités de calcul, lue le 25 octobre 2026) et du billet d'architecture Hopper de NVIDIA ; elles changent d'une génération à l'autre.</p>
 <div class="tbl-wrap">
@@ -512,7 +529,7 @@ ptxas info    : Used 9 registers, 1024 bytes smem, 372 bytes cmem[0]</code></pre
 </tbody>
 </table>
 </div>
-<p>Le H100 SXM5 compte 132 SM d'après le billet Hopper ; l'A100 en compte 108, d'après l'article FlashAttention (chapitre 8). Retenez la hiérarchie plutôt que les chiffres : plus on est près des unités de calcul, plus c'est rapide et plus c'est petit. La mémoire partagée est la seule mémoire rapide que le programmeur gère lui-même.</p>
+<p>Le H100 SXM5 compte 132 SM d'après le billet Hopper ; l'A100 en compte 108, d'après l'article FlashAttention (chapitre 8). Retenez la hiérarchie plutôt que les chiffres : plus on est près des unités de calcul, plus c'est rapide et petit. La mémoire partagée est la seule mémoire rapide que le programmeur gère lui-même.</p>
 <h3 id="la-coalescence">2.2. La coalescence</h3>
 <div class="def">
 <p><span class="tag">Coalescence</span> Les lectures ou écritures des 32 threads d'un warp sont <strong>coalescées</strong> quand le matériel les sert avec aussi peu de transactions que possible. Pour les capacités de calcul 6.0 et plus, le guide des bonnes pratiques résume : les accès simultanés d'un warp se regroupent en autant de transactions de <strong>32 octets</strong> (des <em>secteurs</em>) qu'il en faut pour couvrir toutes les adresses demandées.</p>
@@ -575,7 +592,7 @@ all lanes read the same word (broadcast)                 1</code></pre>
 </ul>
 </div>
 <h2 id="ch3">3. Écrire des noyaux : réduction, produit par tuiles, scan</h2>
-<p>Peu d'ingénieurs d'infrastructure écrivent des noyaux de production ; presque tous doivent en lire. Trois patrons couvrent l'essentiel de ce qu'on rencontre dans un profil : la réduction (somme, maximum, normalisation), le produit de matrices par tuiles et le scan (somme cumulée). Les trois reposent sur la mémoire partagée et les barrières du chapitre 1.</p>
+<p>Peu d'ingénieurs d'infrastructure écrivent des noyaux de production ; presque tous doivent en lire. Trois patrons couvrent l'essentiel d'un profil : la réduction (somme, maximum, normalisation), le produit de matrices par tuiles et le scan (somme cumulée). Les trois reposent sur la mémoire partagée et les barrières du chapitre 1.</p>
 <h3 id="la-réduction-en-arbre">3.1. La réduction en arbre</h3>
 <p>Sommer <span class="math inline">n</span> nombres en parallèle se fait en arbre : à chaque tour, la moitié des threads ajoute la valeur d'un voisin, et la barrière garantit que tout le monde a fini avant le tour suivant. Un bloc de <span class="math inline">t</span> threads réduit <span class="math inline">t</span> valeurs en <span class="math inline">\log_2 t</span> tours. Voici le noyau du lab 4.2 (<code>kernels.py</code>), écrit pour Numba ; son jumeau CUDA C++ est dans <code>cuda/reduce_matmul.cu</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="at">@cuda.jit</span></span>
@@ -720,7 +737,7 @@ reduction without barriers: 5 wrong results out of 5 launches</code></pre>
 </ul>
 </div>
 <h2 id="ch4">4. Streams, événements, mémoire épinglée et recouvrement</h2>
-<p>Un GPU exécute des noyaux et des copies. Si le programme les enchaîne l'un après l'autre, le GPU attend les copies, et les copies attendent le GPU. Ce chapitre montre comment les recouvrir, et comment ne pas se tromper en les chronométrant.</p>
+<p>Un GPU exécute des noyaux et des copies. Enchaînés l'un après l'autre, le GPU attend les copies et les copies attendent le GPU. Ce chapitre montre comment les recouvrir, et comment ne pas se tromper en les chronométrant.</p>
 <h3 id="lasynchronisme">4.1. L'asynchronisme</h3>
 <p>Le guide de programmation CUDA décrit l'interface comme asynchrone : un appel qui lance un noyau ou une copie retourne aussitôt, souvent avant que l'opération ait commencé. Le CPU peut alors préparer la suite pendant que le GPU travaille. La documentation de PyTorch en tire la conséquence pour le chronométrage : les mesures de temps sans synchronisation ne sont pas exactes ; il faut appeler <code>torch.cuda.synchronize()</code> avant de mesurer, ou utiliser des <code>torch.cuda.Event</code>.</p>
 <p>Un <strong>flux</strong> (<em>stream</em>) est une file d'attente d'opérations exécutées dans l'ordre. Deux opérations de flux différents peuvent s'exécuter en même temps si les ressources le permettent ; une opération lancée sans flux explicite va dans le flux par défaut. Un <strong>événement</strong> est un repère inséré dans un flux : on l'utilise pour chronométrer sur le GPU (<code>cudaEventElapsedTime</code>) et pour faire attendre un flux sur un autre.</p>
@@ -772,9 +789,9 @@ Même travail, mêmes durées par étape (40, 30 et 40 ms pour le tampon entier)
 </ul>
 </div>
 <h2 id="ch5">5. Triton : programmer par blocs</h2>
-<p>CUDA demande d'écrire ce que fait <strong>un thread</strong> et de gérer à la main mémoire partagée, barrières et coalescence. Triton propose de décrire ce que fait <strong>un bloc de données</strong>, et laisse le compilateur choisir la répartition sur les threads. Il s'exécute sans GPU dans un interpréteur, ce qui le rend idéal pour apprendre.</p>
+<p>CUDA demande d'écrire ce que fait <strong>un thread</strong> et de gérer à la main mémoire partagée, barrières et coalescence. Triton décrit ce que fait <strong>un bloc de données</strong> et laisse le compilateur répartir sur les threads. Il s'exécute sans GPU dans un interpréteur, idéal pour apprendre.</p>
 <h3 id="un-programme-par-bloc">5.1. Un programme par bloc</h3>
-<p>Le dépôt de Triton le présente comme un langage et un compilateur pour écrire des primitives d'apprentissage profond très efficaces, avec l'ambition d'une productivité supérieure à CUDA et d'une flexibilité supérieure à d'autres langages dédiés. Ses fondations sont décrites dans l'article de Tillet, Kung et Cox (MAPL 2019), qui introduit un langage de blocs (« tuiles »), une représentation intermédiaire et un auto-réglage. Le langage actuel est intégré à Python et diffère de la syntaxe de cet article.</p>
+<p>Le dépôt de Triton le présente comme un langage et un compilateur pour écrire des primitives d'apprentissage profond efficaces, avec plus de productivité que CUDA. Ses fondations sont décrites dans l'article de Tillet, Kung et Cox (MAPL 2019), qui introduit un langage de blocs (« tuiles »), une représentation intermédiaire et un auto-réglage. Le langage actuel est intégré à Python et diffère de la syntaxe de cet article.</p>
 <p>Dans un noyau Triton, une <strong>instance de programme</strong> traite un bloc d'éléments. <code>tl.program_id(axis=0)</code> donne son numéro, <code>tl.arange(0, BLOCK_SIZE)</code> crée un vecteur d'indices, et <code>tl.load</code>/<code>tl.store</code> lisent et écrivent des blocs entiers. Le tutoriel officiel appelle la grille de lancement « SPMD » (<em>single program, multiple data</em> : un même programme, des données différentes) et la compare à une grille CUDA.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">@triton.jit</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_kernel(x_ptr, y_ptr, out_ptr, n_elements, BLOCK_SIZE: tl.constexpr):</span>
@@ -786,7 +803,7 @@ Même travail, mêmes durées par étape (40, 30 et 40 ms pour le tampon entier)
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    tl.store(out_ptr <span class="op">+</span> offsets, x <span class="op">+</span> y, mask<span class="op">=</span>mask)</span></code></pre></div>
 <p>Le masque <code>offsets &lt; n_elements</code> joue le rôle du garde-fou du chapitre 1 : la dernière instance dépasse la fin du tableau. L'hôte lance autant d'instances que de blocs avec <code>add_kernel[(triton.cdiv(n, block),)](x, y, out, n, BLOCK_SIZE=block)</code>. <code>BLOCK_SIZE</code> est une constante de compilation (<code>tl.constexpr</code>), comme la taille de tuile du chapitre 3.</p>
 <h3 id="la-fusion-le-softmax">5.2. La fusion : le softmax</h3>
-<p>Le softmax de chaque ligne d'une matrice <span class="math inline">M \times N</span> s'écrit en cinq opérations PyTorch : maximum de la ligne, soustraction, exponentielle, somme, division. Chacune lit et écrit la mémoire globale. Le noyau Triton ci-dessous garde la ligne entière en mémoire rapide et ne lit qu'une fois, n'écrit qu'une fois.</p>
+<p>Le softmax de chaque ligne d'une matrice <span class="math inline">M \times N</span> s'écrit en cinq opérations PyTorch (maximum, soustraction, exponentielle, somme, division), chacune lisant et écrivant la mémoire globale. Le noyau Triton ci-dessous garde la ligne entière en mémoire rapide : une lecture, une écriture.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="at">@triton.jit</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax_kernel(x_ptr, out_ptr, n_cols, row_stride, BLOCK_SIZE: tl.constexpr):</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;One program per row; the whole row lives in registers/SRAM: read once, write once.&quot;&quot;&quot;</span></span>
@@ -885,7 +902,7 @@ Même travail, mêmes durées par étape (40, 30 et 40 ms pour le tampon entier)
 </ul>
 </div>
 <h2 id="ch6">6. Précision numérique : formats, sommes, mise à l'échelle</h2>
-<p>Un entraînement choisit un compromis entre la vitesse, la mémoire et la fidélité des nombres. Pour un ingénieur d'infrastructure, trois situations reviennent : une perte qui devient <code>NaN</code>, des gradients qui disparaissent, et deux exécutions « identiques » qui donnent des résultats différents. Ce chapitre donne les outils pour les expliquer, avec des expériences exécutables sur un CPU.</p>
+<p>Un entraînement choisit un compromis entre la vitesse, la mémoire et la fidélité des nombres. Trois situations reviennent : une perte qui devient <code>NaN</code>, des gradients qui disparaissent, et deux exécutions « identiques » qui donnent des résultats différents. Ce chapitre donne les outils pour les expliquer, avec des expériences exécutables sur CPU.</p>
 <h3 id="les-formats">6.1. Les formats</h3>
 <p>Un nombre flottant a un bit de signe, un exposant (qui fixe la plage) et une mantisse (qui fixe la précision). La précision relative d'un format vaut environ <span class="math inline">2^{-m}</span> pour <span class="math inline">m</span> bits de mantisse explicites. Le tableau vient de <code>torch.finfo</code> (PyTorch 2.14.1, 25 octobre 2026) ; les nombres de bits sont ceux des formats, vérifiés par le test <code>test_format_table_matches_the_bit_layouts</code> du lab 4.2.</p>
 <pre class="text"><code>format     exp mant         eps         max   smallest normal
@@ -902,7 +919,7 @@ fp8 e5m2     5    2        0.25   5.734e+04           6.1e-05</code></pre>
 <p><span class="tag">Exemple 6.1 — Un accumulateur FP16 qui se bloque</span> Sortie capturée (<code>precision.py</code>, NumPy, <code>cumsum</code> en <code>float16</code>) : la somme de <span class="math inline">n</span> uns en <code>float16</code> vaut 1000 pour <span class="math inline">n = 1000</span>, 2048 pour <span class="math inline">n = 2048</span>, puis <strong>2048 pour <span class="math inline">n = 4096</span> et pour <span class="math inline">n = 100\,000</span></strong>. Il n'y a aucune erreur, aucun <code>NaN</code> : le résultat est faux sans le dire. C'est pourquoi les produits matriciels en précision réduite accumulent en <code>float32</code> (l'article de Micikevicius et al. recommande une arithmétique qui accumule dans des sorties en simple précision), et pourquoi les réductions d'un noyau (chapitre 3) utilisent un accumulateur <code>float32</code> même pour des entrées <code>float16</code>.</p>
 </div>
 <h3 id="la-mise-à-léchelle-de-la-perte">6.3. La mise à l'échelle de la perte</h3>
-<p>Les gradients sont souvent minuscules. Micikevicius et al. (2017) notent que toute valeur de module inférieur à <span class="math inline">2^{-24}</span> devient zéro en FP16, et observent, pour les gradients des poids d'un réseau de reconnaissance vocale (figure 2b de l'article), qu'environ 5 % des valeurs ont un exposant inférieur à <span class="math inline">-24</span>. Remède : multiplier la perte par un facteur <span class="math inline">S</span> avant la passe arrière, ce qui multiplie tous les gradients par <span class="math inline">S</span>, puis diviser les gradients par <span class="math inline">S</span> en <code>float32</code> avant la mise à jour des poids.</p>
+<p>Les gradients sont souvent minuscules. Micikevicius et al. (2017) notent que toute valeur de module inférieur à <span class="math inline">2^{-24}</span> devient zéro en FP16, et observent (figure 2b) qu'environ 5 % des gradients de poids d'un réseau de reconnaissance vocale ont un exposant inférieur à <span class="math inline">-24</span>. Remède : multiplier la perte par un facteur <span class="math inline">S</span> avant la passe arrière, ce qui multiplie tous les gradients par <span class="math inline">S</span>, puis diviser les gradients par <span class="math inline">S</span> en <code>float32</code> avant la mise à jour des poids.</p>
 <p>Ce facteur est borné des deux côtés : trop petit, les petits gradients disparaissent ; trop grand, les grands gradients dépassent 65 504 et deviennent <code>inf</code>. Le tableau vient de gradients <strong>synthétiques</strong> de modules répartis uniformément en échelle logarithmique entre <span class="math inline">2^{-30}</span> et <span class="math inline">2^0</span> (ce n'est pas la distribution d'un réseau réel). Sortie capturée (<code>precision.py</code>, graine fixée) :</p>
 <pre class="text"><code>== loss scaling: gradients with magnitudes in [2^-30, 2^0] cast to float16 ==
 scale       zeros      inf
@@ -910,7 +927,7 @@ scale       zeros      inf
 2^8          0.0%     0.0%
 2^16         0.0%     0.0%
 2^24         0.0%    26.8%</code></pre>
-<p>Sans échelle, 16,5 % des gradients synthétiques deviennent nuls. Avec <span class="math inline">2^{24}</span>, plus aucun ne s'annule mais 26,8 % débordent. Comme la bonne valeur change pendant l'entraînement, PyTorch fournit <a href="https://docs.pytorch.org/docs/2.14/amp.html"><code>torch.amp.GradScaler</code></a>, qui ajuste l'échelle dynamiquement ; la documentation précise que l'entraînement en précision mixte avec <code>float16</code> utilise ordinairement <code>autocast</code> et <code>GradScaler</code> ensemble. Avec <code>bfloat16</code>, dont la plage est celle de <code>float32</code>, on n'utilise en général pas de mise à l'échelle (à vérifier pour votre modèle).</p>
+<p>Sans échelle, 16,5 % des gradients synthétiques deviennent nuls. Avec <span class="math inline">2^{24}</span>, plus aucun ne s'annule mais 26,8 % débordent. Comme la bonne valeur change pendant l'entraînement, PyTorch fournit <a href="https://docs.pytorch.org/docs/2.14/amp.html"><code>torch.amp.GradScaler</code></a>, qui ajuste l'échelle dynamiquement et s'utilise avec <code>autocast</code> en <code>float16</code>. Avec <code>bfloat16</code>, dont la plage est celle de <code>float32</code>, on n'utilise en général pas de mise à l'échelle (à vérifier pour votre modèle).</p>
 <h3 id="le-coût-en-précision-des-entrées-réduites">6.4. Le coût en précision des entrées réduites</h3>
 <p>Que perd-on à arrondir les <strong>entrées</strong> d'un produit matriciel ? Le lab émule l'arrondi à <span class="math inline">m</span> bits de mantisse (<code>round_mantissa</code>) et calcule le produit avec une accumulation exacte. L'émulation à 7 bits reproduit exactement <code>bfloat16</code> (testé). L'émulation à 10 bits imite l'arrondi des entrées de TF32 ; ce n'est pas la sortie d'un cœur tensoriel, dont le mode d'arrondi peut différer.</p>
 <pre class="text"><code>== relative error of C = round(A) @ round(B), n = 256, exact accumulation ==
@@ -939,7 +956,7 @@ bfloat16 (7 bits)                   2.36e-03
 </ul>
 </div>
 <h2 id="ch7">7. Profiler : Nsight, PyTorch Profiler et lecture d'une trace</h2>
-<p>Un profil répond à une seule question : où va le temps ? Ce chapitre présente les trois outils, la structure d'une trace, puis une méthode de lecture en quatre verdicts. Les verdicts sont appliqués dans le lab 4.4 à un vrai profil CPU et à des traces de type GPU <strong>fabriquées à la main</strong>.</p>
+<p>Un profil répond à une seule question : où va le temps ? Ce chapitre présente les trois outils, la structure d'une trace, puis une méthode de lecture en quatre verdicts, appliquée dans le lab 4.4 à un vrai profil CPU et à des traces de type GPU <strong>fabriquées à la main</strong>.</p>
 <h3 id="trois-outils-trois-échelles">7.1. Trois outils, trois échelles</h3>
 <div class="tbl-wrap">
 <table>
@@ -977,7 +994,7 @@ bfloat16 (7 bits)                   2.36e-03
 <p>Le profileur PyTorch se pilote avec <code>torch.profiler.profile</code> ; la recette et la référence de l'API (<code>torch.profiler</code>) indiquent les activités <code>ProfilerActivity.CPU</code> et <code>ProfilerActivity.CUDA</code>, les options <code>record_shapes</code>, <code>with_flops</code> et <code>profile_memory</code>, la méthode <code>export_chrome_trace</code> et le tableau <code>key_averages().table(sort_by=...)</code>. <code>record_function("nom")</code> ajoute une annotation qui apparaît dans la trace.</p>
 <p>Nsight Systems se lance par <code>nsys profile -o rapport commande</code> et se résume par <code>nsys stats rapport.nsys-rep</code> (guide utilisateur de Nsight Systems). Nsight Compute se lance par <code>ncu</code> ; ses options de filtrage <code>-k</code> (nom du noyau) et <code>-c</code> (nombre de lancements) limitent le profilage aux noyaux voulus (guide en ligne de commande). Ces commandes sont documentées, mais <strong>non exécutées ici</strong> faute de GPU.</p>
 <h3 id="anatomie-dune-trace">7.2. Anatomie d'une trace</h3>
-<p>Une trace Chrome (<code>export_chrome_trace</code>) est un fichier JSON dont chaque événement complet porte un nom, une date de début <code>ts</code>, une durée <code>dur</code>, un processus, un fil et une catégorie <code>cat</code>. D'après le code de Kineto, la bibliothèque qui alimente le profileur PyTorch, les catégories incluent <code>cpu_op</code> (opérateur du CPU), <code>user_annotation</code>, <code>cuda_runtime</code> (appel à l'API CUDA, comme le lancement d'un noyau), <code>kernel</code> (noyau sur le GPU), <code>gpu_memcpy</code> et <code>gpu_memset</code>.</p>
+<p>Une trace Chrome (<code>export_chrome_trace</code>) est un fichier JSON dont chaque événement complet porte un nom, une date de début <code>ts</code>, une durée <code>dur</code>, un processus, un fil et une catégorie <code>cat</code>. D'après le code de Kineto (<a href="https://raw.githubusercontent.com/pytorch/kineto/main/libkineto/include/ActivityType.h"><em>ActivityType.h</em></a>, branche <code>main</code>, lu le 25 octobre 2026), la bibliothèque qui alimente le profileur PyTorch, les catégories incluent <code>cpu_op</code> (opérateur du CPU), <code>user_annotation</code>, <code>cuda_runtime</code> (appel à l'API CUDA, comme le lancement d'un noyau), <code>kernel</code> (noyau sur le GPU), <code>gpu_memcpy</code> et <code>gpu_memset</code>.</p>
 <p>On y lit deux voies. La voie CPU montre ce que fait le programme : opérateurs, puis lancements. La voie GPU, par flux, montre ce que fait le matériel : noyaux et copies. Les <strong>trous</strong> de la voie GPU sont du temps perdu ; la question est ce que le CPU faisait pendant ce temps.</p>
 <h3 id="quatre-verdicts">7.3. Quatre verdicts</h3>
 <p>Le script <code>trace_report.py</code> du lab calcule, pour une trace avec activité GPU : l'utilisation du GPU (durée de l'union des intervalles occupés sur la durée totale), la durée médiane des noyaux et la part des copies. Il en tire un verdict selon des seuils qui sont des <strong>heuristiques de ce cours</strong>.</p>
@@ -1034,7 +1051,7 @@ aten::_softmax                         2          934       0.0
 profiler FLOPs of mm+addmm+bmm: 1308622848 = 3.000 x analytic forward FLOPs</code></pre>
 <div class="ex">
 <p><span class="tag">Exemple 7.1 — Vérifier un profil avec un modèle</span> Les nombres d'appels découlent de l'architecture : 8 <code>addmm</code> (4 couches linéaires par bloc, 2 blocs), 16 <code>mm</code> (la passe arrière en fait deux par couche linéaire : gradient de l'entrée et des poids) et 12 <code>bmm</code> (2 produits d'attention en passe avant, 4 en passe arrière, par bloc). Les FLOP s'accordent aussi. Par bloc, <span class="math inline">24\,BTD^2 + 4\,BT^2D</span> avec <span class="math inline">B=8</span>, <span class="math inline">T=64</span>, <span class="math inline">D=128</span> donne 218 103 808 FLOP, soit 436 207 616 pour deux blocs ; la passe arrière en ajoute le double, d'où <span class="math inline">3 \times 436\,207\,616 = 1\,308\,622\,848</span> : exactement la valeur du profileur.</p>
-<p>Un profil qui s'accorde avec le modèle de FLOP du module 2 est un profil auquel on peut se fier ; un écart serait le signal à explorer. Sur six exécutions de relecture, les trois opérateurs de produit matriciel ont représenté de 40 à 51 % du temps propre du CPU : la moitié environ va ailleurs, aux copies, à GELU, au softmax, à l'annotation et à de plus petits opérateurs. Ce sont les candidats à la fusion du chapitre 8.</p>
+<p>Un profil qui s'accorde avec le modèle de FLOP du module 2 est fiable ; un écart serait le signal à explorer. Sur six relectures, les trois produits matriciels ont représenté de 40 à 51 % du temps propre du CPU : le reste va aux copies, à GELU, au softmax et à l'annotation — les candidats à la fusion du chapitre 8.</p>
 </div>
 <p>Ne retenez pas les microsecondes : elles varient d'une exécution à l'autre sur une machine partagée. Le test du lab n'affirme donc aucune durée, seulement les compteurs, les FLOP et la cohérence de l'imbrication (la somme des temps propres égale la durée de l'étape annotée).</p>
 <h3 id="des-traces-de-type-gpu-fabriquées-lab-4.4-partie-b">7.5. Des traces de type GPU, fabriquées (lab 4.4, partie B)</h3>
@@ -1101,7 +1118,7 @@ profiler FLOPs of mm+addmm+bmm: 1308622848 = 3.000 x analytic forward FLOPs</cod
 </ul>
 </div>
 <h2 id="ch8">8. Techniques d'accélération : fusion, FlashAttention, compilation, CUDA graphs</h2>
-<p>Le chapitre 7 a donné des verdicts ; celui-ci donne les leviers. Chaque technique traite un goulot précis. L'erreur la plus coûteuse est d'appliquer un levier sans verdict : fusionner des noyaux déjà saturés en calcul, ou capturer un graphe quand le GPU n'attend pas.</p>
+<p>Le chapitre 7 a donné des verdicts ; celui-ci donne les leviers. Chaque technique traite un goulot précis. L'erreur la plus coûteuse est d'appliquer un levier sans verdict : fusionner des noyaux saturés en calcul, ou capturer un graphe quand le GPU n'attend pas.</p>
 <h3 id="quel-levier-pour-quel-verdict">8.1. Quel levier pour quel verdict</h3>
 <div class="tbl-wrap">
 <table>
@@ -1165,15 +1182,15 @@ profiler FLOPs of mm+addmm+bmm: 1308622848 = 3.000 x analytic forward FLOPs</cod
 </div>
 <p>Dans PyTorch, <code>scaled_dot_product_attention</code> est l'opérateur qui permet de choisir une implémentation fusionnée selon la plateforme. Le lab 4.4 montre ce que la substitution change dans un profil : avec l'attention explicite, le profil contient les appels <code>aten::softmax</code> et plus de <code>aten::bmm</code> ; avec l'opérateur fusionné, l'appel <code>aten::softmax</code> disparaît (testé sur CPU). Sur GPU, le noyau choisi dépend de votre version et de votre matériel : vérifiez-le dans votre propre trace.</p>
 <h3 id="torch.compile">8.4. <code>torch.compile</code></h3>
-<p><code>torch.compile</code> optimise une fonction ou un modèle avec TorchDynamo et un moteur de génération de code ; le moteur par défaut est <code>inductor</code>, décrit comme un bon équilibre entre performance et surcoût (documentation PyTorch 2.14). Quand une portion du code ne peut pas être capturée, la compilation retombe sur l'exécution normale : une « rupture de graphe » fait perdre une partie du bénéfice. Le paramètre <code>mode</code> propose <code>"default"</code>, <code>"reduce-overhead"</code>, <code>"max-autotune"</code> et <code>"max-autotune-no-cudagraphs"</code>.</p>
+<p><code>torch.compile</code> optimise une fonction ou un modèle avec TorchDynamo et un moteur de génération de code ; le moteur par défaut est <code>inductor</code> (documentation PyTorch 2.14). Quand une portion du code ne peut pas être capturée, la compilation retombe sur l'exécution normale : une « rupture de graphe » fait perdre une partie du bénéfice. Le paramètre <code>mode</code> propose <code>"default"</code>, <code>"reduce-overhead"</code>, <code>"max-autotune"</code> et <code>"max-autotune-no-cudagraphs"</code>.</p>
 <div class="war">
 <p><span class="tag"><code>reduce-overhead</code> n'est pas garanti</span> La documentation de <code>torch.compile</code> décrit le mode <code>"reduce-overhead"</code> comme une réduction du surcoût de Python avec des CUDA graphs, utile pour les petits lots, avec une consommation mémoire accrue. Elle précise : « Reduction of overhead is not guaranteed to work; today, we only reduce overhead for CUDA only graphs which do not mutate inputs. » Source : <a href="https://docs.pytorch.org/docs/2.14/generated/torch.compile.html">PyTorch, torch.compile</a>.</p>
 </div>
 <h3 id="les-cuda-graphs">8.5. Les CUDA graphs</h3>
-<p>Dans un flux, chaque lancement de noyau impose au pilote du CPU une séquence d'opérations préparatoires. Le guide de programmation CUDA note que, pour un noyau de courte durée, ce surcoût peut représenter une fraction significative du temps total. Un <strong>graphe</strong> CUDA définit une fois un ensemble d'opérations et de dépendances, puis le lance plusieurs fois ; les coûts de lancement baissent car une grande partie de la préparation est faite à l'avance. L'article de blog de PyTorch sur le sujet présente l'effet : les trous entre noyaux courts disparaissent.</p>
+<p>Dans un flux, chaque lancement de noyau impose au pilote du CPU une séquence d'opérations préparatoires. Le guide de programmation CUDA note que, pour un noyau de courte durée, ce surcoût peut représenter une fraction significative du temps total. Un <strong>graphe</strong> CUDA définit une fois un ensemble d'opérations et de dépendances, puis le lance plusieurs fois ; les coûts de lancement baissent car la préparation est faite à l'avance. L'article de blog de PyTorch le montre : les trous entre noyaux courts disparaissent.</p>
 <p>Les conditions d'emploi ne sont pas anodines : le graphe est défini une fois puis relancé, donc les formes et les adresses mémoire doivent en principe rester stables entre les lancements (à vérifier dans la documentation de votre version). Un décodage de modèle de langage dont la longueur de contexte varie à chaque pas y est mal adapté sans précautions ; l'exercice 10 chiffre l'arbitrage.</p>
 <h3 id="quand-cela-ne-paie-pas">8.6. Quand cela ne paie pas</h3>
-<p>Une technique ne paie pas dans cinq cas : le goulot est ailleurs (vérifié par le verdict du chapitre 7), le gain maximal calculé est inférieur au coût de maintenance, les formes sont trop dynamiques, la précision réduite dégrade la convergence, ou le surcoût de compilation n'est jamais amorti sur la durée du job. Une règle d'équipe simple : toute proposition d'optimisation arrive avec un profil avant, un plafond de gain calculé, et un profil après.</p>
+<p>Une technique ne paie pas dans cinq cas : le goulot est ailleurs (verdict du chapitre 7), le gain maximal calculé est inférieur au coût de maintenance, les formes sont trop dynamiques, la précision réduite dégrade la convergence, ou le surcoût de compilation n'est jamais amorti. La règle d'équipe : profil avant, plafond de gain calculé, profil après.</p>
 <div class="recap">
 <p>Points clés — chapitre 8</p>
 <ul>
@@ -1183,8 +1200,123 @@ profiler FLOPs of mm+addmm+bmm: 1308622848 = 3.000 x analytic forward FLOPs</cod
 <li>Les CUDA graphs exigent des formes et adresses stables ; sans verdict « lancement », ils ne servent à rien.</li>
 </ul>
 </div>
+<h2 id="ch9">9. Au-delà de NVIDIA : AMD, TPU, Trainium et accélérateurs chinois</h2>
+<p>Les huit chapitres précédents portent sur CUDA, qui domine les flottes. Mais près d'une offre sur cinq du <a href="../../market/index.html">relevé du marché</a> mentionne un autre accélérateur. Ce chapitre transpose le vocabulaire des chapitres 1 à 8 (noyau, warp, roofline, collective, profil) vers AMD, les TPU de Google, AWS Trainium et les piles chinoises.</p>
+<h3 id="pourquoi-une-flotte-devient-hétérogène">9.1. Pourquoi une flotte devient hétérogène</h3>
+<p>Une équipe exploite rarement plusieurs matériels par goût : elle y est conduite par la disponibilité (en pénurie de GPU), par le coût, et parfois par la souveraineté ou l'accès. Le marché le montre : les offres chinoises citent les accélérateurs non NVIDIA près de deux fois plus souvent, et plusieurs laboratoires nationaux imposent leur propre matériel (<a href="../../market/index.html">marché</a>).</p>
+<div class="note">
+<p><span class="tag">Ce que ce chapitre ne prétend pas</span> Les raisons économiques et réglementaires changent vite et dépendent du pays. Ce cours ne chiffre ni prix ni règles d'export ; le prix relève du <a href="../finops-capacity/index.html">module FinOps</a>, le choix de fournisseur du <a href="../multi-cloud/index.html">module multi-fournisseurs</a>.</p>
+</div>
+<p>L'enjeu technique est la <strong>portabilité</strong> : changer de matériel sans réécriture totale. Chaque fournisseur propose soit une copie de l'API CUDA, soit un compilateur qui prend le graphe entier ; dans les deux cas, l'équipe hérite d'un nouveau pilote, d'un nouvel outil de santé et de nouvelles collectives.</p>
+<h3 id="amd-instinct-et-rocm-hip-une-quasi-copie-de-cuda">9.2. AMD Instinct et ROCm : HIP, une quasi-copie de CUDA</h3>
+<p>ROCm est la pile d'AMD pour ses GPU Instinct. Son langage de noyaux, <strong>HIP</strong> (<em>Heterogeneous-compute Interface for Portability</em>), reprend de près l'API CUDA, mais la documentation prévient que « HIP is not intended to be a drop-in replacement for NVIDIA CUDA » (<a href="https://rocm.docs.amd.com/projects/HIP/en/latest/what_is_hip.html">What is HIP</a>). L'outil <strong>HIPIFY</strong> traduit une grande partie du code (<code>hipify-clang</code>, <code>hipify-perl</code>) mais « cannot automatically translate all code » : le code sans équivalent HIP reste à reprendre (<a href="https://rocm.docs.amd.com/projects/HIPIFY/en/latest/index.html">HIPIFY</a>).</p>
+<div class="note">
+<p><span class="tag">Ne codez pas une taille de warp en dur</span> Le guide de portage HIP est explicite : « Code should not assume a warp size of 32 or 64, as AMD GPU architectures have different warp sizes. » Il faut lire <code>warpSize</code> dans le code du device. Une réduction du chapitre 3 écrite pour un warp de 32 peut donc être fausse sur AMD. Source : <a href="https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_porting_guide.html">HIP porting guide</a>.</p>
+</div>
+<p>Le reste de la pile reproduit l'écosystème CUDA presque un pour un : <strong>rocBLAS</strong> et <strong>hipBLASLt</strong> pour les GEMM (comme cuBLAS), <strong>MIOpen</strong> pour l'apprentissage profond (comme cuDNN), <strong>RCCL</strong> pour les collectives — mêmes routines que NCCL du <a href="../networking/index.html">module 7</a> (<a href="https://rocm.docs.amd.com/projects/rccl/en/latest/what-is-rccl.html">RCCL</a>). PyTorch réutilise la même interface : « PyTorch for HIP intentionally reuses the existing torch.cuda interfaces », et un device reste <code>'cuda:0'</code> sur AMD (<a href="https://docs.pytorch.org/docs/2.14/notes/hip.html">PyTorch HIP</a>). Côté santé, <code>rocm-smi</code> joue le rôle de <code>nvidia-smi</code> ; <strong>AMD SMI</strong> (<code>amd-smi</code>) en est le successeur (<a href="https://rocm.docs.amd.com/projects/amdsmi/en/latest/">AMD SMI</a>).</p>
+<h3 id="tpu-et-xla-compiler-le-graphe-entier">9.3. TPU et XLA : compiler le graphe entier</h3>
+<p>Le TPU de Google ne se programme pas noyau par noyau. On décrit le calcul dans JAX ou PyTorch, et le compilateur <strong>XLA</strong> (<em>Accelerated Linear Algebra</em>) prend « as much code as possible » pour l'optimiser d'un bloc (<a href="https://openxla.org/xla">XLA</a>, <a href="https://docs.jax.dev/en/latest/jit-compilation.html">JAX</a>). Le cœur matériel est une <strong>MXU</strong>, un réseau systolique de multiplieurs-accumulateurs (<a href="https://cloud.google.com/tpu/docs/system-architecture-tpu-vm">architecture TPU</a>).</p>
+<div class="note">
+<p><span class="tag">La contrepartie de la compilation de graphe</span> JAX recompile pour chaque nouvelle forme et valeur statique : « JAX will have to re-compile the function for every new value of the specified static input » (<a href="https://docs.jax.dev/en/latest/jit-compilation.html">JAX</a>). Comme <code>torch.compile</code> (chapitre 8), des formes trop variables font payer la compilation en boucle : c'est le pendant TPU du goulot de lancement du chapitre 7.</p>
+</div>
+<p>Les puces d'un <strong>pod</strong> sont reliées par un interconnexion <strong>inter-chip (ICI)</strong> en tore 2D ou 3D ; un pod v5p compte 8960 puces, à 1200 Go/s d'ICI bidirectionnel par puce (<a href="https://cloud.google.com/tpu/docs/v5p">TPU v5p</a>). Côté PyTorch, Google a remplacé l'ancien PyTorch/XLA par <strong>TorchTPU</strong>, en <em>eager</em> par défaut et compilé par <code>torch.compile</code> via OpenXLA (<a href="https://docs.cloud.google.com/tpu/docs/pytorch-on-tpu">PyTorch on TPU</a>). La santé se lit avec <code>tpu-info</code> (<code>duty_cycle_pct</code>, <code>hbm_util</code>) (<a href="https://docs.cloud.google.com/tpu/docs/tpu-monitoring-library">TPU monitoring</a>).</p>
+<h3 id="aws-trainium-et-le-neuron-sdk">9.4. AWS Trainium et le Neuron SDK</h3>
+<p>AWS Trainium suit aussi le modèle « graphe compilé ». Le <strong>Neuron SDK</strong> « includes a compiler, runtime, training and inference libraries, and developer tools » et s'utilise depuis PyTorch et JAX sans réécriture (<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/what-is-neuron.html">What is Neuron</a>). Le compilateur <code>neuronx-cc</code> produit le code machine via OpenXLA, comme sur TPU.</p>
+<p>Les outils reprennent les mêmes rôles : <code>neuron-top</code> est un <code>htop</code> des NeuronCore, <code>neuron-monitor</code> exporte les métriques, <code>nccom-test</code> mesure les collectives (<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/tools/neuron-sys-tools/index.html">Neuron tools</a>). Sur Kubernetes, le <em>device plugin</em> enregistre <code>aws.amazon.com/neuron</code> et <code>aws.amazon.com/neuroncore</code>, avec aussi un pilote DRA (<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/deploy/eks/setup.html">Neuron EKS</a>) — les deux approches du <a href="../kubernetes-gpu/index.html">module 12</a>.</p>
+<h3 id="huawei-ascend-et-les-piles-chinoises">9.5. Huawei Ascend et les piles chinoises</h3>
+<p>La pile Ascend de Huawei s'appelle <strong>CANN</strong> (<em>Compute Architecture for Neural Networks</em>). Le plugin PyTorch <strong>torch_npu</strong> « fully inherits and reuses » les capacités de PyTorch amont via le mécanisme <code>PrivateUse1</code> : après <code>import torch_npu</code>, un tenseur passe sur l'accélérateur par <code>x.npu()</code> (<a href="https://raw.githubusercontent.com/Ascend/pytorch/master/README.md">torch_npu</a>). Les collectives passent par <strong>HCCL</strong> (<code>libhccl.so</code>), l'équivalent de NCCL et de RCCL (<a href="https://docs.vllm.ai/projects/ascend/en/latest/user_guide/configuration/env_vars.html">vLLM Ascend</a>) ; la santé se vérifie par <code>npu-smi info</code> (<a href="https://docs.vllm.ai/projects/ascend/en/latest/getting_started/installation.html">install</a>).</p>
+<p>D'autres constructeurs chinois — MetaX, Moore Threads, Enflame — proposent des GPU de centre de données, cités par les offres (<a href="../../market/index.html">marché</a>). Leurs piles existent mais ne sont pas relues ici : API, collectives et outils de santé à vérifier à la source.</p>
+<h3 id="ce-qui-change-pour-léquipe-dinfrastructure">9.6. Ce qui change pour l'équipe d'infrastructure</h3>
+<p>Chaque fournisseur expose les mêmes rôles que NVIDIA, sous d'autres noms (tableau ci-dessous) ; les cases marquées d'un astérisque ne sont pas relues à la source (voir « Sources et portée »).</p>
+<div class="tbl-wrap">
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rôle</th>
+<th>NVIDIA</th>
+<th>AMD</th>
+<th>TPU</th>
+<th>Trainium</th>
+<th>Ascend</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pilote / runtime</td>
+<td>CUDA</td>
+<td>ROCm (HIP)</td>
+<td>libTPU / XLA</td>
+<td>Neuron (<code>neuronx-cc</code>)</td>
+<td>CANN</td>
+</tr>
+<tr class="even">
+<td>Ressource Kubernetes</td>
+<td><code>nvidia.com/gpu</code>, DRA</td>
+<td><code>amd.com/gpu</code>, DRA</td>
+<td>plugin GKE*</td>
+<td><code>aws.amazon.com/neuron</code>, DRA</td>
+<td>plugin Ascend*</td>
+</tr>
+<tr class="odd">
+<td>Santé / télémétrie</td>
+<td><code>nvidia-smi</code>, DCGM</td>
+<td><code>rocm-smi</code> / <code>amd-smi</code></td>
+<td><code>tpu-info</code></td>
+<td><code>neuron-monitor</code></td>
+<td><code>npu-smi</code></td>
+</tr>
+<tr class="even">
+<td>Collectives</td>
+<td>NCCL</td>
+<td>RCCL</td>
+<td>collectives XLA (ICI)</td>
+<td>collectives Neuron</td>
+<td>HCCL</td>
+</tr>
+<tr class="odd">
+<td>Profileur</td>
+<td>Nsight</td>
+<td>ROCm Compute Profiler</td>
+<td>profileur XLA</td>
+<td>Neuron Explorer</td>
+<td>profileur CANN*</td>
+</tr>
+<tr class="even">
+<td>Image conteneur</td>
+<td>image CUDA</td>
+<td>image ROCm</td>
+<td>image TPU</td>
+<td>image Neuron</td>
+<td>image CANN</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Une <strong>liste de contrôle de portabilité</strong> avant d'accueillir un matériel : (1) pilote et runtime dans une image conteneur reproductible (<a href="../provisioning/index.html">module 6</a>) ; (2) un <em>device plugin</em> ou un pilote DRA pour votre ordonnanceur ; (3) la bibliothèque de collectives intégrée à PyTorch et testée sur votre fabric ; (4) un outil de santé branché sur votre observabilité (<a href="../observability/index.html">module 14</a>) ; (5) aucun noyau maison supposant une taille de warp ou une API CUDA sans équivalent.</p>
+<div class="ex">
+<p><span class="tag">Exemple 9.1 — Le point de rupture du roofline sur trois accélérateurs</span> Le point de rupture du roofline (chapitre 2) vaut <span class="math inline">P_{\text{pic}}/B</span>, pic dense divisé par bande passante mémoire. Avec les seules fiches techniques relues (BF16 dense, HBM) :</p>
+<p><span class="math display">\text{H100} : \frac{989{,}4}{3{,}35} = 295 \quad \text{MI300X} : \frac{1307{,}4}{5{,}325} = 246 \quad \text{TPU v5p} : \frac{459}{2{,}765} = 166</span></p>
+<p>en FLOP par octet (pics et bandes passantes en <span class="math inline">10^{12}</span>). Le MI300X a un point de rupture <strong>plus bas</strong> que le H100 : à bande passante supérieure (5,33 contre 3,35 To/s, <a href="https://www.amd.com/en/products/accelerators/instinct/mi300/mi300x.html">AMD</a>), il faut moins de réutilisation pour saturer le calcul. Pour un noyau limité par la mémoire, c'est la bande passante qui compte, pas le pic (l'exercice 11 le chiffre sur le softmax fusionné).</p>
+</div>
+<div class="recap">
+<p>Points clés — chapitre 9</p>
+<ul>
+<li>Une flotte devient hétérogène par disponibilité, coût ou souveraineté ; l'enjeu technique est la portabilité.</li>
+<li>AMD/ROCm copie l'API CUDA (HIP, hipify, rocBLAS/MIOpen, RCCL, <code>torch.cuda</code>) ; attention à <code>warpSize</code>, qui n'est pas 32.</li>
+<li>TPU, Trainium et Ascend compilent le graphe (XLA, Neuron) : la recompilation sur formes variables est leur goulot de lancement.</li>
+<li>Chaque fournisseur a son pilote, son <em>device plugin</em>, son outil de santé, ses collectives et son profileur : la liste de contrôle les recense.</li>
+</ul>
+</div>
 <h2 id="labs">Labs</h2>
-<p>Les quatre labs s'exécutent sur un portable Linux <strong>sans GPU</strong>. Prérequis communs : Python 3 récent (testé avec 3.13) avec <code>numpy</code>, <code>torch</code> (version CPU), <code>numba</code>, <code>triton</code> et <code>pytest</code> ; ils ont été exécutés le 25 octobre 2026 avec PyTorch 2.14.1, Numba 0.68.0 et Triton 3.8.0. <code>nvcc</code> est facultatif : s'il est installé (<code>apt install nvidia-cuda-toolkit</code>, version 12.0.140 testée), <code>verify.sh</code> compile les programmes CUDA C++, sans jamais les lancer. Chaque lab dit ce qui est <strong>vérifié</strong> ici et ce qui ne l'est pas.</p>
+<p>Les quatre labs s'exécutent sur un portable Linux <strong>sans GPU</strong>. Prérequis communs : Python 3 (testé avec 3.13) avec <code>numpy</code>, <code>torch</code> (version CPU), <code>numba</code>, <code>triton</code> et <code>pytest</code> ; exécutés le 25 octobre 2026 avec PyTorch 2.14.1, Numba 0.68.0 et Triton 3.8.0. <code>nvcc</code> est facultatif : s'il est installé (version 12.0.140 testée), <code>verify.sh</code> compile les programmes CUDA C++ sans les lancer. Chaque lab dit ce qui est <strong>vérifié</strong> et ce qui ne l'est pas.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> pip install numpy torch numba triton pytest</span></code></pre></div>
 <h3 id="lab-4-1">Lab 4.1 — Le warp et la mémoire, en modèle</h3>
 <div class="lab">
@@ -1290,7 +1422,7 @@ reduction without barriers: 5 wrong results out of 5 launches</code></pre>
 <li><p>Ligne 1 : le noyau <code>vec_add_unguarded</code> ne teste pas <code>i &lt; c.shape[0]</code> ; le thread 44 du bloc 1 (index global <span class="math inline">64 + 44 = 108</span> avec des blocs de 64) dépasse un tableau de 100 éléments. Correction : le test de <code>vec_add</code> (<code>if i &lt; c.shape[0]:</code>). Ligne 2 : <code>block_sum(sync=False)</code> lit la mémoire partagée avant que les autres threads l'aient écrite et entre les tours de l'arbre. Correction : les deux <code>cuda.syncthreads()</code> de <code>block_sum</code>, placées <strong>hors</strong> de tout <code>if</code>.</p></li>
 <li><p><span class="math inline">\lceil 1000/256 \rceil = 4</span> blocs, 1024 threads : 24 en trop. Chacun écrit un <code>float32</code> : 96 octets après la fin de la sortie (et lit 96 octets après la fin de chaque entrée).</p></li>
 <li><p>Sur un vrai GPU, il n'y a pas d'exception : l'écriture hors tableau corrompt silencieusement la mémoire voisine, ou provoque une erreur d'accès illégal signalée plus tard (les erreurs sont asynchrones : § 4.1, lu à la séance suivante). La documentation de Triton recommande <code>compute-sanitizer</code> pour contrôler les courses de données et les accès mémoire sur GPU NVIDIA.</p></li>
-<li><p>Le simulateur ne modélise pas les warps et ordonne ses threads comme le système ; il attrape les accès hors bornes sur des tableaux NumPy, pas toutes les courses. Une absence de plainte prouve peu : il faut des tests sur plusieurs tailles et un outil de contrôle sur GPU.</p></li>
+<li><p>Le simulateur ne modélise pas les warps et n'attrape que les accès hors bornes sur tableaux NumPy, pas les courses. Une absence de plainte prouve peu : testez plusieurs tailles et un outil de contrôle sur GPU.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1305,7 +1437,7 @@ reduction without barriers: 5 wrong results out of 5 launches</code></pre>
 <li><p>La somme vaut 54 ms et le maximum 24 ms. <span class="math inline">T(1) = 54</span> ms, <span class="math inline">T(3) = 18 + \frac{2}{3} \times 24 = 34</span> ms, <span class="math inline">T(6) = 9 + \frac{5}{6} \times 24 = 29</span> ms, <span class="math inline">T(12) = 4{,}5 + \frac{11}{12} \times 24 = 26{,}5</span> ms.</p></li>
 <li><p><span class="math inline">T(c) = 24 + 30/c</span> : le maximum plus (somme moins maximum) divisé par <span class="math inline">c</span>.</p></li>
 <li><p>On veut <span class="math inline">T \le 1{,}1 \times 24 = 26{,}4</span> ms, soit <span class="math inline">30/c \le 2{,}4</span>, donc <span class="math inline">c \ge 12{,}5</span> : <span class="math inline">c = 13</span> (<span class="math inline">T = 26{,}3</span> ms).</p></li>
-<li><p><span class="math inline">T(c) = 24 + 30/c + 0{,}05\,c</span> est minimal pour <span class="math inline">c = \sqrt{30/0{,}05} \approx 24{,}5</span> ; en entiers, <span class="math inline">c = 24</span> ou <span class="math inline">25</span> donne <span class="math inline">26{,}45</span> ms. Avec ce coût fixe, on <strong>ne peut plus</strong> passer sous 26,4 ms : le gain marginal du découpage s'annule vers <span class="math inline">c \approx 25</span>. Le coût fixe réel se mesure ; l'hypothèse sert à montrer qu'il existe un optimum.</p></li>
+<li><p><span class="math inline">T(c) = 24 + 30/c + 0{,}05\,c</span> est minimal pour <span class="math inline">c = \sqrt{30/0{,}05} \approx 24{,}5</span> ; en entiers, <span class="math inline">c = 24</span> ou <span class="math inline">25</span> donne <span class="math inline">26{,}45</span> ms. Avec ce coût fixe, on <strong>ne peut plus</strong> passer sous 26,4 ms : le gain marginal s'annule vers <span class="math inline">c \approx 25</span>. L'hypothèse montre qu'il existe un optimum.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1316,7 +1448,7 @@ reduction without barriers: 5 wrong results out of 5 launches</code></pre>
 <li><p>Non fusionné : <span class="math inline">(8MN + 4M) \times 2 = 536\,936\,448</span> octets (536,9 Mo). Fusionné : <span class="math inline">2MN \times 2 = 134\,217\,728</span> octets (134,2 Mo). Rapport : 4,0005.</p></li>
 <li><p><span class="math inline">536{,}9 \cdot 10^{6}/3{,}35 \cdot 10^{12} = 160{,}3</span> µs et <span class="math inline">134{,}2 \cdot 10^{6}/3{,}35 \cdot 10^{12} = 40{,}1</span> µs.</p></li>
 <li><p><span class="math inline">40{,}1/0{,}7 = 57{,}2</span> µs.</p></li>
-<li><p><span class="math inline">134{,}2 \cdot 10^{6}/90 \cdot 10^{-6} = 1{,}49</span> To/s, soit 44,5 % de 3,35 To/s. Le noyau est loin de la borne : on cherche des accès non coalescés, une occupation basse ou une <code>BLOCK_SIZE</code> mal choisie (auto-réglage), à confirmer avec Nsight Compute. Le noyau peut aussi être limité par le lancement si la matrice est petite : ici 40 µs de borne est assez court pour que le coût de lancement compte.</p></li>
+<li><p><span class="math inline">134{,}2 \cdot 10^{6}/90 \cdot 10^{-6} = 1{,}49</span> To/s, soit 44,5 % de 3,35 To/s. Le noyau est loin de la borne : on cherche des accès non coalescés, une occupation basse ou une <code>BLOCK_SIZE</code> mal choisie, à confirmer avec Nsight Compute. Il peut aussi être limité par le lancement si la matrice est petite (40 µs de borne est court).</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1331,7 +1463,7 @@ reduction without barriers: 5 wrong results out of 5 launches</code></pre>
 <p>La valeur <span class="math inline">2^{22}</span> dépasse. Les facteurs de <span class="math inline">2^5</span> à <span class="math inline">2^{21}</span> conviennent.</p>
 <ol start="2" type="a">
 <li><p>Pour des nombres normaux : <span class="math inline">S \ge 2^{-14}/(3 \cdot 10^{-9}) = 20\,345</span>, donc <span class="math inline">S \ge 2^{15} = 32\,768</span>. La plage devient <span class="math inline">2^{15}</span> à <span class="math inline">2^{21}</span>.</p></li>
-<li><p>Les modules changent pendant l'entraînement et les gradients accumulés sur plusieurs micro-lots peuvent dépasser un gradient isolé. Stratégie : partir d'une échelle élevée ; si un gradient contient <code>inf</code> ou <code>NaN</code>, sauter le pas et diviser l'échelle par 2 ; après un nombre fixé de pas sans incident, la doubler. C'est le principe de <code>torch.amp.GradScaler</code>. Une valeur fixe ne suit pas la dérive des modules.</p></li>
+<li><p>Les modules changent pendant l'entraînement, et les gradients cumulés sur plusieurs micro-lots peuvent dépasser un gradient isolé. Stratégie : partir d'une échelle élevée ; si un gradient contient <code>inf</code> ou <code>NaN</code>, sauter le pas et diviser l'échelle par 2 ; après un nombre fixé de pas sans incident, la doubler. C'est le principe de <code>torch.amp.GradScaler</code> ; une valeur fixe ne suit pas la dérive.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1351,7 +1483,7 @@ VERDICT: LAUNCH-BOUND: many short kernels and an idle device (fuse, CUDA graphs,
 <li><p>Le GPU n'est occupé que 27,7 % du temps (utilisation <span class="math inline">&lt; 60</span> %) et le noyau médian dure 5,0 µs (<span class="math inline">&lt; 50</span> µs) : beaucoup de noyaux très courts séparés par des trous, c'est un goulot de lancement.</p></li>
 <li><p><span class="math inline">3587/994 = 3{,}61</span> : en supprimant tous les trous sans changer les noyaux, la durée tomberait au mieux à 994 µs.</p></li>
 <li><p><span class="math inline">3587/200 = 17{,}9</span> µs par noyau, dont 5,0 µs de calcul sur le GPU (utilisation 27,7 %).</p></li>
-<li><p>Fusionner les 200 multiplications élémentaires (par <code>torch.compile</code>, ou un noyau Triton) ou capturer la séquence dans un CUDA graph. Essayez d'abord la fusion : elle supprime les lancements <strong>et</strong> le trafic mémoire intermédiaire, donc elle peut dépasser la borne de 3,6 du graphe. Après, refaites la trace : utilisation, nombre de noyaux, durée de l'étape, et vérifiez que les résultats restent dans la tolérance. Les valeurs viennent d'une trace fabriquée : sur une vraie trace, relisez d'abord le profil.</p></li>
+<li><p>Fusionner les 200 multiplications élémentaires (par <code>torch.compile</code> ou un noyau Triton) ou capturer la séquence dans un CUDA graph. Essayez d'abord la fusion : elle supprime les lancements <strong>et</strong> le trafic intermédiaire, donc peut dépasser la borne de 3,6 du graphe. Après, refaites la trace (utilisation, nombre de noyaux, durée de l'étape) et vérifiez la tolérance. Les valeurs viennent d'une trace fabriquée : sur une vraie trace, relisez d'abord le profil.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1366,7 +1498,7 @@ VERDICT: LAUNCH-BOUND: many short kernels and an idle device (fuse, CUDA graphs,
 <li><p>A : 8 blocs par les threads, 10 par les registres (<span class="math inline">65\,536/(24 \times 256)</span>), 39 par la mémoire partagée : 8 blocs, 64 warps, <strong>100 %</strong>. B : <span class="math inline">64 \times 65 \times 4 = 16\,640</span> octets ; 2 blocs par les threads, 2 par les registres (<span class="math inline">65\,536/(24 \times 1024) = 2{,}67</span>), 10 par la mémoire partagée : 2 blocs, 64 warps, <strong>100 %</strong> (<code>python3 warpmodel.py occupancy --threads 1024 --regs 24 --smem 16640</code>).</p></li>
 <li><p>Le pas entre threads vaut 64 mots pour <span class="math inline">pad = 0</span> : degré <strong>32</strong>. Avec <span class="math inline">pad = 1</span> : 65 mots, degré <strong>1</strong>.</p></li>
 <li><p>Largeur 32 : pas de 32, 33, 34, 35, 36 mots, soit des degrés <strong>32, 1, 2, 1, 4</strong>. Règle : pour un pas <span class="math inline">p</span>, le degré vaut <span class="math inline">\gcd(p, 32)</span> (vérifié par le modèle pour <span class="math inline">p</span> de 1 à 128) ; un pas impair est sans conflit.</p></li>
-<li><p>Les deux versions atteignent 100 % d'occupation et A utilise 33 792 octets par SM (<span class="math inline">8 \times 4224</span>) contre 33 280 pour B (<span class="math inline">2 \times 16\,640</span>) : aucune raison de préférer B sur ces seuls critères. On garde A (plus simple, mieux répartie sur de petites matrices) et on mesure les deux avec <code>transpose.cu</code> sur GPU : débit en Go/s, conflits de bancs et efficacité des accès globaux avec Nsight Compute. Le modèle élimine les mauvaises options, il ne choisit pas la meilleure.</p></li>
+<li><p>Les deux versions atteignent 100 % d'occupation et A utilise 33 792 octets par SM (<span class="math inline">8 \times 4224</span>) contre 33 280 pour B (<span class="math inline">2 \times 16\,640</span>) : aucune raison de préférer B sur ces seuls critères. On garde A (plus simple, mieux répartie sur de petites matrices) et on mesure les deux avec <code>transpose.cu</code> sur GPU (débit, conflits de bancs, accès globaux sous Nsight Compute). Le modèle élimine les mauvaises options, il ne choisit pas la meilleure.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1383,7 +1515,32 @@ VERDICT: LAUNCH-BOUND: many short kernels and an idle device (fuse, CUDA graphs,
 <li><p>Avec 5 noyaux par couche : <span class="math inline">160</span> noyaux, CPU 960 µs, GPU 640 µs. Sans graphe : 960 µs, soit <strong>1042 tokens/s</strong> (gain 2,4). Avec graphe : 640 µs, soit <strong>1562 tokens/s</strong> (gain 3,6).</p></li>
 <li><p>Gain croissant : graphe (1,5), fusion (2,4), fusion et graphe (3,6). Risque : le graphe suppose des formes et adresses stables, ce qui est délicat quand le cache clé-valeur grandit à chaque pas ; <code>torch.compile</code> en mode <code>reduce-overhead</code> n'est pas garanti (§ 8.4) ; la fusion demande de la validation numérique.</p></li>
 </ol>
-<p>On mesure d'abord le vrai profil : durée réelle des noyaux et du lancement, utilisation du GPU, nombre de ruptures de graphe, et on vérifie que la durée d'un noyau fusionné est bien celle supposée (4 µs est une hypothèse optimiste). Un lot plus grand allonge les noyaux et réduit le poids relatif du lancement, au prix de la latence par requête.</p>
+<p>On mesure d'abord le vrai profil : durée des noyaux et du lancement, utilisation du GPU, ruptures de graphe, et on vérifie que le noyau fusionné dure bien 4 µs (hypothèse optimiste). Un lot plus grand allonge les noyaux et réduit le poids du lancement, au prix de la latence par requête.</p>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 11 · ★★ — Porter un noyau limité par la mémoire</span> Vous portez le softmax fusionné du chapitre 5 (matrice <span class="math inline">8192 \times 4096</span> en <code>bfloat16</code>) d'un H100 vers un MI300X puis un TPU v5p. Le noyau fusionné lit <span class="math inline">MN</span> éléments de 2 octets et en écrit autant. Bandes passantes HBM relues : H100 3,35, MI300X 5,325, TPU v5p 2,765 To/s. (a) Trafic en octets ? (b) Borne de durée sur chaque accélérateur ? (c) Le pic BF16 dense du MI300X vaut 1,32 fois celui du H100 ; le gain suit-il le pic ou la bande passante ? (d) Le TPU v5p est-il un bon choix par puce ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li>Le trafic vaut <span class="math inline">2MN</span> éléments de 2 octets :</li>
+</ol>
+<p><span class="math display">2 \times 8192 \times 4096 \times 2 = 134\,217\,728 \text{ octets} = 134{,}2 \text{ Mo}</span></p>
+<ol start="2" type="a">
+<li><p><span class="math inline">134{,}2 \cdot 10^{6}</span> divisé par la bande passante : H100 <span class="math inline">40{,}1</span> µs, MI300X <span class="math inline">25{,}2</span> µs, TPU v5p <span class="math inline">48{,}5</span> µs.</p></li>
+<li><p>Le gain MI300X/H100 vaut <span class="math inline">40{,}1/25{,}2 = 1{,}59</span>, le rapport des bandes passantes (<span class="math inline">5{,}325/3{,}35</span>), non celui des pics (1,32) : un noyau limité par la mémoire suit la <strong>bande passante</strong> (exemple 9.1).</p></li>
+<li><p>Par puce, le TPU v5p est plus lent (<span class="math inline">48{,}5</span> µs) car sa bande passante HBM est plus faible. Ce sont des <strong>bornes idéalisées</strong> : le choix réel dépend aussi des collectives du pod, de XLA et du coût.</p></li>
+</ol>
+</details>
+<div class="exo">
+<p><span class="tag">Exercice 12 · ★★★ — Un plan de portage d'une base CUDA</span> Par pénurie de H100, une équipe doit faire tourner sa base de code — noyaux maison en CUDA C++, cuBLAS, NCCL et un modèle PyTorch — sur MI300X (ROCm) et sur Trainium. (a) Pour chaque composant, dites s'il se porte par quasi-copie, <code>hipify</code>, bibliothèque équivalente ou réécriture, source à l'appui. (b) Quel piège de taille de warp guette les noyaux maison sur AMD ? (c) Pourquoi Trainium ne se « hipifie » pas ? (d) Quelle liste de contrôle appliquez-vous avant la mise en production ?</p>
+</div>
+<details class="sol"><summary>Corrigé</summary>
+<ol type="a">
+<li><p>Vers <strong>AMD/ROCm</strong> : le modèle PyTorch tourne presque tel quel, car « PyTorch for HIP intentionally reuses the existing torch.cuda interfaces » et le device reste <code>'cuda:0'</code> (<a href="https://docs.pytorch.org/docs/2.14/notes/hip.html">PyTorch HIP</a>). cuBLAS devient <strong>rocBLAS/hipBLASLt</strong>, NCCL devient <strong>RCCL</strong>. Les noyaux maison passent par <code>hipify-clang</code>/<code>hipify-perl</code> puis revue, car HIPIFY « cannot automatically translate all code » (<a href="https://rocm.docs.amd.com/projects/HIPIFY/en/latest/index.html">HIPIFY</a>).</p></li>
+<li><p>Les noyaux qui supposent un warp de 32 lanes (réductions, <em>shuffles</em> du chapitre 3) peuvent être faux : « Code should not assume a warp size of 32 or 64 » ; il faut lire <code>warpSize</code> (<a href="https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_porting_guide.html">HIP porting guide</a>).</p></li>
+<li><p>Trainium ne partage pas l'API CUDA : son modèle est « graphe compilé » par le Neuron SDK (<a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/what-is-neuron.html">What is Neuron</a>). On ne hipifie pas ; on part du modèle PyTorch ou JAX et on laisse <code>torch.compile</code>/OpenXLA et <code>neuronx-cc</code> compiler, en surveillant la recompilation sur formes variables (§ 9.4).</p></li>
+<li><p>La liste de contrôle du § 9.6 (image reproductible, <em>device plugin</em> ou DRA, collectives testées, santé branchée sur l'observabilité, aucune hypothèse de <code>warpSize</code> ou d'API CUDA), plus une validation numérique (précision, TF32) et un profil mesuré sur le nouveau matériel avant la mise en production.</p></li>
+</ol>
 </details>
 <h2 id="exit">Checkpoint de sortie</h2>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
@@ -1395,6 +1552,7 @@ VERDICT: LAUNCH-BOUND: many short kernels and an idle device (fuse, CUDA graphs,
 <li><strong>Je peux lire un noyau Triton et chiffrer ce que la fusion économise.</strong> Preuve : le lab 4.3 et l'exercice 6.</li>
 <li><strong>Je peux expliquer un défaut numérique.</strong> Preuve : l'accumulateur FP16 bloqué à 2048 et l'exercice 7.</li>
 <li><strong>Je peux lire une trace et en tirer un verdict et un plafond de gain.</strong> Preuve : le lab 4.4 et l'exercice 8, refaits sur une trace de votre choix.</li>
+<li><strong>Je peux dresser la liste de contrôle de portabilité d'un noyau vers un accélérateur non NVIDIA.</strong> Preuve : l'exercice 12 et le tableau de correspondance du chapitre 9 appliqués à un noyau de votre choix.</li>
 </ul>
 <p>Trois questions d'entretien à traiter en deux minutes chacune.</p>
 <ol type="1">
@@ -1407,28 +1565,29 @@ VERDICT: LAUNCH-BOUND: many short kernels and an idle device (fuse, CUDA graphs,
 <li>NVIDIA. <a href="https://docs.nvidia.com/cuda/cuda-programming-guide/index.html"><em>CUDA Programming Guide</em></a>, v13.4.2. Lu le 25 octobre 2026. Chapitres 1 et 2 pour les blocs, warps et flux (chapitres 1 et 4 du module) ; annexe 5.1 pour les limites par SM.</li>
 <li>NVIDIA. <a href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html"><em>CUDA C++ Best Practices Guide</em></a>. Consulté le 25 octobre 2026. Les sections sur la coalescence, la mémoire partagée et les bancs, l'occupation, la divergence et la mémoire épinglée (chapitres 1, 2 et 4).</li>
 <li>NVIDIA. <a href="https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/"><em>NVIDIA Hopper Architecture In-Depth</em></a>, blog technique, 22 mars 2022. Nombre de SM, mémoire partagée, cache L2, formats FP8 (chapitres 2 et 6).</li>
-<li>NVIDIA. <a href="https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html"><em>Nsight Compute, Profiling Guide</em></a> et <a href="https://docs.nvidia.com/nsight-compute/NsightComputeCli/index.html"><em>Command Line Interface</em></a>. Consultés le 25 octobre 2026. Sections Speed Of Light, Occupancy, Warp State ; filtres <code>-k</code> et <code>-c</code> (chapitre 7).</li>
-<li>NVIDIA. <a href="https://docs.nvidia.com/nsight-systems/UserGuide/index.html"><em>Nsight Systems, User Guide</em></a>. Consulté le 25 octobre 2026. <code>nsys profile</code>, <code>nsys stats</code>, NVTX (chapitre 7).</li>
+<li>NVIDIA. <a href="https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html"><em>Nsight Compute, Profiling Guide</em></a>, <a href="https://docs.nvidia.com/nsight-compute/NsightComputeCli/index.html"><em>Command Line Interface</em></a> et <a href="https://docs.nvidia.com/nsight-systems/UserGuide/index.html"><em>Nsight Systems, User Guide</em></a>. Consultés le 25 octobre 2026. Speed Of Light, Occupancy, Warp State, filtres <code>-k</code>/<code>-c</code> ; <code>nsys profile</code>, <code>nsys stats</code>, NVTX (chapitre 7).</li>
 <li>Numba. <a href="https://numba.readthedocs.io/en/stable/cuda/simulator.html"><em>The CUDA Simulator</em></a>. Consulté le 25 octobre 2026. Fonctions prises en charge et limites : à lire avant le lab 4.2.</li>
-<li>Tillet, Kung, Cox. <a href="http://www.eecs.harvard.edu/~htk/publication/2019-mapl-tillet-kung-cox.pdf"><em>Triton: An Intermediate Language and Compiler for Tiled Neural Network Computations</em></a>. MAPL 2019. L'origine des idées de Triton (chapitre 5).</li>
-<li>Triton. <a href="https://triton-lang.org/main/getting-started/tutorials/02-fused-softmax.html">Tutoriel <em>Fused Softmax</em></a> et <a href="https://triton-lang.org/main/programming-guide/chapter-3/debugging.html"><em>Debugging</em></a>. Consultés le 25 octobre 2026. Le décompte du trafic et l'interpréteur (chapitre 5, lab 4.3).</li>
+<li>Triton. <a href="http://www.eecs.harvard.edu/~htk/publication/2019-mapl-tillet-kung-cox.pdf">Article MAPL 2019 de Tillet, Kung, Cox</a> (l'origine des idées), <a href="https://triton-lang.org/main/getting-started/tutorials/02-fused-softmax.html">tutoriel <em>Fused Softmax</em></a> et <a href="https://triton-lang.org/main/programming-guide/chapter-3/debugging.html"><em>Debugging</em></a>. Consultés le 25 octobre 2026. Décompte du trafic et interpréteur (chapitre 5, lab 4.3).</li>
 <li>Dao, Fu, Ermon, Rudra, Ré. <a href="https://arxiv.org/abs/2205.14135"><em>FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness</em></a>. 2022. Théorèmes 1 et 2, résultats de la section 4 (chapitre 8).</li>
 <li>Micikevicius et al. <a href="https://arxiv.org/abs/1710.03740"><em>Mixed Precision Training</em></a>. 2017. Copie maîtresse en simple précision, mise à l'échelle de la perte (chapitre 6).</li>
 <li>PyTorch. <a href="https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html"><em>Profiler recipe</em></a> et <a href="https://docs.pytorch.org/docs/2.14/profiler.html"><em>torch.profiler</em></a> (référence de l'API, option <code>with_flops</code>). Consultés le 25 octobre 2026. <code>profile</code>, <code>record_function</code>, <code>key_averages</code>, export de trace (chapitre 7, lab 4.4).</li>
 <li>PyTorch. <a href="https://docs.pytorch.org/docs/2.14/generated/torch.compile.html"><em>torch.compile</em></a>, PyTorch 2.14, consulté le 25 octobre 2026. Modes et limites (chapitre 8).</li>
 <li>PyTorch. <a href="https://docs.pytorch.org/docs/2.14/notes/randomness.html"><em>Reproducibility</em></a>, PyTorch 2.14, consulté le 25 octobre 2026. Ce que PyTorch garantit et ne garantit pas (chapitre 6).</li>
 <li>Nguyen et al. <a href="https://pytorch.org/blog/accelerating-pytorch-with-cuda-graphs/"><em>Accelerating PyTorch with CUDA Graphs</em></a>. 2021. Pourquoi les graphes réduisent les trous entre noyaux courts (chapitre 8).</li>
-<li>PyTorch Kineto. <a href="https://raw.githubusercontent.com/pytorch/kineto/main/libkineto/include/ActivityType.h"><em>ActivityType.h</em></a>, branche <code>main</code>, consulté le 25 octobre 2026. Les noms de catégories d'une trace (chapitre 7).</li>
+<li>AMD. <a href="https://rocm.docs.amd.com/projects/HIP/en/latest/what_is_hip.html"><em>What is HIP</em></a>, <a href="https://rocm.docs.amd.com/projects/HIPIFY/en/latest/index.html"><em>HIPIFY</em></a>, <a href="https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_porting_guide.html"><em>HIP porting guide</em></a> et <a href="https://rocm.docs.amd.com/projects/rccl/en/latest/what-is-rccl.html"><em>RCCL</em></a>. Consultés le 25 octobre 2026. HIP, hipify, <code>warpSize</code>, RCCL (chapitre 9).</li>
+<li>Google Cloud et OpenXLA. <a href="https://cloud.google.com/tpu/docs/system-architecture-tpu-vm"><em>Architecture système TPU</em></a>, <a href="https://cloud.google.com/tpu/docs/v5p"><em>TPU v5p</em></a>, <a href="https://openxla.org/xla"><em>XLA</em></a> et <a href="https://docs.cloud.google.com/tpu/docs/pytorch-on-tpu"><em>PyTorch on TPU</em></a>. Consultés le 25 octobre 2026. Compilation de graphe, MXU, ICI, pods, TorchTPU (chapitre 9, exemple 9.1).</li>
+<li>AWS et Ascend. <a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/about-neuron/what-is-neuron.html"><em>What is AWS Neuron</em></a>, <a href="https://awsdocs-neuron.readthedocs-hosted.com/en/latest/tools/neuron-sys-tools/index.html">outils système Neuron</a> et <a href="https://raw.githubusercontent.com/Ascend/pytorch/master/README.md"><em>torch_npu</em></a>. Consultés le 25 octobre 2026. Neuron SDK, <code>neuron-top</code>/<code>neuron-monitor</code>, CANN, HCCL, <code>torch_npu</code> (chapitre 9).</li>
 </ul>
 <h2 id="sources">Sources et portée</h2>
 <h3 id="documente">Documenté</h3>
-<p>Les faits attribués aux sources ont été relus à la source le 25 octobre 2026 : guide de programmation CUDA v13.4.2 (warps de 32 threads, masquage SIMT, absence de garantie d'ordonnancement entre blocs, limites de la capacité 8.0, asynchronisme, mémoire épinglée requise pour les copies asynchrones, surcoût de lancement et graphes), guide des bonnes pratiques (coalescence en secteurs de 32 octets, 32 bancs, définitions d'occupation, de divergence, remplissage d'une colonne, exemple de 12 Go/s en mémoire épinglée), billet Hopper (132 SM, 50 Mo de L2, 256 Kio combinés, formats FP8), guides Nsight Compute et Nsight Systems (sections, options), documentation du simulateur de Numba, du débogage et de l'auto-réglage de Triton, tutoriel de softmax fusionné, article de Triton, article de FlashAttention (théorèmes, résultats), article de précision mixte, documentation de PyTorch (profileur, précision des produits, <code>torch.compile</code>, reproductibilité, exécution asynchrone), billet sur les CUDA graphs et catégories de Kineto. Tous les nombres calculés des exemples et des corrigés ont été refaits en Python. Les sorties capturées viennent d'un portable de rédaction (Linux, 4 vCPU, sans GPU) avec PyTorch 2.14.1 CPU, Numba 0.68.0, Triton 3.8.0, <code>nvcc</code> 12.0.140 en compilation seule ; les labs ont été exécutés le 25 octobre 2026.</p>
+<p>Les faits attribués aux sources ont été relus le 25 octobre 2026 : guide de programmation CUDA v13.4.2, guide des bonnes pratiques, billet Hopper, guides Nsight Compute et Nsight Systems, documentation du simulateur de Numba et du débogage et de l'auto-réglage de Triton, tutoriel de softmax fusionné, article de Triton, article de FlashAttention, article de précision mixte, documentation de PyTorch (profileur, <code>torch.compile</code>, reproductibilité, exécution asynchrone), billet sur les CUDA graphs et en-têtes de Kineto. Pour le chapitre 9 : documentation AMD (HIP, HIPIFY, <code>warpSize</code>, RCCL, AMD SMI, <code>torch.cuda</code> réutilisé), Google Cloud et OpenXLA (XLA, MXU, ICI, pod v5p, TorchTPU, <code>tpu-info</code>), AWS Neuron (<code>neuronx-cc</code>, <code>neuron-monitor</code>, <code>nccom-test</code>, ressources <code>aws.amazon.com/neuron</code>), Huawei Ascend (<code>torch_npu</code>, CANN 9.1.0, HCCL, <code>npu-smi</code>), et les fiches techniques H100 (989,4 TFLOP/s, 3,35 To/s), MI300X (1307,4 TFLOP/s, 5,325 To/s) et TPU v5p (459 TFLOP/s, 2,765 To/s) en BF16 dense. Tous les nombres des exemples et corrigés ont été refaits en Python. Les sorties capturées viennent du portable Linux (4 vCPU, sans GPU) décrit dans la section Labs (PyTorch 2.14.1 CPU, Numba 0.68.0, Triton 3.8.0, <code>nvcc</code> 12.0.140 en compilation seule).</p>
 <h3 id="recommande">Recommandé</h3>
-<p>L'ordre des chapitres et les durées, la grille Triton, bibliothèque ou CUDA, les quatre verdicts de lecture de trace et leurs seuils (50 µs, 60 %, 85 %, 50 %), l'usage de bornes de gain avant toute optimisation et la règle « profil avant, plafond calculé, profil après » sont des choix de ce parcours, pas des règles des constructeurs. Les hypothèses chiffrées des exercices 5 et 10 sont des données d'énoncé.</p>
+<p>L'ordre des chapitres et les durées, la grille Triton/bibliothèque/CUDA, les quatre verdicts de trace et leurs seuils (50 µs, 60 %, 85 %, 50 %), l'usage de bornes de gain et la règle « profil avant, plafond calculé, profil après » sont des choix de ce parcours, pas des règles des constructeurs. Les hypothèses chiffrées des exercices 5 et 10 sont des données d'énoncé. La liste de contrôle de portabilité du chapitre 9 est aussi une recommandation de ce parcours.</p>
 <h3 id="a-verifier">À vérifier</h3>
-<p><strong>Aucun programme de ce module n'a tourné sur un GPU</strong> : les fichiers <code>cuda/*.cu</code> ont seulement été compilés, <code>bench_gpu.py</code> seulement octet-compilé, et toutes les prédictions de vitesse (rapports de trafic de 4 et de 4,5, gains de recouvrement, rapport d'environ 24 de FlashAttention tiré de formules en <span class="math inline">\Theta</span>) sont des bornes de modèle à confronter à une mesure. Les commandes <code>nsys</code> et <code>ncu</code> des chapitres 7 et du lab 4.4 sont documentées mais non exécutées ; leurs options varient selon les versions. Le tableau des limites par SM du guide CUDA a été lu ; seules les valeurs de la capacité 8.0 servent aux calculs, et les colonnes du texte extrait sont parfois fusionnées (nombre de blocs résidents par SM) : relisez le tableau de votre capacité de calcul. Les 228 Kio de mémoire partagée de la capacité 9.0 sont ceux du tableau des capacités de mémoire partagée du même guide. La largeur d'exposant et le mode d'arrondi de TF32, le nombre de moteurs de copie d'un GPU donné, la nécessité de formes et d'adresses stables pour un CUDA graph, les noms des options d'épinglage de PyTorch, l'absence de mise à l'échelle avec <code>bfloat16</code> et le surcoût du profilage n'ont pas été relus à la source. La documentation de Triton annonce que l'interpréteur ne gère pas <code>bfloat16</code> ; notre essai (Triton 3.8.0) n'a pas levé d'exception mais a rendu des valeurs fausses (observation d'une version, refaite par <code>probe_observations.py</code>). L'échec de <code>@triton.autotune</code> dans l'interpréteur et l'arrêt brutal sans masque sont aussi des observations d'une version. Les traces de type GPU du lab 4.4 sont fabriquées. Les chiffres de fiche technique du H100 (3,35 To/s) viennent du module 2 et n'ont pas été relus ici.</p>
+<p><strong>Aucun programme de ce module n'a tourné sur un GPU</strong> : les <code>cuda/*.cu</code> ont seulement été compilés et toutes les prédictions de vitesse (rapports de trafic de 4 et 4,5, gains de recouvrement, rapport d'environ 24 de FlashAttention en <span class="math inline">\Theta</span>) sont des bornes de modèle à mesurer. Les commandes <code>nsys</code> et <code>ncu</code> sont documentées mais non exécutées. Seules les valeurs de la capacité 8.0 servent aux calculs : relisez le tableau de votre capacité. TF32, le nombre de moteurs de copie, la stabilité des formes d'un CUDA graph et le surcoût du profilage n'ont pas été relus. La documentation de Triton annonce que l'interpréteur ne gère pas <code>bfloat16</code> ; notre essai (3.8.0) a rendu des valeurs fausses sans exception, comme l'échec de <code>@triton.autotune</code> et l'arrêt sans masque — des observations d'une version. Les traces du lab 4.4 sont fabriquées, les chiffres du H100 (3,35 To/s) viennent du module 2. Pour le chapitre 9, aucun matériel non NVIDIA n'a servi : les points de rupture (exemple 9.1) et les bornes (exercice 11) sont des bornes de modèle ; les cases du § 9.6 marquées d'un astérisque (ressource Kubernetes TPU et Ascend, profileur CANN) et les piles chinoises autres que Huawei (MetaX, Moore Threads, Enflame) ne sont pas relues à la source.</p>
+<p>Le développement de l'acronyme CANN (<em>Compute Architecture for Neural Networks</em>) n'a pas pu être relu sur le site de Huawei, injoignable depuis le bac à sable ; il est donné d'après l'usage courant.</p>
 <h3 id="hors-perimetre">Hors périmètre</h3>
-<p>Les communications entre GPU (NCCL, voir les modules sur les réseaux), la programmation des cœurs tensoriels (<code>mma</code>, CUTLASS), la programmation multi-GPU et les groupes coopératifs, les clusters de blocs et le TMA de Hopper, le scan de Blelloch, les GPU non NVIDIA (ROCm), la sparsité, le partage de GPU (MIG) et l'installation des profileurs. L'observabilité d'une flotte (DCGM, métriques d'utilisation) relève du module sur l'observabilité.</p>
+<p>Les communications entre GPU (NCCL, voir les modules sur les réseaux), la programmation des cœurs tensoriels (<code>mma</code>, CUTLASS), la programmation multi-GPU et les groupes coopératifs, les clusters de blocs et le TMA de Hopper, le scan de Blelloch, la sparsité, le partage de GPU (MIG) et l'installation des profileurs. Le chapitre 9 présente les piles non NVIDIA (ROCm, XLA/TPU, Neuron, CANN) et leur portabilité, mais pas l'écriture de noyaux optimisés pour chacune (HIP avancé, NKI, Ascend C) ni le coût d'une flotte hétérogène (module FinOps). L'observabilité d'une flotte (DCGM, métriques d'utilisation) relève du module sur l'observabilité.</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/parallel-programming/index.html"><span class="k">← Précédent</span>Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a><a class="next" href="../../courses/slurm/index.html"><span class="k">Suivant →</span>Module 05 — Slurm et exploitation d'un cluster HPC</a></nav>
 </main>
