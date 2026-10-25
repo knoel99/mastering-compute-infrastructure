@@ -42,7 +42,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h2 id="phase0">Phase 0 — Fondations : machines et performance</h2>
 <h3 id="linux-systems">Module 01 — Linux, systèmes et diagnostic de performance (rédigé, 24 h)</h3>
 <p>Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.</p>
-<p><strong>Cours complet :</strong> <a href="courses/linux-systems/index.html">Linux, systèmes et diagnostic de performance</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/linux-systems/index.html">Linux, systèmes et diagnostic de performance</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Cartographier une machine (CPU, NUMA, PCIe, NIC, GPU) et dire quel chemin les données empruntent</li>
@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 1.</p>
 <h3 id="perf-models">Module 02 — Architecture matérielle et modèles de performance (rédigé, 24 h)</h3>
 <p>Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.</p>
-<p><strong>Cours complet :</strong> <a href="courses/perf-models/index.html">Architecture matérielle et modèles de performance</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/perf-models/index.html">Architecture matérielle et modèles de performance</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Calculer l'intensité arithmétique d'un noyau et le situer sur un roofline</li>
@@ -115,7 +115,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="parallel-programming">Module 03 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle (rédigé, 30 h)</h3>
 <p>Le noyau commun de tous les masters HPC : mémoire partagée, passage de messages, collectives, et la discipline d'une étude de scalabilité.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/parallel-programming/index.html">Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/parallel-programming/index.html">Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Paralléliser une boucle avec OpenMP en justifiant partage, réduction et ordonnancement</li>
@@ -150,7 +150,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="gpu-programming">Module 04 — Programmation GPU : CUDA, Triton et profilage (rédigé, 30 h)</h3>
 <p>Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occupation, coalescence, streams, puis Triton et Nsight.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/gpu-programming/index.html">Programmation GPU : CUDA, Triton et profilage</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/gpu-programming/index.html">Programmation GPU : CUDA, Triton et profilage</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Écrire un noyau CUDA (Numba) avec mémoire partagée et le comparer à une version vectorisée</li>
@@ -188,7 +188,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="slurm">Module 05 — Slurm et exploitation d'un cluster HPC (rédigé, 32 h)</h3>
 <p>L'ordonnanceur de référence du calcul scientifique et de l'entraînement : partitions, QOS, fairshare, GRES, préemption, comptabilité, santé des nœuds.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/slurm/index.html">Slurm et exploitation d'un cluster HPC</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/slurm/index.html">Slurm et exploitation d'un cluster HPC</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Écrire et soumettre des jobs (batch, tableaux, dépendances, interactifs) avec ressources GPU</li>
@@ -223,7 +223,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="provisioning">Module 06 — Provisioning, images et santé des nœuds GPU (rédigé, 24 h)</h3>
 <p>Du châssis nu au nœud en production : installation, images, configuration, pilotes, tests de recette et supervision matérielle.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/provisioning/index.html">Provisioning, images et santé des nœuds GPU</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/provisioning/index.html">Provisioning, images et santé des nœuds GPU</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Décrire la chaîne PXE → image → configuration → enregistrement dans l'ordonnanceur</li>
@@ -259,7 +259,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="networking">Module 07 — Réseaux haute performance : InfiniBand, RoCE et NCCL (rédigé, 28 h)</h3>
 <p>Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, RDMA, NVLink, NCCL, mesures et diagnostic.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/networking/index.html">Réseaux haute performance : InfiniBand, RoCE et NCCL</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/networking/index.html">Réseaux haute performance : InfiniBand, RoCE et NCCL</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Comparer InfiniBand et RoCE (contrôle de congestion, perte, configuration) et choisir selon le besoin</li>
@@ -294,7 +294,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="storage">Module 08 — Stockage et E/S pour l'entraînement (rédigé, 24 h)</h3>
 <p>Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parallèles, objet, cache, chargeurs de données et E/S de checkpoint.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/storage/index.html">Stockage et E/S pour l'entraînement</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/storage/index.html">Stockage et E/S pour l'entraînement</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Choisir entre système de fichiers parallèle, NFS et stockage objet pour un usage donné</li>
@@ -331,7 +331,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (rédigé, 36 h)</h3>
 <p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).</p>
-<p><strong>Cours complet :</strong> <a href="courses/distributed-training/index.html">Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/distributed-training/index.html">Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Choisir DDP, FSDP, tensor, pipeline ou expert parallelism pour un modèle et un cluster donnés, chiffres à l'appui</li>
@@ -370,7 +370,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="fault-tolerance">Module 10 — Pannes, checkpointing et reprise automatique (rédigé, 28 h)</h3>
 <p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p>
 <p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement).</p>
-<p><strong>Cours complet :</strong> <a href="courses/fault-tolerance/index.html">Pannes, checkpointing et reprise automatique</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/fault-tolerance/index.html">Pannes, checkpointing et reprise automatique</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Modéliser la fiabilité d'un job (MTBF d'un cluster, temps perdu, intervalle de checkpoint optimal)</li>
@@ -406,7 +406,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="ray-rl-infra">Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne (rédigé, 28 h)</h3>
 <p>Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, apprenant et acteurs, synchronisation de politique, tampons de rejeu, traitement de données orchestré.</p>
 <p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).</p>
-<p><strong>Cours complet :</strong> <a href="courses/ray-rl-infra/index.html">Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/ray-rl-infra/index.html">Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Expliquer le modèle de Ray (tâches, acteurs, objets) et choisir quand l'utiliser</li>
@@ -443,7 +443,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="kubernetes-gpu">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling (rédigé, 28 h)</h3>
 <p>Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator, MIG, Kueue, Volcano, JobSet, KubeRay, topologie et comparaison honnête avec Slurm.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).</p>
-<p><strong>Cours complet :</strong> <a href="courses/kubernetes-gpu/index.html">Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/kubernetes-gpu/index.html">Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Exposer des GPU à des pods (device plugin, GPU Operator, MIG, time-slicing) et en comprendre les limites</li>
@@ -479,7 +479,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="multi-cloud">Module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC (rédigé, 28 h)</h3>
 <p>Placer, déborder et basculer des charges entre fournisseurs sans réécrire les jobs : abstraction de la capacité, bascule, préemption et paysage de l'offre.</p>
 <p><strong>Prérequis :</strong> module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 10 (Pannes, checkpointing et reprise automatique).</p>
-<p><strong>Cours complet :</strong> <a href="courses/multi-cloud/index.html">Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/multi-cloud/index.html">Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Cartographier l'offre GPU (hyperscalers, GPU clouds, centres HPC, colocation) et ses modèles de capacité</li>
@@ -515,7 +515,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="observability">Module 14 — Observabilité et fiabilité d'une flotte GPU (rédigé, 24 h)</h3>
 <p>Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée : métriques GPU, journaux, traces, SLO de jobs et goodput.</p>
 <p><strong>Prérequis :</strong> module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).</p>
-<p><strong>Cours complet :</strong> <a href="courses/observability/index.html">Observabilité et fiabilité d'une flotte GPU</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/observability/index.html">Observabilité et fiabilité d'une flotte GPU</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Instrumenter une flotte GPU (DCGM, node exporter, exportateurs Slurm/Kubernetes) avec Prometheus</li>
@@ -550,7 +550,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="finops-capacity">Module 15 — FinOps, capacité, énergie et achats de calcul (rédigé, 24 h)</h3>
 <p>Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire un contrat GPU et négocier : le volet technique de l'achat de calcul.</p>
 <p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance).</p>
-<p><strong>Cours complet :</strong> <a href="courses/finops-capacity/index.html">FinOps, capacité, énergie et achats de calcul</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/finops-capacity/index.html">FinOps, capacité, énergie et achats de calcul</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Construire un modèle de coût total (TCO) comparant achat, colocation, réservation et à la demande</li>
@@ -587,7 +587,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="platform-leadership">Module 16 — Plateforme interne, sécurité, production et leadership (rédigé, 28 h)</h3>
 <p>Transformer un cluster en plateforme que des chercheurs adoptent : expérience développeur, sécurité multi-locataire, fiabilité de production, direction d'équipe et entretien.</p>
 <p><strong>Prérequis :</strong> module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).</p>
-<p><strong>Cours complet :</strong> <a href="courses/platform-leadership/index.html">Plateforme interne, sécurité, production et leadership</a>.</p>
+<p><strong>Cours complet :</strong> <a href="../courses/platform-leadership/index.html">Plateforme interne, sécurité, production et leadership</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
 <li>Concevoir une plateforme de calcul self-service (sessions interactives, files, quotas, modèles de jobs)</li>

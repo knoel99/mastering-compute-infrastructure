@@ -1146,7 +1146,7 @@ Sur la VM de test (2026-10-24) : `OK loader-bottleneck: stall 0/1/2/4/8 workers 
 5.  Partie C : relevez le gain agrégé de 1 à 4 écrivains et expliquez pourquoi il est faible sur un seul disque.
 6.  Partie D : relevez le rapport entre la première et la seconde copie dans un tampon.
 
-**Critère de réussite.** `bash verify.sh` affiche `OK checkpoint-io` : relecture exacte des trois modes, erreur médiane de l'ajustement sous 60 %, protocole `fsync` plus de 1,2 fois plus lent qu'une écriture ordinaire à la plus grande taille, surcoût simulé synchrone à moins de 15 points (ou 35 % en relatif) du modèle, asynchrone à moins de 10 points, et asynchrone sous la moitié du synchrone.
+**Critère de réussite.** `bash verify.sh` affiche `OK checkpoint-io` : relecture exacte des trois modes, erreur médiane de l'ajustement sous 60 %, protocole `fsync` plus de 1,2 fois plus lent qu'une écriture ordinaire à la plus grande taille, surcoût simulé synchrone à moins de 15 points (ou 35 % en relatif) du modèle, asynchrone à moins de 20 points, et asynchrone sous la moitié du synchrone.
 
  Sur la VM de test : `OK checkpoint-io: fit B = 518 MiB/s, error 13 %; sync 28.3 % vs model 25.7 %; async 1.4 % vs model 0.4 %`. Vos valeurs seront différentes ; les parties C et D n'ont pas de seuil.
 

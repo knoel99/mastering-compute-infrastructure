@@ -17,7 +17,7 @@ Les sources citées dans les rubriques « Sources à lire et faits à vérifier 
 
 Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, systemd, réseau et stockage vus par un exploitant de cluster.
 
-**Cours complet :** [Linux, systèmes et diagnostic de performance](courses/linux-systems/index.html).
+**Cours complet :** [Linux, systèmes et diagnostic de performance](../courses/linux-systems/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -57,7 +57,7 @@ Le socle commun à tout ce qui suit : processus, mémoire, cgroups, NUMA, system
 
 Prédire avant de mesurer : hiérarchie mémoire, roofline, Amdahl/Gustafson, modèle α-β des communications et MFU.
 
-**Cours complet :** [Architecture matérielle et modèles de performance](courses/perf-models/index.html).
+**Cours complet :** [Architecture matérielle et modèles de performance](../courses/perf-models/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -101,7 +101,7 @@ Le noyau commun de tous les masters HPC : mémoire partagée, passage de message
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
 
-**Cours complet :** [Programmation parallèle : OpenMP, MPI et études de passage à l'échelle](courses/parallel-programming/index.html).
+**Cours complet :** [Programmation parallèle : OpenMP, MPI et études de passage à l'échelle](../courses/parallel-programming/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -141,7 +141,7 @@ Comprendre un noyau GPU assez pour juger un profil : hiérarchie mémoire, occup
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
 
-**Cours complet :** [Programmation GPU : CUDA, Triton et profilage](courses/gpu-programming/index.html).
+**Cours complet :** [Programmation GPU : CUDA, Triton et profilage](../courses/gpu-programming/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -186,7 +186,7 @@ L'ordonnanceur de référence du calcul scientifique et de l'entraînement : par
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
 
-**Cours complet :** [Slurm et exploitation d'un cluster HPC](courses/slurm/index.html).
+**Cours complet :** [Slurm et exploitation d'un cluster HPC](../courses/slurm/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -226,7 +226,7 @@ Du châssis nu au nœud en production : installation, images, configuration, pil
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
 
-**Cours complet :** [Provisioning, images et santé des nœuds GPU](courses/provisioning/index.html).
+**Cours complet :** [Provisioning, images et santé des nœuds GPU](../courses/provisioning/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -267,7 +267,7 @@ Pourquoi un entraînement multi-nœuds est limité par le réseau : topologies, 
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 2 (Architecture matérielle et modèles de performance).
 
-**Cours complet :** [Réseaux haute performance : InfiniBand, RoCE et NCCL](courses/networking/index.html).
+**Cours complet :** [Réseaux haute performance : InfiniBand, RoCE et NCCL](../courses/networking/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -307,7 +307,7 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance).
 
-**Cours complet :** [Stockage et E/S pour l'entraînement](courses/storage/index.html).
+**Cours complet :** [Stockage et E/S pour l'entraînement](../courses/storage/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -351,7 +351,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).
 
-**Cours complet :** [Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](courses/distributed-training/index.html).
+**Cours complet :** [Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../courses/distributed-training/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -395,7 +395,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement).
 
-**Cours complet :** [Pannes, checkpointing et reprise automatique](courses/fault-tolerance/index.html).
+**Cours complet :** [Pannes, checkpointing et reprise automatique](../courses/fault-tolerance/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -436,7 +436,7 @@ Les charges qui ne sont pas un simple gros job : acteurs, rollouts distribués, 
 
 **Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline).
 
-**Cours complet :** [Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](courses/ray-rl-infra/index.html).
+**Cours complet :** [Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](../courses/ray-rl-infra/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -480,7 +480,7 @@ Ce que Kubernetes sait et ne sait pas faire pour l'entraînement : GPU Operator,
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).
 
-**Cours complet :** [Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](courses/kubernetes-gpu/index.html).
+**Cours complet :** [Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../courses/kubernetes-gpu/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -521,7 +521,7 @@ Placer, déborder et basculer des charges entre fournisseurs sans réécrire les
 
 **Prérequis :** module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 10 (Pannes, checkpointing et reprise automatique).
 
-**Cours complet :** [Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](courses/multi-cloud/index.html).
+**Cours complet :** [Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](../courses/multi-cloud/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -562,7 +562,7 @@ Diagnostiquer en minutes un job bloqué, un GPU silencieux ou une courbe cassée
 
 **Prérequis :** module 1 (Linux, systèmes et diagnostic de performance), module 5 (Slurm et exploitation d'un cluster HPC).
 
-**Cours complet :** [Observabilité et fiabilité d'une flotte GPU](courses/observability/index.html).
+**Cours complet :** [Observabilité et fiabilité d'une flotte GPU](../courses/observability/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -602,7 +602,7 @@ Prévoir la demande, choisir le bon mélange de matériel et de contrats, lire u
 
 **Prérequis :** module 2 (Architecture matérielle et modèles de performance).
 
-**Cours complet :** [FinOps, capacité, énergie et achats de calcul](courses/finops-capacity/index.html).
+**Cours complet :** [FinOps, capacité, énergie et achats de calcul](../courses/finops-capacity/index.html).
 
 **Ce que vous saurez vérifier :**
 
@@ -646,7 +646,7 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 
 **Prérequis :** module 5 (Slurm et exploitation d'un cluster HPC), module 12 (Kubernetes pour l'IA : GPU, files d'attente et gang scheduling), module 14 (Observabilité et fiabilité d'une flotte GPU).
 
-**Cours complet :** [Plateforme interne, sécurité, production et leadership](courses/platform-leadership/index.html).
+**Cours complet :** [Plateforme interne, sécurité, production et leadership](../courses/platform-leadership/index.html).
 
 **Ce que vous saurez vérifier :**
 

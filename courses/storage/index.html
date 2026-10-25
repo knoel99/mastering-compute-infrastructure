@@ -1103,7 +1103,7 @@ Taux de succès selon la taille relative du cache pour des époques en ordre al�
 <li>Partie C : relevez le gain agrégé de 1 à 4 écrivains et expliquez pourquoi il est faible sur un seul disque.</li>
 <li>Partie D : relevez le rapport entre la première et la seconde copie dans un tampon.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK checkpoint-io</code> : relecture exacte des trois modes, erreur médiane de l'ajustement sous 60 %, protocole <code>fsync</code> plus de 1,2 fois plus lent qu'une écriture ordinaire à la plus grande taille, surcoût simulé synchrone à moins de 15 points (ou 35 % en relatif) du modèle, asynchrone à moins de 10 points, et asynchrone sous la moitié du synchrone.</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>OK checkpoint-io</code> : relecture exacte des trois modes, erreur médiane de l'ajustement sous 60 %, protocole <code>fsync</code> plus de 1,2 fois plus lent qu'une écriture ordinaire à la plus grande taille, surcoût simulé synchrone à moins de 15 points (ou 35 % en relatif) du modèle, asynchrone à moins de 20 points, et asynchrone sous la moitié du synchrone.</p>
 <p>Sur la VM de test : <code>OK checkpoint-io: fit B = 518 MiB/s, error 13 %; sync 28.3 % vs model 25.7 %; async 1.4 % vs model 0.4 %</code>. Vos valeurs seront différentes ; les parties C et D n'ont pas de seuil.</p>
 <p><strong>Pour aller plus loin.</strong> Lancez <code>bench_ckpt.py --dir &lt;point de montage&gt;</code> sur le stockage de votre cluster. Un test multi-clients (section 6.7) reste à écrire. <strong>Non testé ici.</strong></p>
 </div>

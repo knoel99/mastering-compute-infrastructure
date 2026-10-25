@@ -227,7 +227,7 @@ Les sources citées dans les rubriques « Sources à lire et faits à vérifier 
         for m in [m for m in C["modules"] if m["phase"] == ph]:
             done = has_course(m["id"])
             tag = "rédigé" if done else "plan"
-            title = f"[{m['title']}](courses/{m['id']}/index.html)" if done else m["title"]
+            title = f"[{m['title']}](../courses/{m['id']}/index.html)" if done else m["title"]   # the syllabus lives in syllabus/
             out.append(f"### Module {m['number']:02d} — {m['title']} ({tag}, {m['hours']} h) {{#{m['id']}}}\n")
             out.append(f"{m['summary']}\n")
             if m["prerequisites"]:

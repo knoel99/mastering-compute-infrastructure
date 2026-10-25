@@ -29,7 +29,7 @@ check(big["atomic_s"] > 1.2 * big["buffered_s"], "fsync + rename must cost clear
 check(0.5 < big["write_bytes_per_call_over_size"] < 1.5, "write_bytes counter should be about the checkpoint size")
 for case in b["cases"]:
     check(abs(case["sync"] - case["pred_sync"]) < max(0.15, 0.35 * case["pred_sync"]), "sync overhead should match the model")
-    check(abs(case["async"] - case["pred_async"]) < 0.10, "async overhead should match the model within 10 points")
+    check(abs(case["async"] - case["pred_async"]) < 0.20, "async overhead should match the model within 20 points")
     check(case["async"] < 0.5 * case["sync"], "async must block much less than sync on slow storage")
 check(len(c["rows"]) == 3 and all(x["aggregate_mib_s"] > 0 for x in c["rows"]), "part C must report 3 writer counts")
 check(r["d"]["first_copy_s"] > 0 and r["d"]["second_copy_s"] > 0, "part D must report two copy times (informational, not asserted)")

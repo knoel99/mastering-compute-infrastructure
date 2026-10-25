@@ -260,6 +260,23 @@ def check_site():
         rel = d.parent.relative_to(ROOT).as_posix()
         if rel + "/index.html" not in home:
             errs.append(f"home page does not link {rel}/")
+    # every relative link and every #anchor of the rendered pages resolves
+    pages = [h for h in ROOT.rglob("*.html") if not {".git", "data", "tools"} & set(h.relative_to(ROOT).parts)]
+    html_cache = {h: h.read_text(encoding="utf-8") for h in pages}
+    for h, text in html_cache.items():
+        for m in re.finditer(r'(?:href|src)="([^"#?]*)(?:\?[^"#]*)?(?:#([^"]*))?"', text):
+            url, anchor = m.group(1), m.group(2)
+            if re.match(r"^(https?:|mailto:|data:|javascript:)", url):
+                continue
+            target = (h.parent / url).resolve() if url else h
+            if target.is_dir():
+                target = target / "index.html"
+            if not target.exists():
+                errs.append(f"broken link in {h.relative_to(ROOT)}: {url}")
+            elif anchor and target.suffix == ".html":
+                body = html_cache.get(target) or target.read_text(encoding="utf-8")
+                if f'id="{anchor}"' not in body:
+                    errs.append(f"missing anchor in {h.relative_to(ROOT)}: {url}#{anchor}")
     # no leftover probes, no secrets, no withheld names
     for p in ROOT.rglob("*"):
         if p.is_file() and ".git" not in p.parts and p.suffix in {".md", ".html", ".json", ".py", ".sh", ".yml", ".yaml"}:

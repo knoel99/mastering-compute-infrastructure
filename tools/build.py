@@ -43,7 +43,7 @@ def sources(args):
     found = []
     for p in sorted(ROOT.rglob("index.md")):
         rel = p.relative_to(ROOT)
-        if rel.parts[0] in SKIP_DIRS:
+        if rel.parts[0] in SKIP_DIRS or "_notes" in rel.parts:   # _notes holds source fragments, not pages
             continue
         found.append(p)
     return found
