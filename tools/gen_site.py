@@ -158,6 +158,7 @@ toc-inline: false
 <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
 {'<a class="cta cta-ghost" href="market/index.html">Analyse du marché</a>' if has_page("market") else ''}
+{'<a class="cta cta-ghost" href="coherence/index.html">Cohérence du parcours</a>' if has_page("coherence") else ''}
 {'<a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>' if masters_ready else ''}
 </div>
 
@@ -197,6 +198,8 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 
 {"Une analyse sourcée d'offres d'emploi d'infrastructure de calcul publiées aux États-Unis, en Europe et en Chine, dans les laboratoires d'IA, les grands groupes, les clouds GPU et les centres HPC : les compétences demandées, ce qui change d'une région à l'autre, et ce que le parcours couvre. <a href=\"market/index.html\">Lire l'analyse</a>." if has_page("market") else "L'analyse des offres d'emploi est en cours de rédaction."}
 
+{"Les seize modules et les six projets ont aussi été relus ensemble pour éliminer les contradictions, les doublons et les prérequis manquants ; la page <a href=\"coherence/index.html\">Cohérence du parcours</a> en donne la méthode, les résultats et les conventions de notation communes." if has_page("coherence") else ""}
+
 ## Enquête sur les masters HPC {{#masters}}
 
 {"Une analyse sourcée des masters orientés calcul haute performance en France, aux États-Unis, en Chine et dans le reste du monde, croisée avec les offres d'emploi de compute infrastructure : ce que les masters enseignent, ce qu'ils n'enseignent presque pas, et ce que ce parcours ajoute. <a href=\"masters/index.html\">Lire l'enquête</a>." if masters_ready else "L'enquête sur les masters HPC (France, États-Unis, Chine, monde) est en cours de rédaction."}
@@ -233,6 +236,27 @@ def priorities():
     for m in C["modules"]:
         rows.append(f"| [{m['number']}. {m['title']}](../courses/{m['id']}/index.html) | " + " | ".join(m["study"][p["id"]] for p in C["profiles"]) + " |")
     return "\n".join(rows)
+
+
+def dependencies():
+    rows = ["| Module | Phase | S'appuie sur | Prépare | Projets |", "|---|---|---|---|---|"]
+    for m in C["modules"]:
+        pre = ", ".join(str(MODS[i]["number"]) for i in sorted(m["prerequisites"], key=lambda i: MODS[i]["number"])) or "—"
+        nxt = ", ".join(str(x["number"]) for x in C["modules"] if m["id"] in x["prerequisites"]) or "—"
+        prj = ", ".join(f"P{p['number']}" for p in C["projects"] if m["id"] in p["modules"]) or "aucun (labs seulement)"
+        rows.append(f"| [{m['number']}. {m['title']}](../courses/{m['id']}/index.html) | {m['phase']} | {pre} | {nxt} | {prj} |")
+    return "\n".join(rows)
+
+
+def fill(rel, name, content):
+    f = ROOT / rel
+    if not f.exists():
+        return
+    t = f.read_text(encoding="utf-8")
+    beg, end = f"<!-- gen:{name} -->", f"<!-- /gen:{name} -->"
+    if beg in t:
+        t = t[:t.index(beg)] + beg + "\n" + content + "\n" + end + t[t.index(end) + len(end):]
+        f.write_text(t, encoding="utf-8")
 
 
 def profile_page():
@@ -368,6 +392,7 @@ def nav():
             seq.append({"href": f"{rel}/index.html", "label": label})
     add("profile", "Point de départ")
     add("market", "Ce que demande le marché")
+    add("coherence", "Cohérence du parcours")
     for rel, label in (("masters", "Enquête sur les masters HPC"), ("masters/france", "Masters en France"),
                        ("masters/usa", "Masters aux États-Unis"), ("masters/china", "Masters en Chine"),
                        ("masters/world", "Masters dans le monde")):
@@ -391,5 +416,6 @@ if __name__ == "__main__":
     roadmap()
     syllabus()
     profile_page()
+    fill("coherence/index.md", "dependencies", dependencies())
     nav()
     print("generated index.md, path/index.md, data/nav.json")

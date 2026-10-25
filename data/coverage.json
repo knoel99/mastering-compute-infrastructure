@@ -85,7 +85,7 @@
    },
    "checkpoint-fault-tolerance": {
     "depth": 1,
-    "where": "#torchrun-et-le-rendez-vous, #la-reproductibilité-et-ses-limites, #du-mfu-au-rendement-utile"
+    "where": "#torchrun-et-le-rendez-vous, #la-reproductibilité-et-ses-limites, #du-mfu-au-goodput"
    },
    "scheduler-design": {
     "depth": 1,

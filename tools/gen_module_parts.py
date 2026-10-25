@@ -53,7 +53,7 @@ def place(m):
     ph = PHASES[m["phase"]]
     lines = ["### Place dans le parcours {#place}", "",
              f"-   **Phase {m['phase']} — {ph['title']}** ({ph['weeks_hint']}) : {ph['goal'][0].lower() + ph['goal'][1:]}"]
-    lines.append("-   **S'appuie sur** : " + (", ".join(mlink(i) for i in m["prerequisites"]) if m["prerequisites"] else "aucun module ; c'est un point d'entrée") + ".")
+    lines.append("-   **S'appuie sur** : " + (", ".join(mlink(i) for i in sorted(m["prerequisites"], key=lambda i: MODS[i]["number"])) if m["prerequisites"] else "aucun module ; c'est un point d'entrée") + ".")
     if followers:
         lines.append("-   **Prépare** : " + ", ".join(mlink(i) for i in followers) + ".")
     if projects:
@@ -126,7 +126,8 @@ def fiche(text, m):
     text, n = re.subn(r"^\| Statut pour le lecteur de référence \|.*\|[ \t]*$", lambda _: row, text, flags=re.M)
     if not n:
         text = re.sub(r"^\| Pour qui \|.*\|[ \t]*$", lambda _: row, text, flags=re.M)
-    pre = ", ".join(f"[Module {MODS[i]['number']} — {MODS[i]['title']}](../{i}/index.html)" for i in m["prerequisites"]) or "aucun"
+    pre = ", ".join(f"[Module {MODS[i]['number']} — {MODS[i]['title']}](../{i}/index.html)"
+                    for i in sorted(m["prerequisites"], key=lambda i: MODS[i]["number"])) or "aucun"
     if m.get("prerequisites_note"):
         pre += f", {m['prerequisites_note']}"
     text = re.sub(r"^\| Prérequis \|.*\|[ \t]*$", lambda _: f"| Prérequis | {pre} |", text, flags=re.M)

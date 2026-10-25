@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Cohérence du parcours — Mastering Compute Infrastructure</title>
+<meta name="description" content="Comment les pages du parcours ont été relues ensemble pour éliminer les contradictions, les doublons, les prérequis manquants et les renvois cassés, et quelles conventions de notation en sont sorties.">
+<meta name="color-scheme" content="light dark">
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script>
+<script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+</script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous">
+<link rel="stylesheet" href="../assets/paper.css">
+<style>
+code{white-space: pre-wrap;}
+div.sourceCode{margin:1em 0;overflow:auto}
+pre.sourceCode{margin:0}
+pre > code.sourceCode{white-space:pre;position:relative}
+pre > code.sourceCode > span{display:inline-block;line-height:1.25}
+pre > code.sourceCode > span:empty{height:1.2em}
+code.sourceCode > span{color:inherit;text-decoration:inherit}
+pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration:none}
+</style>
+</head>
+<body class="has-sidetoc">
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+  <button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span aria-hidden="true">☰</span><span class="tb-label">Sommaire</span></button>
+  <a class="brand" href="../index.html">MCI<span class="brand-sub"> · Compute Infrastructure</span></a>
+  <span class="tb-title" id="tb-title"></span>
+  <button type="button" class="tb-btn" id="theme-toggle"><span aria-hidden="true">◐</span><span class="tb-label">Theme</span></button>
+</header>
+<div class="layout">
+<nav class="sidetoc" id="sidetoc" aria-label="Sommaire"></nav>
+<main class="paper" id="main">
+<p class="crumb"><a href="../index.html">Accueil</a></p>
+<header id="title-block-header">
+<h1 class="title">Cohérence du parcours</h1>
+<p class="subtitle">Une revue croisée des seize modules et des six projets : méthode, constats, corrections et conventions communes</p>
+</header>
+<section id="sommaire" class="unnumbered toc-inline">
+<h2 class="unnumbered">Sommaire</h2>
+<ul>
+<li><a href="#objet">1. Ce que fait cette page</a></li>
+<li><a href="#methode">2. Méthode</a>
+<ul>
+<li><a href="#etapes">2.1. Quatre étapes</a></li>
+<li><a href="#limites-methode">2.2. Ce que la revue ne fait pas</a></li>
+</ul></li>
+<li><a href="#resultats">3. Résultats</a>
+<ul>
+<li><a href="#constats">3.1. Constats croisés</a></li>
+<li><a href="#defauts-locaux">3.2. Défauts locaux</a></li>
+</ul></li>
+<li><a href="#corrections">4. Principaux constats et corrections</a>
+<ul>
+<li><a href="#definitions">4.1. Une seule définition par notion</a></li>
+<li><a href="#chiffres">4.2. Des chiffres qui ne se contredisent plus</a></li>
+<li><a href="#progression">4.3. Une progression qui tient</a></li>
+<li><a href="#labs-projets">4.4. Des labs et des projets alignés sur les cours</a></li>
+</ul></li>
+<li><a href="#conventions">5. Conventions du parcours</a></li>
+<li><a href="#dependances">6. Les dépendances entre modules</a></li>
+<li><a href="#reste">7. Ce qui reste à surveiller</a></li>
+<li><a href="#sources">8. Sources et portée</a>
+<ul>
+<li><a href="#documente">8.1. Documenté</a></li>
+<li><a href="#recommande">8.2. Recommandé</a></li>
+<li><a href="#hors-perimetre">8.3. Hors périmètre</a></li>
+</ul></li>
+</ul>
+</section>
+<h2 id="objet">1. Ce que fait cette page</h2>
+<p>Un parcours écrit module par module accumule des incohérences : deux définitions d'un même terme, un chiffre qui change d'une page à l'autre, un exercice qui suppose un chapitre placé plus loin, un projet qui annonce des modules qu'il n'utilise pas. Cette page décrit la revue croisée menée le 25 octobre 2026 sur les seize modules et les six projets, ce qu'elle a trouvé, ce qui a été corrigé, et les conventions qui valent désormais dans tout le parcours.</p>
+<p>Elle complète l'<a href="../market/index.html">analyse du marché</a>, qui confronte le contenu du parcours aux offres d'emploi.</p>
+<h2 id="methode">2. Méthode</h2>
+<h3 id="etapes">2.1. Quatre étapes</h3>
+<ol type="1">
+<li><strong>Extraction.</strong> Chaque page a été lue en entier par un agent, qui en a relevé les concepts et leurs définitions, les notations, les chiffres réutilisables, les renvois vers d'autres pages, les prérequis supposés, la profondeur de couverture de chacune des 44 compétences de la taxonomie du marché et les défauts visibles dans la page.</li>
+<li><strong>Analyse croisée.</strong> Quatre analyses ont comparé toutes les extractions, chacune sous un angle : contradictions de faits et de notations ; progression et prérequis ; doublons, lacunes et terminologie ; labs, projets et cohérence du parcours dans son ensemble. Chaque constat devait citer les passages en cause.</li>
+<li><strong>Vérification adversariale.</strong> Un vérificateur par angle a rouvert les pages et tenté de réfuter chaque constat (citation absente, différence expliquée dans le texte, renvoi en fait correct, calcul juste). Faute de confirmation, le constat était réfuté.</li>
+<li><strong>Correction page par page.</strong> Un agent par page a revérifié chaque constat confirmé sur le texte du jour, appliqué une correction minimale, vérifié chaque défaut local signalé avant d'y toucher, relancé deux fois les labs dont il changeait le code, puis les contrôles du dépôt. Les corrections qui touchaient une autre page ont été transmises à l'agent de cette page.</li>
+</ol>
+<h3 id="limites-methode">2.2. Ce que la revue ne fait pas</h3>
+<p>Elle ne remplace pas une relecture humaine experte : elle détecte des incohérences entre pages et des erreurs vérifiables (calcul, citation, renvoi), pas la pertinence pédagogique d'un choix. Elle n'exécute rien sur un GPU, un cluster multi-nœuds ou un cloud : les parties qui en dépendent gardent leur badge « non vérifié ».</p>
+<h2 id="resultats">3. Résultats</h2>
+<h3 id="constats">3.1. Constats croisés</h3>
+<div class="tbl-wrap">
+<table>
+<thead>
+<tr class="header">
+<th>Angle d'analyse</th>
+<th>Constats</th>
+<th>Confirmés</th>
+<th>En partie</th>
+<th>Réfutés</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Faits, définitions et notations</td>
+<td>32</td>
+<td>21</td>
+<td>9</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>Progression et prérequis</td>
+<td>32</td>
+<td>22</td>
+<td>9</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>Doublons, lacunes et terminologie</td>
+<td>33</td>
+<td>18</td>
+<td>15</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>Labs, projets et parcours</td>
+<td>29</td>
+<td>16</td>
+<td>11</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td><strong>126</strong></td>
+<td><strong>77</strong></td>
+<td><strong>44</strong></td>
+<td><strong>5</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Parmi les 121 constats retenus, 2 étaient graves (un apprenant aurait appris quelque chose de faux), 33 moyens (confusion ou heures perdues) et 86 mineurs.</p>
+<h3 id="defauts-locaux">3.2. Défauts locaux</h3>
+<p>Les lecteurs ont aussi signalé 300 défauts internes aux pages (chiffre arrondi faux, exercice insoluble avec le texte, terme employé avant d'être défini, version d'outil non datée). Chacun a été vérifié avant correction : 210 ont été corrigés, 23 rejetés après vérification, les autres recoupaient un constat croisé ou ne s'appliquaient plus après une autre correction.</p>
+<h2 id="corrections">4. Principaux constats et corrections</h2>
+<h3 id="definitions">4.1. Une seule définition par notion</h3>
+<ul>
+<li><strong>Goodput</strong> (constat grave) : le module 2 le définissait comme MFU × part du temps utile, les modules 10, 14 et 15 comme une part du temps. Il désigne désormais partout la part du temps d'horloge consacrée à du calcul conservé ; le produit MFU × goodput s'appelle « usage utile du pic ».</li>
+<li><strong>Calcul d'entraînement</strong> : écrit 6N, 6ΨD, 6PD, 6NT ou 6Pb selon les pages ; c'est maintenant <span class="math inline">C \approx 6ND</span> partout, avec une glose quand une page reprend la notation Ψ de ZeRO.</li>
+<li><strong>Coût d'une heure utile</strong> : trois formules, et la lettre <span class="math inline">u</span> prenait trois sens ; <span class="math inline">a</span> désigne l'allocation et <span class="math inline">u</span> l'utilisation mesurée par DCGM dans les modules 5, 12 et 15.</li>
+<li><strong>Formule de Young-Daly</strong> : deux notations (<span class="math inline">\tau</span>, <span class="math inline">\delta</span> contre <span class="math inline">T</span>, <span class="math inline">C</span>) ; le module 10 garde la sienne, les autres pages donnent la correspondance.</li>
+<li><strong>SLO, budget d'erreur, post-mortem sans blâme</strong> : définis deux fois chacun ; un module en est propriétaire, l'autre y renvoie.</li>
+</ul>
+<h3 id="chiffres">4.2. Des chiffres qui ne se contredisent plus</h3>
+<ul>
+<li><strong>NVLink de la H100</strong> : 900 Go/s utilisés comme un débit par sens ; c'est un total, soit 450 Go/s par sens, et les comparaisons de débit de bus en tiennent compte.</li>
+<li><strong>Pannes de Llama 3</strong> : le pourcentage du texte de l'article (58,7 %) ne correspond pas aux comptes de son tableau (268 sur 419, soit 64 %) ; les pages donnent les deux et le disent.</li>
+<li><strong>Taux de panne d'un exercice</strong> (0,0002 par GPU-heure) : six fois les taux publiés cités au module 10 ; il est présenté comme une hypothèse pessimiste.</li>
+<li><strong>Diagnostics DCGM</strong> : trois niveaux au module 14, quatre au module 6, avec des durées différentes ; alignés sur la documentation.</li>
+</ul>
+<h3 id="progression">4.3. Une progression qui tient</h3>
+<ul>
+<li><strong>Prérequis</strong> : plusieurs modules utilisaient le bac à sable Slurm ou le modèle α-β sans les avoir en prérequis ; les prérequis sont complétés, et les lignes « Prérequis » et « Projets liés » des fiches sont désormais générées depuis le plan du parcours.</li>
+<li><strong>Semaines</strong> : les pages de module et la feuille de route donnaient des semaines différentes ; elles sont calculées à partir des volumes horaires.</li>
+<li><strong>Projets</strong> : le projet 1, jalon de la phase 2, demandait des compétences de la phase 4 ; il est découpé (exigences R1 à R4 en phase 2, R5 à R7 après le module 14). Les projets déclarent les modules qu'ils utilisent vraiment, et la page d'accueil dit lequel n'est exercé que par ses labs.</li>
+<li><strong>Renvois circulaires</strong> : les compteurs InfiniBand étaient renvoyés du module 7 au module 14 et inversement ; le module 14 a maintenant une section qui les exporte et les surveille.</li>
+</ul>
+<h3 id="labs-projets">4.4. Des labs et des projets alignés sur les cours</h3>
+<ul>
+<li>Le « MFU » du projet 2 n'était pas celui du module 2 ; le projet parle maintenant d'utilisation du pic mesuré.</li>
+<li>Le coût attendu du projet 4 oubliait le démarrage facturé, ce qui inversait un classement : la formule de la page compte désormais le démarrage, ses chiffres sont recalculés par le modèle exact et par le simulateur, et la page dit que la politique de référence garde une version simplifiée.</li>
+<li>Le lab 14.3 affichait « OK » sans sa partie C ; il dit désormais quelle partie a tourné.</li>
+<li>La page <a href="../lab-setup/index.html">Environnement de travail</a> dit enfin ce que chaque lab et chaque projet exige, et comment écrire un ADR et un runbook dès le premier projet.</li>
+</ul>
+<h2 id="conventions">5. Conventions du parcours</h2>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Notion</th>
+<th>Notation ou terme</th>
+<th>Sens</th>
+<th>Page de référence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Goodput</td>
+<td><span class="math inline">g</span></td>
+<td>part du temps d'horloge consacrée à du calcul conservé</td>
+<td><a href="../courses/fault-tolerance/index.html#ch2">module 10, chapitre 2</a></td>
+</tr>
+<tr class="even">
+<td>Usage utile du pic</td>
+<td>MFU × goodput</td>
+<td>part du pic de calcul réellement transformée en entraînement conservé</td>
+<td><a href="../courses/perf-models/index.html#ch7">module 2, chapitre 7</a></td>
+</tr>
+<tr class="odd">
+<td>Calcul d'entraînement</td>
+<td><span class="math inline">C \approx 6ND</span></td>
+<td><span class="math inline">N</span> paramètres, <span class="math inline">D</span> tokens ; Ψ chez ZeRO désigne le même <span class="math inline">N</span></td>
+<td><a href="../courses/perf-models/index.html#ch7">module 2, chapitre 7</a></td>
+</tr>
+<tr class="even">
+<td>Modèle α-β</td>
+<td><span class="math inline">T(n) = \alpha + n/B</span></td>
+<td>latence α et débit <span class="math inline">B</span> ; la littérature écrit souvent <span class="math inline">\beta = 1/B</span></td>
+<td><a href="../courses/perf-models/index.html#ch6">module 2, chapitre 6</a></td>
+</tr>
+<tr class="odd">
+<td>NVLink de la H100</td>
+<td>900 Go/s</td>
+<td>débit total, soit 450 Go/s par sens</td>
+<td><a href="../courses/perf-models/index.html#ch2">module 2, chapitre 2</a></td>
+</tr>
+<tr class="even">
+<td>Période de checkpoint</td>
+<td><span class="math inline">\tau^\star \approx \sqrt{2\delta M}</span></td>
+<td><span class="math inline">\delta</span> coût bloquant d'un checkpoint, <span class="math inline">M</span> temps moyen entre pannes ; d'autres pages écrivent <span class="math inline">T</span> et <span class="math inline">C</span></td>
+<td><a href="../courses/fault-tolerance/index.html#ch2">module 10, chapitre 2</a></td>
+</tr>
+<tr class="odd">
+<td>Pannes d'un job</td>
+<td>système en série</td>
+<td>les taux de panne des nœuds s'additionnent</td>
+<td><a href="../courses/fault-tolerance/index.html#ch1">module 10, chapitre 1</a></td>
+</tr>
+<tr class="even">
+<td>Allocation et utilisation</td>
+<td><span class="math inline">a</span> et <span class="math inline">u</span></td>
+<td>part des heures allouées ; activité mesurée par DCGM</td>
+<td><a href="../courses/finops-capacity/index.html#ch1">module 15, chapitre 1</a></td>
+</tr>
+<tr class="odd">
+<td><em>Gang scheduling</em></td>
+<td>—</td>
+<td>dans Slurm, partage par tranches de temps ; dans Kubernetes, démarrage tout ou rien d'un groupe</td>
+<td><a href="../courses/slurm/index.html#ch4">module 5, chapitre 4</a>, <a href="../courses/kubernetes-gpu/index.html#ch3">module 12, chapitre 3</a></td>
+</tr>
+<tr class="even">
+<td><em>Straggler</em></td>
+<td>traînard</td>
+<td>GPU ou rang plus lent qui retarde tout le job</td>
+<td><a href="../courses/perf-models/index.html#ch5">module 2, chapitre 5</a></td>
+</tr>
+<tr class="odd">
+<td><em>Pipeline stage</em></td>
+<td>étage</td>
+<td>groupe de couches porté par un rang du parallélisme pipeline</td>
+<td><a href="../courses/distributed-training/index.html#ch1">module 9, chapitre 1</a></td>
+</tr>
+<tr class="even">
+<td><em>Scaling</em></td>
+<td>passage à l'échelle</td>
+<td>fort (taille fixe) ou faible (taille par rang fixe)</td>
+<td><a href="../courses/parallel-programming/index.html#ch8">module 3, chapitre 8</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="dependances">6. Les dépendances entre modules</h2>
+<p>Le tableau est généré depuis le plan du parcours (<code>data/curriculum.json</code>) : il est donc toujours d'accord avec les fiches des modules.</p>
+<!-- gen:dependencies -->
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Module</th>
+<th>Phase</th>
+<th>S'appuie sur</th>
+<th>Prépare</th>
+<th>Projets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="../courses/linux-systems/index.html">1. Linux, systèmes et diagnostic de performance</a></td>
+<td>0</td>
+<td>—</td>
+<td>5, 6, 7, 8, 12, 14</td>
+<td>P1</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/perf-models/index.html">2. Architecture matérielle et modèles de performance</a></td>
+<td>0</td>
+<td>—</td>
+<td>3, 4, 7, 8, 9, 15</td>
+<td>P2, P6</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/parallel-programming/index.html">3. Programmation parallèle : OpenMP, MPI et études de passage à l'échelle</a></td>
+<td>1</td>
+<td>2</td>
+<td>9</td>
+<td>P2</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/gpu-programming/index.html">4. Programmation GPU : CUDA, Triton et profilage</a></td>
+<td>1</td>
+<td>2</td>
+<td>9</td>
+<td>aucun (labs seulement)</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/slurm/index.html">5. Slurm et exploitation d'un cluster HPC</a></td>
+<td>2</td>
+<td>1</td>
+<td>6, 7, 10, 12, 14, 15, 16</td>
+<td>P1, P5, P6</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/provisioning/index.html">6. Provisioning, images et santé des nœuds GPU</a></td>
+<td>2</td>
+<td>1, 5</td>
+<td>10</td>
+<td>P1, P6</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/networking/index.html">7. Réseaux haute performance : InfiniBand, RoCE et NCCL</a></td>
+<td>2</td>
+<td>1, 2, 5</td>
+<td>9</td>
+<td>P6</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/storage/index.html">8. Stockage et E/S pour l'entraînement</a></td>
+<td>2</td>
+<td>1, 2</td>
+<td>10</td>
+<td>P3, P6</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/distributed-training/index.html">9. Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a></td>
+<td>3</td>
+<td>2, 3, 4, 7</td>
+<td>10, 11, 12</td>
+<td>P2, P3, P6</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/fault-tolerance/index.html">10. Pannes, checkpointing et reprise automatique</a></td>
+<td>3</td>
+<td>5, 6, 8, 9</td>
+<td>13, 16</td>
+<td>P3, P4, P5, P6</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/ray-rl-infra/index.html">11. Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a></td>
+<td>3</td>
+<td>9</td>
+<td>—</td>
+<td>P6</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/kubernetes-gpu/index.html">12. Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a></td>
+<td>4</td>
+<td>1, 5, 9</td>
+<td>13, 16</td>
+<td>P4, P6</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/multi-cloud/index.html">13. Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a></td>
+<td>4</td>
+<td>10, 12</td>
+<td>—</td>
+<td>P4, P6</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/observability/index.html">14. Observabilité et fiabilité d'une flotte GPU</a></td>
+<td>4</td>
+<td>1, 5</td>
+<td>16</td>
+<td>P1, P5, P6</td>
+</tr>
+<tr class="odd">
+<td><a href="../courses/finops-capacity/index.html">15. FinOps, capacité, énergie et achats de calcul</a></td>
+<td>4</td>
+<td>2, 5</td>
+<td>16</td>
+<td>P4, P6</td>
+</tr>
+<tr class="even">
+<td><a href="../courses/platform-leadership/index.html">16. Plateforme interne, sécurité, production et leadership</a></td>
+<td>5</td>
+<td>5, 10, 12, 14, 15</td>
+<td>—</td>
+<td>P6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- /gen:dependencies -->
+<h2 id="reste">7. Ce qui reste à surveiller</h2>
+<ul>
+<li><strong>Volumes de lecture.</strong> Les heures de lecture de chaque module sont des estimations, pas des mesures ; les modules les plus denses (stockage, provisioning, FinOps) demandent sans doute plus que ce qu'annonce leur fiche.</li>
+<li><strong>Parties non exécutées.</strong> Ce qui demande un GPU, un cluster multi-nœuds ou un cloud n'a pas tourné ; les pages le disent dans leur badge et leur section « À vérifier ».</li>
+<li><strong>Versions.</strong> Les outils évoluent : chaque page date les versions testées, et la page Environnement de travail donne les versions de référence.</li>
+<li><strong>Nouvelles pages, nouvelles incohérences.</strong> Toute modification future d'une définition ou d'un chiffre de la table des conventions doit être faite dans la page de référence, puis répercutée.</li>
+</ul>
+<h2 id="sources">8. Sources et portée</h2>
+<h3 id="documente">8.1. Documenté</h3>
+<p>Les constats, leurs verdicts et les corrections appliquées ont été produits par la revue décrite plus haut ; les contrôles mécaniques du dépôt (<code>tools/check_gates.py</code>, <code>tools/check_airiness.py</code>, <code>tools/build.py --check</code>) passent sur toutes les pages après correction.</p>
+<h3 id="recommande">8.2. Recommandé</h3>
+<p>Les conventions de la table sont des choix de ce parcours, faits pour qu'un même mot garde un même sens ; d'autres ouvrages en font d'autres.</p>
+<h3 id="hors-perimetre">8.3. Hors périmètre</h3>
+<p>La qualité pédagogique de chaque explication, qui relève d'une relecture humaine.</p>
+<nav class="pager" aria-label="Navigation">
+<a class="prev" href="../market/index.html"><span class="k">← Précédent</span>Ce que demande le marché</a><a class="next" href="../masters/index.html"><span class="k">Suivant →</span>Enquête sur les masters HPC</a></nav>
+</main>
+</div>
+<footer class="foot">
+<p><a href="../index.html">← Accueil · Mastering Compute Infrastructure</a></p>
+<p>Notes d'étude indépendantes. Les chiffres et versions d'outils sont datés ; vérifiez-les avant de décider un achat ou un déploiement.</p>
+</footer>
+<script defer src="../assets/theme.js"></script>
+</body>
+</html>

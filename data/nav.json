@@ -9,6 +9,10 @@
    "label": "Ce que demande le marché"
   },
   {
+   "href": "coherence/index.html",
+   "label": "Cohérence du parcours"
+  },
+  {
    "href": "masters/index.html",
    "label": "Enquête sur les masters HPC"
   },

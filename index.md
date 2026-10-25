@@ -14,6 +14,7 @@ toc-inline: false
 <a class="cta cta-ghost" href="syllabus/index.html">Plans détaillés</a>
 <a class="cta cta-ghost" href="profile/index.html">Point de départ</a>
 <a class="cta cta-ghost" href="market/index.html">Analyse du marché</a>
+<a class="cta cta-ghost" href="coherence/index.html">Cohérence du parcours</a>
 <a class="cta cta-ghost" href="masters/index.html">Enquête sur les masters HPC</a>
 </div>
 
@@ -122,6 +123,8 @@ Chaque projet mobilise plusieurs modules et produit un dépôt que vous pouvez p
 ## Ce que demande le marché {#marche}
 
 Une analyse sourcée d'offres d'emploi d'infrastructure de calcul publiées aux États-Unis, en Europe et en Chine, dans les laboratoires d'IA, les grands groupes, les clouds GPU et les centres HPC : les compétences demandées, ce qui change d'une région à l'autre, et ce que le parcours couvre. <a href="market/index.html">Lire l'analyse</a>.
+
+Les seize modules et les six projets ont aussi été relus ensemble pour éliminer les contradictions, les doublons et les prérequis manquants ; la page <a href="coherence/index.html">Cohérence du parcours</a> en donne la méthode, les résultats et les conventions de notation communes.
 
 ## Enquête sur les masters HPC {#masters}
 

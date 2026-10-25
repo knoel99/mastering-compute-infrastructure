@@ -349,7 +349,7 @@ Nourrir les GPU et sauvegarder sans les arrêter : systèmes de fichiers parall�
 
 Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.
 
-**Prérequis :** module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).
+**Prérequis :** module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL), module 3 (Programmation parallèle : OpenMP, MPI et études de passage à l'échelle).
 
 **Cours complet :** [Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../courses/distributed-training/index.html).
 
@@ -393,7 +393,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.
 
-**Prérequis :** module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement), module 5 (Slurm et exploitation d'un cluster HPC).
+**Prérequis :** module 6 (Provisioning, images et santé des nœuds GPU), module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement), module 5 (Slurm et exploitation d'un cluster HPC).
 
 **Cours complet :** [Pannes, checkpointing et reprise automatique](../courses/fault-tolerance/index.html).
 
@@ -406,7 +406,7 @@ Le cœur du métier côté entraînement : choisir un parallélisme, estimer mé
 
 **Chapitres :**
 
-1.  Pannes à grande échelle : taxonomie (matériel, réseau, logiciel, humaine), données publiées, loi des grands nombres
+1.  Pannes à grande échelle : taxonomie (matériel, réseau, logiciel, humaine), données publiées, système en série (les taux de panne s'additionnent)
 2.  Modèle de coût : formule de Young/Daly, goodput, temps perdu, arbitrage fréquence/coût de checkpoint
 3.  Checkpoint correct : atomicité, état complet, reproductibilité de la reprise, sharding, formats (DCP, safetensors)
 4.  Checkpoints rapides : asynchrones, en mémoire, multi-niveaux, couche de stockage, déduplication
@@ -667,7 +667,7 @@ Transformer un cluster en plateforme que des chercheurs adoptent : expérience d
 3.  Sécurité d'une plateforme GPU partagée : identité, isolation, secrets, réseau, chaîne d'approvisionnement logicielle, audit
 4.  Fiabilité de production : SLO, astreinte, gestion d'incident, post-mortems, revues de conception (RFC/ADR)
 5.  Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs
-6.  Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication
+6.  Diriger une petite équipe d'infrastructure : priorités, dette, relation avec la recherche, communication
 7.  Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible
 8.  Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser
 9.  Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue

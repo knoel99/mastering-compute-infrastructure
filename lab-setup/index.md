@@ -96,7 +96,7 @@ Tous les labs « vérifiés » tournent sans GPU. Le tableau liste, **en plus** 
 | Module 11, Ray et RL | A | `ray[data,train]` |
 | Module 12, Kubernetes pour l'IA | A | `jsonschema`, `kubernetes-validate` ; le lab 12.4 (Linux x86_64, `curl`, `openssl`, HTTPS sortant vers dl.k8s.io, registry.k8s.io et raw.githubusercontent.com, environ 350 Mo) arrête à la fin tout processus de l'utilisateur nommé `etcd` ou `kube-*` : ne le lancez pas sur une machine qui fait tourner un autre plan de contrôle ; le lab 12.2 exige un cluster GPU |
 | Module 13, multi-fournisseurs | A | `yamllint`, `shellcheck` ; `skypilot` dans un environnement à part pour la branche d'analyse ; la branche cloud exige un compte |
-| Module 14, observabilité | A, plus `promtool` (paquet `prometheus`, à installer une fois avec sudo) | `prometheus_client` ; `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3 |
+| Module 14, observabilité | A, plus `promtool` (paquet `prometheus`, à installer une fois avec sudo) | `prometheus_client` ; `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3 ; `opentelemetry-sdk` pour la partie D (testé en 1.45.1) |
 | Module 15, FinOps et capacité | A | rien d'autre ; un Slurm réel est facultatif |
 | Module 16, plateforme et leadership | A | `pytest` ; la partie facultative du lab 16.4 demande les binaires `etcd`, `etcdctl` et `etcdutl` (variable `ETCD_BIN`) |
 | Projet 1, Slurm de laboratoire | B | Slurm et `promtool` |
@@ -107,7 +107,7 @@ Tous les labs « vérifiés » tournent sans GPU. Le tableau liste, **en plus** 
 
 ## Écrire un ADR et un runbook {#adr-runbook}
 
-Les projets 1 à 5 demandent un ADR (*Architecture Decision Record*) et un runbook d'une page. Le gabarit et son vérificateur sont dans le lab 16.1 ; vous pouvez vous en servir dès le premier projet, sans attendre le module 16.
+Les projets 1 à 5 demandent un ADR (*Architecture Decision Record*) d'une page ; les projets 1, 3 et 5 demandent aussi un runbook d'une page. Le gabarit et son vérificateur sont dans le lab 16.1 ; vous pouvez vous en servir dès le premier projet, sans attendre le module 16.
 
 -   **ADR** : cinq sections, dans cet ordre, Statut daté, Contexte, Décision, Alternatives écartées, Conséquences. Partez de `labs/platform-leadership/rfc-template/adr_template.md` et vérifiez votre fichier avec `python3 labs/platform-leadership/rfc-template/adr_lint.py mon_adr.md`.
 -   **Runbook** : une page par panne, avec le symptôme observé, les vérifications dans l'ordre, l'action, et la manière de revenir en arrière si l'action aggrave la situation.

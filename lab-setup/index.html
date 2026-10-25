@@ -250,7 +250,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tr class="even">
 <td>Module 14, observabilité</td>
 <td>A, plus <code>promtool</code> (paquet <code>prometheus</code>, à installer une fois avec sudo)</td>
-<td><code>prometheus_client</code> ; <code>mlflow-skinny</code>, <code>sqlalchemy</code>, <code>alembic</code> pour la partie C du lab 14.3</td>
+<td><code>prometheus_client</code> ; <code>mlflow-skinny</code>, <code>sqlalchemy</code>, <code>alembic</code> pour la partie C du lab 14.3 ; <code>opentelemetry-sdk</code> pour la partie D (testé en 1.45.1)</td>
 </tr>
 <tr class="odd">
 <td>Module 15, FinOps et capacité</td>
@@ -291,7 +291,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </table>
 </div>
 <h2 id="adr-runbook">5. Écrire un ADR et un runbook</h2>
-<p>Les projets 1 à 5 demandent un ADR (<em>Architecture Decision Record</em>) et un runbook d'une page. Le gabarit et son vérificateur sont dans le lab 16.1 ; vous pouvez vous en servir dès le premier projet, sans attendre le module 16.</p>
+<p>Les projets 1 à 5 demandent un ADR (<em>Architecture Decision Record</em>) d'une page ; les projets 1, 3 et 5 demandent aussi un runbook d'une page. Le gabarit et son vérificateur sont dans le lab 16.1 ; vous pouvez vous en servir dès le premier projet, sans attendre le module 16.</p>
 <ul>
 <li><strong>ADR</strong> : cinq sections, dans cet ordre, Statut daté, Contexte, Décision, Alternatives écartées, Conséquences. Partez de <code>labs/platform-leadership/rfc-template/adr_template.md</code> et vérifiez votre fichier avec <code>python3 labs/platform-leadership/rfc-template/adr_lint.py mon_adr.md</code>.</li>
 <li><strong>Runbook</strong> : une page par panne, avec le symptôme observé, les vérifications dans l'ordre, l'action, et la manière de revenir en arrière si l'action aggrave la situation.</li>

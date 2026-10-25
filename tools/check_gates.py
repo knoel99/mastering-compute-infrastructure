@@ -123,8 +123,8 @@ def check_course(path: Path):
             errs.append(f"session duration {r[1]!r} not like '3 h'")
             continue
         d = float(m.group(1).replace(",", "."))
-        if not 1.5 <= d <= 3.5:
-            errs.append(f"session {r[0]}: {d} h outside 1.5-3.5 h")
+        if not 2 <= d <= 3:
+            errs.append(f"session {r[0]}: {d} h outside 2-3 h (specs/module-contract.md)")
         total += d
         if r[2] not in ("1", "2", "3"):
             errs.append(f"session {r[0]}: level {r[2]!r}")

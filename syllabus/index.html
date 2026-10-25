@@ -381,7 +381,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h2 id="phase3">Phase 3 — Systèmes d'entraînement distribué</h2>
 <h3 id="distributed-training">Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline (labs vérifiés, 36 h)</h3>
 <p>Le cœur du métier côté entraînement : choisir un parallélisme, estimer mémoire et communication, atteindre un bon MFU et déboguer l'instabilité numérique.</p>
-<p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL).</p>
+<p><strong>Prérequis :</strong> module 2 (Architecture matérielle et modèles de performance), module 4 (Programmation GPU : CUDA, Triton et profilage), module 7 (Réseaux haute performance : InfiniBand, RoCE et NCCL), module 3 (Programmation parallèle : OpenMP, MPI et études de passage à l'échelle).</p>
 <p><strong>Cours complet :</strong> <a href="../courses/distributed-training/index.html">Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
@@ -420,7 +420,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><strong>Projets qui s'appuient sur ce module :</strong> Projet 2, Projet 3, Projet 6.</p>
 <h3 id="fault-tolerance">Module 10 — Pannes, checkpointing et reprise automatique (labs vérifiés, 28 h)</h3>
 <p>À grande échelle les pannes sont la norme : modèle de panne, checkpoints rapides et corrects, entraînement élastique, reprise sans intervention humaine.</p>
-<p><strong>Prérequis :</strong> module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement), module 5 (Slurm et exploitation d'un cluster HPC).</p>
+<p><strong>Prérequis :</strong> module 6 (Provisioning, images et santé des nœuds GPU), module 9 (Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline), module 8 (Stockage et E/S pour l'entraînement), module 5 (Slurm et exploitation d'un cluster HPC).</p>
 <p><strong>Cours complet :</strong> <a href="../courses/fault-tolerance/index.html">Pannes, checkpointing et reprise automatique</a>.</p>
 <p><strong>Ce que vous saurez vérifier :</strong></p>
 <ul>
@@ -431,7 +431,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <p><strong>Chapitres :</strong></p>
 <ol type="1">
-<li>Pannes à grande échelle : taxonomie (matériel, réseau, logiciel, humaine), données publiées, loi des grands nombres</li>
+<li>Pannes à grande échelle : taxonomie (matériel, réseau, logiciel, humaine), données publiées, système en série (les taux de panne s'additionnent)</li>
 <li>Modèle de coût : formule de Young/Daly, goodput, temps perdu, arbitrage fréquence/coût de checkpoint</li>
 <li>Checkpoint correct : atomicité, état complet, reproductibilité de la reprise, sharding, formats (DCP, safetensors)</li>
 <li>Checkpoints rapides : asynchrones, en mémoire, multi-niveaux, couche de stockage, déduplication</li>
@@ -658,7 +658,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <li>Sécurité d'une plateforme GPU partagée : identité, isolation, secrets, réseau, chaîne d'approvisionnement logicielle, audit</li>
 <li>Fiabilité de production : SLO, astreinte, gestion d'incident, post-mortems, revues de conception (RFC/ADR)</li>
 <li>Évolutions et migrations : changer de scheduler, de fournisseur, de génération de GPU sans casser les utilisateurs</li>
-<li>Diriger une petite équipe d'infrastructure : recrutement, priorités, dette, relation avec la recherche, communication</li>
+<li>Diriger une petite équipe d'infrastructure : priorités, dette, relation avec la recherche, communication</li>
 <li>Contribuer et se rendre visible : open source, articles, présentations ; construire un portfolio crédible</li>
 <li>Entretiens : exercices de conception de cluster, cas de dépannage commentés, récits d'expérience structurés, questions à poser</li>
 <li>Un plan de contrôle fiable : consensus, haute disponibilité et livraison continue</li>
