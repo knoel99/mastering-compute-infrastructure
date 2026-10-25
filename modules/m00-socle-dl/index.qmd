@@ -1,0 +1,39 @@
+---
+title: "Socle PyTorch pour l'infra"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 5
+  jalon: "Confirmé. Mer. 4 nov. 2026, 9h-17h. Introduction au Deep Learning"
+---
+
+Confirmé. Mercredi 4 novembre 2026, de 9 h à 17 h. La séance s'appelle Introduction au Deep Learning.
+
+## Objectifs
+
+Il enseigne déjà le deep learning. Cette page n'est pas un manuel.
+
+Il arrive capable de lire une boucle d'entraînement. Il nomme les trois jeux train, val et test. Il désigne la boucle des epochs et le découpage en batch. Il montre quel jeu met les poids à jour. Il montre quels jeux calculent une perte sans mettre les poids à jour.
+
+## Travaux pratiques prévus
+
+Avant la séance, sur le laptop, il ouvre un notebook `loop.ipynb`. Il charge un petit tenseur. Il lance dix pas. Il enregistre un fichier de poids. Dans une cellule, il marque les lignes qui touchent train, celles qui touchent val, et celles qui touchent test.
+
+Après la séance, il reprend le même notebook et il ne change qu'une chose. Il sépare les trois jeux dans le code. Il écrit un journal d'une ligne par jeu, avec le nom de la fonction qui lit ce jeu.
+
+Si le compte ROMEO existe, une branche du notebook part vers le centre. Il rend le notebook du laptop.
+
+## Sources
+
+Fiche de la séance, sur le site du centre.
+
+https://romeo.univ-reims.fr/21_formations.html/340/Introduction_au_Deep_Learning_

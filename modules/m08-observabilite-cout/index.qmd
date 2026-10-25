@@ -1,0 +1,30 @@
+---
+title: "Observabilité et coût de flotte"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 10
+---
+
+## Objectifs
+
+Il fait déjà tourner Prometheus, Grafana et DCGM pour l'inférence. Ces outils disent si un GPU répond. Ils ne disent pas ce qu'un job d'entraînement a coûté, ni quelle trace le job a laissée. Cette page ne réapprend pas les trois outils.
+
+Il ajoute une trace par job et un coût en heures GPU. Il peut alors expliquer une dépense à l'équipe de la startup robotique. C'est un travail de l'offre A, Compute Infrastructure Lead.
+
+## Travaux pratiques prévus
+
+Sur papier, il esquisse un tableau de bord. Une ligne par job. Les colonnes sont le nom, le type de GPU, la durée, et le coût en heures GPU.
+
+À côté, sur le laptop, il remplit une feuille avec trois jobs fictifs, `indexation`, `entrainement` et `evaluation`. Il leur donne une durée. Il choisit un prix d'heure GPU. Il multiplie chaque durée par ce prix. Il additionne les trois coûts.
+
+Si un compte cloud peu cher existe, une branche remplace le prix fictif par un prix de catalogue. Il rend le croquis et la feuille du laptop.

@@ -1,0 +1,30 @@
+---
+title: "Infra d'entraînement par renforcement"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 15
+---
+
+## Objectifs
+
+L'offre B peut demander un entraînement par renforcement, pas seulement une boucle supervisée. Il connaît la boucle supervisée. Il n'a pas encore posé l'infra d'un acteur et d'un apprenant.
+
+Il nomme les rollouts, le schéma actor-learner, et le tampon de replay. L'acteur produit les trajectoires. L'apprenant met le modèle à jour. Le tampon garde les trajectoires entre les deux, et il survit si l'apprenant redémarre.
+
+## Travaux pratiques prévus
+
+Sur papier, il dessine la séquence. L'acteur agit. Le tampon stocke. L'apprenant tire un échantillon. L'apprenant écrit les nouveaux poids. L'acteur recharge les poids.
+
+Sur le CPU du laptop, il code une boucle sans bibliothèque d'environnement. Un compteur tient lieu de monde. L'acteur écrit dix transitions dans `replay.json`. L'apprenant en lit quatre, ajoute un centième à un poids, et réécrit ce poids dans `poids.json`. Il relance seulement l'apprenant. Il vérifie que les dix transitions sont encore dans `replay.json`.
+
+Une branche plus lourde, cloud peu cher ou ROMEO, attend un compte. La boucle tourne sur le CPU du laptop.

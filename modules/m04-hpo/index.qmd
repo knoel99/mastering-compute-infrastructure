@@ -1,0 +1,39 @@
+---
+title: "Recherche d'hyperparamètres multi-GPU"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 6
+  jalon: "Confirmé. Ven. 27 nov. 2026, 9h-13h. Recherche d'hyperparamètres multi-GPU"
+---
+
+Confirmé. Vendredi 27 novembre 2026, de 9 h à 13 h.
+
+## Objectifs
+
+Il sait lancer un essai. Il ne sait pas encore comparer une grille de paramètres sur plus d'un GPU sans mélanger les résultats.
+
+Il décrit la grille. Il fixe un budget d'essais. Il désigne l'essai qu'il garde, en comparant la perte et la durée. Il relie ce choix au coût GPU du poste de Compute Infrastructure Lead, offre A, dans la startup robotique.
+
+## Travaux pratiques prévus
+
+Sur le laptop, il lance une petite grille. Un GPU local convient. Le CPU convient aussi. Chaque essai écrit sa perte et sa durée dans un tableau. La grille tient en peu de valeurs.
+
+Après la séance, il rédige une note sur le passage à plusieurs GPU. La note dit ce qui change pour le tableau, pour le budget, et pour l'arrêt d'un essai trop mauvais.
+
+Il rend la grille du laptop. Une branche, vers le centre si le compte existe, ou vers un cloud peu cher, ne reprend que la note de passage à plusieurs GPU.
+
+## Sources
+
+Fiche du créneau, sur le site du centre.
+
+https://romeo.univ-reims.fr/21_formations.html/343/Optimisation_Multi-GPU_des_Hyperparametres_et_des_Modeles_d_IA_sur_Supercalculateur

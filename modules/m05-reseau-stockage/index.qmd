@@ -1,0 +1,30 @@
+---
+title: "Réseau et stockage d'entraînement"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 7
+---
+
+## Objectifs
+
+Il fait tourner l'inférence sur site. Il ne choisit pas encore le réseau d'un entraînement, ni l'endroit où les données attendent avant le premier pas.
+
+Il nomme InfiniBand et RoCE. Il lit un schéma de topologie à deux nœuds. Il dit à quel moment les données sont copiées sur le disque de staging, et à quel moment le job les lit. L'offre A, Compute Infrastructure Lead, lui demande ce choix dans la startup robotique.
+
+## Travaux pratiques prévus
+
+Sur papier, il dessine deux nœuds, un lien, et un disque de staging. Il marque la copie des données avant le job, et la lecture pendant le job. Il indique si le lien est InfiniBand ou RoCE, et quel nœud est loin du stockage.
+
+Sur le laptop, il mesure un débit. La mesure est iperf vers 127.0.0.1, ou la copie chronométrée d'un fichier d'un gigaoctet si iperf manque. Il note le débit et l'unité.
+
+Une branche cloud peu cher reprend la même mesure si un compte existe. Il garde le chiffre du laptop.

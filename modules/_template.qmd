@@ -1,0 +1,33 @@
+---
+title: "Titre"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  # status : full ou skeleton. order : entier. hours : entier optionnel. jalon : texte optionnel.
+  status: full
+  order: 1
+---
+
+## Objectifs
+
+## Prérequis
+
+## Notes de cours
+
+## Exercices
+
+## Projet solo
+
+## Projet de groupe
+
+## Examen
+
+## Sources

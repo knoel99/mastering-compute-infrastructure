@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>PyTorch distribué et NCCL</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-html-435ba6093e6f0817aa7405139811e7b1.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<link rel="stylesheet" href="../../assets/paper.css">
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script><script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous"></head>
+
+<body>
+
+<!-- derived from module front matter. build_site overwrites this file. -->
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+<button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span class="tb-label">Sommaire</span></button>
+<a class="brand" href="../../index.html">Infra de calcul</a>
+<span class="tb-title" id="tb-title"></span>
+<button type="button" class="tb-btn" id="theme-toggle">Thème</button>
+</header>
+<div class="layout">
+<nav id="sidetoc" class="sidetoc" aria-label="Sommaire"></nav>
+<div class="content">
+<nav id="mci-nav">
+<a href="../../index.html">Accueil</a>
+<a href="../../parcours/index.html">Parcours</a>
+<a href="../../glossaire/index.html">Glossaire</a>
+<a href="../../programmes/index.html">Programmes</a>
+<a href="../../programmes/france.html">France</a>
+<a href="../../programmes/usa.html">États-Unis</a>
+<a href="../../programmes/chine.html">Chine</a>
+<a href="../../programmes/monde.html">Reste du monde</a>
+<a href="../../programmes/synthese.html">Synthèse</a>
+<a href="../../modules/m01-anatomie-noeud/">Anatomie d'un nœud Linux et GPU</a>
+<a href="../../modules/m02-ordonnancement/">Ordonnancement Slurm et Kubernetes</a>
+<a href="../../modules/a-romeo-cuda/">ROMEO2025 et CUDA Python</a>
+<a href="../../modules/m03-pytorch-nccl/">PyTorch distribué et NCCL</a>
+<a href="../../modules/m00-socle-dl/">Socle PyTorch pour l'infra</a>
+<a href="../../modules/m04-hpo/">Recherche d'hyperparamètres multi-GPU</a>
+<a href="../../modules/m05-reseau-stockage/">Réseau et stockage d'entraînement</a>
+<a href="../../modules/m06-reprise/">Préemption et reprise</a>
+<a href="../../modules/m07-multi-fournisseurs/">Placement multi-fournisseurs</a>
+<a href="../../modules/m08-observabilite-cout/">Observabilité et coût de flotte</a>
+<a href="../../modules/m09-capstone/">Capstone portefeuille Lead</a>
+<a href="../../modules/m10-parallelismes/">Parallélismes et MFU</a>
+<a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
+<a href="../../modules/m12-numerique/">Débogage numérique</a>
+<a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+</nav>
+<main id="main">
+
+<header id="title-block-header">
+<h1 class="title">PyTorch distribué et NCCL</h1>
+
+</header>
+
+
+<h2 id="objectifs" class="anchored">Objectifs</h2>
+<p>Il entraîne déjà de petits modèles. Il sert déjà des LLM. Le job sur plusieurs nœuds est nouveau pour lui. Les 18 heures servent à tenir ce premier job, à deux processus, et à lire l’all-reduce qui réunit les gradients.</p>
+<p>Au bout du module, il fait cinq choses.</p>
+<ol type="1">
+<li>Il lance un processus par GPU et il lit <code>RANK</code>, <code>LOCAL_RANK</code> et <code>WORLD_SIZE</code>.</li>
+<li>Il calcule la moyenne d’un gradient après l’all-reduce, sur l’exemple à quatre lignes.</li>
+<li>Il enveloppe un petit modèle avec <code>DistributedDataParallel</code>. Le portable utilise gloo et un tenseur CPU. Un GPU visible, avec <code>MCI_BACKEND=nccl</code>, utilise NCCL.</li>
+<li>Il reconnaît un blocage et il le sépare d’un pas lent.</li>
+<li>Il chronomètre un all-reduce. Un tenseur GPU passe par <code>torch.cuda.Event</code>. Un tenseur CPU passe par <code>time.perf_counter</code>.</li>
+</ol>
+<p>Le jalon est le jeudi 26 novembre 2026, de 13 h à 17 h, en présentiel et en visioconférence. La fiche affiche 4 heures et le nom A. Fahs. Elle place la séance à l’URCA, campus Moulin de la Housse, bâtiment 7, salle TD707. Les places sont limitées. Les 18 heures couvrent la préparation et le travail autour de cette séance.</p>
+<p>Le poste visé est Compute Infrastructure Lead dans une startup robotique. Ce poste demande de tenir un job d’entraînement distribué. L’offre B, l’entraînement à grande échelle, reprendra plus tard. Ce module s’arrête à DDP.</p>
+<h2 id="prérequis" class="anchored">Prérequis</h2>
+<p>Une boucle PyTorch sur un seul processus suffit. Cette boucle a un tenseur, une perte, un appel à <code>backward</code>, et un optimiseur. Le portable a Python 3 et pip. Aucun GPU n’est requis pour valider les laboratoires.</p>
+<p>La fiche du 26 novembre demande le cours ROMEO « Fundamentals of Deep Learning », des bases de Python, et des bases de calcul haute performance. Cette page commence après ce cours, au moment où un processus sait déjà calculer un gradient.</p>
+<p>Le compte ouvre seulement la branche du cluster, le jour où il existe. Sans compte, un GPU loué porte la même branche nccl. Sans GPU du tout, le chemin gloo reste la validation.</p>
+<h2 id="notes-de-cours" class="anchored">Notes de cours</h2>
+<h3 id="un-processus-pour-chaque-gpu" class="anchored">Un processus pour chaque GPU</h3>
+<p><code>DistributedDataParallel</code> exécute une copie du script par GPU. Chaque copie est un processus, avec son propre interpréteur. Servir un LLM reste un processus. L’entraînement de ce module en lance un par GPU.</p>
+<p>Sur un nœud à quatre GPU, il lance quatre processus. Chacun en voit un. Sur le portable, le laboratoire lance deux processus même s’il n’y a aucun GPU. Ces deux processus tiennent le rôle des deux GPU, sur le CPU, pour que l’all-reduce soit réel.</p>
+<p>NCCL demande qu’un processus ait l’usage exclusif de chaque GPU qu’il touche. La documentation de <code>torch.distributed</code> prévient qu’un GPU partagé entre processus peut mener à un interblocage ou à un usage NCCL invalide. Un processus par GPU évite ce partage.</p>
+<p>La fiche nomme aussi le parallélisme de modèle, le découpage du modèle en morceaux. Le script de cette page laisse le modèle entier sur chaque rang, avec une ligne d’entrée différente. Le découpage d’un LLM plus grand qu’un GPU est hors de cette page.</p>
+<h3 id="trois-variables-pour-situer-le-processus" class="anchored">Trois variables pour situer le processus</h3>
+<p><code>RANK</code> est l’indice du processus dans le job. Il va de 0 à <code>WORLD_SIZE</code> moins un. <code>WORLD_SIZE</code> est le nombre de processus du job. <code>LOCAL_RANK</code> est l’indice du processus sur le nœud. C’est lui qui choisit le GPU.</p>
+<p>Sur un seul nœud et deux processus, <code>LOCAL_RANK</code> vaut <code>RANK</code>. <code>WORLD_SIZE</code> vaut 2.</p>
+<p>Sur deux nœuds et deux processus par nœud, <code>WORLD_SIZE</code> vaut 4. <code>RANK</code> vaut 0, 1, 2 ou 3. <code>LOCAL_RANK</code> vaut 0 ou 1, et il recommence à 0 sur chaque nœud. Le GPU se choisit avec <code>LOCAL_RANK</code>.</p>
+<p><code>torchrun</code> écrit les trois variables, plus <code>MASTER_ADDR</code> et <code>MASTER_PORT</code>. <code>init_process_group</code> les lit quand aucune autre méthode n’est passée. Cette méthode par défaut s’appelle <code>env://</code>. La documentation la décrit dans la page citée en sources.</p>
+<p><code>srun</code> écrit <code>SLURM_PROCID</code>, <code>SLURM_LOCALID</code> et <code>SLURM_NTASKS</code>. Le fichier Python ne change pas. Le lanceur copie ces trois valeurs dans <code>RANK</code>, <code>LOCAL_RANK</code> et <code>WORLD_SIZE</code>, et il fournit aussi <code>MASTER_ADDR</code> et <code>MASTER_PORT</code>.</p>
+<h3 id="ce-que-la-somme-écrit-sur-le-gradient" class="anchored">Ce que la somme écrit sur le gradient</h3>
+<div class="def">
+<p><span class="tag">All-reduce</span> Chaque rang entre avec un tenseur de même forme. L’appel remplace le tenseur de chaque rang par la réduction de tous. <code>all_reduce</code> somme par défaut.</p>
+</div>
+<p>L’exemple tient en quatre lignes.</p>
+<pre><code>rang 0  [1, 3]
+rang 1  [5, 7]
+somme   [6, 10]
+moyenne [3, 5]</code></pre>
+<p>Le rang 0 apporte <code>[1, 3]</code>. Le rang 1 apporte <code>[5, 7]</code>. La somme est <code>[6, 10]</code>. Chaque rang reçoit cette somme. La moyenne est cette somme divisée par <code>WORLD_SIZE</code>, donc <code>[3, 5]</code>.</p>
+<p><code>all_reduce</code> s’arrête à la somme. DDP entraîne avec la moyenne. Le script manuel divise donc par <code>WORLD_SIZE</code> après l’appel. Pendant <code>backward</code>, DDP fait cette division lui-même. Les deux chemins doivent laisser la même valeur sur chaque rang.</p>
+<div class="thm">
+<p><span class="tag">Même gradient</span> Après la division par <code>WORLD_SIZE</code>, chaque rang détient le même gradient. Un SGD déterministe, parti des mêmes poids, écrit alors les mêmes poids au pas suivant.</p>
+</div>
+<h3 id="le-script-qui-tourne-sans-gpu" class="anchored">Le script qui tourne sans GPU</h3>
+<p>Le fichier s’appelle <code>labo.py</code>. Le chemin du portable est le défaut. <code>MCI_BACKEND</code> absent, ou égal à <code>gloo</code>, sélectionne gloo et un tenseur CPU. Un portable qui a déjà un GPU reste sur ce chemin. Le laboratoire du portable ignore ce GPU.</p>
+<p>La branche nccl s’ouvre seulement si <code>MCI_BACKEND</code> vaut <code>nccl</code> et si un GPU est visible. Le tenseur est alors sur le GPU d’indice <code>LOCAL_RANK</code>. <code>DistributedDataParallel</code> reçoit <code>device_ids</code> dans ce seul cas. Sur CPU, l’appel omet <code>device_ids</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> timedelta</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.distributed <span class="im">as</span> dist</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn.parallel <span class="im">import</span> DistributedDataParallel <span class="im">as</span> DDP</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> choose_device():</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    use_nccl <span class="op">=</span> os.environ.get(<span class="st">"MCI_BACKEND"</span>, <span class="st">"gloo"</span>) <span class="op">==</span> <span class="st">"nccl"</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> use_nccl:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> torch.device(<span class="st">"cpu"</span>), <span class="st">"gloo"</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> torch.cuda.is_available():</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">"MCI_BACKEND=nccl demande un GPU visible."</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    local_rank <span class="op">=</span> <span class="bu">int</span>(os.environ[<span class="st">"LOCAL_RANK"</span>])</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    torch.cuda.set_device(local_rank)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> torch.device(<span class="st">"cuda"</span>, local_rank), <span class="st">"nccl"</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> time_allreduce_ms(tensor):</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tensor.is_cuda:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Une roue CPU lève une erreur si on construit Event sans GPU.</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        start <span class="op">=</span> torch.cuda.Event(enable_timing<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        end <span class="op">=</span> torch.cuda.Event(enable_timing<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        start.record()</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        dist.all_reduce(tensor)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        end.record()</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        end.synchronize()</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> start.elapsed_time(end)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    t0 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    dist.all_reduce(tensor)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (time.perf_counter() <span class="op">-</span> t0) <span class="op">*</span> <span class="fl">1e3</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    device, backend <span class="op">=</span> choose_device()</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    timeout_s <span class="op">=</span> <span class="bu">int</span>(os.environ.get(<span class="st">"MCI_TIMEOUT_S"</span>, <span class="st">"20"</span>))</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    dist.init_process_group(backend<span class="op">=</span>backend, timeout<span class="op">=</span>timedelta(seconds<span class="op">=</span>timeout_s))</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    rank <span class="op">=</span> <span class="bu">int</span>(os.environ[<span class="st">"RANK"</span>])</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    local_rank <span class="op">=</span> <span class="bu">int</span>(os.environ[<span class="st">"LOCAL_RANK"</span>])</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    world <span class="op">=</span> <span class="bu">int</span>(os.environ[<span class="st">"WORLD_SIZE"</span>])</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dist.get_rank() <span class="op">!=</span> rank <span class="kw">or</span> dist.get_world_size() <span class="op">!=</span> world:</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">"RANK ou WORLD_SIZE diverge du process group."</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># flush=True, sinon un blocage garde la ligne dans le tampon.</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"RANK=</span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss"> LOCAL_RANK=</span><span class="sc">{</span>local_rank<span class="sc">}</span><span class="ss"> WORLD_SIZE=</span><span class="sc">{</span>world<span class="sc">}</span><span class="ss"> backend=</span><span class="sc">{</span>backend<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        flush<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> world <span class="op">!=</span> <span class="dv">2</span>:</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">SystemExit</span>(<span class="st">"Ce laboratoire attend WORLD_SIZE=2."</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    local <span class="op">=</span> torch.tensor([<span class="fl">1.0</span>, <span class="fl">3.0</span>] <span class="cf">if</span> rank <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> [<span class="fl">5.0</span>, <span class="fl">7.0</span>], device<span class="op">=</span>device)</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    reduced <span class="op">=</span> local.clone()</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    skip_raw <span class="op">=</span> os.environ.get(<span class="st">"MCI_SKIP_RANK"</span>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    skipping <span class="op">=</span> skip_raw <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> rank <span class="op">==</span> <span class="bu">int</span>(skip_raw)</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> skipping:</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"saute </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss">"</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        time.sleep(timeout_s <span class="op">+</span> <span class="dv">5</span>)</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"entre </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss">"</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        dist.all_reduce(reduced, op<span class="op">=</span>dist.ReduceOp.SUM)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"sort </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss">"</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        mean <span class="op">=</span> reduced <span class="op">/</span> world</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"moyenne </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>mean<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> skip_raw <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>        model <span class="op">=</span> torch.nn.Linear(<span class="dv">2</span>, <span class="dv">1</span>, bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>            model.weight.copy_(torch.tensor([[<span class="fl">1.0</span>, <span class="fl">1.0</span>]]))</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        model.to(device)</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> device.<span class="bu">type</span> <span class="op">==</span> <span class="st">"cuda"</span>:</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>            model <span class="op">=</span> DDP(model, device_ids<span class="op">=</span>[local_rank])</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>            model <span class="op">=</span> DDP(model)</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        row <span class="op">=</span> [<span class="fl">1.0</span>, <span class="fl">0.0</span>] <span class="cf">if</span> rank <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> [<span class="fl">0.0</span>, <span class="fl">3.0</span>]</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> model(torch.tensor([row], device<span class="op">=</span>device)).<span class="bu">sum</span>()</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        grad <span class="op">=</span> model.module.weight.grad.detach().cpu().tolist()</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"gradient </span><span class="sc">{</span>rank<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>grad<span class="sc">}</span><span class="ss">"</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>        elapsed_ms <span class="op">=</span> time_allreduce_ms(torch.ones(<span class="dv">8</span>, device<span class="op">=</span>device))</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> rank <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"all_reduce_ms </span><span class="sc">{</span>elapsed_ms<span class="sc">:.3f}</span><span class="ss">"</span>, flush<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>    dist.destroy_process_group()</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    main()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="note">
+<p><span class="tag">Chemin du portable</span> <code>choose_device</code> renvoie ensemble le device et le backend. Le défaut est le CPU avec gloo. Le GPU avec nccl n’existe que dans l’autre retour. Un tenseur CPU ne part donc pas vers NCCL.</p>
+</div>
+<p>La commande du portable est la suivante.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">torchrun</span> <span class="at">--nproc_per_node</span><span class="op">=</span>2 <span class="at">--master_port</span><span class="op">=</span>29531 labo.py</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Si le nom <code>torchrun</code> est absent du <code>PATH</code>, le même lanceur s’appelle ainsi.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> <span class="at">-m</span> torch.distributed.run <span class="at">--nproc_per_node</span><span class="op">=</span>2 <span class="at">--master_port</span><span class="op">=</span>29531 labo.py</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Les deux rangs impriment <code>backend=gloo</code>, le texte <code>[3.0, 5.0]</code> après <code>moyenne</code>, et le texte <code>[[0.5, 1.5]]</code> après <code>gradient</code>. Le rang 0 imprime aussi <code>all_reduce_ms</code>. Deux processus peuvent coller deux textes sur la même ligne. Le critère est la présence de ces textes, dans n’importe quel ordre.</p>
+<p>Sans <code>torchrun</code>, <code>python3 labo.py</code> s’arrête dans <code>init_process_group</code>. L’erreur contient <code>environment variable RANK expected, but not set</code> et elle nomme <code>env://</code>. Le lanceur est obligatoire.</p>
+<p>Si <code>MCI_BACKEND=nccl</code> alors qu’aucun GPU n’est visible, chaque processus s’arrête avec <code>MCI_BACKEND=nccl demande un GPU visible.</code> Le message peut apparaître deux fois, une fois par processus.</p>
+<h3 id="la-branche-avec-nccl" class="anchored">La branche avec nccl</h3>
+<p>Le fichier reste <code>labo.py</code>. Sur une machine ou une allocation dont les GPU sont visibles, <code>torchrun</code> écrit déjà les cinq variables.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">MCI_BACKEND</span><span class="op">=</span>nccl <span class="ex">torchrun</span> <span class="at">--nproc_per_node</span><span class="op">=</span>2 <span class="at">--master_port</span><span class="op">=</span>29531 labo.py</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Si le compte cluster existe, <code>srun</code> lance le même fichier. <code>srun</code> écrit <code>SLURM_PROCID</code>, <code>SLURM_LOCALID</code> et <code>SLURM_NTASKS</code>. La commande ci-dessous les copie dans <code>RANK</code>, <code>LOCAL_RANK</code> et <code>WORLD_SIZE</code>. <code>MASTER_ADDR</code> est le nom du nœud qui porte le rang 0. Sur un seul nœud, <code>hostname</code> suffit. Sur deux nœuds, <code>127.0.0.1</code> reste dans le nœud local.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MASTER_ADDR</span><span class="op">=</span><span class="st">"</span><span class="va">$(</span><span class="fu">hostname</span><span class="va">)</span><span class="st">"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MASTER_PORT</span><span class="op">=</span>29531</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MCI_BACKEND</span><span class="op">=</span>nccl</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">--ntasks</span><span class="op">=</span>2 <span class="at">--gpus-per-task</span><span class="op">=</span>1 bash <span class="at">-c</span> <span class="st">'export RANK="$SLURM_PROCID" LOCAL_RANK="$SLURM_LOCALID" WORLD_SIZE="$SLURM_NTASKS"; exec python3 labo.py'</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Le drapeau qui demande les GPU dépend du site. S’il est refusé, le fichier Python reste le même. La demande de GPU est celle indiquée avec le compte. Les tenseurs du script fixent <code>moyenne</code> et <code>gradient</code>. Sur la branche nccl, la ligne <code>backend</code> vaut <code>nccl</code>.</p>
+<p>Un GPU loué, sans compte cluster, reprend la commande <code>torchrun</code> de cette section.</p>
+<h3 id="un-rang-qui-nentre-pas" class="anchored">Un rang qui n’entre pas</h3>
+<p>Un all-reduce et un barrier sont des collectifs. L’appel se termine quand chaque rang y est entré. Si un rang saute le collectif, les rangs qui sont entrés attendent.</p>
+<p>Le script le montre avec <code>MCI_SKIP_RANK</code>. Le rang dont l’indice est cette valeur imprime <code>saute</code> et n’appelle pas <code>all_reduce</code>. Les autres impriment <code>entre</code>, appellent <code>all_reduce</code>, et n’impriment <code>sort</code> que si l’appel revient.</p>
+<p>La documentation de <code>init_process_group</code> indique un délai de 10 minutes pour NCCL et de 30 minutes pour les autres backends, dont gloo. Avec ce délai long, un blocage ressemble à un job encore vivant. Le script passe <code>timeout</code> à <code>init_process_group</code>. <code>MCI_TIMEOUT_S</code> vaut 20 secondes par défaut. Au laboratoire, 8 flottants sur CPU reviennent bien avant 20 secondes. Un silence jusqu’à ce délai est un blocage.</p>
+<p>Un pas lent imprime <code>entre</code> sur chaque rang, puis <code>sort</code> sur chaque rang. Le temps entre les deux est la durée du pas. <code>all_reduce_ms</code> est cette durée pour la sonde, en millisecondes.</p>
+<p>Un blocage imprime <code>entre</code> seulement sur les rangs qui sont entrés, et il n’imprime pas le <code>sort</code> correspondant. Le rang qui a sauté imprime <code>saute</code> et il n’imprime pas <code>entre</code>.</p>
+<p>Avec <code>MCI_SKIP_RANK=1</code>, le rang 1 imprime <code>saute 1</code>. Le rang 0 imprime <code>entre 0</code>. Aucun des deux n’imprime <code>sort</code>. Gloo lève alors une <code>RuntimeError</code> dont le texte contient <code>Timed out waiting</code> et le délai choisi. <code>torchrun</code> envoie ensuite <code>SIGTERM</code> au rang qui a sauté. Le code de sortie du lanceur est 1.</p>
+<p><code>flush=True</code> sert à voir <code>entre</code> avant l’attente. Sans flush, le tampon peut garder cette ligne, et le blocage ressemble à un processus qui n’a rien démarré.</p>
+<h3 id="deux-horloges-pour-un-collectif" class="anchored">Deux horloges pour un collectif</h3>
+<p><code>time_allreduce_ms</code> chronomètre un all-reduce de 8 flottants, après le <code>backward</code>. <code>init_process_group</code> a déjà rendu la main. Le nombre commence après le démarrage du job.</p>
+<p>Sur un tenseur CUDA, l’all-reduce NCCL rend la main avant la fin du travail sur le GPU. <code>time.perf_counter</code> autour de l’appel s’arrête au lancement. <code>torch.cuda.Event</code> enregistre sur le flux GPU. <code>end.synchronize</code> attend la fin. <code>elapsed_time</code> renvoie des millisecondes.</p>
+<p>Sur un tenseur CPU, gloo bloque jusqu’à l’écriture du résultat. <code>time.perf_counter</code> autour de l’appel est alors la durée. Le script multiplie par <code>1e3</code> pour imprimer aussi des millisecondes.</p>
+<p>Le test <code>tensor.is_cuda</code> choisit l’horloge. Le chemin CPU ne construit pas <code>torch.cuda.Event</code>. Une roue installée sans GPU lève <code>Tried to instantiate dummy base class Event</code>.</p>
+<p>Un barrier se chronomètre avec les mêmes deux horloges, autour de <code>dist.barrier</code>. Le laboratoire chronomètre un all-reduce, parce que c’est l’appel qui porte la somme du gradient.</p>
+<h3 id="ce-quil-prépare-avant-le-26-novembre" class="anchored">Ce qu’il prépare avant le 26 novembre</h3>
+<p>Avant le 26 novembre, il fait tourner <code>labo.py</code> sur le portable. Deux rangs, gloo, tenseurs CPU, et les deux lignes <code>gradient</code> identiques. C’est le script DDP qu’il apporte.</p>
+<p>Si le compte existe, il relance le même fichier sur le cluster, sous <code>torchrun</code> ou sous <code>srun</code>, avec <code>MCI_BACKEND=nccl</code>. Sans compte, le chemin portable reste la validation. Un GPU loué est la branche intermédiaire, avec la même commande nccl.</p>
+<div class="note">
+<p><span class="tag">Compte absent</span> Les exercices se valident sans cluster. La branche nccl attend un GPU visible et, sur le cluster, un compte déjà ouvert. Le fichier Python est le même dans les trois cas.</p>
+</div>
+<p>Le jour de la séance, la fiche fait travailler sur les GPU du cluster. Il lance le script sur le portable avant d’entrer dans la salle, pour y arriver en connaissant déjà <code>RANK</code>.</p>
+<h2 id="exercices" class="anchored">Exercices</h2>
+<p>Les quatre exercices utilisent <code>labo.py</code>. Une roue CPU suffit.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Le lanceur imprime un bandeau sur <code>OMP_NUM_THREADS</code>. Les lignes qui comptent commencent par <code>RANK</code>. Si le port <code>29531</code> est occupé, changez-le pour un port libre.</p>
+<h3 id="exercice-1.-lire-rank-local_rank-et-world_size" class="anchored">Exercice 1. Lire RANK, LOCAL_RANK et WORLD_SIZE</h3>
+<p>Copiez le script dans <code>labo.py</code>. Lancez-le.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">torchrun</span> <span class="at">--nproc_per_node</span><span class="op">=</span>2 <span class="at">--master_port</span><span class="op">=</span>29531 labo.py</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Les deux textes suivants doivent apparaître. Ils peuvent partager une ligne.</p>
+<pre><code>RANK=0 LOCAL_RANK=0 WORLD_SIZE=2 backend=gloo
+RANK=1 LOCAL_RANK=1 WORLD_SIZE=2 backend=gloo</code></pre>
+<p>Écrivez une phrase. Elle dit quel processus prendrait le second GPU si la machine en avait deux.</p>
+<p>Si la sortie contient <code>Ce laboratoire attend WORLD_SIZE=2.</code>, la commande n’a lancé qu’un processus.</p>
+<h3 id="exercice-2.-retrouver-la-moyenne-à-la-main" class="anchored">Exercice 2. Retrouver la moyenne à la main</h3>
+<p>Avant de relancer, écrivez les quatre lignes pour <code>[1, 3]</code> et <code>[5, 7]</code>.</p>
+<p>Relancez la commande de l’exercice 1. La sortie contient les deux textes suivants, même collés.</p>
+<pre><code>moyenne 0 [3.0, 5.0]
+moyenne 1 [3.0, 5.0]</code></pre>
+<p>La somme de l’exemple est <code>[6, 10]</code>.</p>
+<h3 id="exercice-3.-envelopper-le-petit-modèle" class="anchored">Exercice 3. Envelopper le petit modèle</h3>
+<p>La perte est la somme de l’unique sortie. La couche est un <code>Linear</code> sans biais. Pour cette perte et cette couche, le gradient local est la ligne d’entrée.</p>
+<p>Le rang 0 reçoit <code>[1, 0]</code>. Son gradient local est <code>[1, 0]</code>. Le rang 1 reçoit <code>[0, 3]</code>. Son gradient local est <code>[0, 3]</code>. La moyenne est <code>[0.5, 1.5]</code>. Le poids a la forme d’une ligne, donc l’impression ajoute une paire de crochets.</p>
+<p>Relancez. La sortie contient les deux textes suivants.</p>
+<pre><code>gradient 0 [[0.5, 1.5]]
+gradient 1 [[0.5, 1.5]]</code></pre>
+<p>Un seul texte <code>gradient</code> veut dire que l’autre rang a manqué <code>backward</code>.</p>
+<h3 id="exercice-4.-chronométrer-lall-reduce" class="anchored">Exercice 4. Chronométrer l’all-reduce</h3>
+<p>Relancez. Relevez la ligne <code>all_reduce_ms</code>. Écrivez la valeur, l’unité, et si elle est très en dessous de 20 secondes.</p>
+<p>Le tenseur de la sonde contient 8 flottants sur le CPU. Écrivez pourquoi ce chemin prend <code>time.perf_counter</code>. Citez le test du script qui choisit l’horloge.</p>
+<h2 id="projet-solo" class="anchored">Projet solo</h2>
+<p>Il rend <code>labo.py</code> et la sortie d’une exécution sur le portable.</p>
+<p>Le fichier contient un petit modèle, un <code>Linear</code> sans biais, deux entrées et une sortie. Le lanceur démarre deux rangs. Le backend est gloo. Les tenseurs restent sur le CPU, même si un GPU est présent. Les deux rangs impriment le gradient moyenné, et les deux listes sont égales.</p>
+<p>La commande est celle de l’exercice 1. Garder les lignes d’entrée du cours est accepté. Les lignes attendues sont alors <code>gradient 0 [[0.5, 1.5]]</code> et <code>gradient 1 [[0.5, 1.5]]</code>.</p>
+<p>S’il change les deux lignes d’entrée, il écrit d’abord la moyenne à la main, puis il montre que l’impression lui est égale. Le critère reste le même. Les deux rangs impriment cette moyenne, et elle est bien la moyenne des deux gradients locaux.</p>
+<h2 id="projet-de-groupe" class="anchored">Projet de groupe</h2>
+<p>Deux personnes. Une seule commande, lancée par la personne B.</p>
+<p>La personne B injecte le rang qui saute le collectif. Elle exporte <code>MCI_SKIP_RANK=1</code>. Elle fixe <code>MCI_TIMEOUT_S=8</code>, en dessous des 20 secondes du script.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="va">MCI_SKIP_RANK</span><span class="op">=</span>1 <span class="va">MCI_TIMEOUT_S</span><span class="op">=</span>8 <span class="ex">torchrun</span> <span class="at">--nproc_per_node</span><span class="op">=</span>2 <span class="at">--master_port</span><span class="op">=</span>29531 labo.py</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La personne A laisse la personne B lancer la commande. La personne A lit les lignes du rang 0. La personne B lit les lignes du rang 1. Les textes <code>entre</code>, <code>saute</code> et <code>sort</code> comptent même s’ils partagent une ligne. Le code de sortie 1 est la fin attendue de cette commande.</p>
+<p>Ensemble, ils écrivent le symptôme. Cinq phrases, plus la sortie brute.</p>
+<ol type="1">
+<li>La ligne que le rang 0 a imprimée, et la ligne <code>sort</code> qui manque.</li>
+<li>La ligne que le rang 1 a imprimée, et la ligne <code>entre</code> qui manque.</li>
+<li>Le texte de l’erreur qui contient <code>Timed out waiting</code> et le délai.</li>
+<li>Ce que le lanceur a fait au processus qui a sauté, y compris le signal.</li>
+<li>Pourquoi ce n’est pas un pas lent. Un pas lent imprime <code>entre</code> puis <code>sort</code> sur les deux rangs. Ici, <code>sort</code> n’apparaît sur aucun rang.</li>
+</ol>
+<h2 id="examen" class="anchored">Examen</h2>
+<p>Les trois questions se répondent par écrit, sans rendre <code>labo.py</code>.</p>
+<h3 id="question-1.-situer-quatre-processus" class="anchored">Question 1. Situer quatre processus</h3>
+<p>Un job a deux nœuds et deux processus par nœud. Donnez <code>WORLD_SIZE</code>. Donnez <code>RANK</code> et <code>LOCAL_RANK</code> pour chaque processus. Dites quelle variable choisit le GPU, et pourquoi l’autre ne convient pas dès que le job a deux nœuds.</p>
+<h3 id="question-2.-somme-puis-moyenne" class="anchored">Question 2. Somme puis moyenne</h3>
+<p><code>WORLD_SIZE</code> vaut 2. Le rang 0 tient le gradient 4. Le rang 1 tient le gradient 10. <code>all_reduce</code> fait la somme. Que tient chaque rang après l’appel ? Que doit voir l’optimiseur de DDP ? La seconde réponse tient en une phrase.</p>
+<h3 id="question-3.-ligne-manquante" class="anchored">Question 3. Ligne manquante</h3>
+<p>Le rang 0 a imprimé <code>entre 0</code> et la ligne <code>sort</code> est absente. Le rang 1 a imprimé <code>saute 1</code>. Le tenseur a 8 flottants. Le délai passé à <code>init_process_group</code> est 20 secondes. Est-ce un blocage ou un pas lent ? Quelle paire de lignes un pas lent aurait ajoutée sur les deux rangs ?</p>
+<h2 id="sources" class="anchored">Sources</h2>
+<p>Confirmé. Fiche du jeudi 26 novembre 2026, de 13 h à 17 h, A. Fahs, présentiel et visioconférence. Le titre de la fiche est « Accélérez vos projets IA avec le HPC et les multi-GPU ».</p>
+<p>https://romeo.univ-reims.fr/21_formations.html/342/Accelerez_vos_projets_IA_avec_le_HPC_et_les_multi-GPU</p>
+<p><code>init_process_group</code>, la méthode <code>env://</code>, les variables <code>RANK</code>, <code>WORLD_SIZE</code>, <code>MASTER_ADDR</code> et <code>MASTER_PORT</code>, les délais par défaut, et <code>all_reduce</code> sont décrits dans la documentation de <code>torch.distributed</code>. La même page indique que DDP moyenne les gradients réunis.</p>
+<p>https://docs.pytorch.org/docs/stable/distributed.html</p>
+
+</main>
+</div>
+</div>
+<script src="../../assets/theme.js"></script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

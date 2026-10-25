@@ -1,0 +1,16 @@
+---
+title: "États-Unis"
+lang: fr
+format:
+  html:
+    theme: none
+    title-block-style: none
+    css: ../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../generated/chrome-d1.html
+    include-after-body: ../assets/closing-d1.html
+---
+
+{{< include usa.md >}}

@@ -1,0 +1,415 @@
+---
+title: "Anatomie d'un nœud Linux et GPU"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 1
+  hours: 12
+  jalon: "Confirmé. Préparer avant le 4 novembre 2026"
+---
+
+## Objectifs
+
+Il prépare ce module avant le 4 novembre 2026. Le volume est de douze heures. Ce temps couvre les notes, quatre exercices sur un portable Linux, une page de rapport, un travail à deux et trois questions courtes.
+
+À la fin, il sait lire un nœud avant d'y lancer un entraînement.
+
+- Il distingue le nœud de login, le nœud de calcul et le job.
+- Il lit les cœurs, les threads, les sockets et les nœuds NUMA avec `lscpu` et `/proc/cpuinfo`.
+- Il sépare la RAM de l'hôte et la mémoire du GPU.
+- Il lit dans `nvidia-smi` le nom, la mémoire, le mode persistence et la puissance.
+- Il reconnaît un GPU silencieux, un GPU occupé et un GPU qui attend le CPU.
+- Il dit, comme culture générale, ce que relient PCIe et NVLink, sans citer un débit du cluster du centre de calcul.
+- Il montre avec `df` pourquoi un jeu de données posé sur un répertoire personnel lent laisse le GPU inactif.
+
+L'offre A, Compute Infrastructure Lead, commence par cette lecture. L'offre B, large-scale training, reprend la même lecture quand un job occupe les GPU d'un nœud de calcul.
+
+## Prérequis
+
+Il fait déjà tourner de l'inférence GPU sur les machines de la startup robotique, avec vLLM, DCGM et Kubernetes. Il sait ouvrir un terminal et copier une sortie.
+
+Le système des exercices est Linux. Les lectures passent par `/proc`. Les commandes obligatoires existent sur un portable Linux sans GPU.
+
+`nvidia-smi` est une branche, seulement si la commande est déjà là. Un GPU loué à l'heure est une branche, seulement s'il en a déjà un. Le cluster du centre de calcul, y compris ROMEO, est une branche seulement si son compte existe déjà.
+
+Ce module lui demande de lire des compteurs. Le mode persistence se constate. La réservation d'un nœud et l'installation d'un logiciel attendent la suite du parcours.
+
+## Notes de cours
+
+Un nœud d'entraînement est une machine Linux qui porte des GPU. Il connaît déjà cette lecture du côté de l'inférence. Ici, la machine du calcul et la machine de la session sont deux machines.
+
+### Le nœud de login, le nœud de calcul et le job
+
+::: {.def}
+<span class="tag">Nœud de login</span>
+
+Le nœud de login accepte la session. Il y dépose des fichiers, édite un script et soumet un job. L'entraînement démarre sur le nœud que le job reçoit.
+:::
+
+::: {.def}
+<span class="tag">Nœud de calcul</span>
+
+Le nœud de calcul exécute le job. Ses CPU, sa RAM, ses GPU et son disque local sont les ressources de la réservation. Le processus d'entraînement vit sur cette machine.
+:::
+
+::: {.def}
+<span class="tag">Job</span>
+
+Un job est une réservation limitée dans le temps. L'ordonnanceur choisit un nœud de calcul, ou une partie de ses GPU, et y démarre le processus. À la fin du job, la réservation disparaît. Sur un centre de calcul, le nom usuel de cet ordonnanceur est Slurm.
+:::
+
+Kubernetes place un pod sur une machine d'inférence. L'ordonnanceur place un job sur un nœud de calcul. Dans les deux cas, un processus finit sur une machine qui a des GPU. Ici, cette machine est différente de celle où il a ouvert la session.
+
+vLLM garde un GPU alloué entre les requêtes. Un job d'entraînement garde le GPU le temps de la réservation, puis le rend. DCGM publie déjà l'utilisation et la puissance des GPU d'inférence. `nvidia-smi` affiche ces grandeurs dans le terminal du nœud.
+
+### Cœurs, threads et NUMA
+
+Un socket est un boîtier physique. Un cœur est une unité d'exécution dans ce boîtier. Un thread matériel partage un cœur. Linux compte un CPU logique par thread matériel.
+
+`lscpu` rassemble cette topologie depuis sysfs et `/proc/cpuinfo`, comme l'écrit son manuel. Ce manuel prévient que la sortie par défaut peut changer. Pour ce module, il lit la sortie humaine et il garde la commande à côté des nombres.
+
+```bash
+lscpu
+```
+
+Il relève les lignes suivantes.
+
+- `CPU(s)`
+- `Thread(s) per core`
+- `Core(s) per socket`
+- `Socket(s)`
+- `NUMA node(s)`
+- `Model name`
+- chaque ligne `NUMA nodeN CPU(s)`
+
+Il multiplie `Thread(s) per core` par `Core(s) per socket`, puis par `Socket(s)`. Il compare le produit à `CPU(s)`. Les valeurs égales décrivent les CPU en ligne. Un écart demande la ligne `On-line CPU(s) list`, quand elle est imprimée. Des CPU hors ligne expliquent souvent cet écart. Il écrit les nombres tels qu'ils sont imprimés.
+
+`NUMA node(s)` compte les domaines de mémoire. Les lignes suivantes disent quels CPU logiques sont dans chaque domaine. Un cœur accède plus vite à la mémoire de son domaine qu'à la mémoire d'un autre. Il note cette répartition. Le déplacement des processus vient plus tard.
+
+Sur un portable, `NUMA node(s)` vaut souvent 1. Il écrit 1 quand c'est le nombre imprimé.
+
+### /proc/cpuinfo
+
+`/proc/cpuinfo` est la source brute. Le manuel dit que le contenu dépend de l'architecture. Deux entrées communes sont `processor` et `bogomips`. `processor` numérote un CPU logique. Une machine à plusieurs CPU a un bloc par CPU logique.
+
+```bash
+grep -c '^processor' /proc/cpuinfo
+awk 'NF==0 { exit } { print }' /proc/cpuinfo
+```
+
+La première commande compte les CPU logiques. Ce compte rejoint `CPU(s)` dans `lscpu`. La seconde imprime le premier bloc, et elle s'arrête à la ligne vide. Il cherche `model name` dans ce bloc quand la ligne existe.
+
+Sur beaucoup de machines x86, le bloc contient aussi `physical id`, `core id` et `cpu cores`. `physical id` désigne le socket. `core id` désigne le cœur dans ce socket. `cpu cores` donne le nombre de cœurs du socket. Le manuel prévient que la liste change avec l'architecture. Pour une ligne manquante, il écrit `absent`. `lscpu` reste la lecture des sockets, des cœurs, des threads et de NUMA.
+
+### La RAM de l'hôte
+
+La RAM de l'hôte est la mémoire de la machine. Le processus, le cache des fichiers et les lots de données en attente de copie y vivent. `free` lit `/proc/meminfo`.
+
+Le manuel de `free` nomme les colonnes. `total` est la mémoire utilisable. `available` estime ce qu'un nouveau programme peut prendre sans swap. `used` est calculé comme `total` moins `available`. `free` est la part inutilisée. Elle est plus basse que `available`, parce que le noyau peut rendre une partie du cache.
+
+```bash
+free -h
+awk '/^MemTotal:|^MemAvailable:/ { print }' /proc/meminfo
+```
+
+Les deux commandes décrivent la même RAM. `free -h` change l'unité. `/proc/meminfo` imprime des kB. Les chiffres diffèrent parce que l'unité diffère. Il retient `total`, `available`, `MemTotal` et `MemAvailable`.
+
+Il surveille `available` avant un job. Si cette valeur tombe très bas et que le swap a encore de la place, le noyau y déplace des pages. Le CPU qui nourrit le GPU attend alors le disque.
+
+La ligne Swap de `free` se copie aussi. Une valeur used égale à zéro se copie comme les autres. Une valeur used différente de zéro veut dire que des pages sont déjà sur le disque.
+
+### Le device et les deux mémoires
+
+Dans `nvidia-smi`, un device est un GPU, avec un index qui part de zéro. Chaque device a sa mémoire. La RAM de l'hôte est commune aux CPU.
+
+`nvidia-smi` montre la mémoire du GPU comme une taille utilisée et une taille totale. Sur un GPU d'entraînement de centre de calcul, cette mémoire est de la HBM. Sur un portable, le type peut être différent. Le champ donne ces deux tailles.
+
+Un poids qui est encore dans la RAM de l'hôte occupe la mémoire du GPU seulement après une copie. Un processus sur le CPU lit le fichier dans la RAM de l'hôte. Une copie envoie ensuite les octets vers le device à travers PCIe.
+
+### Nom, mémoire, persistence et puissance
+
+Sans argument, `nvidia-smi` affiche une table par device. Il y cherche le nom du produit, le mode persistence, l'usage de la mémoire, et la puissance sous la forme d'une consommation et d'une limite.
+
+La page de `nvidia-smi` décrit ces grandeurs. Le nom du produit est une chaîne. Le mode persistence vaut `Enabled` ou `Disabled`. `Enabled` garde le pilote chargé quand aucun client n'est connecté. Le premier programme évite alors l'attente du chargement.
+
+Après un redémarrage, la valeur par défaut documentée est `Disabled`. Changer ce mode demande root. Au redémarrage suivant, la valeur documentée redevient `Disabled`. La documentation du mode persistence le présente comme un mécanisme en fin de vie, remplacé par un démon de persistance. Il copie la valeur imprimée. Dans cet exercice, elle reste telle quelle.
+
+La puissance instantanée est la dernière mesure du device, en watts. La limite est le plafond demandé par le logiciel. Les deux nombres se lisent ensemble. Au repos, la mesure reste basse face à la limite. Quand le GPU calcule, la mesure s'en rapproche.
+
+```bash
+nvidia-smi --query-gpu=name,memory.total,memory.used,persistence_mode,power.draw.instant,power.limit --format=csv
+```
+
+Cette requête utilise les clés usuelles de ces champs. La page de `nvidia-smi` donne `persistence_mode` comme exemple de `--query-gpu`, et elle nomme `power.draw.instant` pour la mesure instantanée. Si une clé est refusée, la liste de ce pilote est `nvidia-smi --help-query-gpu`. Il remplace seulement la clé refusée, puis il relance la requête.
+
+### Un GPU silencieux
+
+Deux silences se séparent par la forme de la sortie.
+
+Le premier a une table. Le nom du produit est présent, donc le pilote voit le device. `memory.used` reste bas devant `memory.total`. La puissance instantanée reste loin sous la limite. Aucun processus n'est listé. `nvidia-smi pmon` imprime alors des tirets pour ce device. La page de `nvidia-smi` le dit, pour un device sans processus. Un `Disabled` sur un portable au repos est une lecture normale. Il copie la valeur imprimée.
+
+Le second silence n'a pas de table. La commande `nvidia-smi` est absente, ou elle quitte en erreur parce que le pilote ne répond pas. Il copie le message. Il laisse vide la case du nom de produit.
+
+### PCIe et le lien entre GPU
+
+::: {.note}
+<span class="tag">Culture générale</span>
+
+Le bus PCIe relie un GPU au CPU et à la RAM de l'hôte. NVLink relie des GPU entre eux, pour qu'ils s'échangent des données sans repasser par le CPU. Sur certaines machines, un lien de la même famille relie aussi un GPU à son CPU. Ce paragraphe est de la culture générale. Ce paragraphe ne donne aucun débit du cluster du centre de calcul. Le débit utile se mesure sur la machine du job.
+:::
+
+### Disque local et système de fichiers partagé
+
+`df` affiche le système de fichiers qui contient un chemin. L'option `-h` rend les tailles lisibles. L'option `-T` ajoute le type. L'option `-l` ne garde que les systèmes que `df` classe comme locaux. Le manuel définit ces trois options.
+
+```bash
+df -h -T "$HOME"
+df -h -T -l
+df -h -T /tmp
+```
+
+Il lit `Filesystem` et `Type` sur la ligne du répertoire personnel. Il cherche la même valeur `Filesystem` dans la sortie de `df -h -T -l`. Si elle y figure, `df` classe ce système comme local. Sinon, le répertoire personnel n'est pas local au sens de `df`. Il compare ensuite `Filesystem` pour `/tmp`. Deux valeurs différentes veulent dire deux systèmes de fichiers.
+
+Une ligne de type `tmpfs` est de la mémoire. Un jeu de données reste sur un disque. Une copie sur `tmpfs` occuperait la RAM de l'hôte dont le CPU a besoin pour préparer les lots.
+
+Sur un portable, `$HOME` et `/tmp` ont souvent la même source. Il écrit cette source, quelle qu'elle soit. Sur un nœud de calcul, il relance les trois commandes et il garde une sortie par machine.
+
+### Un jeu de données qui fait attendre le GPU
+
+Le goulot est la ressource qui fait attendre les autres. Le GPU calcule sur des octets déjà présents dans sa mémoire. Si le lot suivant est encore sur un système de fichiers lent, il n'est pas prêt. Un processus sur le CPU lit ce lot vers la RAM de l'hôte. Une copie le transfère vers le device, à travers PCIe. Pendant cette lecture, le GPU a fini son pas et attend. Sa mémoire peut déjà contenir le modèle. Son utilisation reste basse. Le goulot est la lecture.
+
+`ps` montre le processus qui lit. La première lettre `D` de `stat` veut dire un sommeil non interruptible, en général une entrée-sortie. Le manuel de `ps` le dit. Un `%CPU` élevé veut dire que ce processus occupe un CPU. `nvidia-smi pmon` montre le pid côté GPU, avec une utilisation SM basse. Un état `D` pointe vers le disque. Un `%CPU` élevé pointe vers le CPU. L'utilisation SM basse dit que le GPU attend. Le goulot est celui que ces lignes montrent.
+
+La copie de travail va sur un système que `df -h -T -l` classe comme local au nœud de calcul. L'original peut rester sur le système partagé. Le processus d'entraînement lit la copie locale.
+
+::: {.thm}
+<span class="tag">GPU en attente</span>
+
+Un GPU dont la mémoire est allouée et dont l'utilisation reste basse attend le processus qui doit lui donner le lot suivant.
+:::
+
+### ps et nvidia-smi pmon
+
+`ps` lit `/proc`. Le manuel définit `%CPU` comme le temps CPU divisé par le temps écoulé depuis le démarrage du processus. Ce ratio couvre toute la vie du processus. `psr` est le CPU logique sur lequel le processus a tourné en dernier. La première lettre de `stat` est l'état. `R` veut dire en exécution, ou en file pour l'être. `D` veut dire sommeil non interruptible, en général une entrée-sortie. D'autres lettres peuvent suivre. Il lit la première.
+
+```bash
+ps -eo pid,psr,stat,pcpu,pmem,comm --sort=-pcpu | head -n 8
+```
+
+Il lit l'en-tête, puis les lignes de tête. Un processus lancé la veille peut afficher un `%CPU` modeste pendant qu'il occupe un cœur. Le temps passé au repos depuis le démarrage entre dans le ratio. Un `bash` dont toute la vie est une boucle de calcul affiche un `%CPU` élevé, parce que la moyenne et l'instant coïncident. vLLM, déjà en service depuis longtemps sur les machines d'inférence, se lit avec cette distinction.
+
+`nvidia-smi pmon` suit les processus de calcul et d'affichage sur chaque device. La page de `nvidia-smi` dit que chaque relevé donne le pid, le nom de la commande, et l'utilisation moyenne depuis le relevé précédent. Cette utilisation couvre SM, la mémoire, l'encodeur et le décodeur. L'intervalle par défaut est d'une seconde. L'option `-c` fixe le nombre de relevés, puis la commande s'arrête. Sans processus, les métriques valent `-`.
+
+```bash
+nvidia-smi pmon -c 1
+```
+
+pmon dit ce que le GPU fait sur le dernier intervalle. `ps` dit quel processus existe, et quelle part de sa vie a occupé un CPU. Il garde les deux sorties. La page de `nvidia-smi` réserve pmon à certains produits. Sur un portable, il copie un refus à la place de la table.
+
+### Un GPU occupé et un GPU qui attend le CPU
+
+Un GPU occupé a un pid dans pmon. L'utilisation SM reste haute sur plusieurs relevés. `power.draw.instant` se rapproche de `power.limit`. `memory.used` a augmenté. Le même pid existe dans `ps`. L'occupation se voit dans SM et dans la puissance. `%CPU` reste le ratio sur la vie du processus.
+
+Un GPU qui attend le CPU a aussi un pid. L'utilisation SM reste basse d'un relevé au suivant. Dans `ps`, ce pid, ou le processus qui prépare les données, montre un `%CPU` élevé ou un état `D`. Un job déjà démarré laisse encore cette lecture possible. L'occupation se confirme dans l'utilisation SM et dans la puissance.
+
+## Exercices
+
+::: {.note}
+<span class="tag">Portable</span>
+
+Les quatre exercices se font sur un portable Linux. Il colle la commande et les lignes demandées. Une ligne absente s'écrit `absent`. Les exercices 1 à 3 utilisent `lscpu`, `/proc`, `free`, `df` et `ps`. L'exercice 4 ajoute la branche `nvidia-smi`. La ligne `nvidia-smi absent` est alors une réponse juste.
+:::
+
+S'il a déjà un GPU loué à l'heure, ou déjà un compte sur le cluster du centre de calcul, il peut refaire la lecture sur cette machine après les exercices. Il range ces sorties à part. Le travail rendu pour les exercices reste celui du portable.
+
+### Exercice 1. Lire le CPU
+
+Il exécute les trois commandes suivantes.
+
+```bash
+lscpu
+grep -c '^processor' /proc/cpuinfo
+awk 'NF==0 { exit } { print }' /proc/cpuinfo
+```
+
+Il écrit une phrase qui contient quatre nombres lus sur la machine.
+
+- Le nombre de lignes `processor`.
+- La valeur `CPU(s)`.
+- Le produit de `Thread(s) per core`, de `Core(s) per socket` et de `Socket(s)`.
+- La valeur `NUMA node(s)`, avec la liste des CPU du premier nœud.
+
+Il ajoute le `Model name`. Si le premier bloc contient `physical id`, `core id` et `cpu cores`, il les copie. Sinon, il écrit `absent` pour chacune des lignes manquantes.
+
+Le compte `processor` et `CPU(s)` se rejoignent. Le produit de la topologie rejoint `CPU(s)`, ou bien il cite `On-line CPU(s) list` pour expliquer l'écart. Un seul nœud NUMA est une lecture réussie sur un portable.
+
+### Exercice 2. Lire la RAM de l'hôte
+
+Il exécute les deux commandes suivantes.
+
+```bash
+free -h
+awk '/^MemTotal:|^MemAvailable:/ { print }' /proc/meminfo
+```
+
+Il écrit trois relevés.
+
+- `total` et `available` dans la sortie de `free -h`.
+- Les lignes `MemTotal` et `MemAvailable`.
+- La ligne Swap, avec la colonne used.
+
+Il nomme la colonne à surveiller avant un programme lourd. Cette colonne est `available`. Le manuel de `free` la définit comme l'estimation pour démarrer une application sans swap. Il rappelle que `free -h` et `/proc/meminfo` n'impriment pas la même unité.
+
+### Exercice 3. Lire le disque du répertoire personnel
+
+Il exécute les trois commandes suivantes.
+
+```bash
+df -h -T "$HOME"
+df -h -T -l
+df -h -T /tmp
+```
+
+Il écrit une phrase. Elle donne le type et la source du répertoire personnel. Elle dit si cette source apparaît dans la liste obtenue avec `-l`. Elle donne la source de `/tmp`. S'il voit une ligne `tmpfs`, il écrit que ce n'est pas un disque pour un jeu de données.
+
+Les trois commandes se terminent. La même source pour `$HOME` et `/tmp` est une lecture valide sur un portable.
+
+### Exercice 4. Lire les processus
+
+Il exécute la commande suivante.
+
+```bash
+ps -eo pid,psr,stat,pcpu,pmem,comm --sort=-pcpu | head -n 8
+```
+
+Il copie l'en-tête et les trois premiers processus. Il écrit ce que `%CPU` mesure. La phrase attendue dit que c'est le ratio depuis le démarrage du processus. Il note la première lettre de `stat` pour le processus en tête.
+
+Il lance ensuite la branche GPU.
+
+```bash
+if command -v nvidia-smi >/dev/null 2>&1; then
+  nvidia-smi --query-gpu=name,memory.total,memory.used,persistence_mode,power.draw.instant,power.limit --format=csv
+  nvidia-smi pmon -c 1
+else
+  echo "nvidia-smi absent"
+fi
+```
+
+Il colle la sortie entière de cette branche. Si une clé de la requête est refusée, il ouvre `nvidia-smi --help-query-gpu`, il remplace cette clé, et il relance la requête. Si pmon répond qu'il n'est pas pris en charge, il colle ce message.
+
+Il ajoute une phrase sur le device. Sans pid, le GPU est au repos, ou la commande était absente. Avec un pid, il dit si l'utilisation SM du relevé est haute ou basse.
+
+## Projet solo
+
+Il rend une page, sur une seule machine. Par défaut, la machine est le portable Linux des exercices. S'il a déjà un GPU loué à l'heure, il peut décrire cette machine à la place. S'il a déjà un compte sur le cluster du centre de calcul, y compris ROMEO, il peut décrire un nœud de calcul à la place. Il choisit une machine et une seule.
+
+Il commence par ces trois commandes.
+
+```bash
+hostname
+date -Is
+uname -srm
+```
+
+Le titre reprend `hostname`. La première ligne reprend la date et `uname`. Le corps reprend, en phrases courtes, les relevés des quatre exercices pour la machine choisie. Il garde les lignes nommées dans les exercices, et il laisse de côté le reste de `/proc/cpuinfo` et de `df`.
+
+La page se ferme sur un jugement. Il dit où il poserait un jeu de données pour un entraînement sur cette machine. Il cite la ligne de `df` qui justifie l'endroit. Si `nvidia-smi` est absent, le jugement le dit et s'appuie sur le disque et sur la RAM.
+
+## Projet de groupe
+
+Il fait ce travail avec une autre personne. Ils utilisent une machine à la fois. Chacun lance au moins une fois une commande de mesure. A désigne la personne qui lance la charge. B désigne la personne qui mesure.
+
+L'étape limitée par le CPU dure trente secondes. A lance la boucle. B, sur la même machine, lance `ps` deux fois pendant ces trente secondes.
+
+```bash
+bash -c 'end=$((SECONDS+30)); x=0; while (( SECONDS < end )); do x=$((x+1)); done; echo "$x"'
+```
+
+```bash
+ps -eo pid,psr,stat,pcpu,pmem,comm --sort=-pcpu | head -n 8
+```
+
+Ils notent le pid du `bash`, `psr`, la première lettre de `stat` et `%CPU`. Le goulot de cette étape est un CPU logique. Le signe attendu est ce `bash` en tête, avec un état `R`, pendant que la boucle tourne.
+
+L'étape GPU a quatre cas. Ils s'arrêtent au premier cas qui s'applique.
+
+**Cas 1.** `nvidia-smi` est absent. Ils écrivent `Mesure GPU absente`.
+
+**Cas 2.** `nvidia-smi pmon -c 1` montre déjà un pid. Ce processus est l'étape GPU. C'est le cas d'un serveur d'inférence déjà en service. Ils lancent `nvidia-smi pmon -c 5`, puis la commande suivante en remplaçant PID par le nombre lu. Le manuel de `ps` dit que les sélections s'additionnent, et que `-e` prend tous les processus. Pour un seul pid, ils utilisent `-p` sans `-e`.
+
+```bash
+ps -p PID -o pid,psr,stat,pcpu,pmem,comm
+```
+
+**Cas 3.** pmon n'a aucun pid, et la commande suivante imprime `True`. A lance alors le produit de matrices. B lance `nvidia-smi pmon -c 5` pendant ces vingt secondes.
+
+```bash
+python3 -c 'import torch; print(torch.cuda.is_available())'
+```
+
+```bash
+python3 - <<'PY'
+import time
+import torch
+size = 2048
+a = torch.randn(size, size, device="cuda")
+b = torch.randn(size, size, device="cuda")
+torch.cuda.synchronize()
+start = time.perf_counter()
+steps = 0
+while time.perf_counter() - start < 20:
+    c = a @ b
+    steps += 1
+torch.cuda.synchronize()
+print(steps)
+PY
+```
+
+**Cas 4.** Les autres situations s'écrivent `Mesure GPU absente`. Un message d'erreur de pmon ou de Python se colle avec cette ligne. Le module ne demande pas d'installer un logiciel pour obtenir un GPU.
+
+Le texte commun tient en une demi-page.
+
+- Pour l'étape CPU, une ligne réelle de `ps`, puis la phrase de goulot.
+- Pour l'étape GPU, une ligne réelle de pmon et une ligne réelle de `ps`, puis la phrase de goulot. Une utilisation SM haute, avec une puissance qui monte vers la limite, veut dire que le GPU est le goulot. Une utilisation SM basse, avec un `%CPU` élevé ou un état `D`, veut dire que le GPU attend. Ils disent s'il attend le CPU ou le disque, et ils citent la ligne qui le montre.
+- Si la mesure GPU manque, la ligne `Mesure GPU absente`, puis une phrase marquée `prédiction`. Cette phrase décrit le signe pmon d'un GPU occupé et le signe pmon d'un GPU en attente. Un pourcentage n'y entre que s'il a été imprimé par une commande.
+
+Si les deux personnes ont des portables différents, ils refont l'étape CPU sur la seconde machine. L'étape GPU reste sur la seule machine qui peut la mesurer.
+
+## Examen
+
+Trois questions courtes. Quelques phrases suffisent pour chacune. Les réponses portent sur les situations ci-dessous.
+
+### Question 1. Où va le processus
+
+Il soumet un job depuis le nœud de login. Où le processus d'entraînement s'exécute-t-il ? Quel travail reste sur le nœud de login pendant que le job tourne ?
+
+### Question 2. Deux lectures
+
+Lecture A. `nvidia-smi` affiche un nom de produit. `persistence_mode` vaut `Disabled`. La puissance instantanée est loin sous la limite. Aucun processus n'est listé. `pmon` imprime des tirets.
+
+Lecture B. Un pid est listé. Sur cinq relevés de `pmon`, l'utilisation SM reste basse. `ps` montre ce pid, ou le processus qui lit les données, avec un `%CPU` élevé.
+
+Que décrit chaque lecture ? Laquelle est un GPU qui attend le CPU ?
+
+### Question 3. Le jeu de données
+
+Le processus lit le jeu de données dans le répertoire personnel. La source `Filesystem` de ce répertoire est absente de `df -h -T -l`. La mémoire du GPU est allouée. L'utilisation SM reste basse. Qu'est-ce que le GPU attend ? Où faut-il placer la copie de travail ? Quelle commande montre que cette destination est locale ?
+
+## Sources
+
+- [manuel lscpu](https://man7.org/linux/man-pages/man1/lscpu.1.html). Topologie des CPU, threads, cœurs, sockets et nœuds NUMA. La commande lit sysfs et `/proc/cpuinfo`. La sortie par défaut peut changer.
+- [manuel proc_cpuinfo](https://man7.org/linux/man-pages/man5/proc_cpuinfo.5.html). Fichier `/proc/cpuinfo`, contenu lié à l'architecture, entrées communes `processor` et `bogomips`.
+- [manuel free](https://man7.org/linux/man-pages/man1/free.1.html). Colonnes `total`, `used`, `free`, `available` et swap. `free` analyse `/proc/meminfo`. `used` vaut `total` moins `available`.
+- [manuel ps](https://man7.org/linux/man-pages/man1/ps.1.html). `%CPU` comme ratio depuis le démarrage du processus, champ `psr`, état `R`, état `D` pour un sommeil non interruptible en général lié à une entrée-sortie.
+- [manuel df](https://man7.org/linux/man-pages/man1/df.1.html). Espace des systèmes de fichiers, option `-T` pour le type, option `-l` pour la liste locale.
+- [nvidia-smi](https://docs.nvidia.com/deploy/nvidia-smi/index.html). Nom du produit, mode persistence, lectures de puissance, `--query-gpu`, et `nvidia-smi pmon` avec des tirets quand aucun processus ne tourne.
+- [mode persistence](https://docs.nvidia.com/deploy/driver-persistence/persistence-mode-legacy.html). Mécanisme en fin de vie, remplacé par un démon de persistance. La page montre la lecture du champ dans `nvidia-smi`.

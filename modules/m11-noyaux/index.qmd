@@ -1,0 +1,38 @@
+---
+title: "Profilage et noyaux"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 13
+---
+
+## Objectifs
+
+L'offre B demande de voir pourquoi un GPU attend. Il sait lire un tableau de bord de flotte. Il ne sait pas encore lire un profil de noyau.
+
+Il nomme Nsight et Triton. Nsight mesure un run. Triton est un langage pour écrire un petit noyau et le comparer au noyau déjà lancé. Il sépare le temps de calcul et le temps d'attente mémoire.
+
+## Travaux pratiques prévus
+
+Sur le laptop, il écrit une liste de contrôle. La liste lui demande les sept points suivants.
+
+1. La commande qui lance le profil.
+2. L'intervalle de temps couvert.
+3. Le noyau le plus long.
+4. La part de temps passée à calculer.
+5. La part de temps passée à attendre la mémoire.
+6. Le chiffre comparé entre deux runs.
+7. Le noyau qu'il réécrirait en Triton, et la raison de ce choix.
+
+S'il a un GPU local et Nsight, il lance le profil une fois sur un petit script et il répond aux sept points. Sans GPU, il rédige un rapport d'exemple de dix lignes et il remplit la liste à partir de ce rapport. Un profileur déjà installé peut remplacer Nsight.
+
+Le centre, ou un cloud peu cher, est une branche si le compte existe. La liste se remplit sur le laptop.

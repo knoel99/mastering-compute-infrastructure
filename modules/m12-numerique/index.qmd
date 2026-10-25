@@ -1,0 +1,30 @@
+---
+title: "Débogage numérique"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: skeleton
+  order: 14
+---
+
+## Objectifs
+
+Une perte qui devient nan, ou qui diverge entre deux runs, bloque un entraînement. Il sait relancer un service. Il ne sait pas encore isoler une anomalie numérique.
+
+Il décrit trois cas. Une perte qui explose. Une perte qui reste plate. Un écart entre deux graines. Sur CPU, une même graine et les mêmes opérations donnent le même résultat. Il écrit cette limite dans la note. Il ne l'étend pas à un GPU.
+
+## Travaux pratiques prévus
+
+Sur le CPU du laptop, il écrit `graines.py` avec `random.Random`, sans rien installer. Le script additionne cent tirages. Il le lance avec la graine 1, deux fois, et il vérifie que les deux totaux sont égaux. Il le lance avec la graine 2, et il vérifie que le total diffère. Il imprime les totaux et l'écart.
+
+Dans le même script, il écrit une perte qui reste égale à un sur dix pas. Il écrit une perte qui double à chaque pas jusqu'à dépasser mille. Il fixe une perte à la valeur nan des flottants. Il imprime `perte != perte` pour ce nan. Le résultat est vrai, et le script continue.
+
+Une branche GPU reste facultative, et seulement si un compte existe. Le script tourne sur le CPU du laptop.
