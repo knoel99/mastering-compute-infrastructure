@@ -21,6 +21,8 @@ Il fait déjà tourner Prometheus, Grafana et DCGM pour l'inférence. Ces outils
 
 Il ajoute une trace par job et un coût en heures GPU. Il peut alors expliquer une dépense à l'équipe de la startup robotique. C'est un travail de l'offre A, Compute Infrastructure Lead.
 
+Un coût par jeton d'inférence, distinct des heures GPU d'entraînement, est sur [Cloud GPU et coût par jeton](../m17-cloud/).
+
 ## Travaux pratiques prévus
 
 Sur papier, il esquisse un tableau de bord. Une ligne par job. Les colonnes sont le nom, le type de GPU, la durée, et le coût en heures GPU.

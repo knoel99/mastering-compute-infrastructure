@@ -76,6 +76,11 @@ ul.task-list li input[type="checkbox"] {
 <a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
 <a href="../../modules/m12-numerique/">Débogage numérique</a>
 <a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+<a href="../../modules/m14-inference/">Inférence</a>
+<a href="../../modules/m15-blackwell/">Prix des GPU Blackwell</a>
+<a href="../../modules/m16-machines/">Machines d'inférence locale</a>
+<a href="../../modules/m17-cloud/">Cloud GPU et coût par jeton</a>
+<a href="../../modules/m18-precision/">NVFP4 et FP8</a>
 </nav>
 <main id="main">
 
@@ -88,6 +93,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 id="objectifs" class="anchored">Objectifs</h2>
 <p>Une perte qui devient nan, ou qui diverge entre deux runs, bloque un entraînement. Il sait relancer un service. Il ne sait pas encore isoler une anomalie numérique.</p>
 <p>Il décrit trois cas. Une perte qui explose. Une perte qui reste plate. Un écart entre deux graines. Sur CPU, une même graine et les mêmes opérations donnent le même résultat. Il écrit cette limite dans la note. Il ne l’étend pas à un GPU.</p>
+<p>Deux formats d’inférence, NVFP4 et FP8, sont comparés sur <a href="../m18-precision/">NVFP4 et FP8</a>. Cette page reste les pertes d’entraînement.</p>
 <h2 id="travaux-pratiques-prévus" class="anchored">Travaux pratiques prévus</h2>
 <p>Sur le CPU du laptop, il écrit <code>graines.py</code> avec <code>random.Random</code>, sans rien installer. Le script additionne cent tirages. Il le lance avec la graine 1, deux fois, et il vérifie que les deux totaux sont égaux. Il le lance avec la graine 2, et il vérifie que le total diffère. Il imprime les totaux et l’écart.</p>
 <p>Dans le même script, il écrit une perte qui reste égale à un sur dix pas. Il écrit une perte qui double à chaque pas jusqu’à dépasser mille. Il fixe une perte à la valeur nan des flottants. Il imprime <code>perte != perte</code> pour ce nan. Le résultat est vrai, et le script continue.</p>
