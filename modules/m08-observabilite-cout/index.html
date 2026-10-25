@@ -76,6 +76,11 @@ ul.task-list li input[type="checkbox"] {
 <a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
 <a href="../../modules/m12-numerique/">Débogage numérique</a>
 <a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+<a href="../../modules/m14-inference/">Inférence</a>
+<a href="../../modules/m15-blackwell/">Prix des GPU Blackwell</a>
+<a href="../../modules/m16-machines/">Machines d'inférence locale</a>
+<a href="../../modules/m17-cloud/">Cloud GPU et coût par jeton</a>
+<a href="../../modules/m18-precision/">NVFP4 et FP8</a>
 </nav>
 <main id="main">
 
@@ -88,6 +93,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 id="objectifs" class="anchored">Objectifs</h2>
 <p>Il fait déjà tourner Prometheus, Grafana et DCGM pour l’inférence. Ces outils disent si un GPU répond. Ils ne disent pas ce qu’un job d’entraînement a coûté, ni quelle trace le job a laissée. Cette page ne réapprend pas les trois outils.</p>
 <p>Il ajoute une trace par job et un coût en heures GPU. Il peut alors expliquer une dépense à l’équipe de la startup robotique. C’est un travail de l’offre A, Compute Infrastructure Lead.</p>
+<p>Un coût par jeton d’inférence, distinct des heures GPU d’entraînement, est sur <a href="../m17-cloud/">Cloud GPU et coût par jeton</a>.</p>
 <h2 id="travaux-pratiques-prévus" class="anchored">Travaux pratiques prévus</h2>
 <p>Sur papier, il esquisse un tableau de bord. Une ligne par job. Les colonnes sont le nom, le type de GPU, la durée, et le coût en heures GPU.</p>
 <p>À côté, sur le laptop, il remplit une feuille avec trois jobs fictifs, <code>indexation</code>, <code>entrainement</code> et <code>evaluation</code>. Il leur donne une durée. Il choisit un prix d’heure GPU. Il multiplie chaque durée par ce prix. Il additionne les trois coûts.</p>

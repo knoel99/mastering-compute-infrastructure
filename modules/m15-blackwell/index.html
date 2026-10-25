@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Prix des GPU Blackwell</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-html-435ba6093e6f0817aa7405139811e7b1.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<link rel="stylesheet" href="../../assets/paper.css">
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script><script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous"></head>
+
+<body>
+
+<!-- derived from module front matter. build_site overwrites this file. -->
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+<button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span class="tb-label">Sommaire</span></button>
+<a class="brand" href="../../index.html">Infra de calcul</a>
+<span class="tb-title" id="tb-title"></span>
+<button type="button" class="tb-btn" id="theme-toggle">Thème</button>
+</header>
+<div class="layout">
+<nav id="sidetoc" class="sidetoc" aria-label="Sommaire"></nav>
+<div class="content">
+<nav id="mci-nav">
+<a href="../../index.html">Accueil</a>
+<a href="../../parcours/index.html">Parcours</a>
+<a href="../../glossaire/index.html">Glossaire</a>
+<a href="../../programmes/index.html">Programmes</a>
+<a href="../../programmes/france.html">France</a>
+<a href="../../programmes/usa.html">États-Unis</a>
+<a href="../../programmes/chine.html">Chine</a>
+<a href="../../programmes/monde.html">Reste du monde</a>
+<a href="../../programmes/synthese.html">Synthèse</a>
+<a href="../../modules/m01-anatomie-noeud/">Anatomie d'un nœud Linux et GPU</a>
+<a href="../../modules/m02-ordonnancement/">Ordonnancement Slurm et Kubernetes</a>
+<a href="../../modules/a-romeo-cuda/">ROMEO2025 et CUDA Python</a>
+<a href="../../modules/m03-pytorch-nccl/">PyTorch distribué et NCCL</a>
+<a href="../../modules/m00-socle-dl/">Socle PyTorch pour l'infra</a>
+<a href="../../modules/m04-hpo/">Recherche d'hyperparamètres multi-GPU</a>
+<a href="../../modules/m05-reseau-stockage/">Réseau et stockage d'entraînement</a>
+<a href="../../modules/m06-reprise/">Préemption et reprise</a>
+<a href="../../modules/m07-multi-fournisseurs/">Placement multi-fournisseurs</a>
+<a href="../../modules/m08-observabilite-cout/">Observabilité et coût de flotte</a>
+<a href="../../modules/m09-capstone/">Capstone portefeuille Lead</a>
+<a href="../../modules/m10-parallelismes/">Parallélismes et MFU</a>
+<a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
+<a href="../../modules/m12-numerique/">Débogage numérique</a>
+<a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+<a href="../../modules/m14-inference/">Inférence</a>
+<a href="../../modules/m15-blackwell/">Prix des GPU Blackwell</a>
+<a href="../../modules/m16-machines/">Machines d'inférence locale</a>
+<a href="../../modules/m17-cloud/">Cloud GPU et coût par jeton</a>
+<a href="../../modules/m18-precision/">NVFP4 et FP8</a>
+</nav>
+<main id="main">
+
+<header id="title-block-header">
+<h1 class="title">Prix des GPU Blackwell</h1>
+
+</header>
+
+
+<h2 id="objectifs" class="anchored">Objectifs</h2>
+<p>Il lit une grille de prix Blackwell sans prendre une estimation pour un prix de liste. À la fin, il relie le prix, la VRAM et la bande passante, et il dit ce qu’un R² autorise à conclure.</p>
+<h2 id="prérequis" class="anchored">Prérequis</h2>
+<p>Il sait ce qu’est un gigaoctet de mémoire GPU et une bande passante en gigaoctets par seconde. La page <a href="../m01-anatomie-noeud/">Anatomie d’un nœud Linux et GPU</a> suffit. Il n’achète rien dans cet exercice.</p>
+<h2 id="notes-de-cours" class="anchored">Notes de cours</h2>
+<p>La grille date du 23 octobre 2026. Le change retenu dans <code>rapport-blackwell-prix-20261023.md</code> est 1 dollar pour 0,893 euro. Les prix américains sans TVA séparée sont traités comme hors taxe après conversion. Une ligne marquée estimation n’est pas un prix NVIDIA affiché.</p>
+<p>Les graphiques sont produits par <code>analyses/blackwell/make_charts.py</code>, <code>make_charts_regimes.py</code> et <code>make_charts_trends.py</code>. Plusieurs fits sont en dollars, parce que ces scripts convertissent le prix euro avant la régression. Le fichier le dit. Il ne faut pas lire un coefficient en dollars comme un coefficient en euros.</p>
+<h2 id="grille-de-prix" class="anchored">Grille de prix</h2>
+<p>Le tableau suivant reprend <code>rapport-blackwell-prix-20261023.md</code>. Les prix sont en euros HT.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Modèle</th>
+<th style="text-align: right;">Euros HT</th>
+<th>Type</th>
+<th style="text-align: right;">VRAM Go</th>
+<th style="text-align: right;">Go/s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RTX 5090</td>
+<td style="text-align: right;">1 785</td>
+<td>MSRP</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">1 792</td>
+</tr>
+<tr class="even">
+<td>RTX 5080</td>
+<td style="text-align: right;">892</td>
+<td>MSRP</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">960</td>
+</tr>
+<tr class="odd">
+<td>RTX 5070 Ti</td>
+<td style="text-align: right;">669</td>
+<td>MSRP</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">896</td>
+</tr>
+<tr class="even">
+<td>RTX 5070</td>
+<td style="text-align: right;">490</td>
+<td>MSRP</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">672</td>
+</tr>
+<tr class="odd">
+<td>RTX 5060 Ti 16 Go</td>
+<td style="text-align: right;">383</td>
+<td>MSRP</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">448</td>
+</tr>
+<tr class="even">
+<td>RTX 5060 Ti 8 Go</td>
+<td style="text-align: right;">338</td>
+<td>MSRP</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">448</td>
+</tr>
+<tr class="odd">
+<td>RTX 5060</td>
+<td style="text-align: right;">267</td>
+<td>MSRP</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">448</td>
+</tr>
+<tr class="even">
+<td>RTX 5050</td>
+<td style="text-align: right;">222</td>
+<td>MSRP</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">320</td>
+</tr>
+<tr class="odd">
+<td>PRO 6000 WS</td>
+<td style="text-align: right;">14 288</td>
+<td>marché</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">1 792</td>
+</tr>
+<tr class="even">
+<td>PRO 6000 Max-Q</td>
+<td style="text-align: right;">14 734</td>
+<td>street</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">1 792</td>
+</tr>
+<tr class="odd">
+<td>PRO 5000 72 Go</td>
+<td style="text-align: right;">8 929</td>
+<td>street</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">1 344</td>
+</tr>
+<tr class="even">
+<td>PRO 5000 48 Go</td>
+<td style="text-align: right;">7 009</td>
+<td>street</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">1 344</td>
+</tr>
+<tr class="odd">
+<td>PRO 4500</td>
+<td style="text-align: right;">4 196</td>
+<td>street</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">896</td>
+</tr>
+<tr class="even">
+<td>PRO 4000</td>
+<td style="text-align: right;">2 723</td>
+<td>street</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">672</td>
+</tr>
+<tr class="odd">
+<td>PRO 2000</td>
+<td style="text-align: right;">1 607</td>
+<td>street</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">288</td>
+</tr>
+<tr class="even">
+<td>B100</td>
+<td style="text-align: right;">28 576</td>
+<td>estimation</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">8 000</td>
+</tr>
+<tr class="odd">
+<td>B200</td>
+<td style="text-align: right;">42 418</td>
+<td>estimation</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">8 000</td>
+</tr>
+<tr class="even">
+<td>B300</td>
+<td style="text-align: right;">47 329</td>
+<td>estimation</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">8 000</td>
+</tr>
+<tr class="odd">
+<td>DGX Spark GB10</td>
+<td style="text-align: right;">6 206</td>
+<td>marché</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">273</td>
+</tr>
+<tr class="even">
+<td>DGX Station GB300</td>
+<td style="text-align: right;">91 532</td>
+<td>estimation</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: right;">7 100</td>
+</tr>
+<tr class="odd">
+<td>GB200 NVL72 par GPU</td>
+<td style="text-align: right;">31 007</td>
+<td>estimation</td>
+<td style="text-align: right;">186</td>
+<td style="text-align: right;">8 000</td>
+</tr>
+<tr class="even">
+<td>GB300 NVL72 par GPU</td>
+<td style="text-align: right;">43 410</td>
+<td>estimation</td>
+<td style="text-align: right;">279</td>
+<td style="text-align: right;">8 000</td>
+</tr>
+</tbody>
+</table>
+<p>Le TDP du rapport va de 70 W pour la PRO 2000 à 1 600 W pour la Station, en passant par 575 W pour la 5090, 600 W pour la PRO 6000 WS, 300 W pour la Max-Q, 1 000 W pour le B200 et 140 W pour le SoC du Spark. Les systèmes Spark et Station ne sont pas des GPU nus. Pour la Station, la VRAM du graphique est les 252 Go de HBM3e, pas les 748 Go de mémoire cohérente.</p>
+<p>La bande passante des B-series est le plafond annoncé de 8 000 Go/s. Les sources de specs et de prix sont celles du rapport du 23 octobre 2026, dont NVIDIA, Newegg le 23 octobre 2026, et tech-insider.org au 13 octobre 2026 pour le B200, le B300 et la Station.</p>
+<p>Ce rapport estime la Station à 91 532 euros HT. Deux autres fichiers donnent d’autres prix. Ils sont réunis, sans choix, dans <a href="../m16-machines/">Machines d’inférence locale</a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/01-vram-vs-price.png" class="img-fluid"></p>
+<figcaption>VRAM contre le prix, axe du prix logarithmique</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/01-vram-vs-price-linear.png" class="img-fluid"></p>
+<figcaption>VRAM contre le prix, axe du prix linéaire</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/02-bw-vs-price.png" class="img-fluid"></p>
+<figcaption>Bande passante contre le prix, axe logarithmique</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/04-tdp-vs-price.png" class="img-fluid"></p>
+<figcaption>TDP contre le prix, axe logarithmique</figcaption>
+</figure>
+</div>
+<h2 id="euros-par-gigaoctet" class="anchored">Euros par gigaoctet</h2>
+<p>Même rapport, mêmes modèles. La colonne de droite est le prix divisé par la bande passante, en euros par gigaoctet par seconde.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Modèle</th>
+<th style="text-align: right;">Euros par Go</th>
+<th style="text-align: right;">Euros par Go/s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RTX 5090</td>
+<td style="text-align: right;">55,8</td>
+<td style="text-align: right;">1,00</td>
+</tr>
+<tr class="even">
+<td>RTX 5080</td>
+<td style="text-align: right;">55,8</td>
+<td style="text-align: right;">0,93</td>
+</tr>
+<tr class="odd">
+<td>RTX 5070 Ti</td>
+<td style="text-align: right;">41,8</td>
+<td style="text-align: right;">0,75</td>
+</tr>
+<tr class="even">
+<td>RTX 5070</td>
+<td style="text-align: right;">40,8</td>
+<td style="text-align: right;">0,73</td>
+</tr>
+<tr class="odd">
+<td>RTX 5060 Ti 16 Go</td>
+<td style="text-align: right;">23,9</td>
+<td style="text-align: right;">0,85</td>
+</tr>
+<tr class="even">
+<td>RTX 5060 Ti 8 Go</td>
+<td style="text-align: right;">42,2</td>
+<td style="text-align: right;">0,75</td>
+</tr>
+<tr class="odd">
+<td>RTX 5060</td>
+<td style="text-align: right;">33,4</td>
+<td style="text-align: right;">0,60</td>
+</tr>
+<tr class="even">
+<td>RTX 5050</td>
+<td style="text-align: right;">27,8</td>
+<td style="text-align: right;">0,69</td>
+</tr>
+<tr class="odd">
+<td>PRO 6000 WS</td>
+<td style="text-align: right;">148,8</td>
+<td style="text-align: right;">7,97</td>
+</tr>
+<tr class="even">
+<td>PRO 6000 Max-Q</td>
+<td style="text-align: right;">153,5</td>
+<td style="text-align: right;">8,22</td>
+</tr>
+<tr class="odd">
+<td>PRO 5000 72 Go</td>
+<td style="text-align: right;">124,0</td>
+<td style="text-align: right;">6,64</td>
+</tr>
+<tr class="even">
+<td>PRO 5000 48 Go</td>
+<td style="text-align: right;">146,0</td>
+<td style="text-align: right;">5,22</td>
+</tr>
+<tr class="odd">
+<td>PRO 4500</td>
+<td style="text-align: right;">131,1</td>
+<td style="text-align: right;">4,68</td>
+</tr>
+<tr class="even">
+<td>PRO 4000</td>
+<td style="text-align: right;">113,5</td>
+<td style="text-align: right;">4,05</td>
+</tr>
+<tr class="odd">
+<td>PRO 2000</td>
+<td style="text-align: right;">100,4</td>
+<td style="text-align: right;">5,58</td>
+</tr>
+<tr class="even">
+<td>B100</td>
+<td style="text-align: right;">148,8</td>
+<td style="text-align: right;">3,57</td>
+</tr>
+<tr class="odd">
+<td>B200</td>
+<td style="text-align: right;">220,9</td>
+<td style="text-align: right;">5,30</td>
+</tr>
+<tr class="even">
+<td>B300</td>
+<td style="text-align: right;">164,3</td>
+<td style="text-align: right;">5,92</td>
+</tr>
+<tr class="odd">
+<td>DGX Spark GB10</td>
+<td style="text-align: right;">48,5</td>
+<td style="text-align: right;">22,73</td>
+</tr>
+<tr class="even">
+<td>DGX Station GB300</td>
+<td style="text-align: right;">363,2</td>
+<td style="text-align: right;">12,89</td>
+</tr>
+<tr class="odd">
+<td>GB200 NVL72 par GPU</td>
+<td style="text-align: right;">166,7</td>
+<td style="text-align: right;">3,88</td>
+</tr>
+<tr class="even">
+<td>GB300 NVL72 par GPU</td>
+<td style="text-align: right;">155,6</td>
+<td style="text-align: right;">5,43</td>
+</tr>
+</tbody>
+</table>
+<p>Le rapport résume ainsi la grille. Les GeForce tombent autour de 24 à 56 euros par Go au MSRP. Les RTX PRO tombent autour de 100 à 154 euros par Go. Le B200 est autour de 221 euros par Go. Le Spark est à 48,5 euros par Go, mais à 22,73 euros par gigaoctet par seconde, à cause des 273 Go/s de LPDDR5X. La Station, système compris, est autour de 363 euros par Go.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/05-usd-per-gb-bars.png" class="img-fluid"></p>
+<figcaption>Euros par gigaoctet, barres</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/06-usd-per-gbs-bars.png" class="img-fluid"></p>
+<figcaption>Euros par gigaoctet par seconde, barres</figcaption>
+</figure>
+</div>
+<p>Le fichier <code>usd-per-gb-equations.md</code> ajuste le prix par gigaoctet en dollars. La loi de puissance globale y est 4,8002 fois P puissance 0,359, avec un R² de 0,817. Par régime, le même fichier donne une droite en logarithme du prix, une droite linéaire, et une puissance. En GeForce, la pente lue dans <code>BRIEF-cloud-interpret.md</code> est d’environ 37 dollars par Go et par décade de prix. En PRO, elle est d’environ 55. La pente HBM d’environ 456 est tirée par la Station sur une demi-décade. L’ordonnée à l’origine d’environ moins 1 910 dollars par Go n’est pas un coût réel.</p>
+<h2 id="tendances-et-régimes" class="anchored">Tendances et régimes</h2>
+<p><code>alpha-refit-by-regime-20261023.md</code> refait l’exposant de la VRAM sur le prix en euros. <code>SYNTHESE.md</code> le résume sans le recalculer. Multiplier le prix par dix ne multiplie la mémoire que par environ 4,4 sur la moyenne du panel, avec V proche de 0,224 fois P puissance 0,641.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Panel</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">Exposant</th>
+<th style="text-align: right;">R²</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tous</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">0,641</td>
+<td style="text-align: right;">0,878</td>
+</tr>
+<tr class="even">
+<td>Sans Spark ni Station</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">0,649</td>
+<td style="text-align: right;">0,930</td>
+</tr>
+<tr class="odd">
+<td>GeForce</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0,652</td>
+<td style="text-align: right;">0,899</td>
+</tr>
+<tr class="even">
+<td>PRO</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0,832</td>
+<td style="text-align: right;">0,987</td>
+</tr>
+<tr class="odd">
+<td>HBM avec Station</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0,281</td>
+<td style="text-align: right;">0,259</td>
+</tr>
+<tr class="even">
+<td>HBM sans Station</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0,744</td>
+<td style="text-align: right;">0,586</td>
+</tr>
+</tbody>
+</table>
+<p><code>trend-equations.md</code> donne des droites globales en dollars, Y égal a plus b fois le logarithme décimal du prix. La VRAM a un R² de 0,785. La bande passante a un R² de 0,657. Le prix par gigaoctet a un R² de 0,747. Le TDP a un R² de 0,621. Ce sont des fits d’ensemble. Ils lissent des régimes différents.</p>
+<p><code>regime-analysis.md</code> sépare les régimes, toujours sur le prix en dollars dans le script. La bande passante GeForce vaut environ moins 3 507 plus 1 548 fois le logarithme du prix, R² 0,93, sur 8 cartes. La bande passante PRO vaut environ moins 4 760 plus 1 551 fois le logarithme, R² 0,99, sur 7 cartes. La pente est donc la même, environ 1,55 To/s par décade de prix. Le HBM ne suit pas cette droite. <code>BRIEF-cloud-interpret.md</code> place un plateau vers 7 850 Go/s.</p>
+<p>Le TDP GeForce, dans le même fichier de régimes, a un R² de 0,96. Le TDP PRO a un R² de 0,71. Le TDP HBM a un R² de 0,88.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/vram-power-log.png" class="img-fluid"></p>
+<figcaption>Loi de puissance de la VRAM, axe logarithmique</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="../../analyses/blackwell/bw-piecewise-log.png" class="img-fluid"></p>
+<figcaption>Bande passante par morceaux, axe logarithmique</figcaption>
+</figure>
+</div>
+<p><code>vram-price-alpha-blackwell-20261023.md</code>, avec les notes du 23 et du 24 octobre 2026, refuse de lire l’exposant 0,64 comme une loi du silicium. La GDDR7 est une DRAM soudée sur la carte, sans TSV ni interposeur. Le HBM3E est un empilement de dies reliés par TSV, posé sur un interposeur CoWoS. Un die défectueux perd le stack. Le modèle de coût d’un B200 cité par Epoch le 10 décembre 2025, et rapporté dans cette note, met environ 2 900 dollars de HBM, 1 100 dollars de CoWoS et 1 000 dollars de rebut, pour un coût variable d’environ 6 250 dollars. Epoch indique aussi, le 21 mai 2026, que le HBM est passé de 52 pour cent à 63 pour cent du coût des composants des puces d’IA. TrendForce, le 29 septembre 2026, dit qu’un stack 8-Hi coûte 10 à 20 pour cent de plus par gigabit qu’un stack 12-Hi. La hausse n’est donc pas une fonction continue de la capacité.</p>
+<p>Les autres graphiques du dossier restent dans <code>analyses/blackwell/</code>. Le nom dit la grandeur et l’échelle. <code>log</code> est un axe de prix logarithmique. <code>linear</code> est un axe linéaire.</p>
+<h2 id="lecture-des-courbes" class="anchored">Lecture des courbes</h2>
+<p>Le rapport complet d’interprétation des courbes n’est pas dans le dépôt. Il s’agit d’un résumé uniquement, rapport complet manquant.</p>
+<p>Le fichier présent est <code>RESUME-interpretations-blackwell-curves.md</code>. Il reprend ce qui a été relayé les 23 et 24 octobre 2026. L’agent visé était <code>bc-0efe6ed0-9e71-51b2-9f3c-ec6fb21f23d6</code>. Le brief envoyé est <code>BRIEF-cloud-interpret.md</code>.</p>
+<p>Le résumé dit ceci. L’exposant n’est pas une loi du silicium. C’est l’élasticité de la grille du 23 octobre 2026. En GeForce, il vaut environ 0,65. En PRO, environ 0,83, avec un R² proche de 0,99. Sur le HBM avec la Station, le R² proche de 0,26 interdit de citer l’exposant. L’exposant du prix par gigaoctet est 1 moins l’exposant de la VRAM. Ce n’est pas un second résultat. Le plateau d’environ 7 850 Go/s est une moyenne HBM. Le packaging décale le niveau de prix du HBM. Il ne fabrique pas le chiffre 0,65.</p>
+<p><code>NOTES-chat-R2-et-fabrication.md</code> dit comment lire le R². Un R² de 0,90 veut dire que le prix explique neuf dixièmes des écarts de VRAM. Un R² proche de 0 veut dire que le prix n’aide presque pas. Un R² négatif voudrait dire que le modèle fait pire qu’une moyenne. Une droite de Y contre le logarithme du prix est une logarithmique, pas une puissance. Une puissance est une droite sur un graphe logarithme contre logarithme. C’est le fit global de la VRAM. La bande passante, elle, est linéaire par morceaux sur le logarithme du prix, plus le plateau HBM.</p>
+<h2 id="exercices" class="anchored">Exercices</h2>
+<h3 id="exercice-1" class="anchored">Exercice 1</h3>
+<p>Il nomme, dans la grille, la famille au plus bas euros par Go et la ligne au plus haut. Il recopie les deux nombres et le type de prix.</p>
+<h3 id="exercice-2" class="anchored">Exercice 2</h3>
+<p>Il explique pourquoi le Spark peut être bon marché au gigaoctet et cher à la bande passante. Il cite les 273 Go/s et les 22,73 euros.</p>
+<h3 id="exercice-3" class="anchored">Exercice 3</h3>
+<p>Il dit, sans nouveau calcul, ce qu’un prix multiplié par dix fait à la VRAM du panel complet. Il nomme le R² de ce fit.</p>
+<h3 id="exercice-4" class="anchored">Exercice 4</h3>
+<p>Il écrit la phrase exacte qui dit que le rapport d’interprétation est un résumé et que le rapport complet manque.</p>
+<h2 id="projet-solo" class="anchored">Projet solo</h2>
+<p>Il rédige une note d’une page. La note sépare les prix MSRP, les prix de rue et les estimations. Elle dit pourquoi l’exposant HBM avec la Station n’est pas citable. Elle ne choisit pas un prix de Station.</p>
+<h2 id="projet-de-groupe" class="anchored">Projet de groupe</h2>
+<p>À deux, l’un lit les fits en euros, l’autre les fits en dollars. Ils marquent, pour trois coefficients, la monnaie de l’axe des prix. Ils rendent ce tableau, pas une nouvelle régression.</p>
+<h2 id="examen" class="anchored">Examen</h2>
+<h3 id="question-1" class="anchored">Question 1</h3>
+<p>Quel change dollar euro le rapport du 23 octobre 2026 utilise-t-il ?</p>
+<h3 id="question-2" class="anchored">Question 2</h3>
+<p>Le R² de 0,259 empêche-t-il de citer l’exposant HBM avec la Station, et pour quelle raison ?</p>
+<h3 id="question-3" class="anchored">Question 3</h3>
+<p>Quelle différence le résumé fait-il entre une droite en logarithme du prix et une loi de puissance ?</p>
+<h2 id="sources" class="anchored">Sources</h2>
+<p><code>rapport-blackwell-prix-20261023.md</code>, 23 octobre 2026.</p>
+<p><code>alpha-refit-by-regime-20261023.md</code>, <code>regime-analysis.md</code>, <code>trend-equations.md</code>, <code>usd-per-gb-equations.md</code>, <code>BRIEF-cloud-interpret.md</code>.</p>
+<p><code>vram-price-alpha-blackwell-20261023.md</code>.</p>
+<p><code>RESUME-interpretations-blackwell-curves.md</code> et <code>NOTES-chat-R2-et-fabrication.md</code>, 23 et 24 octobre 2026.</p>
+<p><code>SYNTHESE.md</code>, octobre 2026, qui cite ces fichiers sans les recalculer.</p>
+<p>Les recherches brutes du même jour ont nourri la note sur l’exposant. Elles ne sont pas recopiées.</p>
+
+</main>
+</div>
+</div>
+<script src="../../assets/theme.js"></script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

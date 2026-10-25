@@ -33,6 +33,8 @@ Il prépare ce module avant le 4 novembre 2026. Le volume est de douze heures. C
 
 L'offre A, Compute Infrastructure Lead, commence par cette lecture. L'offre B, large-scale training, reprend la même lecture quand un job occupe les GPU d'un nœud de calcul.
 
+Les prix des GPU et les machines d'inférence locale sont dans [Inférence](../m14-inference/). Cette page reste la lecture du nœud.
+
 ## Prérequis
 
 Il fait déjà tourner de l'inférence GPU sur les machines de la startup robotique, avec vLLM, DCGM et Kubernetes. Il sait ouvrir un terminal et copier une sortie.

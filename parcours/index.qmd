@@ -58,7 +58,7 @@ La page Observabilité et coût de flotte part de Prometheus, Grafana et DCGM, d
 
 La page Capstone portefeuille Lead est le dossier de l'offre A. Un relecteur lance un dépôt sur un laptop, avec un job préempté, une reprise et une note de coût.
 
-Quatre pages sont dans l'offre B.
+Quatre pages sont dans l'offre B. Cinq pages d'inférence suivent. Elles portent les prix Blackwell, les machines locales, la location réservée et la précision NVFP4. La liste générée les place après les pages d'entraînement.
 
 Sur la page Parallélismes et MFU, il nomme DDP, FSDP, le parallélisme tensoriel, le parallélisme pipeline et le parallélisme expert. Il estime la mémoire sur un seul GPU. Il définit MFU comme le rapport entre les opérations du modèle réellement exécutées et le pic annoncé du GPU.
 

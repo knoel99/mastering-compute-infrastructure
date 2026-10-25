@@ -1,0 +1,102 @@
+---
+title: "Inférence"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 16
+---
+
+## Objectifs
+
+Il range le dossier d'inférence à part du parcours d'entraînement. À la fin, il sait quelle page porte les prix, quelle page porte les machines, et quelle page porte le cloud.
+
+- Il ouvre la grille Blackwell du 23 octobre 2026 sans mélanger une estimation et un prix de marché.
+- Il retrouve les trois prix HT de la DGX Station et la phrase qui dit qu'ils ne concordent pas.
+- Il sait que l'interprétation des courbes n'existe ici qu'en résumé.
+- Il retrouve le cours zero-to-sglang et les textes de Yichi Zhang sur HiCache.
+
+## Prérequis
+
+Il a déjà fait tourner vLLM pour l'inférence. Il sait lire une mémoire de GPU dans `nvidia-smi`. Il n'a pas besoin du cluster du centre de calcul pour lire ces pages.
+
+## Notes de cours
+
+Ces pages reprennent le dossier préparé le 25 octobre 2026. Chaque chiffre reste attaché au fichier qui le porte. Rien n'est recalculé pour départager deux sources.
+
+## Carte de la section
+
+Cinq pages se suivent. Celle-ci est la carte. Les quatre autres portent les chiffres.
+
+- [Prix des GPU Blackwell](../m15-blackwell/) donne la VRAM, la bande passante, les euros par gigaoctet, les fits et le résumé des courbes.
+- [Machines d'inférence locale](../m16-machines/) compare DGX Spark, DGX Station, Mac Studio et les rigs WRX90. Les trois prix de la Station y sont réunis.
+- [Cloud GPU et coût par jeton](../m17-cloud/) met une location réservée un an à côté de l'achat local, puis le coût par jeton.
+- [NVFP4 et FP8](../m18-precision/) compare le débit, la mémoire et la qualité sur RTX PRO 6000.
+
+Les graphiques sont dans `analyses/blackwell/` et `analyses/rigs/charts/`. Les scripts qui les retracent sont à côté, dans `analyses/blackwell/` et `analyses/rigs/`. Le tableur des rigs n'est pas dans le dépôt. Ses totaux sont dans `analyses/rigs/configs-wrx90.csv`.
+
+Les recherches brutes qui ont nourri le dossier ne sont pas recopiées. Seules les notes déjà rédigées servent de source.
+
+## Exercices
+
+### Exercice 1
+
+Il ouvre la carte et il écrit le titre de la page qui porte les trois prix de la Station.
+
+### Exercice 2
+
+Il ouvre la page des prix Blackwell et il copie la phrase qui dit que le rapport complet d'interprétation manque.
+
+### Exercice 3
+
+Il ouvre le fichier `analyses/rigs/configs-wrx90.csv` et il note le prix HT du palier 1 GPU et celui du palier 4 GPU. Il ne les additionne pas.
+
+### Exercice 4
+
+Il retrouve, dans les références de cette page, l'adresse du dépôt zero-to-sglang et l'adresse du billet HiCache. Il les recopie.
+
+## Projet solo
+
+Il écrit une page d'une trentaine de lignes. La page dit ce qu'il irait lire avant d'acheter une machine d'inférence, et ce qu'il ne trancherait pas tant que les trois prix de la Station restent en désaccord. Il n'ajoute aucun chiffre qui ne soit déjà sur ces pages.
+
+## Projet de groupe
+
+À deux, ils se répartissent la page des machines et la page du cloud. Chacun explique à l'autre un seul écart de prix, avec le nom du fichier source. Ils rendent les deux explications.
+
+## Examen
+
+### Question 1
+
+Quel fichier du 22 octobre 2026 porte le prix d'environ 90 000 euros HT pour la Station ?
+
+### Question 2
+
+Que manque-t-il au dossier d'interprétation des courbes Blackwell ?
+
+### Question 3
+
+Où sont les totaux des rigs WRX90, puisque le tableur n'est pas publié ?
+
+## Sources
+
+Les chiffres des pages liées viennent des fichiers nommés sur chaque page. Cette carte ne recalcule rien.
+
+Les notes de recherche brutes du dossier du 25 octobre 2026 ont servi à rédiger ces notes. Elles ne sont pas reproduites.
+
+### Références
+
+Les adresses suivantes ont été ouvertes le 25 octobre 2026. Seules celles qui ont répondu sont gardées.
+
+Le dépôt du cours zero-to-sglang est [datawhalechina/zero-to-sglang](https://github.com/datawhalechina/zero-to-sglang). La page du cours en anglais est [zero-to-sglang](https://datawhalechina.github.io/zero-to-sglang/eng/).
+
+Yichi Zhang publie sur [x.com/YichiZ03](https://x.com/YichiZ03). Le 22 octobre 2026, ses messages renvoient au billet HiCache et à une série sur le cache KV dans SGLang. Le billet ouvert est [HiCache in SGLang](https://www.sglang.io/blog/hicache). La documentation ouverte est [Hierarchical KV Caching](https://docs.sglang.io/docs/advanced_features/hicache).
+
+Le profil public répond. Les messages datés du 21 et du 22 octobre 2026 décrivent les chapitres KV Cache, Tensor Parallelism et RadixAttention du cours, puis le billet HiCache. L'identifiant numérique de chaque message n'a pas été retenu ici, faute d'une page de message dont le texte a été lu directement sur x.com.
