@@ -78,6 +78,8 @@ def home():
     n_av = sum(has_course(m["id"]) for m in C["modules"])
     n_pr = sum(has_project(p["id"]) for p in C["projects"])
     masters_ready = has_page("masters")
+    complete = n_av == len(C["modules"]) and n_pr == len(C["projects"])
+    rest_note = "." if complete else " ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours."
     txt = f"""---
 title: "Mastering Compute Infrastructure"
 subtitle: "Un parcours pour devenir compute infrastructure engineer : cours, labs vérifiés, projets de portfolio et enquête sur les masters HPC"
@@ -96,7 +98,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {{#etat}}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **{n_av} module(s) sur {len(C['modules'])} et {n_pr} projet(s) sur {len(C['projects'])} sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **{n_av} module(s) sur {len(C['modules'])} et {n_pr} projet(s) sur {len(C['projects'])} sont publiés**{rest_note}
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).

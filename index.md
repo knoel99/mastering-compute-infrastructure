@@ -16,7 +16,7 @@ description: "Parcours d'apprentissage en français pour opérer des clusters GP
 
 ## État du chantier {#etat}
 
-Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **16 module(s) sur 16 et 6 projet(s) sur 6 sont publiés** ; les autres apparaissent en gris, avec leur plan, pour que vous voyiez où va le parcours.
+Ce site est construit module par module, et chaque page est vérifiée avant d'être publiée. **16 module(s) sur 16 et 6 projet(s) sur 6 sont publiés**.
 
 -   **Documenté** : chaque chiffre sur un système réel renvoie à sa source ; sinon il est présenté comme un ordre de grandeur.
 -   **Vérifié** : les calculs des exemples et des corrigés sont refaits en Python, les labs « bac à sable » s'exécutent sans GPU (`verify.sh`), les pages passent des contrôles mécaniques (`tools/check_gates.py`).
