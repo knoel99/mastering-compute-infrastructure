@@ -1,10 +1,12 @@
 """Checkpoint interval: closed-form models and a Monte-Carlo simulator.
 
 Notation (all times in seconds)
-    delta  cost of one checkpoint that blocks the training loop (C in the course)
+    delta  cost of one checkpoint that blocks the training loop (delta in module 10; C in modules 13,
+           15, 16 and projects 3, 4, 6)
     mtbf   mean time between failures of the whole job (M)
     r      restart cost: detection + relaunch + checkpoint load (R)
-    tau    useful compute between two checkpoints (T)
+    tau    useful compute between two checkpoints (tau in module 10; T in modules 13, 15, 16 and
+           projects 3, 4, 6)
 
 The simulated system is the one assumed by Young and Daly: the job computes for tau seconds,
 then writes a checkpoint for delta seconds. A failure destroys everything since the last

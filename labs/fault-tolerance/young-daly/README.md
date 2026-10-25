@@ -18,7 +18,7 @@ $PYTHON sweep.py --delta 60 --mtbf-hours 3.09 --restart 300 --svg yd.svg
 Ligne attendue (sortie réelle du bac à sable, 2026-10-24) :
 
 ```
-OK young-daly: Young T=1155 s, Daly T=1116 s, exact argmin T=1116 s; goodput at Young 0.8767 vs best sampled 0.8767
+OK young-daly: Young tau=1155 s, Daly tau=1116 s, exact argmin tau=1116 s; goodput at Young 0.8767 vs best sampled 0.8767
 ```
 
 Ce que le lab ne fait pas : il ne mesure aucun coût de checkpoint réel (voir le projet *resilient-trainer*), et ses pannes sont des tirages aléatoires, pas des données de production. Les assertions portent sur des tolérances statistiques, jamais sur des durées d'exécution.

@@ -8,7 +8,7 @@ module:
   phase: 4
   hours: 28
   level: 2
-prerequisites: [linux-systems, slurm]
+prerequisites: [linux-systems, slurm, distributed-training]
 status: core
 badges:
   - {label: "Cœur du parcours", class: core}
@@ -24,7 +24,7 @@ labs:
 
 **La question à laquelle ce module répond :** votre cluster Kubernetes sait lancer des milliers de pods ; sait-il lancer un entraînement qui exige 128 GPU *ensemble ou pas du tout*, le mettre en file derrière d'autres équipes, le préempter proprement, et le replacer si un nœud meurt ? Et si oui, à quel prix d'exploitation par rapport à Slurm ?
 
-Vous connaissez déjà Kubernetes. Ce module ne le réexplique donc pas : il se concentre sur ce qui change quand la ressource rare est un GPU et que la charge est un travail fini, parallèle et fragile. Les versions sont celles lues sur les sources officielles le 24 octobre 2026 ; les comportements annoncés comme « observés » viennent d'un vrai plan de contrôle Kubernetes 1.37.1 démarré dans le bac à sable du module.
+Ce module ne réexplique pas Kubernetes : si vous ne l'avez jamais exploité, la section 1.1 en donne le minimum. Il se concentre sur ce qui change quand la ressource rare est un GPU et que la charge est un travail fini, parallèle et fragile. Les versions sont celles lues sur les sources officielles le 24 octobre 2026 ; les comportements annoncés comme « observés » viennent d'un vrai plan de contrôle Kubernetes 1.37.1 démarré dans le bac à sable du module.
 
 ::: key
 [Règle de ce module]{.tag} Kubernetes décide **pod par pod** ; un entraînement est **un tout**. Chaque outil du module restaure une atomicité à un niveau différent : le quota (Kueue), le groupe de pods (ordonnancement de groupe, *gang scheduling*), le placement dans la topologie (TAS), le redémarrage (JobSet). Si vous ne savez pas dire de quel niveau parle un outil, vous ne savez pas encore ce qu'il garantit.
@@ -35,29 +35,29 @@ Vous connaissez déjà Kubernetes. Ce module ne le réexplique donc pas : il se 
 | Clé | Valeur |
 |---|---|
 | Volume | 28 h, dont environ 11 h de lecture, 10 h de labs et 7 h d'exercices |
-| Niveau d'entrée | 2 : Linux et Slurm (modules 1 et 5) ; pour Kubernetes, les notions de la section 1.1 suffisent, ou le tutoriel officiel [*Learn Kubernetes Basics*](https://kubernetes.io/docs/tutorials/kubernetes-basics/) avant de commencer |
-| Prérequis | [Module 1 — Linux, systèmes et diagnostic](../linux-systems/index.html), [Module 5 — Slurm](../slurm/index.html) |
+| Niveau d'entrée | 2 : Linux, Slurm et entraînement distribué (modules 1, 5 et 9) ; pour Kubernetes, les notions de la section 1.1 suffisent, ou le tutoriel officiel [*Learn Kubernetes Basics*](https://kubernetes.io/docs/tutorials/kubernetes-basics/) avant de commencer |
+| Prérequis | [Module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [Module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [Module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html) |
 | Pour qui | Cœur : la couche GPU de Kubernetes, la mise en file et le placement des entraînements ; si vous exploitez déjà Kubernetes, survolez les rappels et travaillez les chapitres sur les GPU, les files d'attente et le gang scheduling. |
 | Livrable | un dossier de manifestes de files et de quotas validé, une trace de simulation commentée, une matrice de décision Slurm / Kubernetes défendue par écrit |
 | Environnement | un portable Linux sans GPU suffit pour les labs 12.1, 12.3 et 12.4 (le lab 12.4 télécharge environ 350 Mo) ; le lab 12.2 ne s'exécute pour de bon que sur un cluster GPU, dont le coût dépend du fournisseur : lisez sa page de prix le jour même |
-| Projets liés | [Projet 4 — Placement multi-fournisseurs](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC de plateforme](../../projects/capstone-rfc/index.html) |
+| Projets liés | [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
 
 ### Ce que vous saurez vérifier {#acquis}
 
--   Dire ce que le plugin de périphériques, l'opérateur GPU, MIG, le *time-slicing* et DRA permettent et interdisent (chapitre 2).
+-   Dire ce que le plugin de périphériques, l'opérateur GPU, MIG, le partage par tranches de temps (*time-slicing*) et DRA permettent et interdisent (chapitre 2).
 -   Écrire et valider des files, quotas, priorités et règles de préemption pour Kueue, et prédire qui est préempté (chapitre 3).
 -   Expliquer pourquoi un ordonnancement pod par pod peut bloquer deux entraînements, et quelle couche y remédie (chapitres 1 et 3).
 -   Lancer un entraînement multi-nœuds avec un Job indexé, JobSet ou Kubeflow Trainer, et décrire son redémarrage (chapitre 4).
 -   Raisonner sur la topologie, la fragmentation des GPU et le coût d'une panne de nœud (chapitre 5).
--   Dimensionner les volumes de points de contrôle et l'effet d'un démarrage massif d'images (chapitre 6).
+-   Dimensionner les volumes de *checkpoints* (points de reprise) et l'effet d'un démarrage massif d'images (chapitre 6).
 -   Choisir entre Slurm, Kubernetes et Slurm sur Kubernetes avec une grille explicite et sa robustesse (chapitre 7).
 -   Planifier une mise à jour, un cloisonnement et un suivi de coût pour une flotte GPU sous Kubernetes (chapitre 8).
 
 <!-- gen:place -->
 ### Place dans le parcours {#place}
 
--   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
--   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html).
+-   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 33-44) : placer, observer et facturer des charges sur plusieurs fournisseurs.
+-   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
 -   **Prépare** : [module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](../multi-cloud/index.html), [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
 -   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Kubernetes, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Slurm, Conteneurs, Systèmes de fichiers parallèles, FinOps, coûts, Planification de capacité, Sécurité, conformité, Systèmes distribués, Santé matérielle (burn-in, diagnostics, RMA) (voir [l'analyse du marché](../../market/index.html#couverture)).
@@ -116,7 +116,7 @@ Consacrez 15 minutes à ces trois questions. Elles servent à vous orienter, pas
 
 1.  Il lie les pods un par un à tout nœud qui convient : 6 pods sont liés, 2 restent `Pending`, et les 48 GPU liés ne servent à rien tant que le Job est incomplet. Voir l'exemple 1.1, qui reproduit exactement ce cas sur un vrai plan de contrôle.
 
-2.  Les ressources étendues d'un plugin de périphériques sont des **entiers** qu'on ne peut pas surallouer. On partage un GPU par MIG (partitions matérielles isolées), par *time-slicing* (réplicas sans isolation) ou par DRA (réclamations qui décrivent le partage). Voir le chapitre 2.
+2.  Les ressources étendues d'un plugin de périphériques sont des **entiers** qu'on ne peut pas surallouer. Trois mécanismes partagent un GPU : MIG (partitions matérielles isolées), le partage par tranches de temps (*time-slicing* : réplicas sans isolation) et DRA (réclamations qui décrivent le partage). Voir le chapitre 2.
 
 3.  Le quota de Kueue est une comptabilité : il décide quand un Job peut créer ses pods. Le placement reste fait par l'ordonnanceur de Kubernetes, qui peut échouer si les nœuds sont fragmentés, drainés ou occupés par autre chose. Voir les chapitres 3 et 5.
 :::
@@ -178,7 +178,7 @@ Ce qu'un entraînement attend de la plateforme se décompose en trois garanties,
 -   **Atomicité du placement.** Les pods ne sont liés aux nœuds que si *tous* peuvent l'être. Un ordonnanceur de groupe l'assure : Volcano, KAI Scheduler, ou, depuis peu, l'ordonnanceur de Kubernetes lui-même.
 -   **Atomicité du cycle de vie.** Si un pod meurt, tout le groupe redémarre ensemble. C'est le rôle de JobSet et de Trainer (chapitre 4).
 
-État au 24 octobre 2026 d'après la documentation de Kubernetes : l'ordonnancement de groupe natif (API `Workload` et `PodGroup`, `scheduling.k8s.io/v1beta1`) est **bêta depuis la v1.37, désactivé par défaut** (porte `GenericWorkload`) ; son intégration au Job est **alpha depuis la v1.36** (porte `WorkloadWithJob`). Le chapitre 3 le fait fonctionner dans le bac à sable.
+État au 24 octobre 2026 d'après la documentation de Kubernetes : l'ordonnancement de groupe natif (API `Workload` et `PodGroup`, `scheduling.k8s.io/v1beta1`) est **bêta depuis la v1.37, désactivé par défaut** (porte `GenericWorkload`) ; son intégration au Job est **alpha depuis la v1.36**, et l'est toujours en v1.37 (porte `WorkloadWithJob`, d'après la [table des portes de fonctionnalités](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/)). Le chapitre 3 le fait fonctionner dans le bac à sable.
 
 ### 1.6. L'échelle du plan de contrôle n'est pas le problème
 
@@ -194,7 +194,7 @@ Points clés — chapitre 1
 -   Kubernetes ordonnance **pod par pod** ; un entraînement est un groupe qui ne progresse qu'au complet.
 -   Un GPU est une ressource étendue entière : ni surallocation, ni partage fin sans mécanisme dédié.
 -   Trois atomicités à distinguer : quota (Kueue), placement (gang), cycle de vie (JobSet, Trainer).
--   Ordonnancement de groupe natif : bêta et désactivé par défaut en v1.37 ; intégration au Job : alpha en v1.36.
+-   Ordonnancement de groupe natif : bêta et désactivé par défaut en v1.37 ; intégration au Job : alpha depuis la v1.36, toujours alpha en v1.37.
 -   À 1 024 GPU, le plan de contrôle est loin de ses limites documentées : le sujet est la sémantique.
 :::
 
@@ -248,6 +248,8 @@ La documentation précise que ce service ne couvre pas certains cas, où la rég
 
 ### 2.4. MIG : des partitions matérielles
 
+Le [module 6, §9.3](../provisioning/index.html#partager-un-gpu-mig-time-slicing-mps-et-vgpu) est la référence du parcours sur les garanties d'un GPU partagé (passthrough, MIG, vGPU, MPS, *time-slicing*). Les sections 2.4 et 2.5 n'en reprennent que l'angle Kubernetes : ce que l'opérateur GPU configure, et ce que l'ordonnanceur voit.
+
 Le **Multi-Instance GPU (MIG)** découpe un GPU de génération Ampere ou plus récente en instances isolées matériellement. L'opérateur déploie un *MIG Manager* qui applique la configuration voulue quand on change l'étiquette `nvidia.com/mig.config` du nœud (par exemple `all-1g.10gb`) ; l'état se lit dans `nvidia.com/mig.config.state` (`pending`, `success`, ou `rebooting` si l'option de redémarrage est activée). La documentation précise que le MIG Manager exige qu'aucune charge utilisateur ne tourne sur les GPU concernés, ce qui impose de vider le nœud avant de changer de profil.
 
 Deux stratégies existent : `single`, où tous les GPU du nœud passent en MIG avec le même profil et restent annoncés comme `nvidia.com/gpu`, et `mixed`, où des profils différents coexistent et sont annoncés sous des noms de ressources distincts. Voici les profils du H100 80 Go (PCIe et SXM5) d'après le guide MIG de NVIDIA :
@@ -276,12 +278,14 @@ Deux conséquences se lisent dans la documentation. Demander plusieurs réplicas
 ::: ex
 [Exemple 2.2 — Les comptes du time-slicing]{.tag} Un nœud de 8 GPU avec `replicas: 4` annonce $8 \times 4 = 32$ ressources. Trois pods d'un seul processus GPU chacun, sur le même GPU, reçoivent chacun $1/3$ du temps, soit 33,3 %, que l'un d'eux ait demandé 1 ou 2 réplicas (la part est égale par processus, non par pod).
 
-Huit pods de 10 Go sur un H100 de 80 Go remplissent la mémoire à 100 % : au moindre dépassement, les autres pods du GPU sont exposés, faute d'isolation. Le fichier `manifests/timeslicing-configmap.yaml` du lab 12.4 reprend la structure de configuration de la documentation ; le serveur d'API en valide le format, pas l'effet.
+Il faut `replicas: 8` pour loger huit pods sur un même GPU (avec `replicas: 4`, il en reçoit au plus quatre). Huit pods de 10 Go sur un H100 de 80 Go remplissent alors la mémoire à 100 % : au moindre dépassement, les autres pods du GPU sont exposés, faute d'isolation. Le fichier `manifests/timeslicing-configmap.yaml` du lab 12.4 reprend la structure de configuration de la documentation ; le serveur d'API en valide le format, pas l'effet.
 :::
 
 ### 2.6. DRA : décrire plutôt que compter
 
-Le **Dynamic Resource Allocation (DRA)** remplace le décompte d'entiers par un modèle proche des volumes persistants. D'après la documentation de Kubernetes, il est **stable depuis la v1.35** (disponible depuis la v1.30). Les pilotes publient des `ResourceSlice` décrivant les périphériques d'un nœud ; des `DeviceClass` les catégorisent ; une charge décrit son besoin dans un `ResourceClaim` ou un `ResourceClaimTemplate`, avec des filtres en CEL (*Common Expression Language*, le langage d'expressions des règles d'API) sur les attributs et capacités.
+Le **Dynamic Resource Allocation (DRA)** remplace le décompte d'entiers par un modèle proche des volumes persistants. D'après la documentation de Kubernetes, il est **stable depuis la v1.35**, où la fonctionnalité ne peut plus être désactivée ; l'[annonce de la v1.34](https://kubernetes.io/blog/2025/08/27/kubernetes-v1-34-release/) (27 août 2025) le déclarait déjà GA (« The core of DRA is GA »), avec l'API `resource.k8s.io/v1` activée par défaut. Il est disponible depuis la v1.30.
+
+Les pilotes publient des `ResourceSlice` décrivant les périphériques d'un nœud ; des `DeviceClass` les catégorisent ; une charge décrit son besoin dans un `ResourceClaim` ou un `ResourceClaimTemplate`, avec des filtres en CEL (*Common Expression Language*, le langage d'expressions des règles d'API) sur les attributs et capacités.
 
 La documentation du pilote DRA de NVIDIA résume la rupture en une phrase : « The Kubernetes device plugin framework treats hardware resources as opaque countable integers. » Avec DRA, on demande « un GPU H100 » ou « une instance MIG de 20 Go » par attributs, on partage un même GPU entre conteneurs en référençant la même réclamation, et on attache une configuration par charge (par exemple le profil MIG). Le fichier `manifests/dra-claim.yaml` du lab 12.4 contient une réclamation de 8 GPU H100 ; le serveur d'API v1.37.1 du lab l'accepte, et refuse une valeur `allocationMode` inconnue.
 
@@ -312,7 +316,7 @@ Points clés — chapitre 2
 -   L'opérateur GPU installe pilote, plugin, toolkit, étiquettes et supervision ; son espace de noms est privilégié.
 -   MIG : partitions isolées mais rigides, profils fixes, nœud à vider pour changer ; un découpage homogène laisse une part inutilisée.
 -   Time-slicing : plus de pods par GPU sans isolation ; demander plus de réplicas ne donne pas plus de calcul.
--   DRA : stable depuis la v1.35, décrit les besoins par attributs ; pas de préemption côté ordonnanceur, pilote NVIDIA partiellement alpha.
+-   DRA : GA en v1.34, verrouillé (non désactivable) en v1.35 ; décrit les besoins par attributs ; pas de préemption côté ordonnanceur, pilote NVIDIA partiellement alpha.
 :::
 
 ## 3. Files d'attente et ordonnancement de groupe : Kueue, Volcano, natif {#ch3}
@@ -377,7 +381,7 @@ La seconde ligne dit que ce qui dépasse la part réservée de chaque file puise
 ::: ex
 [Exemple 3.1 — Combien de GPU chaque équipe peut-elle obtenir ?]{.tag} Dans le jeu du lab, la recherche a un quota de 32, un emprunt limité à 8 et un prêt limité à 16 (donc 16 GPU réservés) ; le produit a 24 sans limite ; le développement a 8 avec un emprunt limité à 8. Capacité du pool : $16 + 24 + 8 = 48$.
 
-Quand les autres files sont vides, le produit peut donc atteindre 48 GPU (24 en propre, 24 empruntés) mais pas 64 : les 16 GPU réservés de la recherche lui restent inaccessibles. La recherche est plafonnée à $32 + 8 = 40$ par sa limite d'emprunt, et le développement à $8 + 8 = 16$. Les tests `test_lending_limit_keeps_quota_for_the_owner` et `test_borrowing_limit_caps_a_queue` du lab vérifient ces plafonds sur le modèle..
+Quand les autres files sont vides, le produit peut donc atteindre 48 GPU (24 en propre, 24 empruntés) mais pas 64 : les 16 GPU réservés de la recherche lui restent inaccessibles. La recherche est plafonnée à $32 + 8 = 40$ par sa limite d'emprunt, et le développement à $8 + 8 = 16$. Les tests `test_lending_limit_keeps_quota_for_the_owner` et `test_borrowing_limit_caps_a_queue` du lab vérifient ces plafonds sur le modèle.
 :::
 
 ### 3.4. Ordre et stratégie de file
@@ -412,7 +416,9 @@ t= 40 min  finish incident-eval
             -> ADMIT   pretrain-7b [research] nominal
 ~~~
 
-À $t=10$, le fine-tuning du produit (30 GPU, dont 6 empruntés) est évincé : la recherche récupère son quota nominal, ce que son champ `reclaimWithinCohort: Any` autorise.
+L'extrait omet les étapes sans préemption, dont trois comptent pour la suite. À $t=0$, des notebooks de développement prennent 8 GPU, rendus à $t=30$. À $t=5$, le fine-tuning du produit est admis avec 30 GPU, dont 6 empruntés. À $t=15$, le balayage d'ablation (8 GPU, priorité `preemptible`) est admis en empruntant.
+
+À $t=10$, le produit puise 30 GPU dans le pool et le développement 8 ; la recherche y puiserait $32 - 16 = 16$, soit $54 > 48$. C'est ce pool partagé, développement compris, qui force une éviction : sans les notebooks, $16 + 30 = 46$ tiendrait. La demande de la recherche tient dans son quota nominal, et `reclaimWithinCohort: Any` l'autorise à évincer le fine-tuning.
 
 À $t=20$, l'évaluation urgente (16 GPU) évince le pré-entraînement de 32 GPU plutôt que le balayage de 8 GPU de priorité plus basse : retirer le balayage seul ne libère pas assez, et une fois le pré-entraînement retiré le balayage peut être remis en place. Les GPU libérés permettent au fine-tuning de reprendre.
 
@@ -429,9 +435,9 @@ Le quota de Kueue est une **comptabilité virtuelle**. Si la capacité physique 
 
 Le même phénomène se produit sans Kueue, au niveau des pods, et il se chiffre. Le script `gang_deadlock.py` du lab 12.1 fait arriver dans un ordre aléatoire les pods de deux Jobs de 8 pods, chacun exigeant un nœud entier ; un ordonnanceur pod par pod lie chaque pod au premier nœud libre. Un Job ne progresse qu'au complet ; la grappe est bloquée si aucun des deux n'est complet une fois tous les pods arrivés.
 
-$$P(\text{blocage}) \;=\; \sum_{a=n-p+1}^{p-1} \frac{\binom{n}{a}\binom{2p-n}{p-a}}{\binom{2p}{p}}$$
+$$P(\text{blocage}) \;=\; \sum_{k=m-p+1}^{p-1} \frac{\binom{m}{k}\binom{2p-m}{p-k}}{\binom{2p}{p}}$$
 
-avec $n$ nœuds et $p$ pods par Job : $a$ est le nombre de pods du premier Job parmi les $n$ premiers arrivés, et le blocage survient quand chaque Job en a au plus $p-1$.
+avec $m$ nœuds et $p$ pods par Job : $k$ est le nombre de pods du premier Job parmi les $m$ premiers arrivés, et le blocage survient quand chaque Job en a au plus $p-1$.
 
 ::: ex
 [Exemple 3.3 — La probabilité de blocage de deux Jobs de 64 GPU]{.tag} Résultat de `python3 gang_deadlock.py` (20 000 tirages, graine 12, calcul exact et simulation) :
@@ -457,6 +463,8 @@ $$\text{deserved} = \frac{\text{weight}}{\text{total-weight}} \times \text{total
 **KAI Scheduler**, ordonnanceur open source orienté GPU, annonce dans son README de l'ordonnancement par lot, des files hiérarchiques et du *bin packing*, et peut cohabiter avec d'autres ordonnanceurs.
 
 La troisième voie est l'ordonnanceur de Kubernetes lui-même. L'API `Workload` décrit une politique de planification de groupes de pods ; un `PodGroup` en est l'instance à l'exécution. Avec la politique `gang`, d'après la documentation de la v1.37, l'ordonnanceur retient les pods tant que le groupe n'existe pas et que `minCount` pods n'ont pas été créés, puis cherche un placement pour tous ; s'il n'en trouve pas pour au moins `minCount`, **aucun** n'est lié. Les pods vont alors dans la file des non-planifiables, laissant passer d'autres charges.
+
+Le mot *gang* n'a pas ce sens dans Slurm. Son *gang scheduling* (option `GANG` de `PreemptMode`) est un partage par tranches de temps (*time slicing*) : des jobs alloués aux mêmes ressources sont suspendus et repris à tour de rôle, chacun pendant un intervalle configuré ([module 5, chapitre 4](../slurm/index.html#ch4)). Dans ce module, il désigne le démarrage tout ou rien d'un groupe de pods.
 
 ::: ex
 [Exemple 3.4 — Le même Job de 64 GPU, avec ordonnancement de groupe natif]{.tag} Le lab 12.4 active les portes `GenericWorkload` et `WorkloadWithJob` sur un plan de contrôle v1.37.1 et ajoute `scheduling: {schedulingPolicy: {gang: {}}}` au Job de l'exemple 1.1. Sortie capturée le 24 octobre 2026 dans le bac à sable (6 puis 8 nœuds de 8 GPU) :
@@ -503,7 +511,7 @@ Ce chapitre décrit comment lancer l'entraînement multi-nœuds lui-même : de l
 
 ### 4.1. Le Job indexé et le rendez-vous
 
-Un entraînement `torchrun` sur $N$ nœuds exige que chaque nœud connaisse un point de rendez-vous commun et, selon le mode, son propre numéro. Kubernetes fournit les briques. Un Job en mode `Indexed` donne à chaque pod un indice de 0 à `completions - 1`, exposé par l'annotation et l'étiquette `batch.kubernetes.io/job-completion-index` et par la variable d'environnement `JOB_COMPLETION_INDEX`. Combiné à un Service sans adresse (*headless*), il donne à chaque pod un nom DNS stable.
+Un entraînement `torchrun` sur plusieurs nœuds exige que chaque nœud connaisse un point de rendez-vous commun et, selon le mode, son propre numéro (lancement et rendez-vous de `torchrun` : [module 9, §2.3](../distributed-training/index.html#torchrun-et-le-rendez-vous)). Kubernetes fournit les briques. Un Job en mode `Indexed` donne à chaque pod un indice de 0 à `completions - 1`, exposé par l'annotation et l'étiquette `batch.kubernetes.io/job-completion-index` et par la variable d'environnement `JOB_COMPLETION_INDEX`. Combiné à un Service sans adresse (*headless*), il donne à chaque pod un nom DNS stable.
 
 Avec le rendez-vous `c10d` de `torchrun`, un seul nom suffit : tous les pods se connectent à l'adresse du pod d'indice 0, et `torchrun` attribue lui-même les rangs. Il reste deux pièges propres au Job. Le champ `backoffLimitPerIndex` (stable depuis la v1.33) relance un seul indice défaillant : c'est la bonne option pour des tâches indépendantes, la mauvaise pour un collectif, où un rang relancé seul ne peut pas rejoindre une communication en cours. Et `podFailurePolicy` permet de ne pas gaspiller de tentatives sur des erreurs non récupérables, par code de sortie.
 
@@ -513,17 +521,19 @@ Avec le rendez-vous `c10d` de `torchrun`, un seul nom suffit : tous les pods se 
 
 -   Plusieurs gabarits : un `replicatedJob` par rôle (meneur, travailleurs, serveurs de paramètres).
 -   Un Service sans adresse créé et géré automatiquement, de sorte que chaque pod a un nom du type `<jobset>-<replicatedJob>-<indice du job>-<indice du pod>.<sous-domaine>` (exemple du dépôt : `network-jobset-leader-0-0.example`).
--   Une politique d'échec : si un Job échoue, **tout le JobSet est recréé**, ce qui permet de reprendre au dernier point de contrôle ; sans politique, le premier échec fait échouer le JobSet. `maxRestarts` borne les recréations.
+-   Une politique d'échec : si un Job échoue, **tout le JobSet est recréé**, ce qui permet de reprendre au dernier checkpoint (l'état d'entraînement sauvegardé : poids, optimiseur, pas courant) ; sans politique, le premier échec fait échouer le JobSet. `maxRestarts` borne les recréations.
 -   Une politique de succès, un ordre de démarrage, et une annotation de **placement exclusif par domaine de topologie**.
 
 L'API est `jobset.x-k8s.io/v1alpha2` ; la page d'installation indique la version v0.13.0 le 24 octobre 2026, et la documentation annonce le support des trois dernières versions mineures de Kubernetes. Son [README](https://github.com/kubernetes-sigs/jobset/blob/main/README.md) donne aussi un ordre de grandeur : un débit d'ordonnancement de 290 pods par seconde pendant la récupération après une défaillance, à l'échelle de 15 000 nœuds, mesuré par le projet (benchmark du projet, non reproduit ici).
+
+C'est trois fois la limite de 5 000 nœuds que garantit la documentation de Kubernetes (§1.6), et le README ne dit pas sur quel cluster la mesure a été faite : lisez ce chiffre comme celui d'un cas extrême, pas d'un cluster standard.
 
 <figure class="fig">
 <svg viewBox="0 0 640 250" role="img" aria-labelledby="jst jsd" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;font-family:inherit"><title id="jst">Rendez-vous d'un JobSet</title><desc id="jsd">Quatre pods d'un Job indexé ont des noms DNS stables ; les pods 1, 2 et 3 se connectent au pod 0, hôte du rendez-vous torchrun (port 29500).</desc><defs><marker id="jsa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs><rect class="fz" x="8" y="8" width="624" height="36" rx="6"/><text class="ft fx" x="320" y="31" style="font-size:13px">Service sans adresse « pretrain-7b » : un enregistrement DNS par pod</text><rect class="fb" x="200" y="80" width="240" height="62" rx="6" style="stroke-width:3"/><text class="ft fh" x="320" y="107">pod 0 : rendez-vous</text><text class="ft" x="320" y="127">pretrain-7b-workers-0-0:29500</text><rect class="fb" x="20" y="180" width="150" height="52" rx="6"/><text class="ft fh" x="95" y="202">pod 1</text><text class="ft" x="95" y="220">workers-0-1</text><rect class="fb" x="245" y="180" width="150" height="52" rx="6"/><text class="ft fh" x="320" y="202">pod 2</text><text class="ft" x="320" y="220">workers-0-2</text><rect class="fb" x="470" y="180" width="150" height="52" rx="6"/><text class="ft fh" x="545" y="202">pod 3 … 15</text><text class="ft" x="545" y="220">workers-0-3 … 0-15</text><path class="fa" d="M120 178L258 144" marker-end="url(#jsa)"/><path class="fa" d="M320 178L320 144" marker-end="url(#jsa)"/><path class="fa" d="M520 178L382 144" marker-end="url(#jsa)"/></svg>
 <figcaption>Rendez-vous d'un JobSet de 16 pods : les noms DNS stables viennent du Service sans adresse ; tous les pods rejoignent le pod 0, qui héberge le rendez-vous c10d de torchrun.</figcaption>
 </figure>
 
-Le lab 12.2 fournit un JobSet complet pour 16 nœuds de 8 GPU (128 GPU), file Kueue, topologie exigée au niveau du bloc, volume de points de contrôle partagé et `maxRestarts: 3`. Voici le cœur de la ligne de commande, qui reprend le modèle de l'exemple PyTorch du dépôt JobSet.
+Le lab 12.2 fournit un JobSet complet pour 16 nœuds de 8 GPU (128 GPU), file Kueue, topologie exigée au niveau du bloc, volume de checkpoints partagé et `maxRestarts: 3`. Voici le cœur de la ligne de commande, qui reprend le modèle de l'exemple PyTorch du dépôt JobSet.
 
 ~~~yaml
 args:
@@ -551,7 +561,7 @@ attempt 1: exit codes of the 2 pods = 0 0
 RESTARTS=1
 ~~~
 
-Les deux « pods » échouent ensemble (le survivant perd son pair), le groupe est relancé en entier et reprend au pas 20, dernier point de contrôle, non au pas 0. Les 10 pas calculés entre 20 et 30 sont perdus. Il s'agit d'une **répétition de la sémantique** et non de Kubernetes : seule l'exécution sur un cluster prouverait le comportement des pods et des volumes.
+Les deux « pods » échouent ensemble (le survivant perd son pair), le groupe est relancé en entier et reprend au pas 20, dernier checkpoint, non au pas 0. Les 10 pas calculés entre 20 et 30 sont perdus. Il s'agit d'une **répétition de la sémantique** et non de Kubernetes : seule l'exécution sur un cluster prouverait le comportement des pods et des volumes.
 :::
 
 ### 4.3. Kubeflow Trainer v2
@@ -564,7 +574,7 @@ L'ancien *Training Operator* (v1) et ses opérateurs `PyTorchJob`, `TFJob`… so
 
 ### 4.4. KubeRay
 
-Pour les charges Ray (module 11), **KubeRay** est, d'après la documentation de Ray, la façon recommandée de l'exécuter sur Kubernetes. Il introduit trois ressources, `RayCluster`, `RayJob` et `RayService` ; chaque nœud Ray est un pod, et un cluster est un pod de tête plus des pods de travail. Un autoscaling optionnel ajoute et retire des pods selon la charge. Les `RayJob` et `RayCluster` sont des intégrations « Stable » de Kueue, et la documentation de Ray décrit leur usage avec Kueue et avec KAI Scheduler pour l'ordonnancement de groupe et les priorités.
+Pour les charges Ray, **KubeRay** est, d'après la documentation de Ray, la façon recommandée de l'exécuter sur Kubernetes ; le [module 11, §8.1](../ray-rl-infra/index.html#ray-sur-kubernetes-avec-kuberay) en détaille un manifeste, `deploy/raycluster.yaml`. Il introduit trois ressources, `RayCluster`, `RayJob` et `RayService` ; chaque nœud Ray est un pod, et un cluster est un pod de tête plus des pods de travail. Un autoscaling optionnel ajoute et retire des pods selon la charge. Les `RayJob` et `RayCluster` sont des intégrations « Stable » de Kueue, et la documentation de Ray décrit leur usage avec Kueue et avec KAI Scheduler pour l'ordonnancement de groupe et les priorités.
 
 ### 4.5. Réseau haute performance
 
@@ -574,14 +584,14 @@ Côté GPU, la documentation de l'opérateur GPU explique que GPUDirect RDMA (ac
 
 ### 4.6. Le coût d'un redémarrage
 
-Quand un pod meurt, tout le JobSet est recréé. Le temps perdu a deux termes : la durée $R$ du redémarrage (recréation des pods, tirage des images, rendez-vous, reprise de lecture du point de contrôle) et, en moyenne, la moitié de l'intervalle $\tau$ entre points de contrôle, puisqu'une panne arrive à un instant uniforme.
+Quand un pod meurt, tout le JobSet est recréé. Le temps perdu a deux termes : la durée $R$ du redémarrage (recréation des pods, tirage des images, rendez-vous, reprise de lecture du checkpoint) et, en moyenne, la moitié de l'intervalle $\tau$ entre checkpoints, puisqu'une panne arrive à un instant uniforme.
 
 $$T_{\text{perdu}} = R + \frac{\tau}{2}$$
 
 ::: ex
-[Exemple 4.2 — Le prix d'une panne pour 128 GPU]{.tag} Hypothèses **illustratives** (à remplacer par vos mesures) : 6 s par pas, point de contrôle tous les 500 pas (donc 3 000 s) et redémarrage de 300 s. Alors $T_{\text{perdu}} = 300 + 1500 = 1800$ s, soit 0,5 h par panne et $128 \times 0{,}5 = 64$ GPU·h.
+[Exemple 4.2 — Le prix d'une panne pour 128 GPU]{.tag} Hypothèses **illustratives** (à remplacer par vos mesures) : 6 s par pas, checkpoint tous les 500 pas (donc 3 000 s) et redémarrage de 300 s. Alors $T_{\text{perdu}} = 300 + 1500 = 1800$ s, soit 0,5 h par panne et $128 \times 0{,}5 = 64$ GPU·h.
 
-Réduire l'intervalle à 1 000 s ramène la perte moyenne à $300 + 500 = 800$ s, mais coûte plus d'écritures de points de contrôle : l'intervalle optimal de Young et Daly équilibre les deux : $\tau^\star = \sqrt{2\,\delta\,M}$, où $\delta$ est la durée d'écriture d'un point de contrôle et $M$ le temps moyen entre pannes du job (module 10 et [Projet 3](../../projects/resilient-trainer/index.html)).
+Réduire l'intervalle à 1 000 s ramène la perte moyenne à $300 + 500 = 800$ s, mais coûte plus d'écritures de checkpoints : l'intervalle optimal du premier ordre, la formule de Young (souvent dite de Young-Daly ; Daly en donne une estimation d'ordre supérieur, module 10), équilibre les deux : $\tau^\star = \sqrt{2\,\delta\,M}$, où $\delta$ est la durée d'écriture d'un checkpoint et $M$ le temps moyen entre pannes du job (module 10 et [Projet 3](../../projects/resilient-trainer/index.html)).
 :::
 
 ::: recap
@@ -589,7 +599,7 @@ Points clés — chapitre 4
 
 -   Job indexé plus Service sans adresse : indice, noms DNS stables et rendez-vous `c10d` sur le pod 0.
 -   `backoffLimitPerIndex` convient aux tâches indépendantes, pas aux collectifs.
--   JobSet recrée tout le groupe à la première défaillance (`maxRestarts`) : c'est le bon modèle pour un entraînement synchrone avec points de contrôle.
+-   JobSet recrée tout le groupe à la première défaillance (`maxRestarts`) : c'est le bon modèle pour un entraînement synchrone avec checkpoints.
 -   Trainer v2 (`TrainJob`) réduit le YAML ; l'ancien Training Operator est déprécié côté Kueue.
 -   Le réseau rapide est un second réseau (Multus, SR-IOV, IPoIB) géré par l'opérateur réseau ; GPUDirect RDMA par DMA-BUF.
 -   Perte moyenne par panne : $R + \tau/2$ ; 64 GPU·h pour 128 GPU avec les hypothèses de l'exemple.
@@ -612,7 +622,7 @@ Du plus ancien au plus récent :
 -   les affinités de pods et de nœuds, et les contraintes de répartition, génériques mais conçues pour des services : elles n'expriment pas « ce groupe entier dans un même rack » ;
 -   l'annotation de **placement exclusif** de JobSet, qui associe un Job enfant à un domaine de topologie, de sorte que tous ses pods y soient colocalisés et qu'aucun autre Job ne s'y installe ;
 -   le **TAS de Kueue** (*Topology-Aware Scheduling*), bêta depuis Kueue v0.14 et activé par défaut : un objet `Topology` liste les niveaux (blocs, racks), un `ResourceFlavor` le référence par `topologyName`, et le Job demande par annotation ;
--   le **TAS natif** de Kubernetes, qui fait partie de l'API `Workload` : alpha depuis la v1.36 (porte `TopologyAwareWorkloadScheduling`), il colocalise un `PodGroup` dans un domaine désigné par une clé d'étiquette, une seule contrainte par groupe en v1.36.
+-   le **TAS natif** de Kubernetes, qui fait partie de l'API `Workload` : alpha depuis la v1.36 et toujours alpha en v1.37 (porte `TopologyAwareWorkloadScheduling`), il colocalise un `PodGroup` dans un domaine désigné par une clé d'étiquette ; la documentation de la v1.37 n'admet toujours qu'une seule contrainte de topologie par `PodGroup`.
 
 Les annotations du TAS de Kueue se placent sur le gabarit de pod. `podset-required-topology` exige un domaine du niveau indiqué, sinon le Workload attend. `podset-preferred-topology` essaie ce niveau puis remonte niveau par niveau, et en dernier recours admet le Workload réparti sur plusieurs domaines. `podset-unconstrained-topology` ne demande pas de proximité mais comble les trous pour limiter la fragmentation. Le calcul de capacité ne compte que les nœuds prêts et ordonnançables, moins les autres charges TAS et les pods hors TAS.
 
@@ -701,7 +711,7 @@ Ce chapitre ne remplace pas le module 8 (stockage), qui traite des systèmes de 
 
 ### 6.1. Quatre usages, quatre profils
 
-Un entraînement touche le stockage de quatre façons très différentes. L'**image** du conteneur est lue une fois par nœud au démarrage, en rafale. Les **données d'entraînement** sont lues en continu, souvent en petits accès. Les **points de contrôle** sont écrits périodiquement en grosses rafales par tous les rangs, et relus au redémarrage. Les **fichiers temporaires et la mémoire partagée** (`/dev/shm`) sont locaux et sans durabilité. Chaque usage a son débit, sa durabilité et son point de défaillance ; les mélanger sur un seul volume est la source classique de surprises.
+Un entraînement touche le stockage de quatre façons très différentes. L'**image** du conteneur est lue une fois par nœud au démarrage, en rafale. Les **données d'entraînement** sont lues en continu, souvent en petits accès. Les **checkpoints** sont écrits périodiquement en grosses rafales par tous les rangs, et relus au redémarrage. Les **fichiers temporaires et la mémoire partagée** (`/dev/shm`) sont locaux et sans durabilité. Chaque usage a son débit, sa durabilité et son point de défaillance ; les mélanger sur un seul volume est la source classique de surprises.
 
 ### 6.2. Les volumes Kubernetes
 
@@ -712,12 +722,14 @@ Un volume persistant (`PersistentVolume`) est demandé par une réclamation (`Pe
 -   `ReadWriteMany` : lecture et écriture par plusieurs nœuds.
 -   `ReadWriteOncePod` : lecture et écriture par **un seul pod** du cluster (stable depuis la v1.29).
 
-Pour un volume partagé de points de contrôle entre 16 pods répartis sur 16 nœuds, seul `ReadWriteMany` convient, ce qui impose une classe de stockage dont le pilote CSI le prend en charge, typiquement un système de fichiers partagé. La documentation prévient que `hostPath` est réservé aux tests sur un seul nœud et ne fonctionne pas sur un cluster multi-nœuds. La mémoire partagée se donne par un `emptyDir` de `medium: Memory`, comme dans le JobSet du lab 12.2 : `/dev/shm` par défaut est petit, et les chargeurs de données de PyTorch en ont besoin.
+Pour un volume partagé de checkpoints entre 16 pods répartis sur 16 nœuds, seul `ReadWriteMany` convient, ce qui impose une classe de stockage dont le pilote CSI le prend en charge, typiquement un système de fichiers partagé. La documentation prévient que `hostPath` est réservé aux tests sur un seul nœud et ne fonctionne pas sur un cluster multi-nœuds. La mémoire partagée se donne par un `emptyDir` de `medium: Memory`, comme dans le JobSet du lab 12.2 : `/dev/shm` par défaut est petit, et les chargeurs de données de PyTorch en ont besoin.
+
+Les jeux de données massifs et les checkpoints archivés vivent souvent hors de tout volume, dans un stockage objet (compatible S3), que les pods lisent par le réseau. Le [module 8, chapitre 3](../storage/index.html#ch3) en donne les garanties et les caches : cohérence forte en lecture après écriture pour S3, mais pas de renommage atomique, même à travers un montage FUSE. Le protocole « fichier temporaire puis renommage » du §6.4 ne s'y applique donc pas tel quel.
 
 ### 6.3. Les données d'entraînement
 
 ::: ex
-[Exemple 6.1 — Le débit de lecture d'un entraînement de texte est minuscule]{.tag} Avec la formule de PaLM de FLOP par token ($6N$ pour un modèle de $N$ paramètres, module 2), un H100 à 40 % de MFU (*model FLOPs utilization*, part du pic réellement utilisée ; hypothèse) et un pic dense BF16 de 989 TFLOPS (la moitié de la valeur « avec sparsité » de la page produit NVIDIA, voir le module 2), un modèle de 7 milliards de paramètres traite par GPU et par seconde :
+[Exemple 6.1 — Le débit de lecture d'un entraînement de texte est minuscule]{.tag} Avec la formule de PaLM de FLOP par token ($6N$ pour un modèle de $N$ paramètres, module 2), un H100 SXM à 40 % de MFU (*model FLOPs utilization*, part du pic réellement utilisée ; hypothèse) et un pic dense BF16 de 989 TFLOPS (la moitié de la valeur « avec sparsité » que la page produit NVIDIA donne pour la version SXM, voir le module 2 ; la version NVL a un pic plus bas), un modèle de 7 milliards de paramètres traite par GPU et par seconde :
 
 $$\frac{0{,}4 \times 989 \cdot 10^{12}}{6 \times 7 \cdot 10^{9}} \approx 9\,400\ \text{tokens}$$
 
@@ -728,15 +740,15 @@ Cet ordre de grandeur change le regard : pour un entraînement de **texte tokeni
 
 Kubeflow Trainer propose de son côté un cache de données distribué, que sa documentation décrit comme conçu pour diffuser de gros volumes vers les nœuds GPU sans copie intermédiaire : c'est une option à évaluer, pas un prérequis.
 
-### 6.4. Les points de contrôle
+### 6.4. Les checkpoints
 
-C'est le vrai poids. Avec l'optimiseur Adam en précision mixte, l'état d'entraînement vaut 16 octets par paramètre (module 2, d'après ZeRO) ; un point de contrôle omet les gradients et garde les poids en BF16 (2 octets) et l'état d'optimiseur (12 octets), soit environ 14 octets par paramètre dans ce modèle. Selon le *framework*, ce chiffre peut aller de 12 à 14 octets : mesurez le vôtre.
+C'est le vrai poids. Avec l'optimiseur Adam en précision mixte, l'état d'entraînement vaut 16 octets par paramètre (module 2, d'après ZeRO) ; un checkpoint omet les gradients et garde les poids en BF16 (2 octets) et l'état d'optimiseur (12 octets), soit environ 14 octets par paramètre dans ce modèle (le dimensionnement de référence du parcours est au [module 8, §1.4](../storage/index.html#dimensionner-le-checkpoint)). Selon le *framework*, ce chiffre peut aller de 12 à 14 octets : mesurez le vôtre.
 
 ::: ex
-[Exemple 6.2 — Taille et durée d'un point de contrôle]{.tag} Pour 7 milliards de paramètres : $14 \times 7 \cdot 10^9 = 98$ Go ; pour 70 milliards : 980 Go. Écrits à 10 Go/s agrégés, cela prend 9,8 s et 98 s ; à 2 Go/s, 49 s et 490 s. Avec un point de contrôle toutes les 30 minutes (1 800 s), la part du temps passée à écrire est de 0,5 % et 5,4 % à 10 Go/s, de 2,7 % et 27,2 % à 2 Go/s. Les débits sont des hypothèses : c'est la méthode qui compte, et les chiffres de votre stockage se mesurent (module 8).
+[Exemple 6.2 — Taille et durée d'un checkpoint]{.tag} Pour 7 milliards de paramètres : $14 \times 7 \cdot 10^9 = 98$ Go ; pour 70 milliards : 980 Go. Écrits à 10 Go/s agrégés, cela prend 9,8 s et 98 s ; à 2 Go/s, 49 s et 490 s. Avec un checkpoint toutes les 30 minutes (1 800 s), la part du temps passée à écrire est de 0,5 % et 5,4 % à 10 Go/s, de 2,7 % et 27,2 % à 2 Go/s. Les débits sont des hypothèses : c'est la méthode qui compte, et les chiffres de votre stockage se mesurent (module 8).
 :::
 
-Deux réserves. Le débit « agrégé » ne vaut que si **tous les rangs écrivent leur part** en parallèle ; un entraîneur où le rang 0 écrit seul (comme `train.py` du lab 12.2, volontairement simple) est limité par la carte réseau d'un seul nœud. Et l'écriture doit être **atomique** (fichier temporaire puis renommage), faute de quoi un redémarrage lit un point de contrôle tronqué. La tolérance aux pannes est l'objet du module 10.
+Deux réserves. Le débit « agrégé » ne vaut que si **tous les rangs écrivent leur part** en parallèle ; un entraîneur où le rang 0 écrit seul (comme `train.py` du lab 12.2, volontairement simple) est limité par la carte réseau d'un seul nœud. Et l'écriture doit être **atomique** (fichier temporaire puis renommage), faute de quoi un redémarrage lit un checkpoint tronqué. La tolérance aux pannes est l'objet du module 10.
 
 ### 6.5. Le démarrage en rafale
 
@@ -751,10 +763,10 @@ Les parades sont classiques : un miroir de registre local, un pré-tirage par Da
 ::: recap
 Points clés — chapitre 6
 
--   Quatre usages, quatre profils : image, données, points de contrôle, fichiers temporaires.
+-   Quatre usages, quatre profils : image, données, checkpoints, fichiers temporaires.
 -   Un volume partagé entre nœuds exige `ReadWriteMany` et un pilote CSI qui le prend en charge ; `hostPath` n'est que pour les tests.
--   Pour du texte tokenisé, la lecture se chiffre en Mo/s : négligeable ; les points de contrôle sont le vrai poids.
--   Point de contrôle : environ 14 octets par paramètre dans ce modèle, soit 98 Go pour 7 milliards ; le débit agrégé suppose que tous les rangs écrivent.
+-   Pour du texte tokenisé, la lecture se chiffre en Mo/s : négligeable ; les checkpoints sont le vrai poids.
+-   Checkpoint : environ 14 octets par paramètre dans ce modèle, soit 98 Go pour 7 milliards ; le débit agrégé suppose que tous les rangs écrivent.
 -   Le tirage simultané d'une image par 128 nœuds se compte en minutes et gonfle le coût de chaque redémarrage.
 :::
 
@@ -764,7 +776,9 @@ La question revient dans toute équipe qui monte une flotte GPU. Ce chapitre ras
 
 ### 7.1. Ce que disent les deux projets
 
-Les concepteurs de Slinky, projet développé par SchedMD (les développeurs principaux de Slurm) et soutenu par NVIDIA d'après sa page, résument la différence dans leur documentation (résumé en français). Kubernetes excelle à ordonnancer des charges qui tournent pour une durée indéfinie, avec des besoins en ressources parfois vagues, sur un seul nœud, avec des règles souples, mais son parc de ressources peut croître sans limite pour suivre la demande. Slurm excelle à ordonnancer vite des charges de durée finie, avec des besoins et une topologie bien définis, sur plusieurs nœuds, avec des règles strictes, mais son parc est connu.
+Slinky a été créé par SchedMD (les développeurs principaux de Slurm, désormais rattachés à NVIDIA d'après la [page de NVIDIA](https://www.nvidia.com/en-us/software/slinky/)) ; sa documentation le dit développé et soutenu par NVIDIA.
+
+Ses concepteurs résument la différence dans leur documentation (résumé en français). Kubernetes excelle à ordonnancer des charges qui tournent pour une durée indéfinie, avec des besoins en ressources parfois vagues, sur un seul nœud, avec des règles souples, mais son parc de ressources peut croître sans limite pour suivre la demande. Slurm excelle à ordonnancer vite des charges de durée finie, avec des besoins et une topologie bien définis, sur plusieurs nœuds, avec des règles strictes, mais son parc est connu.
 
 Cette phrase vient d'un projet qui vend un pont entre les deux, ce qui n'en fait pas une preuve ; mais elle recoupe ce que ce module a montré. Le chapitre 3 a vu que les fonctions de file et de gang sont natives dans Slurm et à assembler dans Kubernetes ; le chapitre 4 que le lancement d'un job multi-nœuds exige JobSet ou Trainer.
 
@@ -839,7 +853,7 @@ Points clés — chapitre 7
 
 ## 8. Exploitation : mises à jour, sécurité, multi-tenance, coûts {#ch8}
 
-Une plateforme d'entraînement se juge à ce qu'elle fait un mardi ordinaire : combien de temps prend une mise à jour de pilote, qui peut faire quoi, qui consomme quoi, et ce que coûte réellement une heure de GPU utile. Ce chapitre donne la méthode, pas des prix.
+Une plateforme d'entraînement se juge à ce qu'elle fait un mardi ordinaire : combien de temps prend une mise à jour de pilote, qui peut faire quoi, qui consomme quoi, et ce que coûte réellement une heure de GPU active. Ce chapitre donne la méthode, pas des prix.
 
 ### 8.1. Les mises à jour
 
@@ -851,7 +865,7 @@ La couche GPU a sa propre mise à jour. Pour les pilotes gérés par l'opérateu
 [Exemple 8.1 — Combien de temps pour changer de pilote sur 128 nœuds ?]{.tag} Avec le paramètre par défaut d'un nœud à la fois et 15 minutes par nœud (vidage, rechargement du pilote, validation : valeur d'exemple), $128 \times 15 = 1\,920$ minutes, soit 32 h. Avec 8 nœuds en parallèle, $\lceil 128/8 \rceil = 16$ vagues de 15 minutes, soit 4 h ; 8 nœuds de 8 GPU représentent 64 GPU sur 1 024, soit 6,25 % de la flotte hors service à tout instant. Le plafond `maxUnavailable: 25%` autoriserait jusqu'à 32 nœuds en parallèle. Calculs faits par un script Python du module.
 :::
 
-Deux règles de prudence en découlent. Une mise à jour de la couche GPU est une opération de flotte : elle se planifie avec les équipes d'entraînement, qui doivent pouvoir faire un point de contrôle et relancer.
+Deux règles de prudence en découlent. Une mise à jour de la couche GPU est une opération de flotte : elle se planifie avec les équipes d'entraînement, qui doivent pouvoir faire un checkpoint et relancer.
 
 Et les API évoluent : dans la CRD de Kueue v0.20.3, la version `v1beta1` de chaque type est marquée dépréciée et **n'est plus servie** (`served: false`), seule `v1beta2` l'est. Des manifestes anciens cessent de s'appliquer à la mise à jour : validez-les contre les CRD de la version cible, comme le fait le lab 12.1.
 
@@ -873,12 +887,14 @@ Le montage que ce parcours recommande : un espace de noms par équipe, une `Loca
 
 ### 8.4. Les coûts
 
-On ne gère pas le coût d'une flotte GPU avec un prix de catalogue mais avec un **rendement**. Deux facteurs séparent le prix d'une heure de GPU du prix d'une heure de GPU *utile*. La fraction $a$ du temps GPU acheté qui est allouée à des jobs, et l'utilisation moyenne $u$ de ces GPU alloués. Le coût d'une heure utile, rapporté au prix d'une heure de catalogue $c$, est :
+On ne gère pas le coût d'une flotte GPU avec un prix de catalogue mais avec un **rendement**. Deux facteurs séparent le prix d'une heure de GPU du prix d'une heure de GPU *active* : la fraction $a$ du temps GPU acheté qui est allouée à des jobs (l'allocation), et l'activité moyenne $u$ de ces GPU alloués, telle que DCGM la mesure (l'utilisation). Le coût d'une heure active, rapporté au prix d'une heure de catalogue $c$, est :
 
-$$c_{\text{utile}} = \frac{c}{a \times u}$$
+$$c_{\text{actif}} = \frac{c}{a \times u}$$
+
+Le [module 15](../finops-capacity/index.html#ch1) affine ce calcul pour obtenir le coût d'une heure *utile* : il remplace l'utilisation $u$, simple indice mesuré par DCGM, par le goodput $g$ du module 10, la part des heures allouées qui produit un calcul conservé.
 
 ::: ex
-[Exemple 8.2 — Le multiplicateur de coût]{.tag} Avec des rendements **illustratifs** : si 85 % du temps GPU est alloué mais que les GPU alloués ne travaillent qu'à 55 %, l'heure utile coûte $1/(0{,}85 \times 0{,}55) \approx 2{,}14$ fois le prix de catalogue. Avec 70 % d'allocation et 80 % d'utilisation, le multiplicateur est de 1,79.
+[Exemple 8.2 — Le multiplicateur de coût]{.tag} Avec des rendements **illustratifs** : si 85 % du temps GPU est alloué mais que les GPU alloués ne travaillent qu'à 55 %, l'heure active coûte $1/(0{,}85 \times 0{,}55) \approx 2{,}14$ fois le prix de catalogue. Avec 70 % d'allocation et 80 % d'utilisation, le multiplicateur est de 1,79.
 
 La seconde flotte alloue moins mais utilise mieux : sa situation est meilleure. Le prix $c$ n'intervient pas dans la comparaison ; lisez la page de prix de votre fournisseur le jour où vous décidez.
 :::
@@ -895,7 +911,7 @@ Points clés — chapitre 8
 -   Les API de Kueue changent (`v1beta1` n'est plus servie en v0.20.3) : validez vos manifestes contre la version cible.
 -   L'opérateur GPU est privilégié, pas les espaces de noms d'équipe ; `namespaceSelector: null` est le bon défaut.
 -   `ResourceQuota` (`requests.` seulement pour les ressources étendues) comme filet, Kueue pour le partage.
--   Le coût d'une heure utile est le prix divisé par allocation × utilisation ; le prix de catalogue se lit le jour même.
+-   Le coût d'une heure active est le prix divisé par allocation × utilisation ; le module 15 remplace l'utilisation par le goodput pour l'heure utile ; le prix de catalogue se lit le jour même.
 :::
 
 ## Labs {#labs}
@@ -973,7 +989,7 @@ Les nœuds sont des objets créés par le script, avec une capacité déclarée 
 
 **Critère de réussite.** `bash verify.sh` se termine par `OK mini-control-plane: Kubernetes v1.37.1 control plane without kubelet; gang demo and server-side validation passed`, après `OK gang_demo: basic job bound 6/8 pods, gang job bound 0/8 on 6 nodes then 8/8 on 8 nodes` (sortie réelle, deux exécutions de 1,5 à 2 minutes avec le cache chaud ; aucun processus résiduel).
 
-**Pour aller plus loin.** Cordonnez un nœud pendant que le Job gang est lié, ou activez la porte `TopologyAwareWorkloadScheduling` (alpha en v1.36) et ajoutez une contrainte de topologie au `PodGroup`.
+**Pour aller plus loin.** Cordonnez un nœud pendant que le Job gang est lié, ou activez la porte `TopologyAwareWorkloadScheduling` (alpha depuis la v1.36) et ajoutez une contrainte de topologie au `PodGroup`.
 :::
 
 ## Exercices {#ex}
@@ -1082,13 +1098,13 @@ La file de poids 5 laisse $80 - 60 = 20$ GPU inutilisés. D'après la documentat
 :::
 
 ::: exo
-[Exercice 7 · ★★ — Dimensionner un JobSet pour 7 milliards de paramètres]{.tag} Un entraînement de 7 milliards de paramètres tourne sur 4 nœuds de 8 GPU pendant 200 h. Le MTBF mesuré de ce job de 4 nœuds est de 40 h ; un point de contrôle pèse 98 Go et s'écrit à 10 Go/s agrégés ; le redémarrage d'un JobSet prend $R = 300$ s. Donnez : les options `torchrun` et le point de rendez-vous du JobSet nommé `pretrain-7b`, l'intervalle de points de contrôle de Young et Daly, la perte moyenne par panne, et un `maxRestarts` défendable (on modélisera les pannes par un processus de Poisson, de taux $1/\text{MTBF}$).
+[Exercice 7 · ★★ — Dimensionner un JobSet pour 7 milliards de paramètres]{.tag} Un entraînement de 7 milliards de paramètres tourne sur 4 nœuds de 8 GPU pendant 200 h. Le MTBF mesuré de ce job de 4 nœuds est de 40 h ; un checkpoint pèse 98 Go et s'écrit à 10 Go/s agrégés ; le redémarrage d'un JobSet prend $R = 300$ s. Donnez : les options `torchrun` et le point de rendez-vous du JobSet nommé `pretrain-7b`, l'intervalle de checkpoints de Young-Daly (premier ordre), la perte moyenne par panne, et un `maxRestarts` défendable (on modélisera les pannes par un processus de Poisson, de taux $1/\text{MTBF}$).
 :::
 
 ::: sol
 **Lancement.** `--nnodes=4 --nproc_per_node=8`, rendez-vous `c10d` sur `pretrain-7b-workers-0-0.pretrain-7b:29500` (nom du pod 0 du Job `workers`, sous le sous-domaine du JobSet, selon le modèle `<jobset>-<replicatedJob>-<job>-<pod>.<sous-domaine>`), `--rdzv_id=pretrain-7b`, et `completionMode: Indexed` avec `backoffLimit: 0` : le Job échoue à la première panne et JobSet recrée le groupe entier.
 
-**Intervalle.** Le temps d'écriture est $\delta = 98 / 10 = 9{,}8$ s. L'intervalle de Young et Daly est
+**Intervalle.** Le temps d'écriture est $\delta = 98 / 10 = 9{,}8$ s. L'intervalle du premier ordre (Young-Daly) est
 
 $$\tau^\star = \sqrt{2\,\delta\,M} = \sqrt{2 \times 9{,}8 \times 144\,000} = 1\,680\ \text{s} = 28\ \text{min},$$
 
@@ -1110,15 +1126,15 @@ soit 280 pas à 6 s par pas. **Perte moyenne** : $R + \tau^\star/2 = 300 + 840 =
 :::
 
 ::: exo
-[Exercice 9 · ★★ — Un volume de points de contrôle pour 70 milliards de paramètres]{.tag} Un entraînement de 70 milliards de paramètres écrit un point de contrôle toutes les 20 minutes, à 14 octets par paramètre. Vous tolérez 5 % du temps en écriture. Quel débit agrégé faut-il ? Si seul le rang 0 écrit, à travers une carte réseau de 200 Gb/s, est-ce tenable ? Quelle taille de volume réserver pour garder 3 points de contrôle plus celui en cours d'écriture ?
+[Exercice 9 · ★★ — Un volume de checkpoints pour 70 milliards de paramètres]{.tag} Un entraînement de 70 milliards de paramètres écrit un checkpoint toutes les 20 minutes, à 14 octets par paramètre. Vous tolérez 5 % du temps en écriture. Quel débit agrégé faut-il ? Si seul le rang 0 écrit, à travers une carte réseau de 200 Gb/s, est-ce tenable ? Quelle taille de volume réserver pour garder 3 checkpoints plus celui en cours d'écriture ?
 :::
 
 ::: sol
-**Taille.** $14 \times 70 \cdot 10^9 = 980$ Go par point de contrôle. **Débit.** Cinq pour cent de 1 200 s font 60 s : il faut $980 / 60 \approx 16{,}3$ Go/s agrégés.
+**Taille.** $14 \times 70 \cdot 10^9 = 980$ Go par checkpoint. **Débit.** Cinq pour cent de 1 200 s font 60 s : il faut $980 / 60 \approx 16{,}3$ Go/s agrégés.
 
 **Rang 0 seul.** Une carte de 200 Gb/s offre au mieux 25 Go/s : $980 / 25 = 39{,}2$ s au minimum théorique, soit 3,3 % du temps, sans compter les protocoles de fichiers, le trafic NCCL qui partage la carte et le débit réel du stockage. Tenable en théorie, fragile en pratique : mieux vaut que **tous les rangs écrivent leur part**.
 
-**Volume.** $4 \times 980 = 3\,920$ Go, soit environ $3{,}57$ Tio : il faut réserver **4 Tio** au minimum. Le volume de 2 Tio du JobSet du lab 12.2 convient pour 7 milliards de paramètres (98 Go par point), pas pour 70 milliards.
+**Volume.** $4 \times 980 = 3\,920$ Go, soit environ $3{,}57$ Tio : il faut réserver **4 Tio** au minimum. Le volume de 2 Tio du JobSet du lab 12.2 convient pour 7 milliards de paramètres (98 Go par checkpoint), pas pour 70 milliards.
 :::
 
 ::: exo
@@ -1170,13 +1186,13 @@ Au départ, eval emprunte 32 GPU. Pretrain arrive : son usage dans le pool serai
 :::
 
 ::: exo
-[Exercice 13 · ★★★ — Changer de pilote GPU sans perdre deux jours]{.tag} Un cluster de 128 nœuds de 8 GPU héberge un entraînement de 64 nœuds (512 GPU) et des évaluations sur les 64 autres. Le changement de pilote prend 15 minutes par nœud. Un point de contrôle de ce modèle prend 100 s et un redémarrage 300 s. Comparez trois plans en GPU·h perdus pour l'entraînement : (A) vider d'un coup les 64 nœuds du job, (B) mettre à jour d'abord les 64 nœuds libres, y basculer le job, puis mettre à jour les anciens nœuds, (C) mettre à jour en place par vagues de 8 nœuds. Recommandez.
+[Exercice 13 · ★★★ — Changer de pilote GPU sans perdre deux jours]{.tag} Un cluster de 128 nœuds de 8 GPU héberge un entraînement de 64 nœuds (512 GPU) et des évaluations sur les 64 autres. Le changement de pilote prend 15 minutes par nœud. Un checkpoint de ce modèle prend 100 s et un redémarrage 300 s. Comparez trois plans en GPU·h perdus pour l'entraînement : (A) vider d'un coup les 64 nœuds du job, (B) mettre à jour d'abord les 64 nœuds libres, y basculer le job, puis mettre à jour les anciens nœuds, (C) mettre à jour en place par vagues de 8 nœuds. Recommandez.
 :::
 
 ::: sol
-**Plan A.** Le job s'arrête pendant tout le changement : point de contrôle (100 s) + mise à jour (900 s) + redémarrage (300 s) = 1 300 s sur 512 GPU, soit $1\,300 \times 512 / 3600 \approx 184{,}9$ GPU·h.
+**Plan A.** Le job s'arrête pendant tout le changement : checkpoint (100 s) + mise à jour (900 s) + redémarrage (300 s) = 1 300 s sur 512 GPU, soit $1\,300 \times 512 / 3600 \approx 184{,}9$ GPU·h.
 
-**Plan B (rotation).** Les 64 nœuds libres sont mis à jour par vagues de 8 (8 vagues de 15 min, 2 h) sans toucher au job. Le job fait un point de contrôle et redémarre sur les nœuds à jour : $(100 + 300) \times 512 / 3600 \approx 56{,}9$ GPU·h. Les anciens nœuds sont ensuite mis à jour en 2 h sans impact. Coût pour le job : une seule interruption.
+**Plan B (rotation).** Les 64 nœuds libres sont mis à jour par vagues de 8 (8 vagues de 15 min, 2 h) sans toucher au job. Le job fait un checkpoint et redémarre sur les nœuds à jour : $(100 + 300) \times 512 / 3600 \approx 56{,}9$ GPU·h. Les anciens nœuds sont ensuite mis à jour en 2 h sans impact. Coût pour le job : une seule interruption.
 
 **Plan C (en place par 8).** Chaque vague retire 8 nœuds au job, qui ne tourne pas à moins de 64 nœuds et doit donc s'arrêter, puis redémarrer : 8 vagues $\times$ 1 300 s $\times$ 512 GPU / 3600 $\approx$ 1 479 GPU·h, soit huit fois le plan A.
 
@@ -1199,7 +1215,7 @@ Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir 
 Trois questions d'entretien à traiter en deux minutes chacune.
 
 1.  *Kueue a admis un entraînement de 128 GPU mais il ne démarre pas. Que regardez-vous ?* Réponse-type : l'état du Workload ; les pods (`Pending` ?) et leurs événements (`Insufficient nvidia.com/gpu`, taints non tolérés) ; l'écart entre quota et capacité physique (nœuds drainés, GPU défectueux, autre charge) ; la fragmentation et le score de l'ordonnanceur ; une topologie `required` trop exigeante ; le gang ou `waitForPodsReady` qui évince et remet en file ; enfin le temps entre admission et pods prêts, à suivre comme indicateur.
-2.  *Comment partager 256 GPU entre quatre équipes sans laisser de GPU inactifs ?* Réponse-type : une cohorte de ClusterQueue avec quotas nominaux, prêt et emprunt bornés ; des jobs préemptibles qui savent faire un point de contrôle pour utiliser le quota prêté ; la récupération (`reclaimWithinCohort`) réglée par équipe ; un `ResourceQuota` comme filet ; la mesure hebdomadaire de l'allocation et de l'utilisation. Piège à citer : DRA ne permet pas la préemption par l'ordonnanceur.
+2.  *Comment partager 256 GPU entre quatre équipes sans laisser de GPU inactifs ?* Réponse-type : une cohorte de ClusterQueue avec quotas nominaux, prêt et emprunt bornés ; des jobs préemptibles qui savent faire un checkpoint pour utiliser le quota prêté ; la récupération (`reclaimWithinCohort`) réglée par équipe ; un `ResourceQuota` comme filet ; la mesure hebdomadaire de l'allocation et de l'utilisation. Piège à citer : DRA ne permet pas la préemption par l'ordonnanceur.
 3.  *Slurm ou Kubernetes pour 40 chercheurs et 200 GPU ?* Réponse-type : poser trois questions (compétences des utilisateurs, part de services permanents, équipe d'exploitation), puis une grille avec justifications, exigences éliminatoires et robustesse ; la marge dit s'il s'agit d'une décision ou d'un débat ; proposer un essai court sur des charges réelles et nommer le coût caché de l'option choisie.
 
 ## Lectures et références {#refs}
@@ -1224,11 +1240,11 @@ Toutes les pages ont été relues pour ce module le 24 octobre 2026, sauf mentio
 
 ### Documenté {#documente}
 
-Les faits attribués à une page officielle ont été relus à la source le 24 octobre 2026 : plugin de périphériques, DRA stable en v1.35 et ses limites, gang et API `Workload` en bêta en v1.37, intégration au Job en alpha en v1.36, TAS natif alpha, règles de `ResourceQuota`, tolérations par défaut de 300 s, politique de décalage de version, dates de fin de vie, profils MIG du H100, *time-slicing*, CDI, mises à jour de pilote, champs et règles de préemption de Kueue, ses intégrations et son TAS, l'interblocage et `waitForPodsReady`, PodGroup et Queue de Volcano, JobSet, Trainer v2, KubeRay, Slinky, SUNK, les études de Hu et al. et de Kokolis et al., le programme de conformité du CNCF. Versions : Kubernetes v1.37.1, GPU Operator 26.7.2, pilote DRA NVIDIA 0.5.1, Kueue v0.20.3, JobSet v0.13.0, Kubeflow Trainer v2.1.0, Slinky 1.2.0. **Observé** dans le bac à sable : les sorties des exemples 1.1, 3.4, 4.1, 5.2 et 5.3 et des exercices 1, 5 et 8 viennent de vraies exécutions (plan de contrôle v1.37.1 sans kubelet ; PyTorch CPU) ; les exemples 3.2, 3.3, 5.1 et 7.1 viennent des modèles et simulateurs des labs, décrits comme tels.
+Les faits attribués à une page officielle ont été relus à la source le 24 octobre 2026 : plugin de périphériques, DRA GA en v1.34 et verrouillé en v1.35 et ses limites, gang et API `Workload` en bêta en v1.37, intégration au Job et TAS natif en alpha depuis la v1.36 (toujours en v1.37), règles de `ResourceQuota`, tolérations par défaut de 300 s, politique de décalage de version, dates de fin de vie, profils MIG du H100, *time-slicing*, CDI, mises à jour de pilote, champs et règles de préemption de Kueue, ses intégrations et son TAS, l'interblocage et `waitForPodsReady`, PodGroup et Queue de Volcano, JobSet, Trainer v2, KubeRay, Slinky, SUNK, les études de Hu et al. et de Kokolis et al., le programme de conformité du CNCF. Versions : Kubernetes v1.37.1, GPU Operator 26.7.2, pilote DRA NVIDIA 0.5.1, Kueue v0.20.3, JobSet v0.13.0, Kubeflow Trainer v2.1.0, Slinky 1.2.0. **Observé** dans le bac à sable : les sorties des exemples 1.1, 3.4, 4.1 et 5.2, la liste des tolérances injectées du §5.5 et les sorties des exercices 1, 5 et 8 viennent de vraies exécutions (plan de contrôle v1.37.1 sans kubelet ; PyTorch CPU) ; les exemples 3.2, 3.3, 5.1 et 7.1 viennent des modèles et simulateurs des labs, décrits comme tels.
 
 ### Recommandé {#recommande}
 
-Le découpage en trois atomicités, la correspondance Slurm / Kubernetes du chapitre 1, la réservation des nœuds GPU par taint, le montage « une ClusterQueue par équipe dans une cohorte plus un `ResourceQuota` large », le calcul du coût par heure utile, la méthode de la grille de décision et tous ses scores, le plan de mise à jour par rotation, et les hypothèses chiffrées des exemples (6 s par pas, 40 % de MFU, 15 minutes par nœud, 20 Go d'image, débits de 2 à 10 Go/s, MTBF de 40 h, 14 octets par paramètre) sont des choix de ce parcours ou des valeurs d'exemple : remplacez-les par vos mesures.
+Le découpage en trois atomicités, la correspondance Slurm / Kubernetes du chapitre 1, la réservation des nœuds GPU par taint, le montage « une ClusterQueue par équipe dans une cohorte plus un `ResourceQuota` large », le calcul du coût par heure active, la méthode de la grille de décision et tous ses scores, le plan de mise à jour par rotation, et les hypothèses chiffrées des exemples (6 s par pas, 40 % de MFU, 15 minutes par nœud, 20 Go d'image, débits de 2 à 10 Go/s, MTBF de 40 h, 14 octets par paramètre) sont des choix de ce parcours ou des valeurs d'exemple : remplacez-les par vos mesures.
 
 ### À vérifier {#a-verifier}
 

@@ -69,7 +69,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul></li>
 <li><a href="#ch1">1. Pannes à grande échelle</a>
 <ul>
-<li><a href="#la-loi-des-grands-nombres-appliquée-aux-gpu">1.1. La loi des grands nombres appliquée aux GPU</a></li>
+<li><a href="#la-loi-des-grands-nombres-appliquée-aux-gpu">1.1. Un système en série : les taux de panne s'additionnent</a></li>
 <li><a href="#une-taxonomie-utile-à-laction">1.2. Une taxonomie utile à l'action</a></li>
 <li><a href="#ce-que-disent-les-données-publiées">1.3. Ce que disent les données publiées</a></li>
 <li><a href="#les-pannes-ne-sarrêtent-pas-au-matériel">1.4. Les pannes ne s'arrêtent pas au matériel</a></li>
@@ -152,7 +152,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </section>
 <h2 id="intro">Introduction et vue d'ensemble</h2>
 <p><strong>La question à laquelle ce module répond :</strong> un entraînement de plusieurs semaines sur des milliers de GPU sera interrompu des dizaines, voire des centaines de fois. Comment faire pour que ces interruptions coûtent dix pour cent du temps de calcul plutôt que soixante, et pour que personne ne soit réveillé à trois heures du matin pour relancer un job ?</p>
-<p>Ce module répond en six temps. Il <strong>chiffre</strong> la panne (taxonomie, données publiées, loi des grands nombres), <strong>modélise</strong> son coût (Young, Daly, goodput), apprend à <strong>écrire</strong> un checkpoint correct puis rapide, à <strong>détecter</strong> les pannes franches et silencieuses, à <strong>reprendre</strong> automatiquement en isolant le nœud fautif, et à <strong>tester</strong> le tout par injection de pannes. Les labs tournent sur un portable, sans GPU, avec des pannes simulées et signalées comme telles.</p>
+<p>Ce module répond en six temps. Il <strong>chiffre</strong> la panne (taxonomie, données publiées, système en série), <strong>modélise</strong> son coût (Young, Daly, goodput), apprend à <strong>écrire</strong> un checkpoint correct puis rapide, à <strong>détecter</strong> les pannes franches et silencieuses, à <strong>reprendre</strong> automatiquement en isolant le nœud fautif, et à <strong>tester</strong> le tout par injection de pannes. Les labs tournent sur un portable, sans GPU, avec des pannes simulées et signalées comme telles.</p>
 <div class="key">
 <p><span class="tag">Règle de ce module</span> Une panne n'est pas un accident à éviter, c'est un paramètre de conception. La bonne question n'est pas « comment l'empêcher ? » mais « combien coûte-t-elle, en GPU-heures, et comment ce coût change-t-il quand je modifie la fréquence de checkpoint, le temps de détection ou le temps de relance ? »</p>
 </div>
@@ -172,7 +172,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <tbody>
 <tr class="odd">
 <td>Volume</td>
-<td>28 h, dont environ 10 h de lecture, 10 h de labs et 8 h d'exercices</td>
+<td>28 h, dont environ 9 h de lecture, 11 h de labs et 8 h d'exercices</td>
 </tr>
 <tr class="even">
 <td>Niveau d'entrée</td>
@@ -180,7 +180,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Prérequis</td>
-<td><a href="../distributed-training/index.html">Module 9 — Entraînement distribué</a>, <a href="../storage/index.html">Module 8 — Stockage</a></td>
+<td><a href="../slurm/index.html">Module 5 — Slurm et exploitation d'un cluster HPC</a>, <a href="../provisioning/index.html">Module 6 — Provisioning, images et santé des nœuds GPU</a>, <a href="../storage/index.html">Module 8 — Stockage et E/S pour l'entraînement</a>, <a href="../distributed-training/index.html">Module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a></td>
 </tr>
 <tr class="even">
 <td>Pour qui</td>
@@ -192,11 +192,11 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="even">
 <td>Environnement</td>
-<td>un portable CPU suffit pour les trois labs ; aucun GPU. Les scripts Slurm et Kubernetes du chapitre 6 sont linté seulement</td>
+<td>un portable CPU suffit pour les trois labs ; aucun GPU. <code>train.sbatch</code> et <code>job.yaml</code> (chapitre 6) sont seulement lintés ; la démonstration de remise en file (partie B du lab 10.3, facultative) demande le Slurm du module 5</td>
 </tr>
 <tr class="odd">
 <td>Projets liés</td>
-<td><a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC de plateforme</a></td>
+<td><a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et détection de pannes silencieuses</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a></td>
 </tr>
 </tbody>
 </table>
@@ -215,10 +215,10 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <!-- gen:place -->
 <h3 id="place">Place dans le parcours</h3>
 <ul>
-<li><strong>Phase 3 — Systèmes d'entraînement distribué</strong> (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.</li>
-<li><strong>S'appuie sur</strong> : <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>, <a href="../storage/index.html">module 8 — Stockage et E/S pour l'entraînement</a>.</li>
-<li><strong>Prépare</strong> : <a href="../multi-cloud/index.html">module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a>.</li>
-<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et détection de pannes silencieuses</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>.</li>
+<li><strong>Phase 3 — Systèmes d'entraînement distribué</strong> (semaines 21-32) : faire tourner un entraînement multi-nœuds qui survit aux pannes.</li>
+<li><strong>S'appuie sur</strong> : <a href="../slurm/index.html">module 5 — Slurm et exploitation d'un cluster HPC</a>, <a href="../provisioning/index.html">module 6 — Provisioning, images et santé des nœuds GPU</a>, <a href="../storage/index.html">module 8 — Stockage et E/S pour l'entraînement</a>, <a href="../distributed-training/index.html">module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a>.</li>
+<li><strong>Prépare</strong> : <a href="../multi-cloud/index.html">module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC</a>, <a href="../platform-leadership/index.html">module 16 — Plateforme interne, sécurité, production et leadership</a>.</li>
+<li><strong>Projets qui s'en servent</strong> : <a href="../../projects/resilient-trainer/index.html">Projet 3 — Entraîneur tolérant aux pannes</a>, <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/gpu-observability/index.html">Projet 5 — Observabilité GPU et détection de pannes silencieuses</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>.</li>
 <li><strong>Compétences demandées dans les offres d'emploi et travaillées ici</strong> : Python, Checkpoint, tolérance aux pannes, Planification de capacité, Astreinte, fiabilité (SRE), Systèmes distribués, Santé matérielle (burn-in, diagnostics, RMA), Administration Linux, Slurm, Kubernetes, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Systèmes de fichiers parallèles, Expérience d'entraînement ML (voir <a href="../../market/index.html#couverture">l'analyse du marché</a>). <!-- /gen:place --></li>
 </ul>
 <h3 id="seances">Plan de séances</h3>
@@ -268,14 +268,14 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>3 h</td>
 <td>2</td>
 <td>ch. 3 Checkpoint correct</td>
-<td>Lab 10.2 partie A ; Ex. 12</td>
+<td>Lab 10.2, étapes 1 à 3 ; Ex. 12</td>
 </tr>
 <tr class="odd">
 <td>5</td>
 <td>2.5 h</td>
 <td>2</td>
 <td>ch. 3 suite (formats, reproductibilité), début du ch. 4</td>
-<td>Lab 10.2 partie B</td>
+<td>Lab 10.2, étapes 4 et 5</td>
 </tr>
 <tr class="even">
 <td>6</td>
@@ -310,7 +310,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <td>2.5 h</td>
 <td>3</td>
 <td>ch. 8 Chaos et procédures, synthèse</td>
-<td>Ex. 11 ; checkpoint de sortie</td>
+<td>Ex. 11 ; checkpoint de sortie ; démarrage du Projet 3</td>
 </tr>
 </tbody>
 </table>
@@ -381,10 +381,11 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </details>
 <h2 id="ch1">1. Pannes à grande échelle</h2>
 <p>Un petit cluster tombe rarement en panne, un grand cluster tombe en panne tout le temps, et ce n'est pas une question de qualité du matériel : c'est de l'arithmétique. Ce chapitre donne la taxonomie des pannes, les ordres de grandeur publiés et le calcul qui relie le taux de panne d'un nœud au temps moyen entre pannes d'un job.</p>
-<h3 id="la-loi-des-grands-nombres-appliquée-aux-gpu">1.1. La loi des grands nombres appliquée aux GPU</h3>
+<h3 id="la-loi-des-grands-nombres-appliquée-aux-gpu">1.1. Un système en série : les taux de panne s'additionnent</h3>
 <p>Un entraînement synchrone est un <strong>système en série</strong> : tous les rangs doivent fonctionner pour que le pas avance. Si <span class="math inline">N</span> nœuds tombent en panne indépendamment, au taux <span class="math inline">r</span> pannes par nœud et par jour, le job subit <span class="math inline">Nr</span> pannes par jour et son temps moyen entre pannes (<em>MTBF</em>, <em>mean time between failures</em>) est l'inverse :</p>
 <p><span class="math display">\text{MTBF}_{\text{job}} = \frac{1}{N\,r} = \frac{\text{MTBF}_{\text{nœud}}}{N}</span></p>
 <p>Doubler la taille du job divise donc par deux le temps entre pannes. C'est la raison pour laquelle un job de 8 GPU sur un nœud peut tourner des mois sans incident, alors qu'un job de 16 000 GPU est interrompu plusieurs fois par jour.</p>
+<p>Kokolis et coauteurs parlent de <em>MTTF</em> (<em>mean time to failure</em>), qu'ils définissent comme le temps mesuré divisé par le nombre d'échecs. Pour un job que l'on relance après chaque panne, c'est le MTBF de ce module.</p>
 <div class="ex">
 <p><span class="tag">Exemple 1.1 — De 6,5 pannes pour mille nœuds-jours au MTBF d'un job</span> Kokolis et ses coauteurs ont mesuré, sur un cluster de recherche de 16 000 GPU, un taux de 6,50 pannes pour mille nœuds-jours (<a href="https://arxiv.org/abs/2410.21680">Kokolis et al., 2024</a>). Un nœud tombe donc en moyenne tous les <span class="math inline">1/0{,}0065 \approx 154</span> jours. Avec 8 GPU par nœud, le calcul <span class="math inline">24\,/\,(N \times 0{,}0065)</span> donne, <strong>calculé ici</strong> :</p>
 <div class="tbl-wrap">
@@ -540,7 +541,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><span class="tag">Redémarrages manuels sur OPT-175B</span> L'équipe d'OPT-175B rapporte que les pannes matérielles ont causé « at least 35 manual restarts » et le remplacement de plus de 100 hôtes sur deux mois, en plus d'environ 70 redémarrages automatiques estimés. Pendant un redémarrage manuel, l'entraînement était mis en pause et une série de tests de diagnostic était lancée avant la reprise. Source : <a href="https://arxiv.org/abs/2205.01068">Zhang et al., 2022, section sur les pannes matérielles</a>.</p>
 </div>
 <h3 id="les-pannes-ne-sarrêtent-pas-au-matériel">1.4. Les pannes ne s'arrêtent pas au matériel</h3>
-<p>Hu et coauteurs notent que la plupart des erreurs de script surviennent au début des jobs et provoquent un arrêt rapide, alors que les pannes d'infrastructure frappent les longs pré-entraînements et coûtent cher. Ils relèvent aussi des pannes liées à la chaleur : sur leur cluster, l'entraînement de modèles de 7 milliards de paramètres, très bien optimisé pour la communication, laissait peu de temps d'inactivité aux GPU, la température de la salle montait d'environ 5 °C, et des erreurs NVLink ou ECC apparaissaient. Le refroidissement fut renforcé, et la fréquence de ces pannes baissa nettement.</p>
+<p>Hu et coauteurs notent que la plupart des erreurs de script surviennent au début des jobs et provoquent un arrêt rapide, alors que les pannes d'infrastructure frappent les longs pré-entraînements et coûtent cher. Ils relèvent aussi des pannes liées à la chaleur de la salle, qui ne viennent ni du code ni d'un composant isolé (§7.4).</p>
 <p>Kokolis et coauteurs insistent sur une autre difficulté : le <strong>diagnostic</strong>. Un délai d'attente NCCL peut être attribué à tort au réseau alors qu'il s'agit d'un blocage logiciel ; ils formulent la leçon ainsi : « Beware of the red-herrings ». Nous verrons au chapitre 5 comment limiter ce risque.</p>
 <h3 id="combien-de-temps-un-job-survit-il-sans-reprise">1.5. Combien de temps un job survit-il sans reprise ?</h3>
 <p>Avec des pannes d'intervalle moyen <span class="math inline">M</span> réparties comme un processus de Poisson, la probabilité qu'un job de durée <span class="math inline">T</span> <strong>ne subisse aucune panne</strong> est <span class="math inline">e^{-T/M}</span>. Pour Llama 3, 419 pannes imprévues en 1 296 heures donnent <span class="math inline">M \approx 3{,}09</span> h, soit 7,8 pannes par jour. Un job de 24 heures sans reprise a alors une chance sur 2 400 d'aller au bout (<span class="math inline">e^{-7{,}77} \approx 4{,}2 \times 10^{-4}</span>, <strong>calculé ici</strong>). Sans tolérance aux pannes, l'entraînement ne finit jamais.</p>
@@ -571,9 +572,12 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le premier terme décroît avec <span class="math inline">\tau</span>, le second croît. En dérivant et en annulant la dérivée, <span class="math inline">-\delta/\tau^2 + 1/(2M) = 0</span>, on obtient la formule de Young (1974) :</p>
 <p><span class="math display">\tau^{\ast} = \sqrt{2\,\delta\,M} \qquad W^{\ast} = \sqrt{\frac{2\delta}{M}} + \frac{R}{M}</span></p>
 <p>À l'optimum, le coût d'écriture <span class="math inline">\delta/\tau</span> est égal au coût moyen de recalcul <span class="math inline">\tau/(2M)</span> : on dépense autant à se protéger qu'à perdre. Les références originales sont Young, <em>A first order approximation to the optimum checkpoint interval</em>, Communications of the ACM 17(9), 1974, et Daly, <em>A higher order estimate of the optimum checkpoint interval for restart dumps</em>, Future Generation Computer Systems 22(3), 2006 (métadonnées vérifiées auprès de Crossref).</p>
+<div class="note">
+<p><span class="tag">Notations</span> Les modules 13, 15 et 16 et les projets 3, 4 et 6 écrivent <span class="math inline">T</span> pour la période et <span class="math inline">C</span> pour le coût bloquant d'un checkpoint : <span class="math inline">T \equiv \tau</span> et <span class="math inline">C \equiv \delta</span>. La période du premier ordre <span class="math inline">\sqrt{2\delta M}</span> s'appelle couramment « formule de Young-Daly » ; l'estimation d'ordre supérieur de Daly est au §2.3.</p>
+</div>
 <div class="ex">
-<p><span class="tag">Exemple 2.1 — L'intervalle de Young pour un job « à la Llama 3 »</span> Prenons <span class="math inline">M = 3{,}09</span> h <span class="math inline">= 11\,124</span> s (419 pannes en 54 jours), <span class="math inline">\delta = 60</span> s et <span class="math inline">R = 300</span> s. Alors <span class="math inline">\tau^{\ast} = \sqrt{2 \times 60 \times 11124} \approx 1155</span> s, soit 19,3 minutes. Le temps perdu vaut <span class="math inline">W^{\ast} = 0{,}1038 + 0{,}0270 = 0{,}131</span>, un goodput de 86,9 %.</p>
-<p>À l'optimum les deux termes sont égaux : <span class="math inline">\delta/\tau = 0{,}0519</span> et <span class="math inline">\tau/(2M) = 0{,}0519</span> (<strong>calculé ici</strong>). Si vous doublez la période à 2 311 s, le goodput du modèle exact passe de 87,6 % à 85,1 % ; si vous la divisez par deux, à 85,7 % : l'optimum est plat.</p>
+<p><span class="tag">Exemple 2.1 — L'intervalle de Young pour un job « à la Llama 3 »</span> Prenons <span class="math inline">M \approx 11\,135</span> s (3,09 h : 419 pannes en 54 jours), <span class="math inline">\delta = 60</span> s et <span class="math inline">R = 300</span> s. Alors <span class="math inline">\tau^{\ast} = \sqrt{2 \times 60 \times 11135} \approx 1156</span> s, soit 19,3 minutes. Le temps perdu vaut <span class="math inline">W^{\ast} = 0{,}1038 + 0{,}0269 = 0{,}131</span>, un goodput de 86,9 %.</p>
+<p>À l'optimum les deux termes sont égaux : <span class="math inline">\delta/\tau = 0{,}0519</span> et <span class="math inline">\tau/(2M) = 0{,}0519</span> (<strong>calculé ici</strong>). Si vous doublez la période à 2 312 s, le goodput du modèle exact passe de 87,6 % à 85,1 % ; si vous la divisez par deux, à 85,7 % : l'optimum est plat.</p>
 </div>
 <h3 id="le-modèle-exact-et-la-correction-de-daly">2.3. Le modèle exact et la correction de Daly</h3>
 <p>Le premier ordre suppose <span class="math inline">\delta \ll M</span>. Pour des pannes exponentielles, on peut écrire l'espérance exacte du temps d'horloge par seconde de calcul utile (résultat classique, repris de Daly 2006 et <strong>vérifié numériquement</strong> dans le lab 10.1) :</p>
@@ -582,7 +586,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p><span class="math display">\tau_{\text{Daly}} = \sqrt{2\delta M}\left[1 + \tfrac{1}{3}\sqrt{\tfrac{\delta}{2M}} + \tfrac{1}{9}\,\tfrac{\delta}{2M}\right] - \delta</span></p>
 <p>Nous n'avons pas pu relire l'article de Daly (accès payant) : cette formule est donnée comme implémentée dans <code>yd.py</code>, et le test <code>test_daly_high_matches_numerical_optimum</code> vérifie qu'elle coïncide à 0,5 % près avec le minimum numérique du modèle exact.</p>
 <div class="ex">
-<p><span class="tag">Exemple 2.2 — Formules contre simulation (lab 10.1)</span> La commande <code>python3 sweep.py --delta 60 --mtbf-hours 3.09 --restart 300</code> simule 40 entraînements de 800 heures de calcul utile par période testée, avec des pannes exponentielles (sortie réelle du bac à sable, 2026-10-24) :</p>
+<p><span class="tag">Exemple 2.2 — Formules contre simulation (lab 10.1)</span> La commande <code>python3 sweep.py --delta 60 --mtbf-hours 3.09 --restart 300</code> (l'arrondi 3,09 h, d'où 1 155 s pour Young) simule 40 entraînements de 800 heures de calcul utile par période testée, avec des pannes exponentielles (sortie réelle du bac à sable, 2026-10-24) :</p>
 <pre class="text"><code>Young   tau = sqrt(2*delta*M)        =   1155.4 s
 Daly 2  higher-order estimate         =   1115.7 s
 exact   argmin of E[wall] (numerical) =   1115.7 s
@@ -595,7 +599,7 @@ exact   argmin of E[wall] (numerical) =   1115.7 s
      2311     0.8432   0.8512   0.8534 0.0013   0.8635
      3466     0.7999   0.8132   0.8141 0.0018   0.8328
      4621     0.7523   0.7729   0.7749 0.0024   0.7997</code></pre>
-<p>La colonne « MC exp » (Monte-Carlo, goodput moyen, erreur standard dans la colonne suivante) coïncide avec le modèle exact à moins de deux erreurs standard. Le premier ordre sous-estime le goodput d'environ 0,7 point à l'optimum, et de 1,3 à 4,1 points aux extrémités de la grille. La dernière colonne utilise des pannes en rafales (loi de Weibull de paramètre de forme 0,7, de même moyenne) : le goodput est un peu meilleur et l'optimum, sur cette grille, ne bouge pas.</p>
+<p>La colonne « MC exp » (Monte-Carlo, goodput moyen, erreur standard dans la colonne suivante) coïncide avec le modèle exact à moins de deux erreurs standard. Le premier ordre sous-estime le goodput d'environ 0,7 point à l'optimum, et de 2,1 points (4 621 s) à 4,1 points (289 s) aux extrémités de la grille. La dernière colonne utilise des pannes en rafales (loi de Weibull de paramètre de forme 0,7, de même moyenne) : le goodput est un peu meilleur et l'optimum, sur cette grille, ne bouge pas.</p>
 </div>
 <figure class="fig">
 <svg viewBox="0 0 640 340" xmlns="http://www.w3.org/2000/svg" font-family="inherit" font-size="12" role="img">
@@ -657,7 +661,7 @@ Goodput en fonction de la période de calcul entre checkpoints, pour les valeurs
 <p>Les 60 minutes donnent 0,68, que l'article arrondit à 0,7 ; les 5 minutes donnent 0,93. La conclusion pratique : à cette échelle, un checkpoint horaire coûte un tiers du temps de calcul, et ce n'est qu'en rendant le checkpoint <strong>non bloquant</strong> que descendre à quelques minutes devient raisonnable. Le plancher (0,945 à 2 minutes) est fixé par <span class="math inline">u_0</span>, d'où l'intérêt de réduire le temps de relance.</p>
 </div>
 <h3 id="dimensionner-le-coût-dun-checkpoint">2.6. Dimensionner le coût d'un checkpoint</h3>
-<p>Que contient le checkpoint, et combien pèse-t-il ? Pour l'optimiseur Adam en précision mixte, le papier <a href="https://arxiv.org/abs/1910.02054">ZeRO</a> compte 2 octets par paramètre pour la copie en demi-précision, 2 pour les gradients et <span class="math inline">K = 12</span> pour l'état de l'optimiseur (copie maître en simple précision, deux moments), soit <span class="math inline">16\Psi</span> octets pour <span class="math inline">\Psi</span> paramètres. Un checkpoint n'a pas besoin des gradients : de <span class="math inline">12\Psi</span> à <span class="math inline">14\Psi</span> octets selon que l'on sauve ou non la copie en demi-précision (qui se reconstruit).</p>
+<p>Le <a href="../storage/index.html#dimensionner-le-checkpoint">module 8, §1.4</a> a dimensionné le checkpoint : <span class="math inline">14\Psi</span> octets pour <span class="math inline">\Psi</span> paramètres avec Adam en précision mixte (décompte du papier <a href="https://arxiv.org/abs/1910.02054">ZeRO</a>, sans les gradients), et son débit d'écriture <span class="math inline">S/(f\tau)</span>. Sans la copie en demi-précision, qui se reconstruit, on descend à <span class="math inline">12\Psi</span>. On n'en retient ici que <span class="math inline">\delta</span>, la part <strong>bloquante</strong> de l'écriture (<a href="../storage/index.html#temps-bloquant-et-temps-de-persistance">module 8, §6.3</a>).</p>
 <div class="ex">
 <p><span class="tag">Exemple 2.4 — Un modèle de 70 milliards de paramètres</span> Avec <span class="math inline">14\Psi</span> octets, <span class="math inline">\Psi = 70 \times 10^9</span> donne 980 Go. Sur un job de 1 024 GPU (<span class="math inline">M = 28{,}85</span> h au taux de RSC-1, <span class="math inline">R = 600</span> s supposé), le minimum exact du modèle donne (<strong>calculé ici</strong>, débits d'écriture agrégés <strong>supposés</strong>) :</p>
 <div class="tbl-wrap">
@@ -767,7 +771,7 @@ load rank 3/4: holds rows 6..7
 OK dcp: saved on 2 ranks, loaded on 4 ranks, tensor identical</code></pre>
 <p>Un fichier de données par rang écrivain et un fichier de métadonnées décrivant le découpage : chaque lecteur sait quels octets lire pour obtenir sa tranche. La reconstruction du tenseur complet vérifie l'égalité avec l'original.</p>
 </div>
-<p>Le format compte aussi pour la sécurité et la portabilité. <code>torch.save</code> repose sur <code>pickle</code>, qui peut exécuter du code arbitraire à la lecture ; le <a href="https://raw.githubusercontent.com/huggingface/safetensors/main/README.md">dépôt de <code>safetensors</code></a> classe d'ailleurs le pickle « Unsafe, runs arbitrary code ». C'est pourquoi le lab charge avec <code>weights_only=True</code>. Le format <code>safetensors</code> est simple : 8 octets (entier non signé de 64 bits, petit-boutiste) donnant la taille <span class="math inline">N</span> d'un en-tête JSON, l'en-tête, puis les octets des tenseurs.</p>
+<p>Le format compte aussi pour la sécurité et la portabilité. <code>torch.save</code> repose sur <code>pickle</code>, qui peut exécuter du code arbitraire à la lecture ; le <a href="https://raw.githubusercontent.com/huggingface/safetensors/main/README.md">dépôt de <code>safetensors</code></a> classe d'ailleurs le pickle « Unsafe, runs arbitrary code ». C'est pourquoi le lab charge avec <code>weights_only=True</code>. Le format <code>safetensors</code> est simple : 8 octets (entier non signé de 64 bits, petit-boutiste) donnant la taille d'un en-tête JSON (le <code>N</code> de la sortie ci-dessous), l'en-tête, puis les octets des tenseurs.</p>
 <pre class="text"><code>file size 182 bytes; header length N = 144; data section = 30 bytes
 {&quot;__metadata__&quot;: {&quot;step&quot;: &quot;40&quot;}, &quot;b&quot;: {&quot;data_offsets&quot;: [24, 30], &quot;dtype&quot;: &quot;BF16&quot;, &quot;shape&quot;: [3]}, &quot;w&quot;: {&quot;data_offsets&quot;: [0, 24], &quot;dtype&quot;: &quot;F32&quot;, &quot;shape&quot;: [2, 3]}}</code></pre>
 <p>Cette sortie, produite par <code>safetensors_peek.py</code>, montre le format : deux tenseurs, leurs décalages et un champ de métadonnées dont les valeurs doivent être des chaînes. Un format fait de tenseurs et de chaînes ne convient pas à l'état d'un entraînement (compteurs, états de générateurs, structures de l'optimiseur) : réservez <code>safetensors</code> à l'export des poids, et utilisez DCP ou <code>torch.save</code> pour reprendre un entraînement.</p>
@@ -821,13 +825,13 @@ Un checkpoint en deux phases. Le snapshot copie l'état vers la mémoire de l'h�
 </div>
 <h3 id="la-couche-de-stockage">4.4. La couche de stockage</h3>
 <p>Le rapport Llama 3 décrit ce que subit le stockage : « A major challenge is supporting the highly bursty checkpoint writes that saturate the storage fabric for short durations », avec un état de modèle par GPU « ranging from 1 MB to 4 GB ». Il note aussi que des dizaines de milliers de GPU qui attendent tous un checkpoint changent de consommation électrique au même instant. Un checkpoint synchrone arrête <strong>tout</strong> le cluster en même temps ; un checkpoint étalé lisse la charge.</p>
-<p>Pour dimensionner, partez du chiffre voulu pour la persistance. Si l'état fait <span class="math inline">S</span> et que la persistance doit tenir dans une fraction <span class="math inline">f</span> de la période <span class="math inline">\tau</span>, le débit d'écriture agrégé requis est <span class="math inline">S/(f\tau)</span>.</p>
+<p>Pour dimensionner, partez du chiffre voulu pour la persistance. Si l'état fait <span class="math inline">S</span> et que la persistance doit tenir dans une fraction <span class="math inline">f</span> de la période <span class="math inline">\tau</span>, le débit d'écriture agrégé requis est <span class="math inline">S/(f\tau)</span> (module 8, §1.4).</p>
 <p>Avec l'exemple 2.4 (<span class="math inline">S = 980</span> Go, <span class="math inline">\tau = 455</span> s, <span class="math inline">f = 10</span> %), il faut 21,5 Go/s (<strong>calculé ici</strong>). La lecture compte autant : à la relance, tous les rangs relisent en même temps, et ce débit entre dans <span class="math inline">R</span>. MegaScale réduit la charge de lecture en faisant lire une partition par un rang du groupe de parallélisme de données, qui la diffuse ensuite aux autres rangs.</p>
 <div class="ex">
 <p><span class="tag">Exemple 4.2 — La borne supérieure de 65 To</span> Avec 16 384 GPU et un état par GPU qui peut atteindre 4 Go (borne haute indiquée par le rapport Llama 3), un checkpoint complet pèse au plus <span class="math inline">16\,384 \times 4</span> Go <span class="math inline">= 65{,}5</span> To (<strong>calcul de borne haute fait ici</strong>, le rapport ne donne pas ce total). Écrire cela en 60 secondes demande plus d'un téraoctet par seconde en agrégé ; l'écrire en trente minutes en demande 36 Go/s. C'est l'argument pour étaler l'écriture sur la période plutôt que de la concentrer.</p>
 </div>
 <h3 id="déduplication-et-rotation">4.5. Déduplication et rotation</h3>
-<p>Dans un entraînement parallèle en données, les réplicas contiennent des copies identiques des poids. Écrire <span class="math inline">N</span> copies est un gaspillage : un seul réplica par groupe doit écrire. Le planificateur par défaut de DCP expose un paramètre <code>dedup_replicated_tensors</code> ; lisez la documentation de votre version pour connaître son comportement par défaut. Entre deux checkpoints successifs, en revanche, presque tous les poids ont changé : la déduplication d'un checkpoint à l'autre rapporte peu, et c'est la <strong>rotation</strong> (garder les <span class="math inline">K</span> derniers checkpoints valides, un checkpoint plus ancien « de sécurité » tous les <span class="math inline">L</span> pas) qui borne le stockage.</p>
+<p>Dans un entraînement parallèle en données, les réplicas contiennent des copies identiques des poids. Écrire une copie par réplica est un gaspillage : un seul réplica par groupe doit écrire. Le planificateur par défaut de DCP expose un paramètre <code>dedup_replicated_tensors</code> ; lisez la documentation de votre version pour connaître son comportement par défaut. Entre deux checkpoints successifs, en revanche, presque tous les poids ont changé : la déduplication d'un checkpoint à l'autre rapporte peu, et c'est la <strong>rotation</strong> (garder les <span class="math inline">K</span> derniers checkpoints valides, un checkpoint plus ancien « de sécurité » tous les <span class="math inline">L</span> checkpoints) qui borne le stockage.</p>
 <div class="recap">
 <p>Points clés — chapitre 4</p>
 <ul>
@@ -991,8 +995,8 @@ finished after 2 restarts</code></pre>
 <p>Le chapitre 7 du <a href="../slurm/index.html">module 5</a> traite de l'autre moitié : le contrôle de santé et le drainage qui empêchent de retomber sur le nœud défectueux.</p>
 <h3 id="sous-kubernetes">6.5. Sous Kubernetes</h3>
 <p>Un <code>Job</code> Kubernetes a un <code>backoffLimit</code> (6 par défaut d'après la documentation) et applique, entre les essais, un délai exponentiel « (10s, 20s, 40s ...) capped at ten minutes ».</p>
-<p>Six essais consomment donc 10 + 20 + 40 + 80 + 160 + 320 = 630 secondes de délai cumulé (<strong>calculé ici</strong>), à ajouter à <span class="math inline">R</span>. La <em>pod failure policy</em> permet de distinguer les causes : une règle <code>FailJob</code> sur un code de sortie (« erreur de configuration, ne pas réessayer ») et une règle <code>Ignore</code> sur la condition <code>DisruptionTarget</code> (le nœud a été drainé ou le pod préempté, ce qui ne doit pas compter dans le budget).</p>
-<p><code>examples/job.yaml</code> du lab montre les deux règles ; il est linté (<code>yamllint</code>), non appliqué à un cluster. Un entraînement multi-nœuds demande en plus une sémantique de gang, que ce module ne traite pas.</p>
+<p>La documentation compte <code>backoffLimit</code> en relances : six relances (sept pods au total) consomment donc 10 + 20 + 40 + 80 + 160 + 320 = 630 secondes de délai cumulé (<strong>calculé ici</strong>), à ajouter à <span class="math inline">R</span>. La <em>pod failure policy</em> permet de distinguer les causes : une règle <code>FailJob</code> sur un code de sortie (« erreur de configuration, ne pas réessayer ») et une règle <code>Ignore</code> sur la condition <code>DisruptionTarget</code> (le nœud a été drainé ou le pod préempté, ce qui ne doit pas compter dans le budget).</p>
+<p><code>examples/job.yaml</code> du lab montre les deux règles ; il est linté (<code>yamllint</code>), non appliqué à un cluster. Un entraînement multi-nœuds demande en plus une sémantique de gang, traitée au <a href="../kubernetes-gpu/index.html#ch3">module 12, chapitre 3</a>.</p>
 <div class="recap">
 <p>Points clés — chapitre 6</p>
 <ul>
@@ -1040,70 +1044,76 @@ finished after 2 restarts</code></pre>
 <td><code>RESTART_APP</code></td>
 </tr>
 <tr class="odd">
+<td>43</td>
+<td><code>ROBUST_CHANNEL_RESETCHANNEL_VERIF_ERROR</code></td>
+<td>le GPU a cessé de traiter</td>
+<td><code>IGNORE</code></td>
+</tr>
+<tr class="even">
 <td>45</td>
 <td><code>ROBUST_CHANNEL_PREEMPTIVE_REMOVAL</code></td>
 <td>nettoyage préventif après erreurs antérieures</td>
 <td><code>WORKFLOW_XID_45</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>48</td>
 <td><code>ROBUST_CHANNEL_GPU_ECC_DBE</code></td>
 <td>erreur ECC à double bit</td>
 <td><code>WORKFLOW_XID_48</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>63</td>
 <td><code>INFOROM_DRAM_RETIREMENT_EVENT</code></td>
 <td>événement de remappage mémoire</td>
 <td><code>IGNORE</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>64</td>
 <td><code>INFOROM_DRAM_RETIREMENT_FAILURE</code></td>
 <td>échec du remappage mémoire</td>
 <td><code>RESET_GPU</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>74</td>
 <td><code>NVLINK_ERROR</code></td>
 <td>erreur NVLink</td>
 <td><code>WORKFLOW_NVLINK_ERR</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>79</td>
 <td><code>ROBUST_CHANNEL_GPU_HAS_FALLEN_OFF_THE_BUS</code></td>
 <td>le GPU est tombé du bus</td>
 <td><code>RESTART_BM</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>94</td>
 <td><code>ROBUST_CHANNEL_CONTAINED_ERROR</code></td>
 <td>erreur mémoire contenue</td>
 <td><code>RESTART_APP</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>95</td>
 <td><code>ROBUST_CHANNEL_UNCONTAINED_ERROR</code></td>
 <td>erreur mémoire non contenue</td>
 <td><code>RESET_GPU</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>119, 120</td>
 <td><code>GSP_RPC_TIMEOUT</code>, <code>GSP_ERROR</code></td>
 <td>erreur ou délai du processeur GSP</td>
 <td><code>RESET_GPU</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>140</td>
 <td><code>UNRECOVERABLE_ECC_ERROR_ESCAPE</code></td>
 <td>erreur ECC non récupérée</td>
 <td><code>RESET_GPU</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>154</td>
 <td><code>GPU_RECOVERY_ACTION_CHANGED</code></td>
-<td>changement d'action de récupération</td>
-<td>informatif</td>
+<td>changement d'action de récupération (informatif)</td>
+<td><code>XID_154</code></td>
 </tr>
 </tbody>
 </table>
@@ -1111,12 +1121,12 @@ finished after 2 restarts</code></pre>
 <p>Nous reproduisons les libellés tels quels : les sigles de la colonne d'action (<code>RESTART_APP</code>, <code>RESET_GPU</code>, <code>RESTART_BM</code>, <code>WORKFLOW_*</code>) ne sont pas définis dans la page lue, et nous ne les traduisons pas. Le catalogue précise que l'Xid 154 « summarizes the recovery action required for other Xids » : lisez-le avec l'Xid qu'il accompagne. Dans leurs clusters de recherche, Kokolis et coauteurs observent que 43 % des erreurs PCIe de RSC-1 (63 % pour RSC-2) coïncident avec l'Xid 79, ce qui rappelle qu'un symptôme peut venir d'un bus et pas du GPU.</p>
 <h3 id="mémoire-ecc-confinement-et-remappage">7.2. Mémoire : ECC, confinement et remappage</h3>
 <p>La documentation de NVIDIA sur la gestion des erreurs mémoire des GPU Ampere et suivants décrit trois mécanismes. Le <strong>confinement d'erreur</strong> limite l'impact d'une erreur ECC non corrigeable aux applications qui la rencontrent : les autres continuent, et les GPU de ces générations ne demandent pas de réinitialisation à chaque erreur mémoire. La <strong>mise hors service dynamique de pages</strong> marque comme inutilisable la page où l'erreur est apparue.</p>
-<p>Le <strong>remappage de lignes</strong> remplace dans le matériel les cellules dégradées par des lignes de rechange ; selon la documentation, « The process of row-remapping requires a GPU reset to take effect ».</p>
+<p>Le <a href="../provisioning/index.html#mémoire-du-gpu-remappage-de-lignes-et-rma">module 6, §6.3</a> a présenté les drapeaux de remappage pour la recette ; on les lit ici pendant un job. Le <strong>remappage de lignes</strong> remplace dans le matériel les cellules dégradées par des lignes de rechange ; selon la documentation, « The process of row-remapping requires a GPU reset to take effect ».</p>
 <p>Les systèmes exposent aussi un <strong>drapeau d'action de récupération</strong>. Ses valeurs, dans la documentation : aucune, <strong>réinitialisation du GPU</strong>, <strong>redémarrage du système</strong>, <strong>vidange du trafic pair-à-pair</strong>, et <strong>vidange puis réinitialisation</strong>. Pour la dernière, le GPU fonctionne à capacité réduite : aucun nouveau travail ne doit y être placé, mais le travail non affecté peut continuer « until they finish or reach a good checkpoint ». C'est exactement la conduite à tenir pour un entraînement : demander un checkpoint, puis drainer le nœud.</p>
 <h3 id="réseau-et-liens">7.3. Réseau et liens</h3>
 <p>Les erreurs NVLink (Xid 74) et les liens InfiniBand qui flottent donnent des blocages de collectives, c'est-à-dire des délais d'attente NCCL (chapitre 5). Le rapport Llama 3 note que des défaillances du GPU distant ou de NVLink se manifestent souvent comme des opérations de chargement ou de rangement bloquées dans des noyaux CUDA, sans code d'erreur. Pour isoler un lien suspect, lancez un test de communication (par exemple <code>nccl-tests</code>) entre le nœud et ses voisins, avant la remise en service. Le <a href="../networking/index.html">module 7</a> approfondit le réseau.</p>
 <h3 id="thermique">7.4. Thermique</h3>
-<p>Les auteurs d'Acme décrivent des pannes liées à la chaleur : sur leur cluster, l'entraînement de modèles de 7 milliards de paramètres a fait monter la température de la salle d'environ 5 °C, avec des erreurs NVLink et ECC à la clé. Ils ont renforcé le refroidissement et la fréquence de ces pannes a nettement baissé.</p>
+<p>La chaleur crée des pannes corrélées (chapitre 1) : des erreurs NVLink ou ECC sur plusieurs nœuds dans la même période, dont la cause est dans la salle et non dans un GPU. Quand plusieurs nœuds voisins produisent ces erreurs en même temps, regardez la température avant de drainer : c'est une recommandation de ce parcours, appuyée sur le cas documenté ci-dessous.</p>
 <div class="war">
 <p><span class="tag">Une salle trop chaude</span> Hu et coauteurs rapportent que l'entraînement de modèles de 7 milliards de paramètres sur le cluster Kalos, très optimisé pour la communication et donc presque sans temps mort pour les GPU, s'est accompagné d'une hausse de température de la salle d'environ 5 °C et d'erreurs NVLink et ECC, surtout en juillet 2023. Le refroidissement a été amélioré. Source : <a href="https://arxiv.org/abs/2403.07648">Hu et al., 2024, section 5.2</a>.</p>
 </div>
@@ -1139,7 +1149,7 @@ finished after 2 restarts</code></pre>
 <tbody>
 <tr class="odd">
 <td>0, surveiller</td>
-<td>Xid dont le catalogue dit d'ignorer l'action immédiate (43, 63) ou qui accompagne un autre (45, 154)</td>
+<td>Xid dont l'action immédiate du catalogue est <code>IGNORE</code> (43, 63) ou qui accompagne un autre (45, 154)</td>
 <td>noter, ne rien faire</td>
 </tr>
 <tr class="even">
@@ -1249,8 +1259,8 @@ node verdict: drain-node</code></pre>
 <h3 id="les-journées-dexercice-game-days">8.3. Les journées d'exercice (<em>game days</em>)</h3>
 <p>Une journée d'exercice est une expérience de chaos planifiée, avec les personnes qui interviendraient en vrai. Préparez : l'hypothèse chiffrée, le périmètre (un job de 64 GPU, pas la production), les <strong>critères d'arrêt</strong> (« on interrompt si la perte dépasse <span class="math inline">Z</span> »), les rôles (qui injecte, qui observe, qui décide) et l'enregistrement du déroulé minute par minute.</p>
 <div class="ex">
-<p><span class="tag">Exemple 8.1 — Un budget de temps pour une expérience</span> Pour un job de 1 024 GPU avec un checkpoint toutes les 455 s (exemple 2.4), une détection visée à 3 minutes et un redémarrage de 15 minutes (900 s, <strong>hypothèses</strong>), le pire cas d'un <code>kill -9</code> est : 180 + 900 + 455 = 1 535 s, soit 25,6 minutes, hors rattrapage.</p>
-<p>L'hypothèse de l'expérience s'écrit alors : « le job est de nouveau en train de calculer 26 minutes au plus après la mort du rang, sans intervention, et l'état final est celui d'une exécution sans panne ». Si la mesure dépasse le budget, l'expérience a trouvé une phase de la reprise (chapitre 6) à raccourcir : c'est son but.</p>
+<p><span class="tag">Exemple 8.1 — Un budget de temps pour une expérience</span> Pour un job de 1 024 GPU avec un checkpoint toutes les 455 s (exemple 2.4), une détection visée à 3 minutes et un redémarrage de 15 minutes (900 s, <strong>hypothèses</strong>), le pire cas d'un <code>kill -9</code> est : 180 s de détection, 900 s de relance, puis jusqu'à 455 s de recalcul du travail perdu, soit 1 535 s ou 25,6 minutes, rattrapage compris. La période optimale du modèle exact ne dépend pas de <span class="math inline">R</span> : les 455 s restent valables avec <span class="math inline">R = 900</span> s.</p>
+<p>L'hypothèse de l'expérience s'écrit alors : « le job a retrouvé le pas atteint avant la panne 26 minutes au plus après la mort du rang, sans intervention, et l'état final est celui d'une exécution sans panne ». Si la mesure dépasse le budget, l'expérience a trouvé une phase de la reprise (chapitre 6) à raccourcir : c'est son but.</p>
 </div>
 <h3 id="les-runbooks">8.4. Les runbooks</h3>
 <p>Un runbook est la procédure écrite de quelqu'un qui n'a pas le temps de réfléchir : à trois heures du matin, on suit, on ne conçoit pas. Chaque entrée suit le même format : <strong>symptôme</strong>, <strong>vérifications dans l'ordre</strong>, <strong>action</strong>, <strong>quand escalader</strong>. Squelette pour « l'entraînement ne repart pas après une panne » :</p>
@@ -1260,16 +1270,16 @@ node verdict: drain-node</code></pre>
 <li>Même échec sur plusieurs nœuds : chercher dans le code ou la configuration, pas dans le matériel.</li>
 <li>Échec sur un seul nœud : le drainer avec une raison, relancer ailleurs.</li>
 <li>Perte NaN après reprise : revenir à un checkpoint plus ancien (une empreinte correcte ne prouve pas que le contenu l'est).</li>
-<li>Escalade : si deux checkpoints successifs échouent ou si plus de <span class="math inline">N</span> nœuds sont drainés dans l'heure.</li>
+<li>Escalade : si deux checkpoints successifs échouent ou si le nombre de nœuds drainés dans l'heure dépasse un seuil fixé à l'avance.</li>
 </ol>
 <h3 id="le-post-mortem-sans-blâme">8.5. Le post-mortem sans blâme</h3>
-<p>Le livre <em>Site Reliability Engineering</em> de Google définit un post-mortem comme « a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring », et pose que les post-mortems sans blâme sont un principe de la culture SRE.</p>
+<p>Le livre <em>Site Reliability Engineering</em> de Google définit un post-mortem comme « a written record of an incident, its impact, the actions taken to mitigate or resolve it, the root cause(s), and the follow-up actions to prevent the incident from recurring », et pose que les post-mortems sans blâme sont un principe de la culture SRE. Le <a href="../platform-leadership/index.html#lab-16-2">module 16, lab 16.2</a> en fait la pratique.</p>
 <p>Ils cherchent les causes contributives sans mettre en cause une personne ou une équipe, en supposant que chacun a fait de son mieux avec l'information dont il disposait. Pour un entraînement, ajoutez une ligne que tout le monde comprend : les <strong>GPU-heures perdues</strong>, avec leur décomposition.</p>
 <div class="ex">
 <p><span class="tag">Exemple 8.2 — Chiffrer un incident (scénario fictif)</span> Sur un job de 1 024 GPU, un nœud tombe en panne à 03 h 02. <strong>Scénario fictif, pour l'exercice</strong> : la détection prend 12 minutes, la relance 18 minutes, le recalcul 14 minutes. Total 44 minutes, soit <span class="math inline">1024 \times 44/60 = 751</span> GPU-heures perdues (<strong>calculé ici</strong>).</p>
 <p>Le post-mortem identifie que 12 minutes de détection viennent d'un délai trop long : le ramener à 3 minutes économise <span class="math inline">1024 \times 9/60 = 154</span> GPU-heures <strong>par incident</strong>. Avec 0,83 incident par jour sur 128 nœuds (taux de l'exemple 1.1), l'action de suivi « raccourcir la détection » vaut environ 128 GPU-heures par jour, à comparer au risque de fausses alertes (exercice 7).</p>
 </div>
-<p>Un bon post-mortem se termine par des actions <strong>vérifiables</strong> : un test qui échoue avant la correction et passe après, une alerte, une ligne de runbook. Le <a href="../../projects/resilient-trainer/index.html">projet 3</a> vous demande un ADR et un runbook, et le <a href="../../projects/capstone-rfc/index.html">projet 6</a> les réutilise.</p>
+<p>Un bon post-mortem se termine par des actions <strong>vérifiables</strong> : un test qui échoue avant la correction et passe après, une alerte, une ligne de runbook. Le <a href="../../projects/resilient-trainer/index.html">projet 3</a> vous demande un ADR (<em>Architecture Decision Record</em>, la trace écrite d'une décision d'architecture et de ses raisons) et un runbook, et le <a href="../../projects/capstone-rfc/index.html">projet 6</a> les réutilise.</p>
 <div class="recap">
 <p>Points clés — chapitre 8</p>
 <ul>
@@ -1296,7 +1306,7 @@ node verdict: drain-node</code></pre>
 <li>Relancez avec <code>--weibull-shape 0.5</code> : que devient le meilleur point échantillonné ?</li>
 <li>Lancez <code>bash verify.sh</code> et lisez les 9 tests.</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « OK young-daly: Young T=1155 s, Daly T=1116 s, exact argmin T=1116 s; goodput at Young 0.8767 vs best sampled 0.8767 » (sortie réelle du bac à sable, 2026-10-24) après <code>9 passed</code>. Temps d'exécution : environ deux secondes.</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche « OK young-daly: Young tau=1155 s, Daly tau=1116 s, exact argmin tau=1116 s; goodput at Young 0.8767 vs best sampled 0.8767 » (sortie réelle du bac à sable, 2026-10-24) après <code>9 passed</code>. Temps d'exécution : environ deux secondes.</p>
 <p><strong>Pour aller plus loin.</strong> Remplacez les pannes de Weibull par une trace de pannes réelle de votre cluster (rejouée), et ajoutez un second niveau de checkpoint au simulateur (exemple 4.1).</p>
 </div>
 <h3 id="lab-10-2">Lab 10.2 — Checkpoint atomique et reprise exacte</h3>
@@ -1322,8 +1332,8 @@ node verdict: drain-node</code></pre>
 <li>Lancez <code>python3 xid_triage.py fixtures/kernel_log_sample.txt</code> ; ajoutez un Xid de votre choix à la table <code>CATALOG</code> avec sa source.</li>
 <li>Partie B, facultative (root et Slurm du module 5) : <code>sudo bash slurm_demo.sh</code>, environ cinq minutes à cause du délai de remise en file (exemple 6.4).</li>
 </ol>
-<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>13 passed</code> (10 tests du superviseur et 3 du triage Xid), puis <code>starter (failures expected): 10 failed</code>, puis « OK supervisor-loop: reference green, starter red; examples linted (not executed) ». <strong>Branches.</strong> La partie A et le triage Xid sont vérifiés dans le bac à sable ; <code>examples/train.sbatch</code> et <code>examples/job.yaml</code> sont seulement linté (<code>shellcheck</code>, <code>yamllint</code>) car ils demandent des GPU ou un cluster ; <code>slurm_demo.sh</code> (partie B, avec <code>requeue_demo.sbatch</code>) a été exécuté de bout en bout une fois sur Slurm 23.11.4 (5 min 44 s, le 2026-10-24) et n'est pas lancé par <code>verify.sh</code>.</p>
-<p><strong>Pour aller plus loin.</strong> Ajoutez une attente exponentielle entre relances (option <code>--backoff</code>), un mode « un nœud sur deux traînard » détecté par comparaison à la médiane, ou branchez le superviseur sur le vrai entraîneur du lab 10.2.</p>
+<p><strong>Critère de réussite.</strong> <code>bash verify.sh</code> affiche <code>13 passed</code> (10 tests du superviseur et 3 du triage Xid), puis <code>starter (failures expected): 10 failed</code>, puis « OK supervisor-loop: reference green, starter red; examples linted (not executed) ». <strong>Branches.</strong> La partie A et le triage Xid sont vérifiés dans le bac à sable ; <code>examples/train.sbatch</code> et <code>examples/job.yaml</code> sont seulement lintés (<code>shellcheck</code>, <code>yamllint</code>) car ils demandent des GPU ou un cluster ; <code>slurm_demo.sh</code> (partie B, avec <code>requeue_demo.sbatch</code>) a été exécuté de bout en bout une fois sur Slurm 23.11.4 (5 min 44 s, le 2026-10-24) et n'est pas lancé par <code>verify.sh</code>.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez à votre <code>starter</code> l'attente exponentielle entre relances que la référence offre déjà (option <code>--backoff</code>, nulle par défaut, plafonnée à 60 s), un mode « un nœud sur deux traînard » détecté par comparaison à la médiane, ou branchez le superviseur sur le vrai entraîneur du lab 10.2.</p>
 </div>
 <h2 id="ex">Exercices</h2>
 <p>Les calculs des corrigés ont été refaits en Python (avec <code>yd.py</code> du lab 10.1 pour les modèles de checkpoint et <code>scipy.stats.poisson</code> pour l'exercice 9), et les commandes citées ont été exécutées dans le bac à sable.</p>
@@ -1362,7 +1372,7 @@ node verdict: drain-node</code></pre>
 <li><p>1 155 s : le goodput simulé y est maximal (0,8767).</p></li>
 <li><p>À 2 311 s, 0,8534, soit 2,3 points de moins ; à 578 s, 0,8573, soit 1,9 point de moins. L'optimum est plat.</p></li>
 <li><p>À 289 s, le goodput simulé tombe à 0,7939 : 8,3 points de moins qu'à l'optimum. « Par prudence » n'est pas gratuit : trop fréquent coûte autant que trop rare (à 4 621 s, 4 fois la période de Young, la perte est de 10,2 points).</p></li>
-<li><p>Le premier ordre approxime la perte de recalcul et néglige des termes d'ordre supérieur en <span class="math inline">\tau/M</span> et <span class="math inline">\delta/M</span> ; il sous-estime donc le goodput d'environ 0,7 point à l'optimum et de 1,3 à 4,1 points aux extrémités de la grille.</p></li>
+<li><p>Le premier ordre approxime la perte de recalcul et néglige des termes d'ordre supérieur en <span class="math inline">\tau/M</span> et <span class="math inline">\delta/M</span> ; il sous-estime donc le goodput d'environ 0,7 point à l'optimum, de 2,1 points à 4 621 s et de 4,1 points à 289 s, les deux extrémités de la grille.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1442,13 +1452,13 @@ node verdict: drain-node</code></pre>
 </details>
 <div class="exo">
 <p><span class="tag">Exercice 9 · ★★★ — Combien de nœuds de rechange ?</span> Un cluster alloue 2 048 nœuds à un job. Les nœuds tombent en panne indépendamment au taux de 6,5 pannes pour mille nœuds-jours et une réparation prend 2 jours (hypothèse), sans limite de capacité de réparation. (a) Combien de nœuds sont en réparation en moyenne ? (b) Combien de rechanges garantissent, avec une probabilité d'au moins 99 %, de remplacer sans redimensionner ? (c) Que devient ce nombre si la réparation prend 5 jours ou 1 jour ? (d) Combien coûtent les rechanges inactives, et comment réduire ce coût ?</p>
-<p><em>Indice</em> : le nombre moyen de nœuds en réparation est le taux de panne multiplié par la durée de réparation (loi de Little) ; sans limite de capacité de réparation, ce nombre suit une loi de Poisson.</p>
+<p><em>Indice</em> : appliquez la méthode du <a href="../provisioning/index.html#dimensionner-un-volant-de-nœuds-de-rechange">module 6, §7.4</a> : la moyenne par la loi de Little (<a href="../linux-systems/index.html#mesurer-un-disque-avec-fio-la-loi-de-little">module 1, §7.2</a>), puis un quantile de Poisson, puisque sans limite de capacité de réparation le nombre de nœuds en réparation suit une loi de Poisson.</p>
 </div>
 <details class="sol"><summary>Corrigé</summary>
 <ol type="a">
 <li><p>Régime permanent d'une file sans limite de serveurs : le nombre de nœuds en réparation suit une loi de Poisson de moyenne <span class="math inline">2048 \times 0{,}0065 \times 2 = 26{,}6</span>.</p></li>
 <li><p>Le plus petit <span class="math inline">k</span> tel que <span class="math inline">P(X \le k) \ge 0{,}99</span> est 39 (calculé avec <code>scipy.stats.poisson.ppf</code>) : <span class="math inline">P(X &gt; 39) = 0{,}0092</span>. Il faut donc 39 nœuds de rechange, soit 1,9 % de l'allocation.</p></li>
-<li><p>À 5 jours, la moyenne est de 66,6 et le seuil de 86 (4,2 %) ; à 1 jour, la moyenne est de 13,3 et le seuil de 22. Le besoin est proportionnel au temps de réparation : le raccourcir est aussi efficace que de réduire le taux de panne.</p></li>
+<li><p>À 5 jours, la moyenne est de 66,6 et le seuil de 86 (4,2 %) ; à 1 jour, la moyenne est de 13,3 et le seuil de 22. La moyenne est proportionnelle au temps de réparation, le seuil un peu moins (22, 39 puis 86 rechanges pour 1, 2 et 5 jours), car les fluctuations relatives diminuent quand la moyenne grandit. La moyenne ne dépend que du produit du taux de panne par la durée de réparation : raccourcir la réparation est aussi efficace que de réduire le taux de panne.</p></li>
 <li><p>39 nœuds de 8 GPU inactifs représentent <span class="math inline">39 \times 8 \times 24 = 7488</span> GPU-heures par jour. On réduit ce coût en faisant tourner sur les rechanges des jobs <strong>préemptibles</strong> (QOS du module 5), au prix d'un délai de libération qui s'ajoute à <span class="math inline">R</span>, ou en mutualisant les rechanges entre plusieurs jobs. Le modèle suppose des pannes indépendantes et ne couvre ni les pannes corrélées (un commutateur) ni la contrainte de taille de réplica de l'exemple 6.1.</p></li>
 </ol>
 </details>
@@ -1461,7 +1471,7 @@ node verdict: drain-node</code></pre>
 <li><p>Chaque tentative coûte <span class="math inline">(90 + 600)\ \text{s} = 690</span> s, soit <span class="math inline">1024 \times 690/3600 = 196{,}3</span> GPU-heures ; 28 tentatives font 5 495 GPU-heures.</p></li>
 <li><p>La garde « aucun progrès » (deux tentatives de suite sans avancer) aurait arrêté la boucle après 2 tentatives, soit 393 GPU-heures : 5 103 GPU-heures économisées, sans parler du cluster qui n'a pas été perturbé (cf. les 35 remises en file et 548 préemptions décrites par Kokolis et coauteurs).</p></li>
 <li><p>Une empreinte correcte prouve l'<strong>intégrité</strong> (ce qui a été lu est ce qui a été écrit), pas l'<strong>exactitude</strong> : le checkpoint du pas 18 000 peut contenir des valeurs non finies, écrites juste après une divergence, que la reprise fait échouer aussitôt (par exemple une garde « perte non finie »).</p></li>
-<li><p>Valider le contenu à l'écriture (perte et norme de gradient finies) et à la lecture ; conserver plusieurs checkpoints et un point « sain » marqué tous les <span class="math inline">L</span> pas ; revenir automatiquement au précédent après un échec sans progrès ; alerter un humain à la deuxième tentative ; ajouter l'entrée 5 du runbook du chapitre 8.</p></li>
+<li><p>Valider le contenu à l'écriture (perte et norme de gradient finies) et à la lecture ; conserver plusieurs checkpoints et un point « sain » marqué tous les <span class="math inline">L</span> checkpoints ; revenir automatiquement au précédent après un échec sans progrès ; alerter un humain à la deuxième tentative ; ajouter l'entrée 5 du runbook du chapitre 8.</p></li>
 </ol>
 </details>
 <div class="exo">
@@ -1539,11 +1549,11 @@ node verdict: drain-node</code></pre>
 <p>Un checkpoint n'est pas un examen : c'est la liste de ce que vous devez pouvoir produire ou expliquer, avec la preuve attendue.</p>
 <ul>
 <li><strong>Je peux chiffrer le coût des pannes d'un job.</strong> Preuve : un tableau MTBF, période de Young et goodput pour un job de votre choix, avec les hypothèses étiquetées (exemples 1.1 et 2.1).</li>
-<li><strong>Je peux écrire un checkpoint atomique, complet et vérifié.</strong> Preuve : le lab 10.2 et un test qui échoue quand on retire le manifeste ou le <code>fsync</code>.</li>
+<li><strong>Je peux écrire un checkpoint atomique, complet et vérifié.</strong> Preuve : le lab 10.2, un test qui échoue quand on retire le manifeste, et l'explication de ce qu'un <code>kill -9</code> ne détecte pas (un <code>fsync</code> retiré, étape 5 du lab).</li>
 <li><strong>Je peux prouver qu'une reprise est exacte.</strong> Preuve : la sortie de <code>ablate.py</code> et de <code>chaos.py</code> appliqués à votre propre entraîneur.</li>
 <li><strong>Je peux concevoir une boucle de reprise qui ne boucle pas.</strong> Preuve : le lab 10.3, <code>starter</code> complété, et un journal où le superviseur exclut un nœud, puis un autre où il abandonne.</li>
 <li><strong>Je peux régler un délai de détection avec des chiffres.</strong> Preuve : l'exercice 7 refait avec vos taux de panne et votre plus longue phase silencieuse.</li>
-<li><strong>Je peux lire un journal d'erreurs GPU et décider.</strong> Preuve : les exercices 8 et 10 refaits sur un journal réel anonymisé.</li>
+<li><strong>Je peux lire un journal d'erreurs GPU et décider.</strong> Preuve : l'exercice 8 refait sur un journal du noyau réel anonymisé, et un Xid sourcé ajouté à <code>xid_triage.py</code> (lab 10.3, étape 4).</li>
 <li><strong>Je peux dimensionner les rechanges.</strong> Preuve : l'exercice 9 avec votre temps de réparation.</li>
 <li><strong>Je peux préparer un test de chaos et un post-mortem.</strong> Preuve : le plan de l'exercice 11 et un post-mortem chiffré en GPU-heures.</li>
 </ul>
@@ -1578,10 +1588,10 @@ node verdict: drain-node</code></pre>
 <p>Les niveaux de triage Xid (surveiller, relancer, drainer), la règle « le délai de détection est plus long que la plus longue phase silencieuse », la garde « aucun progrès », l'exclusion après deux échecs, les cinq règles du checkpoint asynchrone, le modèle à deux niveaux du premier ordre (dérivé ici, vérifié par minimisation numérique), le calcul de rechanges par la loi de Poisson, la distinction reprise identique et reprise équivalente, le budget de temps d'une expérience de chaos : ce sont des choix de ce parcours, pas des règles de PyTorch, de NVIDIA, de Slurm ou de Kubernetes.</p>
 <h3 id="a-verifier">À vérifier</h3>
 <ol type="1">
-<li>La formule d'ordre supérieur de Daly n'a pas été relue dans l'article (accès payant) ; elle est vérifiée numériquement contre le modèle exact. (2) Le tableau 5 de Llama 3 est incohérent dans le texte récupéré (148 sur 419 ne fait pas 30,1 %, et 268 sur 419 ne fait pas 58,7 %) : nous citons les comptes, pas les pourcentages. (3) Le texte de Kokolis et coauteurs cite un MTTF de 7,9 h pour des jobs de 1 024 GPU ; avec le taux de 6,50 pour mille nœuds-jours, nous obtenons 28,8 h : nous n'avons pas pu réconcilier les deux et n'utilisons que les projections à 16 384 et 131 072 GPU, que nous reproduisons. (4) Le délai de 121 secondes avant éligibilité d'un job remis en file a été observé sur Slurm 23.11.4 par défaut ; nous n'avons pas identifié le paramètre en cause. (5) Les libellés d'action du catalogue Xid (<code>RESTART_APP</code>, <code>RESET_GPU</code>, <code>RESTART_BM</code>, <code>WORKFLOW_*</code>) ne sont pas définis dans la page lue ; les Xid et leurs libellés évoluent avec les pilotes, relisez le catalogue de votre version. (6) Le comportement par défaut de <code>dedup_replicated_tensors</code> et la signature de <code>async_save</code> changent selon la version de PyTorch : seul <code>save</code>/<code>load</code> a été exécuté. (7) Les injections de pannes réseau, GPU (DCGM) et de nœud lent du chapitre 8 n'ont pas été testées. (8) Les garanties de cohérence d'un stockage objet pour le motif « manifeste en dernier » dépendent du fournisseur. (9) Les scripts <code>train.sbatch</code> et <code>job.yaml</code> sont linté, pas exécutés, faute de GPU et de cluster.</li>
+<li>La formule d'ordre supérieur de Daly n'a pas été relue dans l'article (accès payant) ; elle est vérifiée numériquement contre le modèle exact. (2) Le tableau 5 de Llama 3 est incohérent dans le texte récupéré (148 sur 419 ne fait pas 30,1 %, et 268 sur 419 ne fait pas 58,7 %) : nous citons les comptes, pas les pourcentages. (3) Le texte de Kokolis et coauteurs cite un MTTF observé de 7,9 h pour des jobs de 1 024 GPU ; avec le taux de 6,50 pour mille nœuds-jours, nous obtenons 28,8 h. L'article n'explique pas cet écart : il écrit au contraire que la projection de sa figure 7, en <span class="math inline">(N_{\text{nœuds}}\,r_f)^{-1}</span> avec un taux calculé sur les jobs de plus de 128 GPU, « matches well with observed MTTF numbers for larger jobs (&gt; 32 GPUs) ». Nous ignorons d'où vient l'écart et n'utilisons que les projections à 16 384 et 131 072 GPU, que nous reproduisons. (4) Le délai de 121 secondes avant éligibilité d'un job remis en file a été observé sur Slurm 23.11.4 par défaut ; nous n'avons pas identifié le paramètre en cause. (5) Les libellés d'action du catalogue Xid (<code>RESTART_APP</code>, <code>RESET_GPU</code>, <code>RESTART_BM</code>, <code>WORKFLOW_*</code>) ne sont pas définis dans la page lue ; les Xid et leurs libellés évoluent avec les pilotes, relisez le catalogue de votre version. (6) Le comportement par défaut de <code>dedup_replicated_tensors</code> et la signature de <code>async_save</code> changent selon la version de PyTorch : seul <code>save</code>/<code>load</code> a été exécuté. (7) Les injections de pannes réseau, GPU (DCGM) et de nœud lent du chapitre 8 n'ont pas été testées. (8) Les garanties de cohérence d'un stockage objet pour le motif « manifeste en dernier » dépendent du fournisseur. (9) Les scripts <code>train.sbatch</code> et <code>job.yaml</code> sont lintés, pas exécutés, faute de GPU et de cluster.</li>
 </ol>
 <h3 id="hors-perimetre">Hors périmètre</h3>
-<p>Les bibliothèques de checkpoint multiniveau d'autres écosystèmes, le checkpoint/restauration au niveau du pilote GPU, les accélérateurs non NVIDIA, les stratégies de redimensionnement élastique qui préservent le lot global et la reproductibilité, l'orchestration de gang sous Kubernetes (JobSet et similaires), la détection matérielle de la corruption silencieuse, la résilience de l'inférence servie, et le dimensionnement financier des rechanges (module 15).</p>
+<p>Les bibliothèques de checkpoint multiniveau d'autres écosystèmes, le checkpoint/restauration au niveau du pilote GPU, les erreurs des accélérateurs non NVIDIA (leur pile logicielle est présentée au <a href="../gpu-programming/index.html#ch9">module 4, chapitre 9</a>, leur supervision au <a href="../observability/index.html#hors-de-nvidia-mêmes-questions-autres-noms">module 14, §2.5</a>), les stratégies de redimensionnement élastique qui préservent le lot global et la reproductibilité, l'orchestration de gang sous Kubernetes (JobSet et similaires, traitée au <a href="../kubernetes-gpu/index.html#ch3">module 12</a>), la détection matérielle de la corruption silencieuse, la résilience de l'inférence servie, et le dimensionnement financier des rechanges (module 15).</p>
 <nav class="pager" aria-label="Navigation">
 <a class="prev" href="../../courses/distributed-training/index.html"><span class="k">← Précédent</span>Module 09 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline</a><a class="next" href="../../courses/ray-rl-infra/index.html"><span class="k">Suivant →</span>Module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne</a></nav>
 </main>

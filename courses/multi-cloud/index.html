@@ -186,7 +186,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 <tr class="odd">
 <td>Prérequis</td>
-<td><a href="../kubernetes-gpu/index.html">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../fault-tolerance/index.html">Module 10 — Pannes, checkpointing et reprise automatique</a></td>
+<td><a href="../fault-tolerance/index.html">Module 10 — Pannes, checkpointing et reprise automatique</a>, <a href="../kubernetes-gpu/index.html">Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a></td>
 </tr>
 <tr class="even">
 <td>Pour qui</td>
@@ -222,7 +222,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <h3 id="place">Place dans le parcours</h3>
 <ul>
 <li><strong>Phase 4 — Plateforme cloud-native et multi-fournisseurs</strong> (semaines 33-44) : placer, observer et facturer des charges sur plusieurs fournisseurs.</li>
-<li><strong>S'appuie sur</strong> : <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>, <a href="../fault-tolerance/index.html">module 10 — Pannes, checkpointing et reprise automatique</a>.</li>
+<li><strong>S'appuie sur</strong> : <a href="../fault-tolerance/index.html">module 10 — Pannes, checkpointing et reprise automatique</a>, <a href="../kubernetes-gpu/index.html">module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling</a>.</li>
 <li><strong>Projets qui s'en servent</strong> : <a href="../../projects/multi-provider-scheduler/index.html">Projet 4 — Placement multi-fournisseurs sensible aux coûts</a>, <a href="../../projects/capstone-rfc/index.html">Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU</a>.</li>
 <li><strong>Compétences demandées dans les offres d'emploi et travaillées ici</strong> : Python, Multi-cloud (SkyPilot…), Stockage objet, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Cloud hyperscaler (AWS, GCP, Azure…), FinOps, coûts, Planification de capacité, Sécurité, conformité, Kubernetes, Terraform, infrastructure as code, Collectives (NCCL, RCCL, HCCL), Clouds GPU spécialisés, Achats, relation fournisseurs, Expérience HPC, Réseau (général), Systèmes distribués (voir <a href="../../market/index.html#couverture">l'analyse du marché</a>). <!-- /gen:place --></li>
 </ul>
@@ -616,7 +616,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <p>Le préavis sert donc à <strong>vider proprement</strong> (terminer l'étape, signaler la fin), pas à remplacer le checkpoint périodique. C'est ce que montre la répétition du lab 13.2 : un arrêt sans préavis perd les 12 étapes écoulées depuis le dernier checkpoint, un arrêt avec préavis traité par le job n'en perd aucune, et seul le premier cas est garanti partout.</p>
 </div>
 <h3 id="le-coût-dune-heure-utile">2.3. Le coût d'une heure utile</h3>
-<p>Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, la formule de Young (fonction <code>young_daly</code> du lab 13.1). On note ici <span class="math inline">C</span> son coût bloquant (<span class="math inline">\delta</span> au module 10), <span class="math inline">T</span> la période (<span class="math inline">\tau</span>), <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le temps de reprise :</p>
+<p>Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, la formule de Young (fonction <code>young_daly</code> du lab 13.1). On note ici <span class="math inline">C</span> son coût bloquant (le <span class="math inline">\delta</span> du module 10), <span class="math inline">T</span> la période (son <span class="math inline">\tau</span>), <span class="math inline">M</span> le temps moyen entre interruptions et <span class="math inline">R</span> le temps de reprise :</p>
 <p><span class="math display">T^* = \sqrt{2CM}, \qquad W(T) = \frac{C}{T} + \frac{T/2 + R}{M}</span></p>
 <p>La fraction <span class="math inline">W</span> est la part du temps alloué qui ne produit pas de progrès. Au point optimal elle se simplifie en <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span>. Le prix d'une heure <strong>utile</strong> est alors le prix catalogue divisé par <span class="math inline">1 - W</span> :</p>
 <p><span class="math display">p_{\text{utile}} = \frac{p}{1 - W(T^*)}</span></p>
@@ -673,7 +673,7 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 <ul>
 <li>Six modèles : à la demande, engagement d'usage, réservation planifiée, capacité à attente, préemptible, contrat de capacité.</li>
 <li>Les préavis de préemption documentés vont de 0 à 120 secondes, au mieux : ils ne remplacent pas le checkpoint périodique.</li>
-<li>Prix d'une heure utile : <span class="math inline">p / (1 - W)</span> avec <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span> ; <span class="math inline">1 - W</span> est le goodput <span class="math inline">g</span> du <a href="../finops-capacity/index.html#ch1">module 15</a>. La remise minimale du spot vaut <span class="math inline">W</span>.</li>
+<li>Prix d'une heure utile : <span class="math inline">p / (1 - W)</span> avec <span class="math inline">W(T^*) = \sqrt{2C/M} + R/M</span> ; <span class="math inline">1 - W</span> n'est le goodput que si les interruptions sont la seule perte, et le <a href="../finops-capacity/index.html#ch4">module 15</a> écrit le spot tarif / <span class="math inline">\bigl(g \cdot (1 - W)\bigr)</span>, son goodput <span class="math inline">g</span> couvrant les autres pertes. La remise minimale du spot vaut <span class="math inline">W</span>.</li>
 <li>Un job qui ne sait pas reprendre n'a pas sa place sur du préemptible.</li>
 <li>Les modèles se combinent : base réservée, pics à la demande, travaux reprenables en préemptible.</li>
 </ul>
@@ -1258,7 +1258,7 @@ bad-job.yaml: 5 error(s), 2 warning(s)</code></pre>
 <li>Changez <code>p_avail</code> du pool a-spot et le tarif de sortie : décrivez ce qui bascule en premier.</li>
 </ol>
 <p><strong>Critère de réussite.</strong> <code>verify.sh</code> affiche la ligne <code>CRITERION (moves of 'aware' non-increasing with data size; cost &lt;= 1.05 x the best other policy): OK</code>, puis <code>CRITERION (threshold positive and non-increasing with lam): OK</code>, après des tests verts côté référence et rouges côté départ. Les critères sont <strong>structurels</strong>, pas des valeurs : le nombre de déménagements de <code>aware</code> ne croît pas avec la taille des données, son coût ne dépasse jamais de 5 % la meilleure des trois autres politiques, et le seuil de taille baisse quand <code>lam</code> monte. Aucun temps mesuré n'est testé.</p>
-<p><strong>Pour aller plus loin.</strong> Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez le même scénario dans le <a href="../../projects/multi-provider-scheduler/index.html">projet 4</a>, qui gère plusieurs jobs et une capacité limitée.</p>
+<p><strong>Pour aller plus loin.</strong> Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez un scénario voisin (mêmes noms d'offres, paramètres différents) dans le <a href="../../projects/multi-provider-scheduler/index.html">projet 4</a>, qui gère plusieurs jobs et une capacité limitée.</p>
 </div>
 <h3 id="lab-13-2">Lab 13.2 — Un job SkyPilot indépendant du fournisseur</h3>
 <div class="lab">

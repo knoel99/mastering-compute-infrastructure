@@ -78,7 +78,7 @@ Onze séances, soit 28 h : trois de 3 h, six de 2,5 h et deux de 2 h. Le niveau 
 | 8 | 3 h | 2 | Lab 7.2 en entier | Lab 7.2 (3 h) |
 | 9 | 2.5 h | 3 | ch. 8 Mesure et diagnostic (1 h) | Ex. 8 (1,5 h) |
 | 10 | 3 h | 3 | ch. 8 en pratique : recette `nccl-tests`, partie A | Lab 7.3 partie A (1,5 h) ; Ex. 9 (1,5 h) |
-| 11 | 2 h | 3 | ch. 8 en pratique : recette sur cluster, partie B | Lab 7.3 partie B (1,5 h) ; Checkpoint de sortie (0,5 h) ; le rapport de recette du lab 7.3 servira au Projet 2 (phase 3) |
+| 11 | 2 h | 3 | ch. 8 en pratique : recette sur cluster, partie B | Lab 7.3 partie B (1,5 h) ; Checkpoint de sortie (0,5 h) ; le rapport de recette du lab 7.3 sert aux extensions « Deux machines » et « Variante GPU » du Projet 2 |
 
 <!-- gen:travailler -->
 ### Comment travailler ce module {#travailler}
@@ -769,11 +769,11 @@ Un blocage est le pire symptôme : aucune erreur, des GPU à 100 % puis à 0 %. 
 
 Le délai de garde lui-même est un compromis. Avec `NCCL_IB_TIMEOUT` $= t$, le délai de bas niveau vaut $4{,}096\ \mu\text{s} \times 2^t$, et le temps avant erreur vaut ce délai multiplié par `NCCL_IB_RETRY_CNT`. Le tableau de la documentation, recalculé par nos soins : pour 7 tentatives, $t = 17$ donne 3,8 s, $t = 20$ donne 30 s et $t = 22$ donne 120 s. Un délai long évite les fausses alertes sur un grand réseau, mais retarde la détection d'un vrai blocage de la durée correspondante.
 
-Les compteurs de ports InfiniBand, les compteurs `rdma statistic` et les métriques GPU gagnent à être exportés vers votre supervision pour détecter une dégradation avant le job : voir [le module 14, observabilité](../observability/index.html), et [le module 10, tolérance aux pannes](../fault-tolerance/index.html) pour la reprise.
+Les compteurs de ports InfiniBand, les compteurs `rdma statistic` et les métriques GPU gagnent à être exportés vers votre supervision pour détecter une dégradation avant le job. L'export et les alertes des compteurs de ports sont au [module 14, § 7.6 « Les compteurs du réseau »](../observability/index.html#les-compteurs-du-réseau) ; la reprise est au [module 10, tolérance aux pannes](../fault-tolerance/index.html).
 
 ### 8.6. Le rapport de recette
 
-Une recette réseau ne se résume pas à « ça marche ». Le rapport consigne : les versions (NCCL, pilote, micrologiciel des cartes, `nccl-tests`), les variables d'environnement, la commande exacte, le débit de bus attendu avec sa source (fiche, calcul du chapitre 1), le plateau mesuré, les résultats par rail, et les écarts expliqués. C'est la discipline du [module 2](../perf-models/index.html#ch8), appliquée au réseau, et le point d'entrée du [Projet 2](../../projects/scaling-study/index.html).
+Une recette réseau ne se résume pas à « ça marche ». Le rapport consigne : les versions (NCCL, pilote, micrologiciel des cartes, `nccl-tests`), les variables d'environnement, la commande exacte, le débit de bus attendu avec sa source (fiche, calcul du chapitre 1), le plateau mesuré, les résultats par rail, et les écarts expliqués. C'est la discipline du [module 2](../perf-models/index.html#ch8), appliquée au réseau, et le point d'entrée des extensions réseau et GPU du [Projet 2](../../projects/scaling-study/index.html#extensions).
 
 ::: ex
 [Exemple 8.2 — Quel débit attendre sur un lien de 400 Gb/s ?]{.tag} Sur RoCE v2, avec 50 Go/s nominaux et un débit utile de 98,0 % pour une MTU InfiniBand de 4 096 (chapitre 1), le plafond d'un all-reduce multi-nœuds limité par la carte est de $50 \times 0{,}9804 = 49{,}0$ Go/s par GPU. Un plateau mesuré à 45 Go/s représente 92 % de ce plafond ; à 26 Go/s, 53 %.

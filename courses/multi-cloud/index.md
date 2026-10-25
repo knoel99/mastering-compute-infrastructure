@@ -35,11 +35,12 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 |---|---|
 | Volume | 28 h, dont 12 h de lecture, 9,5 h de labs et 6,5 h d'exercices (répartition estimée par l'auteur, non mesurée) |
 | Niveau d'entrée | 3 : la tolérance aux pannes (module 10) et Kubernetes pour les GPU (module 12) |
-| Prérequis | [Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [Module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html) |
+| Prérequis | [Module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html) |
 | Pour qui | Cœur : la plateforme de calcul d'une organisation est presque toujours répartie entre plusieurs fournisseurs. |
 | Livrable | un simulateur de placement testé, un calculateur de coût de déménagement de données testé, un job SkyPilot analysé hors ligne avec sa politique de gouvernance |
 | Environnement | un portable CPU suffit pour les labs 13.1 et 13.3 et pour la branche hors ligne du lab 13.2. La branche cloud du lab 13.2 demande un compte cloud et du crédit : lancez de petits jobs de quelques minutes et vérifiez l'arrêt automatique |
 | Projets liés | [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
+
 ### Ce que vous saurez vérifier {#acquis}
 
 -   Situer une offre de calcul (hyperscaler, GPU cloud, centre public, colocation) par ce qu'elle vend, son unité de facturation, son engagement et son réseau (chapitres 1 et 2).
@@ -55,7 +56,7 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 ### Place dans le parcours {#place}
 
 -   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 33-44) : placer, observer et facturer des charges sur plusieurs fournisseurs.
--   **S'appuie sur** : [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
+-   **S'appuie sur** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html).
 -   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Multi-cloud (SkyPilot…), Stockage objet, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Cloud hyperscaler (AWS, GCP, Azure…), FinOps, coûts, Planification de capacité, Sécurité, conformité, Kubernetes, Terraform, infrastructure as code, Collectives (NCCL, RCCL, HCCL), Clouds GPU spécialisés, Achats, relation fournisseurs, Expérience HPC, Réseau (général), Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
@@ -236,7 +237,7 @@ Le préavis sert donc à **vider proprement** (terminer l'étape, signaler la fi
 
 ### 2.3. Le coût d'une heure utile
 
-Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, la formule de Young (fonction `young_daly` du lab 13.1). On note ici $C$ son coût bloquant ($\delta$ au module 10), $T$ la période ($\tau$), $M$ le temps moyen entre interruptions et $R$ le temps de reprise :
+Une heure payée sur une offre préemptible n'est pas une heure de travail. Le module 10 établit la période de checkpoint optimale au premier ordre, la formule de Young (fonction `young_daly` du lab 13.1). On note ici $C$ son coût bloquant (le $\delta$ du module 10), $T$ la période (son $\tau$), $M$ le temps moyen entre interruptions et $R$ le temps de reprise :
 
 $$T^* = \sqrt{2CM}, \qquad W(T) = \frac{C}{T} + \frac{T/2 + R}{M}$$
 
@@ -274,7 +275,7 @@ Points clés — chapitre 2
 
 -   Six modèles : à la demande, engagement d'usage, réservation planifiée, capacité à attente, préemptible, contrat de capacité.
 -   Les préavis de préemption documentés vont de 0 à 120 secondes, au mieux : ils ne remplacent pas le checkpoint périodique.
--   Prix d'une heure utile : $p / (1 - W)$ avec $W(T^*) = \sqrt{2C/M} + R/M$ ; $1 - W$ est le goodput $g$ du [module 15](../finops-capacity/index.html#ch1). La remise minimale du spot vaut $W$.
+-   Prix d'une heure utile : $p / (1 - W)$ avec $W(T^*) = \sqrt{2C/M} + R/M$ ; $1 - W$ n'est le goodput que si les interruptions sont la seule perte, et le [module 15](../finops-capacity/index.html#ch4) écrit le spot tarif / $\bigl(g \cdot (1 - W)\bigr)$, son goodput $g$ couvrant les autres pertes. La remise minimale du spot vaut $W$.
 -   Un job qui ne sait pas reprendre n'a pas sa place sur du préemptible.
 -   Les modèles se combinent : base réservée, pics à la demande, travaux reprenables en préemptible.
 :::
@@ -901,7 +902,7 @@ Trois labs, 9,5 h au total : 4 h, 2,5 h et 3 h. Les labs 13.1 et 13.3 sont de ty
 
 **Critère de réussite.** `verify.sh` affiche la ligne `CRITERION (moves of 'aware' non-increasing with data size; cost <= 1.05 x the best other policy): OK`, puis `CRITERION (threshold positive and non-increasing with lam): OK`, après des tests verts côté référence et rouges côté départ. Les critères sont **structurels**, pas des valeurs : le nombre de déménagements de `aware` ne croît pas avec la taille des données, son coût ne dépasse jamais de 5 % la meilleure des trois autres politiques, et le seuil de taille baisse quand `lam` monte. Aucun temps mesuré n'est testé.
 
-**Pour aller plus loin.** Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez le même scénario dans le [projet 4](../../projects/multi-provider-scheduler/index.html), qui gère plusieurs jobs et une capacité limitée.
+**Pour aller plus loin.** Ajoutez une migration volontaire vers un pool devenu moins cher, ou reprenez un scénario voisin (mêmes noms d'offres, paramètres différents) dans le [projet 4](../../projects/multi-provider-scheduler/index.html), qui gère plusieurs jobs et une capacité limitée.
 :::
 
 ### Lab 13.2 — Un job SkyPilot indépendant du fournisseur {#lab-13-2}

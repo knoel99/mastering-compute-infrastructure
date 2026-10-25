@@ -42,6 +42,7 @@ Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriq
 | Livrable | un exportateur testé, des règles d'alerte testées par promtool et par mutation, un détecteur de blocage dont vous connaissez les fausses alarmes |
 | Environnement | un portable ou une VM Linux, **sans GPU** ; `promtool` (paquet apt `prometheus`), Python avec `prometheus_client`, `torch` CPU, `pytest`, `pyyaml` (et `mlflow-skinny`, `sqlalchemy`, `alembic` pour la partie C du lab 14.3, `opentelemetry-sdk` pour sa partie D) ; Slurm du module 5 pour la branche en direct |
 | Projets liés | [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
+
 ### Ce que vous saurez vérifier {#acquis}
 
 -   Dire ce qu'une métrique GPU mesure vraiment, en particulier pourquoi `DCGM_FI_DEV_GPU_UTIL` ne dit pas si le GPU travaille (chapitres 1 et 2).
@@ -836,7 +837,7 @@ Elle destine le niveau 1 à la vérification avant un job, le niveau 2 à l'épi
 
 La conception recommandée est stratifiée : des vérifications **bon marché et fréquentes** (XID, ECC, fréquences, erreurs PCIe et NVLink) toutes les quelques minutes ; un diagnostic de niveau 1 au prologue de chaque job et de niveau 2 à l'épilogue d'un job en échec ; un diagnostic long (niveau 3 ou 4) à la mise en service et après une réparation. Un nœud qui échoue est drainé avec une raison au préfixe convenu (`health:`, module 5) ; seules les raisons que le contrôle sait clore sans ambiguïté sont remises en service automatiquement.
 
-### 7.6. Les compteurs du réseau
+### 7.6. Les compteurs du réseau {#les-compteurs-du-réseau}
 
 Le rapport de Llama 3 cité au § 7.1 note que les traînards apparaissent souvent comme des communications lentes : le réseau a lui aussi ses pannes silencieuses. Le collecteur `infiniband` de `node_exporter`, actif par défaut sous Linux, lit les compteurs des ports dans `/sys/class/infiniband` et les expose avec les étiquettes `device` et `port`.
 

@@ -39,7 +39,7 @@ Le dossier `labs/projects/scaling-study/` contient `starter/` (à compléter), `
 
 | ID | Exigence | Test qui la vérifie |
 |---|---|---|
-| R1 | **Plan d'expériences** : régimes fort et faible, p dans {1, 2, 4}, au moins 3 exécutions indépendantes par point, chacune de plusieurs pas mesurés après chauffe (le protocole du [module 2, § 8.1](../../courses/perf-models/index.html#ch8) demande dix répétitions : signalez ce nombre réduit parmi les menaces à la validité, comme le rapport de référence), ordre des exécutions mélangé de façon reproductible (graine) | `test_plan_*`, `test_dry_run_prints_the_plan` |
+| R1 | **Plan d'expériences** : régimes fort et faible, p dans {1, 2, 4}, au moins 3 exécutions indépendantes par point, chacune de plusieurs pas mesurés après chauffe (le protocole du [module 2, § 8.1](../../courses/perf-models/index.html#ch8) demande au moins dix répétitions : signalez ce nombre réduit parmi les menaces à la validité, comme le rapport de référence), ordre des exécutions mélangé de façon reproductible (graine) | `test_plan_*`, `test_dry_run_prints_the_plan` |
 | R2 | **Exécuteur** : lance `bench.py` pour chaque exécution et écrit un `results.json` brut | `test_end_to_end_small_study` |
 | R3 | **Ajustement α-β** par moindres carrés sur l'erreur relative, avec exclusion des petits messages et **intervalle de confiance bootstrap** reproductible | `tests/test_fit.py` (7 tests) |
 | R4 | **Métriques** : gain, efficacité, fraction séquentielle de Karp-Flatt, médiane et interquartile | `test_speedup_efficiency_karp_flatt`, `test_summarize` |
@@ -120,7 +120,7 @@ Ces indices ne donnent pas la solution ; essayez d'abord sans.
 
 **Mesurer.** Écartez les premiers pas (caches, allocations, initialisation de `gloo`) : `bench.py` le fait déjà et le test vérifie que la série n'en contient pas. Fixez `OMP_NUM_THREADS=1` et `torch.set_num_threads(1)` : sans cela, chaque processus lance plusieurs fils et vous mesurez la contention entre processus, pas le passage à l'échelle. Sur une machine à quatre processeurs, quatre processus occupent tout : le système et tout autre processus actif se disputent les mêmes cœurs.
 
-**Plan.** Un enchaînement « toutes les mesures à p = 1, puis toutes à p = 2 » confond le facteur étudié avec la dérive de la machine (fréquence, voisins bruyants). Mélangez, avec une graine pour pouvoir rejouer. Trois répétitions sont un minimum : l'intervalle interquartile de trois valeurs est grossier, signalez-le.
+**Plan.** Un enchaînement « toutes les mesures à p = 1, puis toutes à p = 2 » confond le facteur étudié avec la dérive de la machine (fréquence, voisins bruyants). Mélangez, avec une graine pour pouvoir rejouer. Trois répétitions sont le minimum du projet, en dessous des dix du module 2 : l'intervalle interquartile de trois valeurs est grossier, signalez-le.
 
 **Ajuster.** Le modèle est linéaire en taille de message, mais ne l'est qu'au-delà d'une taille : les petits messages dépendent du pilote et de l'ordonnanceur. Ajustez sur l'erreur relative (divisez chaque équation par le temps mesuré) pour ne pas laisser les plus gros messages écraser les autres. Le bootstrap rééchantillonne les couples (taille, temps) ; avec une dizaine de points il est optimiste, comme le montre le test de couverture.
 

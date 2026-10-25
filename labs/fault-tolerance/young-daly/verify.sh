@@ -17,6 +17,6 @@ gap = s["goodput_best_exp"] - s["goodput_at_young_exp"]
 assert gap < 0.01, "Young's period should be within one point of the best sampled period"
 assert abs(s["t_daly_high"] - s["t_exact"]) / s["t_exact"] < 0.005
 assert open(sys.argv[2]).read().startswith("<svg")
-print("OK young-daly: Young T=%.0f s, Daly T=%.0f s, exact argmin T=%.0f s; goodput at Young %.4f vs best sampled %.4f"
+print("OK young-daly: Young tau=%.0f s, Daly tau=%.0f s, exact argmin tau=%.0f s; goodput at Young %.4f vs best sampled %.4f"
       % (s["t_young"], s["t_daly_high"], s["t_exact"], s["goodput_at_young_exp"], s["goodput_best_exp"]))
 PYEOF

@@ -12,9 +12,9 @@ Type : **cluster** (GPU, Kubernetes, JobSet ; Kueue et Kubeflow Trainer en optio
 
 ## Fichiers
 
-- `manifests/20-jobset-torchrun.yaml` : 16 nœuds de 8 GPU, file Kueue, topologie exigée au niveau du bloc, `maxRestarts: 3`, volume de points de contrôle.
+- `manifests/20-jobset-torchrun.yaml` : 16 nœuds de 8 GPU, file Kueue, topologie exigée au niveau du bloc, `maxRestarts: 3`, volume de checkpoints.
 - `manifests/30-trainjob.yaml` : le même entraînement pour Kubeflow Trainer v2 (le runtime `torch-distributed` fournit le gabarit).
-- `train.py` : entraîneur DDP minimal avec points de contrôle atomiques et reprise ; NCCL si CUDA est présent, sinon gloo.
+- `train.py` : entraîneur DDP minimal avec checkpoints atomiques et reprise ; NCCL si CUDA est présent, sinon gloo.
 - `local_two_nodes.sh` : la répétition locale.
 
 ## Sur un vrai cluster (non exécuté)

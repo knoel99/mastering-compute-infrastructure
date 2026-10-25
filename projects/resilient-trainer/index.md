@@ -17,7 +17,7 @@ numbered: true
 
 Un entraînement qui dure des semaines sur des milliers de GPU sera interrompu, c'est une certitude statistique et non un risque. Le rapport technique de Llama 3 (§ 3.3.4) donne l'ordre de grandeur : « During a 54-day snapshot period of pre-training, we experienced a total of 466 job interruptions », dont 47 prévues et « the remaining 419 were unexpected » ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)).
 
-Environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou soupçonnés, et les GPU en forment la première catégorie : 268 des 419 interruptions imprévues, soit 64 % recalculé à partir des comptes du tableau 5 (le texte de l'article dit 58,7 %, voir le [module 10, § 1.3](../../courses/fault-tolerance/index.html#ce-que-disent-les-données-publiées)).
+Environ 78 % des interruptions imprévues sont attribuées à des problèmes matériels confirmés ou soupçonnés, et les GPU en forment la première catégorie : 268 des 419 interruptions imprévues (64 % recalculé à partir des comptes du tableau 5 ; le texte de l'article dit 58,7 %, voir le [module 10, § 1.3](../../courses/fault-tolerance/index.html#ce-que-disent-les-données-publiées)).
 
 Cela fait 419 interruptions imprévues, que nous assimilons ici à des pannes, en 1 296 heures : une toutes les 3,1 heures en moyenne, soit un intervalle moyen entre pannes (MTBF) d'environ 11 100 secondes pour l'ensemble de la machine. Le même rapport annonce pourtant « higher than 90% effective training time », avec une intervention manuelle importante seulement trois fois (« only three times during this period »). L'écart entre ces deux faits, c'est l'ingénierie de la reprise automatique : c'est elle que vous construisez ici, à petite échelle.
 
