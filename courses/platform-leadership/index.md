@@ -36,11 +36,12 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 |---|---|
 | Volume | 30,5 h, dont environ 11 h de lecture, 7,5 h de labs et 12 h d'exercices (estimations de l'auteur, non mesurées auprès d'un lecteur) |
 | Niveau d'entrée | 3 : avoir suivi les phases 2 à 4 du parcours, ou avoir exploité un cluster ou une plateforme de calcul |
-| Prérequis | [Module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [Module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [Module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html), [Module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html) |
+| Prérequis | [Module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [Module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [Module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [Module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [Module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html) |
 | Pour qui | Cœur : écrire des décisions, gérer des incidents et diriger une équipe font partie du métier, au-delà de l'outillage. |
 | Livrable | un ADR vérifié, un post-mortem cohérent avec son journal, un dimensionnement chiffré et défendu à l'oral |
 | Environnement | un portable Linux avec Python, **sans GPU** ; aucun cloud ; les données des labs sont synthétiques ou fictives et étiquetées |
 | Projets liés | [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html) |
+
 ### Ce que vous saurez vérifier {#acquis}
 
 - Choisir quatre mesures d'adoption d'une plateforme et dire pourquoi une utilisation GPU élevée n'est pas un succès en soi (chapitre 1).
@@ -56,7 +57,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 ### Place dans le parcours {#place}
 
 -   **Phase 5 — Production et leadership** (semaines 45-50) : opérer en production, décider, négocier, diriger et passer l'entretien.
--   **S'appuie sur** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
+-   **S'appuie sur** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html).
 -   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
 -   **Compétences demandées dans les offres d'emploi et travaillées ici** : Checkpoint, tolérance aux pannes, Planification de capacité, Sécurité, conformité, Astreinte, fiabilité (SRE), Leadership, management, Systèmes distribués, Slurm, Kubernetes, Conteneurs, Journaux, traces, Expérience d'entraînement ML, CI/CD, automatisation (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
