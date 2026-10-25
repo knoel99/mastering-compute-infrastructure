@@ -97,10 +97,16 @@ Relevé de postes « compute / ML infrastructure » (cluster GPU, plateforme d'e
   "unit": "jobs-a",
   "retrieved_on": "2026-10-22",
   "postings": [{
-    "id": "…", "company": "…", "company_type": "ai-lab | gpu-cloud | hyperscaler | hpc-centre | vendor | startup | other",
+    "id": "…", "company": "…", "company_type": "ai-lab | gpu-cloud | hyperscaler | big-tech | hpc-centre | vendor | startup | other",
     "title": "…", "location": "…", "url": "https://…", "seniority": "ic | senior | lead | staff | manager | unspecified",
     "years_required": null,
-    "skills": [{"id": "slurm", "level": "required | bonus", "quote": "≤ 25 mots copiés"}],
+    "region": "us | eu | cn | other",
+    "company_origin": "us | eu | cn | other",
+    "role_family": "training-platform | gpu-cluster-ops | hpc-ops | inference-platform | ml-systems-perf | network | storage | capacity-finops | leadership | other",
+    "source_url": "https://… (URL réellement lue avec tools/fetch_text.py : page publique ou point d'accès JSON de l'ATS)",
+    "posted_on": "2026-10-01 | null (si la page l'affiche)",
+    "language": "en | fr | zh | de | …",
+    "skills": [{"id": "slurm", "level": "required | bonus", "quote": "≤ 25 mots (≤ 50 caractères en chinois) copiés"}],
     "responsibilities": ["…"],
     "notes": "…"
   }],
@@ -108,7 +114,11 @@ Relevé de postes « compute / ML infrastructure » (cluster GPU, plateforme d'e
 }
 ```
 
-Taxonomie des compétences (`skills[].id`) : `python`, `systems-lang` (Go/Rust/C++), `linux-admin`, `slurm`, `kubernetes`, `ray`, `multicloud-skypilot`, `terraform-iac`, `ansible-config`, `containers`, `pytorch-distributed`, `nccl-collectives`, `cuda-gpu`, `infiniband-roce`, `parallel-fs-storage`, `object-storage`, `prometheus-grafana`, `dcgm-gpu-monitoring`, `logging-tracing`, `experiment-tracking`, `checkpoint-fault-tolerance`, `scheduler-design`, `hyperscaler-cloud`, `gpu-cloud-providers`, `finops-cost`, `procurement-vendor`, `capacity-planning`, `security-compliance`, `sre-oncall`, `leadership-mgmt`, `hpc-experience`, `ml-training-experience`, `rl-infra`, `data-pipelines`, `networking-general`, `bare-metal-provisioning`, `ci-cd`, `inference-serving`.
+`region` est le lieu du poste ; `company_origin` le pays du siège (un poste de ByteDance à San José : `region: us`, `company_origin: cn`). `role_family` dit ce que le poste fait surtout ; les postes d'inférence sont gardés et étiquetés `inference-platform` pour que l'analyse puisse les séparer. Les citations d'une offre sont vérifiées dans le texte de `source_url` (à défaut `url`) : `tools/build_job_evidence.py` en fait des `evidence` que `tools/verify_quotes.py` contrôle.
+
+Taxonomie des compétences (`skills[].id`) : `python`, `systems-lang` (Go/Rust/C++), `linux-admin`, `slurm`, `kubernetes`, `ray`, `multicloud-skypilot`, `terraform-iac`, `ansible-config`, `containers`, `pytorch-distributed` (DDP/FSDP, Megatron, DeepSpeed, JAX/pjit, MindSpore distribué…), `nccl-collectives` (NCCL, RCCL, HCCL…), `cuda-gpu`, `infiniband-roce`, `parallel-fs-storage`, `object-storage`, `prometheus-grafana`, `dcgm-gpu-monitoring`, `logging-tracing`, `experiment-tracking`, `checkpoint-fault-tolerance`, `scheduler-design`, `hyperscaler-cloud`, `gpu-cloud-providers`, `finops-cost`, `procurement-vendor`, `capacity-planning`, `security-compliance`, `sre-oncall`, `leadership-mgmt`, `hpc-experience`, `ml-training-experience`, `rl-infra`, `data-pipelines`, `networking-general`, `bare-metal-provisioning`, `ci-cd`, `inference-serving`.
+
+Ajouts du 2026-10-25 (relevé élargi) : `non-nvidia-accelerators` (AMD ROCm, TPU/XLA, Trainium, Ascend/CANN, Kunlun, Cambricon, GPU chinois), `perf-profiling` (profilage, Nsight, perf, bancs d'essai, analyse de goulots), `datacenter-facilities` (énergie, refroidissement, baies, construction de centres de données), `distributed-systems` (conception de systèmes distribués, haute disponibilité, consensus), `virtualization` (KVM, hyperviseurs, passthrough/VFIO, MIG/vGPU), `hardware-health` (tests de réception, burn-in, diagnostics, firmware, remédiation des nœuds).
 
 ## Fichier `data/resources/learning.json` (ressources d'apprentissage)
 

@@ -22,9 +22,14 @@ parallel-fs-storage object-storage prometheus-grafana dcgm-gpu-monitoring loggin
 experiment-tracking checkpoint-fault-tolerance scheduler-design hyperscaler-cloud gpu-cloud-providers
 finops-cost procurement-vendor capacity-planning security-compliance sre-oncall leadership-mgmt
 hpc-experience ml-training-experience rl-infra data-pipelines networking-general
-bare-metal-provisioning ci-cd inference-serving""".split()
+bare-metal-provisioning ci-cd inference-serving non-nvidia-accelerators perf-profiling
+datacenter-facilities distributed-systems virtualization hardware-health""".split()
 FOCUS = {"hpc-core", "ml-systems", "cse", "cloud-distributed", "ops-sysadmin", "mixed"}
 CONF = {"high", "medium", "low"}
+REGIONS = {"us", "eu", "cn", "other"}
+ROLE_FAMILIES = {"training-platform", "gpu-cluster-ops", "hpc-ops", "inference-platform", "ml-systems-perf",
+                 "network", "storage", "capacity-finops", "leadership", "other"}
+COMPANY_TYPES = {"ai-lab", "gpu-cloud", "hyperscaler", "big-tech", "hpc-centre", "vendor", "startup", "other"}
 URL = re.compile(r"^https?://[^\s]+$")
 
 
@@ -125,9 +130,19 @@ def check_jobs(d, errs, warns):
         if pid in seen:
             errs.append(f"{w}: duplicate id")
         seen.add(pid)
-        for k in ("company", "company_type", "title", "location", "seniority", "skills", "responsibilities"):
+        for k in ("company", "company_type", "title", "location", "seniority", "skills", "responsibilities",
+                  "region", "company_origin", "role_family"):
             if k not in p:
                 errs.append(f"{w}: missing {k}")
+        if p.get("company_type") not in COMPANY_TYPES:
+            errs.append(f"{w}: company_type {p.get('company_type')!r} not in {sorted(COMPANY_TYPES)}")
+        for k in ("region", "company_origin"):
+            if k in p and p[k] not in REGIONS:
+                errs.append(f"{w}: {k} {p[k]!r} not in {sorted(REGIONS)}")
+        if "role_family" in p and p["role_family"] not in ROLE_FAMILIES:
+            errs.append(f"{w}: role_family {p['role_family']!r} not in {sorted(ROLE_FAMILIES)}")
+        if p.get("source_url") and not URL.match(str(p["source_url"])):
+            errs.append(f"{w}: bad source_url")
         withheld = str(p.get("company", "")).startswith("startup robotique")
         if not withheld and not URL.match(str(p.get("url", ""))):
             errs.append(f"{w}: bad or missing url")
@@ -140,6 +155,8 @@ def check_jobs(d, errs, warns):
                 errs.append(f"{w}: skill level invalid for {s.get('id')}")
             if not s.get("quote"):
                 errs.append(f"{w}: skill {s.get('id')} has no quote")
+            elif words(s["quote"]) > 40 or len(s["quote"]) > 300:
+                warns.append(f"{w}: skill {s.get('id')} quote too long")
         if not p.get("skills"):
             errs.append(f"{w}: no skills extracted")
 
