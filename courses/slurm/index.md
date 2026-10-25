@@ -449,11 +449,11 @@ JOBID QOS    STATE   REASON
 $ scontrol show job 12 | grep -E 'JobState|Restarts'
    JobState=PENDING Reason=BeginTime Dependency=(null)
    Requeue=1 Restarts=1 BatchFlag=1 Reboot=0 ExitCode=0:0
-$ sacct -X -n -j 12 --format=JobID,State
+$ sacct -D -X -n -j 12 --format=JobID,State
 12            PREEMPTED
 ~~~
 
-Le job urgent a démarré aussitôt. Le job normal a été **préempté puis remis en file** : `sacct` garde la trace `PREEMPTED` de son premier passage, `Restarts=1` compte la remise en file, et sa raison d'attente `BeginTime` s'explique par un délai avant la reprise. Si ce job ne savait pas reprendre depuis un checkpoint, il repartirait de zéro.
+Le job urgent a démarré aussitôt. Le job normal a été **préempté puis remis en file** : `sacct -D` (`--duplicates`) garde la trace `PREEMPTED` de son premier passage (sans `-D`, `sacct` n'affiche que la dernière instance d'un job remis en file, ici celle qui attend ; la [documentation de sacct](https://slurm.schedmd.com/sacct.html) précise que les passages précédents se lisent avec `-D`), `Restarts=1` compte la remise en file, et sa raison d'attente `BeginTime` s'explique par un délai avant la reprise. Si ce job ne savait pas reprendre depuis un checkpoint, il repartirait de zéro.
 :::
 
 ### 4.2. Les réservations
@@ -898,7 +898,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y munge slurm-wlm slurmdbd 
 1.  Lisez `labs/slurm/fairshare-qos/configure.sh` : `PriorityCalcPeriod=1`, `PreemptType=preempt/qos`, `PreemptMode=REQUEUE`, comptes, QOS `urgent`.
 2.  Partie A : huit jobs courts du compte `teama` créent de la consommation ; attendez que `sshare` affiche un facteur d'équité inférieur à celui de `teamb`.
 3.  Soumettez un job bloqueur, puis un job de chaque compte ; lisez `sprio` et vérifiez l'ordre de démarrage dans `sacct`.
-4.  Partie B : lancez un job `normal` de quatre processeurs, puis un job `urgent` ; vérifiez `Restarts=1` et l'état `PREEMPTED`.
+4.  Partie B : lancez un job `normal` de quatre processeurs, puis un job `urgent` ; vérifiez `Restarts=1` et l'état `PREEMPTED` du premier passage avec `sacct -D`.
 5.  Changez les poids (`PriorityWeightFairshare`, `PriorityWeightAge`) et relisez `sprio -w`.
 
 **Critère de réussite.** `sudo bash verify.sh` affiche « OK part A » et « OK part B ». Comptez un peu plus de deux minutes (123 s mesurées) : le facteur d'équité n'est recalculé qu'à chaque `PriorityCalcPeriod`, réglé ici à une minute.

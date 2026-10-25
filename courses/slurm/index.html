@@ -681,9 +681,9 @@ JOBID QOS    STATE   REASON
 $ scontrol show job 12 | grep -E &#39;JobState|Restarts&#39;
    JobState=PENDING Reason=BeginTime Dependency=(null)
    Requeue=1 Restarts=1 BatchFlag=1 Reboot=0 ExitCode=0:0
-$ sacct -X -n -j 12 --format=JobID,State
+$ sacct -D -X -n -j 12 --format=JobID,State
 12            PREEMPTED</code></pre>
-<p>Le job urgent a démarré aussitôt. Le job normal a été <strong>préempté puis remis en file</strong> : <code>sacct</code> garde la trace <code>PREEMPTED</code> de son premier passage, <code>Restarts=1</code> compte la remise en file, et sa raison d'attente <code>BeginTime</code> s'explique par un délai avant la reprise. Si ce job ne savait pas reprendre depuis un checkpoint, il repartirait de zéro.</p>
+<p>Le job urgent a démarré aussitôt. Le job normal a été <strong>préempté puis remis en file</strong> : <code>sacct -D</code> (<code>--duplicates</code>) garde la trace <code>PREEMPTED</code> de son premier passage (sans <code>-D</code>, <code>sacct</code> n'affiche que la dernière instance d'un job remis en file, ici celle qui attend ; la <a href="https://slurm.schedmd.com/sacct.html">documentation de sacct</a> précise que les passages précédents se lisent avec <code>-D</code>), <code>Restarts=1</code> compte la remise en file, et sa raison d'attente <code>BeginTime</code> s'explique par un délai avant la reprise. Si ce job ne savait pas reprendre depuis un checkpoint, il repartirait de zéro.</p>
 </div>
 <h3 id="les-réservations">4.2. Les réservations</h3>
 <p>Une <strong>réservation</strong> retire des nœuds du pool pour une période donnée : maintenance planifiée, démonstration, fenêtre dédiée à une équipe. La documentation donne l'exemple d'une maintenance de deux heures sur tous les nœuds :</p>
@@ -1114,7 +1114,7 @@ Prolog error | vm</code></pre>
 <li>Lisez <code>labs/slurm/fairshare-qos/configure.sh</code> : <code>PriorityCalcPeriod=1</code>, <code>PreemptType=preempt/qos</code>, <code>PreemptMode=REQUEUE</code>, comptes, QOS <code>urgent</code>.</li>
 <li>Partie A : huit jobs courts du compte <code>teama</code> créent de la consommation ; attendez que <code>sshare</code> affiche un facteur d'équité inférieur à celui de <code>teamb</code>.</li>
 <li>Soumettez un job bloqueur, puis un job de chaque compte ; lisez <code>sprio</code> et vérifiez l'ordre de démarrage dans <code>sacct</code>.</li>
-<li>Partie B : lancez un job <code>normal</code> de quatre processeurs, puis un job <code>urgent</code> ; vérifiez <code>Restarts=1</code> et l'état <code>PREEMPTED</code>.</li>
+<li>Partie B : lancez un job <code>normal</code> de quatre processeurs, puis un job <code>urgent</code> ; vérifiez <code>Restarts=1</code> et l'état <code>PREEMPTED</code> du premier passage avec <code>sacct -D</code>.</li>
 <li>Changez les poids (<code>PriorityWeightFairshare</code>, <code>PriorityWeightAge</code>) et relisez <code>sprio -w</code>.</li>
 </ol>
 <p><strong>Critère de réussite.</strong> <code>sudo bash verify.sh</code> affiche « OK part A » et « OK part B ». Comptez un peu plus de deux minutes (123 s mesurées) : le facteur d'équité n'est recalculé qu'à chaque <code>PriorityCalcPeriod</code>, réglé ici à une minute.</p>

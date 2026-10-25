@@ -48,7 +48,9 @@ wait_until 30 "squeue -h -j $hi -o %T | grep -q RUNNING"
 squeue -o "%i %q %T %r"
 restarts=$(scontrol show job "$low" | sed -n 's/.*Restarts=\([0-9]*\).*/\1/p')
 [ "$restarts" -ge 1 ] || { echo "FAIL: low-priority job was not requeued"; exit 1; }
-wait_until 30 "sacct -X -n -j $low --format=JobID,State | grep -q PREEMPTED" || { echo "FAIL: no PREEMPTED record in the accounting"; exit 1; }   # slurmdbd gets the record a moment after the preemption
+# a requeued job has several records; sacct shows only the latest unless -D (--duplicates) is given
+wait_until 60 "sacct -D -X -n -j $low --format=JobID,State | grep -q PREEMPTED" || { echo "FAIL: no PREEMPTED record in the accounting"; exit 1; }   # slurmdbd gets the record a moment after the preemption
+sacct -D -X -n -j "$low" --format=JobID,State   # one line per run: PREEMPTED, then the requeued instance
 scancel "$low"
 echo "OK part B: urgent job started, normal job preempted and requeued (Restarts=$restarts)"
 echo "OK fairshare-qos"
