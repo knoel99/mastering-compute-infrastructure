@@ -61,6 +61,7 @@ Le fil rouge est une grandeur discrète, **l'obsolescence** : de combien de vers
 -   **Phase 3 — Systèmes d'entraînement distribué** (semaines 23-31) : faire tourner un entraînement multi-nœuds qui survit aux pannes.
 -   **S'appuie sur** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
 -   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Ray, Checkpoint, tolérance aux pannes, FinOps, coûts, Planification de capacité, Infrastructure de RL, Chaînes de données, Service d'inférence, Systèmes distribués, Slurm, Kubernetes, Prometheus, Grafana, Conception d'ordonnanceur, Expérience d'entraînement ML, Réseau (général), Profilage, bancs d'essai (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

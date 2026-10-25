@@ -58,6 +58,7 @@ Ce module est le volet technique de l'achat de calcul. Il part de l'utilisation 
 -   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Slurm, Clouds GPU spécialisés, FinOps, coûts, Achats, relation fournisseurs, Planification de capacité, Centre de données (énergie, refroidissement), Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Cloud hyperscaler (AWS, GCP, Azure…), Leadership, management (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

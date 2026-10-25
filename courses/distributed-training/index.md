@@ -60,6 +60,7 @@ Ce module donne un vocabulaire (données, tenseur, pipeline, experts, séquence)
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html), [module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html).
 -   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html), [module 11 — Ray, infrastructure d'apprentissage par renforcement et boucles en ligne](../ray-rl-infra/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html), [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Expérience d'entraînement ML, Profilage, bancs d'essai, Journaux, traces, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

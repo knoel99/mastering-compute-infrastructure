@@ -59,6 +59,7 @@ Il ne cherche pas à faire de vous un administrateur système complet. Il vous d
 -   **S'appuie sur** : aucun module ; c'est un point d'entrée.
 -   **Prépare** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 6 — Provisioning, images et santé des nœuds GPU](../provisioning/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html), [module 8 — Stockage et E/S pour l'entraînement](../storage/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Administration Linux, Astreinte, fiabilité (SRE), Réseau (général), Profilage, bancs d'essai, Conteneurs, Journaux, traces, Checkpoint, tolérance aux pannes, Planification de capacité, CI/CD, automatisation, Virtualisation (KVM, MIG, vGPU), Santé matérielle (burn-in, diagnostics, RMA) (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

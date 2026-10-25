@@ -58,6 +58,7 @@ Ce module vous apprend à **lire** un cluster Slurm (états, raisons d'attente, 
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
 -   **Prépare** : [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html), [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Slurm, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Astreinte, fiabilité (SRE), Expérience HPC, Santé matérielle (burn-in, diagnostics, RMA), Administration Linux, Conteneurs, Planification de capacité, Réseau (général) (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

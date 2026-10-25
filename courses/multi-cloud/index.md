@@ -58,6 +58,7 @@ Ce module donne le vocabulaire et les calculs pour y répondre. Il couvre l'offr
 -   **Phase 4 — Plateforme cloud-native et multi-fournisseurs** (semaines 32-41) : placer, observer et facturer des charges sur plusieurs fournisseurs.
 -   **S'appuie sur** : [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
 -   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Multi-cloud (SkyPilot…), Stockage objet, Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Cloud hyperscaler (AWS, GCP, Azure…), FinOps, coûts, Planification de capacité, Sécurité, conformité, Kubernetes, Terraform, infrastructure as code, Collectives (NCCL, RCCL, HCCL), Clouds GPU spécialisés, Achats, relation fournisseurs, Expérience HPC, Réseau (général), Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

@@ -59,6 +59,7 @@ Ce module vous apprend à **choisir** une technologie (InfiniBand ou RoCE), à *
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Prépare** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Collectives (NCCL, RCCL, HCCL), InfiniBand, RoCE, Réseau (général), Santé matérielle (burn-in, diagnostics, RMA), Administration Linux, Slurm, Journaux, traces, FinOps, coûts, Planification de capacité, Astreinte, fiabilité (SRE), Expérience HPC, Profilage, bancs d'essai (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

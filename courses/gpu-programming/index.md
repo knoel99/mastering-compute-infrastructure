@@ -62,6 +62,7 @@ Aucun GPU n'a servi à rédiger ce module : tout ce qui est calculé ou capturé
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Prépare** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, CUDA, programmation GPU, Accélérateurs non NVIDIA (TPU, ROCm, Ascend…), Profilage, bancs d'essai, Langage système (Go, Rust, C++), Expérience d'entraînement ML, Service d'inférence (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

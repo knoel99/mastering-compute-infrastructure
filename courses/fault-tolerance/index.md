@@ -59,6 +59,7 @@ Ce module répond en six temps. Il **chiffre** la panne (taxonomie, données pub
 -   **S'appuie sur** : [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html), [module 8 — Stockage et E/S pour l'entraînement](../storage/index.html).
 -   **Prépare** : [module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](../multi-cloud/index.html).
 -   **Projets qui s'en servent** : [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Checkpoint, tolérance aux pannes, Planification de capacité, Astreinte, fiabilité (SRE), Systèmes distribués, Santé matérielle (burn-in, diagnostics, RMA), Administration Linux, Slurm, Kubernetes, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Systèmes de fichiers parallèles, Expérience d'entraînement ML (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

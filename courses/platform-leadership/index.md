@@ -59,6 +59,7 @@ Les modules précédents donnent les briques (ordonnanceur, réseau, stockage, o
 -   **Phase 5 — Production et leadership** (semaines 42-48) : opérer en production, décider, négocier, diriger et passer l'entretien.
 -   **S'appuie sur** : [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html), [module 12 — Kubernetes pour l'IA : GPU, files d'attente et gang scheduling](../kubernetes-gpu/index.html), [module 14 — Observabilité et fiabilité d'une flotte GPU](../observability/index.html).
 -   **Projets qui s'en servent** : [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Checkpoint, tolérance aux pannes, Planification de capacité, Sécurité, conformité, Astreinte, fiabilité (SRE), Leadership, management, Systèmes distribués, Slurm, Kubernetes, Conteneurs, Journaux, traces, Expérience d'entraînement ML, CI/CD, automatisation (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

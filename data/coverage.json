@@ -1,0 +1,3924 @@
+{
+ "method": "Profondeur relevée dans le texte de chaque page (0 absent, 1 mentionné, 2 enseigné, 3 pratiqué par un lab, un exercice noté ou un jalon de projet), par une lecture outillée des 22 pages le 25 octobre 2026 (workflow tools/workflows de revue de cohérence), puis corrigée à la main pour les quatre chapitres ajoutés le même jour et pour les langages système (C et CUDA C++ ne valent pas Go ou Rust).",
+ "retrieved_on": "2026-10-25",
+ "modules": {
+  "distributed-training": {
+   "python": {
+    "depth": 3,
+    "where": "lab parallelism-planner (starter/planner.py), labs"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#labs, lab hang-debug"
+   },
+   "slurm": {
+    "depth": 1,
+    "where": "#torchrun-et-le-rendez-vous, #placer-les-dimensions-sur-la-topologie"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#placer-les-dimensions-sur-la-topologie"
+   },
+   "ray": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 3,
+    "where": "#ch2, #ch3, #ch8, labs ddp-gloo, fsdp-memory, hang-debug"
+   },
+   "nccl-collectives": {
+    "depth": 3,
+    "where": "#les-collectives-dont-vous-aurez-besoin, labs ddp-gloo, hang-debug"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#mesurer-correctement, #erreurs-classiques"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": "#parallélisme-tensoriel"
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#les-leviers, #ex (Ex. 9)"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 2,
+    "where": "#les-outils, #deux-bugs-cinq-outils, lab hang-debug"
+   },
+   "experiment-tracking": {
+    "depth": 1,
+    "where": "#ex (Ex. 12)"
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 1,
+    "where": "#torchrun-et-le-rendez-vous, #la-reproductibilité-et-ses-limites, #du-mfu-au-rendement-utile"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#placer-les-dimensions-sur-la-topologie"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#ex (Ex. 12), #ch8"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 1,
+    "where": "#ch5, lab parallelism-planner"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#une-procédure-en-cinq-temps, #exit"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ch1, #ch4"
+   },
+   "ml-training-experience": {
+    "depth": 3,
+    "where": "#ch2-#ch7, all four labs, #ex"
+   },
+   "rl-infra": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#les-leviers, #la-reproductibilité-et-ses-limites, #ex (Ex. 9)"
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#parallélisme-tensoriel, #torchrun-et-le-rendez-vous"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 1,
+    "where": "#le-lot-global-comme-contrainte"
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#ch6, #ex (Ex. 11)"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#les-collectives-dont-vous-aurez-besoin, #torchrun-et-le-rendez-vous, #ch8"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#normes-de-gradient-pics-de-perte-et-nan, #les-leviers"
+   }
+  },
+  "fault-tolerance": {
+   "python": {
+    "depth": 3,
+    "where": "labs young-daly, atomic-checkpoint, supervisor-loop ; #ex"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 2,
+    "where": "#atomicité-le-protocole-en-quatre-temps #les-pulsations #un-superviseur-de-relance #lire-un-message-xid ; lab supervisor-loop"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#sous-slurm ; examples/train.sbatch, slurm_demo.sh"
+   },
+   "kubernetes": {
+    "depth": 2,
+    "where": "#sous-kubernetes ; examples/job.yaml"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 2,
+    "where": "#checkpoints-répartis-et-formats #les-règles-dun-checkpoint-asynchrone-correct #les-délais-dattente-un-budget-pas-une-valeur-par-défaut #torchrun-élastique ; dcp_reshard.py"
+   },
+   "nccl-collectives": {
+    "depth": 2,
+    "where": "#les-délais-dattente-un-budget-pas-une-valeur-par-défaut #réseau-et-liens"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#quel-état-sauvegarder #réseau-et-liens"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#les-délais-dattente-un-budget-pas-une-valeur-par-défaut #réseau-et-liens"
+   },
+   "parallel-fs-storage": {
+    "depth": 2,
+    "where": "#dimensionner-le-coût-dun-checkpoint #la-couche-de-stockage ; ex. 6"
+   },
+   "object-storage": {
+    "depth": 1,
+    "where": "#atomicité-le-protocole-en-quatre-temps"
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#la-conduite-à-tenir #un-catalogue-dinjections"
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#un-superviseur-de-relance #lire-un-message-xid"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#ch2 #ch3 #ch4 #ch6 ; trois labs"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#un-superviseur-de-relance #sous-slurm #sous-kubernetes"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#les-délais-dattente-un-budget-pas-une-valeur-par-défaut #le-post-mortem-sans-blâme ; ex. 2, 7, 10"
+   },
+   "procurement-vendor": {
+    "depth": 1,
+    "where": "#la-conduite-à-tenir"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#torchrun-élastique ; ex. 9"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#checkpoints-répartis-et-formats"
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#ch8 #les-runbooks #le-post-mortem-sans-blâme ; ex. 11"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#les-journées-dexercice-game-days #le-post-mortem-sans-blâme"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ch2 #sous-slurm"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#quel-état-sauvegarder #reprise-exacte-reprise-équivalente ; ablate.py"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#quel-état-sauvegarder"
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#une-taxonomie-utile-à-laction #réseau-et-liens"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#la-conduite-à-tenir"
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": "#sources"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": "#sources"
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#les-nœuds-lents"
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#les-pannes-ne-sarrêtent-pas-au-matériel #la-couche-de-stockage #thermique"
+   },
+   "distributed-systems": {
+    "depth": 3,
+    "where": "#ch5 #ch6 #atomicité-le-protocole-en-quatre-temps ; labs atomic-checkpoint, supervisor-loop"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 3,
+    "where": "#ch7 ; xid_triage.py, ex. 8"
+   }
+  },
+  "finops-capacity": {
+   "python": {
+    "depth": 3,
+    "where": "#labs, usage-showback, demand-forecast, tco-model, contract-checklist"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#lab-15-1"
+   },
+   "slurm": {
+    "depth": 3,
+    "where": "#mesurer-depuis-lordonnanceur, #lab-15-1 (verify-live.sh)"
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 1,
+    "where": "#ce-que-le-modèle-ne-dit-pas, #une-alternative-crédible"
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 1,
+    "where": "#les-clauses-propres-aux-gpu, #lappel-doffres-technique"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#lappel-doffres-technique"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#les-clauses-propres-aux-gpu, #lappel-doffres-technique"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#les-clauses-propres-aux-gpu, #lappel-doffres-technique"
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": "#indicateurs-de-pilotage-trimestriels"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 2,
+    "where": "#ce-que-des-publications-mesurent, #le-coût-de-la-gpu-heure-utile, #les-régimes-réels-et-leurs-conditions"
+   },
+   "scheduler-design": {
+    "depth": 2,
+    "where": "#files-dattente-et-coût-de-linactivité, #ex (Ex. 3)"
+   },
+   "hyperscaler-cloud": {
+    "depth": 2,
+    "where": "#les-régimes-réels-et-leurs-conditions, #lire-un-sla-publié, #engagement-prix-et-sortie, #ex (Ex. 10)"
+   },
+   "gpu-cloud-providers": {
+    "depth": 3,
+    "where": "#ch6, #lab-15-4, #ex (Ex. 11, 12)"
+   },
+   "finops-cost": {
+    "depth": 3,
+    "where": "#ch1, #ch2, #ch4, #lab-15-1, #lab-15-3"
+   },
+   "procurement-vendor": {
+    "depth": 3,
+    "where": "#ch6, #ch7, #ch8, #lab-15-4, #ex (Ex. 11, 12, 13)"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#ch3, #ch5, #lab-15-2, #ex (Ex. 5, 6, 8)"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#engagement-prix-et-sortie, #hors-perimetre"
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#files-dattente-et-coût-de-linactivité, #les-clauses-propres-aux-gpu"
+   },
+   "leadership-mgmt": {
+    "depth": 2,
+    "where": "#ch7, #ch8"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#mesurer-depuis-lordonnanceur"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#trois-gpu-heures-et-leurs-coûts, #ex (Ex. 1)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": "#ce-que-des-publications-mesurent"
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#les-clauses-propres-aux-gpu, #engagement-prix-et-sortie"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#les-postes-dun-parc-possédé, #les-clauses-propres-aux-gpu"
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 1,
+    "where": "#trois-gpu-heures-et-leurs-coûts"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#une-chaîne-de-rendements, #lappel-doffres-technique"
+   },
+   "datacenter-facilities": {
+    "depth": 3,
+    "where": "#ch5, #ex (Ex. 8, 9)"
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#pourquoi-un-crédit-nest-pas-une-compensation"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#ce-que-des-publications-mesurent, #les-clauses-propres-aux-gpu, #ex (Ex. 4)"
+   }
+  },
+  "gpu-programming": {
+   "python": {
+    "depth": 3,
+    "where": "labs warp-memory-model, numba-cuda-sim, triton-interpret, profile-reading"
+   },
+   "systems-lang": {
+    "depth": 2,
+    "where": "#recouvrir-transferts-et-calcul, #loccupation, labs */cuda/*.cu"
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#labs"
+   },
+   "slurm": {
+    "depth": 0,
+    "where": ""
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "cuda-gpu": {
+    "depth": 3,
+    "where": "#ch1-#ch5, labs numba-cuda-sim, triton-interpret, warp-memory-model, Ex. 1-6, 9"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#anatomie-dune-trace, #trois-outils-trois-échelles"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 0,
+    "where": ""
+   },
+   "scheduler-design": {
+    "depth": 0,
+    "where": ""
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#fiche"
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#fiche"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 0,
+    "where": ""
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 0,
+    "where": ""
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#quand-cela-ne-paie-pas, #exit"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ch1, #ch3"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#ch6, #un-vrai-profil-cpu-lab-4.4-partie-a, Ex. 7"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#ce-que-fait-pytorch-pour-vous, #quatre-verdicts"
+   },
+   "networking-general": {
+    "depth": 0,
+    "where": ""
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 2,
+    "where": "#les-cuda-graphs, #ex (Ex. 10), #exit Q3"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 3,
+    "where": "#ch9, exercices 11 et 12"
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#ch7, #ch8, lab profile-reading, Ex. 8, 10"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 0,
+    "where": ""
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "hardware-health": {
+    "depth": 0,
+    "where": ""
+   }
+  },
+  "kubernetes-gpu": {
+   "python": {
+    "depth": 3,
+    "where": "#lab-12-1 (starter/admission.py), #lab-12-3"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#ch2 §2.3, #lab-12-4"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#ch1 §1.4, #ch7, #lab-12-3"
+   },
+   "kubernetes": {
+    "depth": 3,
+    "where": "#ch1-#ch8, #lab-12-1, #lab-12-4"
+   },
+   "ray": {
+    "depth": 1,
+    "where": "#ch4 §4.4"
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": "#place"
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 2,
+    "where": "#ch2 §2.3, #ch6 §6.5, #ch8 §8.2"
+   },
+   "pytorch-distributed": {
+    "depth": 3,
+    "where": "#ch4 §4.1-4.2, #lab-12-2, #ex Ex. 7"
+   },
+   "nccl-collectives": {
+    "depth": 1,
+    "where": "#ch4 §4.5, #ch5 §5.5"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#ch2"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#ch4 §4.5"
+   },
+   "parallel-fs-storage": {
+    "depth": 2,
+    "where": "#ch6, #ex Ex. 9"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": "#ch6"
+   },
+   "prometheus-grafana": {
+    "depth": 1,
+    "where": "#ch1 §1.4"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#ch2 §2.5, #ch8 §8.4"
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#ch4 §4.6, #ch6 §6.4, #lab-12-2, #ex Ex. 7, 12"
+   },
+   "scheduler-design": {
+    "depth": 3,
+    "where": "#ch3, #ch5, #lab-12-1, #lab-12-4"
+   },
+   "hyperscaler-cloud": {
+    "depth": 1,
+    "where": "#ch5 §5.1"
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#ch7 §7.3, #lab-12-3"
+   },
+   "finops-cost": {
+    "depth": 2,
+    "where": "#ch8 §8.4, #ex Ex. 12-13"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 2,
+    "where": "#ch3, #ex Ex. 11, 13"
+   },
+   "security-compliance": {
+    "depth": 2,
+    "where": "#ch8 §8.2"
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#ex Ex. 8, #exit"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#ch7 §7.5, #lab-12-3"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ch7"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#ch6"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#ch6 §6.3"
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#ch4, #ch8 §8.2"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#ch2 §2.2, #ch8 §8.1"
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#ch8 §8.1, #lab-12-1"
+   },
+   "inference-serving": {
+    "depth": 1,
+    "where": "#ex Ex. 2-3"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": "#hors-perimetre"
+   },
+   "perf-profiling": {
+    "depth": 0,
+    "where": ""
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#ch1, #ch3"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#ch2"
+   },
+   "hardware-health": {
+    "depth": 2,
+    "where": "#ch2 §2.3 note, #ch5 §5.5, #ex Ex. 12"
+   }
+  },
+  "linux-systems": {
+   "python": {
+    "depth": 3,
+    "where": "labs machine-map, psi-triage (étapes 4-5 : ajouter code et test)"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 3,
+    "where": "#ch1-#ch8, all five labs"
+   },
+   "slurm": {
+    "depth": 1,
+    "where": "#ce-que-slurm-et-kubernetes-en-font, #processus-états-et-signaux"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#ce-que-slurm-et-kubernetes-en-font"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 1,
+    "where": "#écrire-un-script-dexploitation-robuste, lab ops-script"
+   },
+   "containers": {
+    "depth": 2,
+    "where": "#ch2, #espaces-de-noms, lab cgroup-limits"
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#qui-est-branché-où-gpu-carte-réseau-disque-nvme, #les-erreurs-de-gpu-les-messages-xid"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#premiers-pas-rdma, #limites-de-processus, #qui-est-branché-où-gpu-carte-réseau-disque-nvme"
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#sources, #labs (NFS remark)"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": "#unités-systemd"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#les-erreurs-de-gpu-les-messages-xid"
+   },
+   "logging-tracing": {
+    "depth": 2,
+    "where": "#lire-un-journal-du-noyau, #les-outils-standard, lab cgroup-limits step 3"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 2,
+    "where": "#écrire-un-checkpoint, #processus-états-et-signaux, #ex (exercice 6)"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#lordonnanceur-et-la-charge-moyenne, #ce-que-slurm-et-kubernetes-en-font"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 0,
+    "where": ""
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 2,
+    "where": "#ex (exercice 7, exercice 3)"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#unités-systemd, #espaces-de-noms"
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#ch4, #où-le-système-voit-une-panne-matérielle, lab psi-triage, #ex (exercice 8), #exit"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#limites-de-processus, #épingler-un-processus"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#écrire-un-checkpoint, #ex (exercices 4, 6, 7)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#ex (exercice 6)"
+   },
+   "networking-general": {
+    "depth": 3,
+    "where": "#ch6, #mtu-et-surcoût-den-têtes, #ex (exercice 10)"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#où-le-système-voit-une-panne-matérielle"
+   },
+   "ci-cd": {
+    "depth": 2,
+    "where": "#unités-systemd, #ex (exercice 9), lab ops-script"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#ch4, #mesurer-un-disque-avec-fio-la-loi-de-little, labs psi-triage, pagecache"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 0,
+    "where": ""
+   },
+   "virtualization": {
+    "depth": 2,
+    "where": "#lire-les-processeurs, #numa-la-mémoire-a-une-adresse, #voir-les-interfaces, #périphériques-de-bloc-et-systèmes-de-fichiers"
+   },
+   "hardware-health": {
+    "depth": 2,
+    "where": "#où-le-système-voit-une-panne-matérielle, #les-erreurs-de-gpu-les-messages-xid, lab ops-script (pour aller plus loin)"
+   }
+  },
+  "multi-cloud": {
+   "python": {
+    "depth": 3,
+    "where": "lab-13-1, lab-13-3, lab-13-2 (règle W5)"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#lab-13-2"
+   },
+   "slurm": {
+    "depth": 1,
+    "where": "#les-files, #articuler-un-centre-public-et-un-cloud"
+   },
+   "kubernetes": {
+    "depth": 2,
+    "where": "#kubernetes-sur-plusieurs-clusters, #les-files"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 3,
+    "where": "#ch3, #lire-un-job-ligne-à-ligne, lab-13-2, lab-13-1"
+   },
+   "terraform-iac": {
+    "depth": 2,
+    "where": "#terraform-multi-fournisseur"
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 1,
+    "where": "#ce-que-labstraction-ne-cache-pas, #reprise-entre-fournisseurs"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#le-réseau-dun-nœud-dépend-du-fournisseur, #lire-un-job-ligne-à-ligne"
+   },
+   "nccl-collectives": {
+    "depth": 2,
+    "where": "#un-job-égale-un-site, #ex (Exercice 9)"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#les-centres-publics-une-famille-à-part"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#le-réseau-dun-nœud-dépend-du-fournisseur"
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#une-fiche-par-fournisseur, #articuler-un-centre-public-et-un-cloud"
+   },
+   "object-storage": {
+    "depth": 3,
+    "where": "#ch4, #lire-un-job-ligne-à-ligne, lab-13-3"
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#ce-qui-traverse-la-liaison"
+   },
+   "experiment-tracking": {
+    "depth": 1,
+    "where": "#lire-un-job-ligne-à-ligne"
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#le-coût-dune-heure-utile, #le-préavis-de-préemption, lab-13-2 répétition, lab-13-1, Ex 4, Ex 5"
+   },
+   "scheduler-design": {
+    "depth": 3,
+    "where": "#ch5, lab-13-1"
+   },
+   "hyperscaler-cloud": {
+    "depth": 3,
+    "where": "#six-modèles, #le-préavis-de-préemption, #comptes-projets-et-quotas, lab-13-3, Ex 1, Ex 10"
+   },
+   "gpu-cloud-providers": {
+    "depth": 2,
+    "where": "#les-familles-doffre, #le-réseau-dun-nœud-dépend-du-fournisseur"
+   },
+   "finops-cost": {
+    "depth": 3,
+    "where": "#le-coût-dune-heure-utile, #ch4, #ch8, lab-13-3, Ex 1, 4, 7, 8"
+   },
+   "procurement-vendor": {
+    "depth": 2,
+    "where": "#une-fiche-par-fournisseur, #six-modèles, #exit"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#comptes-projets-et-quotas, #aux-états-unis, Ex 3, Ex 10"
+   },
+   "security-compliance": {
+    "depth": 3,
+    "where": "#résidence-et-conformité, #identités-fédérées, lab-13-2 (E4, E6), Ex 11"
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#ex (Exercice 12)"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#une-revue-périodique, #exit"
+   },
+   "hpc-experience": {
+    "depth": 2,
+    "where": "#ch7, #les-centres-publics-une-famille-à-part, Ex 3"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#le-préavis-de-préemption, #un-job-égale-un-site"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#copier-ou-relire-à-distance"
+   },
+   "networking-general": {
+    "depth": 2,
+    "where": "#ce-qui-traverse-la-liaison, #trois-coûts-dun-déplacement, lab-13-3 transfer_hours"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#les-familles-doffre"
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#la-gouvernance-comme-code, #exit"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 1,
+    "where": "#un-exemple-publié-avec-des-tarifs-daujourdhui"
+   },
+   "perf-profiling": {
+    "depth": 0,
+    "where": ""
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#quatre-questions-qui-classent-une-offre"
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#skypilot-un-courtier-entre-les-fournisseurs, #kubernetes-sur-plusieurs-clusters, #trois-coûts-dun-déplacement"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#le-préavis-de-préemption"
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#les-jobs-managés-et-la-reprise"
+   }
+  },
+  "networking": {
+   "python": {
+    "depth": 3,
+    "where": "lab topology-sizing, nccl-log-reading, nccl-tests-run"
+   },
+   "systems-lang": {
+    "depth": 1,
+    "where": "#ch6, #ch7"
+   },
+   "linux-admin": {
+    "depth": 2,
+    "where": "#ch2, #labs, #ex (Ex 8)"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#ch5, #ch6, lab nccl-tests-run"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#ch5"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": "#ch7"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#ch7"
+   },
+   "nccl-collectives": {
+    "depth": 3,
+    "where": "#ch7, #ch8, labs nccl-log-reading, nccl-tests-run, Ex 8-9"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#ch2, #ch6, #ch7"
+   },
+   "infiniband-roce": {
+    "depth": 3,
+    "where": "#ch1-#ch4, lab topology-sizing part B, Ex 1, 3, 4"
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#ch2 (2.5), #sources"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 1,
+    "where": "#ch8 (8.5)"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": "#ch8"
+   },
+   "logging-tracing": {
+    "depth": 2,
+    "where": "#ch7, #ch8, lab nccl-log-reading"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 1,
+    "where": "#ch2, #ch8"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#ch5 (5.5), #exit Q3"
+   },
+   "hyperscaler-cloud": {
+    "depth": 1,
+    "where": "#ch1, #ch4"
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#fiche, #labs"
+   },
+   "finops-cost": {
+    "depth": 2,
+    "where": "#ch5, #ex (Ex 7)"
+   },
+   "procurement-vendor": {
+    "depth": 1,
+    "where": "#ch4, #exit Q2"
+   },
+   "capacity-planning": {
+    "depth": 2,
+    "where": "#ch5, lab topology-sizing"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": "#ch2"
+   },
+   "sre-oncall": {
+    "depth": 2,
+    "where": "#ch8, #ex (Ex 8, Ex 9)"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 2,
+    "where": "#ch3, #ch5, #ch7"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#ch1, #ch4, #ex (Ex 7)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": "#ch2"
+   },
+   "networking-general": {
+    "depth": 3,
+    "where": "#ch1, #ch4, Ex 1, Ex 4"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#ch2"
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": "#sources"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 2,
+    "where": "#ch8, lab nccl-tests-run, Ex 9"
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#ch5, #ex (Ex 4)"
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#ch4, #ch7"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#ch2"
+   },
+   "hardware-health": {
+    "depth": 3,
+    "where": "#ch3 (3.5), #ch8, Ex 3, Ex 9, lab nccl-log-reading"
+   }
+  },
+  "observability": {
+   "python": {
+    "depth": 3,
+    "where": "lab-14-1, lab-14-2, lab-14-3"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#ch1/1.1, #ch3/3.4, #ch4/4.2"
+   },
+   "slurm": {
+    "depth": 3,
+    "where": "#ch5, lab-14-1 (live branch)"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#ch5/5.5"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 1,
+    "where": "#intro"
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 1,
+    "where": "#ch8/8.1, #ch2/2.1"
+   },
+   "pytorch-distributed": {
+    "depth": 2,
+    "where": "#ch4/4.2, lab-14-3 partie B"
+   },
+   "nccl-collectives": {
+    "depth": 2,
+    "where": "#ch4/4.2, #ex (ex. 4)"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#ch2/2.3"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#hors-perimetre"
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#ex (ex. 4, 7)"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 3,
+    "where": "#ch3, lab-14-1, lab-14-2"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 3,
+    "where": "#ch2, lab-14-1"
+   },
+   "logging-tracing": {
+    "depth": 2,
+    "where": "#ch4"
+   },
+   "experiment-tracking": {
+    "depth": 3,
+    "where": "#ch8, lab-14-3 partie C"
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 2,
+    "where": "#ch6/6.4, #ch7"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#ch5/5.3"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#ch7/7.2, #ch5/5.2"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 1,
+    "where": "#ch3/3.1, #ch6/6.2"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#ch6, lab-14-2, #ex (ex. 6, 7)"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ch5"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#ch8/8.3, #ex (ex. 10)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#ch7/7.2, #ex (ex. 4)"
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#ch1/1.1, #ex (ex. 4)"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#ch7/7.5"
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "lab-14-2"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#ch4/4.3, #ch2/2.3"
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#ch6/6.3, #ch7/7.4"
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#ch1/1.3, #ch7"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 3,
+    "where": "#ch2/2.4, #ch7/7.5, lab-14-1, lab-14-2"
+   }
+  },
+  "parallel-programming": {
+   "python": {
+    "depth": 3,
+    "where": "#ch3, #ch4, lab mpi-ring, lab jacobi-scaling"
+   },
+   "systems-lang": {
+    "depth": 2,
+    "where": "#ch2, lab openmp-reduction, jacobi.c (C et CUDA C++ ; ni Go ni Rust)"
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#lire-la-machine, #labs"
+   },
+   "slurm": {
+    "depth": 3,
+    "where": "#lancer-sous-slurm, lab jacobi-scaling part D, Ex. 10"
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 1,
+    "where": "#un-programme-plusieurs-processus, #labs"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#de-mpi-à-nccl"
+   },
+   "nccl-collectives": {
+    "depth": 2,
+    "where": "#ch4, #de-mpi-à-nccl, lab mpi-ring"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#de-mpi-à-nccl"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#écrire-un-fichier-partagé-avec-mpi-io"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 1,
+    "where": "#tous-ou-personne, #écrire-un-fichier-partagé-avec-mpi-io"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#travail-profondeur-et-bornes, #ordonnancement-des-itérations"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#ex (Ex. 12)"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 1,
+    "where": "#ex (Ex. 12)"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#exit"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 3,
+    "where": "#ch2-#ch8, all three labs"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#trois-formes-de-parallélisme, #le-catalogue, #ex (Ex. 7)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#trois-formes-de-parallélisme"
+   },
+   "networking-general": {
+    "depth": 2,
+    "where": "#combien-coûte-un-all-reduce, #le-modèle-face-à-la-mesure, #deux-niveaux-nœud-puis-réseau, Ex. 7"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 1,
+    "where": "#de-mpi-à-nccl"
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#ch2, #mesurer-où-passe-le-temps, #ch8, labs"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#ch3, #tous-ou-personne, lab mpi-ring"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#lire-la-machine, #lire-les-chiffres"
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#exit"
+   }
+  },
+  "perf-models": {
+   "python": {
+    "depth": 3,
+    "where": "#labs (mfu-calculator, stream-gemm, allreduce-model), #ch8 median_ci"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": "#ch3"
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#ch3, #labs"
+   },
+   "slurm": {
+    "depth": 0,
+    "where": ""
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 2,
+    "where": "#labs (allreduce-model)"
+   },
+   "nccl-collectives": {
+    "depth": 3,
+    "where": "#ch6, #labs (allreduce-model), #ex (ex. 7, 8)"
+   },
+   "cuda-gpu": {
+    "depth": 2,
+    "where": "#ch2, #ch3, #ch4"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": "#ch1"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": "#ch5"
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": "#ch3, #ch8"
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 1,
+    "where": "#ch7"
+   },
+   "scheduler-design": {
+    "depth": 0,
+    "where": ""
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": "#ex"
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#intro, #sources"
+   },
+   "procurement-vendor": {
+    "depth": 2,
+    "where": "#ch2, #ex (ex. 2, 10)"
+   },
+   "capacity-planning": {
+    "depth": 2,
+    "where": "#ch7, #ex (ex. 9, 11)"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 0,
+    "where": ""
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#ch8"
+   },
+   "hpc-experience": {
+    "depth": 2,
+    "where": "#ch1-#ch6, #ch8, #labs"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#ch7, #labs (mfu-calculator), #ex (ex. 9-11)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#exit"
+   },
+   "networking-general": {
+    "depth": 2,
+    "where": "#ch1, #ch6"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": "#labs"
+   },
+   "inference-serving": {
+    "depth": 2,
+    "where": "#ch4 (ex. 4.4), #ex (ex. 5)"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 1,
+    "where": "#ch7"
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#ch3, #ch4, #labs (stream-gemm)"
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#ch2"
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#ch5, #ch6"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": "#labs"
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#ch5, #ch7"
+   }
+  },
+  "platform-leadership": {
+   "python": {
+    "depth": 1,
+    "where": "#labs, lab-16-3"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#ch3, #labs"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#ch5, #ch3, #ch2"
+   },
+   "kubernetes": {
+    "depth": 2,
+    "where": "#ch3, #ex (ex. 8)"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 1,
+    "where": "#ch5"
+   },
+   "ansible-config": {
+    "depth": 1,
+    "where": "#ch5"
+   },
+   "containers": {
+    "depth": 2,
+    "where": "#ch3"
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#ch2, #ex (ex. 6)"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#ch8"
+   },
+   "object-storage": {
+    "depth": 1,
+    "where": "#ch3"
+   },
+   "prometheus-grafana": {
+    "depth": 1,
+    "where": "#ch2, #lab-16-2"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#ch4, #lab-16-2"
+   },
+   "logging-tracing": {
+    "depth": 2,
+    "where": "#ch3, #ch4, lab-16-2"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#ch8, lab-16-3, #ex (ex. 9)"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#ch1, #ch2"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#ch1, #ch6"
+   },
+   "procurement-vendor": {
+    "depth": 1,
+    "where": "#exit"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#ch1, #ch2, #ch8, #ex (ex. 3, 9), lab-16-3"
+   },
+   "security-compliance": {
+    "depth": 3,
+    "where": "#ch3, #ex (ex. 8)"
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#ch4, lab-16-2, #ex (ex. 1, 2, 4, 11)"
+   },
+   "leadership-mgmt": {
+    "depth": 3,
+    "where": "#ch6, #ch5, lab-16-1, #ex (ex. 5, 7, 10)"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ch2, #ch5"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#ch8, lab-16-3, #ex (ex. 9)"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#ch8, #ch3"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 2,
+    "where": "#ch9 (9.5 : GitOps, tests en CI, déploiement par canaris)"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#ex (ex. 9)"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 3,
+    "where": "#ch9, lab 16.4, exercices 12 et 13"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#ch3"
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#lab-16-2, #ex (ex. 4)"
+   }
+  },
+  "provisioning": {
+   "python": {
+    "depth": 3,
+    "where": "#labs (Lab 6.3 partie B, Lab 6.4 step 5)"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 3,
+    "where": "#ch3, #un-rôle-un-inventaire, ansible-node-role"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#les-états-dun-nœud, #une-mise-à-jour-progressive-en-cinq-temps, terraform-fleet"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 3,
+    "where": "#ch4, terraform-fleet, #ex (Exercice 5)"
+   },
+   "ansible-config": {
+    "depth": 3,
+    "where": "#ch3, ansible-node-role, #ex (Exercice 4)"
+   },
+   "containers": {
+    "depth": 2,
+    "where": "#pilote-et-cuda-la-table-de-compatibilité, #les-autres-services-de-lhôte"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#les-couches"
+   },
+   "nccl-collectives": {
+    "depth": 2,
+    "where": "#les-outils-et-ce-quils-prouvent, #ex (Exercice 8), node-acceptance"
+   },
+   "cuda-gpu": {
+    "depth": 2,
+    "where": "#ch5, #ex (Exercice 6), node-acceptance check_stack"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#avant, #sources"
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 3,
+    "where": "#des-tests-à-plusieurs-profondeurs, #les-outils-et-ce-quils-prouvent, node-acceptance"
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#les-outils-et-ce-quils-prouvent, #pannes-traçabilité-rma"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 2,
+    "where": "#pourquoi-la-porte-de-la-recette-rapporte-le-plus, #ex (Exercice 1)"
+   },
+   "scheduler-design": {
+    "depth": 1,
+    "where": "#les-états-dun-nœud"
+   },
+   "hyperscaler-cloud": {
+    "depth": 1,
+    "where": "#ce-que-terraform-gère-dans-une-flotte, #ex (Exercice 5c)"
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#dimensionner-un-volant-de-nœuds-de-rechange, #ex (Exercice 11)"
+   },
+   "procurement-vendor": {
+    "depth": 2,
+    "where": "#pannes-traçabilité-rma, #trois-outils-leurs-forces-et-leurs-limites, #ex (Exercices 3, 11)"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#dimensionner-un-volant-de-nœuds-de-rechange, #une-mise-à-jour-progressive-en-cinq-temps, #ex (Exercices 10, 11)"
+   },
+   "security-compliance": {
+    "depth": 3,
+    "where": "#secrets, #le-réseau-de-démarrage-nest-pas-de-confiance, #sécuriser-le-bmc, ansible-node-role step F"
+   },
+   "sre-oncall": {
+    "depth": 2,
+    "where": "#intro, #du-signal-hors-bande-à-une-décision, #ex (Exercice 11)"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#ex (Exercice 3)"
+   },
+   "hpc-experience": {
+    "depth": 2,
+    "where": "#ch2, #trois-outils-leurs-forces-et-leurs-limites"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#pourquoi-la-porte-de-la-recette-rapporte-le-plus"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 3,
+    "where": "#la-chaîne-de-démarrage, #la-boucle-ipxe-et-sa-parade, terraform-fleet, #ex (Exercice 2)"
+   },
+   "bare-metal-provisioning": {
+    "depth": 3,
+    "where": "#ch2, terraform-fleet, #ex (Exercices 2, 3)"
+   },
+   "ci-cd": {
+    "depth": 2,
+    "where": "#plan-application-et-dérive, #ex (Exercice 5d)"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#les-outils-et-ce-quils-prouvent, #ex (Exercice 9)"
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#identité-et-inventaire-la-source-de-vérité, #du-signal-hors-bande-à-une-décision"
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#ce-qui-ne-doit-jamais-se-détruire"
+   },
+   "virtualization": {
+    "depth": 3,
+    "where": "#ch9, exercices 12 et 13, labs/provisioning/virt-checks"
+   },
+   "hardware-health": {
+    "depth": 3,
+    "where": "#ch6, #ch8, node-acceptance, redfish-oob, #ex (Exercices 7, 9)"
+   }
+  },
+  "ray-rl-infra": {
+   "python": {
+    "depth": 3,
+    "where": "#labs, ray-actors, actor-learner-toy, throughput-model"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#la-mémoire-qui-manque, #objets-partagés-et-mémoire"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#ray-sur-slurm, #lab-11-1 (deploy/ray_slurm.sbatch)"
+   },
+   "kubernetes": {
+    "depth": 2,
+    "where": "#ray-sur-kubernetes-avec-kuberay, #ex (Ex. 12), #lab-11-1 (raycluster.yaml)"
+   },
+   "ray": {
+    "depth": 3,
+    "where": "#ch1, #ch2, #ch3, #lab-11-1, #lab-11-2"
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 1,
+    "where": "#ray-sur-kubernetes-avec-kuberay"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#ray-train-un-groupe-de-travailleurs"
+   },
+   "nccl-collectives": {
+    "depth": 1,
+    "where": "#quand-ray-quand-pas, #un-pool-par-rôle-et-par-type"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#des-ressources-logiques-pas-des-garanties"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": "#hors-perimetre"
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 2,
+    "where": "#observer-une-application-ray"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#ex (Ex. 10), #ray-data-un-flux-de-blocs"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#pannes-ce-que-ray-rejoue-et-ce-quil-ne-sait-pas, #ray-train-un-groupe-de-travailleurs, #lab-11-1, #ex (Ex. 10)"
+   },
+   "scheduler-design": {
+    "depth": 2,
+    "where": "#ch1, #placement-groups-réserver-ensemble, #où-placer-la-contre-pression"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": "#le-coût-par-million-de-pas"
+   },
+   "finops-cost": {
+    "depth": 3,
+    "where": "#le-coût-par-million-de-pas, #ex (Ex. 9, 12), #ray-sur-kubernetes-avec-kuberay"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#ch6, #lab-11-3, #ex (Ex. 3, 5, 6, 8, 11, 12)"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#a-verifier, #hors-perimetre"
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#exit"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#ray-sur-slurm"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#ch4, #lab-11-2"
+   },
+   "rl-infra": {
+    "depth": 3,
+    "where": "#ch4, #ch5, #ch6, #lab-11-2, #lab-11-3, #ex (Ex. 11)"
+   },
+   "data-pipelines": {
+    "depth": 3,
+    "where": "#ray-data-un-flux-de-blocs, #lab-11-1 (data_demo.py)"
+   },
+   "networking-general": {
+    "depth": 2,
+    "where": "#synchroniser-les-poids, #ex (Ex. 11)"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#lab-11-1, #lab-11-3"
+   },
+   "inference-serving": {
+    "depth": 3,
+    "where": "#ch9, lab 11.4, exercices 13 et 14"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 2,
+    "where": "#le-coût-dune-tâche, #lab-11-1"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 3,
+    "where": "#ch2, #ch5, #ch6, #lab-11-1, #lab-11-2, #lab-11-3"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 0,
+    "where": ""
+   }
+  },
+  "slurm": {
+   "python": {
+    "depth": 1,
+    "where": "#écrire-un-script-qui-survit-à-slurm, #les-trois-indicateurs-à-suivre"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 2,
+    "where": "#labs (slurm-sandbox setup.sh), #les-démons"
+   },
+   "slurm": {
+    "depth": 3,
+    "where": "#ch1-#ch8, slurm-sandbox, fairshare-qos, node-health, #ex"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#slurm-sur-kubernetes, #slurm-kubernetes-ou-les-deux, #ex (Ex. 10)"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 2,
+    "where": "#conteneurs-sous-slurm"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#demander-des-ressources, #ex (Ex. 2)"
+   },
+   "nccl-collectives": {
+    "depth": 1,
+    "where": "#demander-des-ressources"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#déclarer-les-gpu-à-slurm, #partager-un-gpu"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 1,
+    "where": "#du-rapport-au-pilotage"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#remettre-un-nœud-en-service, node-health README"
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#remettre-un-nœud-en-service, #ex (Ex. 9)"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#écrire-un-script-qui-survit-à-slurm, slurm-sandbox part B, #la-préemption-par-qos"
+   },
+   "scheduler-design": {
+    "depth": 3,
+    "where": "#ch3, #ch4, fairshare-qos, #ex (Ex. 4-7)"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#intro"
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#du-rapport-au-pilotage, #les-trois-indicateurs-à-suivre"
+   },
+   "procurement-vendor": {
+    "depth": 1,
+    "where": "#remettre-un-nœud-en-service, #ex (Ex. 9)"
+   },
+   "capacity-planning": {
+    "depth": 2,
+    "where": "#les-trois-indicateurs-à-suivre, #ex (Ex. 8)"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#les-démons, #labs"
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#ch7, node-health, #ex (Ex. 9), #exit"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#intro, #une-politique-pour-trois-équipes, #ex (Ex. 10)"
+   },
+   "hpc-experience": {
+    "depth": 3,
+    "where": "slurm-sandbox, fairshare-qos, node-health"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#demander-des-ressources, #écrire-un-script-qui-survit-à-slurm"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#tableaux-et-dépendances"
+   },
+   "networking-general": {
+    "depth": 2,
+    "where": "#topologie-du-réseau"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#remettre-un-nœud-en-service, #sources"
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 1,
+    "where": "#partager-un-gpu, #ex (Ex. 10)"
+   },
+   "non-nvidia-accelerators": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#demander-des-gpu-et-les-lier-correctement"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#les-démons"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 3,
+    "where": "#ch7, node-health, #ex (Ex. 9)"
+   }
+  },
+  "storage": {
+   "python": {
+    "depth": 3,
+    "where": "all labs; lab io-sizing step 2 (write a test)"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 3,
+    "where": "#ch4, #ch6, labs shard-format, checkpoint-io"
+   },
+   "slurm": {
+    "depth": 1,
+    "where": "#ch7"
+   },
+   "kubernetes": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 1,
+    "where": "#ch1, #ch2"
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#ch6, #ch7"
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#ch5, #ch7"
+   },
+   "infiniband-roce": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "parallel-fs-storage": {
+    "depth": 3,
+    "where": "#ch2, #ex (Ex 3, 4, 11)"
+   },
+   "object-storage": {
+    "depth": 3,
+    "where": "#ch3, #ex (Ex 5, 7)"
+   },
+   "prometheus-grafana": {
+    "depth": 1,
+    "where": "#ch8"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#ch1"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#ch6, #ch8, lab checkpoint-io, #ex (Ex 2, 9, 12)"
+   },
+   "scheduler-design": {
+    "depth": 0,
+    "where": ""
+   },
+   "hyperscaler-cloud": {
+    "depth": 1,
+    "where": "#ch3"
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 3,
+    "where": "#ch3, #ch8, #ex (Ex 12e)"
+   },
+   "procurement-vendor": {
+    "depth": 2,
+    "where": "#ch2, #ch6"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#ch8, #ex (Ex 12), lab io-sizing"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#sources"
+   },
+   "sre-oncall": {
+    "depth": 1,
+    "where": "#ch8"
+   },
+   "leadership-mgmt": {
+    "depth": 0,
+    "where": ""
+   },
+   "hpc-experience": {
+    "depth": 2,
+    "where": "#ch2, #ch8"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#ch1, #ch5, #ch6"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 3,
+    "where": "#ch4, #ch5, labs shard-format, loader-bottleneck"
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#ch1, #ch3"
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#ch7"
+   },
+   "ci-cd": {
+    "depth": 0,
+    "where": ""
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#ch3, #ch4, #ch5, labs loader-bottleneck, shard-format"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#ch2, #ch3"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#ch3, #ch6"
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#ch2, #ch7"
+   }
+  }
+ },
+ "projects": {
+  "homelab-slurm": {
+   "python": {
+    "depth": 3,
+    "where": "#cahier, labs/projects/homelab-slurm"
+   },
+   "systems-lang": {
+    "depth": 1,
+    "where": "#extensions : variante Go ou Rust proposée"
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#jalons, #pistes"
+   },
+   "slurm": {
+    "depth": 3,
+    "where": "#cahier, #pistes, verify-live.sh"
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 2,
+    "where": "#contexte, #cahier R3-R4"
+   },
+   "ansible-config": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 0,
+    "where": ""
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 3,
+    "where": "#cahier R5-R6, #criteres"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 0,
+    "where": ""
+   },
+   "scheduler-design": {
+    "depth": 2,
+    "where": "#cahier, #reference-results"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 0,
+    "where": ""
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 0,
+    "where": ""
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#cahier R6, #livrables"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#livrables"
+   },
+   "hpc-experience": {
+    "depth": 3,
+    "where": "#cahier, verify-live.sh"
+   },
+   "ml-training-experience": {
+    "depth": 0,
+    "where": ""
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 0,
+    "where": ""
+   },
+   "bare-metal-provisioning": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#livrables, #criteres"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 0,
+    "where": ""
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "hardware-health": {
+    "depth": 2,
+    "where": "#cahier, #pistes, #extensions"
+   }
+  },
+  "scaling-study": {
+   "python": {
+    "depth": 3,
+    "where": "#cahier, labs/projects/scaling-study"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "slurm": {
+    "depth": 0,
+    "where": ""
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 3,
+    "where": "#cahier, #jalons"
+   },
+   "nccl-collectives": {
+    "depth": 2,
+    "where": "#cahier R3, #formules, #extensions"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 1,
+    "where": "#livrables"
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 0,
+    "where": ""
+   },
+   "scheduler-design": {
+    "depth": 0,
+    "where": ""
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 1,
+    "where": "#contexte, #extensions"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 0,
+    "where": ""
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#livrables"
+   },
+   "hpc-experience": {
+    "depth": 3,
+    "where": "#cahier, #reference-results"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#cahier"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#contexte, #extensions"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#criteres"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 3,
+    "where": "#cahier R7, #pistes, #reference-results"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#pistes"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#reference-results"
+   },
+   "hardware-health": {
+    "depth": 0,
+    "where": ""
+   }
+  },
+  "resilient-trainer": {
+   "python": {
+    "depth": 3,
+    "where": "#cahier, labs/projects/resilient-trainer"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 3,
+    "where": "#cahier R1, R6-R7, #pistes"
+   },
+   "slurm": {
+    "depth": 1,
+    "where": "#extensions, #pre"
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "object-storage": {
+    "depth": 1,
+    "where": "#cahier"
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#criteres"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#cahier, #criteres, #formules"
+   },
+   "scheduler-design": {
+    "depth": 0,
+    "where": ""
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 0,
+    "where": ""
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "sre-oncall": {
+    "depth": 2,
+    "where": "#livrables, #cahier R5-R7"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#livrables"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#formules"
+   },
+   "ml-training-experience": {
+    "depth": 2,
+    "where": "#cahier R3"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "networking-general": {
+    "depth": 0,
+    "where": ""
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#portfolio"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#criteres, #portfolio"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 2,
+    "where": "#cahier, #formules"
+   },
+   "virtualization": {
+    "depth": 1,
+    "where": "#portfolio"
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#contexte, #extensions"
+   }
+  },
+  "multi-provider-scheduler": {
+   "python": {
+    "depth": 3,
+    "where": "#jalons; labs/projects/multi-provider-scheduler"
+   },
+   "systems-lang": {
+    "depth": 1,
+    "where": "#extensions : variante Go ou Rust proposée"
+   },
+   "linux-admin": {
+    "depth": 0,
+    "where": ""
+   },
+   "slurm": {
+    "depth": 0,
+    "where": ""
+   },
+   "kubernetes": {
+    "depth": 3,
+    "where": "#cahier R6, #pistes"
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 3,
+    "where": "#cahier R6, #pistes, #lectures"
+   },
+   "terraform-iac": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 0,
+    "where": ""
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 0,
+    "where": ""
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#cahier R1-R2, #formules, #reference-results"
+   },
+   "scheduler-design": {
+    "depth": 3,
+    "where": "#cahier R4, #pistes"
+   },
+   "hyperscaler-cloud": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "gpu-cloud-providers": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "finops-cost": {
+    "depth": 3,
+    "where": "#formules, #reference-results"
+   },
+   "procurement-vendor": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "capacity-planning": {
+    "depth": 2,
+    "where": "#reference-results"
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 0,
+    "where": ""
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#livrables"
+   },
+   "hpc-experience": {
+    "depth": 0,
+    "where": ""
+   },
+   "ml-training-experience": {
+    "depth": 0,
+    "where": ""
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#jalons"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 0,
+    "where": ""
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#extensions"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 0,
+    "where": ""
+   }
+  },
+  "gpu-observability": {
+   "python": {
+    "depth": 3,
+    "where": "#jalons; labs/projects/gpu-observability"
+   },
+   "systems-lang": {
+    "depth": 1,
+    "where": "#extensions : variante Go ou Rust proposée"
+   },
+   "linux-admin": {
+    "depth": 1,
+    "where": "#pre"
+   },
+   "slurm": {
+    "depth": 2,
+    "where": "#cahier R2, #pistes, #extensions"
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 0,
+    "where": ""
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 1,
+    "where": "#contexte, #extensions"
+   },
+   "nccl-collectives": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "cuda-gpu": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 3,
+    "where": "#cahier R1-R5, R8, #jalons"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 3,
+    "where": "#contexte, #cahier R1"
+   },
+   "logging-tracing": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#cahier R6-R7, #reference-results"
+   },
+   "scheduler-design": {
+    "depth": 0,
+    "where": ""
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "procurement-vendor": {
+    "depth": 0,
+    "where": ""
+   },
+   "capacity-planning": {
+    "depth": 0,
+    "where": ""
+   },
+   "security-compliance": {
+    "depth": 0,
+    "where": ""
+   },
+   "sre-oncall": {
+    "depth": 3,
+    "where": "#livrables, #pistes, #extensions"
+   },
+   "leadership-mgmt": {
+    "depth": 1,
+    "where": "#livrables"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#pre"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 0,
+    "where": ""
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 2,
+    "where": "#jalons, #criteres"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "datacenter-facilities": {
+    "depth": 1,
+    "where": "#pistes"
+   },
+   "distributed-systems": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 3,
+    "where": "#cahier R3, R7, #livrables"
+   }
+  },
+  "capstone-rfc": {
+   "python": {
+    "depth": 3,
+    "where": "#jalons; labs/projects/capstone-rfc"
+   },
+   "systems-lang": {
+    "depth": 0,
+    "where": ""
+   },
+   "linux-admin": {
+    "depth": 0,
+    "where": ""
+   },
+   "slurm": {
+    "depth": 1,
+    "where": "#contexte, #extensions"
+   },
+   "kubernetes": {
+    "depth": 0,
+    "where": ""
+   },
+   "ray": {
+    "depth": 0,
+    "where": ""
+   },
+   "multicloud-skypilot": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "terraform-iac": {
+    "depth": 0,
+    "where": ""
+   },
+   "ansible-config": {
+    "depth": 0,
+    "where": ""
+   },
+   "containers": {
+    "depth": 0,
+    "where": ""
+   },
+   "pytorch-distributed": {
+    "depth": 0,
+    "where": ""
+   },
+   "nccl-collectives": {
+    "depth": 0,
+    "where": ""
+   },
+   "cuda-gpu": {
+    "depth": 0,
+    "where": ""
+   },
+   "infiniband-roce": {
+    "depth": 0,
+    "where": ""
+   },
+   "parallel-fs-storage": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "object-storage": {
+    "depth": 0,
+    "where": ""
+   },
+   "prometheus-grafana": {
+    "depth": 1,
+    "where": "#grille"
+   },
+   "dcgm-gpu-monitoring": {
+    "depth": 0,
+    "where": ""
+   },
+   "logging-tracing": {
+    "depth": 0,
+    "where": ""
+   },
+   "experiment-tracking": {
+    "depth": 0,
+    "where": ""
+   },
+   "checkpoint-fault-tolerance": {
+    "depth": 3,
+    "where": "#cahier R3, #formules, #reference-results"
+   },
+   "scheduler-design": {
+    "depth": 2,
+    "where": "#pistes, #extensions"
+   },
+   "hyperscaler-cloud": {
+    "depth": 0,
+    "where": ""
+   },
+   "gpu-cloud-providers": {
+    "depth": 0,
+    "where": ""
+   },
+   "finops-cost": {
+    "depth": 3,
+    "where": "#cahier R4, #reference-results"
+   },
+   "procurement-vendor": {
+    "depth": 2,
+    "where": "#livrables, #reference-results"
+   },
+   "capacity-planning": {
+    "depth": 3,
+    "where": "#cahier R1-R2, #formules"
+   },
+   "security-compliance": {
+    "depth": 1,
+    "where": "labs/projects/capstone-rfc rfc_lint.py SECTIONS"
+   },
+   "sre-oncall": {
+    "depth": 2,
+    "where": "#grille, #soutenance"
+   },
+   "leadership-mgmt": {
+    "depth": 3,
+    "where": "#jalons 3-6, #grille, #soutenance"
+   },
+   "hpc-experience": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "ml-training-experience": {
+    "depth": 1,
+    "where": "#cahier"
+   },
+   "rl-infra": {
+    "depth": 0,
+    "where": ""
+   },
+   "data-pipelines": {
+    "depth": 0,
+    "where": ""
+   },
+   "networking-general": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "bare-metal-provisioning": {
+    "depth": 0,
+    "where": ""
+   },
+   "ci-cd": {
+    "depth": 1,
+    "where": "#cahier R5"
+   },
+   "inference-serving": {
+    "depth": 0,
+    "where": ""
+   },
+   "non-nvidia-accelerators": {
+    "depth": 0,
+    "where": ""
+   },
+   "perf-profiling": {
+    "depth": 1,
+    "where": "#contexte"
+   },
+   "datacenter-facilities": {
+    "depth": 0,
+    "where": ""
+   },
+   "distributed-systems": {
+    "depth": 0,
+    "where": ""
+   },
+   "virtualization": {
+    "depth": 0,
+    "where": ""
+   },
+   "hardware-health": {
+    "depth": 1,
+    "where": "#cahier R3"
+   }
+  }
+ }
+}

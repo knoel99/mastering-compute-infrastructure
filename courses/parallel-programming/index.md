@@ -60,6 +60,7 @@ Le module [Architecture matérielle et modèles de performance](../perf-models/i
 -   **Phase 1 — Calcul parallèle et GPU** (semaines 6-11) : écrire, mesurer et expliquer un programme parallèle sur CPU et GPU.
 -   **S'appuie sur** : [module 2 — Architecture matérielle et modèles de performance](../perf-models/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Slurm, Expérience HPC, Profilage, bancs d'essai, Langage système (Go, Rust, C++), Collectives (NCCL, RCCL, HCCL), Réseau (général), Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

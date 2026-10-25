@@ -59,6 +59,7 @@ Tout le reste du parcours en dépend. Dimensionner un réseau (module 7), choisi
 -   **S'appuie sur** : aucun module ; c'est un point d'entrée.
 -   **Prépare** : [module 3 — Programmation parallèle : OpenMP, MPI et études de passage à l'échelle](../parallel-programming/index.html), [module 4 — Programmation GPU : CUDA, Triton et profilage](../gpu-programming/index.html), [module 7 — Réseaux haute performance : InfiniBand, RoCE et NCCL](../networking/index.html), [module 9 — Entraînement distribué : DDP, FSDP, parallélisme tensoriel et pipeline](../distributed-training/index.html), [module 15 — FinOps, capacité, énergie et achats de calcul](../finops-capacity/index.html).
 -   **Projets qui s'en servent** : [Projet 2 — Étude de passage à l'échelle d'un entraînement](../../projects/scaling-study/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Collectives (NCCL, RCCL, HCCL), Profilage, bancs d'essai, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), CUDA, programmation GPU, Achats, relation fournisseurs, Planification de capacité, Expérience HPC, Expérience d'entraînement ML, Réseau (général), Service d'inférence, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

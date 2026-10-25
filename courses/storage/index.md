@@ -62,6 +62,7 @@ Ce module ne remplace pas le module 10 sur les pannes : le protocole d'un checkp
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html).
 -   **Prépare** : [module 10 — Pannes, checkpointing et reprise automatique](../fault-tolerance/index.html).
 -   **Projets qui s'en servent** : [Projet 3 — Entraîneur tolérant aux pannes](../../projects/resilient-trainer/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Administration Linux, Systèmes de fichiers parallèles, Stockage objet, Checkpoint, tolérance aux pannes, FinOps, coûts, Planification de capacité, Chaînes de données, Profilage, bancs d'essai, Achats, relation fournisseurs, Expérience HPC, Expérience d'entraînement ML, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

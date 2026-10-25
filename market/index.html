@@ -56,7 +56,11 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul></li>
 <li><a href="#employeurs">6. Ce qui change d'un employeur à l'autre</a></li>
 <li><a href="#couverture">7. Ce que le parcours couvre</a></li>
-<li><a href="#ecarts">8. Écarts et décisions</a></li>
+<li><a href="#ecarts">8. Écarts et décisions</a>
+<ul>
+<li><a href="#ajouts">8.1. Ce qui a été ajouté au parcours</a></li>
+<li><a href="#assume">8.2. Ce qui reste un écart assumé</a></li>
+</ul></li>
 <li><a href="#sources">9. Sources et portée</a>
 <ul>
 <li><a href="#documente">9.1. Documenté</a></li>
@@ -774,7 +778,336 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </ul>
 <h2 id="couverture">7. Ce que le parcours couvre</h2>
 <p>La profondeur est relevée module par module dans le texte des pages : <strong>mentionné</strong> (cité), <strong>enseigné</strong> (une section ou un exemple travaillé l'explique), <strong>pratiqué</strong> (un lab, un exercice noté ou un jalon de projet le fait faire). Le tableau donne la profondeur maximale atteinte dans le parcours et les modules ou projets qui la portent.</p>
-<p><em>(couverture non calculée)</em></p>
+<div class="tbl-wrap">
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Compétence</th>
+<th>Offres qui la citent</th>
+<th>dont exigée</th>
+<th>Profondeur dans le parcours</th>
+<th>Modules et projets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Python</td>
+<td>68 %</td>
+<td>59 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/distributed-training/index.html">9</a>, <a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/finops-capacity/index.html">15</a>, <a href="../courses/gpu-programming/index.html">4</a></td>
+</tr>
+<tr class="even">
+<td>Administration Linux</td>
+<td>56 %</td>
+<td>52 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/provisioning/index.html">6</a>, <a href="../courses/storage/index.html">8</a>, <a href="../projects/resilient-trainer/index.html">P3</a></td>
+</tr>
+<tr class="odd">
+<td>Langage système (Go, Rust, C++)</td>
+<td>55 %</td>
+<td>50 %</td>
+<td>enseigné</td>
+<td><a href="../courses/gpu-programming/index.html">4</a>, <a href="../courses/parallel-programming/index.html">3</a></td>
+</tr>
+<tr class="even">
+<td>Astreinte, fiabilité (SRE)</td>
+<td>54 %</td>
+<td>51 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/observability/index.html">14</a>, <a href="../courses/platform-leadership/index.html">16</a></td>
+</tr>
+<tr class="odd">
+<td>Kubernetes</td>
+<td>52 %</td>
+<td>38 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/kubernetes-gpu/index.html">12</a>, <a href="../projects/multi-provider-scheduler/index.html">P4</a>, <a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/multi-cloud/index.html">13</a></td>
+</tr>
+<tr class="even">
+<td>Expérience HPC</td>
+<td>51 %</td>
+<td>30 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/parallel-programming/index.html">3</a>, <a href="../courses/slurm/index.html">5</a>, <a href="../projects/homelab-slurm/index.html">P1</a>, <a href="../projects/scaling-study/index.html">P2</a></td>
+</tr>
+<tr class="odd">
+<td>Profilage, bancs d'essai</td>
+<td>51 %</td>
+<td>45 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/distributed-training/index.html">9</a>, <a href="../courses/gpu-programming/index.html">4</a>, <a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/parallel-programming/index.html">3</a></td>
+</tr>
+<tr class="even">
+<td>Expérience d'entraînement ML</td>
+<td>46 %</td>
+<td>28 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/distributed-training/index.html">9</a>, <a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/gpu-programming/index.html">4</a>, <a href="../courses/observability/index.html">14</a></td>
+</tr>
+<tr class="odd">
+<td>Systèmes distribués</td>
+<td>45 %</td>
+<td>35 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/platform-leadership/index.html">16</a>, <a href="../courses/ray-rl-infra/index.html">11</a>, <a href="../courses/distributed-training/index.html">9</a></td>
+</tr>
+<tr class="even">
+<td>Réseau (général)</td>
+<td>44 %</td>
+<td>30 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/networking/index.html">7</a>, <a href="../courses/provisioning/index.html">6</a>, <a href="../courses/multi-cloud/index.html">13</a></td>
+</tr>
+<tr class="odd">
+<td>InfiniBand, RoCE</td>
+<td>43 %</td>
+<td>27 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/networking/index.html">7</a></td>
+</tr>
+<tr class="even">
+<td>CUDA, programmation GPU</td>
+<td>38 %</td>
+<td>18 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/gpu-programming/index.html">4</a>, <a href="../courses/perf-models/index.html">2</a>, <a href="../courses/provisioning/index.html">6</a></td>
+</tr>
+<tr class="odd">
+<td>Santé matérielle (burn-in, diagnostics, RMA)</td>
+<td>38 %</td>
+<td>34 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/networking/index.html">7</a>, <a href="../courses/observability/index.html">14</a>, <a href="../courses/provisioning/index.html">6</a></td>
+</tr>
+<tr class="even">
+<td>Prometheus, Grafana</td>
+<td>36 %</td>
+<td>26 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/observability/index.html">14</a>, <a href="../projects/homelab-slurm/index.html">P1</a>, <a href="../projects/gpu-observability/index.html">P5</a>, <a href="../courses/ray-rl-infra/index.html">11</a></td>
+</tr>
+<tr class="odd">
+<td>Systèmes de fichiers parallèles</td>
+<td>30 %</td>
+<td>19 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/storage/index.html">8</a>, <a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/kubernetes-gpu/index.html">12</a></td>
+</tr>
+<tr class="even">
+<td>Provisioning bare-metal</td>
+<td>29 %</td>
+<td>21 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/provisioning/index.html">6</a></td>
+</tr>
+<tr class="odd">
+<td>Planification de capacité</td>
+<td>28 %</td>
+<td>23 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/finops-capacity/index.html">15</a>, <a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/platform-leadership/index.html">16</a></td>
+</tr>
+<tr class="even">
+<td>CI/CD, automatisation</td>
+<td>28 %</td>
+<td>20 %</td>
+<td>enseigné</td>
+<td><a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/platform-leadership/index.html">16</a>, <a href="../courses/provisioning/index.html">6</a>, <a href="../projects/gpu-observability/index.html">P5</a></td>
+</tr>
+<tr class="odd">
+<td>Conteneurs</td>
+<td>27 %</td>
+<td>18 %</td>
+<td>enseigné</td>
+<td><a href="../courses/kubernetes-gpu/index.html">12</a>, <a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/platform-leadership/index.html">16</a>, <a href="../courses/provisioning/index.html">6</a></td>
+</tr>
+<tr class="even">
+<td>Cloud hyperscaler (AWS, GCP, Azure…)</td>
+<td>27 %</td>
+<td>19 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/finops-capacity/index.html">15</a></td>
+</tr>
+<tr class="odd">
+<td>Terraform, infrastructure as code</td>
+<td>26 %</td>
+<td>17 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/provisioning/index.html">6</a>, <a href="../courses/multi-cloud/index.html">13</a>, <a href="../projects/homelab-slurm/index.html">P1</a></td>
+</tr>
+<tr class="even">
+<td>Collectives (NCCL, RCCL, HCCL)</td>
+<td>26 %</td>
+<td>16 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/distributed-training/index.html">9</a>, <a href="../courses/networking/index.html">7</a>, <a href="../courses/perf-models/index.html">2</a>, <a href="../courses/fault-tolerance/index.html">10</a></td>
+</tr>
+<tr class="odd">
+<td>Sécurité, conformité</td>
+<td>26 %</td>
+<td>23 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/platform-leadership/index.html">16</a>, <a href="../courses/provisioning/index.html">6</a>, <a href="../courses/kubernetes-gpu/index.html">12</a></td>
+</tr>
+<tr class="even">
+<td>Ansible, gestion de configuration</td>
+<td>24 %</td>
+<td>18 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/provisioning/index.html">6</a></td>
+</tr>
+<tr class="odd">
+<td>Journaux, traces</td>
+<td>23 %</td>
+<td>20 %</td>
+<td>enseigné</td>
+<td><a href="../courses/distributed-training/index.html">9</a>, <a href="../courses/linux-systems/index.html">1</a>, <a href="../courses/networking/index.html">7</a>, <a href="../courses/observability/index.html">14</a></td>
+</tr>
+<tr class="even">
+<td>Leadership, management</td>
+<td>23 %</td>
+<td>19 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/platform-leadership/index.html">16</a>, <a href="../projects/capstone-rfc/index.html">P6</a>, <a href="../courses/finops-capacity/index.html">15</a></td>
+</tr>
+<tr class="odd">
+<td>Slurm</td>
+<td>22 %</td>
+<td>12 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/finops-capacity/index.html">15</a>, <a href="../courses/observability/index.html">14</a>, <a href="../courses/parallel-programming/index.html">3</a>, <a href="../courses/slurm/index.html">5</a></td>
+</tr>
+<tr class="even">
+<td>Entraînement distribué (PyTorch, Megatron, DeepSpeed…)</td>
+<td>20 %</td>
+<td>15 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/distributed-training/index.html">9</a>, <a href="../courses/kubernetes-gpu/index.html">12</a>, <a href="../projects/scaling-study/index.html">P2</a>, <a href="../courses/fault-tolerance/index.html">10</a></td>
+</tr>
+<tr class="odd">
+<td>Checkpoint, tolérance aux pannes</td>
+<td>20 %</td>
+<td>16 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/fault-tolerance/index.html">10</a>, <a href="../courses/kubernetes-gpu/index.html">12</a>, <a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/platform-leadership/index.html">16</a></td>
+</tr>
+<tr class="even">
+<td>Conception d'ordonnanceur</td>
+<td>20 %</td>
+<td>17 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/kubernetes-gpu/index.html">12</a>, <a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/slurm/index.html">5</a>, <a href="../projects/multi-provider-scheduler/index.html">P4</a></td>
+</tr>
+<tr class="odd">
+<td>Accélérateurs non NVIDIA (TPU, ROCm, Ascend…)</td>
+<td>18 %</td>
+<td>14 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/gpu-programming/index.html">4</a></td>
+</tr>
+<tr class="even">
+<td>Virtualisation (KVM, MIG, vGPU)</td>
+<td>18 %</td>
+<td>10 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/provisioning/index.html">6</a>, <a href="../courses/linux-systems/index.html">1</a></td>
+</tr>
+<tr class="odd">
+<td>Service d'inférence</td>
+<td>17 %</td>
+<td>12 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/ray-rl-infra/index.html">11</a>, <a href="../courses/gpu-programming/index.html">4</a>, <a href="../courses/perf-models/index.html">2</a></td>
+</tr>
+<tr class="even">
+<td>FinOps, coûts</td>
+<td>15 %</td>
+<td>14 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/finops-capacity/index.html">15</a>, <a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/ray-rl-infra/index.html">11</a>, <a href="../courses/storage/index.html">8</a></td>
+</tr>
+<tr class="odd">
+<td>Supervision GPU (DCGM)</td>
+<td>14 %</td>
+<td>12 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/observability/index.html">14</a>, <a href="../courses/provisioning/index.html">6</a>, <a href="../projects/gpu-observability/index.html">P5</a></td>
+</tr>
+<tr class="even">
+<td>Chaînes de données</td>
+<td>14 %</td>
+<td>9 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/ray-rl-infra/index.html">11</a>, <a href="../courses/storage/index.html">8</a></td>
+</tr>
+<tr class="odd">
+<td>Centre de données (énergie, refroidissement)</td>
+<td>14 %</td>
+<td>7 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/finops-capacity/index.html">15</a></td>
+</tr>
+<tr class="even">
+<td>Achats, relation fournisseurs</td>
+<td>12 %</td>
+<td>12 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/finops-capacity/index.html">15</a>, <a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/perf-models/index.html">2</a>, <a href="../courses/provisioning/index.html">6</a></td>
+</tr>
+<tr class="odd">
+<td>Stockage objet</td>
+<td>8 %</td>
+<td>7 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/multi-cloud/index.html">13</a>, <a href="../courses/storage/index.html">8</a></td>
+</tr>
+<tr class="even">
+<td>Multi-cloud (SkyPilot…)</td>
+<td>7 %</td>
+<td>6 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/multi-cloud/index.html">13</a>, <a href="../projects/multi-provider-scheduler/index.html">P4</a></td>
+</tr>
+<tr class="odd">
+<td>Clouds GPU spécialisés</td>
+<td>7 %</td>
+<td>6 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/finops-capacity/index.html">15</a>, <a href="../courses/multi-cloud/index.html">13</a></td>
+</tr>
+<tr class="even">
+<td>Infrastructure de RL</td>
+<td>6 %</td>
+<td>6 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/ray-rl-infra/index.html">11</a></td>
+</tr>
+<tr class="odd">
+<td>Suivi d'expériences</td>
+<td>5 %</td>
+<td>4 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/observability/index.html">14</a></td>
+</tr>
+<tr class="even">
+<td>Ray</td>
+<td>4 %</td>
+<td>1 %</td>
+<td>pratiqué</td>
+<td><a href="../courses/ray-rl-infra/index.html">11</a></td>
+</tr>
+</tbody>
+</table>
+</div>
 <h2 id="ecarts">8. Écarts et décisions</h2>
 <p>L'indice d'écart multiplie la part d'offres qui citent une compétence par ce qui manque au parcours pour la pratiquer (3 moins la profondeur). Les compétences d'expérience (années d'HPC ou d'entraînement) ne s'enseignent pas et sont traitées par les projets.</p>
 <div class="tbl-wrap">
@@ -788,11 +1121,50 @@ pre > code.sourceCode > span > a:first-child{pointer-events:none;text-decoration
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td>Langage système (Go, Rust, C++)</td>
+<td>55 %</td>
+<td>enseigné</td>
+<td>0.55</td>
+</tr>
+<tr class="even">
+<td>CI/CD, automatisation</td>
+<td>28 %</td>
+<td>enseigné</td>
+<td>0.28</td>
+</tr>
+<tr class="odd">
+<td>Conteneurs</td>
+<td>27 %</td>
+<td>enseigné</td>
+<td>0.27</td>
+</tr>
+<tr class="even">
+<td>Journaux, traces</td>
+<td>23 %</td>
+<td>enseigné</td>
+<td>0.23</td>
+</tr>
 </tbody>
 </table>
 </div>
-<!-- gen:decisions -->
-<!-- /gen:decisions -->
+<h3 id="ajouts">8.1. Ce qui a été ajouté au parcours</h3>
+<p>Ce relevé a conduit, le 25 octobre 2026, à quatre chapitres nouveaux et à des compléments, chacun relu contre ses sources primaires.</p>
+<ul>
+<li><strong>Accélérateurs non NVIDIA</strong> (18 % des offres, 30 % en Chine) : <a href="../courses/gpu-programming/index.html#ch9">module 4, chapitre 9</a>, AMD ROCm, TPU et XLA, Trainium, Ascend, avec une liste de contrôle de portabilité.</li>
+<li><strong>Inférence</strong> (17 %) : <a href="../courses/ray-rl-infra/index.html#ch9">module 11, chapitre 9</a>, moteurs, cache KV, batching continu, objectifs de service, et le lab 11.4.</li>
+<li><strong>Virtualisation</strong> (18 %, 26 % en Europe) : <a href="../courses/provisioning/index.html#ch9">module 6, chapitre 9</a>, IOMMU, VFIO, MIG, vGPU et KubeVirt.</li>
+<li><strong>Systèmes distribués et livraison continue</strong> (45 % et 28 %) : <a href="../courses/platform-leadership/index.html#ch9">module 16, chapitre 9</a>, quorum, haute disponibilité de Slurm et de Kubernetes, restauration prouvée, GitOps et canaris, et le lab 16.4.</li>
+<li><strong>Langages système</strong> : des ressources vérifiées pour Go et Rust dans la page <a href="../resources/index.html">Ressources</a>, et des variantes Go ou Rust proposées dans les projets <a href="../projects/homelab-slurm/index.html#extensions">1</a>, <a href="../projects/multi-provider-scheduler/index.html#extensions">4</a> et <a href="../projects/gpu-observability/index.html#extensions">5</a>.</li>
+<li><strong>Profils d'entrée</strong> : les modules 12 et 14 ne supposent plus une pratique de Kubernetes ou de Prometheus ; chaque module dit quoi travailler selon le <a href="../profile/index.html#profils">profil d'entrée</a>.</li>
+</ul>
+<h3 id="assume">8.2. Ce qui reste un écart assumé</h3>
+<ul>
+<li><strong>Un langage système</strong> s'apprend en écrivant du code pendant des mois, pas dans un chapitre : le parcours fait lire et écrire du C et du CUDA C++ (modules 3 et 4) et propose les variantes Go ou Rust des projets, sans module dédié.</li>
+<li><strong>La CI/CD, les conteneurs, les journaux et les traces</strong> sont enseignés (modules 1, 5, 6, 12, 14 et 16) mais sans lab qui leur soit consacré ; les projets 1 et 5 en font pratiquer une partie (tests de règles par <code>promtool</code>, exportateurs).</li>
+<li><strong>L'expérience</strong> (calcul intensif, entraînement à grande échelle) ne s'acquiert que sur de vraies machines : les projets, un stage dans un centre de calcul ou une compétition de clusters en sont les meilleurs substituts.</li>
+<li><strong>Les contraintes propres à un pays</strong> (habilitations de sécurité dans les laboratoires nationaux américains, langue de travail, statut des centres publics) sont signalées, pas enseignées.</li>
+</ul>
 <h2 id="sources">9. Sources et portée</h2>
 <h3 id="documente">9.1. Documenté</h3>
 <p>Les offres, leurs URL et les citations qui appuient chaque compétence sont dans <code>data/jobs/*.json</code> ; l'analyse est recalculée par <code>python3 tools/market_analysis.py</code>, la page par <code>python3 tools/gen_market.py</code>. La couverture des modules est dans <code>data/coverage.json</code>.</p>

@@ -60,6 +60,7 @@ Vous connaissez déjà Kubernetes. Ce module ne le réexplique donc pas : il se 
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html).
 -   **Prépare** : [module 13 — Flotte multi-fournisseurs : SkyPilot, GPU clouds, hyperscalers et centres HPC](../multi-cloud/index.html), [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
 -   **Projets qui s'en servent** : [Projet 4 — Placement multi-fournisseurs sensible aux coûts](../../projects/multi-provider-scheduler/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Kubernetes, Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Checkpoint, tolérance aux pannes, Conception d'ordonnanceur, Slurm, Conteneurs, Systèmes de fichiers parallèles, FinOps, coûts, Planification de capacité, Sécurité, conformité, Systèmes distribués, Santé matérielle (burn-in, diagnostics, RMA) (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}

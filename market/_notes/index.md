@@ -99,8 +99,23 @@ L'indice d'écart multiplie la part d'offres qui citent une compétence par ce q
 
 {{GAPS_TABLE}}
 
-<!-- gen:decisions -->
-<!-- /gen:decisions -->
+### Ce qui a été ajouté au parcours {#ajouts}
+
+Ce relevé a conduit, le 25 octobre 2026, à quatre chapitres nouveaux et à des compléments, chacun relu contre ses sources primaires.
+
+-   **Accélérateurs non NVIDIA** ({{SHARE:non-nvidia-accelerators}} des offres, {{SHARE:non-nvidia-accelerators:cn}} en Chine) : [module 4, chapitre 9](../courses/gpu-programming/index.html#ch9), AMD ROCm, TPU et XLA, Trainium, Ascend, avec une liste de contrôle de portabilité.
+-   **Inférence** ({{SHARE:inference-serving}}) : [module 11, chapitre 9](../courses/ray-rl-infra/index.html#ch9), moteurs, cache KV, batching continu, objectifs de service, et le lab 11.4.
+-   **Virtualisation** ({{SHARE:virtualization}}, {{SHARE:virtualization:eu}} en Europe) : [module 6, chapitre 9](../courses/provisioning/index.html#ch9), IOMMU, VFIO, MIG, vGPU et KubeVirt.
+-   **Systèmes distribués et livraison continue** ({{SHARE:distributed-systems}} et {{SHARE:ci-cd}}) : [module 16, chapitre 9](../courses/platform-leadership/index.html#ch9), quorum, haute disponibilité de Slurm et de Kubernetes, restauration prouvée, GitOps et canaris, et le lab 16.4.
+-   **Langages système** : des ressources vérifiées pour Go et Rust dans la page [Ressources](../resources/index.html), et des variantes Go ou Rust proposées dans les projets [1](../projects/homelab-slurm/index.html#extensions), [4](../projects/multi-provider-scheduler/index.html#extensions) et [5](../projects/gpu-observability/index.html#extensions).
+-   **Profils d'entrée** : les modules 12 et 14 ne supposent plus une pratique de Kubernetes ou de Prometheus ; chaque module dit quoi travailler selon le [profil d'entrée](../profile/index.html#profils).
+
+### Ce qui reste un écart assumé {#assume}
+
+-   **Un langage système** s'apprend en écrivant du code pendant des mois, pas dans un chapitre : le parcours fait lire et écrire du C et du CUDA C++ (modules 3 et 4) et propose les variantes Go ou Rust des projets, sans module dédié.
+-   **La CI/CD, les conteneurs, les journaux et les traces** sont enseignés (modules 1, 5, 6, 12, 14 et 16) mais sans lab qui leur soit consacré ; les projets 1 et 5 en font pratiquer une partie (tests de règles par `promtool`, exportateurs).
+-   **L'expérience** (calcul intensif, entraînement à grande échelle) ne s'acquiert que sur de vraies machines : les projets, un stage dans un centre de calcul ou une compétition de clusters en sont les meilleurs substituts.
+-   **Les contraintes propres à un pays** (habilitations de sécurité dans les laboratoires nationaux américains, langue de travail, statut des centres publics) sont signalées, pas enseignées.
 
 ## Sources et portée {#sources}
 

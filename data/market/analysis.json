@@ -4798,5 +4798,1830 @@
    "b": "linux-admin",
    "n": 30
   }
+ ],
+ "coverage": {
+  "python": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "resilient-trainer",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "systems-lang": {
+   "max_depth": 2,
+   "owners": [
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": false
+  },
+  "linux-admin": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "resilient-trainer",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "slurm": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "kubernetes": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "ray": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "multicloud-skypilot": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "terraform-iac": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "ansible-config": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "containers": {
+   "max_depth": 2,
+   "owners": [
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": false
+  },
+  "pytorch-distributed": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "nccl-collectives": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "cuda-gpu": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "infiniband-roce": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "parallel-fs-storage": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "object-storage": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "prometheus-grafana": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "dcgm-gpu-monitoring": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "logging-tracing": {
+   "max_depth": 2,
+   "owners": [
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": false
+  },
+  "experiment-tracking": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "checkpoint-fault-tolerance": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "resilient-trainer",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "scheduler-design": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 2
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "hyperscaler-cloud": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "gpu-cloud-providers": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "finops-cost": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "procurement-vendor": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "capacity-planning": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "multi-provider-scheduler",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "security-compliance": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "sre-oncall": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "resilient-trainer",
+     "kind": "project",
+     "depth": 2
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "leadership-mgmt": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "capstone-rfc",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "hpc-experience": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "ml-training-experience": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 2
+    },
+    {
+     "page": "resilient-trainer",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "rl-infra": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "data-pipelines": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "networking-general": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "bare-metal-provisioning": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "ci-cd": {
+   "max_depth": 2,
+   "owners": [
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": false
+  },
+  "inference-serving": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "non-nvidia-accelerators": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "perf-profiling": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "gpu-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "datacenter-facilities": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "finops-capacity",
+     "kind": "module",
+     "depth": 3
+    }
+   ],
+   "practised": true
+  },
+  "distributed-systems": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "platform-leadership",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "ray-rl-infra",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "distributed-training",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "multi-cloud",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "parallel-programming",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "perf-models",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "storage",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "scaling-study",
+     "kind": "project",
+     "depth": 2
+    },
+    {
+     "page": "resilient-trainer",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "virtualization": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  },
+  "hardware-health": {
+   "max_depth": 3,
+   "owners": [
+    {
+     "page": "fault-tolerance",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "networking",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "observability",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "provisioning",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "slurm",
+     "kind": "module",
+     "depth": 3
+    },
+    {
+     "page": "gpu-observability",
+     "kind": "project",
+     "depth": 3
+    },
+    {
+     "page": "kubernetes-gpu",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "linux-systems",
+     "kind": "module",
+     "depth": 2
+    },
+    {
+     "page": "homelab-slurm",
+     "kind": "project",
+     "depth": 2
+    }
+   ],
+   "practised": true
+  }
+ },
+ "gaps": [
+  {
+   "skill": "systems-lang",
+   "share_any": 0.552,
+   "share_required": 0.5,
+   "max_depth": 2,
+   "practised": false,
+   "gap_score": 0.552
+  },
+  {
+   "skill": "ci-cd",
+   "share_any": 0.281,
+   "share_required": 0.198,
+   "max_depth": 2,
+   "practised": false,
+   "gap_score": 0.281
+  },
+  {
+   "skill": "containers",
+   "share_any": 0.271,
+   "share_required": 0.177,
+   "max_depth": 2,
+   "practised": false,
+   "gap_score": 0.271
+  },
+  {
+   "skill": "logging-tracing",
+   "share_any": 0.229,
+   "share_required": 0.198,
+   "max_depth": 2,
+   "practised": false,
+   "gap_score": 0.229
+  },
+  {
+   "skill": "python",
+   "share_any": 0.677,
+   "share_required": 0.594,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "linux-admin",
+   "share_any": 0.562,
+   "share_required": 0.521,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "slurm",
+   "share_any": 0.219,
+   "share_required": 0.125,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "kubernetes",
+   "share_any": 0.521,
+   "share_required": 0.385,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "ray",
+   "share_any": 0.042,
+   "share_required": 0.01,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "multicloud-skypilot",
+   "share_any": 0.073,
+   "share_required": 0.062,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "terraform-iac",
+   "share_any": 0.26,
+   "share_required": 0.167,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "ansible-config",
+   "share_any": 0.24,
+   "share_required": 0.177,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "pytorch-distributed",
+   "share_any": 0.198,
+   "share_required": 0.146,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "nccl-collectives",
+   "share_any": 0.26,
+   "share_required": 0.156,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "cuda-gpu",
+   "share_any": 0.385,
+   "share_required": 0.177,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "infiniband-roce",
+   "share_any": 0.427,
+   "share_required": 0.271,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "parallel-fs-storage",
+   "share_any": 0.302,
+   "share_required": 0.188,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "object-storage",
+   "share_any": 0.083,
+   "share_required": 0.073,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "prometheus-grafana",
+   "share_any": 0.365,
+   "share_required": 0.26,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "dcgm-gpu-monitoring",
+   "share_any": 0.135,
+   "share_required": 0.125,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "experiment-tracking",
+   "share_any": 0.052,
+   "share_required": 0.042,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "checkpoint-fault-tolerance",
+   "share_any": 0.198,
+   "share_required": 0.156,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "scheduler-design",
+   "share_any": 0.198,
+   "share_required": 0.167,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "hyperscaler-cloud",
+   "share_any": 0.271,
+   "share_required": 0.188,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "gpu-cloud-providers",
+   "share_any": 0.073,
+   "share_required": 0.062,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "finops-cost",
+   "share_any": 0.146,
+   "share_required": 0.135,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "procurement-vendor",
+   "share_any": 0.125,
+   "share_required": 0.115,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "capacity-planning",
+   "share_any": 0.281,
+   "share_required": 0.229,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "security-compliance",
+   "share_any": 0.26,
+   "share_required": 0.229,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "sre-oncall",
+   "share_any": 0.542,
+   "share_required": 0.51,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "leadership-mgmt",
+   "share_any": 0.229,
+   "share_required": 0.188,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "hpc-experience",
+   "share_any": 0.51,
+   "share_required": 0.302,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "ml-training-experience",
+   "share_any": 0.458,
+   "share_required": 0.281,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "rl-infra",
+   "share_any": 0.062,
+   "share_required": 0.062,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "data-pipelines",
+   "share_any": 0.135,
+   "share_required": 0.094,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "networking-general",
+   "share_any": 0.438,
+   "share_required": 0.302,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "bare-metal-provisioning",
+   "share_any": 0.292,
+   "share_required": 0.208,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "inference-serving",
+   "share_any": 0.167,
+   "share_required": 0.115,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "non-nvidia-accelerators",
+   "share_any": 0.177,
+   "share_required": 0.135,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "perf-profiling",
+   "share_any": 0.51,
+   "share_required": 0.448,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "datacenter-facilities",
+   "share_any": 0.135,
+   "share_required": 0.073,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "distributed-systems",
+   "share_any": 0.448,
+   "share_required": 0.354,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "virtualization",
+   "share_any": 0.177,
+   "share_required": 0.104,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  },
+  {
+   "skill": "hardware-health",
+   "share_any": 0.385,
+   "share_required": 0.344,
+   "max_depth": 3,
+   "practised": true,
+   "gap_score": 0.0
+  }
  ]
 }

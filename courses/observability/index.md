@@ -60,6 +60,7 @@ Tout ce qui est exécutable l'a été dans un bac à sable sans GPU. Les métriq
 -   **S'appuie sur** : [module 1 — Linux, systèmes et diagnostic de performance](../linux-systems/index.html), [module 5 — Slurm et exploitation d'un cluster HPC](../slurm/index.html).
 -   **Prépare** : [module 16 — Plateforme interne, sécurité, production et leadership](../platform-leadership/index.html).
 -   **Projets qui s'en servent** : [Projet 1 — Mini-cluster Slurm instrumenté](../../projects/homelab-slurm/index.html), [Projet 5 — Observabilité GPU et détection de pannes silencieuses](../../projects/gpu-observability/index.html), [Projet 6 — RFC et prototype : une plateforme de calcul de 8 à 256 GPU](../../projects/capstone-rfc/index.html).
+-   **Compétences demandées dans les offres d'emploi et travaillées ici** : Python, Slurm, Prometheus, Grafana, Supervision GPU (DCGM), Suivi d'expériences, Astreinte, fiabilité (SRE), Santé matérielle (burn-in, diagnostics, RMA), Entraînement distribué (PyTorch, Megatron, DeepSpeed…), Collectives (NCCL, RCCL, HCCL), Journaux, traces, Checkpoint, tolérance aux pannes, Expérience d'entraînement ML, Systèmes distribués (voir [l'analyse du marché](../../market/index.html#couverture)).
 <!-- /gen:place -->
 
 ### Plan de séances {#seances}
