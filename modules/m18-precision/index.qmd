@@ -1,0 +1,127 @@
+---
+title: "NVFP4 et FP8"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 20
+---
+
+## Objectifs
+
+Il compare NVFP4 et FP8 seulement quand le modèle, le moteur et la concurrence sont les mêmes. À la fin, il sépare un gain de débit, un gain de mémoire, et une parité de qualité qui n'a pas été mesurée contre FP8.
+
+## Prérequis
+
+Il a lu [Machines d'inférence locale](../m16-machines/). Il sait qu'un tok/s agrégé se divise par le nombre de flux pour obtenir le débit d'un utilisateur. Les pertes d'entraînement restent sur [Débogage numérique](../m12-numerique/).
+
+## Notes de cours
+
+La note `nvfp4-vs-fp8-resume.md` est du 15 octobre 2026. Elle porte sur des RTX PRO 6000 Blackwell. Elle ne refait pas les bancs. Chaque ligne garde sa source.
+
+## Débit
+
+Les comparaisons ci-dessous opposent NVFP4 et FP8 sur le même modèle. Le premier nombre est NVFP4.
+
+| Banc | NVFP4 | FP8 | Écart |
+| --- | ---: | ---: | --- |
+| Qwen3.8-27B, 8 requêtes, vLLM et MTP | 654,1 tok/s | 556,2 | plus 18 pour cent |
+| Même banc, par flux | 86,3 | 73,9 | même écart |
+| Qwen3.8-27B, 1 requête, 4K, SGLang sans spéculation | 57,9 | 48,0 | plus 20,6 pour cent |
+| Même banc, prompt de 389k, une requête à froid | 37,0 | 33,2 | écart réduit |
+| Qwen3-32B, 128 requêtes, vLLM | 2 050 | 1 558 | plus 32 pour cent |
+| Nemotron-Super-49B, 100 requêtes, NIM | 3 030 | 2 256 | 1,32 fois |
+
+Sources, dans l'ordre des lignes. Deep-AI-Evo pour les 8 requêtes. Fakoli, qualification du 15 août 2026, pour SGLang. Le temps avant le premier jeton y baisse de 22,6 pour cent sur le contexte 4K. Jarvislabs pour le 32B. Akamai pour Nemotron.
+
+NexGen publie 720 tok/s en NVFP4 contre 212 en FP8 sur Qwen3.8-27B à 8 requêtes. La note marque la comparaison comme faussée. DFlash2, le décodage spéculatif, n'est que du côté NVFP4. À conditions égales sous SGLang, la même source donne 365,1 contre 212,0 tok/s. Ce second couple est celui qu'il faut citer.
+
+La recommandation de la note, pour une PRO 6000 en service multi-utilisateurs, est NVFP4. Le débit y gagne environ 18 à 32 pour cent sur les bancs équitables, et les poids environ 15 à 24 pour cent. La qualité se valide sur les tâches réelles du service avant la mise en production. La note ne publie pas cette validation.
+
+## Mémoire
+
+Deux mesures de poids pour Qwen3.8-27B ne se moyennent pas.
+
+| Source | NVFP4 | FP8 |
+| --- | ---: | ---: |
+| Deep-AI-Evo | 22 Go | 29 Go |
+| Fakoli | 24,21 Go | 28,47 Go |
+
+Fakoli ajoute qu'environ 139 000 jetons de cache KV sont libérés, 1,81 million contre 1,67 million. Ce n'est pas un second pesage des poids.
+
+Pour GLM-5.3-Flash, la fiche NVIDIA citée annonce environ 3,33 fois moins de mémoire que BF16. Ce n'est pas une comparaison avec FP8.
+
+## Qualité
+
+La parité chiffrée de la note oppose NVFP4 et BF16 sur GLM-5.3-Flash, pas NVFP4 et FP8. La source est la fiche NVIDIA du modèle. L'écart tient en moins d'un point sur les scores imprimés.
+
+| Jeu | NVFP4 | BF16 |
+| --- | ---: | ---: |
+| GPQA Diamond | 0,9211 | 0,9217 |
+| SciCode | 0,5769 | 0,5621 |
+| MMMU Pro | 0,763 | 0,7688 |
+| AA-LCR | 0,7106 | 0,71 |
+| IFBench | 0,6054 | 0,613 |
+| Terminal Bench 2.1 | 0,8315 | 0,8258 |
+
+Sur Qwen3.8-27B, Fakoli dit que NVFP4 et FP8 réussissent les mêmes tests fonctionnels, outils 20 sur 20, récupération à 128k, intelligence 6 sur 6. La même source précise que ces tests sont limités et ne prouvent pas une équivalence générale.
+
+La note dit n'avoir pas trouvé de perplexité NVFP4 contre FP8, ni un score Artificial Analysis séparé par quantification, ni une comparaison directe NVFP4 contre FP8 sur la fiche NVIDIA.
+
+## Exercices
+
+### Exercice 1
+
+Il recopie le banc à 8 requêtes et le banc SGLang à 4K. Il dit ce qui est tenu égal dans chacun.
+
+### Exercice 2
+
+Il explique pourquoi 720 contre 212 ne se cite pas comme gain NVFP4.
+
+### Exercice 3
+
+Il donne les deux pesages de Qwen3.8-27B sans en faire la moyenne.
+
+### Exercice 4
+
+Il dit contre quel format la parité GLM est mesurée, et ce que la note n'a pas trouvé contre FP8.
+
+## Projet solo
+
+Il écrit la recommandation de la note en cinq lignes. Il marque ce qui est un débit, ce qui est un poids, et ce qui reste à valider sur les tâches du service. Il n'ajoute pas de score.
+
+## Projet de groupe
+
+À deux, l'un défend NVFP4 à partir du tableau de débit. L'autre liste les limites de qualité de la même note. Ils rendent les deux textes, pas une moyenne.
+
+## Examen
+
+### Question 1
+
+Quel écart de débit la note retient-elle pour Qwen3.8-27B à 8 requêtes sous vLLM avec MTP ?
+
+### Question 2
+
+Les 22 Go et les 24,21 Go ne se remplacent-ils pas l'un l'autre. Quelle en est la raison ?
+
+### Question 3
+
+La parité à moins d'un point est-elle NVFP4 contre FP8, ou NVFP4 contre BF16 ?
+
+## Sources
+
+`nvfp4-vs-fp8-resume.md`, 15 octobre 2026.
+
+Deep-AI-Evo, Fakoli anvil (15 août 2026), Jarvislabs, Akamai, NexGen, fiche NVIDIA GLM-5.3-Flash-NVFP4. Les adresses sont dans la note. Elles ne sont pas recontrôlées pour cette page.
+
+`SYNTHESE.md`, octobre 2026.
+
+Les recherches brutes ne sont pas recopiées.

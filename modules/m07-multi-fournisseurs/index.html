@@ -76,6 +76,11 @@ ul.task-list li input[type="checkbox"] {
 <a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
 <a href="../../modules/m12-numerique/">Débogage numérique</a>
 <a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+<a href="../../modules/m14-inference/">Inférence</a>
+<a href="../../modules/m15-blackwell/">Prix des GPU Blackwell</a>
+<a href="../../modules/m16-machines/">Machines d'inférence locale</a>
+<a href="../../modules/m17-cloud/">Cloud GPU et coût par jeton</a>
+<a href="../../modules/m18-precision/">NVFP4 et FP8</a>
 </nav>
 <main id="main">
 
@@ -88,6 +93,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 id="objectifs" class="anchored">Objectifs</h2>
 <p>Il connaît Azure et Terraform. Il place encore un entraînement chez un seul fournisseur.</p>
 <p>Il traite Ray et SkyPilot comme la classe d’outil qui choisit où un job tourne. Il écrit un quota, un débordement, et un basculement. L’offre A, Compute Infrastructure Lead, lui demande ce placement pour la startup robotique.</p>
+<p>Le coût d’une location réservée un an, face à un achat local, est sur <a href="../m17-cloud/">Cloud GPU et coût par jeton</a>. Cette page reste le placement.</p>
 <h2 id="travaux-pratiques-prévus" class="anchored">Travaux pratiques prévus</h2>
 <p>Sur une feuille, il place le même job sur deux types de GPU. Le type A est un petit GPU, celui du laptop ou d’un cloud peu cher, avec un quota de dix heures. Le type B est un GPU plus gros, utilisé seulement quand le quota de A est plein. Le signal de basculement est un refus de quota, ou un job arrêté avant la fin. Il note le fichier de checkpoint que B relit, et ce qui est perdu si A s’arrête sans ce fichier.</p>
 <p>Il ne soumet le job nulle part. Il écrit Ray et SkyPilot sur la feuille pour nommer la classe d’outil. Il ne les installe pas. Une branche avec un compte réel, cloud peu cher ou ROMEO, viendrait plus tard. Il rend la feuille.</p>

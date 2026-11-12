@@ -21,6 +21,8 @@ Il connaît Azure et Terraform. Il place encore un entraînement chez un seul fo
 
 Il traite Ray et SkyPilot comme la classe d'outil qui choisit où un job tourne. Il écrit un quota, un débordement, et un basculement. L'offre A, Compute Infrastructure Lead, lui demande ce placement pour la startup robotique.
 
+Le coût d'une location réservée un an, face à un achat local, est sur [Cloud GPU et coût par jeton](../m17-cloud/). Cette page reste le placement.
+
 ## Travaux pratiques prévus
 
 Sur une feuille, il place le même job sur deux types de GPU. Le type A est un petit GPU, celui du laptop ou d'un cloud peu cher, avec un quota de dix heures. Le type B est un GPU plus gros, utilisé seulement quand le quota de A est plein. Le signal de basculement est un refus de quota, ou un job arrêté avant la fin. Il note le fichier de checkpoint que B relit, et ce qui est perdu si A s'arrête sans ce fichier.

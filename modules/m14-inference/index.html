@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Inférence</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-html-435ba6093e6f0817aa7405139811e7b1.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<link rel="stylesheet" href="../../assets/paper.css">
+<script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js" integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZR1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk" crossorigin="anonymous"></script><script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css" integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp" crossorigin="anonymous"></head>
+
+<body>
+
+<!-- derived from module front matter. build_site overwrites this file. -->
+<script>(function(){try{var t=localStorage.getItem("mci-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="topbar">
+<button type="button" class="tb-btn" id="toc-toggle" aria-controls="sidetoc" aria-expanded="false"><span class="tb-label">Sommaire</span></button>
+<a class="brand" href="../../index.html">Infra de calcul</a>
+<span class="tb-title" id="tb-title"></span>
+<button type="button" class="tb-btn" id="theme-toggle">Thème</button>
+</header>
+<div class="layout">
+<nav id="sidetoc" class="sidetoc" aria-label="Sommaire"></nav>
+<div class="content">
+<nav id="mci-nav">
+<a href="../../index.html">Accueil</a>
+<a href="../../parcours/index.html">Parcours</a>
+<a href="../../glossaire/index.html">Glossaire</a>
+<a href="../../programmes/index.html">Programmes</a>
+<a href="../../programmes/france.html">France</a>
+<a href="../../programmes/usa.html">États-Unis</a>
+<a href="../../programmes/chine.html">Chine</a>
+<a href="../../programmes/monde.html">Reste du monde</a>
+<a href="../../programmes/synthese.html">Synthèse</a>
+<a href="../../modules/m01-anatomie-noeud/">Anatomie d'un nœud Linux et GPU</a>
+<a href="../../modules/m02-ordonnancement/">Ordonnancement Slurm et Kubernetes</a>
+<a href="../../modules/a-romeo-cuda/">ROMEO2025 et CUDA Python</a>
+<a href="../../modules/m03-pytorch-nccl/">PyTorch distribué et NCCL</a>
+<a href="../../modules/m00-socle-dl/">Socle PyTorch pour l'infra</a>
+<a href="../../modules/m04-hpo/">Recherche d'hyperparamètres multi-GPU</a>
+<a href="../../modules/m05-reseau-stockage/">Réseau et stockage d'entraînement</a>
+<a href="../../modules/m06-reprise/">Préemption et reprise</a>
+<a href="../../modules/m07-multi-fournisseurs/">Placement multi-fournisseurs</a>
+<a href="../../modules/m08-observabilite-cout/">Observabilité et coût de flotte</a>
+<a href="../../modules/m09-capstone/">Capstone portefeuille Lead</a>
+<a href="../../modules/m10-parallelismes/">Parallélismes et MFU</a>
+<a href="../../modules/m11-noyaux/">Profilage et noyaux</a>
+<a href="../../modules/m12-numerique/">Débogage numérique</a>
+<a href="../../modules/m13-rl/">Infra d'entraînement par renforcement</a>
+<a href="../../modules/m14-inference/">Inférence</a>
+<a href="../../modules/m15-blackwell/">Prix des GPU Blackwell</a>
+<a href="../../modules/m16-machines/">Machines d'inférence locale</a>
+<a href="../../modules/m17-cloud/">Cloud GPU et coût par jeton</a>
+<a href="../../modules/m18-precision/">NVFP4 et FP8</a>
+</nav>
+<main id="main">
+
+<header id="title-block-header">
+<h1 class="title">Inférence</h1>
+
+</header>
+
+
+<h2 id="objectifs" class="anchored">Objectifs</h2>
+<p>Il range le dossier d’inférence à part du parcours d’entraînement. À la fin, il sait quelle page porte les prix, quelle page porte les machines, et quelle page porte le cloud.</p>
+<ul>
+<li>Il ouvre la grille Blackwell du 23 octobre 2026 sans mélanger une estimation et un prix de marché.</li>
+<li>Il retrouve les trois prix HT de la DGX Station et la phrase qui dit qu’ils ne concordent pas.</li>
+<li>Il sait que l’interprétation des courbes n’existe ici qu’en résumé.</li>
+<li>Il retrouve le cours zero-to-sglang et les textes de Yichi Zhang sur HiCache.</li>
+</ul>
+<h2 id="prérequis" class="anchored">Prérequis</h2>
+<p>Il a déjà fait tourner vLLM pour l’inférence. Il sait lire une mémoire de GPU dans <code>nvidia-smi</code>. Il n’a pas besoin du cluster du centre de calcul pour lire ces pages.</p>
+<h2 id="notes-de-cours" class="anchored">Notes de cours</h2>
+<p>Ces pages reprennent le dossier préparé le 25 octobre 2026. Chaque chiffre reste attaché au fichier qui le porte. Rien n’est recalculé pour départager deux sources.</p>
+<h2 id="carte-de-la-section" class="anchored">Carte de la section</h2>
+<p>Cinq pages se suivent. Celle-ci est la carte. Les quatre autres portent les chiffres.</p>
+<ul>
+<li><a href="../m15-blackwell/">Prix des GPU Blackwell</a> donne la VRAM, la bande passante, les euros par gigaoctet, les fits et le résumé des courbes.</li>
+<li><a href="../m16-machines/">Machines d’inférence locale</a> compare DGX Spark, DGX Station, Mac Studio et les rigs WRX90. Les trois prix de la Station y sont réunis.</li>
+<li><a href="../m17-cloud/">Cloud GPU et coût par jeton</a> met une location réservée un an à côté de l’achat local, puis le coût par jeton.</li>
+<li><a href="../m18-precision/">NVFP4 et FP8</a> compare le débit, la mémoire et la qualité sur RTX PRO 6000.</li>
+</ul>
+<p>Les graphiques sont dans <code>analyses/blackwell/</code> et <code>analyses/rigs/charts/</code>. Les scripts qui les retracent sont à côté, dans <code>analyses/blackwell/</code> et <code>analyses/rigs/</code>. Le tableur des rigs n’est pas dans le dépôt. Ses totaux sont dans <code>analyses/rigs/configs-wrx90.csv</code>.</p>
+<p>Les recherches brutes qui ont nourri le dossier ne sont pas recopiées. Seules les notes déjà rédigées servent de source.</p>
+<h2 id="exercices" class="anchored">Exercices</h2>
+<h3 id="exercice-1" class="anchored">Exercice 1</h3>
+<p>Il ouvre la carte et il écrit le titre de la page qui porte les trois prix de la Station.</p>
+<h3 id="exercice-2" class="anchored">Exercice 2</h3>
+<p>Il ouvre la page des prix Blackwell et il copie la phrase qui dit que le rapport complet d’interprétation manque.</p>
+<h3 id="exercice-3" class="anchored">Exercice 3</h3>
+<p>Il ouvre le fichier <code>analyses/rigs/configs-wrx90.csv</code> et il note le prix HT du palier 1 GPU et celui du palier 4 GPU. Il ne les additionne pas.</p>
+<h3 id="exercice-4" class="anchored">Exercice 4</h3>
+<p>Il retrouve, dans les références de cette page, l’adresse du dépôt zero-to-sglang et l’adresse du billet HiCache. Il les recopie.</p>
+<h2 id="projet-solo" class="anchored">Projet solo</h2>
+<p>Il écrit une page d’une trentaine de lignes. La page dit ce qu’il irait lire avant d’acheter une machine d’inférence, et ce qu’il ne trancherait pas tant que les trois prix de la Station restent en désaccord. Il n’ajoute aucun chiffre qui ne soit déjà sur ces pages.</p>
+<h2 id="projet-de-groupe" class="anchored">Projet de groupe</h2>
+<p>À deux, ils se répartissent la page des machines et la page du cloud. Chacun explique à l’autre un seul écart de prix, avec le nom du fichier source. Ils rendent les deux explications.</p>
+<h2 id="examen" class="anchored">Examen</h2>
+<h3 id="question-1" class="anchored">Question 1</h3>
+<p>Quel fichier du 22 octobre 2026 porte le prix d’environ 90 000 euros HT pour la Station ?</p>
+<h3 id="question-2" class="anchored">Question 2</h3>
+<p>Que manque-t-il au dossier d’interprétation des courbes Blackwell ?</p>
+<h3 id="question-3" class="anchored">Question 3</h3>
+<p>Où sont les totaux des rigs WRX90, puisque le tableur n’est pas publié ?</p>
+<h2 id="sources" class="anchored">Sources</h2>
+<p>Les chiffres des pages liées viennent des fichiers nommés sur chaque page. Cette carte ne recalcule rien.</p>
+<p>Les notes de recherche brutes du dossier du 25 octobre 2026 ont servi à rédiger ces notes. Elles ne sont pas reproduites.</p>
+<h3 id="références" class="anchored">Références</h3>
+<p>Les adresses suivantes ont été ouvertes le 25 octobre 2026. Seules celles qui ont répondu sont gardées.</p>
+<p>Le dépôt du cours zero-to-sglang est <a href="https://github.com/datawhalechina/zero-to-sglang">datawhalechina/zero-to-sglang</a>. La page du cours en anglais est <a href="https://datawhalechina.github.io/zero-to-sglang/eng/">zero-to-sglang</a>.</p>
+<p>Yichi Zhang publie sur <a href="https://x.com/YichiZ03">x.com/YichiZ03</a>. Le 22 octobre 2026, ses messages renvoient au billet HiCache et à une série sur le cache KV dans SGLang. Le billet ouvert est <a href="https://www.sglang.io/blog/hicache">HiCache in SGLang</a>. La documentation ouverte est <a href="https://docs.sglang.io/docs/advanced_features/hicache">Hierarchical KV Caching</a>.</p>
+<p>Le profil public répond. Les messages datés du 21 et du 22 octobre 2026 décrivent les chapitres KV Cache, Tensor Parallelism et RadixAttention du cours, puis le billet HiCache. L’identifiant numérique de chaque message n’a pas été retenu ici, faute d’une page de message dont le texte a été lu directement sur x.com.</p>
+
+</main>
+</div>
+</div>
+<script src="../../assets/theme.js"></script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

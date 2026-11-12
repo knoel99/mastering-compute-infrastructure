@@ -4,7 +4,18 @@ import unittest
 from html import escape
 from pathlib import Path
 
-from tools.gates import Code, _html_contains, check_gates
+from tools.gates import (
+    Code,
+    _annex_qmd,
+    _derive_chrome,
+    _derive_glossary,
+    _derive_home_cards,
+    _derive_parcours,
+    _describe_programmes,
+    _html_contains,
+    _load_catalog,
+    check_gates,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 MARKER = "<!-- derived from module front matter. build_site overwrites this file. -->"
@@ -368,6 +379,246 @@ class GateTests(unittest.TestCase):
             ),
             _show(report),
         )
+
+
+def _sync_derived(root: Path) -> None:
+    catalog = _load_catalog(root)
+    publication = _describe_programmes(root, catalog.modules)
+    _fill(root, "generated/home-cards.md", _derive_home_cards(catalog.modules))
+    _fill(
+        root,
+        "generated/parcours-sequence.md",
+        _derive_parcours(catalog.modules, publication.anchors),
+    )
+    _fill(root, "generated/glossaire.md", _derive_glossary(_annex_qmd(root, catalog.modules)))
+    for depth in (0, 1, 2):
+        _fill(
+            root,
+            f"generated/chrome-d{depth}.html",
+            _derive_chrome(catalog.modules, depth, publication.links),
+        )
+
+
+def _full_page(title: str, order: int, extras: str) -> str:
+    exercises = "".join(f"### Exercice {i}\n\nFaire {i}.\n\n" for i in range(1, 5))
+    questions = "".join(f"### Question {i}\n\nRépondre {i}.\n\n" for i in range(1, 4))
+    return (
+        _front(title, 2, f"mci:\n  status: full\n  order: {order}")
+        + "## Objectifs\n\nLire la page.\n\n"
+        + "## Prérequis\n\nAucun acquis particulier.\n\n"
+        + "## Notes de cours\n\nDes notes.\n\n"
+        + extras
+        + "## Exercices\n\n"
+        + exercises
+        + "## Projet solo\n\nSeul.\n\n## Projet de groupe\n\nEnsemble.\n\n"
+        + "## Examen\n\n"
+        + questions
+        + "## Sources\n\nNotes internes.\n"
+    )
+
+
+def _link_lines(depth: int, modules: list[tuple[str, str, str, str]]) -> str:
+    prefix = "../" * depth
+    return "\n".join(
+        f'<a href="{prefix}modules/{slug}/">{title}</a> {track}. {status}.'
+        for slug, title, track, status in modules
+    )
+
+
+class InferenceGateTests(unittest.TestCase):
+    def test_banned_document_file(self) -> None:
+        ext = "." + "pd" + "f"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / ("quote" + ext)).write_bytes(b"x")
+            report = check_gates(root)
+        self.assertTrue(
+            any(
+                item.code == Code.INFERENCE and item.message == f"fichier interdit : {ext}"
+                for item in report.findings
+            ),
+            _show(report),
+        )
+
+    def test_banned_word(self) -> None:
+        word = "confiden" + "tiel"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fill(root, "note.md", f"Le mot {word} est là.\n")
+            report = check_gates(root)
+        self.assertTrue(
+            any(item.code == Code.INFERENCE and item.message == "chaîne interdite" for item in report.findings),
+            _show(report),
+        )
+
+    def test_banned_extension_mention(self) -> None:
+        mention = "table" + "." + "xls" + "x"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fill(root, "note.md", f"Voir {mention}.\n")
+            report = check_gates(root)
+        self.assertTrue(
+            any(item.code == Code.INFERENCE and "mention interdite" in item.message for item in report.findings),
+            _show(report),
+        )
+
+    def test_programme_handbook_mention_is_kept(self) -> None:
+        mention = "handbook" + "." + "pd" + "f"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fill(root, "programmes/usa.md", f"Voir {mention}.\n")
+            report = check_gates(root)
+        self.assertFalse(
+            any(
+                item.code == Code.INFERENCE and "mention interdite" in item.message
+                for item in report.findings
+            ),
+            _show(report),
+        )
+
+    def test_course_marker_requires_inference_pages(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fill(root, "modules/m01-anatomie-noeud/index.qmd", _bare("Anatomie", "skeleton"))
+            report = check_gates(root)
+        self.assertTrue(
+            any(
+                item.code == Code.INFERENCE and item.message == "page d'inférence absente"
+                for item in report.findings
+            ),
+            _show(report),
+        )
+
+    def test_station_prices_must_sit_together(self) -> None:
+        extras = (
+            "## Decode et prefill\n\nTexte.\n\n"
+            "## Spark et Station\n\nTexte.\n\n"
+            "## Prix de la DGX Station\n\n90 000 et 105 000 seulement.\n\n"
+            "## Rigs WRX90\n\nTexte.\n\n"
+            "## Mac Studio\n\nTexte.\n\n"
+            "## Concurrence et débit\n\nTexte.\n\n"
+            "## Bruit\n\nTexte.\n\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fill(root, "modules/m16-machines/index.qmd", _full_page("Machines", 2, extras))
+            report = check_gates(root)
+        self.assertTrue(
+            any(
+                item.code == Code.INFERENCE and "91 532" in item.message
+                for item in report.findings
+            ),
+            _show(report),
+        )
+
+    def test_missing_image(self) -> None:
+        extras = "## Grille de prix\n\n![graphique](absent.png)\n\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _fill(root, "modules/m15-blackwell/index.qmd", _full_page("Prix", 2, extras))
+            report = check_gates(root)
+        self.assertTrue(
+            any(
+                item.code == Code.INFERENCE and item.message == "image absente : absent.png"
+                for item in report.findings
+            ),
+            _show(report),
+        )
+
+    def test_complete_inference_section_passes(self) -> None:
+        refs = "\n".join(
+            [
+                "https://github.com/datawhalechina/zero-to-sglang",
+                "https://datawhalechina.github.io/zero-to-sglang/eng/",
+                "https://x.com/YichiZ03",
+                "https://www.sglang.io/blog/hicache",
+                "https://docs.sglang.io/docs/advanced_features/hicache",
+                "25 octobre 2026",
+            ]
+        )
+        price = (
+            "90 000 vient de rapport-concurrence-spark-station-20261022.md. "
+            "105 000 vient de configs-wrx90. "
+            "91 532 vient de rapport-blackwell-prix-20261023.md. "
+            "Les trois prix ne concordent pas."
+        )
+        pages = [
+            ("m14-inference", "Inférence", 2, "## Carte de la section\n\nLa carte.\n\n## Références\n\n" + refs + "\n\n"),
+            (
+                "m15-blackwell",
+                "Prix",
+                3,
+                "## Grille de prix\n\nLa grille.\n\n## Euros par gigaoctet\n\nLe ratio.\n\n"
+                "## Tendances et régimes\n\nLes fits.\n\n## Lecture des courbes\n\n"
+                "résumé uniquement, rapport complet manquant\n\n",
+            ),
+            (
+                "m16-machines",
+                "Machines",
+                4,
+                "## Decode et prefill\n\nTexte.\n\n## Spark et Station\n\nTexte.\n\n"
+                f"## Prix de la DGX Station\n\n{price}\n\n## Rigs WRX90\n\nTexte.\n\n"
+                "## Mac Studio\n\nTexte.\n\n## Concurrence et débit\n\nTexte.\n\n## Bruit\n\nTexte.\n\n",
+            ),
+            (
+                "m17-cloud",
+                "Cloud",
+                5,
+                "## Location réservée et achat local\n\nTexte.\n\n## Coût par jeton\n\nTexte.\n\n",
+            ),
+            (
+                "m18-precision",
+                "Précision",
+                6,
+                "## Débit\n\nTexte.\n\n## Mémoire\n\nTexte.\n\n## Qualité\n\nTexte.\n\n",
+            ),
+        ]
+        modules = [("a-glossaire", "Glossaire", "Annexe", "Squelette")]
+        modules.extend((slug, title, "Offre B", "Cours") for slug, title, _order, _extras in pages)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _valid_tree(root)
+            for slug, title, order, extras in pages:
+                qmd = _full_page(title, order, extras)
+                _fill(root, f"modules/{slug}/index.qmd", qmd)
+                headings = [
+                    "Objectifs",
+                    "Prérequis",
+                    "Notes de cours",
+                    "Exercices",
+                    "Projet solo",
+                    "Projet de groupe",
+                    "Examen",
+                    "Exercice 1",
+                    "Exercice 2",
+                    "Exercice 3",
+                    "Exercice 4",
+                    "Question 1",
+                    "Question 2",
+                    "Question 3",
+                ]
+                if slug == "m15-blackwell":
+                    headings.append("résumé uniquement, rapport complet manquant")
+                if slug == "m16-machines":
+                    headings.append(price)
+                body = "\n".join(f"<h2>{item}</h2>" for item in headings) + "\n" + extras
+                _fill(
+                    root,
+                    f"modules/{slug}/index.html",
+                    _html(body + "\n" + _link_lines(2, modules)),
+                )
+            _sync_derived(root)
+            for rel, depth in (
+                ("index.html", 0),
+                ("parcours/index.html", 1),
+                ("glossaire/index.html", 1),
+                ("programmes/index.html", 1),
+                ("modules/a-glossaire/index.html", 2),
+            ):
+                previous = (root / rel).read_text(encoding="utf-8")
+                _fill(root, rel, previous.replace("</body>", _link_lines(depth, modules) + "\n</body>"))
+            report = check_gates(root)
+        self.assertTrue(report.ok, _show(report))
 
 
 if __name__ == "__main__":

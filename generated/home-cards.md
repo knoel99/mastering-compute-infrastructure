@@ -14,3 +14,8 @@
 - [Profilage et noyaux](modules/m11-noyaux/). Offre B. Squelette
 - [Débogage numérique](modules/m12-numerique/). Offre B. Squelette
 - [Infra d'entraînement par renforcement](modules/m13-rl/). Offre B. Squelette
+- [Inférence](modules/m14-inference/). Offre B. Cours
+- [Prix des GPU Blackwell](modules/m15-blackwell/). Offre B. Cours
+- [Machines d'inférence locale](modules/m16-machines/). Offre B. Cours
+- [Cloud GPU et coût par jeton](modules/m17-cloud/). Offre B. Cours
+- [NVFP4 et FP8](modules/m18-precision/). Offre B. Cours

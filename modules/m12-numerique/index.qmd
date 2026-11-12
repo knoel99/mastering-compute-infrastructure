@@ -21,6 +21,8 @@ Une perte qui devient nan, ou qui diverge entre deux runs, bloque un entraîneme
 
 Il décrit trois cas. Une perte qui explose. Une perte qui reste plate. Un écart entre deux graines. Sur CPU, une même graine et les mêmes opérations donnent le même résultat. Il écrit cette limite dans la note. Il ne l'étend pas à un GPU.
 
+Deux formats d'inférence, NVFP4 et FP8, sont comparés sur [NVFP4 et FP8](../m18-precision/). Cette page reste les pertes d'entraînement.
+
 ## Travaux pratiques prévus
 
 Sur le CPU du laptop, il écrit `graines.py` avec `random.Random`, sans rien installer. Le script additionne cent tirages. Il le lance avec la graine 1, deux fois, et il vérifie que les deux totaux sont égaux. Il le lance avec la graine 2, et il vérifie que le total diffère. Il imprime les totaux et l'écart.

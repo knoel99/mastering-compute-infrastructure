@@ -246,6 +246,7 @@ class Code(StrEnum):
     KATEX = "katex"
     WORKFLOW = "workflow"
     NOJEKYLL = "nojekyll"
+    INFERENCE = "inference"
 
 
 TRACK_LABEL: dict[Track, str] = {
@@ -2110,6 +2111,190 @@ def _annex_qmd(root: Path, modules: Sequence[Module]) -> str | None:
     return _read_text(root / "modules" / annexes[0].slug / "index.qmd")
 
 
+_INFERENCE_MARKER = "modules/m01-anatomie-noeud/index.qmd"
+_BANNED_WORD = "confiden" + "ti"
+_BANNED_DOT = ("." + "pdf", "." + "xlsx")
+_SCAN_SUFFIXES = _TEXT_SUFFIXES | {".py", ".csv", ".tsv"}
+_MENTION_SKIP = frozenset({"programmes"})
+_MD_IMAGE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)")
+_HTML_IMG = re.compile(r"""<img\b[^>]*?\bsrc\s*=\s*['"]([^'"]+)['"]""", re.IGNORECASE)
+_PRICE_SLUG = "m16-machines"
+_PRICE_HEADING = "Prix de la DGX Station"
+_PRICE_BITS = (
+    "90 000",
+    "105 000",
+    "91 532",
+    "Les trois prix ne concordent pas",
+    "rapport-concurrence-spark-station-20261022.md",
+    "configs-wrx90",
+    "rapport-blackwell-prix-20261023.md",
+)
+_SUMMARY_SLUG = "m15-blackwell"
+_SUMMARY_PHRASE = "résumé uniquement, rapport complet manquant"
+_REF_SLUG = "m14-inference"
+_REF_HEADING = "Références"
+_REF_URLS = (
+    "https://github.com/datawhalechina/zero-to-sglang",
+    "https://datawhalechina.github.io/zero-to-sglang/eng/",
+    "https://x.com/YichiZ03",
+    "https://www.sglang.io/blog/hicache",
+    "https://docs.sglang.io/docs/advanced_features/hicache",
+)
+_REF_DATE = "25 octobre 2026"
+
+
+@dataclass(frozen=True)
+class InferencePage:
+    slug: str
+    headings: tuple[str, ...]
+
+
+INFERENCE_PAGES: tuple[InferencePage, ...] = (
+    InferencePage("m14-inference", ("Carte de la section", "Références")),
+    InferencePage(
+        "m15-blackwell",
+        ("Grille de prix", "Euros par gigaoctet", "Tendances et régimes", "Lecture des courbes"),
+    ),
+    InferencePage(
+        "m16-machines",
+        (
+            "Decode et prefill",
+            "Spark et Station",
+            "Prix de la DGX Station",
+            "Rigs WRX90",
+            "Mac Studio",
+            "Concurrence et débit",
+            "Bruit",
+        ),
+    ),
+    InferencePage("m17-cloud", ("Location réservée et achat local", "Coût par jeton")),
+    InferencePage("m18-precision", ("Débit", "Mémoire", "Qualité")),
+)
+
+
+def _named_body(text: str, title: str) -> str | None:
+    heads = _headings(text)
+    for index, head in enumerate(heads):
+        if head.text != title or head.level not in (2, 3):
+            continue
+        end = len(text)
+        for nxt in heads[index + 1 :]:
+            if nxt.level <= head.level:
+                end = nxt.start
+                break
+        return text[head.line_end : end]
+    return None
+
+
+def _local_image_urls(text: str) -> tuple[str, ...]:
+    found: list[str] = []
+    for match in (*_MD_IMAGE.finditer(text), *_HTML_IMG.finditer(text)):
+        url = match.group(1).strip().split("#", 1)[0]
+        if url.startswith(("http://", "https://", "data:")):
+            continue
+        found.append(url)
+    return tuple(found)
+
+
+def _inference_active(root: Path) -> bool:
+    if (root / _INFERENCE_MARKER).is_file():
+        return True
+    return any((root / "modules" / page.slug / "index.qmd").is_file() for page in INFERENCE_PAGES)
+
+
+def _banned_findings(root: Path) -> tuple[Finding, ...]:
+    findings: list[Finding] = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root).as_posix()
+        if any(part in _SKIP_DIRS for part in Path(rel).parts):
+            continue
+        suffix = path.suffix.lower()
+        if suffix in _BANNED_DOT:
+            findings.append(Finding(Code.INFERENCE, rel, f"fichier interdit : {suffix}"))
+        if suffix not in _SCAN_SUFFIXES and path.name != ".nojekyll":
+            continue
+        text = _read_text(path)
+        if not text:
+            continue
+        folded = text.lower()
+        if _BANNED_WORD in folded:
+            findings.append(Finding(Code.INFERENCE, rel, "chaîne interdite"))
+        if any(part in _MENTION_SKIP for part in Path(rel).parts):
+            continue
+        for dot in _BANNED_DOT:
+            if dot in folded:
+                findings.append(Finding(Code.INFERENCE, rel, f"mention interdite : {dot}"))
+                break
+    return tuple(findings)
+
+
+def _image_findings(root: Path, rel_qmd: str, qmd: str) -> tuple[Finding, ...]:
+    findings: list[Finding] = []
+    base = (root / rel_qmd).parent
+    for url in _local_image_urls(qmd):
+        if (base / url).is_file() or (root / url).is_file():
+            continue
+        findings.append(Finding(Code.INFERENCE, rel_qmd, f"image absente : {url}"))
+    return tuple(findings)
+
+
+def _inference_page_findings(root: Path, page: InferencePage) -> tuple[Finding, ...]:
+    rel = f"modules/{page.slug}/index.qmd"
+    html_rel = f"modules/{page.slug}/index.html"
+    qmd = _read_text(root / rel)
+    findings: list[Finding] = []
+    if qmd is None:
+        return (Finding(Code.INFERENCE, rel, "page d'inférence absente"),)
+    for title in page.headings:
+        body = _named_body(qmd, title)
+        if body is None:
+            findings.append(Finding(Code.INFERENCE, rel, f"section manquante : {title}"))
+        elif not body.strip():
+            findings.append(Finding(Code.INFERENCE, rel, f"section vide : {title}"))
+    findings.extend(_image_findings(root, rel, qmd))
+    html = _read_text(root / html_rel)
+    if page.slug == _PRICE_SLUG:
+        body = _named_body(qmd, _PRICE_HEADING) or ""
+        for bit in _PRICE_BITS:
+            if bit not in body:
+                findings.append(Finding(Code.INFERENCE, rel, f"prix de Station incomplet : {bit}"))
+        if html is not None:
+            for bit in _PRICE_BITS:
+                if not _html_contains(html, bit):
+                    findings.append(
+                        Finding(Code.INFERENCE, html_rel, f"prix de Station absent du HTML : {bit}")
+                    )
+    if page.slug == _SUMMARY_SLUG:
+        if _SUMMARY_PHRASE not in qmd:
+            findings.append(Finding(Code.INFERENCE, rel, f"mention absente : {_SUMMARY_PHRASE}"))
+        if html is not None and not _html_contains(html, _SUMMARY_PHRASE):
+            findings.append(
+                Finding(Code.INFERENCE, html_rel, f"mention absente : {_SUMMARY_PHRASE}")
+            )
+    if page.slug == _REF_SLUG:
+        body = _named_body(qmd, _REF_HEADING) or ""
+        for url in _REF_URLS:
+            if url not in body:
+                findings.append(Finding(Code.INFERENCE, rel, f"référence absente : {url}"))
+        if _REF_DATE not in body:
+            findings.append(Finding(Code.INFERENCE, rel, f"date de consultation absente : {_REF_DATE}"))
+    if html is not None:
+        for title in page.headings:
+            if not _html_contains(html, title):
+                findings.append(Finding(Code.INFERENCE, html_rel, f"HTML sans : {title}"))
+    return tuple(findings)
+
+
+def _inference_findings(root: Path) -> tuple[Finding, ...]:
+    findings = list(_banned_findings(root))
+    if _inference_active(root):
+        for page in INFERENCE_PAGES:
+            findings.extend(_inference_page_findings(root, page))
+    return tuple(findings)
+
+
 def check_gates(root: Path) -> CheckReport:
     """Return every contract failure under root.
 
@@ -2125,6 +2310,14 @@ def check_gates(root: Path) -> CheckReport:
     6. _link_findings, after programme HTML pages are appended.
     7. _programme_findings.
     8. _publishing_findings.
+    9. _inference_findings. The published course, detected by
+       modules/m01-anatomie-noeud/index.qmd, must contain the inference
+       pages. A tree that already has one of those pages must contain
+       every page. Every tree rejects a spreadsheet file, a document file
+       of the banned extensions, and the banned text, whether or not the
+       section is present. Mentions of those extensions are rejected
+       everywhere except under programmes/, whose notes already cite
+       public handbook addresses.
 
     report.ok is true only when that tuple is empty. Module HTML is depth 2.
     Pass require_titles for index.html and parcours/index.html only.
@@ -2218,6 +2411,7 @@ def check_gates(root: Path) -> CheckReport:
     findings.extend(
         _publishing_findings(_publishing_files(root, html_rels), programme_names)
     )
+    findings.extend(_inference_findings(root))
     return CheckReport(tuple(findings))
 
 

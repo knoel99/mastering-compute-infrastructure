@@ -1,0 +1,128 @@
+---
+title: "Cloud GPU et coût par jeton"
+lang: fr
+format:
+  html:
+    theme: none
+    css: ../../assets/paper.css
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
+    include-before-body: ../../generated/chrome-d2.html
+    include-after-body: ../../assets/closing-d2.html
+mci:
+  status: full
+  order: 19
+---
+
+## Objectifs
+
+Il compare une location de GPU sur un an et l'achat de machines locales sans traiter 384 Go de mémoire unifiée comme 240 Go de HBM. À la fin, il distingue un coût par million de jetons vérifié, un chiffre rapporté, et une lecture de graphique.
+
+## Prérequis
+
+Il a lu [Machines d'inférence locale](../m16-machines/). Il sait qu'une heure réservée se paie même si la machine est vide. Le placement multi-fournisseurs reste sur [Placement multi-fournisseurs](../m07-multi-fournisseurs/). Le coût d'un job d'entraînement reste sur [Observabilité et coût de flotte](../m08-observabilite-cout/).
+
+## Notes de cours
+
+Deux notes du 7 octobre 2026 portent sur le cloud. Elles ne répondent pas au même panier. La note courte compare trois Spark à une seule L40S ou une seule H100. La note longue cherche un panier dont la mémoire se rapproche de 384 Go, ou un débit de classe H100. Les prix annuels de la note longue comptent déjà 8 760 heures.
+
+La note du 16 octobre 2026 sur le coût par jeton sépare ce qui a été ouvert (vérifié) de ce qui vient d'un extrait (rapporté) et d'une lecture visuelle.
+
+## Location réservée et achat local
+
+Trois DGX Spark, c'est 3 fois 128 Go, soit 384 Go de mémoire unifiée, à environ 273 Go/s par boîtier. Trois H100 de 80 Go, c'est 240 Go de HBM. La note longue du 7 octobre 2026 dit qu'aucune offre publique ne reproduit à la fois 384 Go unifiés et environ 0,4 à 0,5 kW.
+
+Le prix d'achat cité ce jour-là est un MSRP presse d'environ 6 950 dollars l'unité, soit environ 20 850 dollars pour trois, hors câbles, switch, taxe et électricité. Le prix de rue européen cité est environ 6 200 euros TTC l'unité chez Geizhals, volatile. L'autre note du même jour retient environ 18,6 k€ TTC pour trois, soit 3 fois environ 6 200 euros.
+
+Panier mémoire ou débit, note longue, prix publics lus le 7 octobre 2026. Ce ne sont pas des prix de station de travail.
+
+| Offre | Montant sur 12 mois | Engagement |
+| --- | --- | --- |
+| AWS, 8 fois g6e.xlarge, L40S | environ 82 160 dollars | réservation 1 an |
+| Scaleway, 4 fois GPU-10-L40S | environ 68 400 euros HT | 12 mois |
+| GCP, 3 H100 via a3, CUD | environ 201 650 dollars | 1 an, non résiliable |
+| Azure, 3 fois NC40ads H100 | environ 137 580 dollars | réservation 1 an |
+| OVH, 3 fois h100-380 | 74 520 dollars | mois, pas d'épargne GPU |
+| Lambda, 3 H100 à la demande | environ 104 860 dollars | réservé non publié |
+| CoreWeave, 3 H100 à la demande | environ 161 750 dollars | réservé sur demande |
+
+La conclusion imprimée de cette note est qu'un cloud réservé un an revient en général à 4 à 10 fois le prix d'achat des Spark sur 12 mois, dès qu'on approche 3 H100 ou 8 L40S, sans le trafic sortant ni le support. Le cloud y gagne sur l'élasticité, l'exploitation et le HBM rapide, pas sur un an allumé en continu.
+
+La note courte, le même jour, dit autre chose sur un plus petit panier. Une H100 OVH à environ 24,5 k€ HT sur un an dépasse déjà l'achat de trois Spark. Une L40S OVH à environ 12,3 k€ HT est du même ordre, pour 48 Go et pas pour 384 Go. Les deux notes se lisent ensemble. Elles ne se contredisent pas si l'on garde le panier.
+
+## Coût par jeton
+
+Un euro par million de jetons n'a de sens que si l'on dit quels jetons. Les bancs locaux de la note du 16 octobre comptent des jetons générés. Les traces agentiques de SemiAnalysis comptent surtout de l'entrée, souvent déjà en cache. La note du coût NVIDIA dit que c'est l'écart le plus gros. Un avantage apparent ne se lit pas comme un gain de machine.
+
+Chiffres ouverts, blog technique NVIDIA du 13 octobre 2025, InferenceMAX. Sur DeepSeek-R1, 8K en entrée et 1K en sortie, un GB200 NVL72 est juste au-dessus de 0,10 dollar par million de jetons vers 75 tok/s par utilisateur, contre 1,56 dollar sur H200. Sur gpt-oss-120b et un B200, le coût passe de 0,11 à 0,02 dollar par million à 100 tok/s par utilisateur, entre le 5 août et le 9 octobre 2025. La précision des points Blackwell de ce blog est FP4 ou NVFP4. La base de coût est le TCO InferenceMAX.
+
+Chiffres rapportés, extraits InferenceX, pas une page relue ligne à ligne ce jour-là. DeepSeek-R1 sur GB300 NVL72 en FP4 coûte 0,054 dollar par million à 71 tok/s par utilisateur. En FP8, le même extrait donne 0,183 dollar au point bas.
+
+Lecture visuelle, non vérifiable comme texte. Le graphique Muse Spark Open sur 8 B200, lu le 16 octobre 2026, se situe environ entre 0,040 et 0,111 dollar par million selon le point d'interactivité. La note refuse d'en faire un verdict contre les points NVIDIA, parce que le scénario, le percentile et le prix de l'heure ne sont pas les mêmes.
+
+Le 35 fois du GTC 2026, blog NVIDIA du 16 mars 2026 sur Groq 3 LPX, est un débit par mégawatt à 400 tok/s par utilisateur, Vera Rubin NVL72 plus LPX contre GB200 NVL72. Ce n'est pas un coût par jeton. La note dit qu'aucun dollar par million ne se déduit de cet axe sans inventer un prix du mégawattheure. Ce cours n'en invente pas.
+
+Les rigs locaux, estimations du 16 octobre 2026, comptent des jetons de sortie. Le prix horaire vient de l'amortissement sur 3 ans à plein temps plus 0,2001 euro par kWh. La ligne Station part des 105 000 euros HT du tableur. Les deux autres prix de la Station sont sur [Machines d'inférence locale](../m16-machines/). Ils ne sont pas recalculés ici.
+
+| Machine et point | Euros par million |
+| --- | ---: |
+| 1 GPU, 8 flux, 86 tok/s par utilisateur | 0,42 |
+| 2 GPU, 32 flux, 50 tok/s par utilisateur | 0,30 |
+| 3 GPU, 8 flux, 56 tok/s par utilisateur | 1,52 |
+| 4 GPU vLLM, 32 flux, 17 tok/s par utilisateur | 1,59 |
+| Station, 128 flux, 35 tok/s par utilisateur | 0,28 |
+
+La même note compare, en estimation, un GPU possédé à environ 0,98 euro de l'heure en continu et une location autour de 2,30 dollars de l'heure, soit environ 2,05 euros. Les prix d'API du jour ne sont pas recopiés. Ils varient selon le fournisseur.
+
+## Exercices
+
+### Exercice 1
+
+Il dit pourquoi trois Spark et trois H100 ne sont pas le même panier de mémoire. Il recopie les deux volumes de la note du 7 octobre 2026.
+
+### Exercice 2
+
+Il classe trois offres de la table longue en prix croissant sur 12 mois. Il garde la monnaie de chacune.
+
+### Exercice 3
+
+Il explique pourquoi le 35 fois du GTC 2026 n'est pas un coût par jeton.
+
+### Exercice 4
+
+Il dit quel prix de Station est utilisé dans la ligne à 0,28 euro par million, et où sont les deux autres.
+
+## Projet solo
+
+Il écrit une note d'une page. La note prend un usage allumé toute l'année et un usage de quelques heures. Elle dit, sans nouveau chiffre, lequel des deux rendements la note longue attribue au cloud. Elle ne choisit pas un prix de Station.
+
+## Projet de groupe
+
+À deux, l'un ne lit que les points vérifiés du blog NVIDIA du 13 octobre 2025. L'autre ne lit que la lecture visuelle Muse. Ils rendent une phrase qui dit pourquoi les deux colonnes ne se départagent pas.
+
+## Examen
+
+### Question 1
+
+Que compare la note courte du 7 octobre 2026, et que compare la note longue ?
+
+### Question 2
+
+Quel écart la note du 16 octobre 2026 juge-t-elle le plus gros entre un banc local et une trace agentique ?
+
+### Question 3
+
+Pourquoi la ligne Station à 0,28 euro par million ne tranche-t-elle pas le prix de la machine ?
+
+## Sources
+
+`cloud-gpu-reserved-1y-vs-spark-20261007.md` et `cloud-gpu-1y-vs-3x-spark-20261007.md`, 7 octobre 2026.
+
+`nvidia-cost-per-token-vs-semianalysis-20261016.md`, 16 octobre 2026.
+
+`rigs-wrx90-courbes-20261016.md`, 16 octobre 2026.
+
+`SYNTHESE.md`, octobre 2026.
+
+Les recherches brutes ne sont pas recopiées.

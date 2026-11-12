@@ -1,0 +1,6 @@
+palier,prix_ht_eur,prix_ttc_eur,gpu,processeur,coeurs,ram,watts_generation,bruit_dba_estime,modele
+1 GPU,22801.67,27362,1x PNY NVIDIA RTX PRO 6000 Blackwell Max-Q 96 Go,Threadripper PRO 9965WX,24,128 Go DDR5 6400 ECC,550,38-46,Qwen3.8-27B NVFP4
+2 GPU,40924.17,49109,2x PNY NVIDIA RTX PRO 6000 Blackwell Max-Q 96 Go,Threadripper PRO 9965WX,24,256 Go DDR5 6400 ECC,800,48-55,Qwen3.8-27B et Qwen3.8-Flash-Next NVFP4
+3 GPU,59114.17,70937,3x PNY NVIDIA RTX PRO 6000 Blackwell Max-Q 96 Go,Threadripper PRO 9985WX,64,256 Go DDR5 6400 ECC,1100,50-56,GLM-5.3-Flash NVFP4
+4 GPU,73075,87690,4x PNY NVIDIA RTX PRO 6000 Blackwell Max-Q 96 Go,Threadripper PRO 9985WX,64,256 Go DDR5 6400 ECC,1400,52-58,GLM-5.3-Flash NVFP4
+DGX Station,105000,126000,1x NVIDIA Blackwell Ultra GB300,Grace 72 coeurs Neoverse V2,72,748 Go coherente dont 252 Go HBM3e,1600,,Qwen3.8-27B BF16
